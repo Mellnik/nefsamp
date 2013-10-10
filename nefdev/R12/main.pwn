@@ -2530,6 +2530,8 @@ public OnGameModeExit()
 
 public OnPlayerRequestClass(playerid, classid)
 {
+	SetPlayerPos(playerid, 1797.5835, -1305.0114, 121.2348);
+	SetPlayerFacingAngle(playerid, 359.9696);
 	SetPlayerCameraPos(playerid, 1797.3688, -1299.8156, 121.4657);
 	SetPlayerCameraLookAt(playerid, 1797.3661, -1300.8164, 121.4556);
 	
@@ -2566,8 +2568,6 @@ public OnPlayerRequestClass(playerid, classid)
 	TextDrawShowForPlayer(playerid, TXTVersionInfo);
 	TextDrawShowForPlayer(playerid, TXTFooter);
 
-	SetPlayerPos(playerid, 387.5766, -1811.7660, 17.2455);
-	SetPlayerFacingAngle(playerid, 301.7893);
 	PlayerInfo[playerid][bFirstSpawn] = true;
 
 	PreloadAnimLib(playerid, "DANCING");
@@ -2639,6 +2639,7 @@ public OnPlayerSpawn(playerid)
     if(PlayerInfo[playerid][bFirstSpawn])
     {
         PlayerInfo[playerid][bFirstSpawn] = false;
+		PlayerInfo[playerid][AllowSpawn] = false;
 		StopAudioStreamForPlayer(playerid);
 		ResetPlayerWorld(playerid);
 		PlayerInfo[playerid][ExitType] = EXIT_FIRST_SPAWNED;
