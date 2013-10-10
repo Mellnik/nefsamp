@@ -2530,6 +2530,9 @@ public OnGameModeExit()
 
 public OnPlayerRequestClass(playerid, classid)
 {
+	SetPlayerCameraPos(playerid, 1797.3688, -1299.8156, 121.4657);
+	SetPlayerCameraLookAt(playerid, 1797.3661, -1300.8164, 121.4556);
+	
 	if(GlobalMain) return 0;
 
 	if(PlayerInfo[playerid][ExitType] == EXIT_FIRST_SPAWNED)
@@ -2552,8 +2555,6 @@ public OnPlayerRequestClass(playerid, classid)
 		}
 		return 1;
 	}
-
-	TogglePlayerControllable(playerid, true);
 
 	TextDrawShowForPlayer(playerid, TXTTeleportInfo);
 
@@ -3279,8 +3280,6 @@ public OnPlayerConnect(playerid)
 		TextDrawShowForPlayer(playerid, TXTOnJoin[1]);
 		TextDrawHideForPlayer(playerid, TXTTeleportInfo);
 
-		TogglePlayerSpectating(playerid, true);
-
         InitSession(playerid);
 
 		format(gstr, sizeof(gstr), "SELECT * FROM `bans` WHERE `PlayerName` = '%s';", __GetName(playerid));
@@ -3916,12 +3915,12 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 	        new rows, fields;
 	        cache_get_data(rows, fields, g_SQL_handle);
 	        
-	        if(rows > 0)
+	        if(rows > 0) // accname with ip found
 	        {
 	            // Auto Login
 				AutoLogin(extraid);
 	        }
-	        else
+	        else // ip on account is not the same as current connection
 	        {
 	            // Login Dialog
 	            RequestLogin(extraid);
@@ -4012,16 +4011,14 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
             new rows, fields;
             cache_get_data(rows, fields, g_SQL_handle);
 
-            if(rows == 0)
+            if(rows == 0) // ip not banned
             {
-				new querystring[128];
-				format(querystring, sizeof(querystring), "SELECT `ID` FROM `accounts` WHERE `Name` = '%s';", __GetName(extraid));
-				mysql_tquery(g_SQL_handle, querystring, "OnQueryFinish", "siii", querystring, THREAD_ACCOUNT_EXIST, extraid, g_SQL_handle);
+				format(gstr, sizeof(gstr), "SELECT `ID` FROM `accounts` WHERE `Name` = '%s';", __GetName(extraid));
+				mysql_tquery(g_SQL_handle, gstr, "OnQueryFinish", "siii", gstr, THREAD_ACCOUNT_EXIST, extraid, g_SQL_handle); // cehcking if acc exists
             }
             else
 			{
 	 		   	SCM(extraid, -1, ""server_sign" You have been banned.");
-	 		   	StopAudioStreamForPlayer(extraid);
 	 		   	TextDrawHideForPlayer(extraid, TXTOnJoin[0]);
 	 		   	TextDrawHideForPlayer(extraid, TXTOnJoin[1]);
        			KickEx(extraid);
@@ -4054,13 +4051,15 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		}
         case THREAD_IS_BANNED:
 		{
+		    SetPlayerColor(extraid, PlayerColors[random(sizeof(PlayerColors))]);
+		    
 		    new rows, fields;
-		    cache_get_data(rows, fields, g_SQL_handle);
-
-		    if(rows > 0)
+		    cache_get_data(row, fields, g_SQL_handle);
+		    
+		    if(rows > 0) // Playername is banned
 		    {
 		        new string[512],
-		            adminname[MAX_PLAYER_NAME+1],
+		            adminname[MAX_PLAYER_NAME + 1],
 		            reason[128],
 		            udate, lift;
 
@@ -4069,7 +4068,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				lift = cache_get_row_int(0, 4, g_SQL_handle);
 				udate = cache_get_row_int(0, 5, g_SQL_handle);
 
-				if(lift == 0)
+				if(lift == 0) // Perm ban
 				{
 			        format(string, sizeof(string), ""red"You have been banned!"white"\n\nAdmin:\t%s\nYour name:\t%s\nReason:\t%s\nDate:\t%s\n\nIf you think that you have been banned wrongly,\nwrite a ban appeal on "SVRFORUM"", adminname, __GetName(extraid), reason, UnixTimeToDate(udate));
 					ShowPlayerDialog(extraid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" - Notice", string, "OK", "");
@@ -4077,13 +4076,13 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				}
 				else if(lift < gettime())
 				{
-				    SetPlayerColor(extraid, PlayerColors[random(sizeof(PlayerColors))]);
-				    
-					format(string, sizeof(string), "SELECT * FROM `blacklist` WHERE `IP` = '%s';", __GetIP(extraid));
-					mysql_tquery(g_SQL_handle, string, "OnQueryFinish", "siii", string, THREAD_CHECK_IP, extraid, g_SQL_handle);
-
-				    format(string, sizeof(string), "DELETE FROM `bans` WHERE `PlayerName` = '%s' LIMIT 1;", __GetName(extraid));
+				    format(string, sizeof(string), "DELETE FROM `bans` WHERE `PlayerName` = '%s' LIMIT 1;", __GetName(extraid)); // Delete time ban
 				    mysql_tquery(g_SQL_handle, string, "", "");
+				    
+				    SCM(extraid, -1, ""nef" Your time ban expired, you've benn unbanned!");
+
+					format(string, sizeof(string), "SELECT * FROM `blacklist` WHERE `IP` = '%s';", __GetIP(extraid));
+					mysql_tquery(g_SQL_handle, string, "OnQueryFinish", "siii", string, THREAD_CHECK_IP, extraid, g_SQL_handle); // Continuing with progress
 				}
 				else
 				{
@@ -4094,11 +4093,8 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		    }
 		    else
 		    {
-	    		SetPlayerColor(extraid, PlayerColors[random(sizeof(PlayerColors))]);
-	    		
-				new querystring[128];
-				format(querystring, sizeof(querystring), "SELECT * FROM `blacklist` WHERE `IP` = '%s';", __GetIP(extraid));
-				mysql_tquery(g_SQL_handle, querystring, "OnQueryFinish", "siii", querystring, THREAD_CHECK_IP, extraid, g_SQL_handle);
+				format(gstr, sizeof(gstr), "SELECT * FROM `blacklist` WHERE `IP` = '%s';", __GetIP(extraid));
+				mysql_tquery(g_SQL_handle, gstr, "OnQueryFinish", "siii", gstr, THREAD_CHECK_IP, extraid, g_SQL_handle);
 		    }
 		}
 	 	case THREAD_ACCOUNT_EXIST:
@@ -4106,24 +4102,16 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		    new rows, fields;
 		    cache_get_data(rows, fields, g_SQL_handle);
 
-			//InterpolateCameraPos(extraid, 389.992431, -1808.731323, 36.022827, 391.209655, -1808.536865, 18.104867, 1000, CAMERA_MOVE);
-			//InterpolateCameraLookAt(extraid, 386.936828, -1810.772216, 34.442390, 387.982666, -1810.896484, 17.967643, 1000, CAMERA_MOVE);
-			//SetPlayerCameraPos(playerid, 1797.3688, -1299.8156, 121.4657);
-			//SetPlayerCameraLookAt(playerid, 1797.3661, -1300.8164, 121.4556);
-
-            Streamer_UpdateEx(extraid, 323.6630, -1852.8362, 8.2406, -1, -1);
-
 			TextDrawHideForPlayer(extraid, TXTOnJoin[0]);
 			TextDrawHideForPlayer(extraid, TXTOnJoin[1]);
 
 			format(gstr, sizeof(gstr), "INSERT INTO `online` VALUES (NULL, '%s', '%s', UNIX_TIMESTAMP());", __GetName(extraid), __GetIP(extraid));
 			mysql_tquery(g_SQL_handle, gstr, "", "");
 
-		    if(rows != 0)
+		    if(rows != 0) // acc exists
 		    {
-				new querystring[128];
-				format(querystring, sizeof(querystring), "SELECT `ID` FROM `accounts` WHERE `Name` = '%s' AND `IP` = '%s';", __GetName(extraid), __GetIP(extraid));
-				mysql_tquery(g_SQL_handle, querystring, "OnQueryFinish", "siii", querystring, THREAD_CHECK_AUTO_LOGIN, extraid, g_SQL_handle);
+				format(gstr, sizeof(gstr), "SELECT `ID` FROM `accounts` WHERE `Name` = '%s' AND `IP` = '%s';", __GetName(extraid), __GetIP(extraid));
+				mysql_tquery(g_SQL_handle, gstr, "OnQueryFinish", "siii", gstr, THREAD_CHECK_AUTO_LOGIN, extraid, g_SQL_handle); // check auto login
 		    }
 		    else
 		    {
@@ -4698,7 +4686,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		    new rows, fields;
 		    cache_get_data(rows, fields, g_SQL_handle);
 
-	  		if(rows > 0)
+	  		if(rows > 0) // correct password
 		    {
 		        PlayerInfo[extraid][AllowSpawn] = true;
 				PlayerInfo[extraid][bLogged] = true;
@@ -4706,8 +4694,6 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
                 
 		        MySQL_LoadPlayer(extraid);
 		        MySQL_UpdateAccount(extraid);
-
-                TogglePlayerSpectating(extraid, false);
 			}
 			else
 			{
@@ -4759,8 +4745,6 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 
 			Streamer_UpdateEx(extraid, 341.8535, -1852.6327, 8.2618, -1, -1);
 			PlayerPlaySound(extraid, 1057, 0.0, 0.0, 0.0);
-			
-			TogglePlayerSpectating(extraid, false);
 			
 			MySQL_SavePlayer(extraid, true);
 			MySQL_UpdateAccount(extraid);
@@ -11287,7 +11271,7 @@ YCMD:register(playerid, params[], help)
     format(newtext2, sizeof(newtext2), ""nef_yellow"Registration "white"- %s", __GetName(playerid));
 
 	format(newtext1, sizeof(newtext1), ""white"Welcome to "SVRLOGO""white"\n\nDesired name: %s\n\nIt seems that you don´t have an account, please enter a password below:", __GetName(playerid));
-	ShowPlayerDialog(playerid, REGISTER_DIALOG2, DIALOG_STYLE_PASSWORD, newtext2, newtext1, "Register", "Skip");
+	ShowPlayerDialog(playerid, REGISTER_DIALOG2, DIALOG_STYLE_PASSWORD, newtext2, newtext1, "Register", "Cancel");
 	return 1;
 }
 
@@ -19242,7 +19226,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 				return true;
 			}
-			case LOGIN_DIALOG:
+			case LOGIN_DIALOG: // player entered a password
 			{
 				if(strlen(inputtext) < 4 || strlen(inputtext) > 32)
 				{
@@ -21184,8 +21168,6 @@ function:AutoLogin(playerid)
     
     MySQL_LoadPlayer(playerid);
     MySQL_UpdateAccount(playerid);
-    
-    TogglePlayerSpectating(playerid, false);
 	return 1;
 }
 
@@ -21211,11 +21193,7 @@ function:RequestLogin(playerid)
 
 function:SkipRegistration(playerid)
 {
-	new str[255];
-	ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef"", ""white"You skipped the registration! You can use /register to create an account.\n\nEnjoy playing on "SVRLOGO"", "OK", "");
-		
     PlayerInfo[playerid][AllowSpawn] = true;
-	TogglePlayerSpectating(playerid, false);
 	
     PlayerInfo[playerid][RegDate] = gettime();
 	PlayerInfo[playerid][PayDay] = 60;
@@ -21224,8 +21202,8 @@ function:SkipRegistration(playerid)
 	PlayerInfo[playerid][LastLogin] = gettime();
 	PlayerInfo[playerid][LastNameChange] = 0;
 	
-	format(str, sizeof(str), "~y~[] ~w~%i", PlayerInfo[playerid][Wanteds]);
-	PlayerTextDrawSetString(playerid, TXTWantedsTD[playerid], str);
+	format(gstr, sizeof(gstr), "~y~[] ~w~%i", PlayerInfo[playerid][Wanteds]);
+	PlayerTextDrawSetString(playerid, TXTWantedsTD[playerid], gstr);
 	
 	ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""white"NEF", ""white"You have chosen not to register.\n\n"red"Please note:\n"dl"Your statistics won't be saved.\n"dl"You will be limited to some features.\n"dl"\
 	You can register at any time using /register.\n\nEnjoy playing here at NEF!", "OK", "");
@@ -21242,13 +21220,13 @@ function:SkipRegistration(playerid)
 
 function:SkipLogin(playerid)
 {
-	if((strlen(__GetName(playerid)) + 5) > 20)
+	if((strlen(__GetName(playerid)) + 4) > 20)
 	{
 		return Kick(playerid);
 	}
 	
 	new string[255],
-	    number = random(8999) + 1000,
+	    number = random(998) + 1,
 	    newname[26],
 	    oldname[26];
 	    
@@ -21256,7 +21234,6 @@ function:SkipLogin(playerid)
 	format(oldname, sizeof(oldname), "%s", __GetName(playerid));
 	    
     PlayerInfo[playerid][AllowSpawn] = true;
-	TogglePlayerSpectating(playerid, false);
 	    
 	if(SetPlayerName(playerid, newname) == 1)
 	{
