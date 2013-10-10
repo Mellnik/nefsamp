@@ -4055,7 +4055,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		    SetPlayerColor(extraid, PlayerColors[random(sizeof(PlayerColors))]);
 		    
 		    new rows, fields;
-		    cache_get_data(row, fields, g_SQL_handle);
+		    cache_get_data(rows, fields, g_SQL_handle);
 		    
 		    if(rows > 0) // Playername is banned
 		    {
@@ -9623,13 +9623,14 @@ YCMD:hitman(playerid, params[], help)
 	{
 		if(GetPlayerCash(playerid) >= amount)
 		{
+			new zone[MAX_ZONE_NAME];
+		    GetPlayer2DZone(player, zone, sizeof(zone));
 		    if(PlayerInfo[player][HitmanHit] == 0)
 		    {
 		        PlayerInfo[player][HitmanHit] += amount;
 				format(gstr, sizeof(gstr), ""nef" "YELLOW_E"%s(%i) has placed a bounty on %s(%i) for $%s get him!", __GetName(playerid), playerid, __GetName(player), player, ToCurrency(amount));
 				SCMToAll(-1, gstr);
-				new zone[MAX_ZONE_NAME];
-			    GetPlayer2DZone(player, zone, sizeof(zone);
+
 				format(gstr, sizeof(gstr), ""nef" "YELLOW_E"%s(%i) has been last seen in '%s'", __GetName(player), player, zone);
 				SCMToAll(-1, gstr);
 				format(gstr, sizeof(gstr), "You´ve placed a bounty on %s(%i) for $%s", __GetName(player), player, ToCurrency(amount));
@@ -9640,8 +9641,7 @@ YCMD:hitman(playerid, params[], help)
 		        PlayerInfo[player][HitmanHit] += amount;
 				format(gstr, sizeof(gstr), ""nef" "YELLOW_E"%s(%i) has placed another bounty on %s(%i) for $%s Total: "red"$%s", __GetName(playerid), playerid, __GetName(player), player, ToCurrency(amount), ToCurrency(PlayerInfo[player][HitmanHit]));
 				SCMToAll(-1, gstr);
-				new zone[MAX_ZONE_NAME];
-			    GetPlayer2DZone(player, zone, sizeof(zone);
+
 				format(gstr, sizeof(gstr), ""nef" "YELLOW_E"%s(%i) has been last seen in '%s'", __GetName(player), player, zone);
 				SCMToAll(-1, gstr);
 				format(gstr, sizeof(gstr), "You´ve placed a bounty on %s(%i) for $%s", __GetName(player), player, ToCurrency(amount));
@@ -10286,7 +10286,7 @@ YCMD:locate(playerid, params[], help)
         if(gTeam[player] != NORMAL) return SCM(playerid, -1, ""er"Player is a minigame!");
 
 		new zone[MAX_ZONE_NAME];
-	    GetPlayer2DZone(player, zone, sizeof(zone);
+	    GetPlayer2DZone(player, zone, sizeof(zone));
     	format(gstr, sizeof(gstr), ""nef" "GREY_E"%s(%i) has been located in '%s'", __GetName(player), player, zone);
     	SCM(playerid, -1, gstr);
 	}
