@@ -1,0 +1,88 @@
+// TextDraw developed using Zamaroht's Textdraw Editor 1.0
+
+// On top of script:
+new Text:Textdraw0;
+new Text:Textdraw1;
+new Text:Textdraw2;
+new Text:Textdraw3;
+new Text:Textdraw4;
+new Text:Textdraw5;
+new Text:Textdraw6;
+new Text:Textdraw7;
+
+// In OnGameModeInit prefferably, we procced to create our textdraws:
+Textdraw0 = TextDrawCreate(323.000000, 188.000000, "~y~~h~N~w~ew ~g~~h~~h~E~w~volution ~r~~h~~h~F~w~reeroam~n~~n~samp.nefserver.com:7777");
+TextDrawAlignment(Textdraw0, 2);
+TextDrawBackgroundColor(Textdraw0, 168430202);
+TextDrawFont(Textdraw0, 1);
+TextDrawLetterSize(Textdraw0, 0.519999, 2.200000);
+TextDrawColor(Textdraw0, -1);
+TextDrawSetOutline(Textdraw0, 1);
+TextDrawSetProportional(Textdraw0, 1);
+
+Textdraw1 = TextDrawCreate(300.000000, 436.000000, "     ");
+TextDrawAlignment(Textdraw1, 2);
+TextDrawBackgroundColor(Textdraw1, 255);
+TextDrawFont(Textdraw1, 1);
+TextDrawLetterSize(Textdraw1, 0.500000, 1.000000);
+TextDrawColor(Textdraw1, -1);
+TextDrawSetOutline(Textdraw1, 0);
+TextDrawSetProportional(Textdraw1, 1);
+TextDrawSetShadow(Textdraw1, 1);
+TextDrawUseBox(Textdraw1, 1);
+TextDrawBoxColor(Textdraw1, 168430202);
+TextDrawTextSize(Textdraw1, 0.000000, -1051.000000);
+
+Textdraw2 = TextDrawCreate(329.000000, 437.000000, "~y~~h~/derby ~b~~h~0 ~y~~h~/cnr ~b~~h~0 ~y~~h~/race ~b~~h~0 ~y~~h~/fallout ~b~~h~0 ~y~~h~/gungame ~b~~h~0 ~y~~h~/tdm ~b~~h~0 ~y~~h~/war ~b~~h~0 ~y~~h~/minigun ~b~~h~0 ~y~~h~/sniper ~b~~h~0");
+TextDrawAlignment(Textdraw2, 2);
+TextDrawBackgroundColor(Textdraw2, 168430202);
+TextDrawFont(Textdraw2, 2);
+TextDrawLetterSize(Textdraw2, 0.200000, 1.000000);
+TextDrawColor(Textdraw2, -1);
+TextDrawSetOutline(Textdraw2, 1);
+TextDrawSetProportional(Textdraw2, 1);
+
+Textdraw3 = TextDrawCreate(4.000000, 421.000000, "nefserver.com");
+TextDrawBackgroundColor(Textdraw3, 168430202);
+TextDrawFont(Textdraw3, 1);
+TextDrawLetterSize(Textdraw3, 0.260000, 1.199999);
+TextDrawColor(Textdraw3, -1);
+TextDrawSetOutline(Textdraw3, 1);
+TextDrawSetProportional(Textdraw3, 1);
+
+Textdraw4 = TextDrawCreate(636.000000, 420.000000, "Don't wanna get killed? Type ~g~~h~~h~/god");
+TextDrawAlignment(Textdraw4, 3);
+TextDrawBackgroundColor(Textdraw4, 168430202);
+TextDrawFont(Textdraw4, 1);
+TextDrawLetterSize(Textdraw4, 0.260000, 1.199999);
+TextDrawColor(Textdraw4, -1);
+TextDrawSetOutline(Textdraw4, 1);
+TextDrawSetProportional(Textdraw4, 1);
+
+Textdraw5 = TextDrawCreate(500.000000, 5.000000, "~g~~h~~h~Mellnik ~w~has gone to ~b~~h~~h~/trackmania");
+TextDrawBackgroundColor(Textdraw5, 168430202);
+TextDrawFont(Textdraw5, 1);
+TextDrawLetterSize(Textdraw5, 0.190000, 1.099999);
+TextDrawColor(Textdraw5, -1);
+TextDrawSetOutline(Textdraw5, 1);
+TextDrawSetProportional(Textdraw5, 1);
+
+Textdraw6 = TextDrawCreate(-6.000000, 408.000000, "~y~[] ~w~4");
+TextDrawBackgroundColor(Textdraw6, 168430202);
+TextDrawFont(Textdraw6, 2);
+TextDrawLetterSize(Textdraw6, 0.300000, 1.199999);
+TextDrawColor(Textdraw6, -1);
+TextDrawSetOutline(Textdraw6, 1);
+TextDrawSetProportional(Textdraw6, 1);
+
+Textdraw7 = TextDrawCreate(86.000000, 296.000000, "~y~~h~Race");
+TextDrawAlignment(Textdraw7, 2);
+TextDrawBackgroundColor(Textdraw7, 168430202);
+TextDrawFont(Textdraw7, 1);
+TextDrawLetterSize(Textdraw7, 0.260000, 1.199999);
+TextDrawColor(Textdraw7, -1);
+TextDrawSetOutline(Textdraw7, 1);
+TextDrawSetProportional(Textdraw7, 1);
+
+// You can now use TextDrawShowForPlayer(-ForAll), TextDrawHideForPlayer(-ForAll) and
+// TextDrawDestroy functions to show, hide, and destroy the textdraw.
