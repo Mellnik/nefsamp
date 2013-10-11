@@ -2460,9 +2460,9 @@ public OnGameModeInit()
     ClearDerbyVotes();
     IRC_SetUp();
 	LoadStores();
+	LoadGZones();
 	LoadHouses();
 	LoadProps();
-	LoadGZones();
 
 	SetTimer("ProcessTick", 1000, true);
     SetTimer("QueueProcess", 60000, true);
@@ -2530,6 +2530,7 @@ public OnGameModeExit()
 
 public OnPlayerRequestClass(playerid, classid)
 {
+	Streamer_UpdateEx(playerid, 1797.5835, -1305.0114, 121.2348, -1, -1);
 	SetPlayerPos(playerid, 1797.5835, -1305.0114, 121.2348);
 	SetPlayerFacingAngle(playerid, 359.9696);
 	SetPlayerCameraPos(playerid, 1797.3688, -1299.8156, 121.4657);
@@ -4744,7 +4745,6 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 	    	GameTextForPlayer(extraid, "~n~+$20,000~n~Startcash", 3000, 1);
 			SCM(extraid, -1, ""server_sign" "r_besch"You are now registered, and have been logged in!");
 
-			Streamer_UpdateEx(extraid, 341.8535, -1852.6327, 8.2618, -1, -1);
 			PlayerPlaySound(extraid, 1057, 0.0, 0.0, 0.0);
 			
 			MySQL_SavePlayer(extraid, true);
@@ -8576,7 +8576,8 @@ YCMD:enter(playerid, params[], help)
 		SetPlayerVirtualWorld(playerid, HouseInfo[i][iID] + 1000);
   		SetPlayerPos(playerid, HouseIntTypes[HouseInfo[i][interior]][house_x], HouseIntTypes[HouseInfo[i][interior]][house_y], HouseIntTypes[HouseInfo[i][interior]][house_z]);
 		gTeam[playerid] = HOUSE;
-		SendInfo(playerid, "~g~~h~~h~House entered!", 3000);
+		SendInfo(playerid, "~g~~h~~h~House entered!~n~Type /exit to leave", 3000);
+		SCM(playerid, -1, ""er"Type /exit to leave the house");
 	}
 	else
 	{
@@ -8923,7 +8924,7 @@ YCMD:buy(playerid, params[], help)
 		strmid(HouseInfo[i][Owner], __GetName(playerid), 0, 25, 25);
 	    HouseInfo[i][sold] = 1;
 
-	    format(gstr, sizeof(gstr), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s\n"green"Press "white"'F'"green" to enter or\ntype /enter.", __GetName(playerid), HouseInfo[i][iID], ToCurrency(HouseInfo[i][price]), HouseInfo[i][E_score], HouseIntTypes[HouseInfo[i][interior]][intname]);
+	    format(gstr, sizeof(gstr), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", __GetName(playerid), HouseInfo[i][iID], ToCurrency(HouseInfo[i][price]), HouseInfo[i][E_score], HouseIntTypes[HouseInfo[i][interior]][intname]);
 	    UpdateDynamic3DTextLabelText(HouseInfo[i][label], -1, gstr);
 	    DestroyDynamicMapIcon(HouseInfo[i][iconid]);
 	    DestroyDynamicPickup(HouseInfo[i][pickid]);
@@ -9045,7 +9046,7 @@ YCMD:sell(playerid, params[], help)
 			}
 		}
 
-	    format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s\n"green"Press "white"'F'"green" to enter or\ntype /enter.", HouseInfo[i][iID], ToCurrency(HouseInfo[i][price]), HouseInfo[i][E_score], HouseIntTypes[HouseInfo[i][interior]][intname]);
+	    format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseInfo[i][iID], ToCurrency(HouseInfo[i][price]), HouseInfo[i][E_score], HouseIntTypes[HouseInfo[i][interior]][intname]);
 	    UpdateDynamic3DTextLabelText(HouseInfo[i][label], -1, gstr);
 	    DestroyDynamicMapIcon(HouseInfo[i][iconid]);
 	    DestroyDynamicPickup(HouseInfo[i][pickid]);
@@ -12059,7 +12060,7 @@ YCMD:ipban(playerid, params[], help)
 								}
 							}
 
-						    format(string, sizeof(string), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s\n"green"Press "white"'F'"green" to enter or\ntype /enter.", HouseInfo[i][iID], ToCurrency(HouseInfo[i][price]), HouseInfo[i][E_score], HouseIntTypes[HouseInfo[i][interior]][intname]);
+						    format(string, sizeof(string), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseInfo[i][iID], ToCurrency(HouseInfo[i][price]), HouseInfo[i][E_score], HouseIntTypes[HouseInfo[i][interior]][intname]);
 						    UpdateDynamic3DTextLabelText(HouseInfo[i][label], -1, string);
 						    DestroyDynamicMapIcon(HouseInfo[i][iconid]);
 						    DestroyDynamicPickup(HouseInfo[i][pickid]);
@@ -12347,7 +12348,7 @@ YCMD:ban(playerid, params[], help)
 							}
 						}
 
-					    format(string, sizeof(string), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s\n"green"Press "white"'F'"green" to enter or\ntype /enter.", HouseInfo[i][iID], ToCurrency(HouseInfo[i][price]), HouseInfo[i][E_score], HouseIntTypes[HouseInfo[i][interior]][intname]);
+					    format(string, sizeof(string), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseInfo[i][iID], ToCurrency(HouseInfo[i][price]), HouseInfo[i][E_score], HouseIntTypes[HouseInfo[i][interior]][intname]);
 					    UpdateDynamic3DTextLabelText(HouseInfo[i][label], -1, string);
 					    DestroyDynamicMapIcon(HouseInfo[i][iconid]);
 					    DestroyDynamicPickup(HouseInfo[i][pickid]);
@@ -13938,7 +13939,7 @@ YCMD:sethouseprice(playerid, params[], help)
 
 	    HouseInfo[i][price] = hprice;
 
- 	   	format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s\n"green"Press "white"'F'"green" to enter or\ntype /enter.", HouseInfo[i][iID], ToCurrency(HouseInfo[i][price]), HouseInfo[i][E_score], HouseIntTypes[HouseInfo[i][interior]][intname]);
+ 	   	format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseInfo[i][iID], ToCurrency(HouseInfo[i][price]), HouseInfo[i][E_score], HouseIntTypes[HouseInfo[i][interior]][intname]);
 	    UpdateDynamic3DTextLabelText(HouseInfo[i][label], -1, gstr);
 	    MySQL_SaveHouse(i);
 
@@ -13968,7 +13969,7 @@ YCMD:sethousescore(playerid, params[], help)
 
 	    HouseInfo[i][E_score] = hscore;
 
- 	   	format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s\n"green"Press "white"'F'"green" to enter or\ntype /enter.", HouseInfo[i][iID], ToCurrency(HouseInfo[i][price]), HouseInfo[i][E_score], HouseIntTypes[HouseInfo[i][interior]][intname]);
+ 	   	format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseInfo[i][iID], ToCurrency(HouseInfo[i][price]), HouseInfo[i][E_score], HouseIntTypes[HouseInfo[i][interior]][intname]);
 	    UpdateDynamic3DTextLabelText(HouseInfo[i][label], -1, gstr);
 	    MySQL_SaveHouse(i);
 
@@ -14022,7 +14023,7 @@ YCMD:resethouse(playerid, params[], help)
         
 		MySQL_SaveHouse(i, true);
 
-	    format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s\n"green"Press "white"'F'"green" to enter or\ntype /enter.", HouseInfo[i][iID], ToCurrency(HouseInfo[i][price]), HouseInfo[i][E_score], HouseIntTypes[HouseInfo[i][interior]][intname]);
+	    format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseInfo[i][iID], ToCurrency(HouseInfo[i][price]), HouseInfo[i][E_score], HouseIntTypes[HouseInfo[i][interior]][intname]);
 	    UpdateDynamic3DTextLabelText(HouseInfo[i][label], -1, gstr);
 	    DestroyDynamicMapIcon(HouseInfo[i][iconid]);
 	    DestroyDynamicPickup(HouseInfo[i][pickid]);
@@ -17109,7 +17110,7 @@ function:OnPlayerNameChangeRequest(newname[], playerid)
 
                     strmid(HouseInfo[i][Owner], newname, 0, 25, 25);
 
-				    format(query, sizeof(query), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s\n"green"Press "white"'F'"green" to enter or\ntype /enter.", __GetName(playerid), HouseInfo[i][iID], ToCurrency(HouseInfo[i][price]), HouseInfo[i][E_score], HouseIntTypes[HouseInfo[i][interior]][intname]);
+				    format(query, sizeof(query), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", __GetName(playerid), HouseInfo[i][iID], ToCurrency(HouseInfo[i][price]), HouseInfo[i][E_score], HouseIntTypes[HouseInfo[i][interior]][intname]);
 				    UpdateDynamic3DTextLabelText(HouseInfo[i][label], -1, query);
 				    MySQL_SaveHouse(i);
 				}
@@ -18907,7 +18908,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	       			SetPlayerPos(playerid, HouseInfo[h_id][E_x], HouseInfo[h_id][E_y], HouseInfo[h_id][E_z]);
 					ResetPlayerWorld(playerid);
 					gTeam[playerid] = NORMAL;
-	      		    format(gstr, sizeof(gstr), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s\n"green"Press "white"'F'"green" to enter or\ntype /enter.", __GetName(playerid), HouseInfo[h_id][iID], ToCurrency(HouseInfo[h_id][price]), HouseInfo[h_id][E_score], HouseIntTypes[PlayerInfo[playerid][HouseIntSelected]][intname]);
+	      		    format(gstr, sizeof(gstr), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", __GetName(playerid), HouseInfo[h_id][iID], ToCurrency(HouseInfo[h_id][price]), HouseInfo[h_id][E_score], HouseIntTypes[PlayerInfo[playerid][HouseIntSelected]][intname]);
 	    			UpdateDynamic3DTextLabelText(HouseInfo[h_id][label], -1, gstr);
 	                MySQL_SaveHouse(h_id, true);
 	                MySQL_SavePlayer(playerid, false);
@@ -20438,7 +20439,7 @@ function:OnHouseLoadEx(index)
 		HouseInfo[index][sold] = cache_get_row_int(0, 8, g_SQL_handle);
 		HouseInfo[index][locked] = cache_get_row_int(0, 9, g_SQL_handle);
 
-		format(line, sizeof(line), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s\n"green"Press "white"'F'"green" to enter or\ntype /enter.", HouseInfo[index][iID], ToCurrency(HouseInfo[index][price]), HouseInfo[index][E_score], HouseIntTypes[HouseInfo[index][interior]][intname]);
+		format(line, sizeof(line), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseInfo[index][iID], ToCurrency(HouseInfo[index][price]), HouseInfo[index][E_score], HouseIntTypes[HouseInfo[index][interior]][intname]);
 
 		HouseInfo[index][label] = CreateDynamic3DTextLabel(line, (HouseInfo[index][sold]) ? (0xFF0000FF) : (0x00FF00FF), HouseInfo[index][E_x], HouseInfo[index][E_y], floatadd(HouseInfo[index][E_z], 0.3), 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 30.0);
 		HouseInfo[index][pickid] = CreateDynamicPickup((HouseInfo[index][sold]) ? (1272) : (1273), 1, HouseInfo[index][E_x], HouseInfo[index][E_y], HouseInfo[index][E_z], -1, -1, -1, 30.0);
@@ -20474,11 +20475,11 @@ function:OnHouseLoad()
 
 			if(!HouseInfo[houseid][sold])
 			{
-			    format(line, sizeof(line), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s\n"green"Press "white"'F'"green" to enter or\ntype /enter.", HouseInfo[houseid][iID], ToCurrency(HouseInfo[houseid][price]), HouseInfo[houseid][E_score], HouseIntTypes[HouseInfo[houseid][interior]][intname]);
+			    format(line, sizeof(line), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseInfo[houseid][iID], ToCurrency(HouseInfo[houseid][price]), HouseInfo[houseid][E_score], HouseIntTypes[HouseInfo[houseid][interior]][intname]);
 			}
 			else
 			{
-			    format(line, sizeof(line), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s\n"green"Press "white"'F'"green" to enter or\ntype /enter.", HouseInfo[houseid][Owner], HouseInfo[houseid][iID], ToCurrency(HouseInfo[houseid][price]), HouseInfo[houseid][E_score], HouseIntTypes[HouseInfo[houseid][interior]][intname]);
+			    format(line, sizeof(line), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseInfo[houseid][Owner], HouseInfo[houseid][iID], ToCurrency(HouseInfo[houseid][price]), HouseInfo[houseid][E_score], HouseIntTypes[HouseInfo[houseid][interior]][intname]);
 
 				for(new ii = 0; ii < MAX_HOUSE_OBJECTS; ii++)
 				{
@@ -21212,7 +21213,6 @@ function:SkipRegistration(playerid)
     GameTextForPlayer(playerid, "Welcome", 3000, 4);
 	GivePlayerCash(playerid, 20000, false);
 	GameTextForPlayer(playerid, "~n~+$20,000~n~Startcash", 3000, 1);
-	Streamer_UpdateEx(playerid, 341.8535, -1852.6327, 8.2618, -1, -1);
 	PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
 	
 	SendWelcomeMSG(playerid);
@@ -21266,7 +21266,6 @@ function:SkipLogin(playerid)
 	    GameTextForPlayer(playerid, "Welcome", 3000, 4);
   		GivePlayerCash(playerid, 20000, false);
     	GameTextForPlayer(playerid, "~n~+$20,000~n~Startcash", 3000, 1);
-		Streamer_UpdateEx(playerid, 341.8535, -1852.6327, 8.2618, -1, -1);
 		PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
 	}
 	else
@@ -23160,6 +23159,9 @@ LoadServerStaticMeshes()
 
 LoadVisualStaticMeshes()
 {
+	// 3374 heuballen
+	// 2898 grünes rasen ding
+	
     new count = GetTickCount() + 3600000;
     
     new object_id = CreateDynamicObject(11317, 1914.20313, -1377.58191, 26.29986,   0.00000, 0.00000, 91.91999); // Gold Credits Wang Cars
