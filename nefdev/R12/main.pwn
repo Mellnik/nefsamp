@@ -2573,9 +2573,21 @@ public OnPlayerRequestClass(playerid, classid)
 
 	PreloadAnimLib(playerid, "DANCING");
 
-    ApplyAnimation(playerid, "DANCING", "DNCE_M_A", 4.1, 1, 0, 0, 0, 0);
-    ApplyAnimation(playerid, "DANCING", "DNCE_M_A", 4.1, 1, 0, 0, 0, 0);
-    ApplyAnimation(playerid, "DANCING", "DNCE_M_A", 4.1, 1, 0, 0, 0, 0); // shit is annoying
+	switch(random(2))
+	{
+	    case 0:
+	    {
+		    ApplyAnimation(playerid, "DANCING", "DNCE_M_A", 4.1, 1, 0, 0, 0, 0);
+		    ApplyAnimation(playerid, "DANCING", "DNCE_M_A", 4.1, 1, 0, 0, 0, 0);
+		    ApplyAnimation(playerid, "DANCING", "DNCE_M_A", 4.1, 1, 0, 0, 0, 0); // shit is annoying
+		}
+		case 1:
+		{
+		    ApplyAnimation(playerid, "DANCING", "DNCE_M_B", 4.1, 1, 0, 0, 0, 0);
+		    ApplyAnimation(playerid, "DANCING", "DNCE_M_B", 4.1, 1, 0, 0, 0, 0);
+		    ApplyAnimation(playerid, "DANCING", "DNCE_M_B", 4.1, 1, 0, 0, 0, 0); // shit is annoying
+		}
+	}
 	return 1;
 }
 
