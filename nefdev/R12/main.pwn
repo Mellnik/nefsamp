@@ -12167,6 +12167,7 @@ YCMD:tban(playerid, params[], help)
 	  	if(isnull(reason) || strlen(reason) < 2) return SCM(playerid, NEF_GREEN, "Usage: /tban <playerid> <minutes> <reason>");
 	  	if(IsPlayerNPC(player)) return SCM(playerid, -1, ""er"Invalid player!");
         if(PlayerInfo[player][KBMarked]) return SCM(playerid, -1, ""er"Can't ban this player!");
+		if(!islogged(player)) return SCM(playerid, -1, ""er"Cannot ban tmp accounts, use /ipban");
 
 	    if(strfind(reason, "-", false) != -1)
 		{
@@ -12201,16 +12202,14 @@ YCMD:tban(playerid, params[], help)
 	  	{
 		 	if(IsPlayerAvail(player) && player != playerid && PlayerInfo[player][Level] != MAX_ADMIN_LEVEL)
 			{
-				new string[255];
-
 	   			MySQL_CreateBan(__GetName(player), __GetName(playerid), reason, gettime() + (mins * 60));
 
-				format(string, sizeof(string), ""yellow"** "red"%s(%i) has been time banned for %i minutes by Admin %s(%i) [Reason: %s]", __GetName(player), player, mins, __GetName(playerid), playerid, reason);
-				SCMToAll(YELLOW, string);
-				print(string);
+				format(gstr, sizeof(gstr), ""yellow"** "red"%s(%i) has been time banned for %i minutes by Admin %s(%i) [Reason: %s]", __GetName(player), player, mins, __GetName(playerid), playerid, reason);
+				SCMToAll(YELLOW, gstr);
+				print(gstr);
 
-	    		format(string, sizeof(string), ""red"You have been time banned!"white"\n\nAdmin:\t%s\nReason:\t%s\nExpires:\t%s\n\nIf you think that you have been banned wrongly,\nwrite a ban appeal on "SVRFORUM"", __GetName(playerid), reason, UnixTimeToDate(gettime() + (mins * 60)));
-	    		ShowPlayerDialog(player, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" - Notice", string, "OK", "");
+	    		format(gstr, sizeof(gstr), ""red"You have been time banned!"white"\n\nAdmin:\t%s\nReason:\t%s\nExpires:\t%s\n\nIf you think that you have been banned wrongly,\nwrite a ban appeal on "SVRFORUM"", __GetName(playerid), reason, UnixTimeToDate(gettime() + (mins * 60)));
+	    		ShowPlayerDialog(player, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" - Notice", gstr, "OK", "");
 	    		KickEx(player);
 
 	    		PlayerPlaySound(playerid, 1184, 0.0, 0.0, 0.0);
@@ -12223,9 +12222,8 @@ YCMD:tban(playerid, params[], help)
 		}
 		else
 		{
-		    new warnstring[128];
-		    format(warnstring, sizeof(warnstring), "OMGLOL: %s just tried to ban you with reason: %s", __GetName(playerid), reason);
-		    SCM(player, RED, warnstring);
+		    format(gstr, sizeof(gstr), "OMGLOL: %s just tried to ban you with reason: %s", __GetName(playerid), reason);
+		    SCM(player, RED, gstr);
 		    SCM(playerid, RED, "I hope that was a joke");
 		}
 	}
