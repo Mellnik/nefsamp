@@ -127,9 +127,9 @@
 #define server_sign                     "{FFFFFF}[{FF005F}SERVER{FFFFFF}]"
 #define gang_sign                       "{FFFFFF}[{FFA000}GANG{FFFFFF}]"
 #define nef                             "{FFFFFF}[{FFE600}"SVRSC"{FFFFFF}]"
-#define NO_PERM                     	"{F42626}[INFO] {D2D2D2}Insufficient Permissions"
-#define NOT_AVAIL                       "{F42626}[INFO] {D2D2D2}You can´t use this command now! Use /exit to leave."
-#define er                              "{F42626}[INFO] {D2D2D2}"
+#define NO_PERM                     	"{F42626}[INFO] {F42626}Insufficient Permissions"
+#define NOT_AVAIL                       "{F42626}[INFO] {F42626}You can´t use this command now! Use /exit to leave."
+#define er                              "{F42626}[INFO] {F42626}"
 // D2D2D2
 #define Error(%1,%2) 					SendClientMessage(%1, -1, "{F42626}[INFO] "GREY2_E""%2)
 #define dl                              "{FFE600}• {F0F0F0}"
@@ -2046,7 +2046,7 @@ new Float:WorldSpawns[4][4] =
 {
 	{341.8535, -1852.6327, 8.2618, 90.2136}, //beach
 	{-1196.3280, -17.4523, 15.8281, 42.5799}, //sfa
-	{372.4490, 2569.1714, 19.4684, 184.6792}, // /aa
+	{385.4325, 2541.2456, 14.5953, 184.6792}, // /aa
 	{680.2595, -1361.8927, 2551.2214, 90.0} // /speed
 };
 new Float:DM_MAP_1[2][4] =
@@ -7415,7 +7415,7 @@ YCMD:party(playerid, params[], help)
 }
 YCMD:aa(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid, 372.4490,2569.1714,19.4684,184.6792,385.7370,2513.5242,16.6766,89.6337, "Abandoned Airport", "aa");
+    PortPlayerMapVeh(playerid, 385.4325, 2541.2456, 14.5953, 184.6792, 385.7370, 2513.5242, 16.6766, 89.6337, "Abandoned Airport", "aa");
     return 1;
 }
 YCMD:a51(playerid, params[], help)
@@ -8884,7 +8884,7 @@ YCMD:bbuy(playerid, params[], help)
 	    format(gstr, sizeof(gstr), ""business_mark"\nOwner: %s\nID: %i\nLevel: %i", __GetName(playerid), PropInfo[i][iID], PropInfo[i][E_Level]);
 	    UpdateDynamic3DTextLabelText(PropInfo[i][label], -1, gstr);
 	    DestroyDynamicMapIcon(PropInfo[i][iconid]);
-	    PropInfo[i][iconid] = CreateDynamicMapIcon(PropInfo[i][E_x], PropInfo[i][E_y], PropInfo[i][E_z], 36, 1, 0, -1, -1, 100.0);
+	    PropInfo[i][iconid] = CreateDynamicMapIcon(PropInfo[i][E_x], PropInfo[i][E_y], PropInfo[i][E_z], 36, 1, 0, -1, -1, 200.0);
 	    PropInfo[i][date] = gettime();
 	    PlayerInfo[playerid][Props]++;
 	    SendInfo(playerid, "~g~~h~~h~Business purchased!", 3500);
@@ -8949,7 +8949,7 @@ YCMD:buy(playerid, params[], help)
 	    UpdateDynamic3DTextLabelText(HouseInfo[i][label], -1, gstr);
 	    DestroyDynamicMapIcon(HouseInfo[i][iconid]);
 	    DestroyDynamicPickup(HouseInfo[i][pickid]);
-	    HouseInfo[i][iconid] = CreateDynamicMapIcon(HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], 32, 1, 0, -1, -1, 100.0);
+	    HouseInfo[i][iconid] = CreateDynamicMapIcon(HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], 32, 1, 0, -1, -1, 200.0);
 	    HouseInfo[i][pickid] = CreateDynamicPickup(1272, 1, HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], -1, -1, -1, 30.0);
 	    GivePlayerCash(playerid, -HouseInfo[i][price]);
 	    HouseInfo[i][date] = gettime();
@@ -9005,7 +9005,7 @@ YCMD:bsell(playerid, params[], help)
 	    format(gstr, sizeof(gstr), ""business_mark"\nOwner: ---\nID: %i\nLevel: %i", PropInfo[i][iID], PropInfo[i][E_Level]);
 	    UpdateDynamic3DTextLabelText(PropInfo[i][label], -1, gstr);
 	    DestroyDynamicMapIcon(PropInfo[i][iconid]);
-	    PropInfo[i][iconid] = CreateDynamicMapIcon(PropInfo[i][E_x], PropInfo[i][E_y], PropInfo[i][E_z], 52, 1, 0, -1, -1, 100.0);
+	    PropInfo[i][iconid] = CreateDynamicMapIcon(PropInfo[i][E_x], PropInfo[i][E_y], PropInfo[i][E_z], 52, 1, 0, -1, -1, 200.0);
 	    PlayerInfo[playerid][Props]--;
 	    PropInfo[i][date] = 0;
 	    SendInfo(playerid, "~g~~h~~h~Business sold!", 3500);
@@ -9071,7 +9071,7 @@ YCMD:sell(playerid, params[], help)
 	    UpdateDynamic3DTextLabelText(HouseInfo[i][label], -1, gstr);
 	    DestroyDynamicMapIcon(HouseInfo[i][iconid]);
 	    DestroyDynamicPickup(HouseInfo[i][pickid]);
-	    HouseInfo[i][iconid] = CreateDynamicMapIcon(HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], 31, 1, 0, -1, -1, 100.0);
+	    HouseInfo[i][iconid] = CreateDynamicMapIcon(HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], 31, 1, 0, -1, -1, 200.0);
 	    HouseInfo[i][pickid] = CreateDynamicPickup(1273, 1, HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], -1, -1, -1, 30.0);
 	    PlayerInfo[playerid][Houses]--;
 	    HouseInfo[i][date] = 0;
@@ -12085,7 +12085,7 @@ YCMD:ipban(playerid, params[], help)
 						    UpdateDynamic3DTextLabelText(HouseInfo[i][label], -1, string);
 						    DestroyDynamicMapIcon(HouseInfo[i][iconid]);
 						    DestroyDynamicPickup(HouseInfo[i][pickid]);
-						    HouseInfo[i][iconid] = CreateDynamicMapIcon(HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], 31, 1, 0, -1, -1, 100.0);
+						    HouseInfo[i][iconid] = CreateDynamicMapIcon(HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], 31, 1, 0, -1, -1, 200.0);
 						    HouseInfo[i][pickid] = CreateDynamicPickup(1273, 1, HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], -1, -1, -1, 30.0);
 						    PlayerInfo[player][Houses]--;
 						    MySQL_SaveHouse(i, true);
@@ -12106,7 +12106,7 @@ YCMD:ipban(playerid, params[], help)
 						    format(string, sizeof(string), ""business_mark"\nOwner: ---\nID: %i\nLevel: %i", PropInfo[i][iID], PropInfo[i][E_Level]);
 						    UpdateDynamic3DTextLabelText(PropInfo[i][label], -1, string);
 						    DestroyDynamicMapIcon(PropInfo[i][iconid]);
-						    PropInfo[i][iconid] = CreateDynamicMapIcon(PropInfo[i][E_x], PropInfo[i][E_y], PropInfo[i][E_z], 52, 1, 0, -1, -1, 100.0);
+						    PropInfo[i][iconid] = CreateDynamicMapIcon(PropInfo[i][E_x], PropInfo[i][E_y], PropInfo[i][E_z], 52, 1, 0, -1, -1, 200.0);
 						    PlayerInfo[player][Props]--;
 						    MySQL_SaveProp(i);
 						}
@@ -12373,7 +12373,7 @@ YCMD:ban(playerid, params[], help)
 					    UpdateDynamic3DTextLabelText(HouseInfo[i][label], -1, string);
 					    DestroyDynamicMapIcon(HouseInfo[i][iconid]);
 					    DestroyDynamicPickup(HouseInfo[i][pickid]);
-					    HouseInfo[i][iconid] = CreateDynamicMapIcon(HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], 31, 1, 0, -1, -1, 100.0);
+					    HouseInfo[i][iconid] = CreateDynamicMapIcon(HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], 31, 1, 0, -1, -1, 200.0);
 					    HouseInfo[i][pickid] = CreateDynamicPickup(1273, 1, HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], -1, -1, -1, 30.0);
 					    PlayerInfo[player][Houses]--;
 					    MySQL_SaveHouse(i, true);
@@ -12394,7 +12394,7 @@ YCMD:ban(playerid, params[], help)
 					    format(string, sizeof(string), ""business_mark"\nOwner: ---\nID: %i\nLevel: %i", PropInfo[i][iID], PropInfo[i][E_Level]);
 					    UpdateDynamic3DTextLabelText(PropInfo[i][label], -1, string);
 					    DestroyDynamicMapIcon(PropInfo[i][iconid]);
-					    PropInfo[i][iconid] = CreateDynamicMapIcon(PropInfo[i][E_x], PropInfo[i][E_y], PropInfo[i][E_z], 52, 1, 0, -1, -1, 100.0);
+					    PropInfo[i][iconid] = CreateDynamicMapIcon(PropInfo[i][E_x], PropInfo[i][E_y], PropInfo[i][E_z], 52, 1, 0, -1, -1, 200.0);
 					    PlayerInfo[player][Props]--;
 					    MySQL_SaveProp(i);
 					}
@@ -14050,7 +14050,7 @@ YCMD:resethouse(playerid, params[], help)
 	    UpdateDynamic3DTextLabelText(HouseInfo[i][label], -1, gstr);
 	    DestroyDynamicMapIcon(HouseInfo[i][iconid]);
 	    DestroyDynamicPickup(HouseInfo[i][pickid]);
-	    HouseInfo[i][iconid] = CreateDynamicMapIcon(HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], 31, 1, 0, -1, -1, 100.0);
+	    HouseInfo[i][iconid] = CreateDynamicMapIcon(HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], 31, 1, 0, -1, -1, 200.0);
 	    HouseInfo[i][pickid] = CreateDynamicPickup(1273, 1, HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], -1, -1, -1, 30.0);
 
 		SendInfo(playerid, "~g~~h~~h~The house has been reset!", 2000);
@@ -14135,7 +14135,7 @@ YCMD:resetbizz(playerid, params[], help)
 	    format(gstr, sizeof(gstr), ""business_mark"\nOwner: ---\nID: %i\nLevel: %i", PropInfo[i][iID], PropInfo[i][E_Level]);
 	    UpdateDynamic3DTextLabelText(PropInfo[i][label], -1, gstr);
 	    DestroyDynamicMapIcon(PropInfo[i][iconid]);
-	    PropInfo[i][iconid] = CreateDynamicMapIcon(PropInfo[i][E_x], PropInfo[i][E_y], PropInfo[i][E_z], 52, 1, 0, -1, -1, 100.0);
+	    PropInfo[i][iconid] = CreateDynamicMapIcon(PropInfo[i][E_x], PropInfo[i][E_y], PropInfo[i][E_z], 52, 1, 0, -1, -1, 200.0);
 
         SendInfo(playerid, "~g~~h~~h~The business has been reset!", 2000);
   		break;
@@ -14316,7 +14316,7 @@ YCMD:createstore(playerid, params[], help)
 			    	BankPickOut[bankid] = CreateDynamicPickup(1559, 1, POS[0], POS[1], POS[2], 0, 0, -1, 30.0);
 		   			BankPickInt[bankid] = CreateDynamicPickup(1559, 1, 2304.69, -16.19, 26.74, (bankid + 1000), -1, -1, 50.0);
 					BankPickMenu[bankid] = CreateDynamicPickup(1559, 1, 2311.63, -3.89, 26.74, (bankid + 1000), -1, -1, 50.0);
-				    BankMIcon[bankid] = CreateDynamicMapIcon(POS[0], POS[1], POS[2], 25, -1, 0, 0, -1, 200.0);
+				    BankMIcon[bankid] = CreateDynamicMapIcon(POS[0], POS[1], POS[2], 25, -1, 0, 0, -1, 300.0);
 				}
 		    }
 	    }
@@ -14338,7 +14338,7 @@ YCMD:createstore(playerid, params[], help)
 	    			dini_IntSet("/Store/Index.ini", "CurrentAmmunationWorld", (ammunationid + 1000));
 			    	AmmunationPickOut[ammunationid] = CreateDynamicPickup(1559, 1, POS[0], POS[1], POS[2], 0, 0, -1, 50.0);
 					AmmunationPickInt[ammunationid] = CreateDynamicPickup(1559, 1, 315.81, -143.65, 999.60, (ammunationid + 1000), 7, -1, 50.0);
-					AmmunationMIcon[ammunationid] = CreateDynamicMapIcon(POS[0], POS[1], POS[2], 6, -1, 0, 0, -1, 200.0);
+					AmmunationMIcon[ammunationid] = CreateDynamicMapIcon(POS[0], POS[1], POS[2], 6, -1, 0, 0, -1, 300.0);
 				}
 			}
 	    }
@@ -14360,7 +14360,7 @@ YCMD:createstore(playerid, params[], help)
 			    	dini_IntSet("/Store/Index.ini", "CurrentBurgerWorld", (burgerid + 1000));
 					BurgerPickOut[burgerid] = CreateDynamicPickup(1559, 1, POS[0], POS[1], POS[2], 0, 0, -1, 50.0);
 					BurgerPickInt[burgerid] = CreateDynamicPickup(1559, 1, 362.87, -75.17, 1001.50, (burgerid + 1000), 10, -1, 50.0);
-					BurgerMIcon[burgerid] = CreateDynamicMapIcon(POS[0], POS[1], POS[2], 10, -1, 0, 0, -1, 200.0);
+					BurgerMIcon[burgerid] = CreateDynamicMapIcon(POS[0], POS[1], POS[2], 10, -1, 0, 0, -1, 300.0);
 				}
 			}
 	    }
@@ -14382,7 +14382,7 @@ YCMD:createstore(playerid, params[], help)
 			    	dini_IntSet("/Store/Index.ini", "CurrentCluckinBellWorld", (cluckinbellid + 1000));
 					CluckinBellPickOut[cluckinbellid] = CreateDynamicPickup(1559, 1, POS[0], POS[1], POS[2], 0, 0, -1, 50.0);
 					CluckinBellPickInt[cluckinbellid] = CreateDynamicPickup(1559, 1, 364.87, -11.74, 1001.85, (cluckinbellid + 1000), 9, -1, 50.0);
-					CluckinBellMIcon[cluckinbellid] = CreateDynamicMapIcon(POS[0], POS[1], POS[2], 14, -1, 0, 0, -1, 200.0);
+					CluckinBellMIcon[cluckinbellid] = CreateDynamicMapIcon(POS[0], POS[1], POS[2], 14, -1, 0, 0, -1, 300.0);
 				}
 			}
 	    }
@@ -14404,7 +14404,7 @@ YCMD:createstore(playerid, params[], help)
 			    	dini_IntSet("/Store/Index.ini", "CurrentPizzaWorld", (pizzaid + 1000));
 					PizzaPickOut[pizzaid] = CreateDynamicPickup(1559, 1, POS[0], POS[1], POS[2], 0, 0, -1, 50.0);
 					PizzaPickInt[pizzaid] = CreateDynamicPickup(1559, 1, 372.36, -133.50, 1001.49, (pizzaid + 1000), 5, -1, 50.0);
-					PizzaMIcon[pizzaid] = CreateDynamicMapIcon(POS[0], POS[1], POS[2], 29, -1, 0, 0, -1, 200.0);
+					PizzaMIcon[pizzaid] = CreateDynamicMapIcon(POS[0], POS[1], POS[2], 29, -1, 0, 0, -1, 300.0);
 				}
 			}
 	    }
@@ -14426,7 +14426,7 @@ YCMD:createstore(playerid, params[], help)
 			    	dini_IntSet("/Store/Index.ini", "CurrentTFSWorld", (tfs + 1000));
 					TFSPickOut[tfs] = CreateDynamicPickup(1559, 1, POS[0], POS[1], POS[2], 0, 0, -1, 50.0);
 					TFSPickInt[tfs] = CreateDynamicPickup(1559, 1,  -25.884, -185.868, 1003.546, (tfs + 1000), 17, -1, 50.0);
-					TFSMIcon[tfs] = CreateDynamicMapIcon(POS[0], POS[1], POS[2], 17, -1, 0, 0, -1, 200.0);
+					TFSMIcon[tfs] = CreateDynamicMapIcon(POS[0], POS[1], POS[2], 17, -1, 0, 0, -1, 300.0);
 				}
 			}
 	    }
@@ -20466,7 +20466,7 @@ function:OnHouseLoadEx(index)
 
 		HouseInfo[index][label] = CreateDynamic3DTextLabel(line, (HouseInfo[index][sold]) ? (0xFF0000FF) : (0x00FF00FF), HouseInfo[index][E_x], HouseInfo[index][E_y], floatadd(HouseInfo[index][E_z], 0.3), 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 30.0);
 		HouseInfo[index][pickid] = CreateDynamicPickup((HouseInfo[index][sold]) ? (1272) : (1273), 1, HouseInfo[index][E_x], HouseInfo[index][E_y], HouseInfo[index][E_z], -1, -1, -1, 30.0);
-		HouseInfo[index][iconid] = CreateDynamicMapIcon(HouseInfo[index][E_x], HouseInfo[index][E_y], HouseInfo[index][E_z], (HouseInfo[index][sold]) ? (32) : (31), 1, 0, -1, -1, 100.0);
+		HouseInfo[index][iconid] = CreateDynamicMapIcon(HouseInfo[index][E_x], HouseInfo[index][E_y], HouseInfo[index][E_z], (HouseInfo[index][sold]) ? (32) : (31), 1, 0, -1, -1, 200.0);
 		index++;
 	}
 	return 1;
@@ -20521,7 +20521,7 @@ function:OnHouseLoad()
 
 			HouseInfo[houseid][label] = CreateDynamic3DTextLabel(line, (HouseInfo[houseid][sold]) ? (0xFF0000FF) : (0x00FF00FF), HouseInfo[houseid][E_x], HouseInfo[houseid][E_y], floatadd(HouseInfo[houseid][E_z], 0.3), 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 30.0);
 			HouseInfo[houseid][pickid] = CreateDynamicPickup((HouseInfo[houseid][sold]) ? (1272) : (1273), 1, HouseInfo[houseid][E_x], HouseInfo[houseid][E_y], HouseInfo[houseid][E_z], -1, -1, -1, 30.0);
-			HouseInfo[houseid][iconid] = CreateDynamicMapIcon(HouseInfo[houseid][E_x], HouseInfo[houseid][E_y], HouseInfo[houseid][E_z], (HouseInfo[houseid][sold]) ? (32) : (31), 1, 0, -1, -1);
+			HouseInfo[houseid][iconid] = CreateDynamicMapIcon(HouseInfo[houseid][E_x], HouseInfo[houseid][E_y], HouseInfo[houseid][E_z], (HouseInfo[houseid][sold]) ? (32) : (31), 1, 0, -1, -1, 200.0);
 			houseid++;
 		}
 	}
@@ -20553,7 +20553,7 @@ function:OnPropLoadEx(pindex)
 
 		PropInfo[pindex][label] = CreateDynamic3DTextLabel(string, -1, PropInfo[pindex][E_x], PropInfo[pindex][E_y], floatadd(PropInfo[pindex][E_z], 0.3), 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 30.0);
 		PropInfo[pindex][pickid] = CreateDynamicPickup(1274, 1, PropInfo[pindex][E_x], PropInfo[pindex][E_y], PropInfo[pindex][E_z], -1, -1, -1, 30.0);
-		PropInfo[pindex][iconid] = CreateDynamicMapIcon(PropInfo[pindex][E_x], PropInfo[pindex][E_y], PropInfo[pindex][E_z], 52, 1, 0, -1, -1, 100.0);
+		PropInfo[pindex][iconid] = CreateDynamicMapIcon(PropInfo[pindex][E_x], PropInfo[pindex][E_y], PropInfo[pindex][E_z], 52, 1, 0, -1, -1, 200.0);
 		pindex++;
 	}
 	return 1;
@@ -20591,7 +20591,7 @@ function:OnPropLoad()
 			}
 			PropInfo[propid][label] = CreateDynamic3DTextLabel(string, WHITE, PropInfo[propid][E_x], PropInfo[propid][E_y], floatadd(PropInfo[propid][E_z], 0.3), 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 30.0);
 			PropInfo[propid][pickid] = CreateDynamicPickup(1274, 1, PropInfo[propid][E_x], PropInfo[propid][E_y], PropInfo[propid][E_z], -1, -1, -1, 30.0);
-			PropInfo[propid][iconid] = CreateDynamicMapIcon(PropInfo[propid][E_x], PropInfo[propid][E_y], PropInfo[propid][E_z], (PropInfo[propid][sold]) ? (36) : (52), 1, 0, -1, -1, 100.0);
+			PropInfo[propid][iconid] = CreateDynamicMapIcon(PropInfo[propid][E_x], PropInfo[propid][E_y], PropInfo[propid][E_z], (PropInfo[propid][sold]) ? (36) : (52), 1, 0, -1, -1, 200.0);
 			propid++;
 		}
 	}
@@ -20612,7 +20612,7 @@ function:OnGangZoneLoadEx(gindex)
         format(gstr, sizeof(gstr), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: ---\n"orange"Type /gwar to start an attack!", GZoneInfo[gindex][iID], GZoneInfo[gindex][sZoneName]);
 
         GZoneInfo[gindex][label] = CreateDynamic3DTextLabel(gstr, WHITE, GZoneInfo[gindex][E_x], GZoneInfo[gindex][E_y], GZoneInfo[gindex][E_z] + 0.3, 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 50.0);
-        GZoneInfo[gindex][iconid] = CreateDynamicMapIcon(GZoneInfo[gindex][E_x], GZoneInfo[gindex][E_y], GZoneInfo[gindex][E_z], 19, 1, 0, -1, -1, 150.0);
+        GZoneInfo[gindex][iconid] = CreateDynamicMapIcon(GZoneInfo[gindex][E_x], GZoneInfo[gindex][E_y], GZoneInfo[gindex][E_z], 19, 1, 0, -1, -1, 300.0);
         GZoneInfo[gindex][zoneid] = GangZoneCreate(GZoneInfo[gindex][E_x] + GZONE_SIZE, GZoneInfo[gindex][E_y] - GZONE_SIZE, GZoneInfo[gindex][E_x] - GZONE_SIZE, GZoneInfo[gindex][E_y] + GZONE_SIZE);
         GZoneInfo[gindex][checkid] = CreateDynamicCP(GZoneInfo[gindex][E_x], GZoneInfo[gindex][E_y], GZoneInfo[gindex][E_z], 7.0, 0, -1, -1, 60.0);
 
@@ -20652,7 +20652,7 @@ function:OnGangZoneLoad()
 	        }
 	        
 	        GZoneInfo[gzoneid][label] = CreateDynamic3DTextLabel(gstr, WHITE, GZoneInfo[gzoneid][E_x], GZoneInfo[gzoneid][E_y], GZoneInfo[gzoneid][E_z] + 0.3, 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 50.0);
-	        GZoneInfo[gzoneid][iconid] = CreateDynamicMapIcon(GZoneInfo[gzoneid][E_x], GZoneInfo[gzoneid][E_y], GZoneInfo[gzoneid][E_z], 19, 1, 0, -1, -1, 150.0);
+	        GZoneInfo[gzoneid][iconid] = CreateDynamicMapIcon(GZoneInfo[gzoneid][E_x], GZoneInfo[gzoneid][E_y], GZoneInfo[gzoneid][E_z], 19, 1, 0, -1, -1, 300.0);
 			GZoneInfo[gzoneid][zoneid] = GangZoneCreate(GZoneInfo[gzoneid][E_x] + GZONE_SIZE, GZoneInfo[gzoneid][E_y] - GZONE_SIZE, GZoneInfo[gzoneid][E_x] - GZONE_SIZE, GZoneInfo[gzoneid][E_y] + GZONE_SIZE);
             GZoneInfo[gzoneid][checkid] = CreateDynamicCP(GZoneInfo[gzoneid][E_x], GZoneInfo[gzoneid][E_y], GZoneInfo[gzoneid][E_z], 7.0, 0, -1, -1, 60.0);
 
@@ -21977,7 +21977,7 @@ LoadStores()
 			BankPickOut[b] = CreateDynamicPickup(1559, 1, dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ"), 0, 0, -1, 50.0);
 	  		BankPickInt[b] = CreateDynamicPickup(1559, 1, 2304.69, -16.19, 26.74, (b + 1000), -1, -1, 50.0);
 	  		BankPickMenu[b] = CreateDynamicPickup(1559, 1, 2311.63, -3.89, 26.74, (b + 1000), -1, -1, 50.0);
-	  		BankMIcon[b] = CreateDynamicMapIcon(dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ"), 25, -1, 0, 0, -1, 200.0);
+	  		BankMIcon[b] = CreateDynamicMapIcon(dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ"), 25, -1, 0, 0, -1, 300.0);
 	  		format(lstring, sizeof(lstring), ""white"["yellow"Store"white"]\n%s", dini_Get(file, "StoreName"));
 	  		CreateDynamic3DTextLabel(lstring, YELLOW, dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ") + 0.7, 25.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 25.0);
 		}
@@ -21989,7 +21989,7 @@ LoadStores()
 		{
 			AmmunationPickOut[a] = CreateDynamicPickup(1559, 1, dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ"), 0, 0, -1, 50.0);
 	  		AmmunationPickInt[a] = CreateDynamicPickup(1559, 1, 315.81, -143.65, 999.60, (a + 1000), 7, -1, 50.0);
-			AmmunationMIcon[a] = CreateDynamicMapIcon(dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ"), 6, -1, 0, 0, -1, 200.0);
+			AmmunationMIcon[a] = CreateDynamicMapIcon(dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ"), 6, -1, 0, 0, -1, 300.0);
 			format(lstring, sizeof(lstring), ""white"["yellow"Store"white"]\n%s", dini_Get(file, "StoreName"));
 			CreateDynamic3DTextLabel(lstring, YELLOW, dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ") + 0.7, 25.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 25.0);
 		}
@@ -22001,7 +22001,7 @@ LoadStores()
 		{
 			BurgerPickOut[bs] = CreateDynamicPickup(1559, 1, dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ"), 0, 0, -1, 50.0);
 	  		BurgerPickInt[bs] = CreateDynamicPickup(1559, 1, 362.87, -75.17, 1001.50, (bs + 1000), 10, -1, 50.0);
-		   	BurgerMIcon[bs] = CreateDynamicMapIcon(dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ"), 10, -1, 0, 0, -1, 200.0);
+		   	BurgerMIcon[bs] = CreateDynamicMapIcon(dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ"), 10, -1, 0, 0, -1, 300.0);
 		   	format(lstring, sizeof(lstring), ""white"["yellow"Store"white"]\n%s", dini_Get(file, "StoreName"));
 	  		CreateDynamic3DTextLabel(lstring, YELLOW, dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ") + 0.7, 25.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 25.0);
 		}
@@ -22013,7 +22013,7 @@ LoadStores()
 		{
 			CluckinBellPickOut[cb] = CreateDynamicPickup(1559, 1, dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ"), 0, 0, -1, 50.0);
 	  		CluckinBellPickInt[cb] = CreateDynamicPickup(1559, 1, 364.87, -11.74, 1001.85, (cb + 1000), 9, -1, 50.0);
-			CluckinBellMIcon[cb] = CreateDynamicMapIcon(dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ"), 14, -1, 0, 0, -1, 200.0);
+			CluckinBellMIcon[cb] = CreateDynamicMapIcon(dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ"), 14, -1, 0, 0, -1, 300.0);
 			format(lstring, sizeof(lstring), ""white"["yellow"Store"white"]\n%s", dini_Get(file, "StoreName"));
 	  		CreateDynamic3DTextLabel(lstring, YELLOW, dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ") + 0.7, 25.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 25.0);
 		}
@@ -22025,7 +22025,7 @@ LoadStores()
 		{
 			PizzaPickOut[ps] = CreateDynamicPickup(1559, 1, dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ"), 0, 0, -1, 50.0);
 	  		PizzaPickInt[ps] = CreateDynamicPickup(1559, 1, 372.36, -133.50, 1001.49, (ps + 1000), 5, -1, 50.0);
-			PizzaMIcon[ps] = CreateDynamicMapIcon(dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ"), 29, -1, 0, 0, -1, 200.0);
+			PizzaMIcon[ps] = CreateDynamicMapIcon(dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ"), 29, -1, 0, 0, -1, 300.0);
 			format(lstring, sizeof(lstring), ""white"["yellow"Store"white"]\n%s", dini_Get(file, "StoreName"));
 	  		CreateDynamic3DTextLabel(lstring, YELLOW, dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ") + 0.7, 25.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 25.0);
 		}
@@ -22037,7 +22037,7 @@ LoadStores()
 		{
 			TFSPickOut[tfs] = CreateDynamicPickup(1559, 1, dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ"), 0, 0, -1, 50.0);
 	  		TFSPickInt[tfs] = CreateDynamicPickup(1559, 1, -25.884, -185.868, 1003.546, (tfs + 1000), 17, -1, 50.0);
-			TFSMIcon[tfs] = CreateDynamicMapIcon(dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ"), 17, -1, 0, 0, -1, 200.0);
+			TFSMIcon[tfs] = CreateDynamicMapIcon(dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ"), 17, -1, 0, 0, -1, 300.0);
 			format(lstring, sizeof(lstring), ""white"["yellow"Store"white"]\n%s", dini_Get(file, "StoreName"));
 	  		CreateDynamic3DTextLabel(lstring, YELLOW, dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ") + 0.7, 25.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 25.0);
 		}
@@ -22936,10 +22936,12 @@ LoadServerStaticMeshes()
     CurrentBGMap = BG_VOTING;
 	StartTime = gettime();
 	Iter_Init(PlayerIgnore);
+	
 	for(new i = 1; i < MAX_REPORTS; i++)
 	{
 		Reports[i] = "<none>";
 	}
+	
 	for(new i = 1; i < MAX_ADS; i++)
 	{
 		Adverts[i] = "<none>";
@@ -22951,7 +22953,7 @@ LoadServerStaticMeshes()
 	}
 	
     CreateDynamicSphere(341.8535, -1852.6327, 6.8569, 25.0); // <- beach sphere
-    CreateDynamicSphere(385.4325, 2541.2456, 14.5953, 18.0); // <- AA sphere
+    CreateDynamicSphere(385.4325, 2541.2456, 14.5953, 14.5); // <- AA sphere
     CreateDynamicSphere(-1203.3666, -27.8846, 15.8403, 15.0); // <- SFA 1 sphere
     CreateDynamicSphere(-1183.3441, -9.4441, 15.8403, 15.0); // <- SFA 2 sphere
 
@@ -22980,6 +22982,7 @@ LoadServerStaticMeshes()
 	}
 
     Command_AddAltNamed("find", "locate");
+    Command_AddAltNamed("locate", "loc");
     Command_AddAltNamed("vs", "wang");
     Command_AddAltNamed("vs", "vehicleshop");
     Command_AddAltNamed("vs", "ottos");
@@ -23357,7 +23360,7 @@ LoadVisualStaticMeshes()
 
 	// hotspots
 	CreateDynamicMapIcon(-1196.1506, -17.3470, 15.8281, 23, 1, -1, -1, -1, 300.0); // SFA
-	CreateDynamicMapIcon(383.3428, 2536.3140, 18.8503, 23, 1, -1, -1, -1, 300.0); // AA
+	CreateDynamicMapIcon(385.4325, 2541.2456, 14.5953, 23, 1, -1, -1, -1, 300.0); // AA
 	CreateDynamicMapIcon(341.5075, -1852.6332, 8.2612, 23, 1, -1, -1, -1, 300.0); // BEACH
 	// hotspots end
 
@@ -23444,7 +23447,7 @@ LoadVisualStaticMeshes()
 	AddTeleport(3, "Skyroad 3", "skyroad3", 205.0412,2481.6416,16.5166);
 	AddTeleport(3, "Skyroad 4", "skyroad4", 587.9016,1400.4779,1228.1453);
 	AddTeleport(3, "Water Jump", "wj", 341.6029,2008.7330,571.1588);
-	AddTeleport(8, "Abandoned Airport", "aa", 372.4490,2569.1714,19.4684);
+	AddTeleport(8, "Abandoned Airport", "aa", 385.4325, 2541.2456, 14.5953);
 	AddTeleport(6, "Transfender", "trans", 1034.5165,-1039.7190,31.6651);
 	AddTeleport(6, "Transfender 2", "trans2", -1932.7380,228.3443,34.1563);
 	AddTeleport(6, "Transfender 3", "trans3", 2386.2788,1021.7114,10.8203);
