@@ -7983,6 +7983,7 @@ YCMD:fallout(playerid, params[], help)
 	if(g_FalloutStatus == e_Fallout_Inactive)
 	{
 	    CheckPlayerGod(playerid);
+	    Command_ReProcess(playerid, "/stopanims", false);
 	    gTeam[playerid] = FALLOUT;
 	    ResetFalloutGameTime();
 	    Fallout_BuildMap();
@@ -7997,6 +7998,7 @@ YCMD:fallout(playerid, params[], help)
 	else if(g_FalloutStatus == e_Fallout_Startup)
 	{
 	    CheckPlayerGod(playerid);
+	    Command_ReProcess(playerid, "/stopanims", false);
 		gTeam[playerid] = FALLOUT;
 		format(gstr, sizeof(gstr), "%s(%i) joined Fallout!", __GetName(playerid), playerid);
 		FalloutMSG(gstr);
@@ -8026,7 +8028,7 @@ YCMD:derby(playerid, params[], help)
 
     SavePos(playerid);
     CheckPlayerGod(playerid);
-
+    Command_ReProcess(playerid, "/stopanims", false);
     ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
     gTeam[playerid] = DERBY;
 	SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
@@ -8094,6 +8096,7 @@ YCMD:war(playerid, params[], help)
 	GivePlayerWeapon(playerid, 17, 10);
 	GivePlayerWeapon(playerid, 10, 1);
 	
+	Command_ReProcess(playerid, "/stopanims", false);
 	gTeam[playerid] = WAR;
 	
 	SetPlayerVirtualWorld(playerid, 5);
@@ -8117,7 +8120,7 @@ YCMD:dm(playerid, params[], help)
 
     SavePos(playerid);
     CheckPlayerGod(playerid);
-    
+    Command_ReProcess(playerid, "/stopanims", false);
     ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
     SetPlayerHealth(playerid, 100.0);
 	SetPlayerVirtualWorld(playerid, DM_WORLD);
@@ -8151,7 +8154,7 @@ YCMD:dm2(playerid, params[], help)
 
     SavePos(playerid);
     CheckPlayerGod(playerid);
-	
+	Command_ReProcess(playerid, "/stopanims", false);
     ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
 	SetPlayerHealth(playerid, 100.0);
 	SetPlayerVirtualWorld(playerid, DM_WORLD+1);
@@ -8185,7 +8188,7 @@ YCMD:dm3(playerid, params[], help)
 
     SavePos(playerid);
     CheckPlayerGod(playerid);
-
+    Command_ReProcess(playerid, "/stopanims", false);
     ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
     SetPlayerHealth(playerid, 100.0);
 	SetPlayerVirtualWorld(playerid, DM_WORLD+2);
@@ -8219,7 +8222,7 @@ YCMD:dm4(playerid, params[], help)
 
     SavePos(playerid);
     CheckPlayerGod(playerid);
-    
+    Command_ReProcess(playerid, "/stopanims", false);
     ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
 	SetPlayerHealth(playerid, 100.0);
 	SetPlayerVirtualWorld(playerid, DM_WORLD+3);
@@ -9207,7 +9210,7 @@ YCMD:gungame(playerid, params[], help)
 
     SavePos(playerid);
     CheckPlayerGod(playerid);
-
+    Command_ReProcess(playerid, "/stopanims", false);
 	GunGamePlayers++;
 	SetPlayerInterior(playerid, 0);
 	SetPlayerVirtualWorld(playerid, 1338);
@@ -9282,7 +9285,7 @@ YCMD:tdm(playerid, params[], help)
 	
     SavePos(playerid);
     CheckPlayerGod(playerid);
-
+    Command_ReProcess(playerid, "/stopanims", false);
 	SetPlayerVirtualWorld(playerid, BG_WORLD);
 	SetPlayerInterior(playerid, 0);
 	ResetPlayerWeapons(playerid);
@@ -9475,7 +9478,7 @@ YCMD:minigun(playerid, params[], help)
 
     SavePos(playerid);
     CheckPlayerGod(playerid);
-
+    Command_ReProcess(playerid, "/stopanims", false);
 	gTeam[playerid] = MINIGUN;
 	ResetPlayerWeapons(playerid);
 	GivePlayerWeapon(playerid, 38, 99999);
@@ -9499,7 +9502,7 @@ YCMD:sniper(playerid, params[], help)
 
     SavePos(playerid);
     CheckPlayerGod(playerid);
-    
+    Command_ReProcess(playerid, "/stopanims", false);
 	gTeam[playerid] = SNIPER;
 	ResetPlayerWeapons(playerid);
 	GivePlayerWeapon(playerid, 34, 99999);
@@ -13923,7 +13926,8 @@ YCMD:race(playerid, params[], help)
 		    if(g_RacePlayerCount == RACE_MAX_PLAYERS) return SCM(playerid, -1, ""er"Race reached it's max players");
 		    
 		    CheckPlayerGod(playerid);
-		    
+
+			Command_ReProcess(playerid, "/stopanims", false);
 			Iter_Add(RaceJoins, playerid);
 			SetupRaceForPlayer(playerid);
 			NewMinigameJoin(playerid, "Race", "race");
