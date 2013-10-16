@@ -13,7 +13,7 @@
 
 #define IS_RELEASE_BUILD false
 #define INC_ENVIORMENT true
-#define IRC_CONNECT false
+#define IRC_CONNECT true
 #define YSI_IS_SERVER
 
 // Todo:
@@ -1166,12 +1166,12 @@ new const szRandomInfoTXTs[14][] =
 	"Don't wanna get killed? Type ~g~~h~~h~/god",
 	"Flip your car with key ~g~~h~~h~'2'",
 	"Visit our forums! "SVRFORUM"",
-	"Get ~p~VIP~w~ today! Go to "SVRURLWWW"/vip",
+	"Get ~p~VIP ~w~today! Go to "SVRURLWWW"/vip",
 	"Get some ~y~Gold Credits ~w~at "SVRURLWWW"/credits",
 	"Player Control: ~g~~h~~h~/settings",
 	"If you see a hacker in game use /report <id> <reason>",
-	"Type /cnr to join Cops and Robbers game",
-	"Use /m and select a minigame to play in!",
+	"Type ~y~/cnr ~w~to join Cops and Robbers game",
+	"Use ~y~/m ~w~and select a minigame to play in!",
 	"~y~/tune ~w~your vehicle randomly",
 	"Join minigames to earn money and score! ~g~~h~~h~/m",
 	"Want money and score fast? Read ~g~~h~~h~/help",
@@ -2659,6 +2659,7 @@ public OnPlayerSpawn(playerid)
 		SetCameraBehindPlayer(playerid);
 		PlayerInfo[playerid][tickLastChat] = 0;
 		StopAudioStreamForPlayer(playerid);
+		PlayerPlaySound(playerid, 1184, 0, 0, 0);
 		RandomSpawn(playerid);
 		RandomWeapon(playerid);
 		HidePlayerWelcomeTextdraws(playerid);
@@ -3293,6 +3294,7 @@ public OnPlayerConnect(playerid)
 		TextDrawHideForPlayer(playerid, TXTTeleportInfo);
 
         InitSession(playerid);
+        PlayerPlaySound(playerid, 1183, 0, 0, 0);
 
 		format(gstr, sizeof(gstr), "SELECT * FROM `bans` WHERE `PlayerName` = '%s';", __GetName(playerid));
 		mysql_tquery(g_SQL_handle, gstr, "OnQueryFinish", "siii", gstr, THREAD_IS_BANNED, playerid, g_SQL_handle);
@@ -4116,6 +4118,12 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 
 			TextDrawHideForPlayer(extraid, TXTOnJoin[0]);
 			TextDrawHideForPlayer(extraid, TXTOnJoin[1]);
+
+			Streamer_UpdateEx(extraid, 1797.5835, -1305.0114, 121.2348, -1, -1);
+			SetPlayerPos(extraid, 1797.5835, -1305.0114, 121.2348);
+			SetPlayerFacingAngle(extraid, 359.9696);
+			SetPlayerCameraPos(extraid, 1797.3688, -1299.8156, 121.4657);
+			SetPlayerCameraLookAt(extraid, 1797.3661, -1300.8164, 121.4556);
 
 			format(gstr, sizeof(gstr), "INSERT INTO `online` VALUES (NULL, '%s', '%s', UNIX_TIMESTAMP());", __GetName(extraid), __GetIP(extraid));
 			mysql_tquery(g_SQL_handle, gstr, "", "");
@@ -22943,7 +22951,7 @@ LoadServerStaticMeshes()
 	}
 	
     CreateDynamicSphere(341.8535, -1852.6327, 6.8569, 25.0); // <- beach sphere
-    CreateDynamicSphere(372.4490, 2569.1714, 19.4684, 20.0); // <- AA sphere
+    CreateDynamicSphere(385.4325, 2541.2456, 14.5953, 18.0); // <- AA sphere
     CreateDynamicSphere(-1203.3666, -27.8846, 15.8403, 15.0); // <- SFA 1 sphere
     CreateDynamicSphere(-1183.3441, -9.4441, 15.8403, 15.0); // <- SFA 2 sphere
 
@@ -23147,6 +23155,9 @@ LoadServerStaticMeshes()
     Command_AddAltNamed("fallouts", "topfallout");
     Command_AddAltNamed("wanteds", "topwanteds");
     Command_AddAltNamed("rtests", "topreaction");
+    Command_AddAltNamed("vmenu", "mycars");
+    Command_AddAltNamed("gmenu", "mygang");
+    Command_AddAltNamed("hmenu", "myhouses");
 	
     AddPlayerClass(3, 1958.3783, 1343.1572, 15.3746, 270.1425, 0, 0, 0, 0, 0, 0);
     AddPlayerClass(81, 1958.3783, 1343.1572, 15.3746, 270.1425, 0, 0, 0, 0, 0, 0);
@@ -23306,7 +23317,7 @@ LoadVisualStaticMeshes()
 	CreateObject(4726, 338.60001, -1853.16003, 5.92000,   0.00000, 0.00000, 270.00000); // LS beach
 	CreateObject(9241, -1182.88000, -12.16000, 14.00000,   0.00000, 0.00000, -135.00000); //SFA 1
 	CreateObject(9241, -1200.43005, -29.73000, 14.00000,   0.00000, 0.00000, -135.00000); //SFA 2
-	CreateObject(9241, 373.13416, 2576.27124, 17.56651,   0.00000, 0.00000, 0.00000); //AA
+	CreateObject(18783, 385.4325, 2541.2456, 14.5953,   0.00000, 0.00000, 0.00000); //AA
 	CreateObject(8040,-1296.403,-1665.809,538.216,0.0,0.0,-6.016); // Ski-Ramp
 	CreateObject(8040, 423.46, 3216.41, 739.40,   0.00, 0.00, -106.57); //AAJUMP
 	CreateObject(14548,-2183.280,1194.442,1696.073,0.0,0.0,-3.438); // Andro
@@ -28965,16 +28976,15 @@ function:DoLotto()
 {
 	Iter_Clear(LottoNumbersUsed);
 	lotto_number = random(75) + 1;
-	lotto_jackpot = 140000 + random(50000);
+	lotto_jackpot = 200000 + random(100000);
 	lotto_active = true;
 
-	new string[255];
-	format(string, sizeof(string), "~g~~h~~<~ Lottery Information ~>~~n~~w~Buy a lotto in any 24/7 shop (/247) inside use /lotto <1-75>~n~~r~~h~Jackpot: $%s - Draw starts in 5 minutes!", ToCurrency(lotto_jackpot));
+	format(gstr, sizeof(gstr), "~g~~h~~<~ Lottery Information ~>~~n~~w~Buy a lotto in any 24/7 shop (/247) inside use /lotto <1-75>~n~~r~~h~Jackpot: $%s - Draw starts in 5 minutes!", ToCurrency(lotto_jackpot));
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(!IsPlayerAvail(i)) continue;
-		InfoTD_MSG(i, 15000, string);
+		InfoTD_MSG(i, 15000, gstr);
 	}
 	
 	SetTimer("LottoDraw", 300000, false);
