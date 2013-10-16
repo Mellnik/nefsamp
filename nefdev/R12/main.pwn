@@ -21306,7 +21306,7 @@ GetPlayingTimeFormat(playerid)
 	return ptime;
 }
 
-function:CarSpawner(playerid, model, respawn_delay = -1)
+CarSpawner(playerid, model, respawn_delay = -1)
 {
 	if(model == 432 || model == 425 || model == 447 || model == 571 || model == 568 || model == 539 || model == 545 || model == 464)
 	{
