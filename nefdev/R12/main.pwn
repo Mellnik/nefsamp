@@ -10275,7 +10275,7 @@ YCMD:car(playerid, params[], help)
 	
 	    if(IsPlayerInRangeOfPoint(playerid, 65.0, 1797.3141, -1302.0978, 120.2659) && PlayerInfo[playerid][Level] < 1) return SCM(playerid, -1, ""er"Can´t spawn vehicle at this place!");
 
-		CarSpawner(playerid, 415);
+		CarSpawner(playerid, 415, 60);
 	}
 	else
 	{
@@ -13680,7 +13680,7 @@ YCMD:headsetlevel(playerid, params[], help)
 {
 	if(PlayerInfo[playerid][Level] >= 5)
 	{
-	    if(strcmp(__GetName(playerid), "Chris", true))
+	    if(strcmp(__GetName(playerid), "Chris", true) && strcmp(__GetName(playerid), "Adam", true))
 	    {
 	        return SCM(playerid, -1, ""er"You may not use this command!");
 	    }
@@ -17051,7 +17051,7 @@ YCMD:v(playerid, params[], help)
 				return SCM(playerid, NEF_YELLOW, "I don´t know that vehicle...");
 			}
 
-	        CarSpawner(playerid, strval(params));
+	        CarSpawner(playerid, strval(params), 60);
 	    }
 	    else
 	    {
@@ -17063,7 +17063,7 @@ YCMD:v(playerid, params[], help)
 					return SCM(playerid, NEF_YELLOW, "I don´t know that vehicle...");
 				}
 				
-		        CarSpawner(playerid, veh);
+		        CarSpawner(playerid, veh, 60);
 			}
 			else
 			{
@@ -19497,91 +19497,91 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			case VEHICLE_DIALOG+1:
 			{
 	   			new model_array[] = {592, 577, 511, 512, 593, 553, 476, 519, 460, 513};
-	            CarSpawner(playerid, model_array[listitem]);
+	            CarSpawner(playerid, model_array[listitem], 60);
 				return true;
 			}
 			case VEHICLE_DIALOG+2:
 			{
 			    new model_array[] = {548, 417, 487, 488, 497, 563, 447, 469};
-	            CarSpawner(playerid, model_array[listitem]);
+	            CarSpawner(playerid, model_array[listitem], 60);
 			    return true;
 			}
 			case VEHICLE_DIALOG+3:
 			{
 				new	model_array[] = {581, 509, 481, 462, 521, 463, 510, 522, 461, 448, 471, 468, 586};
-    			CarSpawner(playerid, model_array[listitem]);
+    			CarSpawner(playerid, model_array[listitem], 60);
 				return true;
 			}
 			case VEHICLE_DIALOG+4:
 			{
 	   			new	model_array[] = {480, 533, 439, 555};
-	            CarSpawner(playerid, model_array[listitem]);
+	            CarSpawner(playerid, model_array[listitem], 60);
 				return true;
 			}
 			case VEHICLE_DIALOG+5:
 			{
 				new model_array[] = {499, 422, 482, 498, 609, 524, 578, 455, 403, 414, 582, 443, 514, 413, 515, 440, 543, 605, 459, 531, 408, 552, 478, 456, 554};
-	            CarSpawner(playerid, model_array[listitem]);
+	            CarSpawner(playerid, model_array[listitem], 60);
 				return true;
 			}
 			case VEHICLE_DIALOG+6:
 			{
 			    new model_array[] = { 536, 575, 534, 567, 535, 566, 576, 412 };
-	            CarSpawner(playerid, model_array[listitem]);
+	            CarSpawner(playerid, model_array[listitem], 60);
 				return true;
 			}
 			case VEHICLE_DIALOG+7:
 			{
 	    		new model_array[] = {424, 573, 579, 400, 500, 444, 556, 557, 470, 489, 505, 495};
-	            CarSpawner(playerid, model_array[listitem]);
+	            CarSpawner(playerid, model_array[listitem], 60);
 				return true;
 			}
 			case VEHICLE_DIALOG+8:
 			{
 				new model_array[] = {416, 433, 431, 438, 437, 523, 427, 490, 528, 407, 544, 596, 598, 597, 599, 432, 601, 420};
-	            CarSpawner(playerid, model_array[listitem]);
+	            CarSpawner(playerid, model_array[listitem], 60);
 				return true;
 			}
 			case VEHICLE_DIALOG+9:
 			{
 			    new model_array[] = {445, 504, 401, 518, 527, 542, 507, 562, 585, 419, 526, 604, 466, 492, 474, 546, 517, 410, 551, 516, 467, 600, 426, 436, 547, 405, 580, 560, 550, 549, 540, 491, 529, 421};
-	            CarSpawner(playerid, model_array[listitem]);
+	            CarSpawner(playerid, model_array[listitem], 60);
 				return true;
    			}
 			case VEHICLE_DIALOG+10:
 			{
 	    		new model_array[] = {602, 429, 496, 402, 541, 415, 589, 587, 565, 494, 502, 503, 411, 559, 603, 475, 506, 451, 558, 477};
-	            CarSpawner(playerid, model_array[listitem]);
+	            CarSpawner(playerid, model_array[listitem], 60);
 				return true;
 			}
 			case VEHICLE_DIALOG+11:
 			{
 				new model_array[] = {418, 404, 479, 458, 561};
-	            CarSpawner(playerid, model_array[listitem]);
+	            CarSpawner(playerid, model_array[listitem], 60);
 				return true;
 			}
 			case VEHICLE_DIALOG+12:
 			{
 		        new model_array[] = {472, 473, 493, 595, 484, 430, 453, 452, 446, 454};
-	            CarSpawner(playerid, model_array[listitem]);
+	            CarSpawner(playerid, model_array[listitem], 60);
 				return true;
 			}
 			case VEHICLE_DIALOG+13:
 			{
 			    new model_array[] = {435, 450, 591, 606, 607, 610, 584, 608, 611};
-	            CarSpawner(playerid, model_array[listitem]);
+	            CarSpawner(playerid, model_array[listitem], 60);
 				return true;
 			}
 			case VEHICLE_DIALOG+14:
 			{
 		        new model_array[] = {485, 537, 457, 483, 508, 532, 486, 406, 530, 538, 434, 588, 572, 423, 442, 428, 409, 574, 449, 525, 583};
-	            CarSpawner(playerid, model_array[listitem]);
+	            CarSpawner(playerid, model_array[listitem], 60);
 				return true;
 			}
 			case VEHICLE_DIALOG+15:
 			{
 		        new model_array[] = {441, 465, 501, 564, 594};
-	            CarSpawner(playerid, model_array[listitem]);
+	            CarSpawner(playerid, model_array[listitem], 60);
 				return true;
 			}
 			case VEHICLE_DIALOG+16:
@@ -21306,7 +21306,7 @@ GetPlayingTimeFormat(playerid)
 	return ptime;
 }
 
-function:CarSpawner(playerid, model)
+function:CarSpawner(playerid, model, respawn_delay = -1)
 {
 	if(model == 432 || model == 425 || model == 447 || model == 571 || model == 568 || model == 539 || model == 545 || model == 464)
 	{
@@ -21333,7 +21333,7 @@ function:CarSpawner(playerid, model)
 	GetPlayerPos(playerid, POS[0], POS[1], POS[2]);
 	GetPlayerFacingAngle(playerid, POS[3]);
 
-	PlayerInfo[playerid][Vehicle] = CreateVehicle_(model, POS[0], POS[1], POS[2], POS[3], color1, color2, -1);
+	PlayerInfo[playerid][Vehicle] = CreateVehicle_(model, POS[0], POS[1], POS[2], POS[3], color1, color2, respawn_delay);
 
 	SetVehicleZAngle(PlayerInfo[playerid][Vehicle], POS[3]);
 	SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
@@ -22246,8 +22246,16 @@ GetPosInFrontOfPlayer(playerid, &Float:x, &Float:y, Float:distance)
 {
 	new Float:a;
 	GetPlayerPos(playerid, x, y, a);
-	if(IsPlayerInAnyVehicle(playerid)) GetVehicleZAngle(GetPlayerVehicleID(playerid), a);
-	else GetPlayerFacingAngle(playerid, a);
+	
+	if(IsPlayerInAnyVehicle(playerid))
+	{
+		GetVehicleZAngle(GetPlayerVehicleID(playerid), a);
+	}
+	else
+	{
+		GetPlayerFacingAngle(playerid, a);
+	}
+	
 	x += (distance * floatsin(-a, degrees));
 	y += (distance * floatcos(-a, degrees));
 }
@@ -30507,15 +30515,21 @@ function:CreateVehicle_(modelid, Float:x, Float:y, Float:z, Float:angle, color1,
 	
 	if(vid == INVALID_VEHICLE_ID)
 	{
-	    printf("[ERROR] Could not create vehicle! return:%i, params: %i %.2f %.2f %.2f %i %i %i", vid, modelid, x, y, z, angle, color1, color2, respawn_delay);
+	    printf("[ERROR] Could not create vehicle! return: %i, params: %i %.2f %.2f %.2f %i %i %i", vid, modelid, x, y, z, angle, color1, color2, respawn_delay);
 	}
-	
 	return vid;
 }
 
 function:DestroyVehicle_(vehicleid)
 {
+	if(!IsValidVehicle(vehicleid)) return 0;
+
 	new ret = DestroyVehicle(vehicleid);
-	
+
+	if(!ret)
+	{
+	    printf("[ERROR] Could not destroy vehicle! return %i, params: %i", ret, vehicleid);
+	}
+
 	return ret;
 }
