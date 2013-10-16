@@ -12004,7 +12004,7 @@ YCMD:ipban(playerid, params[], help)
 	    if(sscanf(params, "rs[144]", player, reason))
 	    {
 	        SCM(playerid, NEF_GREEN, "Usage: /ipban <playerid> <reason>");
-	        SCM(playerid, NEF_GREEN, "Bans the account and IP of the specified player");
+	        SCM(playerid, NEF_GREEN, "Bans the account (if registered) AND IP of the specified player");
 	        return 1;
 	    }
 	    
@@ -12014,7 +12014,12 @@ YCMD:ipban(playerid, params[], help)
 	    
 		if(strlen(reason) > 50) return SCM(playerid, -1, ""er"Keep the reason below 50");
 	    if(player == playerid) return SCM(playerid, -1, ""er"Fail :p");
-	  	if(isnull(reason) || strlen(reason) < 2) return SCM(playerid, NEF_GREEN, "Usage: /ban <playerid> <reason>");
+	  	if(isnull(reason) || strlen(reason) < 2)
+  		{
+	        SCM(playerid, NEF_GREEN, "Usage: /ipban <playerid> <reason>");
+	        SCM(playerid, NEF_GREEN, "Bans the account (if registered) AND IP of the specified player");
+		  	return 1;
+		}
 	  	if(IsPlayerNPC(player)) return SCM(playerid, -1, ""er"Invalid player!");
         if(PlayerInfo[player][KBMarked]) return SCM(playerid, -1, ""er"Can't ban this player!");
         
@@ -12051,74 +12056,19 @@ YCMD:ipban(playerid, params[], help)
 	  	{
 		 	if(IsPlayerAvail(player) && player != playerid && PlayerInfo[player][Level] != MAX_ADMIN_LEVEL)
 			{
-				new string[255];
-				
 				MySQL_BanIP(__GetIP(player));
 
 				if(islogged(player))
 				{
 	                MySQL_CreateBan(__GetName(player), __GetName(playerid), reason);
-	                if(PlayerInfo[player][Houses] > 0)
-	                {
-						for(new i = 0; i < houseid; i++)
-						{
-		    				if(strcmp(HouseInfo[i][Owner], __GetName(player), true)) continue;
-
-	                        strmid(HouseInfo[i][Owner], "ForSale", 0, 25, 25);
-						    HouseInfo[i][sold] = 0;
-						    HouseInfo[i][locked] = 1;
-						    HouseInfo[i][date] = 0;
-
-							for(new ii = 0; ii < MAX_HOUSE_OBJECTS; ii++)
-							{
-								if(HouseInfo[i][E_Obj_Model][ii] != 0)
-								{
-								    DestroyDynamicObject(HouseInfo[i][E_Obj_ObjectID][ii]);
-								    DestroyDynamic3DTextLabel(HouseInfo[i][E_Obj_Label][ii]);
-								    HouseInfo[i][E_Obj_Label][ii] = Text3D:-1;
-								    HouseInfo[i][E_Obj_ObjectID][ii] = -1;
-								    HouseInfo[i][E_Obj_Model][ii] = 0;
-								}
-							}
-
-						    format(string, sizeof(string), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseInfo[i][iID], ToCurrency(HouseInfo[i][price]), HouseInfo[i][E_score], HouseIntTypes[HouseInfo[i][interior]][intname]);
-						    UpdateDynamic3DTextLabelText(HouseInfo[i][label], -1, string);
-						    DestroyDynamicMapIcon(HouseInfo[i][iconid]);
-						    DestroyDynamicPickup(HouseInfo[i][pickid]);
-						    HouseInfo[i][iconid] = CreateDynamicMapIcon(HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], 31, 1, 0, -1, -1, 200.0);
-						    HouseInfo[i][pickid] = CreateDynamicPickup(1273, 1, HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], -1, -1, -1, 30.0);
-						    PlayerInfo[player][Houses]--;
-						    MySQL_SaveHouse(i, true);
-						}
-	                }
-
-	                if(PlayerInfo[player][Props] > 0)
-	                {
-						for(new i = 0; i < propid; i++)
-						{
-		    				if(strcmp(PropInfo[i][Owner], __GetName(player), true)) continue;
-
-	                        strmid(PropInfo[i][Owner], "ForSale", 0, 25, 25);
-						    PropInfo[i][sold] = 0;
-						    PropInfo[i][date] = 0;
-						    PropInfo[i][E_Level] = 1;
-
-						    format(string, sizeof(string), ""business_mark"\nOwner: ---\nID: %i\nLevel: %i", PropInfo[i][iID], PropInfo[i][E_Level]);
-						    UpdateDynamic3DTextLabelText(PropInfo[i][label], -1, string);
-						    DestroyDynamicMapIcon(PropInfo[i][iconid]);
-						    PropInfo[i][iconid] = CreateDynamicMapIcon(PropInfo[i][E_x], PropInfo[i][E_y], PropInfo[i][E_z], 52, 1, 0, -1, -1, 200.0);
-						    PlayerInfo[player][Props]--;
-						    MySQL_SaveProp(i);
-						}
-	                }
 				}
                 
-				format(string, sizeof(string), ""yellow"** "red"%s(%i) has been banned by Admin %s(%i) [Reason: %s]", __GetName(player), player, __GetName(playerid), playerid, reason);
-				SCMToAll(YELLOW, string);
-				print(string);
+				format(gstr, sizeof(gstr), ""yellow"** "red"%s(%i) has been banned by Admin %s(%i) [Reason: %s]", __GetName(player), player, __GetName(playerid), playerid, reason);
+				SCMToAll(YELLOW, gstr);
+				print(gstr);
 
-	    		format(string, sizeof(string), ""red"You have been banned!"white"\n\nAdmin:\t%s\nReason:\t%s\n\nIf you think that you have been banned wrongly,\nwrite a ban appeal on "SVRFORUM"", __GetName(playerid), reason);
-	    		ShowPlayerDialog(player, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" - Notice", string, "OK", "");
+	    		format(gstr, sizeof(gstr), ""red"You have been banned!"white"\n\nAdmin:\t%s\nReason:\t%s\n\nIf you think that you have been banned wrongly,\nwrite a ban appeal on "SVRFORUM"", __GetName(playerid), reason);
+	    		ShowPlayerDialog(player, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" - Notice", gstr, "OK", "");
 
 				KickEx(player);
 	    		
@@ -12132,9 +12082,8 @@ YCMD:ipban(playerid, params[], help)
 		}
 		else
 		{
-		    new warnstring[128];
-		    format(warnstring, sizeof(warnstring), "OMGLOL: %s just tried to ban you with reason: %s", __GetName(playerid), reason);
-		    SCM(player, RED, warnstring);
+		    format(gstr, sizeof(gstr), "OMGLOL: %s just tried to ban you with reason: %s", __GetName(playerid), reason);
+		    SCM(player, RED, gstr);
 		    SCM(playerid, RED, "I hope that was a joke");
 		}
 	}
@@ -12342,78 +12291,21 @@ YCMD:ban(playerid, params[], help)
 			{
 			    if(!islogged(player)) return SCM(playerid, -1, ""er"Use /ipban on not registered players!");
 			    
-				new string[255];
-
 	   			MySQL_CreateBan(__GetName(player), __GetName(playerid), reason);
 
-                if(PlayerInfo[player][Houses] > 0)
-                {
-					for(new i = 0; i < houseid; i++)
-					{
-	    				if(strcmp(HouseInfo[i][Owner], __GetName(player), true)) continue;
+				format(gstr, sizeof(gstr), ""yellow"** "red"%s(%i) has been banned by Admin %s(%i) [Reason: %s]", __GetName(player), player, __GetName(playerid), playerid, reason);
+				SCMToAll(YELLOW, gstr);
+				print(gstr);
 
-                        strmid(HouseInfo[i][Owner], "ForSale", 0, 25, 25);
-					    HouseInfo[i][sold] = 0;
-					    HouseInfo[i][locked] = 1;
-					    HouseInfo[i][date] = 0;
+				format(gstr, sizeof(gstr), "4Server: 2Admin %s(%i) has banned %s(%i) 1(Reason: %s)", __GetName(playerid), playerid, __GetName(player), player, reason);
+				IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 
-						for(new ii = 0; ii < MAX_HOUSE_OBJECTS; ii++)
-						{
-							if(HouseInfo[i][E_Obj_Model][ii] != 0)
-							{
-							    DestroyDynamicObject(HouseInfo[i][E_Obj_ObjectID][ii]);
-							    DestroyDynamic3DTextLabel(HouseInfo[i][E_Obj_Label][ii]);
-							    HouseInfo[i][E_Obj_Label][ii] = Text3D:-1;
-							    HouseInfo[i][E_Obj_ObjectID][ii] = -1;
-							    HouseInfo[i][E_Obj_Model][ii] = 0;
-							}
-						}
-
-					    format(string, sizeof(string), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseInfo[i][iID], ToCurrency(HouseInfo[i][price]), HouseInfo[i][E_score], HouseIntTypes[HouseInfo[i][interior]][intname]);
-					    UpdateDynamic3DTextLabelText(HouseInfo[i][label], -1, string);
-					    DestroyDynamicMapIcon(HouseInfo[i][iconid]);
-					    DestroyDynamicPickup(HouseInfo[i][pickid]);
-					    HouseInfo[i][iconid] = CreateDynamicMapIcon(HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], 31, 1, 0, -1, -1, 200.0);
-					    HouseInfo[i][pickid] = CreateDynamicPickup(1273, 1, HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], -1, -1, -1, 30.0);
-					    PlayerInfo[player][Houses]--;
-					    MySQL_SaveHouse(i, true);
-					}
-                }
-
-                if(PlayerInfo[player][Props] > 0)
-                {
-					for(new i = 0; i < propid; i++)
-					{
-	    				if(strcmp(PropInfo[i][Owner], __GetName(player), true)) continue;
-
-                        strmid(PropInfo[i][Owner], "ForSale", 0, 25, 25);
-					    PropInfo[i][sold] = 0;
-					    PropInfo[i][date] = 0;
-					    PropInfo[i][E_Level] = 1;
-
-					    format(string, sizeof(string), ""business_mark"\nOwner: ---\nID: %i\nLevel: %i", PropInfo[i][iID], PropInfo[i][E_Level]);
-					    UpdateDynamic3DTextLabelText(PropInfo[i][label], -1, string);
-					    DestroyDynamicMapIcon(PropInfo[i][iconid]);
-					    PropInfo[i][iconid] = CreateDynamicMapIcon(PropInfo[i][E_x], PropInfo[i][E_y], PropInfo[i][E_z], 52, 1, 0, -1, -1, 200.0);
-					    PlayerInfo[player][Props]--;
-					    MySQL_SaveProp(i);
-					}
-                }
-
-				format(string, sizeof(string), ""yellow"** "red"%s(%i) has been banned by Admin %s(%i) [Reason: %s]", __GetName(player), player, __GetName(playerid), playerid, reason);
-				SCMToAll(YELLOW, string);
-				print(string);
-
-				format(string, sizeof(string), "4Server: 2Admin %s(%i) has banned %s(%i) 1(Reason: %s)", __GetName(playerid), playerid, __GetName(player), player, reason);
-				IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, string);
-
-	    		format(string, sizeof(string), ""red"You have been banned!"white"\n\nAdmin:\t%s\nReason:\t%s\n\nIf you think that you have been banned wrongly,\nwrite a ban appeal on "SVRFORUM"", __GetName(playerid), reason);
-	    		ShowPlayerDialog(player, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" - Notice", string, "OK", "");
+	    		format(gstr, sizeof(gstr), ""red"You have been banned!"white"\n\nAdmin:\t%s\nReason:\t%s\n\nIf you think that you have been banned wrongly,\nwrite a ban appeal on "SVRFORUM"", __GetName(playerid), reason);
+	    		ShowPlayerDialog(player, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" - Notice", gstr, "OK", "");
 
 				KickEx(player);
 	    		
 	    		PlayerPlaySound(playerid, 1184, 0.0, 0.0, 0.0);
-				return 1;
 			}
 			else
 			{
@@ -12422,9 +12314,8 @@ YCMD:ban(playerid, params[], help)
 		}
 		else
 		{
-		    new warnstring[128];
-		    format(warnstring, sizeof(warnstring), "OMGLOL: %s just tried to ban you with reason: %s", __GetName(playerid), reason);
-		    SCM(player, RED, warnstring);
+		    format(gstr, sizeof(gstr), "OMGLOL: %s just tried to ban you with reason: %s", __GetName(playerid), reason);
+		    SCM(player, RED, gstr);
 		    SCM(playerid, RED, "I hope that was a joke");
 		}
 	}
