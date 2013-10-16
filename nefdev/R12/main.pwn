@@ -1930,7 +1930,7 @@ new GunGame_Weapons[] =
 	23,	22, 27, 26, 29, 32, 30, 31, 38, 33, 34, 35, 36, 24
 };
 
-new Float:Minigun_Spawns[11][4] =
+new Float:Minigun_Spawns[10][4] =
 {
 	{38.1505, 1564.5778, 12.7500, 132.2755},
 	{8.7437, 1549.5354, 12.7560, 55.1620},
@@ -1941,8 +1941,7 @@ new Float:Minigun_Spawns[11][4] =
 	{28.7336, 1517.8481, 12.7560, 121.7190},
 	{9.5176, 1560.8956, 12.7500, 217.7807},
 	{16.0684, 1552.2834, 28.2681, 151.2032},
-	{-4.4292, 1508.5903, 20.0397, 338.7700},
-	{-3.7889, 1534.5502, 30.8132, 241.6056}
+	{-4.4292, 1508.5903, 20.0397, 338.7700}
 };
 new Float:Sniper_Spawns[14][4] =
 {
@@ -2848,7 +2847,7 @@ public OnPlayerSpawn(playerid)
 	        SetPlayerVirtualWorld(playerid, MINIGUN_WORLD);
 			SetPlayerInterior(playerid, 0);
 
-			new rand = random(11);
+			new rand = random(10);
 
 			SetPlayerPosEx(playerid, Minigun_Spawns[rand][0], Minigun_Spawns[rand][1], floatadd(Minigun_Spawns[rand][2], 0.5));
 			SetPlayerFacingAngle(playerid, Minigun_Spawns[rand][3]);
@@ -9487,7 +9486,7 @@ YCMD:minigun(playerid, params[], help)
 
 	HidePlayerInfoTextdraws(playerid);
 
-	new rand = random(11);
+	new rand = random(10);
 	SetPlayerPos(playerid, Minigun_Spawns[rand][0], Minigun_Spawns[rand][1], Minigun_Spawns[rand][2]);
 	SetPlayerFacingAngle(playerid, Minigun_Spawns[rand][3]);
 	
