@@ -917,6 +917,7 @@ enum e_gzone_data
 	Text:E_Txt,
 	checkid,
 	zoneid,
+	zsphere,
 	bool:bUnderAttack,
 	AttackingGang,
 	DefendingGang
@@ -1614,6 +1615,7 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
 	Float:g_RaceVehCoords[RACE_MAX_PLAYERS][4],
 	Float:g_RaceCPs[RACE_MAX_CHECKPOINTS][3],
 	bool:CSGSOFT[MAX_PLAYERS] = {false, ...},
+	g_SpawnAreas[4],
 	g_RaceForceMap = 0,
 	g_BuildRace = INVALID_PLAYER_ID,
 	g_BuildDeployTime = 0,
@@ -5760,6 +5762,32 @@ public OnPlayerDeath(playerid, killerid, reason)
 		}
 	}
 	IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, msg);
+	return 1;
+}
+
+public OnPlayerEnterDynamicArea(playerid, areaid)
+{
+	for(new i = 0; i < gzoneid; i++)
+	{
+	    if(GZoneInfo[i][localGang] == PlayerInfo[playerid][GangID] && GZoneInfo[i][bUnderAttack] && areaid == GZoneInfo[i][zsphere])
+	    {
+	        // Player entered GWAR
+
+		}
+	}
+	return 1;
+}
+
+public OnPlayerLeaveDynamicArea(playerid, areaid)
+{
+	for(new i = 0; i < gzoneid; i++)
+	{
+	    if(GZoneInfo[i][localGang] == PlayerInfo[playerid][GangID] && GZoneInfo[i][bUnderAttack] && areaid == GZoneInfo[i][zsphere])
+	    {
+	        // Player left GWAR
+
+		}
+	}
 	return 1;
 }
 
@@ -20539,6 +20567,7 @@ function:OnGangZoneLoadEx(gindex)
         GZoneInfo[gindex][iconid] = CreateDynamicMapIcon(GZoneInfo[gindex][E_x], GZoneInfo[gindex][E_y], GZoneInfo[gindex][E_z], 19, 1, 0, -1, -1, 300.0);
         GZoneInfo[gindex][zoneid] = GangZoneCreate(GZoneInfo[gindex][E_x] + GZONE_SIZE, GZoneInfo[gindex][E_y] - GZONE_SIZE, GZoneInfo[gindex][E_x] - GZONE_SIZE, GZoneInfo[gindex][E_y] + GZONE_SIZE);
         GZoneInfo[gindex][checkid] = CreateDynamicCP(GZoneInfo[gindex][E_x], GZoneInfo[gindex][E_y], GZoneInfo[gindex][E_z], 7.0, 0, -1, -1, 60.0);
+		GZoneInfo[gindex][zsphere] = CreateDynamicSphere(GZoneInfo[gindex][E_x], GZoneInfo[gindex][E_y], GZoneInfo[gindex][E_z], 300.0, 0, -1, -1);
 
         GangZoneShowForAll(GZoneInfo[gindex][zoneid], COLOR_NONE);
 
@@ -20579,6 +20608,7 @@ function:OnGangZoneLoad()
 	        GZoneInfo[gzoneid][iconid] = CreateDynamicMapIcon(GZoneInfo[gzoneid][E_x], GZoneInfo[gzoneid][E_y], GZoneInfo[gzoneid][E_z], 19, 1, 0, -1, -1, 300.0);
 			GZoneInfo[gzoneid][zoneid] = GangZoneCreate(GZoneInfo[gzoneid][E_x] + GZONE_SIZE, GZoneInfo[gzoneid][E_y] - GZONE_SIZE, GZoneInfo[gzoneid][E_x] - GZONE_SIZE, GZoneInfo[gzoneid][E_y] + GZONE_SIZE);
             GZoneInfo[gzoneid][checkid] = CreateDynamicCP(GZoneInfo[gzoneid][E_x], GZoneInfo[gzoneid][E_y], GZoneInfo[gzoneid][E_z], 7.0, 0, -1, -1, 60.0);
+            GZoneInfo[gzoneid][zsphere] = CreateDynamicSphere(GZoneInfo[gzoneid][E_x], GZoneInfo[gzoneid][E_y], GZoneInfo[gzoneid][E_z], 300.0, 0, -1, -1);
 
 	        gzoneid++;
 	    }
@@ -22876,10 +22906,10 @@ LoadServerStaticMeshes()
 		NPCLabelHandle[i] = Text3D:-1;
 	}
 	
-    CreateDynamicSphere(341.8535, -1852.6327, 6.8569, 25.0); // <- beach sphere
-    CreateDynamicSphere(385.4325, 2541.2456, 14.5953, 14.5); // <- AA sphere
-    CreateDynamicSphere(-1203.3666, -27.8846, 15.8403, 15.0); // <- SFA 1 sphere
-    CreateDynamicSphere(-1183.3441, -9.4441, 15.8403, 15.0); // <- SFA 2 sphere
+    g_SpawnAreas[0] = CreateDynamicSphere(341.8535, -1852.6327, 6.8569, 25.0); // <- beach sphere
+    g_SpawnAreas[1] = CreateDynamicSphere(385.4325, 2541.2456, 14.5953, 14.5); // <- AA sphere
+    g_SpawnAreas[2] = CreateDynamicSphere(-1203.3666, -27.8846, 15.8403, 15.0); // <- SFA 1 sphere
+    g_SpawnAreas[3] = CreateDynamicSphere(-1183.3441, -9.4441, 15.8403, 15.0); // <- SFA 2 sphere
 
 	toyslist = LoadModelSelectionMenu("Other/toys.txt");
 	hobjslist = LoadModelSelectionMenu("Other/hobjs.txt");
@@ -25163,9 +25193,16 @@ function:ProcessTick()
 			{
 			    case NORMAL:
 			    {
-	   			    if(GetPlayerState(i) == PLAYER_STATE_DRIVER && IsPlayerInAnyDynamicArea(i))
+	   			    if(GetPlayerState(i) == PLAYER_STATE_DRIVER)
 				    {
-						SetVehicleVelocity(GetPlayerVehicleID(i), 0.0, 0.30, 0.35);
+						for(new ii = 0; ii < sizeof(g_SpawnAreas); ii++)
+						{
+						    if(IsPlayerInDynamicArea(i, g_SpawnAreas[ii]))
+						    {
+						        SetVehicleVelocity(GetPlayerVehicleID(i), 0.0, 0.30, 0.35);
+						        break;
+						    }
+						}
 				    }
 			    }
 			    case gRACE:
