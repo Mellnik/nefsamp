@@ -63,6 +63,8 @@
 #include <server_map_vehicles>
 #endif
 
+native IsValidVehicle(vehicleid); // undefined
+
 // -
 // - MySQL
 // -
@@ -2046,7 +2048,7 @@ new Float:WorldSpawns[4][4] =
 {
 	{341.8535, -1852.6327, 8.2618, 90.2136}, //beach
 	{-1196.3280, -17.4523, 15.8281, 42.5799}, //sfa
-	{385.4325, 2541.2456, 14.5953, 184.6792}, // /aa
+	{386.0204, 2541.1179, 19.0953, 181.2326}, // /aa
 	{680.2595, -1361.8927, 2551.2214, 90.0} // /speed
 };
 new Float:DM_MAP_1[2][4] =
@@ -7415,7 +7417,7 @@ YCMD:party(playerid, params[], help)
 }
 YCMD:aa(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid, 385.4325, 2541.2456, 14.5953, 184.6792, 385.7370, 2513.5242, 16.6766, 89.6337, "Abandoned Airport", "aa");
+    PortPlayerMapVeh(playerid, 386.0204, 2541.1179, 19.0953, 181.2326, 385.7370, 2513.5242, 16.6766, 89.6337, "Abandoned Airport", "aa");
     return 1;
 }
 YCMD:a51(playerid, params[], help)
@@ -9463,9 +9465,9 @@ YCMD:adminhelp(playerid, params[], help)
 
 	    strcat(string, ""yellow_e"Level 1:\n"white"/rplayers /dplayers /asay /warn /slap /reports /spec /specoff /disarm\n/pweaps /getin /gotoxyza /spectators /caps /day /night /dawn /lightfw\n");
 	    strcat(string, "/kick /mute /unmute /adminhq /ncrecords\n\n");
-	    strcat(string, ""yellow_e"Level 2:\n"white"/tban /online /offline /onduty /offduty /akill\n/move /ban /ipban /cuff /uncuff /jail /unjail /unfreeze\n\n");
+	    strcat(string, ""yellow_e"Level 2:\n"white"/tban /online /offline /onduty /offduty /akill /rv\n/move /ban /ipban /cuff /uncuff /jail /unjail /unfreeze\n\n");
 	    strcat(string, ""yellow_e"Level 3:\n"white"/freeze /eject /go /burn /mkick /clearchat\n/giveweapon /announce /npccheck /raceforcemap /deleterecord\n\n");
-	    strcat(string, ""yellow_e"Level 4:\n"white"/unban /oban /sethealth /get /getip /healall /armorall /cashfall /scorefall /announce2\n/iplookup\n\n");
+	    strcat(string, ""yellow_e"Level 4:\n"white"/unban /oban /sethealth /get /getip /healall /armorall /cashfall /scorefall\n/announce2 /iplookup\n\n");
 	    strcat(string, ""yellow_e"Level 5:\n"white"/setcash /setbcash /setscore /gdestroy /addcash /addscore\n\n");
 	    strcat(string, ""yellow_e"Level 6:\n"white"/resethouse /resetbizz /sethouseprice /sethousescore\n/setbizzlevel /createhouse /createbizz /createstore /gcreatezone");
 
@@ -12806,6 +12808,39 @@ YCMD:gotoxyza(playerid, params[], help)
 		SetCameraBehindPlayer(playerid);
 		format(gstr, sizeof(gstr), ""nef" You have teleported yourself to %.3f %.3f %.3f %.3f!", POS[0], POS[1], POS[2], POS[3]);
 		SCM(playerid, -1, gstr);
+	}
+	else
+	{
+		SCM(playerid, -1, NO_PERM);
+	}
+	return 1;
+}
+
+YCMD:rv(playerid, params[], help)
+{
+	if(PlayerInfo[playerid][Level] >= 2)
+	{
+	    new reason[50];
+	    if(sscanf(params, "s[49]", reason))
+	    {
+	        SCM(playerid, NEF_GREEN, "Usage: /rv <reason>");
+	        SCM(playerid, NEF_GREEN, "Respawns all unoccupied vehicles");
+	        return 1;
+	    }
+	    
+	    for(new i = 0; i < MAX_VEHICLES; i++)
+	    {
+	        if(IsValidVehicle(i))
+	        {
+	            if(IsVehicleOccupied(i)) continue;
+	            
+	            SetVehicleToRespawn(i);
+	        }
+	    }
+	    
+		format(gstr, sizeof(gstr), ""yellow"** Admin "red"%s(%i) respawned all unoccupied vehicles [Reason: %s]", __GetName(playerid), playerid, reason);
+		SCMToAll(YELLOW, gstr);
+		print(gstr);
 	}
 	else
 	{
@@ -16943,7 +16978,7 @@ YCMD:v(playerid, params[], help)
 	{
 	    if(IsNumeric(params))
 	    {
-			if(!IsValidVehicle(strval(params)))
+			if(!IsValidVehicleModel(strval(params)))
 			{
 				return SCM(playerid, NEF_YELLOW, "I don´t know that vehicle...");
 			}
@@ -16955,7 +16990,7 @@ YCMD:v(playerid, params[], help)
 			if(!sscanf(params, "s[144]", gstr))
 			{
 				new veh = GetVehicleModelID(gstr);
-				if(!IsValidVehicle(veh))
+				if(!IsValidVehicleModel(veh))
 				{
 					return SCM(playerid, NEF_YELLOW, "I don´t know that vehicle...");
 				}
@@ -17123,7 +17158,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		        if(!strlen(inputtext)) return ShowDialog(playerid, DIALOG_RACE_RACEVEH);
 		        if(IsNumeric(inputtext))
 		        {
-		            if(!IsValidVehicle(strval(inputtext))) return ShowDialog(playerid, DIALOG_RACE_RACEVEH);
+		            if(!IsValidVehicleModel(strval(inputtext))) return ShowDialog(playerid, DIALOG_RACE_RACEVEH);
 					new Float:POS[4];
 					GetPlayerPos(playerid, POS[0], POS[1], POS[2]);
 					GetPlayerFacingAngle(playerid, POS[3]);
@@ -17139,7 +17174,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 		        else
 		        {
-		            if(!IsValidVehicle(GetVehicleModelID(inputtext))) return ShowDialog(playerid, DIALOG_RACE_RACEVEH);
+		            if(!IsValidVehicleModel(GetVehicleModelID(inputtext))) return ShowDialog(playerid, DIALOG_RACE_RACEVEH);
 					new Float:POS[4];
 					GetPlayerPos(playerid, POS[0], POS[1], POS[2]);
 					GetPlayerFacingAngle(playerid, POS[3]);
@@ -22870,6 +22905,8 @@ LoadServerStaticMeshes()
 		TextDrawSetSelectable(GZoneInfo[i][E_Txt], 0);
 	}
 
+    Command_AddAltNamed("rv", "respawnvehicles");
+    Command_AddAltNamed("rv", "resetvehicles");
     Command_AddAltNamed("find", "locate");
     Command_AddAltNamed("locate", "loc");
     Command_AddAltNamed("vs", "wang");
@@ -23336,7 +23373,7 @@ LoadVisualStaticMeshes()
 	AddTeleport(3, "Skyroad 3", "skyroad3", 205.0412,2481.6416,16.5166);
 	AddTeleport(3, "Skyroad 4", "skyroad4", 587.9016,1400.4779,1228.1453);
 	AddTeleport(3, "Water Jump", "wj", 341.6029,2008.7330,571.1588);
-	AddTeleport(8, "Abandoned Airport", "aa", 385.4325, 2541.2456, 14.5953);
+	AddTeleport(8, "Abandoned Airport", "aa", 386.0204, 2541.1179, 18.0953);
 	AddTeleport(6, "Transfender", "trans", 1034.5165,-1039.7190,31.6651);
 	AddTeleport(6, "Transfender 2", "trans2", -1932.7380,228.3443,34.1563);
 	AddTeleport(6, "Transfender 3", "trans3", 2386.2788,1021.7114,10.8203);
@@ -26657,7 +26694,7 @@ NewMapEvent(Player, const mname[], const CMD[])
     TextDrawSetString(TXTTeleportInfo, string);
 }
 
-IsValidVehicle(vmodel)
+IsValidVehicleModel(vmodel)
 {
 	if(vmodel < 400 || vmodel > 611) return 0;
 	return 1;
@@ -26746,7 +26783,7 @@ GetVehicleNameById(vehicleid)
 {
 	new	string[56];
 
-	if(IsValidVehicle(GetVehicleModel(vehicleid)))
+	if(IsValidVehicleModel(GetVehicleModel(vehicleid)))
 	{
 	    format(string, sizeof(string), VehicleNames[GetVehicleModel(vehicleid) - 400]);
 	}
@@ -30411,7 +30448,7 @@ function:OnRaceRecordPurged(playerid, map)
 	return 1;
 }
 
-function:CreateVehicle_(modelid, Float:x, Float:y, Float:z, Float:angle, color1, color2, respawn_delay)
+CreateVehicle_(modelid, Float:x, Float:y, Float:z, Float:angle, color1, color2, respawn_delay)
 {
 	new vid = CreateVehicle(modelid, x, y, z, angle, color1, color2, respawn_delay);
 	
@@ -30422,7 +30459,7 @@ function:CreateVehicle_(modelid, Float:x, Float:y, Float:z, Float:angle, color1,
 	return vid;
 }
 
-function:DestroyVehicle_(vehicleid)
+DestroyVehicle_(vehicleid)
 {
 	if(!IsValidVehicle(vehicleid)) return 0;
 
@@ -30434,4 +30471,19 @@ function:DestroyVehicle_(vehicleid)
 	}
 
 	return ret;
+}
+
+IsVehicleOccupied(vehicleid)
+{
+	for(new i = 0; i < MAX_PLAYERS; i++)
+    {
+        if(IsPlayerInAnyVehicle(i) && gTeam[i] == NORMAL)
+        {
+            if(GetPlayerVehicleID(i) == vehicleid)
+			{
+			    return 1;
+			}
+        }
+    }
+    return 0;
 }
