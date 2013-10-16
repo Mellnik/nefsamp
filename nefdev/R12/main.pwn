@@ -16,8 +16,7 @@
 #define IRC_CONNECT false
 #define YSI_IS_SERVER
 
-// todo:
-// http://forum.sa-mp.com/showthread.php?t=17866
+// Todo:
 // letzen prop löschen
 // loginsound.txt löschen
 
@@ -2540,7 +2539,7 @@ public OnPlayerRequestClass(playerid, classid)
 
 	if(PlayerInfo[playerid][ExitType] == EXIT_FIRST_SPAWNED)
 	{
-		SCM(playerid, -1, ""er"You are bugged. Please reconnect.");
+		SCM(playerid, -1, ""er"You are bugged in class selection. Please reconnect.");
 		PlayerInfo[playerid][AllowSpawn] = false;
 		KickEx(playerid);
 	    return 0;
@@ -13894,7 +13893,6 @@ YCMD:race(playerid, params[], help)
     if(gTeam[playerid] != NORMAL) return GameTextForPlayer(playerid, "~w~Type ~p~/exit ~w~to leave first!", 4000, 4);
     
     SavePos(playerid);
-    CheckPlayerGod(playerid);
     
     switch(g_RaceStatus)
     {
@@ -13923,6 +13921,8 @@ YCMD:race(playerid, params[], help)
 		else
 		{
 		    if(g_RacePlayerCount == RACE_MAX_PLAYERS) return SCM(playerid, -1, ""er"Race reached it's max players");
+		    
+		    CheckPlayerGod(playerid);
 		    
 			Iter_Add(RaceJoins, playerid);
 			SetupRaceForPlayer(playerid);
