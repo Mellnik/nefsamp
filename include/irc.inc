@@ -213,7 +213,6 @@ public IRC_OnUserSay(botid, recipient[], user[], host[], message[])
 {
 	if (recipient[0] == CHANNEL_PREFIX && message[0] == COMMAND_PREFIX)
 	{
-		if(strlen(message) > 31) return 1;
 		new function[32], pos = 0;
 		while (message[++pos] > ' ')
 		{
