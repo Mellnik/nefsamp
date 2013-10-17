@@ -5754,7 +5754,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 	}
 	else
 	{
-		switch (reason)
+		switch(reason)
 		{
 			case 53: format(msg, sizeof(msg), "04*** %s died. (Drowned)", playerName);
 			case 54: format(msg, sizeof(msg), "04*** %s died. (Collision)", playerName);
@@ -5772,7 +5772,8 @@ public OnPlayerEnterDynamicArea(playerid, areaid)
 	    if(GZoneInfo[i][localGang] == PlayerInfo[playerid][GangID] && GZoneInfo[i][bUnderAttack] && areaid == GZoneInfo[i][zsphere])
 	    {
 	        // Player entered GWAR
-
+			SCM(playerid, -1, ""orange"You have joined the Gang War! Type /capture near the flag when no enemy is around!");
+			SetPlayerGWarMode(playerid);
 		}
 	}
 	return 1;
@@ -5785,7 +5786,8 @@ public OnPlayerLeaveDynamicArea(playerid, areaid)
 	    if(GZoneInfo[i][localGang] == PlayerInfo[playerid][GangID] && GZoneInfo[i][bUnderAttack] && areaid == GZoneInfo[i][zsphere])
 	    {
 	        // Player left GWAR
-
+            SCM(playerid, -1, ""orange"You have left the gang zone! Get back fast and defend it!");
+            ResetPlayerGWarMode(playerid);
 		}
 	}
 	return 1;
@@ -11753,7 +11755,7 @@ YCMD:gwar(playerid, params[], help)
 		    {
 		        if(PlayerInfo[ii][GangID] == PlayerInfo[playerid][GangID] && IsPlayerAvail(ii))
 		        {
-		            if(IsPlayerInRangeOfPoint(ii, 20.0, GZoneInfo[i][E_x], GZoneInfo[i][E_y], GZoneInfo[i][E_z]))
+		            if(IsPlayerInRangeOfPoint(ii, 30.0, GZoneInfo[i][E_x], GZoneInfo[i][E_y], GZoneInfo[i][E_z]))
 		            {
 		        		TextDrawShowForPlayer(ii, GZoneInfo[i][E_Txt]);
 		        		SetPlayerGWarMode(ii);
@@ -11791,7 +11793,7 @@ YCMD:gwar(playerid, params[], help)
 		    {
 		        if(PlayerInfo[ii][GangID] == PlayerInfo[playerid][GangID] && IsPlayerAvail(ii))
 		        {
-		            if(IsPlayerInRangeOfPoint(ii, 20.0, GZoneInfo[i][E_x], GZoneInfo[i][E_y], GZoneInfo[i][E_z]))
+		            if(IsPlayerInRangeOfPoint(ii, 30.0, GZoneInfo[i][E_x], GZoneInfo[i][E_y], GZoneInfo[i][E_z]))
 		            {
 		        		TextDrawShowForPlayer(ii, GZoneInfo[i][E_Txt]);
 		        		SetPlayerGWarMode(ii);
@@ -20668,6 +20670,18 @@ GetAttackingGZoneByGang(id)
 	return -1;
 }
 
+GetAttackingDefendingGZoneByGang(id)
+{
+	for(new i = 0; i < gzoneid; i++)
+	{
+	    if(id == GZoneInfo[i][AttackingGang] || id == GZoneInfo[i][DefendingGang])
+	    {
+	        return i;
+	    }
+	}
+	return -1;
+}
+
 GetGZonesByGang(id)
 {
 	new count = 0;
@@ -29260,11 +29274,12 @@ ExitPlayer(playerid)
 {
     if(PlayerInfo[playerid][bGWarMode])
     {
-		new tmp = GetAttackingGZoneByGang(PlayerInfo[playerid][GangID]);
+		new tmp = GetAttackingDefendingGZoneByGang(PlayerInfo[playerid][GangID]);
 		if(tmp == -1) return SCM(playerid, -1, ""er"Error! Please reconnect!");
         ResetPlayerGWarMode(playerid, tmp);
         return 0;
     }
+    
 	switch(gTeam[playerid])
 	{
 	    case gBUILDRACE:
