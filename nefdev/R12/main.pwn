@@ -435,17 +435,17 @@ native IsValidVehicle(vehicleid); // undefined
 // - Player
 // -
 #define COOLDOWN_CHAT                   (5500)
-#define COOLDOWN_CMD_BUY                (90000)
-#define COOLDOWN_CMD_PBUY               (90000)
+#define COOLDOWN_CMD_BUY                (30000)
+#define COOLDOWN_CMD_PBUY               (30000)
 #define COOLDOWN_CMD_LOCK               (5000)
-#define COOLDOWN_CMD_GIVECASH           (60000)
+#define COOLDOWN_CMD_GIVECASH           (120000)
 #define COOLDOWN_CMD_REPORT             (30000)
-#define COOLDOWN_CMD_SELL               (90000)
-#define COOLDOWN_CMD_PSELL              (90000)
+#define COOLDOWN_CMD_SELL               (30000)
+#define COOLDOWN_CMD_PSELL              (30000)
 #define COOLDOWN_CMD_CHANGEPASS         (60000)
 #define COOLDOWN_CMD_PM                 (3000)
 #define COOLDOWN_CMD_HITMAN             (60000)
-#define COOLDOWN_CMD_GINVITE            (120000)
+#define COOLDOWN_CMD_GINVITE            (60000)
 #define COOLDOWN_CMD_GKICK              (8000)
 #define COOLDOWN_CMD_GCREATE            (5000)
 #define COOLDOWN_DEATH                  (3000)
@@ -9495,9 +9495,9 @@ YCMD:adminhelp(playerid, params[], help)
 	{
 	    new string[1024];
 
-	    strcat(string, ""yellow_e"Level 1:\n"white"/rplayers /dplayers /asay /warn /slap /reports /spec /specoff /disarm\n/pweaps /getin /gotoxyza /spectators /caps /day /night /dawn /lightfw\n");
+	    strcat(string, ""yellow_e"Level 1:\n"white"/rplayers /dplayers /asay /warn /slap /reports /spec /specoff /disarm\n/pweaps /getin /gotoxyza /spectators /caps /day /night /dawn\n");
 	    strcat(string, "/kick /mute /unmute /adminhq /ncrecords\n\n");
-	    strcat(string, ""yellow_e"Level 2:\n"white"/tban /online /offline /onduty /offduty /akill /rv\n/move /ban /ipban /cuff /uncuff /jail /unjail /unfreeze\n\n");
+	    strcat(string, ""yellow_e"Level 2:\n"white"/tban /online /offline /onduty /offduty /akill /rv\n/move /ban /ipban /cuff /uncuff /jail /unjail /unfreeze /lightfw\n\n");
 	    strcat(string, ""yellow_e"Level 3:\n"white"/freeze /eject /go /burn /mkick /clearchat\n/giveweapon /announce /npccheck /raceforcemap /deleterecord\n\n");
 	    strcat(string, ""yellow_e"Level 4:\n"white"/unban /oban /sethealth /get /getip /healall /armorall /cashfall /scorefall\n/announce2 /iplookup\n\n");
 	    strcat(string, ""yellow_e"Level 5:\n"white"/setcash /setbcash /setscore /gdestroy /addcash /addscore\n\n");
@@ -11050,17 +11050,17 @@ YCMD:kick(playerid, params[], help)
 YCMD:lightfw(playerid, params[], help)
 {
 	if(gTeam[playerid] != NORMAL) return SCM(playerid, RED, NOT_AVAIL);
-	if(PlayerInfo[playerid][Level] >= 1)
+	
+	if(PlayerInfo[playerid][Level] >= 2)
 	{
 		new distance;
 	    if(AllowedFirework[DrawDistance] == 0) distance = 15;
 	    if(AllowedFirework[DrawDistance] == 1) distance = 22;
 	    if(AllowedFirework[DrawDistance] == 2) distance = 30;
-		new fwtype;
+
 	    if(sscanf(params, "i", fwtype))
 		{
-	        SCM(playerid, NEF_GREEN, "Usage: /lightfw <1-8>");
-	        return 1;
+	        return SCM(playerid, NEF_GREEN, "Usage: /lightfw <1-8>");
 	    }
 	    
 		switch(fwtype)
@@ -11075,7 +11075,6 @@ YCMD:lightfw(playerid, params[], help)
 					GetPosInFrontOfPlayer(playerid, X,Y, 8);
 					Firecracker[playerid] = CreateDynamicObject(1672, X,Y,(Z-0.9), 0, 0, 0);
 					SetTimerEx("FirecrackerTime", (2000+(random(3000))), false, "i", playerid);
-					return 1;
 				}
 				else return SCM(playerid, COLOR_RED, "ERROR: You already threw a firecracker.");
 			}
@@ -11093,7 +11092,6 @@ YCMD:lightfw(playerid, params[], help)
 					RollStartZ[playerid] = (Z-1.00);
 					CrackerRollSmoke[playerid] = CreateDynamicObject(2780, X, Y, (Z-5.00), 0, 0, 0);
 					SetTimerEx("CrackerRollTime", (2000+(random(3000))), false, "i", playerid);
-					return 1;
 				}
 				else return SCM(playerid, COLOR_RED, "ERROR: You already placed a firecracker roll.");
 			}
@@ -11110,7 +11108,6 @@ YCMD:lightfw(playerid, params[], help)
 					MoveDynamicObject(Firerocket[playerid], X, Y, Z+30, 10);
 					MoveDynamicObject(rocketsmoke[playerid], X, Y, Z+30, 10);
 					SetTimerEx("FirerocketTime", 3000, false, "i", playerid);
-					return 1;
 				}
 				else return SCM(playerid, COLOR_RED, "ERROR: You already lit a firerocket.");
 			}
@@ -11127,7 +11124,6 @@ YCMD:lightfw(playerid, params[], help)
 					MoveDynamicObject(Firerocket[playerid], X, Y, Z+50, 15);
 					MoveDynamicObject(rocketsmoke[playerid], X, Y, Z+50, 15);
 					SetTimerEx("FirerocketTime", 3000, false, "i", playerid);
-					return 1;
 				}
 				else return SCM(playerid, COLOR_RED, "ERROR: You already lit a firerocket.");
 			}
@@ -11145,7 +11141,6 @@ YCMD:lightfw(playerid, params[], help)
 					Fountain[playerid] = CreateDynamicObject(354, X,Y,(Z-1.0), 0, 0, 0);
 					FountainSmoke[playerid] = CreateDynamicObject(2780, X,Y,(Z-1.0), 0, 0, 0);
 					SetTimerEx("FountainTimer", 3000, false, "i", playerid);
-					return 1;
 				}
 				else return SCM(playerid, COLOR_RED, "ERROR: You already lit a Firework Fountain.");
 			}
@@ -11163,7 +11158,6 @@ YCMD:lightfw(playerid, params[], help)
 					Fountain[playerid] = CreateDynamicObject(354, X,Y,(Z-1.0), 0, 0, 0);
 					FountainSmoke[playerid] = CreateDynamicObject(2780, X,Y,(Z-1.0), 0, 0, 0);
 					SetTimerEx("FountainTimer", 3000, false, "i", playerid);
-					return 1;
 				}
 				else return SCM(playerid, COLOR_RED, "ERROR: You already lit a Firework Fountain.");
 			}
@@ -11181,7 +11175,6 @@ YCMD:lightfw(playerid, params[], help)
 					Fountain[playerid] = CreateDynamicObject(354, X,Y,(Z-1.0), 0, 0, 0);
 					FountainSmoke[playerid] = CreateDynamicObject(2780, X,Y,(Z-1.0), 0, 0, 0);
 					SetTimerEx("FountainTimer", 3000, false, "i", playerid);
-					return 1;
 				}
 				else return SCM(playerid, COLOR_RED, "ERROR: You already lit a Firework Fountain.");
 			}
@@ -11199,7 +11192,6 @@ YCMD:lightfw(playerid, params[], help)
 					RocketBox[playerid] = CreateDynamicObject(354, X,Y,(Z-1.0), 0, 0, 0);
 					RocketBoxSmoke[playerid] = CreateDynamicObject(2780, X,Y,(Z-1.0), 0, 0, 0);
 					SetTimerEx("RocketBoxTimer", 3000, false, "i", playerid);
-					return 1;
 				}
 				else return SCM(playerid, COLOR_RED, "ERROR: You already lit a Firework RocketBox.");
 			}
