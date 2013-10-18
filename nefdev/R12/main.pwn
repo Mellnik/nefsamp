@@ -651,6 +651,7 @@ enum e_player_data
 	bool:SniperAiming,
 	bool:bFloodDect,
 	bool:bLogged,
+	bool:bSpeedo,
 	tLoadMap,
 	Boost,
 	BoostDeplete,
@@ -1739,6 +1740,8 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
 	PlayerText:TXTWantedsTD[MAX_PLAYERS],
 	PlayerText:TXTMoney[MAX_PLAYERS],
 	PlayerText:TXTScore[MAX_PLAYERS],
+	PlayerText:TXTSpeedo[MAX_PLAYERS],
+	Text:TXTSpeedo_Main[2],
   	Text:TXTGunGameSign,
   	Text:TXTLoading,
   	Text:TXTTeleportInfo,
@@ -3272,6 +3275,7 @@ public OnPlayerConnect(playerid)
     pDerbyCar[playerid] = -1;
     PreviewTmpVeh[playerid] = -1;
 
+    ToggleSpeedo(playerid, false);
 	SetPlayerScore_(playerid, 0);
 	SetPlayerTeam(playerid, NO_TEAM);
 
@@ -4892,6 +4896,19 @@ public OnPlayerUpdate(playerid)
 	        }
 	    }
 	}
+	
+    if(PlayerInfo[playerid][bSpeedo])
+    {
+        if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
+        {
+	        new Float:p[3], Float:sspeed, str[12];
+	        GetVehicleVelocity(GetPlayerVehicleID(playerid), p[0], p[1], p[2]);
+	        sspeed = 150 * (p[0] * p[0] + p[1] * p[1]/*+p[2]*p[2]*/);
+	        format(str, sizeof(str), "%.0f", sspeed);
+
+			PlayerTextDrawSetString(playerid, TXTSpeedo[playerid], str);
+		}
+	}
 	return 1;
 }
 
@@ -4899,12 +4916,8 @@ public OnPlayerExitVehicle(playerid, vehicleid)
 {
 	if(gTeam[playerid] == DERBY || gTeam[playerid] == gRACE)
 	{
-		new Float:POS[3];
-		GetPlayerPos(playerid, POS[0], POS[1], POS[2]);
-		SetPlayerPos(playerid, POS[0], POS[1], POS[2]);
 		PutPlayerInVehicle(playerid, vehicleid, 0);
 	}
-
 	return 1;
 }
 
@@ -5404,6 +5417,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 			}
 
 			TogglePlayerControllable(playerid, true);
+            ToggleSpeedo(playerid, false);
 
 			g_CPProgress[playerid] = 0;
 
@@ -15952,6 +15966,7 @@ YCMD:rampdown(playerid, params[], help)
 
 YCMD:mellnik(playerid, params[], help)
 {
+    ToggleSpeedo(playerid, true);
 	if(PlayerInfo[playerid][Level] == MAX_ADMIN_LEVEL)
 	{
 		switch(YHash(__GetName(playerid), false))
@@ -20563,6 +20578,7 @@ function:OnHouseLoad()
 			HouseInfo[houseid][label] = CreateDynamic3DTextLabel(line, (HouseInfo[houseid][sold]) ? (0xFF0000FF) : (0x00FF00FF), HouseInfo[houseid][E_x], HouseInfo[houseid][E_y], floatadd(HouseInfo[houseid][E_z], 0.3), 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 30.0);
 			HouseInfo[houseid][pickid] = CreateDynamicPickup((HouseInfo[houseid][sold]) ? (1272) : (1273), 1, HouseInfo[houseid][E_x], HouseInfo[houseid][E_y], HouseInfo[houseid][E_z], -1, -1, -1, 30.0);
 			HouseInfo[houseid][iconid] = CreateDynamicMapIcon(HouseInfo[houseid][E_x], HouseInfo[houseid][E_y], HouseInfo[houseid][E_z], (HouseInfo[houseid][sold]) ? (32) : (31), 1, 0, -1, -1, 200.0);
+			
 			houseid++;
 		}
 	}
@@ -20595,6 +20611,7 @@ function:OnPropLoadEx(pindex)
 		PropInfo[pindex][label] = CreateDynamic3DTextLabel(string, -1, PropInfo[pindex][E_x], PropInfo[pindex][E_y], floatadd(PropInfo[pindex][E_z], 0.3), 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 30.0);
 		PropInfo[pindex][pickid] = CreateDynamicPickup(1274, 1, PropInfo[pindex][E_x], PropInfo[pindex][E_y], PropInfo[pindex][E_z], -1, -1, -1, 30.0);
 		PropInfo[pindex][iconid] = CreateDynamicMapIcon(PropInfo[pindex][E_x], PropInfo[pindex][E_y], PropInfo[pindex][E_z], 52, 1, 0, -1, -1, 200.0);
+		
 		pindex++;
 	}
 	return 1;
@@ -20633,6 +20650,7 @@ function:OnPropLoad()
 			PropInfo[propid][label] = CreateDynamic3DTextLabel(string, WHITE, PropInfo[propid][E_x], PropInfo[propid][E_y], floatadd(PropInfo[propid][E_z], 0.3), 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 30.0);
 			PropInfo[propid][pickid] = CreateDynamicPickup(1274, 1, PropInfo[propid][E_x], PropInfo[propid][E_y], PropInfo[propid][E_z], -1, -1, -1, 30.0);
 			PropInfo[propid][iconid] = CreateDynamicMapIcon(PropInfo[propid][E_x], PropInfo[propid][E_y], PropInfo[propid][E_z], (PropInfo[propid][sold]) ? (36) : (52), 1, 0, -1, -1, 200.0);
+			
 			propid++;
 		}
 	}
@@ -20675,7 +20693,9 @@ function:OnGangZoneLoad()
 	    for(new i = 0; i < rows; i++)
 	    {
 	        GZoneInfo[gzoneid][iID] = cache_get_row_int(i, 0, g_SQL_handle);
-	        cache_get_row(i, 1, GZoneInfo[gzoneid][sZoneName], g_SQL_handle, 40);
+	        new tmp[41];
+	        cache_get_row(i, 1, tmp, g_SQL_handle, sizeof(tmp));
+	        strmid(GZoneInfo[gzoneid][sZoneName], tmp, 0, 40, 40);
 	        
 	        GZoneInfo[gzoneid][E_x] = cache_get_row_float(i, 2, g_SQL_handle);
 	        GZoneInfo[gzoneid][E_y] = cache_get_row_float(i, 3, g_SQL_handle);
@@ -22519,6 +22539,27 @@ RandomWeapon(playerid)
 CreateTextdraws()
 {
     new count = GetTickCount() + 3600000;
+
+	TXTSpeedo_Main[0] = TextDrawCreate(224.000000, 382.999908, "usebox");
+	TextDrawLetterSize(TXTSpeedo_Main[0], 0.000000, -0.337033);
+	TextDrawTextSize(TXTSpeedo_Main[0], 143.500000, 0.000000);
+	TextDrawAlignment(TXTSpeedo_Main[0], 1);
+	TextDrawColor(TXTSpeedo_Main[0], 0);
+	TextDrawUseBox(TXTSpeedo_Main[0], true);
+	TextDrawBoxColor(TXTSpeedo_Main[0],0x73B1EDFF);
+	TextDrawSetShadow(TXTSpeedo_Main[0], 0);
+	TextDrawSetOutline(TXTSpeedo_Main[0], 0);
+	TextDrawFont(TXTSpeedo_Main[0], 0);
+	
+	TXTSpeedo_Main[1] = TextDrawCreate(126.500000, 333.666687, "KM/H");
+	TextDrawLetterSize(TXTSpeedo_Main[1], 0.209998, 0.905833);
+	TextDrawAlignment(TXTSpeedo_Main[1], 1);
+	TextDrawColor(TXTSpeedo_Main[1], 0x73B1ED55);
+	TextDrawSetShadow(TXTSpeedo_Main[1], 0);
+	TextDrawSetOutline(TXTSpeedo_Main[1], 0);
+	TextDrawBackgroundColor(TXTSpeedo_Main[1], 51);
+	TextDrawFont(TXTSpeedo_Main[1], 1);
+	TextDrawSetProportional(TXTSpeedo_Main[1], 1);
 
 	TXTRandomInfo = TextDrawCreate(636.000000, 421.000000, "Don't wanna get killed? Type ~g~~h~~h~/god");
 	TextDrawAlignment(TXTRandomInfo, 3);
@@ -27746,6 +27787,17 @@ function:InitSession(playerid)
 	RemoveBuildingForPlayer(playerid, 978, -1183.7344, 2.2891, 13.9844, 0.25);
 	RemoveBuildingForPlayer(playerid, 16594, -25.2109, 2338.7813, 27.5078, 0.25);
 	RemoveBuildingForPlayer(playerid, 16108, -25.2109, 2338.7813, 27.5078, 0.25);
+	
+	TXTSpeedo[playerid] = CreatePlayerTextDraw(playerid, 147.500000, 325.499938, "Speed");
+	PlayerTextDrawLetterSize(playerid, TXTSpeedo[playerid], 0.569999, 3.338332);
+	PlayerTextDrawTextSize(playerid, TXTSpeedo[playerid], 0.000000, 2.333331);
+	PlayerTextDrawAlignment(playerid, TXTSpeedo[playerid], 1);
+	PlayerTextDrawColor(playerid, TXTSpeedo[playerid], -1);
+	PlayerTextDrawSetShadow(playerid, TXTSpeedo[playerid], 0);
+	PlayerTextDrawSetOutline(playerid, TXTSpeedo[playerid], 1);
+	PlayerTextDrawBackgroundColor(playerid, TXTSpeedo[playerid],0x73B1ED55);
+	PlayerTextDrawFont(playerid, TXTSpeedo[playerid], 2);
+	PlayerTextDrawSetProportional(playerid, TXTSpeedo[playerid], 1);
 	return 1;
 }
 
@@ -29580,6 +29632,7 @@ ExitPlayer(playerid)
 			ResetPlayerWorld(playerid);
 			RandomWeapon(playerid);
 			RandomSpawn(playerid, true);
+            ToggleSpeedo(playerid, false);
 
 			g_CPProgress[playerid] = 0;
 
@@ -30239,6 +30292,8 @@ SetupRaceForPlayer(playerid)
     TogglePlayerControllable(playerid, false);
     SetCameraBehindPlayer(playerid);
 
+    ToggleSpeedo(playerid, true);
+
     g_CPProgress[playerid] = 0;
 
     format(gstr2, sizeof(gstr2), "SELECT `name`, `time` FROM `race_records` WHERE `track` = %i ORDER BY `time` ASC LIMIT 5;", g_NextRace);
@@ -30347,6 +30402,8 @@ function:StopRace()
 			RandomWeapon(i);
 			HidePlayerRaceTextdraws(i);
 			DisablePlayerRaceCheckpoint(i);
+			TogglePlayerControllable(i, true);
+			ToggleSpeedo(i, false);
 
 		    Streamer_ToggleItemUpdate(i, STREAMER_TYPE_OBJECT, 1);
 		    Streamer_ToggleItemUpdate(i, STREAMER_TYPE_PICKUP, 1);
@@ -30623,4 +30680,24 @@ IsVehicleOccupied(vehicleid)
         }
     }
     return 0;
+}
+
+ToggleSpeedo(playerid, bool:toggle)
+{
+	if(!toggle)
+	{
+	    PlayerInfo[playerid][bSpeedo] = false;
+
+		PlayerTextDrawHide(playerid, TXTSpeedo[playerid]);
+		TextDrawHideForPlayer(playerid, TXTSpeedo_Main[0]);
+	    TextDrawHideForPlayer(playerid, TXTSpeedo_Main[1]);
+	}
+	else
+	{
+	    PlayerInfo[playerid][bSpeedo] = true;
+
+		PlayerTextDrawShow(playerid, TXTSpeedo[playerid]);
+		TextDrawShowForPlayer(playerid, TXTSpeedo_Main[0]);
+	    TextDrawShowForPlayer(playerid, TXTSpeedo_Main[1]);
+	}
 }
