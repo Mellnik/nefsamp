@@ -11058,6 +11058,7 @@ YCMD:lightfw(playerid, params[], help)
 	    if(AllowedFirework[DrawDistance] == 1) distance = 22;
 	    if(AllowedFirework[DrawDistance] == 2) distance = 30;
 
+		new fwtype;
 	    if(sscanf(params, "i", fwtype))
 		{
 	        return SCM(playerid, NEF_GREEN, "Usage: /lightfw <1-8>");
