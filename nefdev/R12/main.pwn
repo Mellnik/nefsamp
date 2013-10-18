@@ -914,7 +914,7 @@ enum e_gzone_data
 	Float:E_y,
 	Float:E_z,
 	localGang,
-	captured,
+	iLocked,
 	iTimeLeft,
 	iconid,
 	Text3D:label,
@@ -3893,7 +3893,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 						GZoneInfo[i][bUnderAttack] = false;
 						GZoneInfo[i][AttackingGang] = 0;
 						GZoneInfo[i][DefendingGang] = 0;
-						GZoneInfo[i][captured] = 0;
+						GZoneInfo[i][iLocked] = gettime();
 						GZoneInfo[i][localGang] = 0;
 
 						format(gstr, sizeof(gstr), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: ---\n"orange"Type /gwar to start an attack!", GZoneInfo[i][iID], GZoneInfo[i][sZoneName]);
@@ -4072,6 +4072,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 	 			PlayerInfo[extraid][GangLabel] = Text3D:-1;
 			}
 
+			SyncGangZones(extraid);
 			PlayerInfo[extraid][GangLabel] = CreateDynamic3DTextLabel(gstr, -1, 0.0, 0.0, 0.5, 20.0, extraid, INVALID_VEHICLE_ID, 1, -1, -1, -1, 20.0);
 		}
         case THREAD_IS_BANNED:
@@ -4916,6 +4917,9 @@ public OnPlayerExitVehicle(playerid, vehicleid)
 {
 	if(gTeam[playerid] == DERBY || gTeam[playerid] == gRACE)
 	{
+	    new Float:POS[3];
+	    GetPlayerPos(playerid, POS[0], POS[1], POS[2]);
+		SetPlayerPos(playerid, POS[0], POS[1], POS[2]);
 		PutPlayerInVehicle(playerid, vehicleid, 0);
 	}
 	return 1;
@@ -5800,13 +5804,13 @@ public OnPlayerLeaveDynamicArea(playerid, areaid)
 {
 	for(new i = 0; i < gzoneid; i++)
 	{
-	    if(GZoneInfo[i][localGang] == PlayerInfo[playerid][GangID] && GZoneInfo[i][bUnderAttack] && areaid == GZoneInfo[i][zsphere])
+	    if(GZoneInfo[i][localGang] == PlayerInfo[playerid][GangID] && GZoneInfo[i][bUnderAttack] && areaid == GZoneInfo[i][zsphere] && PlayerInfo[playerid][bGWarMode])
 	    {
 	        // Player left GWAR
             SCM(playerid, -1, ""orange"You have left the gang zone! Get back fast and defend it!");
 			new tmp = GetGZoneByInvlovedGang(PlayerInfo[playerid][GangID]);
 			if(tmp == -1) return SCM(playerid, -1, ""er"Error! Please reconnect!");
-            ResetPlayerGWarMode(playerid, tmp);
+            ResetPlayerGWarMode(playerid, tmp, false);
 		}
 	}
 	return 1;
@@ -8028,6 +8032,8 @@ YCMD:netstats(playerid, params[], help)
 
 YCMD:fallout(playerid, params[], help)
 {
+    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't join minigames while being in a Gang War, type /exit");
+    
 	switch(gTeam[playerid])
 	{
 	    case STORE, BUYCAR, SPEC, VIPL, gBUILDRACE, HOUSE, JAIL: return SCM(playerid, RED, NOT_AVAIL);
@@ -8074,6 +8080,8 @@ YCMD:fallout(playerid, params[], help)
 
 YCMD:derby(playerid, params[], help)
 {
+    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't join minigames while being in a Gang War, type /exit");
+    
 	switch(gTeam[playerid])
 	{
 	    case STORE, BUYCAR, SPEC, VIPL, gBUILDRACE, HOUSE, JAIL: return SCM(playerid, RED, NOT_AVAIL);
@@ -8120,6 +8128,8 @@ YCMD:derby(playerid, params[], help)
 
 YCMD:war(playerid, params[], help)
 {
+    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't join minigames while being in a Gang War, type /exit");
+    
 	switch(gTeam[playerid])
 	{
 	    case STORE, BUYCAR, SPEC, VIPL, gBUILDRACE, HOUSE, JAIL: return SCM(playerid, RED, NOT_AVAIL);
@@ -8168,6 +8178,8 @@ YCMD:war(playerid, params[], help)
 
 YCMD:dm(playerid, params[], help)
 {
+    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't join minigames while being in a Gang War, type /exit");
+    
 	switch(gTeam[playerid])
 	{
 	    case STORE, BUYCAR, SPEC, VIPL, gBUILDRACE, HOUSE, JAIL: return SCM(playerid, RED, NOT_AVAIL);
@@ -8202,6 +8214,7 @@ YCMD:dm(playerid, params[], help)
 
 YCMD:dm2(playerid, params[], help)
 {
+    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't join minigames while being in a Gang War, type /exit");
 	switch(gTeam[playerid])
 	{
 	    case STORE, BUYCAR, SPEC, VIPL, gBUILDRACE, HOUSE, JAIL: return SCM(playerid, RED, NOT_AVAIL);
@@ -8236,6 +8249,7 @@ YCMD:dm2(playerid, params[], help)
 
 YCMD:dm3(playerid, params[], help)
 {
+    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't join minigames while being in a Gang War, type /exit");
 	switch(gTeam[playerid])
 	{
 	    case STORE, BUYCAR, SPEC, VIPL, gBUILDRACE, HOUSE, JAIL: return SCM(playerid, RED, NOT_AVAIL);
@@ -8270,6 +8284,7 @@ YCMD:dm3(playerid, params[], help)
 
 YCMD:dm4(playerid, params[], help)
 {
+    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't join minigames while being in a Gang War, type /exit");
 	switch(gTeam[playerid])
 	{
 	    case STORE, BUYCAR, SPEC, VIPL, gBUILDRACE, HOUSE, JAIL: return SCM(playerid, RED, NOT_AVAIL);
@@ -8764,7 +8779,7 @@ YCMD:ad(playerid, params[], help)
 		return SCM(playerid, NEF_GREEN, "Usage: /ad <text>");
 	}
 
-	if(strlen(ad) <= 0 || strlen(ad) > 110) return SCM(playerid, -1, ""er"Invalid text length");
+	if(strlen(ad) <= 2 || strlen(ad) > 120) return SCM(playerid, -1, ""er"Invalid text length");
 	if(IsAd(ad)) return SCM(playerid, -1, ""er"You may not post server ips");
 
 	GivePlayerCash(playerid, -10000);
@@ -8774,10 +8789,10 @@ YCMD:ad(playerid, params[], help)
 		Adverts[i] = Adverts[i + 1];
 	}
 	Adverts[MAX_ADS - 1] = ad;
-	format(gstr, sizeof(gstr), ""nef_green"Advertisment: %s", ad);
+	format(gstr, sizeof(gstr), ""nef_green"Advert: %s", ad);
 	SCMToAll(-1, gstr);
 	print(gstr);
-	format(gstr, sizeof(gstr), ""nef_green"Advertisment by %s(%i), contact ID: /pm %i - Last 10: /ads", __GetName(playerid), playerid, playerid);
+	format(gstr, sizeof(gstr), ""nef_green"Advert by %s(%i), contact ID: /pm %i", __GetName(playerid), playerid, playerid);
     SCMToAll(-1, gstr);
     print(gstr);
 	return 1;
@@ -8800,7 +8815,7 @@ YCMD:ads(playerid, params[], help)
 	{
 		SCM(playerid, WHITE, "There have been no adverts");
 	}
-	else ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_LIST, "Last Adverts (/ad)", ass, "Close", "");
+	else ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_LIST, "Last Adverts (/ad <text>)", ass, "Close", "");
 	return 1;
 }
 
@@ -9258,6 +9273,8 @@ YCMD:lock(playerid, params[], help)
 
 YCMD:gungame(playerid, params[], help)
 {
+    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't join minigames while being in a Gang War, type /exit");
+    
 	switch(gTeam[playerid])
 	{
 	    case STORE, BUYCAR, SPEC, VIPL, gBUILDRACE, HOUSE, JAIL: return SCM(playerid, RED, NOT_AVAIL);
@@ -9333,6 +9350,8 @@ YCMD:cnrhelp(playerid, params[], help)
 
 YCMD:tdm(playerid, params[], help)
 {
+    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't join minigames while being in a Gang War, type /exit");
+    
 	switch(gTeam[playerid])
 	{
 	    case STORE, BUYCAR, SPEC, VIPL, gBUILDRACE, HOUSE, JAIL: return SCM(playerid, RED, NOT_AVAIL);
@@ -9531,6 +9550,7 @@ YCMD:adminhelp(playerid, params[], help)
 
 YCMD:minigun(playerid, params[], help)
 {
+    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't join minigames while being in a Gang War, type /exit");
     if(gTeam[playerid] == MINIGUN) return SCM(playerid, -1, ""er"You are already in this minigame!");
     if(gTeam[playerid] != NORMAL) return GameTextForPlayer(playerid, "~w~Type ~p~/exit ~w~to leave first!", 4000, 4);
 
@@ -9555,6 +9575,7 @@ YCMD:minigun(playerid, params[], help)
 
 YCMD:sniper(playerid, params[], help)
 {
+    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't join minigames while being in a Gang War, type /exit");
     if(gTeam[playerid] == MINIGUN) return SCM(playerid, -1, ""er"You are already in this minigame!");
     if(gTeam[playerid] != NORMAL) return GameTextForPlayer(playerid, "~w~Type ~p~/exit ~w~to leave first!", 4000, 4);
 
@@ -11498,7 +11519,7 @@ YCMD:gcreatezone(playerid, params[], help)
         GZoneInfo[gzoneid][E_z] = POS[2];
 
 		GZoneInfo[gzoneid][localGang] = 0;
-  		GZoneInfo[gzoneid][captured] = 0;
+  		GZoneInfo[gzoneid][iLocked] = gettime();
         GZoneInfo[gzoneid][bUnderAttack] = false;
 
 		format(gstr2, sizeof(gstr2), "INSERT INTO `gzones` VALUES (NULL, '%s', %f, %f, %f, %i, %i);",
@@ -11507,7 +11528,7 @@ YCMD:gcreatezone(playerid, params[], help)
 			GZoneInfo[gzoneid][E_y],
 			GZoneInfo[gzoneid][E_z],
 			GZoneInfo[gzoneid][localGang],
-			GZoneInfo[gzoneid][captured]);
+			GZoneInfo[gzoneid][iLocked]);
 			
 	    mysql_tquery(g_SQL_handle, gstr2, "", "");
 	    mysql_tquery(g_SQL_handle, "SELECT * FROM `gzones` ORDER BY `id` DESC LIMIT 1;", "OnGangZoneLoadEx", "i", gzoneid);
@@ -11762,7 +11783,7 @@ YCMD:gcapture(playerid, params[], help)
 		    format(gstr, sizeof(gstr), ""gang_sign" "r_besch" Your gang failed to capture '%s'. %s(%i) re-captured it!", GZoneInfo[i][sZoneName], __GetName(playerid), playerid);
 			GangMSG(GZoneInfo[i][AttackingGang], gstr);
 
-			format(gstr, sizeof(gstr), ""orange"Gang %s failed to capture '%s' The zone remains %s gang territory and will be locked for 3 hours!", GetGangNameByID(GZoneInfo[i][AttackingGang]), GZoneInfo[i][sZoneName], GetGangNameByID(GZoneInfo[i][DefendingGang]));
+			format(gstr, sizeof(gstr), ""orange"Gang %s failed to capture '%s' The zone remains %s gang territory and will be locked for 30 minutes!", GetGangNameByID(GZoneInfo[i][AttackingGang]), GZoneInfo[i][sZoneName], GetGangNameByID(GZoneInfo[i][DefendingGang]));
 			SCMToAll(-1, gstr);
 
 			for(new ii = 0; ii < MAX_PLAYERS; ii++)
@@ -11771,7 +11792,7 @@ YCMD:gcapture(playerid, params[], help)
 			    {
 			        if(PlayerInfo[ii][GangID] == GZoneInfo[i][AttackingGang] || PlayerInfo[ii][GangID] == GZoneInfo[i][DefendingGang])
 			        {
-			    		ResetPlayerGWarMode(ii, i);
+			    		ResetPlayerGWarMode(ii, i, false);
 					}
 					
 					if(PlayerInfo[ii][GangID] == GZoneInfo[i][DefendingGang])
@@ -11781,7 +11802,7 @@ YCMD:gcapture(playerid, params[], help)
 				}
 			}
 
-			format(gstr, sizeof(gstr), ""gang_sign" "r_besch" Member %s(%i) re-captured zone '%s' which was under attack.", __GetName(playerid), playerid);
+			format(gstr, sizeof(gstr), ""gang_sign" "r_besch" Member %s(%i) re-captured zone '%s' which was under attack.", __GetName(playerid), playerid, GZoneInfo[i][sZoneName]);
 			GangMSG(GZoneInfo[i][DefendingGang], gstr);
 
 			MySQL_UpdateGangScore(GZoneInfo[i][localGang], 10);
@@ -11794,7 +11815,7 @@ YCMD:gcapture(playerid, params[], help)
 			GZoneInfo[i][bUnderAttack] = false;
 			GZoneInfo[i][AttackingGang] = 0;
 			GZoneInfo[i][DefendingGang] = 0;
-			GZoneInfo[i][captured] = gettime();
+			GZoneInfo[i][iLocked] = gettime() + 1800;
 			
 			MySQL_SaveGangZone(i);
 		}
@@ -11825,9 +11846,9 @@ YCMD:gwar(playerid, params[], help)
 		    return ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" Gang War", ""white"This zone already belongs to your gang!", "OK", "");
 		}
 
-        if(GZoneInfo[i][captured] + 10800 > gettime())
+        if(GZoneInfo[i][iLocked] > gettime())
         {
-            return ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" Gang War", ""white"This zone was recently captured by another gang and can\ntherefore not be attacked now!", "OK", "");
+            return ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" Gang War", ""white"This zone is currently locked!", "OK", "");
 		}
 		
 		if(GetGZonesByGang(PlayerInfo[playerid][GangID]) >= MAX_GZONES_PER_GANG) return ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" Gang War", ""white"Your gang already owns the max Zones per Gang.", "OK", "");
@@ -11935,9 +11956,9 @@ SetPlayerGWarMode(playerid)
     PlayerInfo[playerid][bGWarMode] = true;
 }
 
-ResetPlayerGWarMode(playerid, id)
+ResetPlayerGWarMode(playerid, id, bool:msg = true)
 {
-    SCM(playerid, -1, ""orange"You have left the gang war!");
+    if(msg) SCM(playerid, -1, ""orange"You have left the gang war!");
     TextDrawHideForPlayer(playerid, GZoneInfo[id][E_Txt]);
     PlayerInfo[playerid][bGWarMode] = false;
 }
@@ -12086,7 +12107,7 @@ YCMD:gleave(playerid, params[], help)
  	PlayerInfo[playerid][GangPosition] = GANG_POS_NONE;
 
     MySQL_SavePlayer(playerid, false);
-
+    SyncGangZones(extraid);
 	if(PlayerInfo[playerid][GangLabel] != Text3D:-1)
 	{
 	    DestroyDynamic3DTextLabel(PlayerInfo[playerid][GangLabel]);
@@ -12965,7 +12986,7 @@ YCMD:rv(playerid, params[], help)
 	        }
 	    }
 	    
-		format(gstr, sizeof(gstr), ""yellow"** Admin "red"%s(%i) respawned all unoccupied vehicles [Reason: %s]", __GetName(playerid), playerid, reason);
+		format(gstr, sizeof(gstr), ""yellow"** "red"Admin %s(%i) respawned all unoccupied vehicles [Reason: %s]", __GetName(playerid), playerid, reason);
 		SCMToAll(YELLOW, gstr);
 		print(gstr);
 	}
@@ -13945,6 +13966,8 @@ YCMD:reports(playerid, params[], help)
 
 YCMD:race(playerid, params[], help)
 {
+    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't join minigames while being in a Gang War, type /exit");
+    
 	switch(gTeam[playerid])
 	{
 	    case STORE, BUYCAR, SPEC, VIPL, gBUILDRACE, HOUSE, JAIL: return SCM(playerid, RED, NOT_AVAIL);
@@ -18567,7 +18590,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						GZoneInfo[i][bUnderAttack] = false;
 						GZoneInfo[i][AttackingGang] = 0;
 						GZoneInfo[i][DefendingGang] = 0;
-						GZoneInfo[i][captured] = 0;
+						GZoneInfo[i][iLocked] = gettime();
 						GZoneInfo[i][localGang] = 0;
 
 						format(gstr, sizeof(gstr), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: ---\n"orange"Type /gwar to start an attack!", GZoneInfo[i][iID], GZoneInfo[i][sZoneName]);
@@ -20703,7 +20726,7 @@ function:OnGangZoneLoad()
 	        GZoneInfo[gzoneid][E_z] = cache_get_row_float(i, 4, g_SQL_handle);
 	        
 	        GZoneInfo[gzoneid][localGang] = cache_get_row_int(i, 5, g_SQL_handle);
-	        GZoneInfo[gzoneid][captured] = cache_get_row_int(i, 6, g_SQL_handle);
+	        GZoneInfo[gzoneid][iLocked] = cache_get_row_int(i, 6, g_SQL_handle);
 	        
 	        cache_set_active(Cache:0, g_SQL_handle);
 	        
@@ -21920,7 +21943,7 @@ MySQL_CreateBan(PlayerName[], AdminName[], Reason[], lift = 0)
 
 MySQL_SaveGangZone(id)
 {
-	format(gstr, sizeof(gstr), "UPDATE `gzones` SET `localgang` = %i, `captured` = %i WHERE `id` = %i;", GZoneInfo[id][localGang], GZoneInfo[id][captured], GZoneInfo[id][iID]);
+	format(gstr, sizeof(gstr), "UPDATE `gzones` SET `localgang` = %i, `locked` = %i WHERE `id` = %i;", GZoneInfo[id][localGang], GZoneInfo[id][iLocked], GZoneInfo[id][iID]);
 	mysql_tquery(g_SQL_handle, gstr, "", "");
 }
 
@@ -25560,7 +25583,7 @@ function:ProcessTick()
 						GZoneInfo[i][bUnderAttack] = false;
 						GZoneInfo[i][AttackingGang] = 0;
 						GZoneInfo[i][DefendingGang] = 0;
-						GZoneInfo[i][captured] = 0;
+						GZoneInfo[i][iLocked] = gettime();
 						GZoneInfo[i][localGang] = 0;
 					}
 					else
@@ -25592,7 +25615,7 @@ function:ProcessTick()
 						GZoneInfo[i][bUnderAttack] = false;
 						GZoneInfo[i][AttackingGang] = 0;
 						GZoneInfo[i][DefendingGang] = 0;
-						GZoneInfo[i][captured] = 0;
+						GZoneInfo[i][iLocked] = gettime();
 					}
 			    }
 			    else
@@ -25656,7 +25679,7 @@ function:ProcessTick()
 					GZoneInfo[i][bUnderAttack] = false;
 					GZoneInfo[i][AttackingGang] = 0;
 					GZoneInfo[i][DefendingGang] = 0;
-					GZoneInfo[i][captured] = gettime();
+					GZoneInfo[i][iLocked] = gettime() + 10800;
 				}
 				
 				MySQL_SaveGangZone(i);
