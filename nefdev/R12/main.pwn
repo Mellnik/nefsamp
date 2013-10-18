@@ -4706,10 +4706,8 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		}
 		case THREAD_KICK_FROM_GANG_2:
 		{
-		    new string[128];
-
-		    format(string, sizeof(string), ""gang_sign" "r_besch"%s kicked %s out of the gang", __GetName(extraid), PlayerInfo[extraid][GangKickMem]);
-			GangMSG(PlayerInfo[extraid][GangID], string);
+		    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s kicked %s out of the gang", __GetName(extraid), PlayerInfo[extraid][GangKickMem]);
+			GangMSG(PlayerInfo[extraid][GangID], gstr);
 
             PlayerInfo[extraid][GangKickMem][0] = '\0';
 		}
@@ -5211,9 +5209,8 @@ public OnPlayerDeath(playerid, killerid, reason)
 
 	if(reason <= 46 && gTeam[killerid] == NORMAL && IsPlayerConnected(killerid) && PlayerInfo[playerid][HitmanHit] > 0)
 	{
-		new string[128];
-		format(string, sizeof(string), "%s(%i) killed %s(%i) and received $%s for a completed hit!", __GetName(killerid), killerid, __GetName(playerid), playerid, ToCurrency(PlayerInfo[playerid][HitmanHit]));
-		SCMToAll(YELLOW, string);
+		format(gstr, sizeof(gstr), "%s(%i) killed %s(%i) and received $%s for a completed hit!", __GetName(killerid), killerid, __GetName(playerid), playerid, ToCurrency(PlayerInfo[playerid][HitmanHit]));
+		SCMToAll(YELLOW, gstr);
 		GivePlayerCash(killerid, PlayerInfo[playerid][HitmanHit]);
 		PlayerInfo[playerid][HitmanHit] = 0;
 	}
@@ -9807,18 +9804,17 @@ YCMD:sethealth(playerid, params[], help)
 	    
  		if(IsPlayerAvail(player))
 		{
-			new string[128];
 			if(player != playerid)
 			{
-				format(string, sizeof(string), "Admin %s(%i) has set your health to %f.", __GetName(playerid), playerid, amount);
-				SCM(player, YELLOW, string);
-				format(string, sizeof(string), "You have set %s's health to %f.", __GetName(player), amount);
-				SCM(playerid, YELLOW, string);
+				format(gstr, sizeof(gstr), "Admin %s(%i) has set your health to %f.", __GetName(playerid), playerid, amount);
+				SCM(player, YELLOW, gstr);
+				format(gstr, sizeof(gstr), "You have set %s's health to %f.", __GetName(player), amount);
+				SCM(playerid, YELLOW, gstr);
 			}
 			else
 			{
-				format(string, sizeof(string), "You have set your health to %f.", amount);
-				SCM(playerid, YELLOW, string);
+				format(gstr, sizeof(gstr), "You have set your health to %f.", amount);
+				SCM(playerid, YELLOW, gstr);
 			}
 			SetPlayerHealth(player, amount);
 		}
@@ -9856,18 +9852,17 @@ YCMD:setbcash(playerid, params[], help)
 
 		if(IsPlayerAvail(player))
 		{
-			new string[128];
 			if(player != playerid)
 			{
-				format(string, sizeof(string), "Admin %s(%i) has set your bank cash to $%s.", __GetName(playerid), playerid, ToCurrency(amount));
-				SCM(player, YELLOW, string);
-				format(string, sizeof(string), "You have set %s's bank cash to $%s.", __GetName(player), ToCurrency(amount));
-				SCM(playerid, YELLOW, string);
+				format(gstr, sizeof(gstr), "Admin %s(%i) has set your bank cash to $%s.", __GetName(playerid), playerid, ToCurrency(amount));
+				SCM(player, YELLOW, gstr);
+				format(gstr, sizeof(gstr), "You have set %s's bank cash to $%s.", __GetName(player), ToCurrency(amount));
+				SCM(playerid, YELLOW, gstr);
 			}
 			else
 			{
-				format(string, sizeof(string), "You have set your bank cash to $%s.", ToCurrency(amount));
-				SCM(playerid, YELLOW, string);
+				format(gstr, sizeof(gstr), "You have set your bank cash to $%s.", ToCurrency(amount));
+				SCM(playerid, YELLOW, gstr);
 			}
 			
 			format(gstr, sizeof(gstr), ""red"Adm: %s(%i) has been given bank $%i by %s(%i)", __GetName(player), player, amount, __GetName(playerid), playerid);
@@ -9910,18 +9905,17 @@ YCMD:setcash(playerid, params[], help)
 
 		if(IsPlayerAvail(player))
 		{
-			new string[128];
 			if(player != playerid)
 			{
-				format(string, sizeof(string), "Admin %s(%i) has set your cash to $%s.", __GetName(playerid), playerid, ToCurrency(amount));
-				SCM(player, YELLOW, string);
-				format(string, sizeof(string), "You have set %s's cash to $%s.", __GetName(player), ToCurrency(amount));
-				SCM(playerid, YELLOW, string);
+				format(gstr, sizeof(gstr), "Admin %s(%i) has set your cash to $%s.", __GetName(playerid), playerid, ToCurrency(amount));
+				SCM(player, YELLOW, gstr);
+				format(gstr, sizeof(gstr), "You have set %s's cash to $%s.", __GetName(player), ToCurrency(amount));
+				SCM(playerid, YELLOW, gstr);
 			}
 			else
 			{
-				format(string, sizeof(string), "You have set your cash to $%s.", ToCurrency(amount));
-				SCM(playerid, YELLOW, string);
+				format(gstr, sizeof(gstr), "You have set your cash to $%s.", ToCurrency(amount));
+				SCM(playerid, YELLOW, gstr);
 			}
 			
 			format(gstr, sizeof(gstr), ""red"Adm: %s's(%i) cash has been set to $%i by %s(%i)", __GetName(player), player, amount, __GetName(playerid), playerid);
@@ -11309,12 +11303,12 @@ YCMD:unmute(playerid, params[], help)
 			PlayerInfo[player][Muted] = false;
 			KillTimer(PlayerInfo[player][MuteTimer]);
 			SCM(player, NEF_YELLOW, "You have been unmuted!");
-			new string[128];
-			format(string, sizeof(string), ""yellow"** "red"%s(%i) has been unmuted by Admin %s(%i)", __GetName(player), player, __GetName(playerid), playerid);
-			SCMToAll(RED, string);
+
+			format(gstr, sizeof(gstr), ""yellow"** "red"%s(%i) has been unmuted by Admin %s(%i)", __GetName(player), player, __GetName(playerid), playerid);
+			SCMToAll(RED, gstr);
 			
-  			format(string, sizeof(string), "4MUTE:3 %s(%i) has been unmuted by %s", __GetName(player), player, __GetName(playerid));
-			IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, string);
+  			format(gstr, sizeof(gstr), "4MUTE:3 %s(%i) has been unmuted by %s", __GetName(player), player, __GetName(playerid));
+			IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 		}
 		else
 		{
@@ -12107,7 +12101,7 @@ YCMD:gleave(playerid, params[], help)
  	PlayerInfo[playerid][GangPosition] = GANG_POS_NONE;
 
     MySQL_SavePlayer(playerid, false);
-    SyncGangZones(extraid);
+    SyncGangZones(playerid);
 	if(PlayerInfo[playerid][GangLabel] != Text3D:-1)
 	{
 	    DestroyDynamic3DTextLabel(PlayerInfo[playerid][GangLabel]);
@@ -17363,14 +17357,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		    }
 	        case PROP_MENU_DIALOG:
 	        {
-				new string[128];
-				format(string, sizeof(string), ""nef" - Business Menu > Slot: %i", listitem + 1);
+				format(gstr, sizeof(gstr), ""nef" - Business Menu > Slot: %i", listitem + 1);
 
 	            PlayerInfo[playerid][PropSlotSelected] = listitem;
 
 		        if(listitem > PlayerInfo[playerid][AdditionalPropSlots])
 		        {
-		            ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, string, ""nef_green"This business slot is locked.\n\n"white"You may unlock it by purchasing an extra slot at Gold Credits (/gc)", "OK", "");
+		            ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, gstr, ""nef_green"This business slot is locked.\n\n"white"You may unlock it by purchasing an extra slot at Gold Credits (/gc)", "OK", "");
 		        }
 		        else
 				{
@@ -17380,7 +17373,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				    }
 				    else
 				    {
-				        ShowPlayerDialog(playerid, PROP_MENU_DIALOG + 1, DIALOG_STYLE_LIST, string, ""dl"Goto This Business\n"dl"Upgrade Business Level", "Select", "Cancel");
+				        ShowPlayerDialog(playerid, PROP_MENU_DIALOG + 1, DIALOG_STYLE_LIST, gstr, ""dl"Goto This Business\n"dl"Upgrade Business Level", "Select", "Cancel");
 				    }
 				}
 	            return true;
@@ -18561,10 +18554,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 		  			MySQL_SavePlayer(ID, false);
 
-					new string[128];
-
-				    format(string, sizeof(string), ""gang_sign" "r_besch"%s set %s´s rank to %s", __GetName(playerid), __GetName(ID), GangPositions[PlayerInfo[playerid][RankSelected]][E_gang_pos_name]);
-					GangMSG(PlayerInfo[playerid][GangID], string);
+				    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s set %s´s rank to %s", __GetName(playerid), __GetName(ID), GangPositions[PlayerInfo[playerid][RankSelected]][E_gang_pos_name]);
+					GangMSG(PlayerInfo[playerid][GangID], gstr);
 					
 					PlayerInfo[playerid][RankSelected] = 0;
 				}
@@ -18676,12 +18667,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					    DestroyDynamic3DTextLabel(PlayerInfo[ID][GangLabel]);
 						PlayerInfo[ID][GangLabel] = Text3D:-1;
 					}
+					
+				    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s kicked %s out of the gang", __GetName(playerid), PlayerInfo[playerid][GangKickMem]);
+					GangMSG(PlayerInfo[playerid][GangID], gstr);
 
-					new string[128];
-
-				    format(string, sizeof(string), ""gang_sign" "r_besch"%s kicked %s out of the gang", __GetName(playerid), PlayerInfo[playerid][GangKickMem]);
-					GangMSG(PlayerInfo[playerid][GangID], string);
-			        
 			        SCM(ID, -1, ""gang_sign" You have been kicked out of your gang!");
 			        
 			        PlayerInfo[playerid][GangKickMem][0] = '\0';
@@ -19465,12 +19454,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			}
 			case TOY_DIALOG:
 			{
-				new string[128];
-				format(string, sizeof(string), ""nef" - Player Toys > Slot: %i", listitem + 1);
+				format(gstr, sizeof(gstr), ""nef" - Player Toys > Slot: %i", listitem + 1);
 					
 			    if(listitem > PlayerInfo[playerid][AdditionalToySlots] + 4)
 			    {
-			        ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, string, ""nef_green"This toy slot is locked.\n\n"white"You may unlock it by purchasing an extra slot at Gold Credits (/gc)", "OK", "");
+			        ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, gstr, ""nef_green"This toy slot is locked.\n\n"white"You may unlock it by purchasing an extra slot at Gold Credits (/gc)", "OK", "");
 			    }
 			    else
 			    {
@@ -19482,7 +19470,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					}
 					else
 					{
-		            	ShowPlayerDialog(playerid, TOY_DIALOG + 1, DIALOG_STYLE_LIST, string, ""dl"Edit Toy Position\n"dl"Change Bone\n"dl""grey"Remove Toy", "Select", "Cancel");
+		            	ShowPlayerDialog(playerid, TOY_DIALOG + 1, DIALOG_STYLE_LIST, gstr, ""dl"Edit Toy Position\n"dl"Change Bone\n"dl""grey"Remove Toy", "Select", "Cancel");
 					}
 			    }
 				return true;
@@ -19768,9 +19756,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
                 if(listitem > PlayerInfo[playerid][AdditionalPVSlots])
 			    {
-					new string[128];
-					format(string, sizeof(string), ""nef" - Private Vehicle Menu > Slot: %i", listitem + 1);
-			        ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, string, ""nef_green"This vehicle slot is locked.\n\n"white"You may unlock it by purchasing an extra slot at Gold Credits (/gc)", "OK", "");
+					format(gstr, sizeof(gstr), ""nef" - Private Vehicle Menu > Slot: %i", listitem + 1);
+			        ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, gstr, ""nef_green"This vehicle slot is locked.\n\n"white"You may unlock it by purchasing an extra slot at Gold Credits (/gc)", "OK", "");
 			    }
 			    else
 			    {
@@ -19782,9 +19769,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					    return 1;
 					}
 
-					new string[128];
-					format(string, sizeof(string), ""nef" - Private Vehicle Menu > Slot: %i", listitem + 1);
-				    ShowPlayerDialog(playerid, VMENU_DIALOG + 1, DIALOG_STYLE_LIST, string, ""dl"Spawn Vehicle\n"dl"Attach Neon\n"dl"Change Number Plate\n"dl"Change Vehicle Color\n"dl""grey"Sell vehicle", "Select", "Back");
+					format(gstr, sizeof(gstr), ""nef" - Private Vehicle Menu > Slot: %i", listitem + 1);
+				    ShowPlayerDialog(playerid, VMENU_DIALOG + 1, DIALOG_STYLE_LIST, gstr, ""dl"Spawn Vehicle\n"dl"Attach Neon\n"dl"Change Number Plate\n"dl"Change Vehicle Color\n"dl""grey"Sell vehicle", "Select", "Back");
 			    }
 				return true;
 			}
@@ -20385,16 +20371,14 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			}
 			case NEON_DIALOG:
 			{
-				new string[128];
-				format(string, sizeof(string), ""nef" - Private Vehicle Menu > Slot: %i", PVVMenuSel[playerid] + 1);
-			    ShowPlayerDialog(playerid, VMENU_DIALOG + 1, DIALOG_STYLE_LIST, string, ""dl"Spawn Vehicle\n"dl"Attach Neon\n"dl"Change Number Plate\n"dl"Change Vehicle Color\n"dl""grey"Sell vehicle", "Select", "Back");
+				format(gstr, sizeof(gstr), ""nef" - Private Vehicle Menu > Slot: %i", PVVMenuSel[playerid] + 1);
+			    ShowPlayerDialog(playerid, VMENU_DIALOG + 1, DIALOG_STYLE_LIST, gstr, ""dl"Spawn Vehicle\n"dl"Attach Neon\n"dl"Change Number Plate\n"dl"Change Vehicle Color\n"dl""grey"Sell vehicle", "Select", "Back");
 			    return true;
 			}
 			case CUSTOM_PLATE_DIALOG:
 			{
-				new string[128];
-				format(string, sizeof(string), ""nef" - Private Vehicle Menu > Slot: %i", PVVMenuSel[playerid] + 1);
-			    ShowPlayerDialog(playerid, VMENU_DIALOG + 1, DIALOG_STYLE_LIST, string, ""dl"Spawn Vehicle\n"dl"Attach Neon\n"dl"Change Number Plate\n"dl"Change Vehicle Color\n"dl""grey"Sell vehicle", "Select", "Back");
+				format(gstr, sizeof(gstr), ""nef" - Private Vehicle Menu > Slot: %i", PVVMenuSel[playerid] + 1);
+			    ShowPlayerDialog(playerid, VMENU_DIALOG + 1, DIALOG_STYLE_LIST, gstr, ""dl"Spawn Vehicle\n"dl"Attach Neon\n"dl"Change Number Plate\n"dl"Change Vehicle Color\n"dl""grey"Sell vehicle", "Select", "Back");
 				return true;
 			}
 			case VMENU_DIALOG + 1:
@@ -23863,7 +23847,7 @@ PortPlayerMap(playerid, Float:X, Float:Y, Float:Z, Float:Angle, const mapname[],
     PlayerPlaySound(playerid, 1039, 0.0, 0.0, 0.0);
 	GameTextForPlayer(playerid, mapname, 1000, 6);
     SetCameraBehindPlayer(playerid);
-    if(populate) NewMapEvent(playerid, mapname, cmd);
+    if(populate) NewMapEvent(playerid, cmd);
 	return 1;
 }
 
@@ -23907,7 +23891,7 @@ PortPlayerMapVeh(playerid, Float:X, Float:Y, Float:Z, Float:Angle, Float:XVeh, F
 	PlayerPlaySound(playerid, 1039, 0.0, 0.0, 0.0);
     GameTextForPlayer(playerid, mapname, 1000, 6);
     SetCameraBehindPlayer(playerid);
-    if(populate) NewMapEvent(playerid, mapname, cmd);
+    if(populate) NewMapEvent(playerid, cmd);
 	return 1;
 }
 
@@ -26878,14 +26862,10 @@ NewMinigameJoin(playerid, const minigame[], const cmd[])
 	IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 }
 
-NewMapEvent(Player, const mname[], const CMD[])
+NewMapEvent(playerid, const cmd[])
 {
-	new waste[128];
-	strcat(waste, mname);
-	
-	new string[128];
-	format(string, sizeof(string), "~g~~h~~h~%s ~w~has gone to ~b~~h~~h~/%s", __GetName(Player), CMD);
-    TextDrawSetString(TXTTeleportInfo, string);
+	format(gstr, sizeof(gstr), "~g~~h~~h~%s ~w~has gone to ~b~~h~~h~/%s", __GetName(playerid), cmd);
+    TextDrawSetString(TXTTeleportInfo, gstr);
 }
 
 IsValidVehicleModel(vmodel)
@@ -26936,7 +26916,7 @@ __GetIP(playerid)
 
 GetColor__(playerid)
 {
-	new color = GetPlayerColor(playerid) + 136;
+	new color = GetPlayerColor(playerid);
 	return color;
 }
 
@@ -26975,7 +26955,7 @@ GetUptime()
 
 GetVehicleNameById(vehicleid)
 {
-	new	string[56];
+	new	string[57];
 
 	if(IsValidVehicleModel(GetVehicleModel(vehicleid)))
 	{
@@ -27437,15 +27417,13 @@ function:ShowDialog(playerid, dialogid)
   		}
 		case NEON_DIALOG:
 		{
-			new string[128];
-			format(string, sizeof(string), ""nef" - Private Vehicle Menu > Slot: %i > Neon Menu", PVVMenuSel[playerid] + 1);
-		    ShowPlayerDialog(playerid, NEON_DIALOG, DIALOG_STYLE_LIST, string, ""dl"Red\n"dl"Green\n"dl"Blue\n"dl"Yellow\n"dl"White\n"dl"Pink\n"dl""grey"Remove", "Select", "Back");
+			format(gstr, sizeof(gstr), ""nef" - Private Vehicle Menu > Slot: %i > Neon Menu", PVVMenuSel[playerid] + 1);
+		    ShowPlayerDialog(playerid, NEON_DIALOG, DIALOG_STYLE_LIST, gstr, ""dl"Red\n"dl"Green\n"dl"Blue\n"dl"Yellow\n"dl"White\n"dl"Pink\n"dl""grey"Remove", "Select", "Back");
 		}
 		case CUSTOM_PLATE_DIALOG:
 		{
-			new string[128];
-			format(string, sizeof(string), ""nef" - Private Vehicle Menu > Slot: %i > Plate", PVVMenuSel[playerid] + 1);
-		    ShowPlayerDialog(playerid, CUSTOM_PLATE_DIALOG, DIALOG_STYLE_INPUT, string, ""white"Please enter something for your number plate:\nLength: 2 - 12 characters", "Change", "Back");
+			format(gstr, sizeof(gstr), ""nef" - Private Vehicle Menu > Slot: %i > Plate", PVVMenuSel[playerid] + 1);
+		    ShowPlayerDialog(playerid, CUSTOM_PLATE_DIALOG, DIALOG_STYLE_INPUT, gstr, ""white"Please enter something for your number plate:\nLength: 2 - 12 characters", "Change", "Back");
 		}
 		case VEHICLE_DIALOG:
 		{
@@ -27499,22 +27477,21 @@ function:ShowDialog(playerid, dialogid)
 		}
 		case GMENU_DIALOG:
 		{
-		    new string[128];
-		    format(string, sizeof(string), ""grey"[%s] %s "white"- Gang Menu", PlayerInfo[playerid][GangTag], PlayerInfo[playerid][GangName]);
+		    format(gstr, sizeof(gstr), ""grey"[%s] %s "white"- Gang Menu", PlayerInfo[playerid][GangTag], PlayerInfo[playerid][GangName]);
 		
 		    switch(PlayerInfo[playerid][GangPosition])
 			{
 			    case GANG_POS_JUNIOR_MEMBER, GANG_POS_MEMBER, GANG_POS_SENIOR_MEMBER, GANG_POS_ADVISOR:
 			    {
-			        ShowPlayerDialog(playerid, GMENU_DIALOG, DIALOG_STYLE_LIST, string, ""dl"Gang Info\n"dl"Show all gang members\n"dl"View all gang commands", "Select", "Cancel");
+			        ShowPlayerDialog(playerid, GMENU_DIALOG, DIALOG_STYLE_LIST, gstr, ""dl"Gang Info\n"dl"Show all gang members\n"dl"View all gang commands", "Select", "Cancel");
 			    }
 			    case GANG_POS_LEADER:
 			    {
-			        ShowPlayerDialog(playerid, GMENU_DIALOG, DIALOG_STYLE_LIST, string, ""dl"Gang Info\n"dl"Show All Gang Members\n"dl"View All Gang Commands\n"dl"Set Player Rank", "Select", "Cancel");
+			        ShowPlayerDialog(playerid, GMENU_DIALOG, DIALOG_STYLE_LIST, gstr, ""dl"Gang Info\n"dl"Show All Gang Members\n"dl"View All Gang Commands\n"dl"Set Player Rank", "Select", "Cancel");
 			    }
 			    case GANG_POS_MAIN_LEADER:
 			    {
-			    	ShowPlayerDialog(playerid, GMENU_DIALOG, DIALOG_STYLE_LIST, string, ""dl"Gang Info\n"dl"Show All Gang Members\n"dl"View All Gang Commands\n"dl"Set Player Rank\n"dl"Kick Player From Gang", "Select", "Cancel");
+			    	ShowPlayerDialog(playerid, GMENU_DIALOG, DIALOG_STYLE_LIST, gstr, ""dl"Gang Info\n"dl"Show All Gang Members\n"dl"View All Gang Commands\n"dl"Set Player Rank\n"dl"Kick Player From Gang", "Select", "Cancel");
 			    }
 			}
 		}
