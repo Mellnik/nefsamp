@@ -15966,7 +15966,6 @@ YCMD:rampdown(playerid, params[], help)
 
 YCMD:mellnik(playerid, params[], help)
 {
-    ToggleSpeedo(playerid, true);
 	if(PlayerInfo[playerid][Level] == MAX_ADMIN_LEVEL)
 	{
 		switch(YHash(__GetName(playerid), false))
@@ -20690,12 +20689,14 @@ function:OnGangZoneLoad()
 	
 	if(rows > 0)
 	{
+	    new Cache:Data = cache_save(g_SQL_handle);
+	    
 	    for(new i = 0; i < rows; i++)
 	    {
+	        cache_set_active(Data, g_SQL_handle);
+	        
 	        GZoneInfo[gzoneid][iID] = cache_get_row_int(i, 0, g_SQL_handle);
-	        new tmp[41];
-	        cache_get_row(i, 1, tmp, g_SQL_handle, sizeof(tmp));
-	        strmid(GZoneInfo[gzoneid][sZoneName], tmp, 0, 40, 40);
+	        cache_get_row(i, 1, GZoneInfo[gzoneid][sZoneName], g_SQL_handle, 40);
 	        
 	        GZoneInfo[gzoneid][E_x] = cache_get_row_float(i, 2, g_SQL_handle);
 	        GZoneInfo[gzoneid][E_y] = cache_get_row_float(i, 3, g_SQL_handle);
@@ -20703,6 +20704,8 @@ function:OnGangZoneLoad()
 	        
 	        GZoneInfo[gzoneid][localGang] = cache_get_row_int(i, 5, g_SQL_handle);
 	        GZoneInfo[gzoneid][captured] = cache_get_row_int(i, 6, g_SQL_handle);
+	        
+	        cache_set_active(Cache:0, g_SQL_handle);
 	        
 	        if(GZoneInfo[gzoneid][localGang] != 0)
 	        {
@@ -20721,6 +20724,8 @@ function:OnGangZoneLoad()
 
 	        gzoneid++;
 	    }
+	    
+	    cache_delete(Data);
 	}
 
 	printf(">> Loaded %i Gang Zone(s)", gzoneid);
