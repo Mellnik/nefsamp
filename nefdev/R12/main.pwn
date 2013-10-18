@@ -1741,7 +1741,7 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
 	PlayerText:TXTMoney[MAX_PLAYERS],
 	PlayerText:TXTScore[MAX_PLAYERS],
 	PlayerText:TXTSpeedo[MAX_PLAYERS],
-	Text:TXTSpeedo_Main[2],
+	Text:TXTSpeedo_Main,
   	Text:TXTGunGameSign,
   	Text:TXTLoading,
   	Text:TXTTeleportInfo,
@@ -22539,27 +22539,16 @@ RandomWeapon(playerid)
 CreateTextdraws()
 {
     new count = GetTickCount() + 3600000;
-
-	TXTSpeedo_Main[0] = TextDrawCreate(224.000000, 382.999908, "usebox");
-	TextDrawLetterSize(TXTSpeedo_Main[0], 0.000000, -0.337033);
-	TextDrawTextSize(TXTSpeedo_Main[0], 143.500000, 0.000000);
-	TextDrawAlignment(TXTSpeedo_Main[0], 1);
-	TextDrawColor(TXTSpeedo_Main[0], 0);
-	TextDrawUseBox(TXTSpeedo_Main[0], true);
-	TextDrawBoxColor(TXTSpeedo_Main[0],0x73B1EDFF);
-	TextDrawSetShadow(TXTSpeedo_Main[0], 0);
-	TextDrawSetOutline(TXTSpeedo_Main[0], 0);
-	TextDrawFont(TXTSpeedo_Main[0], 0);
 	
-	TXTSpeedo_Main[1] = TextDrawCreate(126.500000, 333.666687, "KM/H");
-	TextDrawLetterSize(TXTSpeedo_Main[1], 0.209998, 0.905833);
-	TextDrawAlignment(TXTSpeedo_Main[1], 1);
-	TextDrawColor(TXTSpeedo_Main[1], 0x73B1ED55);
-	TextDrawSetShadow(TXTSpeedo_Main[1], 0);
-	TextDrawSetOutline(TXTSpeedo_Main[1], 0);
-	TextDrawBackgroundColor(TXTSpeedo_Main[1], 51);
-	TextDrawFont(TXTSpeedo_Main[1], 1);
-	TextDrawSetProportional(TXTSpeedo_Main[1], 1);
+	TXTSpeedo_Main = TextDrawCreate(126.500000, 333.666687, "KM/H");
+	TextDrawLetterSize(TXTSpeedo_Main, 0.209998, 0.905833);
+	TextDrawAlignment(TXTSpeedo_Main, 1);
+	TextDrawColor(TXTSpeedo_Main, 0x73B1ED55);
+	TextDrawSetShadow(TXTSpeedo_Main, 0);
+	TextDrawSetOutline(TXTSpeedo_Main, 0);
+	TextDrawBackgroundColor(TXTSpeedo_Main, 51);
+	TextDrawFont(TXTSpeedo_Main, 1);
+	TextDrawSetProportional(TXTSpeedo_Main, 1);
 
 	TXTRandomInfo = TextDrawCreate(636.000000, 421.000000, "Don't wanna get killed? Type ~g~~h~~h~/god");
 	TextDrawAlignment(TXTRandomInfo, 3);
@@ -30689,15 +30678,13 @@ ToggleSpeedo(playerid, bool:toggle)
 	    PlayerInfo[playerid][bSpeedo] = false;
 
 		PlayerTextDrawHide(playerid, TXTSpeedo[playerid]);
-		TextDrawHideForPlayer(playerid, TXTSpeedo_Main[0]);
-	    TextDrawHideForPlayer(playerid, TXTSpeedo_Main[1]);
+		TextDrawHideForPlayer(playerid, TXTSpeedo_Main);
 	}
 	else
 	{
 	    PlayerInfo[playerid][bSpeedo] = true;
 
 		PlayerTextDrawShow(playerid, TXTSpeedo[playerid]);
-		TextDrawShowForPlayer(playerid, TXTSpeedo_Main[0]);
-	    TextDrawShowForPlayer(playerid, TXTSpeedo_Main[1]);
+		TextDrawShowForPlayer(playerid, TXTSpeedo_Main);
 	}
 }
