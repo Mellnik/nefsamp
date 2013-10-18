@@ -13,15 +13,16 @@
 
 #define IS_RELEASE_BUILD false
 #define INC_ENVIORMENT true
-#define IRC_CONNECT true
+#define IRC_CONNECT false
 #define YSI_IS_SERVER
 
 // Todo:
 // letzen prop löschen
 // loginsound.txt löschen
+// add additions
 
 // R12 db changes:
-// IMPORT `gangzones`;
+// IMPORT `gzones`;
 
 // -
 // - Plugins
@@ -29,6 +30,7 @@
 // sscanf.so | 2.8.1
 // timerfix.so | v1.3
 // streamer.so | R84
+// crashdetect.so | v4.12
 // mysql_static.so | R34
 // irc.so | 1.4.3
 // dns.so | 2.4
@@ -53,6 +55,7 @@
 #include <dini>         	// 1.6
 #include <irc>          	// 1.4.3
 #include <md-sort>      	// 16/07/2013
+#include <crashdetect>      // 4.12
 #include <unixtimetodate> 	// 2.0
 #include <dns>              // v2.4
 #if INC_ENVIORMENT == true
@@ -11484,7 +11487,7 @@ YCMD:gcreatezone(playerid, params[], help)
   		GZoneInfo[gzoneid][captured] = 0;
         GZoneInfo[gzoneid][bUnderAttack] = false;
 
-		format(gstr2, sizeof(gstr2), "INSERT INTO `gangzones` VALUES (NULL, '%s', %f, %f, %f, %i, %i);",
+		format(gstr2, sizeof(gstr2), "INSERT INTO `gzones` VALUES (NULL, '%s', %f, %f, %f, %i, %i);",
 			GZoneInfo[gzoneid][sZoneName],
 			GZoneInfo[gzoneid][E_x],
 			GZoneInfo[gzoneid][E_y],
@@ -11493,7 +11496,7 @@ YCMD:gcreatezone(playerid, params[], help)
 			GZoneInfo[gzoneid][captured]);
 			
 	    mysql_tquery(g_SQL_handle, gstr2, "", "");
-	    mysql_tquery(g_SQL_handle, "SELECT * FROM `gangzones` ORDER BY `id` DESC LIMIT 1;", "OnGangZoneLoadEx", "i", gzoneid);
+	    mysql_tquery(g_SQL_handle, "SELECT * FROM `gzones` ORDER BY `id` DESC LIMIT 1;", "OnGangZoneLoadEx", "i", gzoneid);
 	    
 	    gzoneid++;
 	}
@@ -11801,7 +11804,7 @@ YCMD:gwar(playerid, params[], help)
 	    if(!IsPlayerInRangeOfPoint(playerid, 7.0, GZoneInfo[i][E_x], GZoneInfo[i][E_y], GZoneInfo[i][E_z])) continue;
         found = true;
 
-		if(GZoneInfo[i][bUnderAttack]) return ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" Gang War", ""white"This can is currently under attack!", "OK", "");
+		if(GZoneInfo[i][bUnderAttack]) return ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" Gang War", ""white"This Gang Zone is currently under attack!", "OK", "");
 
 		if(GZoneInfo[i][localGang] == PlayerInfo[playerid][GangID])
 		{
@@ -11817,7 +11820,7 @@ YCMD:gwar(playerid, params[], help)
 		
 		if(Iter_Contains(iterGangWar, PlayerInfo[playerid][GangID]))
 		{
-		    return ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" Gang War", ""white"You can't attack this zone because your gang is already\ninvloved in another gang war!!", "OK", "");
+		    return ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" Gang War", ""white"You can't attack this zone because your gang is already\ninvloved in another Gang War!", "OK", "");
 		}
 		
 		if(GZoneInfo[i][localGang] == 0)
@@ -20653,7 +20656,7 @@ function:OnGangZoneLoadEx(gindex)
         GZoneInfo[gindex][iconid] = CreateDynamicMapIcon(GZoneInfo[gindex][E_x], GZoneInfo[gindex][E_y], GZoneInfo[gindex][E_z], 19, 1, 0, -1, -1, 300.0);
         GZoneInfo[gindex][zoneid] = GangZoneCreate(GZoneInfo[gindex][E_x] + GZONE_SIZE, GZoneInfo[gindex][E_y] - GZONE_SIZE, GZoneInfo[gindex][E_x] - GZONE_SIZE, GZoneInfo[gindex][E_y] + GZONE_SIZE);
         GZoneInfo[gindex][checkid] = CreateDynamicCP(GZoneInfo[gindex][E_x], GZoneInfo[gindex][E_y], GZoneInfo[gindex][E_z], 7.0, 0, -1, -1, 60.0);
-		GZoneInfo[gindex][zsphere] = CreateDynamicSphere(GZoneInfo[gindex][E_x], GZoneInfo[gindex][E_y], GZoneInfo[gindex][E_z], 250.0, 0, -1, -1);
+		GZoneInfo[gindex][zsphere] = CreateDynamicSphere(GZoneInfo[gindex][E_x], GZoneInfo[gindex][E_y], GZoneInfo[gindex][E_z], 100.0, 0, -1, -1);
 
         GangZoneShowForAll(GZoneInfo[gindex][zoneid], COLOR_NONE);
 
@@ -20694,7 +20697,7 @@ function:OnGangZoneLoad()
 	        GZoneInfo[gzoneid][iconid] = CreateDynamicMapIcon(GZoneInfo[gzoneid][E_x], GZoneInfo[gzoneid][E_y], GZoneInfo[gzoneid][E_z], 19, 1, 0, -1, -1, 300.0);
 			GZoneInfo[gzoneid][zoneid] = GangZoneCreate(GZoneInfo[gzoneid][E_x] + GZONE_SIZE, GZoneInfo[gzoneid][E_y] - GZONE_SIZE, GZoneInfo[gzoneid][E_x] - GZONE_SIZE, GZoneInfo[gzoneid][E_y] + GZONE_SIZE);
             GZoneInfo[gzoneid][checkid] = CreateDynamicCP(GZoneInfo[gzoneid][E_x], GZoneInfo[gzoneid][E_y], GZoneInfo[gzoneid][E_z], 7.0, 0, -1, -1, 60.0);
-            GZoneInfo[gzoneid][zsphere] = CreateDynamicSphere(GZoneInfo[gzoneid][E_x], GZoneInfo[gzoneid][E_y], GZoneInfo[gzoneid][E_z], 250.0, 0, -1, -1);
+            GZoneInfo[gzoneid][zsphere] = CreateDynamicSphere(GZoneInfo[gzoneid][E_x], GZoneInfo[gzoneid][E_y], GZoneInfo[gzoneid][E_z], 100.0, 0, -1, -1);
 
 	        gzoneid++;
 	    }
@@ -20781,7 +20784,7 @@ function:LoadProps()
 
 function:LoadGZones()
 {
-	mysql_tquery(g_SQL_handle, "SELECT * FROM `gangzones`;", "OnGangZoneLoad", "");
+	mysql_tquery(g_SQL_handle, "SELECT * FROM `gzones`;", "OnGangZoneLoad", "");
 	return 1;
 }
 
@@ -21892,7 +21895,7 @@ MySQL_CreateBan(PlayerName[], AdminName[], Reason[], lift = 0)
 
 MySQL_SaveGangZone(id)
 {
-	format(gstr, sizeof(gstr), "UPDATE `gangzones` SET `gang` = %i, `captured` = %i WHERE `id` = %i;", GZoneInfo[id][localGang], GZoneInfo[id][captured], GZoneInfo[id][iID]);
+	format(gstr, sizeof(gstr), "UPDATE `gzones` SET `localgang` = %i, `captured` = %i WHERE `id` = %i;", GZoneInfo[id][localGang], GZoneInfo[id][captured], GZoneInfo[id][iID]);
 	mysql_tquery(g_SQL_handle, gstr, "", "");
 }
 
@@ -22993,7 +22996,7 @@ LoadServerStaticMeshes()
 	}
 	
     g_SpawnAreas[0] = CreateDynamicSphere(341.8535, -1852.6327, 6.8569, 25.0); // <- beach sphere
-    g_SpawnAreas[1] = CreateDynamicSphere(385.4325, 2541.2456, 14.5953, 14.5); // <- AA sphere
+    g_SpawnAreas[1] = CreateDynamicSphere(385.4325, 2541.2456, 14.5953, 13.5); // <- AA sphere
     g_SpawnAreas[2] = CreateDynamicSphere(-1203.3666, -27.8846, 15.8403, 15.0); // <- SFA 1 sphere
     g_SpawnAreas[3] = CreateDynamicSphere(-1183.3441, -9.4441, 15.8403, 15.0); // <- SFA 2 sphere
 
@@ -24090,7 +24093,7 @@ function:StartDerbyMap1()
 						case 4: vid = 573;
 						case 5: vid = 402;
 					}
-					pDerbyCar[i] = CreateVehicle_(vid, Derby_Map1Spawns[m1s][m1sX], Derby_Map1Spawns[m1s][m1sY], floatadd(Derby_Map1Spawns[m1s][m1sZ], 6.0), Derby_Map1Spawns[m1s][m1sA], (random(128) + 127), (random(128) + 127), -1);
+					pDerbyCar[i] = CreateVehicle_(vid, Derby_Map1Spawns[m1s][m1sX], Derby_Map1Spawns[m1s][m1sY], floatadd(Derby_Map1Spawns[m1s][m1sZ], 6.0), Derby_Map1Spawns[m1s][m1sA], (random(128) + 127), (random(128) + 127), 60);
                     SetVehicleNumberPlate(pDerbyCar[i], "{3399ff}D{FFFFFF}erb{F81414}Y");
                     SetVehicleToRespawn(pDerbyCar[i]);
 					SetVehicleVirtualWorld(pDerbyCar[i], GetPlayerVirtualWorld(i));
@@ -24185,7 +24188,7 @@ function:StartDerbyMap2()
 						case 4: vid = 573;
 						case 5: vid = 402;
 					}
-					pDerbyCar[i] = CreateVehicle_(vid, Derby_Map2Spawns[m2s][m2sX], Derby_Map2Spawns[m2s][m2sY], floatadd(Derby_Map2Spawns[m2s][m2sZ], 6.0), Derby_Map2Spawns[m2s][m2sA], (random(128) + 127), (random(128) + 127), -1);
+					pDerbyCar[i] = CreateVehicle_(vid, Derby_Map2Spawns[m2s][m2sX], Derby_Map2Spawns[m2s][m2sY], floatadd(Derby_Map2Spawns[m2s][m2sZ], 6.0), Derby_Map2Spawns[m2s][m2sA], (random(128) + 127), (random(128) + 127), 60);
                     SetVehicleNumberPlate(pDerbyCar[i], "{3399ff}D{FFFFFF}erb{F81414}Y");
                     SetVehicleToRespawn(pDerbyCar[i]);
 					SetVehicleVirtualWorld(pDerbyCar[i], GetPlayerVirtualWorld(i));
@@ -24280,7 +24283,7 @@ function:StartDerbyMap3()
 						case 4: vid = 573;
 						case 5: vid = 402;
 					}
-					pDerbyCar[i] = CreateVehicle_(vid, Derby_Map3Spawns[m3s][m3sX], Derby_Map3Spawns[m3s][m3sY], floatadd(Derby_Map3Spawns[m3s][m3sZ], 6.0), Derby_Map3Spawns[m3s][m3sA], (random(128) + 127), (random(128) + 127), -1);
+					pDerbyCar[i] = CreateVehicle_(vid, Derby_Map3Spawns[m3s][m3sX], Derby_Map3Spawns[m3s][m3sY], floatadd(Derby_Map3Spawns[m3s][m3sZ], 6.0), Derby_Map3Spawns[m3s][m3sA], (random(128) + 127), (random(128) + 127), 60);
                     SetVehicleNumberPlate(pDerbyCar[i], "{3399ff}D{FFFFFF}erb{F81414}Y");
                     SetVehicleToRespawn(pDerbyCar[i]);
 					SetVehicleVirtualWorld(pDerbyCar[i], GetPlayerVirtualWorld(i));
@@ -24375,7 +24378,7 @@ function:StartDerbyMap4()
 						case 4: vid = 573;
 						case 5: vid = 402;
 					}
-					pDerbyCar[i] = CreateVehicle_(vid, Derby_Map4Spawns[m4s][m4sX], Derby_Map4Spawns[m4s][m4sY], floatadd(Derby_Map4Spawns[m4s][m4sZ], 6.0), Derby_Map4Spawns[m4s][m4sA], (random(128) + 127), (random(128) + 127), -1);
+					pDerbyCar[i] = CreateVehicle_(vid, Derby_Map4Spawns[m4s][m4sX], Derby_Map4Spawns[m4s][m4sY], floatadd(Derby_Map4Spawns[m4s][m4sZ], 6.0), Derby_Map4Spawns[m4s][m4sA], (random(128) + 127), (random(128) + 127), 60);
                     SetVehicleNumberPlate(pDerbyCar[i], "{3399ff}D{FFFFFF}erb{F81414}Y");
                     SetVehicleToRespawn(pDerbyCar[i]);
 					SetVehicleVirtualWorld(pDerbyCar[i], GetPlayerVirtualWorld(i));
@@ -24470,7 +24473,7 @@ function:StartDerbyMap5()
 						case 4: vid = 573;
 						case 5: vid = 402;
 					}
-					pDerbyCar[i] = CreateVehicle_(vid, Derby_Map5Spawns[m5s][m5sX], Derby_Map5Spawns[m5s][m5sY], floatadd(Derby_Map5Spawns[m5s][m5sZ], 6.0), Derby_Map5Spawns[m5s][m5sA], (random(128) + 127), (random(128) + 127), -1);
+					pDerbyCar[i] = CreateVehicle_(vid, Derby_Map5Spawns[m5s][m5sX], Derby_Map5Spawns[m5s][m5sY], floatadd(Derby_Map5Spawns[m5s][m5sZ], 6.0), Derby_Map5Spawns[m5s][m5sA], (random(128) + 127), (random(128) + 127), 60);
                     SetVehicleNumberPlate(pDerbyCar[i], "{3399ff}D{FFFFFF}erb{F81414}Y");
                     SetVehicleToRespawn(pDerbyCar[i]);
 					SetVehicleVirtualWorld(pDerbyCar[i], GetPlayerVirtualWorld(i));
@@ -24555,7 +24558,7 @@ function:StartDerbyMap6()
 	    		    ResetPlayerWeapons(i);
 	    		    ShowPlayerDialog(i, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
 
-					pDerbyCar[i] = CreateVehicle_(573, Derby_Map6Spawns[m6s][m6sX], Derby_Map6Spawns[m6s][m6sY], floatadd(Derby_Map6Spawns[m6s][m6sZ], 6.0), Derby_Map6Spawns[m6s][m6sA], (random(128) + 127), (random(128) + 127), -1);
+					pDerbyCar[i] = CreateVehicle_(573, Derby_Map6Spawns[m6s][m6sX], Derby_Map6Spawns[m6s][m6sY], floatadd(Derby_Map6Spawns[m6s][m6sZ], 6.0), Derby_Map6Spawns[m6s][m6sA], (random(128) + 127), (random(128) + 127), 60);
                     SetVehicleNumberPlate(pDerbyCar[i], "{3399ff}D{FFFFFF}erb{F81414}Y");
                     SetVehicleToRespawn(pDerbyCar[i]);
 					SetVehicleVirtualWorld(pDerbyCar[i], GetPlayerVirtualWorld(i));
@@ -24640,7 +24643,7 @@ function:StartDerbyMap7()
 	    		    ResetPlayerWeapons(i);
 	    		    ShowPlayerDialog(i, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
 
-					pDerbyCar[i] = CreateVehicle_(415, Derby_Map7Spawns[m7s][m7sX], Derby_Map7Spawns[m7s][m7sY], floatadd(Derby_Map7Spawns[m7s][m7sZ], 6.0), Derby_Map7Spawns[m7s][m7sA], (random(128) + 127), (random(128) + 127), -1);
+					pDerbyCar[i] = CreateVehicle_(415, Derby_Map7Spawns[m7s][m7sX], Derby_Map7Spawns[m7s][m7sY], floatadd(Derby_Map7Spawns[m7s][m7sZ], 6.0), Derby_Map7Spawns[m7s][m7sA], (random(128) + 127), (random(128) + 127), 60);
                     SetVehicleNumberPlate(pDerbyCar[i], "{3399ff}D{FFFFFF}erb{F81414}Y");
                     SetVehicleToRespawn(pDerbyCar[i]);
 					SetVehicleVirtualWorld(pDerbyCar[i], GetPlayerVirtualWorld(i));
@@ -24725,7 +24728,7 @@ function:StartDerbyMap8()
 	    		    ResetPlayerWeapons(i);
 	    		    ShowPlayerDialog(i, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
 
-					pDerbyCar[i] = CreateVehicle_(415, Derby_Map8Spawns[m8s][m8sX], Derby_Map8Spawns[m8s][m8sY], floatadd(Derby_Map8Spawns[m8s][m8sZ], 6.0), Derby_Map8Spawns[m8s][m8sA], (random(128) + 127), (random(128) + 127), -1);
+					pDerbyCar[i] = CreateVehicle_(415, Derby_Map8Spawns[m8s][m8sX], Derby_Map8Spawns[m8s][m8sY], floatadd(Derby_Map8Spawns[m8s][m8sZ], 6.0), Derby_Map8Spawns[m8s][m8sA], (random(128) + 127), (random(128) + 127), 60);
                     SetVehicleNumberPlate(pDerbyCar[i], "{3399ff}D{FFFFFF}erb{F81414}Y");
                     SetVehicleToRespawn(pDerbyCar[i]);
 					SetVehicleVirtualWorld(pDerbyCar[i], GetPlayerVirtualWorld(i));
@@ -24810,7 +24813,7 @@ function:StartDerbyMap9()
 	    		    ResetPlayerWeapons(i);
 	    		    ShowPlayerDialog(i, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
 
-					pDerbyCar[i] = CreateVehicle_(415, Derby_Map9Spawns[m9s][m9sX], Derby_Map9Spawns[m9s][m9sY], floatadd(Derby_Map9Spawns[m9s][m9sZ], 6.0), Derby_Map9Spawns[m9s][m9sA], (random(128) + 127), (random(128) + 127), -1);
+					pDerbyCar[i] = CreateVehicle_(415, Derby_Map9Spawns[m9s][m9sX], Derby_Map9Spawns[m9s][m9sY], floatadd(Derby_Map9Spawns[m9s][m9sZ], 6.0), Derby_Map9Spawns[m9s][m9sA], (random(128) + 127), (random(128) + 127), 60);
                     SetVehicleNumberPlate(pDerbyCar[i], "{3399ff}D{FFFFFF}erb{F81414}Y");
                     SetVehicleToRespawn(pDerbyCar[i]);
 					SetVehicleVirtualWorld(pDerbyCar[i], GetPlayerVirtualWorld(i));
@@ -30208,7 +30211,7 @@ SetupRaceForPlayer(playerid)
 
     SetCP(playerid, g_CPProgress[playerid], g_CPProgress[playerid] + 1, g_RaceArray[E_rCPs], g_RaceArray[E_rType]);
 
-	g_RaceVehicle[playerid] = CreateVehicle_(g_RaceArray[E_vModel], g_RaceVehCoords[g_RaceSpawnCount][0], g_RaceVehCoords[g_RaceSpawnCount][1], g_RaceVehCoords[g_RaceSpawnCount][2] + 0.5, g_RaceVehCoords[g_RaceSpawnCount][3], (random(128) + 127), (random(128) + 127), -1);
+	g_RaceVehicle[playerid] = CreateVehicle_(g_RaceArray[E_vModel], g_RaceVehCoords[g_RaceSpawnCount][0], g_RaceVehCoords[g_RaceSpawnCount][1], g_RaceVehCoords[g_RaceSpawnCount][2] + 0.5, g_RaceVehCoords[g_RaceSpawnCount][3], (random(128) + 127), (random(128) + 127), 60);
 	SetPlayerPos(playerid, g_RaceVehCoords[g_RaceSpawnCount][0], g_RaceVehCoords[g_RaceSpawnCount][1], floatadd(g_RaceVehCoords[g_RaceSpawnCount][2], 2.0));
 	SetPlayerFacingAngle(playerid, g_RaceVehCoords[g_RaceSpawnCount][3]);
 	SetPlayerVirtualWorld(playerid, g_RaceArray[E_rWorld]);
@@ -30588,7 +30591,7 @@ CreateVehicle_(modelid, Float:x, Float:y, Float:z, Float:angle, color1, color2, 
 	
 	if(vid == INVALID_VEHICLE_ID)
 	{
-	    printf("[ERROR] Could not create vehicle! return: %i, params: %i %.2f %.2f %.2f %i %i %i", vid, modelid, x, y, z, angle, color1, color2, respawn_delay);
+	    printf("[ERROR] Could not create vehicle! return: %i, params: %i %.2f %.2f %.2f %.2f %i %i %i", vid, modelid, x, y, z, angle, color1, color2, respawn_delay);
 	}
 	return vid;
 }
