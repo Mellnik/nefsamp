@@ -13,7 +13,7 @@
 
 #define IS_RELEASE_BUILD false
 #define INC_ENVIORMENT true
-#define IRC_CONNECT false
+#define IRC_CONNECT true
 #define YSI_IS_SERVER
 
 // Todo:
@@ -30,7 +30,6 @@
 // sscanf.so | 2.8.1
 // timerfix.so | v1.3
 // streamer.so | R84
-// crashdetect.so | v4.12
 // mysql_static.so | R34
 // irc.so | 1.4.3
 // dns.so | 2.4
@@ -55,7 +54,6 @@
 #include <dini>         	// 1.6
 #include <irc>          	// 1.4.3
 #include <md-sort>      	// 16/07/2013
-#include <crashdetect>      // 4.12
 #include <unixtimetodate> 	// 2.0
 #include <dns>              // v2.4
 #if INC_ENVIORMENT == true
@@ -271,8 +269,8 @@ native IsValidVehicle(vehicleid); // undefined
 // - GWARS
 // -
 #define MAX_GZONES						(40)
-#define MAX_GZONES_PER_GANG             (20)
-#define GZONE_SIZE                      (85.0)
+#define MAX_GZONES_PER_GANG             (15)
+#define GZONE_SIZE                      (100.0)
 #define COLOR_HOSTILE                   (0x95133496)
 #define COLOR_FRIENDLY                  (0x33FF33AA)
 #define COLOR_NONE                      (0xFFFFFFAA)
@@ -8773,7 +8771,7 @@ YCMD:ad(playerid, params[], help)
     if(GetPlayerCash(playerid) < 10000) return SCM(playerid, -1, ""er"You need $10,000 to make an advertisment");
     
 	new ad[144];
-	if(sscanf(params, "s", ad))
+	if(sscanf(params, "s[140]", ad))
 	{
 		return SCM(playerid, NEF_GREEN, "Usage: /ad <text>");
 	}
@@ -11528,7 +11526,7 @@ YCMD:gzonecreate(playerid, params[], help)
 			GZoneInfo[gzoneid][localGang],
 			GZoneInfo[gzoneid][iLocked]);
 			
-		mysql_query(g_SQL_handle, gstr2, false); // Make sure the INSERT query is done before selecting
+		mysql_tquery(g_SQL_handle, gstr2, "", "");
 	    mysql_tquery(g_SQL_handle, "SELECT * FROM `gzones` ORDER BY `id` DESC LIMIT 1;", "OnGangZoneLoadEx", "i", gzoneid);
 	    
 	    gzoneid++;
@@ -14343,7 +14341,7 @@ YCMD:createbizz(playerid, params[], help)
 	 	PropInfo[propid][E_y],
 		PropInfo[propid][E_z]);
 
-    mysql_query(g_SQL_handle, query, false); // Make sure the INSERT query is done before selecting
+    mysql_tquery(g_SQL_handle, query, "", "");
     mysql_tquery(g_SQL_handle, "SELECT * FROM `props` ORDER BY `ID` DESC LIMIT 1;", "OnPropLoadEx", "i", propid);
 
     propid++;
@@ -14396,7 +14394,7 @@ YCMD:createhouse(playerid, params[], help)
 	    HouseInfo[houseid][locked],
 		HouseInfo[houseid][date]);
 
-    mysql_query(g_SQL_handle, query, false); // Make sure the INSERT query is done before selecting
+    mysql_tquery(g_SQL_handle, query, "", "");
     mysql_tquery(g_SQL_handle, "SELECT * FROM `houses` ORDER BY `ID` DESC LIMIT 1;", "OnHouseLoadEx", "i", houseid);
 
     houseid++;
@@ -20749,9 +20747,9 @@ function:OnGangZoneLoadEx(gindex)
 
         GZoneInfo[gindex][label] = CreateDynamic3DTextLabel(gstr, WHITE, GZoneInfo[gindex][E_x], GZoneInfo[gindex][E_y], GZoneInfo[gindex][E_z] + 0.3, 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 50.0);
         GZoneInfo[gindex][iconid] = CreateDynamicMapIcon(GZoneInfo[gindex][E_x], GZoneInfo[gindex][E_y], GZoneInfo[gindex][E_z], 19, 1, 0, -1, -1, 300.0);
-        GZoneInfo[gindex][zoneid] = GangZoneCreate(GZoneInfo[gindex][E_x] + GZONE_SIZE, GZoneInfo[gindex][E_y] - GZONE_SIZE, GZoneInfo[gindex][E_x] - GZONE_SIZE, GZoneInfo[gindex][E_y] + GZONE_SIZE);
+        GZoneInfo[gindex][zoneid] = GangZoneCreate(GZoneInfo[gindex][E_x] - GZONE_SIZE, GZoneInfo[gindex][E_y] - GZONE_SIZE, GZoneInfo[gindex][E_x] + GZONE_SIZE, GZoneInfo[gindex][E_y] + GZONE_SIZE);
         GZoneInfo[gindex][checkid] = CreateDynamicCP(GZoneInfo[gindex][E_x], GZoneInfo[gindex][E_y], GZoneInfo[gindex][E_z], 7.0, 0, -1, -1, 60.0);
-		GZoneInfo[gindex][zsphere] = CreateDynamicSphere(GZoneInfo[gindex][E_x], GZoneInfo[gindex][E_y], GZoneInfo[gindex][E_z], 100.0, 0, -1, -1);
+		GZoneInfo[gindex][zsphere] = CreateDynamicSphere(GZoneInfo[gindex][E_x], GZoneInfo[gindex][E_y], GZoneInfo[gindex][E_z], GZONE_SIZE, 0, -1, -1);
 
         GangZoneShowForAll(GZoneInfo[gindex][zoneid], COLOR_NONE);
 
@@ -20796,9 +20794,9 @@ function:OnGangZoneLoad()
 	        
 	        GZoneInfo[gzoneid][label] = CreateDynamic3DTextLabel(gstr, WHITE, GZoneInfo[gzoneid][E_x], GZoneInfo[gzoneid][E_y], GZoneInfo[gzoneid][E_z] + 0.3, 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 50.0);
 	        GZoneInfo[gzoneid][iconid] = CreateDynamicMapIcon(GZoneInfo[gzoneid][E_x], GZoneInfo[gzoneid][E_y], GZoneInfo[gzoneid][E_z], 19, 1, 0, -1, -1, 300.0);
-			GZoneInfo[gzoneid][zoneid] = GangZoneCreate(GZoneInfo[gzoneid][E_x] + GZONE_SIZE, GZoneInfo[gzoneid][E_y] - GZONE_SIZE, GZoneInfo[gzoneid][E_x] - GZONE_SIZE, GZoneInfo[gzoneid][E_y] + GZONE_SIZE);
+			GZoneInfo[gzoneid][zoneid] = GangZoneCreate(GZoneInfo[gzoneid][E_x] - GZONE_SIZE, GZoneInfo[gzoneid][E_y] - GZONE_SIZE, GZoneInfo[gzoneid][E_x] + GZONE_SIZE, GZoneInfo[gzoneid][E_y] + GZONE_SIZE);
             GZoneInfo[gzoneid][checkid] = CreateDynamicCP(GZoneInfo[gzoneid][E_x], GZoneInfo[gzoneid][E_y], GZoneInfo[gzoneid][E_z], 7.0, 0, -1, -1, 60.0);
-            GZoneInfo[gzoneid][zsphere] = CreateDynamicSphere(GZoneInfo[gzoneid][E_x], GZoneInfo[gzoneid][E_y], GZoneInfo[gzoneid][E_z], 100.0, 0, -1, -1);
+            GZoneInfo[gzoneid][zsphere] = CreateDynamicSphere(GZoneInfo[gzoneid][E_x], GZoneInfo[gzoneid][E_y], GZoneInfo[gzoneid][E_z], GZONE_SIZE, 0, -1, -1);
 
 	        gzoneid++;
 	    }
@@ -25601,7 +25599,7 @@ function:ProcessTick()
 			    {
 			        if(IsPlayerAvail(ii) && PlayerInfo[ii][GangID] == GZoneInfo[i][AttackingGang] && PlayerInfo[ii][bGWarMode])
 			        {
-			            if(!IsPlayerInRangeOfPoint(ii, 100.0, GZoneInfo[i][E_x], GZoneInfo[i][E_y], GZoneInfo[i][E_z]) || IsPlayerOnDesktop(ii, 50000)) continue;
+			            if(!IsPlayerInRangeOfPoint(ii, GZONE_SIZE, GZoneInfo[i][E_x], GZoneInfo[i][E_y], GZoneInfo[i][E_z]) || IsPlayerOnDesktop(ii, 50000)) continue;
 
 			            Iter_Add(Players, ii);
 			        }
