@@ -3055,7 +3055,7 @@ public OnPlayerFloodControl(playerid, iCount, iTimeSpan)
 	new p_IP[16];
 	GetPlayerIp(playerid, p_IP, 16);
     
-    if(iCount > 3 && iTimeSpan < 8000 && !IsWhitelisted(p_IP))
+    if(iCount > 3 && iTimeSpan < 8500 && !IsWhitelisted(p_IP))
 	{
 	    PlayerInfo[playerid][bFloodDect] = true;
 
@@ -3093,7 +3093,7 @@ public OnPlayerConnect(playerid)
 	    if(!IsPlayerConnected(i) || IsPlayerNPC(i)) continue;
 	    if(!strcmp(__GetIP(i), sz_IP))
 	    {
-	        count_t++;
+	        ++count_t;
 	    }
 	}
 	
@@ -3105,11 +3105,6 @@ public OnPlayerConnect(playerid)
 
 	format(gstr, sizeof(gstr), "DELETE FROM `online` WHERE `name` = '%s';", __GetName(playerid));
 	mysql_tquery(g_SQL_handle, gstr, "", "");
-    
-	for(new i = 0; i < 128; i++)
-	{
-		SCM(playerid, GREY, " ");
-	}
 
     RobberyCount[playerid] = 0;
 	PlayerInfo[playerid][Level] = 0;
