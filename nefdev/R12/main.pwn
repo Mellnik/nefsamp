@@ -11,7 +11,7 @@
 
 #pragma dynamic 8192
 
-#define IS_RELEASE_BUILD false
+#define IS_RELEASE_BUILD true
 #define INC_ENVIORMENT true
 #define IRC_CONNECT true
 #define YSI_IS_SERVER
@@ -270,7 +270,7 @@ native IsValidVehicle(vehicleid); // undefined
 // -
 #define MAX_GZONES						(40)
 #define MAX_GZONES_PER_GANG             (15)
-#define GZONE_SIZE                      (100.0)
+#define GZONE_SIZE                      (75.0)
 #define COLOR_HOSTILE                   (0x95133496)
 #define COLOR_FRIENDLY                  (0x33FF33AA)
 #define COLOR_NONE                      (0xFFFFFFAA)
@@ -6797,7 +6797,7 @@ public OnPlayerModelSelection(playerid, response, listid, modelid)
 
 public OnVehicleDamageStatusUpdate(vehicleid, playerid)
 {
-	if(gTeam[playerid] == NORMAL)
+	if(gTeam[playerid] == NORMAL && !PlayerInfo[playerid][bGWarMode])
 	{
     	SetVehicleHealth(vehicleid, 1000.0);
 		RepairVehicle(vehicleid);
@@ -7006,9 +7006,12 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 
 		if(PlayerInfo[playerid][SuperJump] && GetPlayerState(playerid) == PLAYER_STATE_ONFOOT && Key(KEY_JUMP) && !PlayerInfo[playerid][SniperAiming])
 		{
-			new Float:POS[3];
-			GetPlayerVelocity(playerid, POS[0], POS[1], POS[2]);
-			SetPlayerVelocity(playerid, POS[0], POS[1], floatadd(POS[2], 5.0));
+		    if(!PlayerInfo[playerid][bGWarMode])
+		    {
+				new Float:POS[3];
+				GetPlayerVelocity(playerid, POS[0], POS[1], POS[2]);
+				SetPlayerVelocity(playerid, POS[0], POS[1], floatadd(POS[2], 5.0));
+			}
 			return 1;
 		}
 
@@ -8609,6 +8612,7 @@ YCMD:elbow(playerid, params[], help)
 
 YCMD:sb(playerid, params[], help)
 {
+    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
 	if(gTeam[playerid] != NORMAL) return SCM(playerid, RED, NOT_AVAIL);
 	if(PlayerInfo[playerid][SpeedBoost])
     {
@@ -8625,6 +8629,7 @@ YCMD:sb(playerid, params[], help)
 
 YCMD:sj(playerid, params[], help)
 {
+    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
 	if(gTeam[playerid] != NORMAL) return SCM(playerid, RED, NOT_AVAIL);
 	if(PlayerInfo[playerid][SuperJump])
     {
@@ -8942,7 +8947,7 @@ YCMD:bbuy(playerid, params[], help)
 	    format(gstr, sizeof(gstr), ""business_mark"\nOwner: %s\nID: %i\nLevel: %i", __GetName(playerid), PropInfo[i][iID], PropInfo[i][E_Level]);
 	    UpdateDynamic3DTextLabelText(PropInfo[i][label], -1, gstr);
 	    DestroyDynamicMapIcon(PropInfo[i][iconid]);
-	    PropInfo[i][iconid] = CreateDynamicMapIcon(PropInfo[i][E_x], PropInfo[i][E_y], PropInfo[i][E_z], 36, 1, 0, -1, -1, 200.0);
+	    PropInfo[i][iconid] = CreateDynamicMapIcon(PropInfo[i][E_x], PropInfo[i][E_y], PropInfo[i][E_z], 36, 1, 0, -1, -1, 150.0);
 	    PropInfo[i][date] = gettime();
 	    PlayerInfo[playerid][Props]++;
 	    SendInfo(playerid, "~g~~h~~h~Business purchased!", 3500);
@@ -9007,7 +9012,7 @@ YCMD:buy(playerid, params[], help)
 	    UpdateDynamic3DTextLabelText(HouseInfo[i][label], -1, gstr);
 	    DestroyDynamicMapIcon(HouseInfo[i][iconid]);
 	    DestroyDynamicPickup(HouseInfo[i][pickid]);
-	    HouseInfo[i][iconid] = CreateDynamicMapIcon(HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], 32, 1, 0, -1, -1, 200.0);
+	    HouseInfo[i][iconid] = CreateDynamicMapIcon(HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], 32, 1, 0, -1, -1, 150.0);
 	    HouseInfo[i][pickid] = CreateDynamicPickup(1272, 1, HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], -1, -1, -1, 30.0);
 	    GivePlayerCash(playerid, -HouseInfo[i][price]);
 	    HouseInfo[i][date] = gettime();
@@ -9063,7 +9068,7 @@ YCMD:bsell(playerid, params[], help)
 	    format(gstr, sizeof(gstr), ""business_mark"\nOwner: ---\nID: %i\nLevel: %i", PropInfo[i][iID], PropInfo[i][E_Level]);
 	    UpdateDynamic3DTextLabelText(PropInfo[i][label], -1, gstr);
 	    DestroyDynamicMapIcon(PropInfo[i][iconid]);
-	    PropInfo[i][iconid] = CreateDynamicMapIcon(PropInfo[i][E_x], PropInfo[i][E_y], PropInfo[i][E_z], 52, 1, 0, -1, -1, 200.0);
+	    PropInfo[i][iconid] = CreateDynamicMapIcon(PropInfo[i][E_x], PropInfo[i][E_y], PropInfo[i][E_z], 52, 1, 0, -1, -1, 150.0);
 	    PlayerInfo[playerid][Props]--;
 	    PropInfo[i][date] = 0;
 	    SendInfo(playerid, "~g~~h~~h~Business sold!", 3500);
@@ -9129,7 +9134,7 @@ YCMD:sell(playerid, params[], help)
 	    UpdateDynamic3DTextLabelText(HouseInfo[i][label], -1, gstr);
 	    DestroyDynamicMapIcon(HouseInfo[i][iconid]);
 	    DestroyDynamicPickup(HouseInfo[i][pickid]);
-	    HouseInfo[i][iconid] = CreateDynamicMapIcon(HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], 31, 1, 0, -1, -1, 200.0);
+	    HouseInfo[i][iconid] = CreateDynamicMapIcon(HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], 31, 1, 0, -1, -1, 150.0);
 	    HouseInfo[i][pickid] = CreateDynamicPickup(1273, 1, HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], -1, -1, -1, 30.0);
 	    PlayerInfo[playerid][Houses]--;
 	    HouseInfo[i][date] = 0;
@@ -12010,7 +12015,8 @@ SetPlayerGWarMode(playerid)
         RandomWeapon(playerid);
   		SCM(playerid, -1, ""orange"God mode has been disabled!");
 	}
-	        
+	PlayerInfo[playerid][SpeedBoost] = false;
+    PlayerInfo[playerid][SuperJump] = false;
     PlayerInfo[playerid][bGWarMode] = true;
 }
 
@@ -14182,7 +14188,7 @@ YCMD:resethouse(playerid, params[], help)
 	    UpdateDynamic3DTextLabelText(HouseInfo[i][label], -1, gstr);
 	    DestroyDynamicMapIcon(HouseInfo[i][iconid]);
 	    DestroyDynamicPickup(HouseInfo[i][pickid]);
-	    HouseInfo[i][iconid] = CreateDynamicMapIcon(HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], 31, 1, 0, -1, -1, 200.0);
+	    HouseInfo[i][iconid] = CreateDynamicMapIcon(HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], 31, 1, 0, -1, -1, 150.0);
 	    HouseInfo[i][pickid] = CreateDynamicPickup(1273, 1, HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], -1, -1, -1, 30.0);
 
 		SendInfo(playerid, "~g~~h~~h~The house has been reset!", 2000);
@@ -14267,7 +14273,7 @@ YCMD:resetbizz(playerid, params[], help)
 	    format(gstr, sizeof(gstr), ""business_mark"\nOwner: ---\nID: %i\nLevel: %i", PropInfo[i][iID], PropInfo[i][E_Level]);
 	    UpdateDynamic3DTextLabelText(PropInfo[i][label], -1, gstr);
 	    DestroyDynamicMapIcon(PropInfo[i][iconid]);
-	    PropInfo[i][iconid] = CreateDynamicMapIcon(PropInfo[i][E_x], PropInfo[i][E_y], PropInfo[i][E_z], 52, 1, 0, -1, -1, 200.0);
+	    PropInfo[i][iconid] = CreateDynamicMapIcon(PropInfo[i][E_x], PropInfo[i][E_y], PropInfo[i][E_z], 52, 1, 0, -1, -1, 150.0);
 
         SendInfo(playerid, "~g~~h~~h~The business has been reset!", 2000);
   		break;
@@ -20592,7 +20598,7 @@ function:OnHouseLoadEx(index)
 
 		HouseInfo[index][label] = CreateDynamic3DTextLabel(line, (HouseInfo[index][sold]) ? (0xFF0000FF) : (0x00FF00FF), HouseInfo[index][E_x], HouseInfo[index][E_y], floatadd(HouseInfo[index][E_z], 0.3), 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 30.0);
 		HouseInfo[index][pickid] = CreateDynamicPickup((HouseInfo[index][sold]) ? (1272) : (1273), 1, HouseInfo[index][E_x], HouseInfo[index][E_y], HouseInfo[index][E_z], -1, -1, -1, 30.0);
-		HouseInfo[index][iconid] = CreateDynamicMapIcon(HouseInfo[index][E_x], HouseInfo[index][E_y], HouseInfo[index][E_z], (HouseInfo[index][sold]) ? (32) : (31), 1, 0, -1, -1, 200.0);
+		HouseInfo[index][iconid] = CreateDynamicMapIcon(HouseInfo[index][E_x], HouseInfo[index][E_y], HouseInfo[index][E_z], (HouseInfo[index][sold]) ? (32) : (31), 1, 0, -1, -1, 150.0);
 		index++;
 	}
 	return 1;
@@ -20647,7 +20653,7 @@ function:OnHouseLoad()
 
 			HouseInfo[houseid][label] = CreateDynamic3DTextLabel(line, (HouseInfo[houseid][sold]) ? (0xFF0000FF) : (0x00FF00FF), HouseInfo[houseid][E_x], HouseInfo[houseid][E_y], floatadd(HouseInfo[houseid][E_z], 0.3), 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 30.0);
 			HouseInfo[houseid][pickid] = CreateDynamicPickup((HouseInfo[houseid][sold]) ? (1272) : (1273), 1, HouseInfo[houseid][E_x], HouseInfo[houseid][E_y], HouseInfo[houseid][E_z], -1, -1, -1, 30.0);
-			HouseInfo[houseid][iconid] = CreateDynamicMapIcon(HouseInfo[houseid][E_x], HouseInfo[houseid][E_y], HouseInfo[houseid][E_z], (HouseInfo[houseid][sold]) ? (32) : (31), 1, 0, -1, -1, 200.0);
+			HouseInfo[houseid][iconid] = CreateDynamicMapIcon(HouseInfo[houseid][E_x], HouseInfo[houseid][E_y], HouseInfo[houseid][E_z], (HouseInfo[houseid][sold]) ? (32) : (31), 1, 0, -1, -1, 150.0);
 			
 			houseid++;
 		}
@@ -20680,7 +20686,7 @@ function:OnPropLoadEx(pindex)
 
 		PropInfo[pindex][label] = CreateDynamic3DTextLabel(string, -1, PropInfo[pindex][E_x], PropInfo[pindex][E_y], floatadd(PropInfo[pindex][E_z], 0.3), 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 30.0);
 		PropInfo[pindex][pickid] = CreateDynamicPickup(1274, 1, PropInfo[pindex][E_x], PropInfo[pindex][E_y], PropInfo[pindex][E_z], -1, -1, -1, 30.0);
-		PropInfo[pindex][iconid] = CreateDynamicMapIcon(PropInfo[pindex][E_x], PropInfo[pindex][E_y], PropInfo[pindex][E_z], 52, 1, 0, -1, -1, 200.0);
+		PropInfo[pindex][iconid] = CreateDynamicMapIcon(PropInfo[pindex][E_x], PropInfo[pindex][E_y], PropInfo[pindex][E_z], 52, 1, 0, -1, -1, 150.0);
 		
 		pindex++;
 	}
@@ -20719,7 +20725,7 @@ function:OnPropLoad()
 			}
 			PropInfo[propid][label] = CreateDynamic3DTextLabel(string, WHITE, PropInfo[propid][E_x], PropInfo[propid][E_y], floatadd(PropInfo[propid][E_z], 0.3), 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 30.0);
 			PropInfo[propid][pickid] = CreateDynamicPickup(1274, 1, PropInfo[propid][E_x], PropInfo[propid][E_y], PropInfo[propid][E_z], -1, -1, -1, 30.0);
-			PropInfo[propid][iconid] = CreateDynamicMapIcon(PropInfo[propid][E_x], PropInfo[propid][E_y], PropInfo[propid][E_z], (PropInfo[propid][sold]) ? (36) : (52), 1, 0, -1, -1, 200.0);
+			PropInfo[propid][iconid] = CreateDynamicMapIcon(PropInfo[propid][E_x], PropInfo[propid][E_y], PropInfo[propid][E_z], (PropInfo[propid][sold]) ? (36) : (52), 1, 0, -1, -1, 150.0);
 			
 			propid++;
 		}
@@ -25668,13 +25674,13 @@ function:ProcessTick()
 				    {
 					    format(gstr, sizeof(gstr), ""gang_sign" "r_besch" Your gang successfully captured '%s' with %i alive players!", GZoneInfo[i][sZoneName], Iter_Count(Players));
 						GangMSG(GZoneInfo[i][AttackingGang], gstr);
-						GangMSG(GZoneInfo[i][AttackingGang], ""gang_sign" "r_besch" The gang gained 25 gang score and each member $50,000 who were tied.");
+						GangMSG(GZoneInfo[i][AttackingGang], ""gang_sign" "r_besch" The gang gained 20 gang score and each member $40,000 who were tied.");
 
 						format(gstr, sizeof(gstr), ""orange"Gang %s captured zone '%s' and gained their reward", GetGangNameByID(GZoneInfo[i][AttackingGang]), GZoneInfo[i][sZoneName]);
 						SCMToAll(-1, gstr);
-						SCMToAll(-1, ""orange"This zone is now locked for 3 hours and cannot be attacked in that time!");
+						SCMToAll(-1, ""orange"This zone is now locked for 2 hours and cannot be attacked in that time!");
 
-						MySQL_UpdateGangScore(GZoneInfo[i][AttackingGang], 25);
+						MySQL_UpdateGangScore(GZoneInfo[i][AttackingGang], 20);
 						
 						Iter_Remove(iterGangWar, GZoneInfo[i][AttackingGang]);
 					}
@@ -25682,13 +25688,13 @@ function:ProcessTick()
 					{
 					    format(gstr, sizeof(gstr), ""gang_sign" "r_besch" Your gang successfully captured '%s' with %i alive players!", GZoneInfo[i][sZoneName], Iter_Count(Players));
 						GangMSG(GZoneInfo[i][AttackingGang], gstr);
-						GangMSG(GZoneInfo[i][AttackingGang], ""gang_sign" "r_besch" The gang gained 25 gang score and each member $50,000 who were tied.");
+						GangMSG(GZoneInfo[i][AttackingGang], ""gang_sign" "r_besch" The gang gained 20 gang score and each member $40,000 who were tied.");
 
 						format(gstr, sizeof(gstr), ""orange"Gang %s captured zone '%s' which was territory of %s", GetGangNameByID(GZoneInfo[i][AttackingGang]), GZoneInfo[i][sZoneName], GetGangNameByID(GZoneInfo[i][DefendingGang]));
 						SCMToAll(-1, gstr);
-						SCMToAll(-1, ""orange"This zone is now locked for 3 hours and cannot be attacked in that time!");
+						SCMToAll(-1, ""orange"This zone is now locked for 2 hours and cannot be attacked in that time!");
 
-						MySQL_UpdateGangScore(GZoneInfo[i][AttackingGang], 25);
+						MySQL_UpdateGangScore(GZoneInfo[i][AttackingGang], 20);
 						
                         format(gstr, sizeof(gstr), ""gang_sign" "r_besch" '%s' was captured by the gang %s!", GZoneInfo[i][sZoneName], GetGangNameByID(GZoneInfo[i][AttackingGang]));
 						GangMSG(GZoneInfo[i][DefendingGang], gstr);
@@ -25713,7 +25719,7 @@ function:ProcessTick()
 
 							if(PlayerInfo[ii][GangID] == GZoneInfo[i][AttackingGang])
 							{
-							    GivePlayerCash(ii, 50000);
+							    GivePlayerCash(ii, 40000);
 							}
 						}
 					    SyncGangZones(ii);
@@ -25723,7 +25729,7 @@ function:ProcessTick()
 					GZoneInfo[i][bUnderAttack] = false;
 					GZoneInfo[i][AttackingGang] = 0;
 					GZoneInfo[i][DefendingGang] = 0;
-					GZoneInfo[i][iLocked] = gettime() + 10800;
+					GZoneInfo[i][iLocked] = gettime() + 7200;
 				}
 				
 				MySQL_SaveGangZone(i);
