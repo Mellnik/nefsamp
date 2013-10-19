@@ -1,6 +1,6 @@
 /*======================================================================*\
 || #################################################################### ||
-|| # Project New Evolution Freeroam - Release 12         			  # ||
+|| # Project New Evolution Freeroam - Release 13         			  # ||
 || # ---------------------------------------------------------------- # ||
 || # Copyright ©2011-2013 New Evolution Freeroam	  				  # ||
 || # Created by Mellnik                                               # ||
@@ -15,14 +15,6 @@
 #define INC_ENVIORMENT true
 #define IRC_CONNECT true
 #define YSI_IS_SERVER
-
-// Todo:
-// letzen prop löschen
-// loginsound.txt löschen
-// add additions.amx
-
-// R12 db changes:
-// IMPORT `gzones`;
 
 // -
 // - Plugins
@@ -98,11 +90,11 @@ native IsValidVehicle(vehicleid); // undefined
 #define HOSTNAME                        " 	        NEF » ×DM/Stunt/Race/Freeroam/Minigames×"
 //#define HOSTNAME 						"NEF 0.3x (R11)     «Stunt/Race/Freeroam/DM»"
 #if IS_RELEASE_BUILD == true
-#define CURRENT_VERSION                 "Release 12"
-#define CURRENT_VERISON_SHORT           "R12"
+#define CURRENT_VERSION                 "Release 13"
+#define CURRENT_VERISON_SHORT           "R13"
 #else
-#define CURRENT_VERSION                 "PTS:R12"
-#define CURRENT_VERSION_SHORT           "PTS:R12"
+#define CURRENT_VERSION                 "PTS:R13"
+#define CURRENT_VERSION_SHORT           "PTS:R13"
 #endif
 #define HOTFIX_REV                      "Hotfix #0"
 #define SAMP_VERSION                    "SA-MP 0.3x-R2"
@@ -10341,6 +10333,8 @@ YCMD:iplookup(playerid, params[], help)
 
 YCMD:car(playerid, params[], help)
 {
+    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
+    
 	if(gTeam[playerid] == NORMAL)
 	{
 	    if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't spawn a car now");
@@ -17194,6 +17188,7 @@ YCMD:nos(playerid, params[], help)
 
 YCMD:v(playerid, params[], help)
 {
+    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
     if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't spawn a car now");
 	if(IsPlayerInRangeOfPoint(playerid, 70.0, 1786.5049, -1298.0465, 120.2656) && PlayerInfo[playerid][Level] < 2) return SCM(playerid, -1, ""er"Can´t spawn vehicle at this place!");
 	if(IsPlayerInRangeOfPoint(playerid, 50.0, -377.2038, 2131.4634, 133.1797) && PlayerInfo[playerid][Level] < 2) return SCM(playerid, -1, ""er"Can´t spawn vehicle at this place!");
