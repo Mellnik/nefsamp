@@ -19,7 +19,7 @@
 // Todo:
 // letzen prop löschen
 // loginsound.txt löschen
-// add additions
+// add additions.amx
 
 // R12 db changes:
 // IMPORT `gzones`;
@@ -5792,6 +5792,7 @@ public OnPlayerEnterDynamicArea(playerid, areaid)
 	        // Player entered GWAR
 			SCM(playerid, -1, ""orange"You have joined the Gang War! Type /capture near the flag when no enemy is around!");
 			SetPlayerGWarMode(playerid);
+			break;
 		}
 	}
 	return 1;
@@ -5808,6 +5809,7 @@ public OnPlayerLeaveDynamicArea(playerid, areaid)
 			new tmp = GetGZoneByInvlovedGang(PlayerInfo[playerid][GangID]);
 			if(tmp == -1) return SCM(playerid, -1, ""er"Error! Please reconnect!");
             ResetPlayerGWarMode(playerid, tmp, false);
+            break;
 		}
 	}
 	return 1;
@@ -9534,7 +9536,7 @@ YCMD:adminhelp(playerid, params[], help)
 	    strcat(string, ""yellow_e"Level 3:\n"white"/freeze /eject /go /burn /mkick /clearchat\n/giveweapon /announce /npccheck /raceforcemap /deleterecord\n\n");
 	    strcat(string, ""yellow_e"Level 4:\n"white"/unban /oban /sethealth /get /getip /healall /armorall /cashfall /scorefall\n/announce2 /iplookup\n\n");
 	    strcat(string, ""yellow_e"Level 5:\n"white"/setcash /setbcash /setscore /gdestroy /addcash /addscore\n\n");
-	    strcat(string, ""yellow_e"Level 6:\n"white"/resethouse /resetbizz /sethouseprice /sethousescore\n/setbizzlevel /createhouse /createbizz /createstore /gcreatezone");
+	    strcat(string, ""yellow_e"Level 6:\n"white"/resethouse /resetbizz /sethouseprice /sethousescore\n/setbizzlevel /createhouse /createbizz /createstore /gzonecreate");
 
         ShowPlayerDialog(playerid, ADMIN_CMD_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" - Admin Commands", string, "OK", "");
 	}
@@ -11493,15 +11495,17 @@ YCMD:grename(playerid, params[], help)
 	return 1;
 }
 
-YCMD:gcreatezone(playerid, params[], help)
+YCMD:gzonecreate(playerid, params[], help)
 {
 	if(PlayerInfo[playerid][Level] == MAX_ADMIN_LEVEL)
 	{
-		new zonename[41];
-		if(sscanf(params, "s[40]", zonename))
+		new tmp[41];
+		if(sscanf(params, "s[40]", tmp))
 		{
-		    return SCM(playerid, NEF_GREEN, "Usage: /gcreatezone <zone name>");
+		    return SCM(playerid, NEF_GREEN, "Usage: /gzonecreate <zone name>");
 		}
+		new zonename[40];
+		mysql_escape_string(tmp, zonename, g_SQL_handle, sizeof(zonename));
 		
         strmid(GZoneInfo[gzoneid][sZoneName], zonename, 0, 40, 40);
 
@@ -11524,10 +11528,53 @@ YCMD:gcreatezone(playerid, params[], help)
 			GZoneInfo[gzoneid][localGang],
 			GZoneInfo[gzoneid][iLocked]);
 			
-	    mysql_tquery(g_SQL_handle, gstr2, "", "");
+		mysql_query(g_SQL_handle, gstr2, false); // Make sure the INSERT query is done before selecting
 	    mysql_tquery(g_SQL_handle, "SELECT * FROM `gzones` ORDER BY `id` DESC LIMIT 1;", "OnGangZoneLoadEx", "i", gzoneid);
 	    
 	    gzoneid++;
+	}
+	else
+	{
+		SCM(playerid, -1, NO_PERM);
+	}
+	return 1;
+}
+
+YCMD:gzonereset(playerid, params[], help)
+{
+	if(PlayerInfo[playerid][Level] == MAX_ADMIN_LEVEL)
+	{
+	    new bool:found = false;
+	    for(new i = 0; i < gzoneid; i++)
+	    {
+		    if(!IsPlayerInRangeOfPoint(playerid, 7.0, GZoneInfo[i][E_x], GZoneInfo[i][E_y], GZoneInfo[i][E_z])) continue;
+	        found = true;
+	        
+	        if(GZoneInfo[i][bUnderAttack])
+	        {
+	            return SCM(playerid, -1, ""er"Zone is currently under attack!");
+	        }
+	        
+	        GZoneInfo[i][iTimeLeft] = 0;
+			GZoneInfo[i][localGang] = 0;
+			GZoneInfo[i][AttackingGang] = 0;
+			GZoneInfo[i][DefendingGang] = 0;
+	  		GZoneInfo[i][iLocked] = gettime();
+	        
+			MySQL_SaveGangZone(i);
+	        
+	        for(new ii = 0; ii < MAX_PLAYERS; ii++)
+	        {
+			    if(IsPlayerConnected(ii) && !IsPlayerNPC(ii))
+			    {
+					SyncGangZones(ii);
+			    }
+	        }
+	        
+	        SCM(playerid, -1, ""orange"Zone has been reset!");
+	        break;
+	    }
+	    if(!found) SCM(playerid, -1, ""er"You aren't near of any gang zone!");
 	}
 	else
 	{
@@ -11816,6 +11863,30 @@ YCMD:gcapture(playerid, params[], help)
 	    break;
 	}
 	if(!found) SCM(playerid, -1, ""er"You aren't near of any gang zone!");
+	return 1;
+}
+
+YCMD:gwars(playerid, params[], help)
+{
+	new str[512], count = 0;
+	strcat(str, ""white"");
+	for(new i = 0; i < gzoneid; i++)
+	{
+	    if(GZoneInfo[i][bUnderAttack])
+	    {
+	        format(gstr, sizeof(gstr), "%s is attacking zone '%s'", GetGangNameByID(GZoneInfo[i][AttackingGang]), GZoneInfo[i][sZoneName]);
+	        strcat(str, gstr);
+			++count;
+	    }
+	}
+	if(count > 0)
+	{
+		ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, "Ongoing Gang Wars", str, "OK", "");
+	}
+	else
+	{
+	    ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, "Ongoing Gang Wars", ""white"There are no Gang Wars at the moment", "OK", "");
+	}
 	return 1;
 }
 
@@ -14272,7 +14343,7 @@ YCMD:createbizz(playerid, params[], help)
 	 	PropInfo[propid][E_y],
 		PropInfo[propid][E_z]);
 
-    mysql_tquery(g_SQL_handle, query, "", "");
+    mysql_query(g_SQL_handle, query, false); // Make sure the INSERT query is done before selecting
     mysql_tquery(g_SQL_handle, "SELECT * FROM `props` ORDER BY `ID` DESC LIMIT 1;", "OnPropLoadEx", "i", propid);
 
     propid++;
@@ -14325,7 +14396,7 @@ YCMD:createhouse(playerid, params[], help)
 	    HouseInfo[houseid][locked],
 		HouseInfo[houseid][date]);
 
-    mysql_tquery(g_SQL_handle, query, "", "");
+    mysql_query(g_SQL_handle, query, false); // Make sure the INSERT query is done before selecting
     mysql_tquery(g_SQL_handle, "SELECT * FROM `houses` ORDER BY `ID` DESC LIMIT 1;", "OnHouseLoadEx", "i", houseid);
 
     houseid++;
@@ -21536,16 +21607,14 @@ VIPMSG(color, const msg[])
 
 MySQL_FetchGangInfo(playerid, gGangID)
 {
-	new query[150];
-	format(query, sizeof(query), "SELECT * FROM `gangs` WHERE `ID` = %i;", gGangID);
-	mysql_tquery(g_SQL_handle, query, "OnQueryFinish", "siii", query, THREAD_FETCH_GANG_INFO, playerid, g_SQL_handle);
+	format(gstr, sizeof(gstr), "SELECT * FROM `gangs` WHERE `ID` = %i;", gGangID);
+	mysql_tquery(g_SQL_handle, gstr, "OnQueryFinish", "siii", gstr, THREAD_FETCH_GANG_INFO, playerid, g_SQL_handle);
 }
 
 MySQL_UpdateGangScore(gGangID, value)
 {
-	new query[150];
-	format(query, sizeof(query), "UPDATE `gangs` SET `GangScore` = `GangScore` + %i WHERE `ID` = %i LIMIT 1;", value, gGangID);
-	mysql_tquery(g_SQL_handle, query, "", "");
+	format(gstr2, sizeof(gstr2), "UPDATE `gangs` SET `GangScore` = `GangScore` + %i WHERE `ID` = %i LIMIT 1;", value, gGangID);
+	mysql_tquery(g_SQL_handle, gstr2, "", "");
 }
 
 MySQL_LoadPlayer(playerid)
@@ -21556,23 +21625,20 @@ MySQL_LoadPlayer(playerid)
 
 MySQL_LoadPlayerGang(playerid)
 {
-	new query[200];
-	format(query, sizeof(query), "SELECT `GangName`, `GangTag` FROM `gangs` WHERE `ID` = %i;", PlayerInfo[playerid][GangID]);
-	mysql_tquery(g_SQL_handle, query, "OnQueryFinish", "siii", query, THREAD_LOAD_PLAYER_GANG, playerid, g_SQL_handle);
+	format(gstr2, sizeof(gstr2), "SELECT `GangName`, `GangTag` FROM `gangs` WHERE `ID` = %i;", PlayerInfo[playerid][GangID]);
+	mysql_tquery(g_SQL_handle, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_LOAD_PLAYER_GANG, playerid, g_SQL_handle);
 }
 
 MySQL_AssignRankIfExist(playerid)
 {
-	new query[180];
-  	format(query, sizeof(query), "SELECT `GangPosition` FROM `accounts` WHERE `GangID` = %i AND `Name` = '%s';", PlayerInfo[playerid][GangID], PlayerInfo[playerid][GangAssignRank]);
-  	mysql_tquery(g_SQL_handle, query, "OnQueryFinish", "siii", query, THREAD_ASSIGN_RANK, playerid, g_SQL_handle);
+  	format(gstr2, sizeof(gstr2), "SELECT `GangPosition` FROM `accounts` WHERE `GangID` = %i AND `Name` = '%s';", PlayerInfo[playerid][GangID], PlayerInfo[playerid][GangAssignRank]);
+  	mysql_tquery(g_SQL_handle, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_ASSIGN_RANK, playerid, g_SQL_handle);
 }
 
 MySQL_KickFromGangIfExist(playerid)
 {
-	new query[180];
-  	format(query, sizeof(query), "SELECT `GangPosition` FROM `accounts` WHERE `GangID` = %i AND `Name` = '%s';", PlayerInfo[playerid][GangID], PlayerInfo[playerid][GangKickMem]);
-  	mysql_tquery(g_SQL_handle, query, "OnQueryFinish", "siii", query, THREAD_KICK_FROM_GANG, playerid, g_SQL_handle);
+  	format(gstr2, sizeof(gstr2), "SELECT `GangPosition` FROM `accounts` WHERE `GangID` = %i AND `Name` = '%s';", PlayerInfo[playerid][GangID], PlayerInfo[playerid][GangKickMem]);
+  	mysql_tquery(g_SQL_handle, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_KICK_FROM_GANG, playerid, g_SQL_handle);
 }
 
 MySQL_SavePlayer(playerid, bool:save_pv)
@@ -25534,7 +25600,7 @@ function:ProcessTick()
 			    {
 			        if(IsPlayerAvail(ii) && PlayerInfo[ii][GangID] == GZoneInfo[i][AttackingGang] && PlayerInfo[ii][bGWarMode])
 			        {
-			            if(!IsPlayerInRangeOfPoint(ii, 80.0, GZoneInfo[i][E_x], GZoneInfo[i][E_y], GZoneInfo[i][E_z]) || IsPlayerOnDesktop(ii, 50000)) continue;
+			            if(!IsPlayerInRangeOfPoint(ii, 100.0, GZoneInfo[i][E_x], GZoneInfo[i][E_y], GZoneInfo[i][E_z]) || IsPlayerOnDesktop(ii, 50000)) continue;
 
 			            Iter_Add(Players, ii);
 			        }
