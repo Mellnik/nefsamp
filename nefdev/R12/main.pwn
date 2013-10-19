@@ -5799,9 +5799,7 @@ public OnPlayerLeaveDynamicArea(playerid, areaid)
 	    {
 	        // Player left GWAR
             SCM(playerid, -1, ""orange"You have left the gang zone! Get back fast and defend it!");
-			new tmp = GetGZoneByInvlovedGang(PlayerInfo[playerid][GangID]);
-			if(tmp == -1) return SCM(playerid, -1, ""er"Error! Please reconnect!");
-            ResetPlayerGWarMode(playerid, tmp, false);
+            ResetPlayerGWarMode(playerid, false);
             break;
 		}
 	}
@@ -11831,7 +11829,7 @@ YCMD:gcapture(playerid, params[], help)
 			    {
 			        if(PlayerInfo[ii][GangID] == GZoneInfo[i][AttackingGang] || PlayerInfo[ii][GangID] == GZoneInfo[i][DefendingGang])
 			        {
-			    		ResetPlayerGWarMode(ii, i, false);
+			    		ResetPlayerGWarMode(ii, false);
 					}
 					
 					if(PlayerInfo[ii][GangID] == GZoneInfo[i][DefendingGang])
@@ -12015,16 +12013,24 @@ SetPlayerGWarMode(playerid)
         RandomWeapon(playerid);
   		SCM(playerid, -1, ""orange"God mode has been disabled!");
 	}
+	
 	PlayerInfo[playerid][SpeedBoost] = false;
     PlayerInfo[playerid][SuperJump] = false;
     PlayerInfo[playerid][bGWarMode] = true;
 }
 
-ResetPlayerGWarMode(playerid, id, bool:msg = true)
+ResetPlayerGWarMode(playerid, bool:msg = true)
 {
     if(msg) SCM(playerid, -1, ""orange"You have left the gang war!");
-    TextDrawHideForPlayer(playerid, GZoneInfo[id][E_Txt]);
+    
+    for(new i = 0; i < gzoneid; i++)
+    {
+        TextDrawHideForPlayer(playerid, GZoneInfo[i][E_Txt]);
+    }
+    
     PlayerInfo[playerid][bGWarMode] = false;
+	PlayerInfo[playerid][SpeedBoost] = true;
+    PlayerInfo[playerid][SuperJump] = false;
 }
 
 YCMD:ginvite(playerid, params[], help)
@@ -20847,18 +20853,6 @@ GetGangNameByID(id)
 	return name;
 }
 
-GetGZoneByInvlovedGang(id)
-{
-	for(new i = 0; i < gzoneid; i++)
-	{
-	    if(id == GZoneInfo[i][AttackingGang] || id == GZoneInfo[i][DefendingGang])
-	    {
-	        return i;
-	    }
-	}
-	return -1;
-}
-
 GetGZonesByGang(id)
 {
 	new count = 0;
@@ -25622,7 +25616,7 @@ function:ProcessTick()
 						    {
 						        if(PlayerInfo[ii][GangID] == GZoneInfo[i][AttackingGang] || PlayerInfo[ii][GangID] == GZoneInfo[i][DefendingGang])
 						        {
-						    		ResetPlayerGWarMode(ii, i);
+						    		ResetPlayerGWarMode(ii);
 								}
 							}
 						}
@@ -25650,7 +25644,7 @@ function:ProcessTick()
 						    {
 						        if(PlayerInfo[ii][GangID] == GZoneInfo[i][AttackingGang] || PlayerInfo[ii][GangID] == GZoneInfo[i][DefendingGang])
 						        {
-						    		ResetPlayerGWarMode(ii, i);
+						    		ResetPlayerGWarMode(ii);
 								}
 							}
 						}
@@ -25714,7 +25708,7 @@ function:ProcessTick()
 					    {
 					        if(PlayerInfo[ii][GangID] == GZoneInfo[i][AttackingGang] || PlayerInfo[ii][GangID] == GZoneInfo[i][DefendingGang])
 					        {
-					    		ResetPlayerGWarMode(ii, i);
+					    		ResetPlayerGWarMode(ii);
 							}
 
 							if(PlayerInfo[ii][GangID] == GZoneInfo[i][AttackingGang])
@@ -29471,9 +29465,7 @@ ExitPlayer(playerid)
 {
     if(PlayerInfo[playerid][bGWarMode])
     {
-		new tmp = GetGZoneByInvlovedGang(PlayerInfo[playerid][GangID]);
-		if(tmp == -1) return SCM(playerid, -1, ""er"Error! Please reconnect!");
-        ResetPlayerGWarMode(playerid, tmp);
+        ResetPlayerGWarMode(playerid);
         return 0;
     }
     
