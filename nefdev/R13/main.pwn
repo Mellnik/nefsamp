@@ -11864,7 +11864,7 @@ YCMD:gwars(playerid, params[], help)
 	{
 	    if(GZoneInfo[i][bUnderAttack])
 	    {
-	        format(gstr, sizeof(gstr), "%s is attacking zone '%s'", GetGangNameByID(GZoneInfo[i][AttackingGang]), GZoneInfo[i][sZoneName]);
+	        format(gstr, sizeof(gstr), "%s is attacking zone '%s'\n", GetGangNameByID(GZoneInfo[i][AttackingGang]), GZoneInfo[i][sZoneName]);
 	        strcat(str, gstr);
 			++count;
 	    }
