@@ -260,7 +260,7 @@ native IsValidVehicle(vehicleid); // undefined
 // -
 // - GWARS
 // -
-#define MAX_GZONES						(40)
+#define MAX_GZONES						(45)
 #define MAX_GZONES_PER_GANG             (15)
 #define GZONE_SIZE                      (75.0)
 #define COLOR_HOSTILE                   (0x95133496)
@@ -5357,7 +5357,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 
 				if(PlayerInfo[playerid][Wanteds] > 2)
 				{
-					new money = floatround((1400 * PlayerInfo[playerid][Wanteds]) / 2.5),
+					new money = floatround((1400 * PlayerInfo[playerid][Wanteds]) / 2.6),
 						score = floatround((2 * PlayerInfo[playerid][Wanteds]) / 2.5);
 
 					GivePlayerScore_(killerid, score, true, true);
@@ -10561,6 +10561,7 @@ YCMD:go(playerid, params[], help)
 			if(gTeam[player] != NORMAL) return SCM(playerid, -1, ""er"Player is currently unavailable to goto");
 			if(PlayerInfo[player][Wanteds] != 0) return SCM(playerid, -1, ""er"This player has wanteds");
 			if(PlayerInfo[player][Level] != 0) return SCM(playerid, -1, ""er"You can´t teleport to admins");
+            if(PlayerInfo[player][bGWarMode]) return SCM(playerid, -1, ""er"This player is in Gang War");
 
 			new Float:POS[3];
 
@@ -11795,6 +11796,7 @@ YCMD:gcapture(playerid, params[], help)
 		{
 		    if(!IsPlayerAvail(ii)) continue;
 		    if(PlayerInfo[ii][GangID] != GZoneInfo[i][AttackingGang]) continue;
+		    if(IsPlayerOnDesktop(ii, 2500)) continue;
 		    
 			GetPlayerPos(ii, POS[0], POS[1], POS[2]);
 
@@ -11906,7 +11908,7 @@ YCMD:gwar(playerid, params[], help)
             return ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" Gang War", ""white"This zone is currently locked!", "OK", "");
 		}
 		
-		if(GetGZonesByGang(PlayerInfo[playerid][GangID]) >= MAX_GZONES_PER_GANG) return ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" Gang War", ""white"Your gang already owns the max Zones per Gang.", "OK", "");
+		if(GetGZonesByGang(PlayerInfo[playerid][GangID]) >= MAX_GZONES_PER_GANG) return ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" Gang War", ""white"Your gang owns the maximum of "MAX_GZONES_PER_GANG" zones", "OK", "");
 		
 		if(Iter_Contains(iterGangWar, PlayerInfo[playerid][GangID]))
 		{
@@ -13824,10 +13826,11 @@ YCMD:headsetlevel(playerid, params[], help)
 {
 	if(PlayerInfo[playerid][Level] >= 5)
 	{
-	    if(strcmp(__GetName(playerid), "Chris", true) && strcmp(__GetName(playerid), "Adam", true))
-	    {
-	        return SCM(playerid, -1, ""er"You may not use this command!");
-	    }
+		switch(YHash(__GetName(playerid), false))
+		{
+		    case _I(c,h,r,i,s), _I(a,d,a,m): { }
+			default: return SCM(playerid, -1, ""er"You may not use this command!");
+		}
 	    
 	    new player, alevel;
 	 	if(sscanf(params, "ri", player, alevel))
@@ -25590,6 +25593,7 @@ function:ProcessTick()
 			        if(IsPlayerAvail(ii) && PlayerInfo[ii][GangID] == GZoneInfo[i][AttackingGang] && PlayerInfo[ii][bGWarMode])
 			        {
 			            if(!IsPlayerInRangeOfPoint(ii, GZONE_SIZE, GZoneInfo[i][E_x], GZoneInfo[i][E_y], GZoneInfo[i][E_z]) || IsPlayerOnDesktop(ii, 50000)) continue;
+                        if(IsPlayerOnDesktop(ii, 2500)) continue;
 
 			            Iter_Add(Players, ii);
 			        }
@@ -25663,7 +25667,7 @@ function:ProcessTick()
 				    {
 					    format(gstr, sizeof(gstr), ""gang_sign" "r_besch" Your gang successfully captured '%s' with %i alive players!", GZoneInfo[i][sZoneName], Iter_Count(Players));
 						GangMSG(GZoneInfo[i][AttackingGang], gstr);
-						GangMSG(GZoneInfo[i][AttackingGang], ""gang_sign" "r_besch" The gang gained 20 gang score and each member $40,000 who were tied.");
+						GangMSG(GZoneInfo[i][AttackingGang], ""gang_sign" "r_besch" The gang gained 20 gang score and each member $30,000 who were tied.");
 
 						format(gstr, sizeof(gstr), ""orange"Gang %s captured zone '%s' and gained their reward", GetGangNameByID(GZoneInfo[i][AttackingGang]), GZoneInfo[i][sZoneName]);
 						SCMToAll(-1, gstr);
@@ -25677,7 +25681,7 @@ function:ProcessTick()
 					{
 					    format(gstr, sizeof(gstr), ""gang_sign" "r_besch" Your gang successfully captured '%s' with %i alive players!", GZoneInfo[i][sZoneName], Iter_Count(Players));
 						GangMSG(GZoneInfo[i][AttackingGang], gstr);
-						GangMSG(GZoneInfo[i][AttackingGang], ""gang_sign" "r_besch" The gang gained 20 gang score and each member $40,000 who were tied.");
+						GangMSG(GZoneInfo[i][AttackingGang], ""gang_sign" "r_besch" The gang gained 20 gang score and each member $30,000 who were tied.");
 
 						format(gstr, sizeof(gstr), ""orange"Gang %s captured zone '%s' which was territory of %s", GetGangNameByID(GZoneInfo[i][AttackingGang]), GZoneInfo[i][sZoneName], GetGangNameByID(GZoneInfo[i][DefendingGang]));
 						SCMToAll(-1, gstr);
@@ -25708,7 +25712,7 @@ function:ProcessTick()
 
 							if(PlayerInfo[ii][GangID] == GZoneInfo[i][AttackingGang])
 							{
-							    GivePlayerCash(ii, 40000);
+							    GivePlayerCash(ii, 30000);
 							}
 						}
 					    SyncGangZones(ii);
