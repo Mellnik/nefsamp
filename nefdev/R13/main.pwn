@@ -7687,6 +7687,11 @@ YCMD:sfdrift(playerid, params[], help)
     PortPlayerMapVeh(playerid, -2410.9963, -600.7848, 132.3277, 127.1357, -2410.9963, -600.7848, 132.3277, 127.1357, "San Fierro Drift", "sfdrift");
     return 1;
 }
+YCMD:driftcity(playerid, params[], help)
+{
+	PortPlayerMapVeh(playerid, 3431.8589, 484.3132, 1788.7490, 180, 3431.8589, 484.3132, 1788.7490, 180, "Drift City", "driftcity");
+	return 1;
+}
 YCMD:driftisland(playerid, params[], help)
 {
     PortPlayerMapVeh(playerid, 3075.9263,-3153.9749,49.1486,3.6277,3075.9263,-3153.9749,49.1486,3.6277, "Drift Island", "df");
@@ -23157,6 +23162,7 @@ LoadServerStaticMeshes()
 	Command_AddAltNamed("trackmania2", "tm2");
 	Command_AddAltNamed("a51", "area51");
 	Command_AddAltNamed("bs", "bsn");
+	Command_AddAltNamed("driftcity", "dc");
 	Command_AddAltNamed("driftisland", "df");
 	Command_AddAltNamed("parkour", "parkour1");
 	Command_AddAltNamed("kk", "krustykrab");
@@ -23534,6 +23540,7 @@ LoadVisualStaticMeshes()
     
     AddTeleport(5, "Gold Credits", "gc", 1858.1874,-1466.7080,13.3981);
 	AddTeleport(9, "Drift", "drift", -344.308, 1528.474, 75.159);
+	AddTeleport(9, "Drift City", "dc", 3431.8589, 484.3132, 1788.7490);
 	AddTeleport(9, "Drift Island", "df", 3075.9263,-3153.9749,49.1486);
 	AddTeleport(9, "Las Venturas Drift", "lvdrift", 2333.8508,1405.8370,42.5904);
 	AddTeleport(9, "San Fierro Drift", "sfdrift", -2410.9963, -600.7848, 132.3277);
