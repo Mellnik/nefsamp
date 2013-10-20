@@ -6231,12 +6231,8 @@ public OnPlayerEnterRaceCheckpoint(playerid)
 
 	if(gTeam[playerid] == gRACE)
 	{
-	    ++g_CPProgress[playerid];
-	    
 	    if(g_CPProgress[playerid] == g_RaceArray[E_rCPs] - 1)
 	    {
-			DisablePlayerRaceCheckpoint(playerid);
-			
 			new TimeStamp,
 			    TotalRaceTime,
 				rTime[3],
@@ -6328,7 +6324,10 @@ public OnPlayerEnterRaceCheckpoint(playerid)
 				print(gstr2);
 			}
 
+            DisablePlayerRaceCheckpoint(playerid);
+
 		    ++g_RaceFinishCount;
+			++g_CPProgress[playerid];
 			
 			if(g_RacePlayerCount == 1) // Wenn er alleine race fährt
 			{
@@ -6354,6 +6353,7 @@ public OnPlayerEnterRaceCheckpoint(playerid)
 		}
 		else
 		{
+			++g_CPProgress[playerid];
 		    SetCP(playerid, g_CPProgress[playerid], g_CPProgress[playerid] + 1, g_RaceArray[E_rCPs], g_RaceArray[E_rType]);
 		    PlayerPlaySound(playerid, 1137, 0.0, 0.0, 0.0);
 		}
@@ -15288,6 +15288,7 @@ YCMD:vmenu(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
     
+    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
     if(gTeam[playerid] != NORMAL) return SCM(playerid, RED, NOT_AVAIL);
     if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't spawn a car now");
     
