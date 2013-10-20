@@ -5775,7 +5775,7 @@ public OnPlayerEnterDynamicArea(playerid, areaid)
 	    if(GZoneInfo[i][localGang] == PlayerInfo[playerid][GangID] && GZoneInfo[i][bUnderAttack] && areaid == GZoneInfo[i][zsphere])
 	    {
 	        // Player entered GWAR
-			SCM(playerid, -1, ""orange"You have joined the Gang War! Type /capture near the flag when no enemy is around!");
+			SCM(playerid, -1, ""orange"You have joined the Gang War! Type /gcapture near the flag when no enemy is around!");
 			SetPlayerGWarMode(playerid);
 			break;
 		}
@@ -11814,7 +11814,7 @@ YCMD:gcapture(playerid, params[], help)
 		    format(gstr, sizeof(gstr), ""gang_sign" "r_besch" Your gang failed to capture '%s'. %s(%i) re-captured it!", GZoneInfo[i][sZoneName], __GetName(playerid), playerid);
 			GangMSG(GZoneInfo[i][AttackingGang], gstr);
 
-			format(gstr, sizeof(gstr), ""orange"Gang %s failed to capture '%s' The zone remains %s gang territory and will be locked for 30 minutes!", GetGangNameByID(GZoneInfo[i][AttackingGang]), GZoneInfo[i][sZoneName], GetGangNameByID(GZoneInfo[i][DefendingGang]));
+			format(gstr, sizeof(gstr), ""orange"Gang %s failed to capture '%s'. The zone remains %s gang territory and were locked for 30 minutes!", GetGangNameByID(GZoneInfo[i][AttackingGang]), GZoneInfo[i][sZoneName], GetGangNameByID(GZoneInfo[i][DefendingGang]));
 			SCMToAll(-1, gstr);
 
 			for(new ii = 0; ii < MAX_PLAYERS; ii++)
