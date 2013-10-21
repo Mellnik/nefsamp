@@ -25343,9 +25343,9 @@ function:OnQueueReceived()
 						cache_delete(res);
 		            }
 		            
-					format(gstr, sizeof(gstr), "~p~%s received for donating $%s!", name, payment);
+					format(gstr, sizeof(gstr), "~p~%s received VIP for donating $%s!", name, payment);
                     GameTextForAll(gstr, 10000, 3);
-                    format(gstr, sizeof(gstr), "%s received for donating $%s!", name, payment);
+                    format(gstr, sizeof(gstr), "%s received VIP for donating $%s!", name, payment);
                     SCMToAll(ORANGE, gstr);
 		        }
 		        default: continue;
