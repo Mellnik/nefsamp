@@ -12,7 +12,7 @@
 #pragma dynamic 8192
 
 #define IS_RELEASE_BUILD true
-#define INC_ENVIORMENT true
+#define INC_ENVIORMENT false
 #define IRC_CONNECT true
 #define YSI_IS_SERVER
 
@@ -1604,7 +1604,6 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
 	Iterator:DerbyVoters<MAX_PLAYERS>,
 	Iterator:PlayerIgnore[MAX_PLAYERS]<MAX_PLAYERS>,
 	Iterator:LottoNumbersUsed<75>,
-	Iterator:IRCBotsDC<10>,
 	Iterator:iterGangWar<1000>,
 	Float:g_RaceVehCoords[RACE_MAX_PLAYERS][4],
 	Float:g_RaceCPs[RACE_MAX_CHECKPOINTS][3],
@@ -1829,43 +1828,7 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
 	T_SniperPlayers = 0,
 	T_CNRPlayers = 0,
 	IRC_Bots[IRC_MAX_BOTS],
-	IRC_GroupID,
-	Float:FRX[MAX_PLAYERS],
-	Float:FRY[MAX_PLAYERS],
-	Float:FRZ[MAX_PLAYERS],
-	Float:FTX[MAX_PLAYERS],
-	Float:FTY[MAX_PLAYERS],
-	Float:FTZ[MAX_PLAYERS],
-	Float:RBX[MAX_PLAYERS],
-	Float:RBY[MAX_PLAYERS],
-	Float:RBZ[MAX_PLAYERS],
-	firecrackertime[MAX_PLAYERS],
-	firerockettime[MAX_PLAYERS],
-	explosionrocket[MAX_PLAYERS],
-	Firecracker[MAX_PLAYERS],
-	Firerocket[MAX_PLAYERS],
-	rocketsmoke[MAX_PLAYERS],
-	FireCrackerRoll[MAX_PLAYERS],
-	firecrackerroll[MAX_PLAYERS],
-	CrackerRollSmoke[MAX_PLAYERS],
-	Float:RollStartX[MAX_PLAYERS],
-	Float:RollStartY[MAX_PLAYERS],
-	Float:RollStartZ[MAX_PLAYERS],
-	RocketBoxTime[MAX_PLAYERS],
-	RocketBox[MAX_PLAYERS],
-	RocketBoxSmoke[MAX_PLAYERS],
-	FountainSmoke[MAX_PLAYERS],
-	Fountain[MAX_PLAYERS],
-	LightFW[MAX_LIGHTS][MAX_PLAYERS],
-	RollParts[MAX_PLAYERS][MAX_PARTS],
-	FountainSprinkle[Sprinkleid][MAX_PLAYERS],
-	RocketBoxSprinkle[RBSprinkleid][MAX_PLAYERS],
-	RBLight[MAX_LIGHTS][MAX_PLAYERS],
-	Fountain1Time[MAX_PLAYERS],
-	Fountain2Time[MAX_PLAYERS],
-	Fountain3Time[MAX_PLAYERS],
-	DestroySprinkleID[MAX_PLAYERS],
-	AllowedFirework[e_firework];
+	IRC_GroupID;
 	
 new Float:FloorZOffsets[21] =
 {
@@ -2504,11 +2467,7 @@ public OnGameModeExit()
 	mysql_stat(gstr2, g_SQL_handle);
 	print(gstr2);
 
-    IRC_Quit(IRC_Bots[0]);
-    IRC_Quit(IRC_Bots[1]);
-    IRC_Quit(IRC_Bots[2]);
-    IRC_Quit(IRC_Bots[3]);
-    IRC_Quit(IRC_Bots[4]);
+    IRC_QuitBots();
     IRC_DestroyGroup(IRC_GroupID);
 	
 	DestroyElevator();
@@ -9527,8 +9486,8 @@ YCMD:adminhelp(playerid, params[], help)
 
 	    strcat(string, ""yellow_e"Level 1:\n"white"/rplayers /dplayers /asay /warn /slap /reports /spec /specoff /disarm\n/pweaps /getin /gotoxyza /spectators /caps /day /night /dawn\n");
 	    strcat(string, "/kick /mute /unmute /adminhq /ncrecords\n\n");
-	    strcat(string, ""yellow_e"Level 2:\n"white"/tban /online /offline /onduty /offduty /akill /rv\n/move /ban /ipban /cuff /uncuff /jail /unjail /unfreeze /lightfw\n\n");
-	    strcat(string, ""yellow_e"Level 3:\n"white"/freeze /eject /go /burn /mkick /clearchat\n/giveweapon /announce /npccheck /raceforcemap /deleterecord\n\n");
+	    strcat(string, ""yellow_e"Level 2:\n"white"/tban /online /offline /onduty /offduty /akill /rv\n/move /ban /ipban /cuff /uncuff /jail /unjail /unfreeze\n\n");
+	    strcat(string, ""yellow_e"Level 3:\n"white"/freeze /eject /go /burn /mkick /clearchat\n/giveweapon /announce /connectbots /raceforcemap /deleterecord\n\n");
 	    strcat(string, ""yellow_e"Level 4:\n"white"/unban /oban /sethealth /get /getip /healall /armorall /cashfall /scorefall\n/announce2 /iplookup\n\n");
 	    strcat(string, ""yellow_e"Level 5:\n"white"/setcash /setbcash /setscore /gdestroy /addcash /addscore\n\n");
 	    strcat(string, ""yellow_e"Level 6:\n"white"/resethouse /resetbizz /sethouseprice /sethousescore\n/setbizzlevel /createhouse /createbizz /createstore /gzonecreate");
@@ -11079,165 +11038,6 @@ YCMD:kick(playerid, params[], help)
 	return 1;
 }
 
-YCMD:lightfw(playerid, params[], help)
-{
-	if(gTeam[playerid] != NORMAL) return SCM(playerid, RED, NOT_AVAIL);
-	
-	if(PlayerInfo[playerid][Level] >= 2)
-	{
-		new distance;
-	    if(AllowedFirework[DrawDistance] == 0) distance = 15;
-	    if(AllowedFirework[DrawDistance] == 1) distance = 22;
-	    if(AllowedFirework[DrawDistance] == 2) distance = 30;
-
-		new fwtype;
-	    if(sscanf(params, "i", fwtype))
-		{
-	        return SCM(playerid, NEF_GREEN, "Usage: /lightfw <1-8>");
-	    }
-	    
-		switch(fwtype)
-	 	{
-	  		case 1:
-			{
-				if(firecrackertime[playerid] == 0)
-			    {
-			        new Float:X, Float:Y, Float:Z;
-			        firecrackertime[playerid] = 1;
-					GetPlayerPos(playerid,X,Y,Z);
-					GetPosInFrontOfPlayer(playerid, X,Y, 8);
-					Firecracker[playerid] = CreateDynamicObject(1672, X,Y,(Z-0.9), 0, 0, 0);
-					SetTimerEx("FirecrackerTime", (2000+(random(3000))), false, "i", playerid);
-				}
-				else return SCM(playerid, COLOR_RED, "ERROR: You already threw a firecracker.");
-			}
-			case 2:
-			{
-				if(firecrackerroll[playerid] == 0)
-			    {
-			        new Float:X, Float:Y, Float:Z;
-			        firecrackerroll[playerid] = 1;
-					GetPlayerPos(playerid,X,Y,Z);
-					GetPosInFrontOfPlayer(playerid, X,Y, 8);
-					FireCrackerRoll[playerid] = CreateRoll(playerid,X,Y,(Z-1.00));
-					RollStartX[playerid] = X;
-					RollStartY[playerid] = Y;
-					RollStartZ[playerid] = (Z-1.00);
-					CrackerRollSmoke[playerid] = CreateDynamicObject(2780, X, Y, (Z-5.00), 0, 0, 0);
-					SetTimerEx("CrackerRollTime", (2000+(random(3000))), false, "i", playerid);
-				}
-				else return SCM(playerid, COLOR_RED, "ERROR: You already placed a firecracker roll.");
-			}
-			case 3:
-			{
-				if(firerockettime[playerid] == 0)
-			    {
-			        new Float:X, Float:Y,Float:Z;
-			        firerockettime[playerid] = 1;
-					GetPlayerPos(playerid,X,Y,Z);
-					GetPosInFrontOfPlayer(playerid, X,Y, distance);
-					Firerocket[playerid] = CreateDynamicObject(354, X,Y,(Z), 0, 0, 0);
-					rocketsmoke[playerid] = CreateDynamicObject(2780, X,Y,(Z), 0, 0, 0);
-					MoveDynamicObject(Firerocket[playerid], X, Y, Z+30, 10);
-					MoveDynamicObject(rocketsmoke[playerid], X, Y, Z+30, 10);
-					SetTimerEx("FirerocketTime", 3000, false, "i", playerid);
-				}
-				else return SCM(playerid, COLOR_RED, "ERROR: You already lit a firerocket.");
-			}
-			case 4:
-			{
-				if(firerockettime[playerid] == 0)
-				{
-				    new Float:X, Float:Y,Float:Z;
-				    firerockettime[playerid] = 2;
-					GetPlayerPos(playerid,X,Y,Z);
-					GetPosInFrontOfPlayer(playerid, X,Y, distance);
-					Firerocket[playerid] = CreateDynamicObject(354, X,Y,(Z), 0, 0, 0);
-					rocketsmoke[playerid] = CreateDynamicObject(2780, X,Y,(Z), 0, 0, 0);
-					MoveDynamicObject(Firerocket[playerid], X, Y, Z+50, 15);
-					MoveDynamicObject(rocketsmoke[playerid], X, Y, Z+50, 15);
-					SetTimerEx("FirerocketTime", 3000, false, "i", playerid);
-				}
-				else return SCM(playerid, COLOR_RED, "ERROR: You already lit a firerocket.");
-			}
-			case 5:
-			{
-				if(Fountain1Time[playerid] == 0 && Fountain2Time[playerid] == 0 && Fountain3Time[playerid] == 0)
-				{
-				    new Float:X, Float:Y,Float:Z;
-				    Fountain1Time[playerid] = 1;
-					GetPlayerPos(playerid,X,Y,Z);
-					GetPosInFrontOfPlayer(playerid, X,Y, 15);
-					FTX[playerid] = X;
-					FTY[playerid] = Y;
-					FTZ[playerid] = (Z-1.0);
-					Fountain[playerid] = CreateDynamicObject(354, X,Y,(Z-1.0), 0, 0, 0);
-					FountainSmoke[playerid] = CreateDynamicObject(2780, X,Y,(Z-1.0), 0, 0, 0);
-					SetTimerEx("FountainTimer", 3000, false, "i", playerid);
-				}
-				else return SCM(playerid, COLOR_RED, "ERROR: You already lit a Firework Fountain.");
-			}
-			case 6:
-			{
-				if(Fountain1Time[playerid] == 0 && Fountain2Time[playerid] == 0 && Fountain3Time[playerid] == 0)
-				{
-				    new Float:X, Float:Y,Float:Z;
-				    Fountain2Time[playerid] = 1;
-					GetPlayerPos(playerid,X,Y,Z);
-					GetPosInFrontOfPlayer(playerid, X,Y, 15);
-					FTX[playerid] = X;
-					FTY[playerid] = Y;
-					FTZ[playerid] = (Z-1.0);
-					Fountain[playerid] = CreateDynamicObject(354, X,Y,(Z-1.0), 0, 0, 0);
-					FountainSmoke[playerid] = CreateDynamicObject(2780, X,Y,(Z-1.0), 0, 0, 0);
-					SetTimerEx("FountainTimer", 3000, false, "i", playerid);
-				}
-				else return SCM(playerid, COLOR_RED, "ERROR: You already lit a Firework Fountain.");
-			}
-			case 7:
-			{
-				if(Fountain1Time[playerid] == 0 && Fountain2Time[playerid] == 0 && Fountain3Time[playerid] == 0)
-				{
-				    new Float:X, Float:Y,Float:Z;
-				    Fountain3Time[playerid] = 1;
-					GetPlayerPos(playerid,X,Y,Z);
-					GetPosInFrontOfPlayer(playerid, X,Y, 15);
-					FTX[playerid] = X;
-					FTY[playerid] = Y;
-					FTZ[playerid] = (Z-1.0);
-					Fountain[playerid] = CreateDynamicObject(354, X,Y,(Z-1.0), 0, 0, 0);
-					FountainSmoke[playerid] = CreateDynamicObject(2780, X,Y,(Z-1.0), 0, 0, 0);
-					SetTimerEx("FountainTimer", 3000, false, "i", playerid);
-				}
-				else return SCM(playerid, COLOR_RED, "ERROR: You already lit a Firework Fountain.");
-			}
-			case 8:
-			{
-				if(RocketBoxTime[playerid] == 0)
-				{
-				    new Float:X, Float:Y,Float:Z;
-				    RocketBoxTime[playerid] = 1;
-					GetPlayerPos(playerid,X,Y,Z);
-					GetPosInFrontOfPlayer(playerid, X,Y, distance);
-					RBX[playerid] = X;
-					RBY[playerid] = Y;
-					RBZ[playerid] = (Z-1.0);
-					RocketBox[playerid] = CreateDynamicObject(354, X,Y,(Z-1.0), 0, 0, 0);
-					RocketBoxSmoke[playerid] = CreateDynamicObject(2780, X,Y,(Z-1.0), 0, 0, 0);
-					SetTimerEx("RocketBoxTimer", 3000, false, "i", playerid);
-				}
-				else return SCM(playerid, COLOR_RED, "ERROR: You already lit a Firework RocketBox.");
-			}
-			default: SCM(playerid, COLOR_WHITE, "No.");
-		}
-	}
-	else
-	{
-		SCM(playerid, -1, NO_PERM);
-	}
-	return 1;
-}
-
 YCMD:mute(playerid, params[], help)
 {
 	if(PlayerInfo[playerid][Level] >= 1)
@@ -11915,7 +11715,7 @@ YCMD:gwar(playerid, params[], help)
             return ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" Gang War", ""white"This zone is currently locked!", "OK", "");
 		}
 		
-		if(GetGZonesByGang(PlayerInfo[playerid][GangID]) >= MAX_GZONES_PER_GANG) return ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" Gang War", ""white"Your gang owns the maximum of "MAX_GZONES_PER_GANG" zones", "OK", "");
+		if(GetGZonesByGang(PlayerInfo[playerid][GangID]) >= MAX_GZONES_PER_GANG) return ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" Gang War", ""white"Your gang owns the maximum of 15 zones", "OK", "");
 		
 		if(Iter_Contains(iterGangWar, PlayerInfo[playerid][GangID]))
 		{
@@ -12722,7 +12522,7 @@ YCMD:rplayers(playerid, params[], help)
 	return 1;
 }
 
-YCMD:npccheck(playerid, params[], help)
+YCMD:connectbots(playerid, params[], help)
 {
 	if(PlayerInfo[playerid][Level] >= 3)
 	{
@@ -12755,6 +12555,7 @@ YCMD:npccheck(playerid, params[], help)
 					}
 				}
 	        }
+	        
 			ConnectNPC("["SVRSC"]Floatround", "bot0");
 			ConnectNPC("["SVRSC"]Inyaface", "bot1");
 			ConnectNPC("["SVRSC"]SS_FatGuy", "bot2");
@@ -12763,69 +12564,8 @@ YCMD:npccheck(playerid, params[], help)
 	    }
 	    
 	    #if IRC_CONNECT == true
-	    if(Iter_Count(IRCBotsDC) != 0)
-	    {
-			for(new botid = Iter_First(IRCBotsDC), prev; botid != Iter_End(IRCBotsDC); botid = Iter_Next(IRCBotsDC, prev))
-			{
-			    #if IS_RELEASE_BUILD == true
-			    if(IRC_Bots[0] == botid)
-			    {
-					IRC_Bots[0] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]Floatround", "["SVRSC"]Floatround", "foatround");
-					IRC_SetIntData(IRC_Bots[0], E_IRC_CONNECT_DELAY, 1);
-			    }
- 			    else if(IRC_Bots[1] == botid)
-			    {
-					IRC_Bots[1] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]Inyaface", "["SVRSC"]Inyaface", "inyaface");
-					IRC_SetIntData(IRC_Bots[1], E_IRC_CONNECT_DELAY, 6);
-			    }
- 			    else if(IRC_Bots[2] == botid)
-			    {
-					IRC_Bots[2] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]SS_FatGuy", "["SVRSC"]SS_FatGuy", "ss_fatguy");
-					IRC_SetIntData(IRC_Bots[2], E_IRC_CONNECT_DELAY, 15);
-			    }
- 			    else if(IRC_Bots[3] == botid)
-			    {
-					IRC_Bots[3] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]TrainRider", "["SVRSC"]TrainRider", "trainrider");
-					IRC_SetIntData(IRC_Bots[3], E_IRC_CONNECT_DELAY, 29);
-	    		}
- 			    else if(IRC_Bots[4] == botid)
-			    {
-					IRC_Bots[4] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]CrazyLilMan", "["SVRSC"]CrazyLilMan", "crazylilman");
-					IRC_SetIntData(IRC_Bots[4], E_IRC_CONNECT_DELAY, 45);
-			    }
-
-			    #else
-			    
-			    if(IRC_Bots[0] == botid)
-			    {
-					IRC_Bots[0] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]Floatround_BETA", "["SVRSC"]Floatround_BETA", "foatround_BETA");
-					IRC_SetIntData(IRC_Bots[0], E_IRC_CONNECT_DELAY, 1);
-			    }
- 			    else if(IRC_Bots[1] == botid)
-			    {
-					IRC_Bots[1] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]Inyaface_BETA", "["SVRSC"]Inyaface", "inyaface_BETA");
-					IRC_SetIntData(IRC_Bots[1], E_IRC_CONNECT_DELAY, 6);
-			    }
- 			    else if(IRC_Bots[2] == botid)
-			    {
-					IRC_Bots[2] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]SS_FatGuy_BETA", "["SVRSC"]SS_FatGuy_BETA", "ss_fatguy_BETA");
-					IRC_SetIntData(IRC_Bots[2], E_IRC_CONNECT_DELAY, 15);
-			    }
- 			    else if(IRC_Bots[3] == botid)
-			    {
-					IRC_Bots[3] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]TrainRider_BETA", "["SVRSC"]TrainRider_BETA", "trainrider_BETA");
-					IRC_SetIntData(IRC_Bots[3], E_IRC_CONNECT_DELAY, 29);
-	    		}
- 			    else if(IRC_Bots[4] == botid)
-			    {
-					IRC_Bots[4] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]CrazyLilMan_BETA", "["SVRSC"]CrazyLilMan_BETA", "crazylilman_BETA");
-					IRC_SetIntData(IRC_Bots[4], E_IRC_CONNECT_DELAY, 45);
-			    }
-			    #endif
-			    
-			    Iter_SafeRemove(IRCBotsDC, botid, prev);
-			}
-	    }
+		IRC_QuitBots();
+		IRC_SetUp(true);
 	    #endif
 		
 		SCM(playerid, -1, ""er"All IRC bots and Server NPCs have been checked and if needed reconnected");
@@ -13046,17 +12786,42 @@ YCMD:rv(playerid, params[], help)
 	        SCM(playerid, NEF_GREEN, "Respawns all unoccupied vehicles");
 	        return 1;
 	    }
-	    
+
+		new Iterator:fVehicles<MAX_VEHICLES>, vehid;
+		for(new i = 0; i < MAX_PLAYERS; i++)
+		{
+			if(IsPlayerAvail(i))
+			{
+			    if(IsPlayerInAnyVehicle(i))
+			    {
+                    vehid = GetPlayerVehicleID(i);
+			        if(!Iter_Contains(fVehicles, vehid))
+			        {
+						Iter_Add(fVehicles, vehid);
+			        }
+			    }
+			}
+		}
+
 	    for(new i = 0; i < MAX_VEHICLES; i++)
 	    {
 	        if(IsValidVehicle(i))
 	        {
-	            if(IsVehicleOccupied(i)) continue;
-	            
-	            SetVehicleToRespawn(i);
+	            if(!Iter_Contains(fVehicles, i))
+	            {
+	                SetVehicleToRespawn(i);
+	            }
 	        }
 	    }
 	    
+	    for(new i = 0; i < MAX_PLAYERS; i++)
+	    {
+	        if(!IsPlayerInAnyVehicle(i) && gTeam[i] == NORMAL)
+	        {
+	            DestroyPlayerVehicles(i);
+	        }
+	    }
+
 		format(gstr, sizeof(gstr), ""yellow"** "red"Admin %s(%i) respawned all unoccupied vehicles [Reason: %s]", __GetName(playerid), playerid, reason);
 		SCMToAll(YELLOW, gstr);
 		print(gstr);
@@ -20562,7 +20327,6 @@ public IRC_OnConnect(botid)
 public IRC_OnDisconnect(botid)
 {
 	IRC_RemoveFromGroup(IRC_GroupID, botid);
-	Iter_Add(IRCBotsDC, botid);
 	return 1;
 }
 
@@ -23129,9 +22893,9 @@ LoadServerStaticMeshes()
 		TextDrawSetSelectable(GZoneInfo[i][E_Txt], 0);
 	}
 
-    Command_AddAltNamed("ah", "fh");
     Command_AddAltNamed("rv", "respawnvehicles");
     Command_AddAltNamed("rv", "resetvehicles");
+    Command_AddAltNamed("ah", "fh");
     Command_AddAltNamed("find", "locate");
     Command_AddAltNamed("locate", "loc");
     Command_AddAltNamed("vs", "wang");
@@ -25359,9 +25123,8 @@ function:OnQueueReceived()
 
 function:ProcessTick()
 {
-	new year, month, day;
+	static year, month, day, hour, minute, second;
 	getdate(year, month, day);
-	new hour, minute, second;
 	gettime(hour, minute, second);
 
 	format(gstr, sizeof(gstr), "worldtime %02i:%02i | %02i.%02i", hour, minute, day, month);
@@ -28454,665 +28217,19 @@ function:InfoTD_Hide(playerid)
 	PlayerTextDrawHide(playerid, TXTInfoTD[playerid]);
 }
 
-function:SplitRBSprinkle(lightobject, playerid)
+IRC_QuitBots()
 {
-	new Float:X, Float:Y, Float:Z;
-	GetDynamicObjectPos(RocketBoxSprinkle[RocketBoxTime[playerid]][playerid], X, Y, Z);
-	CreateExplosion(X, Y, Z, 2, 0);
-	DestroyDynamicObject(RocketBoxSprinkle[RocketBoxTime[playerid]][playerid]);
-	RBLight[1][playerid] = CreateDynamicObject(lightobject, X, Y, Z, 0, 0, 0);
-	MoveDynamicObject(RBLight[1][playerid], (X-(0+(random(8)))), (Y-(0+(random(8)))), (Z-25), (2+(random(4))));
-	RBLight[2][playerid] = CreateDynamicObject(lightobject, X, Y, Z, 0, 0, 0);
-	MoveDynamicObject(RBLight[2][playerid], (X+(0+(random(8)))), (Y+(0+(random(8)))), (Z-25), (2+(random(4))));
-	RBLight[3][playerid] = CreateDynamicObject(lightobject, X, Y, Z, 0, 0, 0);
-	MoveDynamicObject(RBLight[3][playerid], (X-(0+(random(8)))), (Y+(0+(random(8)))), (Z-25), (2+(random(4))));
-	RBLight[4][playerid] = CreateDynamicObject(lightobject, X, Y, Z, 0, 0, 0);
-	MoveDynamicObject(RBLight[4][playerid], (X+(0+(random(8)))), (Y-(0+(random(8)))), (Z-25), (2+(random(4))));
-	SetTimerEx("DestroyRBLight", 2600, false, "i", playerid);
-	return 1;
+    IRC_Quit(IRC_Bots[0]);
+    IRC_Quit(IRC_Bots[1]);
+    IRC_Quit(IRC_Bots[2]);
+    IRC_Quit(IRC_Bots[3]);
+    IRC_Quit(IRC_Bots[4]);
 }
 
-function:DestroyRBLight(playerid)
-{
-	DestroyDynamicObject(RBLight[1][playerid]);
-	DestroyDynamicObject(RBLight[2][playerid]);
-	DestroyDynamicObject(RBLight[3][playerid]);
-	DestroyDynamicObject(RBLight[4][playerid]);
-	RocketBoxTime[playerid] = RocketBoxTime[playerid] + 1;
-	RocketBoxTimer(playerid);
-	return 1;
-}
-
-function:RocketBoxTimer(playerid)
-{
-	if(RocketBoxTime[playerid] == 11)
-	{
-	    RocketBoxTime[playerid] = 0;
-	    DestroyDynamicObject(RocketBox[playerid]);
-	    DestroyDynamicObject(RocketBoxSmoke[playerid]);
-	    return 1;
-	}
-	if(RocketBoxTime[playerid] >= 1)
-	{
-	    new LightObject;
-	    switch(random(2))
-		{
-			case 0:
-			{
-				LightObject = 354;
-			}
-			case 1:
-			{
-				LightObject = 1213;
-			}
-		}
-	    RocketBoxSprinkle[RocketBoxTime[playerid]][playerid] = CreateDynamicObject(LightObject, RBX[playerid], RBY[playerid], RBZ[playerid], 0, 0, 0);
-		MoveDynamicObject(RocketBoxSprinkle[RocketBoxTime[playerid]][playerid], RBX[playerid], RBY[playerid], (RBZ[playerid]+35), 20);
-		SetTimerEx("SplitRBSprinkle", 1500, false, "ii", LightObject, playerid);
-		return 1;
-	}
-	return 1;
-}
-
-function:Destroy1Sprinkle(playerid)
-{
-	if(DestroySprinkleID[playerid] >= 50)
-	{
-	    new x;
-	    for (x = 0; x < Sprinkleid; x++)
-		{
-			DestroyDynamicObject(FountainSprinkle[x][playerid]);
-		}
-	    return 1;
-	}
-	if(DestroySprinkleID[playerid] >= 0)
-	{
-		DestroyDynamicObject(FountainSprinkle[DestroySprinkleID[playerid]][playerid]);
-		DestroySprinkleID[playerid] = DestroySprinkleID[playerid]+1;
-		return 1;
-	}
-	return 1;
-}
-
-function:Destroy3Sprinkle(playerid)
-{
-	if(DestroySprinkleID[playerid] >= 50)
-	{
-	    new x;
-	    for (x = 0; x < Sprinkleid; x++)
-		{
-			DestroyDynamicObject(FountainSprinkle[x][playerid]);
-		}
-	    return 1;
-	}
-	if(DestroySprinkleID[playerid] >= 0)
-	{
-	    new Float:X, Float:Y, Float:Z;
-	    GetDynamicObjectPos(FountainSprinkle[DestroySprinkleID[playerid]][playerid] ,X, Y, Z);
-	    CreateExplosion(X, Y, Z, 12, 0);
-		DestroyDynamicObject(FountainSprinkle[DestroySprinkleID[playerid]][playerid]);
-		DestroySprinkleID[playerid] = DestroySprinkleID[playerid]+1;
-		return 1;
-	}
-	return 1;
-}
-
-function:LastSprinkles(playerid)
-{
-    Fountain1Time[playerid] = 0;
-    Fountain2Time[playerid] = 0;
-    Fountain3Time[playerid] = 0;
-    DestroySprinkleID[playerid] = 0;
-    return 1;
-}
-
-function:FountainTimer(playerid)
-{
-	if(Fountain1Time[playerid] >= 50)
-	{
-	    DestroyDynamicObject(Fountain[playerid]);
-	    DestroyDynamicObject(FountainSmoke[playerid]);
-	    SetTimerEx("Destroy1Sprinkle", 300, false, "i",playerid);
-	    SetTimerEx("LastSprinkles", 600, false, "i", playerid);
-	    return 1;
-	}
-	if(Fountain1Time[playerid] >= 1)
-	{
-	    new Float:RandomXPos;
-	    new Float:RandomYPos;
-	    switch(random(2))
-		{
-			case 0:
-			{
-				RandomXPos = -(random(4));
-			}
-			case 1:
-			{
-				RandomXPos = (random(4));
-			}
-		}
-	    switch(random(2))
-		{
-			case 0:
-			{
-				RandomYPos = -(random(4));
-			}
-			case 1:
-			{
-				RandomYPos = (random(4));
-			}
-		}
-		FountainSprinkle[Fountain1Time[playerid]][playerid] = CreateDynamicObject(354, FTX[playerid], FTY[playerid], FTZ[playerid], 0, 0, 0);
-		MoveDynamicObject(FountainSprinkle[Fountain1Time[playerid]][playerid], (FTX[playerid]+RandomXPos), (FTY[playerid]+RandomYPos), (FTZ[playerid]+8), 30);
-		Fountain1Time[playerid] = Fountain1Time[playerid]+1;
-		SetTimerEx("Destroy1Sprinkle", 300, false, "i", playerid);
-		SetTimerEx("FountainTimer", (100+(random(200))), false, "i", playerid);
-		return 1;
-	}
-	if(Fountain2Time[playerid] >= 50)
-	{
-	    DestroyDynamicObject(Fountain[playerid]);
-	    DestroyDynamicObject(FountainSmoke[playerid]);
-	    SetTimerEx("Destroy1Sprinkle", 300, false, "i",playerid);
-	    SetTimerEx("LastSprinkles", 600, false, "i", playerid);
-	    return 1;
-	}
-	if(Fountain2Time[playerid] >= 1)
-	{
-	    new Float:RandomXPos;
-	    new Float:RandomYPos;
-	    switch(random(2))
-		{
-			case 0:
-			{
-				RandomXPos = -(random(4));
-			}
-			case 1:
-			{
-				RandomXPos = (random(4));
-			}
-		}
-	    switch(random(2))
-		{
-			case 0:
-			{
-				RandomYPos = -(random(4));
-			}
-			case 1:
-			{
-				RandomYPos = (random(4));
-			}
-		}
-		FountainSprinkle[Fountain2Time[playerid]][playerid] = CreateDynamicObject(1213, FTX[playerid], FTY[playerid], FTZ[playerid], 0, 0, 0);
-		MoveDynamicObject(FountainSprinkle[Fountain2Time[playerid]][playerid], (FTX[playerid]+RandomXPos), (FTY[playerid]+RandomYPos), (FTZ[playerid]+8), 30);
-		Fountain2Time[playerid] = Fountain2Time[playerid]+1;
-		SetTimerEx("Destroy1Sprinkle", 300, false, "i", playerid);
-		SetTimerEx("FountainTimer", (100+(random(200))), false, "i", playerid);
-		return 1;
-	}
-	if(Fountain3Time[playerid] >= 50)
-	{
-	    DestroyDynamicObject(Fountain[playerid]);
-	    DestroyDynamicObject(FountainSmoke[playerid]);
-	    SetTimerEx("Destroy3Sprinkle", 300, false, "i",playerid);
-	    SetTimerEx("LastSprinkles", 600, false, "i", playerid);
-	    return 1;
-	}
-	if(Fountain3Time[playerid] >= 1)
-	{
-	    new Float:RandomXPos;
-	    new Float:RandomYPos;
-	    new RandomLight;
-	    switch(random(2))
-		{
-			case 0:
-			{
-				RandomXPos = -(random(4));
-			}
-			case 1:
-			{
-				RandomXPos = (random(4));
-			}
-		}
-	    switch(random(2))
-		{
-			case 0:
-			{
-				RandomYPos = -(random(4));
-			}
-			case 1:
-			{
-				RandomYPos = (random(4));
-			}
-		}
-		switch(random(2))
-		{
-			case 0:
-			{
-				RandomLight = 354;
-			}
-			case 1:
-			{
-				RandomLight = 1213;
-			}
-		}
-		FountainSprinkle[Fountain3Time[playerid]][playerid] = CreateDynamicObject(RandomLight, FTX[playerid], FTY[playerid], FTZ[playerid], 0, 0, 0);
-		MoveDynamicObject(FountainSprinkle[Fountain3Time[playerid]][playerid], (FTX[playerid]+RandomXPos), (FTY[playerid]+RandomYPos), (FTZ[playerid]+8), 30);
-		Fountain3Time[playerid] = Fountain3Time[playerid]+1;
-		SetTimerEx("Destroy3Sprinkle", 300, false, "i",playerid);
-		SetTimerEx("FountainTimer", (100+(random(200))), false, "i",playerid);
-		return 1;
-	}
-	return 1;
-}
-
-function:CreateRoll(Rollid, Float:X, Float:Y, Float:Z)
-{
-	RollParts[Rollid][1] = CreateDynamicObject(1654, X,Y,Z, 90, 90, 0);
-	RollParts[Rollid][2] = CreateDynamicObject(1654,(X+0.25),Y,Z, 90, 90, 0);
-	RollParts[Rollid][3] = CreateDynamicObject(1654,(X+0.50),Y,Z, 90, 90, 0);
-	RollParts[Rollid][4] = CreateDynamicObject(1654,(X+0.75),Y,Z, 90, 90, 0);
-	RollParts[Rollid][5] = CreateDynamicObject(1654,(X+1.00),Y,Z, 90, 90, 0);
-	RollParts[Rollid][6] = CreateDynamicObject(1654,(X+1.25),Y,Z, 90, 90, 0);
-	RollParts[Rollid][7] = CreateDynamicObject(1654, X,(Y+0.1),Z, 90, 90, 0);
-	RollParts[Rollid][8] = CreateDynamicObject(1654,(X+0.25),(Y+0.1),Z, 90, 90, 0);
-	RollParts[Rollid][9] = CreateDynamicObject(1654,(X+0.50),(Y+0.1),Z, 90, 90, 0);
-	RollParts[Rollid][10] = CreateDynamicObject(1654,(X+0.75),(Y+0.1),Z, 90, 90, 0);
-	RollParts[Rollid][11] = CreateDynamicObject(1654,(X+1.00),(Y+0.1),Z, 90, 90, 0);
-	RollParts[Rollid][12] = CreateDynamicObject(1654,(X+1.25),(Y+0.1),Z, 90, 90, 0);
-	return 1;
-}
-
-function:DestroyRoll(Rollid)
-{
-	DestroyDynamicObject(RollParts[Rollid][1]);
-	DestroyDynamicObject(RollParts[Rollid][2]);
-	DestroyDynamicObject(RollParts[Rollid][3]);
-	DestroyDynamicObject(RollParts[Rollid][4]);
-	DestroyDynamicObject(RollParts[Rollid][5]);
-	DestroyDynamicObject(RollParts[Rollid][6]);
-	DestroyDynamicObject(RollParts[Rollid][7]);
-	DestroyDynamicObject(RollParts[Rollid][8]);
-	DestroyDynamicObject(RollParts[Rollid][9]);
-	DestroyDynamicObject(RollParts[Rollid][10]);
-	DestroyDynamicObject(RollParts[Rollid][11]);
-	DestroyDynamicObject(RollParts[Rollid][12]);
-	return 1;
-}
-
-function:CrackerRollTime(playerid)
-{
-	if(firecrackerroll[playerid] == 1)
-	{
-	    DestroyDynamicObject(CrackerRollSmoke[playerid]);
-	}
-	if(firecrackerroll[playerid] == 49)
-	{
-	    firecrackerroll[playerid] = 0;
-	    DestroyRoll(playerid);
-	    return 1;
-	}
-	if(firecrackerroll[playerid] >= 1)
-	{
-	    new Float:X, Float:Y, Float:Z;
-	    switch(firecrackerroll[playerid])
-	    {
-	        case 1..4: GetDynamicObjectPos(RollParts[playerid][1], X, Y, Z);
-	        case 5..8: GetDynamicObjectPos(RollParts[playerid][2], X, Y, Z);
-	        case 9..12: GetDynamicObjectPos(RollParts[playerid][3], X, Y, Z);
-	        case 13..16: GetDynamicObjectPos(RollParts[playerid][4], X, Y, Z);
-	        case 17..20: GetDynamicObjectPos(RollParts[playerid][5], X, Y, Z);
-	        case 21..24: GetDynamicObjectPos(RollParts[playerid][6], X, Y, Z);
-	        case 25..28: GetDynamicObjectPos(RollParts[playerid][12], X, Y, Z);
-	        case 29..32: GetDynamicObjectPos(RollParts[playerid][11], X, Y, Z);
-			case 33..36: GetDynamicObjectPos(RollParts[playerid][10], X, Y, Z);
-			case 37..40:GetDynamicObjectPos(RollParts[playerid][9], X, Y, Z);
-			case 41..44: GetDynamicObjectPos(RollParts[playerid][8], X, Y, Z);
-			case 45..48: GetDynamicObjectPos(RollParts[playerid][7], X, Y, Z);
-		}
-
-        DestroyRoll(playerid);
-        CreateExplosion(X, Y, Z, 12, 0);
-        CreateRoll(playerid, RollStartX[playerid], RollStartY[playerid], RollStartZ[playerid]);
-	    firecrackerroll[playerid]++;
-        SetTimerEx("CrackerRollTime", (100+(random(200))), false, "i", playerid);
-	}
-	return 1;
-}
-
-function:FirecrackerTime(playerid)
-{
-	if(firecrackertime[playerid] == 1)
-	{
-	    new Float:X, Float:Y, Float:Z;
-		GetDynamicObjectPos(Firecracker[playerid], X, Y, Z);
-		CreateExplosion(X,Y,Z, 12, 0);
-		DestroyDynamicObject(Firecracker[playerid]);
-		firecrackertime[playerid] = 0;
-		return 1;
-	}
-	return 1;
-}
-
-function:FirerocketTime(playerid)
-{
-	GetDynamicObjectPos(Firerocket[playerid], FRX[playerid], FRY[playerid], FRZ[playerid]);
-	explosionrocket[playerid] = CreateExplosion(FRX[playerid], FRY[playerid], FRZ[playerid], 6, 0);
-		
-	if(firerockettime[playerid] == 1)
-	{
-		SetTimerEx("splittime", 500, false, "i", playerid);
-	}
-	else if(firerockettime[playerid] == 2)
-	{
-		SetTimerEx("splittime2", 100, false, "i", playerid);
-	}
-	return 1;
-}
-
-function:splittime(playerid)
-{
-	if(firerockettime[playerid] == 1)
-	{
-		CreateExplosion(FRX[playerid]-(0+(random(3))),FRY[playerid]-(0+(random(3))),FRZ[playerid]-(0+(random(3))), 4, 0);
-		CreateExplosion(FRX[playerid]-(0+(random(3))),FRY[playerid]+(0+(random(3))),FRZ[playerid]-(0+(random(3))), 4, 0);
-		CreateExplosion(FRX[playerid]-(0+(random(3))),FRY[playerid],FRZ[playerid]-(0+(random(3))), 4, 0);
-		CreateExplosion(FRX[playerid]+(0+(random(3))),FRY[playerid]-(0+(random(3))),FRZ[playerid]-(0+(random(3))), 4, 0);
-		CreateExplosion(FRX[playerid]+(0+(random(3))),FRY[playerid]+(0+(random(3))),FRZ[playerid]-(0+(random(3))), 4, 0);
-		CreateExplosion(FRX[playerid]+(0+(random(3))),FRY[playerid],FRZ[playerid]-(0+(random(3))), 4, 0);
-		CreateExplosion(FRX[playerid],FRY[playerid]-(0+(random(3))),FRZ[playerid]-(0+(random(3))), 4, 0);
-		CreateExplosion(FRX[playerid],FRY[playerid]+(0+(random(3))),FRZ[playerid]-(0+(random(3))), 4, 0);
-		LightFW[1][playerid] = CreateDynamicObject(354,FRX[playerid]-(0+(random(6))),FRY[playerid]-(0+(random(6))),FRZ[playerid]+(0+(random(6))), 0, 0,0);
-		LightFW[2][playerid] = CreateDynamicObject(354,FRX[playerid]-(0+(random(6))),FRY[playerid],FRZ[playerid]+(0+(random(6))), 0, 0,0);
-		LightFW[3][playerid] = CreateDynamicObject(354,FRX[playerid]-(0+(random(6))),FRY[playerid],FRZ[playerid]-(0+(random(6))), 0, 0,0);
-		LightFW[4][playerid] = CreateDynamicObject(354,FRX[playerid]-(0+(random(6))),FRY[playerid]-(0+(random(6))),FRZ[playerid]+(0+(random(6))), 0, 0,0);
-		LightFW[5][playerid] = CreateDynamicObject(354,FRX[playerid]-(0+(random(6))),FRY[playerid]+(0+(random(6))),FRZ[playerid]+(0+(random(6))), 0, 0,0);
-		LightFW[6][playerid] = CreateDynamicObject(354,FRX[playerid]-(0+(random(6))),FRY[playerid],FRZ[playerid]-(0+(random(6))), 0, 0,0);
-		LightFW[7][playerid] = CreateDynamicObject(354,FRX[playerid]-(0+(random(6))),FRY[playerid]-(0+(random(6))),FRZ[playerid]-(0+(random(6))), 0, 0,0);
-		LightFW[8][playerid] = CreateDynamicObject(354,FRX[playerid],FRY[playerid]-(0+(random(6))),FRZ[playerid]+(0+(random(6))), 0, 0,0);
-		new Float:X,Float:Y,Float:Z;
-		GetDynamicObjectPos(LightFW[1][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[1][playerid], X-(0+(random(6))), Y-(0+(random(6))), Z-20, 6);
-		GetDynamicObjectPos(LightFW[2][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[2][playerid], X-(0+(random(6))), Y+(0+(random(6))), Z-20, 5);
-		GetDynamicObjectPos(LightFW[3][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[3][playerid], X-(0+(random(6))), Y, Z-20, 4);
-		GetDynamicObjectPos(LightFW[4][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[4][playerid], X+(0+(random(6))), Y-(0+(random(6))), Z-20, 5);
-		GetDynamicObjectPos(LightFW[5][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[5][playerid], X+(0+(random(6))), Y+(0+(random(6))), Z-20, 5);
-		GetDynamicObjectPos(LightFW[6][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[6][playerid], X+(0+(random(6))), Y, Z-20, 4);
-		GetDynamicObjectPos(LightFW[7][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[7][playerid], X, Y-(0+(random(6))), Z-20, 6);
-		GetDynamicObjectPos(LightFW[8][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[8][playerid], X, Y+(0+(random(6))), Z-20, 5);
-		SetTimerEx("lighttimer", 3900, false, "i", playerid);
-		DestroyDynamicObject(Firerocket[playerid]);
-		DestroyDynamicObject(rocketsmoke[playerid]);
-		return 1;
-	}
-	return 1;
-}
-
-function:splittime2(playerid)
-{
-	if(firerockettime[playerid] == 2)
-	{
-		CreateExplosion(FRX[playerid]-(0+(random(10))),FRY[playerid]-(0+(random(10))),FRZ[playerid]-5, 6, 0);
-		CreateExplosion(FRX[playerid]-(0+(random(10))),FRY[playerid]+(0+(random(10))),FRZ[playerid]-5, 6, 0);
-		CreateExplosion(FRX[playerid]-(0+(random(10))),FRY[playerid],FRZ[playerid]-5, 6, 0);
-		CreateExplosion(FRX[playerid]+(0+(random(10))),FRY[playerid]-(0+(random(10))),FRZ[playerid]-5, 6, 0);
-		CreateExplosion(FRX[playerid]+(0+(random(10))),FRY[playerid]+(0+(random(10))),FRZ[playerid]-5, 6, 0);
-		CreateExplosion(FRX[playerid]+(0+(random(10))),FRY[playerid],FRZ[playerid]-5, 6, 0);
-		CreateExplosion(FRX[playerid],FRY[playerid]-(0+(random(10))),FRZ[playerid]-5, 6, 0);
-		CreateExplosion(FRX[playerid],FRY[playerid]+(0+(random(10))),FRZ[playerid]-5, 6, 0);
-		LightFW[1][playerid] = CreateDynamicObject(354,FRX[playerid]-(0+(random(10))),FRY[playerid]-(0+(random(10))),FRZ[playerid]-5, 0, 0,0);
-		LightFW[2][playerid] = CreateDynamicObject(354,FRX[playerid]-(0+(random(10))),FRY[playerid]+(0+(random(10))),FRZ[playerid]-5, 0, 0,0);
-		LightFW[3][playerid] = CreateDynamicObject(354,FRX[playerid]-(0+(random(10))),FRY[playerid],FRZ[playerid]-5, 0, 0,0);
-		LightFW[4][playerid] = CreateDynamicObject(354,FRX[playerid]+(0+(random(10))),FRY[playerid]-(0+(random(10))),FRZ[playerid]-5, 0, 0,0);
-		LightFW[5][playerid] = CreateDynamicObject(354,FRX[playerid]+(0+(random(10))),FRY[playerid]+(0+(random(10))),FRZ[playerid]-5, 0, 0,0);
-		LightFW[6][playerid] = CreateDynamicObject(354,FRX[playerid]+(0+(random(10))),FRY[playerid],FRZ[playerid]-5, 0, 0,0);
-		LightFW[7][playerid] = CreateDynamicObject(354,FRX[playerid],FRY[playerid]-(0+(random(10))),FRZ[playerid]-5, 0, 0,0);
-		LightFW[8][playerid] = CreateDynamicObject(354,FRX[playerid],FRY[playerid]+(0+(random(10))),FRZ[playerid]-5, 0, 0,0);
-		new Float:X,Float:Y,Float:Z;
-		GetDynamicObjectPos(LightFW[1][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[1][playerid], X-6, Y-6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[2][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[2][playerid], X-6, Y+6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[3][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[3][playerid], X-6, Y, Z-20, 4);
-		GetDynamicObjectPos(LightFW[4][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[4][playerid], X+6, Y-6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[5][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[5][playerid], X+6, Y+6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[6][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[6][playerid], X+6, Y, Z-20, 4);
-		GetDynamicObjectPos(LightFW[7][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[7][playerid], X, Y-6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[8][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[8][playerid], X, Y+6, Z-20, 4);
-		SetTimerEx("splittime3", 3000, false, "i", playerid);
-		DestroyDynamicObject(Firerocket[playerid]);
-		DestroyDynamicObject(rocketsmoke[playerid]);
-		return 1;
-	}
-	return 1;
-}
-
-function:splittime3(playerid)
-{
-	if(firerockettime[playerid] == 2)
-	{
-		new Float:X,Float:Y,Float:Z;
-		GetDynamicObjectPos(LightFW[1][playerid], X, Y, Z);
-		CreateExplosion(X, Y, Z, 6, 0);
-		GetDynamicObjectPos(LightFW[2][playerid], X, Y, Z);
-		CreateExplosion(X, Y, Z, 6, 0);
-		GetDynamicObjectPos(LightFW[3][playerid], X, Y, Z);
-		CreateExplosion(X, Y, Z, 6, 0);
-		GetDynamicObjectPos(LightFW[4][playerid], X, Y, Z);
-		CreateExplosion(X, Y, Z, 6, 0);
-		GetDynamicObjectPos(LightFW[5][playerid], X, Y, Z);
-		CreateExplosion(X, Y, Z, 6, 0);
-		GetDynamicObjectPos(LightFW[6][playerid], X, Y, Z);
-		CreateExplosion(X, Y, Z, 6, 0);
-		GetDynamicObjectPos(LightFW[7][playerid], X, Y, Z);
-		CreateExplosion(X, Y, Z, 6, 0);
-		GetDynamicObjectPos(LightFW[8][playerid], X, Y, Z);
-		CreateExplosion(X, Y, Z, 6, 0);
-		GetDynamicObjectPos(LightFW[9][playerid], X, Y, Z);
-		LightFW[11][playerid] = CreateDynamicObject(1213,X-7,Y+7,Z+8, 0, 0,0);
-		LightFW[12][playerid] = CreateDynamicObject(1213,X-7,Y,Z+5, 0, 0,0);
-		LightFW[13][playerid] = CreateDynamicObject(1213,X,Y+7,Z-5, 0, 0,0);
-		LightFW[14][playerid] = CreateDynamicObject(1213,X,Y-7,Z-5, 0, 0,0);
-		GetDynamicObjectPos(LightFW[2][playerid], X, Y, Z);
-		LightFW[15][playerid] = CreateDynamicObject(1213,X,Y-7,Z+5, 0, 0,0);
-		LightFW[16][playerid] = CreateDynamicObject(1213,X-7,Y,Z-5, 0, 0,0);
-		LightFW[17][playerid] = CreateDynamicObject(1213,X,Y+7,Z-8, 0, 0,0);
-		LightFW[18][playerid] = CreateDynamicObject(1213,X,Y+7,Z-5, 0, 0,0);
-		GetDynamicObjectPos(LightFW[3][playerid], X, Y, Z);
-		LightFW[19][playerid] = CreateDynamicObject(1213,X+7,Y,Z-1, 0, 0,0);
-		LightFW[20][playerid] = CreateDynamicObject(1213,X-7,Y,Z-8, 0, 0,0);
-		LightFW[21][playerid] = CreateDynamicObject(1213,X+7,Y+7,Z-5, 0, 0,0);
-		LightFW[22][playerid] = CreateDynamicObject(1213,X,Y,Z+5, 0, 0,0);
-		GetDynamicObjectPos(LightFW[4][playerid], X, Y, Z);
-		LightFW[23][playerid] = CreateDynamicObject(1213,X+7,Y-7,Z-5, 0, 0,0);
-		LightFW[24][playerid] = CreateDynamicObject(1213,X-7,Y,Z-7, 0, 0,0);
-		LightFW[25][playerid] = CreateDynamicObject(1213,X+7,Y+7,Z+5, 0, 0,0);
-		LightFW[26][playerid] = CreateDynamicObject(1213,X,Y-7,Z, 0, 0,0);
-		GetDynamicObjectPos(LightFW[5][playerid], X, Y, Z);
-		LightFW[27][playerid] = CreateDynamicObject(1213,X,Y-7,Z-5, 0, 0,0);
-		LightFW[28][playerid] = CreateDynamicObject(1213,X-7,Y,Z+8, 0, 0,0);
-		LightFW[29][playerid] = CreateDynamicObject(1213,X+7,Y,Z-8, 0, 0,0);
-		LightFW[30][playerid] = CreateDynamicObject(1213,X,Y+7,Z+5, 0, 0,0);
-		GetDynamicObjectPos(LightFW[6][playerid], X, Y, Z);
-		LightFW[31][playerid] = CreateDynamicObject(1213,X-7,Y-7,Z-7, 0, 0,0);
-		LightFW[32][playerid] = CreateDynamicObject(1213,X,Y,Z-5, 0, 0,0);
-		LightFW[33][playerid] = CreateDynamicObject(1213,X+7,Y+7,Z+5, 0, 0,0);
-		LightFW[34][playerid] = CreateDynamicObject(1213,X+4,Y-7,Z-5, 0, 0,0);
-		GetDynamicObjectPos(LightFW[7][playerid], X, Y, Z);
-		LightFW[35][playerid] = CreateDynamicObject(1213,X-7,Y-7,Z-8, 0, 0,0);
-		LightFW[36][playerid] = CreateDynamicObject(1213,X-7,Y,Z+5, 0, 0,0);
-		LightFW[37][playerid] = CreateDynamicObject(1213,X,Y,Z-5, 0, 0,0);
-		LightFW[38][playerid] = CreateDynamicObject(1213,X,Y-7,Z+8, 0, 0,0);
-		GetDynamicObjectPos(LightFW[8][playerid], X, Y, Z);
-		LightFW[39][playerid] = CreateDynamicObject(1213,X-4,Y-7,Z-8, 0, 0,0);
-		LightFW[40][playerid] = CreateDynamicObject(1213,X+7,Y,Z+8, 0, 0,0);
-		LightFW[41][playerid] = CreateDynamicObject(1213,X+4,Y,Z+5, 0, 0,0);
-		LightFW[42][playerid] = CreateDynamicObject(1213,X,Y-7,Z-5, 0, 0,0);
-		GetDynamicObjectPos(LightFW[1][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[1][playerid], X-6, Y-6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[2][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[2][playerid], X-6, Y+6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[3][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[3][playerid], X-6, Y, Z-20, 4);
-		GetDynamicObjectPos(LightFW[4][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[4][playerid], X+6, Y-6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[5][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[5][playerid], X+6, Y+6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[6][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[6][playerid], X+6, Y, Z-20, 4);
-		GetDynamicObjectPos(LightFW[7][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[1][playerid], X, Y-6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[8][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[8][playerid], X, Y+6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[11][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[11][playerid], X-6, Y-6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[12][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[12][playerid], X-6, Y-6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[13][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[13][playerid], X-6, Y-6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[14][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[14][playerid], X-6, Y-6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[15][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[15][playerid], X-6, Y-6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[16][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[16][playerid], X-6, Y-6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[17][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[17][playerid], X-6, Y-6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[18][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[18][playerid], X-6, Y-6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[19][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[19][playerid], X-6, Y-6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[20][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[20][playerid], X-6, Y-6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[21][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[21][playerid], X-6, Y-6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[22][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[22][playerid], X-6, Y-6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[23][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[23][playerid], X-6, Y-6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[24][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[24][playerid], X-6, Y-6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[25][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[25][playerid], X-6, Y-6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[26][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[26][playerid], X-6, Y-6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[27][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[27][playerid], X-6, Y-6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[28][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[28][playerid], X-6, Y-6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[29][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[29][playerid], X-6, Y-6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[30][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[30][playerid], X-6, Y-6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[31][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[31][playerid], X-6, Y-6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[32][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[32][playerid], X-6, Y-6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[33][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[33][playerid], X-6, Y-6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[34][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[34][playerid], X-6, Y-6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[35][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[35][playerid], X-6, Y-6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[36][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[36][playerid], X-6, Y-6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[37][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[37][playerid], X-6, Y-6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[38][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[38][playerid], X-6, Y-6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[39][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[39][playerid], X-6, Y-6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[40][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[40][playerid], X-6, Y-6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[41][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[41][playerid], X-6, Y-6, Z-20, 4);
-		GetDynamicObjectPos(LightFW[42][playerid], X, Y, Z);
-		MoveDynamicObject(LightFW[42][playerid], X-6, Y-6, Z-20, 4);
-		SetTimerEx("lighttimer2", 4000, false, "i", playerid);
-		DestroyDynamicObject(Firerocket[playerid]);
-		DestroyDynamicObject(rocketsmoke[playerid]);
-		return 1;
-	}
-	return 1;
-}
-
-function:lighttimer(playerid)
-{
-	DestroyDynamicObject(LightFW[1][playerid]);
-	DestroyDynamicObject(LightFW[2][playerid]);
-	DestroyDynamicObject(LightFW[3][playerid]);
-	DestroyDynamicObject(LightFW[4][playerid]);
-	DestroyDynamicObject(LightFW[5][playerid]);
-    DestroyDynamicObject(LightFW[6][playerid]);
-    DestroyDynamicObject(LightFW[7][playerid]);
-    DestroyDynamicObject(LightFW[8][playerid]);
-    firerockettime[playerid] = 0;
-	return 1;
-}
-
-function:lighttimer2(playerid)
-{
-	DestroyDynamicObject(LightFW[1][playerid]);
-	DestroyDynamicObject(LightFW[2][playerid]);
-	DestroyDynamicObject(LightFW[3][playerid]);
-	DestroyDynamicObject(LightFW[4][playerid]);
-	DestroyDynamicObject(LightFW[5][playerid]);
-    DestroyDynamicObject(LightFW[6][playerid]);
-    DestroyDynamicObject(LightFW[7][playerid]);
-    DestroyDynamicObject(LightFW[8][playerid]);
-    DestroyDynamicObject(LightFW[11][playerid]);
-	DestroyDynamicObject(LightFW[12][playerid]);
-	DestroyDynamicObject(LightFW[13][playerid]);
-	DestroyDynamicObject(LightFW[14][playerid]);
-	DestroyDynamicObject(LightFW[15][playerid]);
-    DestroyDynamicObject(LightFW[16][playerid]);
-    DestroyDynamicObject(LightFW[17][playerid]);
-    DestroyDynamicObject(LightFW[18][playerid]);
-    DestroyDynamicObject(LightFW[19][playerid]);
-	DestroyDynamicObject(LightFW[20][playerid]);
-	DestroyDynamicObject(LightFW[21][playerid]);
-	DestroyDynamicObject(LightFW[22][playerid]);
-	DestroyDynamicObject(LightFW[23][playerid]);
-    DestroyDynamicObject(LightFW[24][playerid]);
-    DestroyDynamicObject(LightFW[25][playerid]);
-    DestroyDynamicObject(LightFW[26][playerid]);
-    DestroyDynamicObject(LightFW[27][playerid]);
-	DestroyDynamicObject(LightFW[28][playerid]);
-	DestroyDynamicObject(LightFW[29][playerid]);
-	DestroyDynamicObject(LightFW[30][playerid]);
-	DestroyDynamicObject(LightFW[31][playerid]);
-    DestroyDynamicObject(LightFW[32][playerid]);
-    DestroyDynamicObject(LightFW[33][playerid]);
-    DestroyDynamicObject(LightFW[34][playerid]);
-    DestroyDynamicObject(LightFW[35][playerid]);
-	DestroyDynamicObject(LightFW[36][playerid]);
-	DestroyDynamicObject(LightFW[37][playerid]);
-	DestroyDynamicObject(LightFW[38][playerid]);
-	DestroyDynamicObject(LightFW[39][playerid]);
-    DestroyDynamicObject(LightFW[40][playerid]);
-    DestroyDynamicObject(LightFW[41][playerid]);
-    DestroyDynamicObject(LightFW[42][playerid]);
-    firerockettime[playerid] = 0;
-	return 1;
-}
-
-IRC_SetUp()
+IRC_SetUp(bool:restart = false)
 {
 	#if IRC_CONNECT == true
-    IRC_GroupID = IRC_CreateGroup();
+    if(!restart) IRC_GroupID = IRC_CreateGroup();
     
     #if IS_RELEASE_BUILD == true
 	IRC_Bots[0] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]Floatround", "["SVRSC"]Floatround", "foatround");
@@ -30724,21 +29841,6 @@ DestroyVehicle_(vehicleid)
 	}
 
 	return ret;
-}
-
-IsVehicleOccupied(vehicleid)
-{
-	for(new i = 0; i < MAX_PLAYERS; i++)
-    {
-        if(IsPlayerInAnyVehicle(i) && gTeam[i] == NORMAL)
-        {
-            if(GetPlayerVehicleID(i) == vehicleid)
-			{
-			    return 1;
-			}
-        }
-    }
-    return 0;
 }
 
 ToggleSpeedo(playerid, bool:toggle)
