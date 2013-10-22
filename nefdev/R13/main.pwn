@@ -12,7 +12,7 @@
 #pragma dynamic 8192
 
 #define IS_RELEASE_BUILD (true)
-#define INC_ENVIORMENT (true)
+#define INC_ENVIORMENT (false)
 #define IRC_CONNECT (true)
 #define YSI_IS_SERVER
 
@@ -612,6 +612,27 @@ enum (<<= 1)
 	BOOST_MASTER
 };
 
+// -
+// - hacks
+// -
+enum (<<= 1)
+{
+    e_FLAG_HACK_JETPACK,
+    e_FLAG_HACK_WEAPON = 1,
+    e_FLAG_HACK_VCOLOR,
+    e_FLAG_HACK_MONEY,
+    e_FLAG_HACK_VMANIPULATION
+};
+
+enum
+{
+	HACK_JETPACK,
+	HACK_WEAPON,
+	HACK_VCOLOR,
+	HACK_MONEY,
+ 	HACK_VMANIPULATION
+};
+
 enum e_player_data
 {
 	bool:GotVIPLInv,
@@ -645,6 +666,7 @@ enum e_player_data
 	bool:bSpeedo,
 	tLoadMap,
 	Boost,
+	HackState,
 	BoostDeplete,
 	sName[25],
 	sIP[16],
@@ -3128,6 +3150,7 @@ public OnPlayerConnect(playerid)
 	PlayerInfo[playerid][Props] = 0;
 	PlayerInfo[playerid][Wanteds] = 0;
 	PlayerInfo[playerid][Boost] = 0;
+	PlayerInfo[playerid][HackState] = 0;
 	PlayerInfo[playerid][Vehicle] = -1;
 	PlayerInfo[playerid][TrailerVid] = -1;
 	PlayerInfo[playerid][Medkits] = 0;
@@ -3521,6 +3544,7 @@ public OnPlayerDisconnect(playerid, reason)
 	PlayerInfo[playerid][Vehicle] = -1;
 	PlayerInfo[playerid][DrawnNumber] = -1;
  	PlayerInfo[playerid][Credits] = 0;
+ 	PlayerInfo[playerid][HackState] = 0;
  	PlayerInfo[playerid][BoostDeplete] = 0;
  	PlayerInfo[playerid][AdditionalPVSlots] = 0;
  	PlayerInfo[playerid][AdditionalToySlots] = 0;
@@ -3643,9 +3667,8 @@ public OnPlayerCommandPerformed(playerid, cmdtext[], success)
 	}
 	else if(PlayerInfo[playerid][iCoolDownCommand] >= 12 && PlayerInfo[playerid][Level] < 5)
 	{
-	    new string[100];
-		format(string, sizeof(string), "Command-Spam detected! %s(%i) has been kicked!", __GetName(playerid), playerid);
-		AdminMSG(RED, string);
+		format(gstr, sizeof(gstr), "Command-Spam detected! %s(%i) has been kicked!", __GetName(playerid), playerid);
+		AdminMSG(RED, gstr);
 		PlayerInfo[playerid][iCoolDownCommand] = 0;
 		return Kick(playerid);
 	}
@@ -6729,7 +6752,7 @@ public OnPlayerModelSelection(playerid, response, listid, modelid)
 			    GivePlayerCash(playerid, -5000);
 		    
 			    new Float:POS[4], str[128];
-			    format(str, sizeof(str), "/hmenu to edit\nSlot ID: %i - Object ID: %i", PlayerInfo[playerid][houseobj_selected] + 1, modelid);
+			    format(str, sizeof(str), "/hmenu to edit\nSlot ID: %i - Item ID: %i", PlayerInfo[playerid][houseobj_selected] + 1, modelid);
 				GetPlayerPos(playerid, POS[0], POS[1], POS[2]);
 				GetPlayerFacingAngle(playerid, POS[3]);
 				
@@ -7106,7 +7129,7 @@ public OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y,
 	        MoveDynamicObject(objectid, x, y, z, 5.0, rx, ry, rz);
 	        
 	        new str[64];
-	        format(str, sizeof(str), "/hmenu to edit\nSlot ID: %i - Object ID: %i", PlayerInfo[playerid][houseobj_selected] + 1, HouseInfo[h_id][E_Obj_Model][PlayerInfo[playerid][houseobj_selected]]);
+	        format(str, sizeof(str), "/hmenu to edit\nSlot ID: %i - Item ID: %i", PlayerInfo[playerid][houseobj_selected] + 1, HouseInfo[h_id][E_Obj_Model][PlayerInfo[playerid][houseobj_selected]]);
 	        DestroyDynamic3DTextLabel(HouseInfo[h_id][E_Obj_Label][PlayerInfo[playerid][houseobj_selected]]);
 	        HouseInfo[h_id][E_Obj_Label][PlayerInfo[playerid][houseobj_selected]] = CreateDynamic3DTextLabel(str, LIGHT_YELLOW, x, y, z+0.5, 3.5, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, HouseInfo[h_id][iID] + 1000);
 	        
@@ -8836,6 +8859,9 @@ YCMD:buyvip(playerid, params[], help)
 	if(IsPlayerAvail(PlayerInfo[playerid][VIPPlayer]) && PlayerInfo[PlayerInfo[playerid][VIPPlayer]][VIP] == 1 && PlayerInfo[playerid][VIPNameHash] == YHash(__GetName(PlayerInfo[playerid][VIPPlayer]), false))
 	{
 		if(GetPlayerCash(playerid) < PlayerInfo[playerid][VIPOffer]) return SCM(playerid, -1, ""er"You do not have enough money!");
+
+        SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
+        SetPlayerSpecialAction(PlayerInfo[playerid][VIPPlayer], SPECIAL_ACTION_NONE);
 
 		GivePlayerCash(PlayerInfo[playerid][VIPPlayer], PlayerInfo[playerid][VIPOffer]);
 		GivePlayerCash(playerid, -PlayerInfo[playerid][VIPOffer]);
@@ -20444,7 +20470,7 @@ function:OnHouseLoad()
 				    sscanf(buffer, "p<,>iffffff", HouseInfo[houseid][E_Obj_Model][ii], postal[0], postal[1], postal[2], postal[3], postal[4], postal[5]);
 					if(HouseInfo[houseid][E_Obj_Model][ii] != 0)
 					{
-					    format(buffer, sizeof(buffer), "/hmenu to edit\nSlot ID: %i - Object ID: %i", ii + 1, HouseInfo[houseid][E_Obj_Model][ii]);
+					    format(buffer, sizeof(buffer), "/hmenu to edit\nSlot ID: %i - Item ID: %i", ii + 1, HouseInfo[houseid][E_Obj_Model][ii]);
 						HouseInfo[houseid][E_Obj_ObjectID][ii] = CreateDynamicObject(HouseInfo[houseid][E_Obj_Model][ii], postal[0], postal[1], postal[2], postal[3], postal[4], postal[5], HouseInfo[houseid][iID] + 1000, -1, -1);
                         HouseInfo[houseid][E_Obj_Label][ii] = CreateDynamic3DTextLabel(buffer, LIGHT_YELLOW, postal[0], postal[1], postal[2]+0.5, 3.5, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, HouseInfo[houseid][iID] + 1000);
 					}
@@ -23308,10 +23334,10 @@ LoadVisualStaticMeshes()
 	CreateDynamicMapIcon(341.5075, -1852.6332, 8.2612, 23, 1, -1, -1, -1, 300.0); // BEACH
 	// hotspots end
 
-	// login obj
-	CreateDynamicObject(19462, 388.20001, -1809.04004, 16.17000,   0.00000, 90.00000, 13.00000);
-	CreateDynamicObject(19462, 391.57999, -1808.23999, 16.17000,   0.00000, 90.00000, 13.00000);
-	CreateDynamicObject(18102, 386.79163, -1807.13257, 20.75563,   0.00000, 0.00000, -245.76001);
+	// login obj (beach ?)
+	//CreateDynamicObject(19462, 388.20001, -1809.04004, 16.17000,   0.00000, 90.00000, 13.00000);
+	//CreateDynamicObject(19462, 391.57999, -1808.23999, 16.17000,   0.00000, 90.00000, 13.00000);
+	//CreateDynamicObject(18102, 386.79163, -1807.13257, 20.75563,   0.00000, 0.00000, -245.76001);
 	// login obj end
 	
 	CreateObject(986, 1385.98, 2643.14, 11.81,   0.00, 0.00, 90.13); // Robbers Gate
@@ -25177,6 +25203,8 @@ function:ProcessTick()
 	{
 	    if(IsPlayerConnected(i) && !IsPlayerNPC(i))
 	    {
+	        AnalyzeGameData(i);
+	        
 			switch(gTeam[i])
 			{
 			    case NORMAL:
@@ -29886,5 +29914,30 @@ ToggleSpeedo(playerid, bool:toggle)
 
 		PlayerTextDrawShow(playerid, TXTSpeedo[playerid]);
 		TextDrawShowForPlayer(playerid, TXTSpeedo_Main);
+	}
+}
+
+AnalyzeGameData(playerid)
+{
+	if(GetPlayerSpecialAction(playerid) == SPECIAL_ACTION_USEJETPACK && PlayerInfo[playerid][VIP] == 0)
+	{
+	    TriggerPlayerHack(playerid, HACK_JETPACK);
+	}
+}
+
+TriggerPlayerHack(playerid, cheattype)
+{
+	switch(cheattype)
+	{
+	    case HACK_JETPACK:
+	    {
+			if(!(PlayerInfo[playerid][HackState] & e_FLAG_HACK_JETPACK))
+			{
+			    PlayerInfo[playerid][HackState] |= e_FLAG_HACK_JETPACK;
+			    
+				format(gstr, sizeof(gstr), "[AC] %s(%i) possible cheat detected: Jetpack hack", __GetName(playerid), playerid);
+				AdminMSG(RED, gstr);
+			}
+	    }
 	}
 }
