@@ -11,9 +11,9 @@
 
 #pragma dynamic 8192
 
-#define IS_RELEASE_BUILD true
-#define INC_ENVIORMENT false
-#define IRC_CONNECT true
+#define IS_RELEASE_BUILD (true)
+#define INC_ENVIORMENT (true)
+#define IRC_CONNECT (true)
 #define YSI_IS_SERVER
 
 // -
@@ -428,6 +428,7 @@ native IsValidVehicle(vehicleid); // undefined
 // - Player
 // -
 #define COOLDOWN_CHAT                   (5500)
+#define COOLDOWN_CMD_ROB                (10000)
 #define COOLDOWN_CMD_BUY                (30000)
 #define COOLDOWN_CMD_PBUY               (30000)
 #define COOLDOWN_CMD_LOCK               (5000)
@@ -688,6 +689,7 @@ enum e_player_data
 	VIPPlayer,
 	VIPNameHash,
 	VIPOffer,
+	tickLastRob,
 	tickLastGiveCash,
 	tickLastMedkit,
 	tickLastVIPLInv,
@@ -3159,6 +3161,7 @@ public OnPlayerConnect(playerid)
 	PlayerInfo[playerid][DrawnNumber] = -1;
 	PlayerInfo[playerid][SavedColor] = 0;
 	PlayerInfo[playerid][tickLastHitman] = 0;
+	PlayerInfo[playerid][tickLastRob] = 0;
 	PlayerInfo[playerid][tickLastMedkit] = 0;
 	PlayerInfo[playerid][tickLastGiveCash] = 0;
 	PlayerInfo[playerid][tickLastGInvite] = 0;
@@ -3550,6 +3553,7 @@ public OnPlayerDisconnect(playerid, reason)
 	PlayerInfo[playerid][tickLastGCreate] = 0;
 	PlayerInfo[playerid][tickLastPBuy] = 0;
 	PlayerInfo[playerid][tickLastBuy] = 0;
+	PlayerInfo[playerid][tickLastRob] = 0;
 	PlayerInfo[playerid][tickLastSell] = 0;
 	PlayerInfo[playerid][tickLastPSell] = 0;
     PlayerInfo[playerid][tickLastPW] = 0;
@@ -8709,6 +8713,9 @@ YCMD:buygc(playerid, params[], help)
 	    SCMToAll(-1, gstr);
 	    print(gstr);
 
+		format(gstr, sizeof(gstr), "3,1GC:4 %s(%i) has sold their %sGC to %s(%i) for $%s", __GetName(PlayerInfo[playerid][GCPlayer]), PlayerInfo[playerid][GCPlayer], ToCurrency(PlayerInfo[playerid][GCOffer]), __GetName(playerid), playerid, ToCurrency(PlayerInfo[playerid][GCPrice]));
+		IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
+
 	    PlayerInfo[playerid][GCPlayer] = INVALID_PLAYER_ID;
 	    PlayerInfo[playerid][GCOffer] = 0;
 	    PlayerInfo[playerid][GCPrice] = 0;
@@ -8741,6 +8748,7 @@ YCMD:ad(playerid, params[], help)
 	{
 		Adverts[i] = Adverts[i + 1];
 	}
+	
 	Adverts[MAX_ADS - 1] = ad;
 	format(gstr, sizeof(gstr), ""nef_green"Advert: %s", ad);
 	SCMToAll(-1, gstr);
@@ -8748,6 +8756,10 @@ YCMD:ad(playerid, params[], help)
 	format(gstr, sizeof(gstr), ""nef_green"Advert by %s(%i), contact ID: /pm %i", __GetName(playerid), playerid, playerid);
     SCMToAll(-1, gstr);
     print(gstr);
+	format(gstr, sizeof(gstr), "3,1ADS:4 Advert: %s", ad);
+	IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
+	format(gstr, sizeof(gstr), "3,1ADS:4 Advert by %s(%i), contact ID: /pm %i", __GetName(playerid), playerid, playerid);
+	IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 	return 1;
 }
 
@@ -8803,6 +8815,7 @@ YCMD:sellvip(playerid, params[], help)
 	    SCM(playerid, -1, gstr);
 	    format(gstr, sizeof(gstr), ""blue"%s(%i) is offering you their V.I.P status for $%s, type /buyvip to accept", __GetName(playerid), playerid, ToCurrency(money));
 	    SCM(player, -1, gstr);
+	    SCM(player, -1, ""red"PLEASE NOTE: "blue"You won't receive $1,000,000 nor the bizz/vehicle slots when buying VIP from a player");
 	    
 		PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
 		PlayerPlaySound(player, 1057, 0.0, 0.0, 0.0);
@@ -8845,6 +8858,9 @@ YCMD:buyvip(playerid, params[], help)
 	    format(gstr, sizeof(gstr), ""orange"[NEF] %s(%i) has sold his VIP stauts to %s(%i) for $%s", __GetName(PlayerInfo[playerid][VIPPlayer]), PlayerInfo[playerid][VIPPlayer], __GetName(playerid), playerid, ToCurrency(PlayerInfo[playerid][VIPOffer]));
 	    SCMToAll(-1, gstr);
 	    print(gstr);
+	    
+  		format(gstr, sizeof(gstr), "3,1GC:4 %s(%i) has sold his VIP stauts to %s(%i) for $%s", __GetName(PlayerInfo[playerid][VIPPlayer]), PlayerInfo[playerid][VIPPlayer], __GetName(playerid), playerid, ToCurrency(PlayerInfo[playerid][VIPOffer]));
+		IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 	    
 	    PlayerInfo[playerid][VIPPlayer] = INVALID_PLAYER_ID;
 	    PlayerInfo[playerid][VIPOffer] = 0;
@@ -13111,7 +13127,7 @@ YCMD:p(playerid, params[], help)
         return 1;
 	}
 
-	format(gstr2, sizeof(gstr2), ""white"["lb_e"VIP CHAT"white"] {%06x}%s"white"(%i): %s", GetColor__(playerid) >>> 8, __GetName(playerid), playerid, gstr);
+	format(gstr2, sizeof(gstr2), ""white"["lb_e"VIP CHAT"white"] {%06x}%s"lb_e"(%i): %s", GetColor__(playerid) >>> 8, __GetName(playerid), playerid, gstr);
 	VIPMSG(-1, gstr2);
 	return 1;
 }
@@ -16725,6 +16741,15 @@ YCMD:rob(playerid, params[], help)
 {
 	if(gTeam[playerid] == CNR)
 	{
+		new tick = GetTickCount() + 3600000;
+		if(PlayerInfo[playerid][Level] != MAX_ADMIN_LEVEL)
+		{
+			if((PlayerInfo[playerid][tickLastRob] + COOLDOWN_CMD_ROB) >= tick)
+			{
+		    	return SCM(playerid, -1, ""er"Please wait a bit before using this cmd again!");
+			}
+		}
+		
 		new str[255];
 		if(GetPVarInt(playerid, "Robber") == 1)
 		{
@@ -16747,6 +16772,8 @@ YCMD:rob(playerid, params[], help)
 				    RobberyTimer[playerid] = SetTimerEx("StartRobbery", 1000, true, "ii", playerid, YHash(__GetName(playerid), false));
 					SCM(playerid, COLOR_BLUE, ">> "ORANGE_E"You have started a robbery, the cops have been notified!");
 					ApplyAnimation(playerid, "SHOP", "ROB_Shifty", 4.0, 0, 0, 0, 0, 0);
+
+                    PlayerInfo[playerid][tickLastRob] = tick;
 
                     format(str, sizeof(str), "COP RADIO: "LB_E"Suspect %s(%i) has started a robbery at the %s!", __GetName(playerid), playerid, GetStoreName(playerid));
 					for(new i = 0; i < MAX_PLAYERS; i++)
@@ -16787,6 +16814,7 @@ YCMD:rob(playerid, params[], help)
 				{
 					SCM(playerid, COLOR_RED, "Server: "GREY2_E"No players to rob near you.");
 				}
+				else PlayerInfo[playerid][tickLastRob] = tick;
 			}
 		}
 		else
@@ -17994,7 +18022,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				    }
 				    else
 				    {
-				        ShowPlayerDialog(playerid, HOUSE_MENU_DIALOG + 1, DIALOG_STYLE_LIST, string, ""dl"Goto This House\n"dl"Upgrade Interior\n"dl"Manage House Objects", "Select", "Cancel");
+				        ShowPlayerDialog(playerid, HOUSE_MENU_DIALOG + 1, DIALOG_STYLE_LIST, string, ""dl"Goto This House\n"dl"Upgrade Interior\n"dl"Manage House Items", "Select", "Cancel");
 				    }
 				}
 	            return true;
@@ -18043,7 +18071,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                             if(GetPlayerVirtualWorld(playerid) != (HouseInfo[h_id][iID] + 1000)) return SCM(playerid, -1, ""er"You need to be in the house you selected!");
                             
 							new string[128], string2[1024], tmp[128];
-							format(string, sizeof(string), ""nef" - House Menu > Slot: %i > House Objects", PlayerInfo[playerid][HouseSlotSelected] + 1);
+							format(string, sizeof(string), ""nef" - House Menu > Slot: %i > House Items", PlayerInfo[playerid][HouseSlotSelected] + 1);
 
 							for(new i = 0; i < MAX_HOUSE_OBJECTS; i++)
 							{
@@ -18789,7 +18817,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        {
 				PlayerInfo[playerid][HouseIntSelected] = listitem;
 				new string[255];
-				format(string, sizeof(string), ""white"House Upgrade\n\n- Interior: %s\n- Price: $%s\n\nClick \"Upgrade\" in order to apply the new interior.\n"green"* "white"All house objects will be removed in this slot!", HouseIntTypes[listitem][intname], ToCurrency(HouseIntTypes[listitem][price]));
+				format(string, sizeof(string), ""white"House Upgrade\n\n- Interior: %s\n- Price: $%s\n\nClick \"Upgrade\" in order to apply the new interior.\n"green"* "white"All House Items will be removed in this slot!", HouseIntTypes[listitem][intname], ToCurrency(HouseIntTypes[listitem][price]));
 				ShowPlayerDialog(playerid, HOUSE_UPGRADE_DIALOG + 1, DIALOG_STYLE_MSGBOX, ""nef" - House Upgrade", string, "Upgrade", "Cancel");
 				return true;
 	        }
