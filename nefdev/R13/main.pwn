@@ -3114,6 +3114,7 @@ public OnPlayerConnect(playerid)
 	PlayerInfo[playerid][bLoadMap] = false;
 	PlayerInfo[playerid][bShowToys] = true;
 	bDerbyAFK[playerid] = false;
+	CSGSOFT[playerid] = false;
 	PlayerInfo[playerid][GotVIPLInv] = false;
 	PlayerInfo[playerid][bGWarMode] = false;
 	PlayerInfo[playerid][ConnectTime] = 0;
@@ -3505,6 +3506,7 @@ public OnPlayerDisconnect(playerid, reason)
     PlayerInfo[playerid][tTimerHP] = -1;
 	PlayerInfo[playerid][ExitType] = EXIT_NONE;
 	bDerbyAFK[playerid] = false;
+	CSGSOFT[playerid] = false;
 	PlayerInfo[playerid][bGWarMode] = false;
 	PlayerInfo[playerid][AllowSpawn] = false;
 	PlayerInfo[playerid][AOnline] = true;
@@ -12229,7 +12231,6 @@ YCMD:ipban(playerid, params[], help)
 	        return 1;
 	    }
 	    
-	    if(CSGSOFT[playerid]) return SCM(playerid, -1, ""er"Player not connected!");
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 	    
@@ -12465,7 +12466,6 @@ YCMD:ban(playerid, params[], help)
 	        return SCM(playerid, NEF_GREEN, "Usage: /ban <playerid> <reason>");
 	    }
 	    
-	    if(CSGSOFT[playerid]) return SCM(playerid, -1, ""er"Player not connected!");
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 	    
