@@ -11763,7 +11763,9 @@ YCMD:gwar(playerid, params[], help)
 
         if(GZoneInfo[i][iLocked] > gettime())
         {
-            return ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" Gang War", ""white"This zone is currently locked!", "OK", "");
+            format(gstr, sizeof(gstr), ""white"This zone is currently locked!\n\nIt will become available for GWar in\n%i minutes.", floatround((GZoneInfo[i][iLocked] - gettime()) / 60.0));
+            ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" Gang War", gstr, "OK", "");
+            return 1;
 		}
 		
 		if(GetGZonesByGang(PlayerInfo[playerid][GangID]) >= MAX_GZONES_PER_GANG) return ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" Gang War", ""white"Your gang owns the maximum of 15 zones", "OK", "");
@@ -11793,7 +11795,7 @@ YCMD:gwar(playerid, params[], help)
 		        		TextDrawShowForPlayer(ii, GZoneInfo[i][E_Txt]);
 		        		SetPlayerGWarMode(ii);
 		        		
-		        		count++;
+		        		++count;
 					}
 				}
 			}
@@ -25506,13 +25508,13 @@ function:ProcessTick()
 				    {
 					    format(gstr, sizeof(gstr), ""gang_sign" "r_besch" Your gang successfully captured '%s' with %i alive players!", GZoneInfo[i][sZoneName], Iter_Count(Players));
 						GangMSG(GZoneInfo[i][AttackingGang], gstr);
-						GangMSG(GZoneInfo[i][AttackingGang], ""gang_sign" "r_besch" The gang gained 20 gang score and each member $30,000 who were tied.");
+						GangMSG(GZoneInfo[i][AttackingGang], ""gang_sign" "r_besch" The gang gained 10 gang score and each member $30,000 who were tied.");
 
 						format(gstr, sizeof(gstr), ""orange"Gang %s captured zone '%s' and gained their reward", GetGangNameByID(GZoneInfo[i][AttackingGang]), GZoneInfo[i][sZoneName]);
 						SCMToAll(-1, gstr);
 						SCMToAll(-1, ""orange"This zone is now locked for 2 hours and cannot be attacked in that time!");
 
-						MySQL_UpdateGangScore(GZoneInfo[i][AttackingGang], 20);
+						MySQL_UpdateGangScore(GZoneInfo[i][AttackingGang], 10);
 						
 						Iter_Remove(iterGangWar, GZoneInfo[i][AttackingGang]);
 					}
