@@ -612,27 +612,6 @@ enum (<<= 1)
 	BOOST_MASTER
 };
 
-// -
-// - hacks
-// -
-enum (<<= 1)
-{
-    e_FLAG_HACK_JETPACK,
-    e_FLAG_HACK_WEAPON = 1,
-    e_FLAG_HACK_VCOLOR,
-    e_FLAG_HACK_MONEY,
-    e_FLAG_HACK_VMANIPULATION
-};
-
-enum
-{
-	HACK_JETPACK,
-	HACK_WEAPON,
-	HACK_VCOLOR,
-	HACK_MONEY,
- 	HACK_VMANIPULATION
-};
-
 enum e_player_data
 {
 	bool:GotVIPLInv,
@@ -666,7 +645,6 @@ enum e_player_data
 	bool:bSpeedo,
 	tLoadMap,
 	Boost,
-	HackState,
 	BoostDeplete,
 	sName[25],
 	sIP[16],
@@ -3150,7 +3128,6 @@ public OnPlayerConnect(playerid)
 	PlayerInfo[playerid][Props] = 0;
 	PlayerInfo[playerid][Wanteds] = 0;
 	PlayerInfo[playerid][Boost] = 0;
-	PlayerInfo[playerid][HackState] = 0;
 	PlayerInfo[playerid][Vehicle] = -1;
 	PlayerInfo[playerid][TrailerVid] = -1;
 	PlayerInfo[playerid][Medkits] = 0;
@@ -3544,7 +3521,6 @@ public OnPlayerDisconnect(playerid, reason)
 	PlayerInfo[playerid][Vehicle] = -1;
 	PlayerInfo[playerid][DrawnNumber] = -1;
  	PlayerInfo[playerid][Credits] = 0;
- 	PlayerInfo[playerid][HackState] = 0;
  	PlayerInfo[playerid][BoostDeplete] = 0;
  	PlayerInfo[playerid][AdditionalPVSlots] = 0;
  	PlayerInfo[playerid][AdditionalToySlots] = 0;
@@ -25203,8 +25179,6 @@ function:ProcessTick()
 	{
 	    if(IsPlayerConnected(i) && !IsPlayerNPC(i))
 	    {
-	        AnalyzeGameData(i);
-	        
 			switch(gTeam[i])
 			{
 			    case NORMAL:
@@ -29914,30 +29888,5 @@ ToggleSpeedo(playerid, bool:toggle)
 
 		PlayerTextDrawShow(playerid, TXTSpeedo[playerid]);
 		TextDrawShowForPlayer(playerid, TXTSpeedo_Main);
-	}
-}
-
-AnalyzeGameData(playerid)
-{
-	if(GetPlayerSpecialAction(playerid) == SPECIAL_ACTION_USEJETPACK && PlayerInfo[playerid][VIP] == 0)
-	{
-	    TriggerPlayerHack(playerid, HACK_JETPACK);
-	}
-}
-
-TriggerPlayerHack(playerid, cheattype)
-{
-	switch(cheattype)
-	{
-	    case HACK_JETPACK:
-	    {
-			if(!(PlayerInfo[playerid][HackState] & e_FLAG_HACK_JETPACK))
-			{
-			    PlayerInfo[playerid][HackState] |= e_FLAG_HACK_JETPACK;
-			    
-				format(gstr, sizeof(gstr), "[AC] %s(%i) possible cheat detected: Jetpack hack", __GetName(playerid), playerid);
-				AdminMSG(RED, gstr);
-			}
-	    }
 	}
 }
