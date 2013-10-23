@@ -691,6 +691,7 @@ enum e_player_data
 	VIPNameHash,
 	VIPOffer,
 	VehicleSpamViolation,
+	tickLastShot,
 	tickLastRob,
 	tickVehicleEnterTime,
 	tickLastGiveCash,
@@ -3184,6 +3185,7 @@ public OnPlayerConnect(playerid)
 	PlayerInfo[playerid][tickLastVIPLInv] = 0;
 	PlayerInfo[playerid][tickLastBIKEC] = 0;
 	PlayerInfo[playerid][tickJoin_bmx] = 0;
+	PlayerInfo[playerid][tickLastShot] = 0;
 	PlayerInfo[playerid][tickVehicleEnterTime] = 0;
 	PlayerInfo[playerid][VehicleSpamViolation] = 0;
 
@@ -3719,6 +3721,8 @@ public OnVehicleRespray(playerid, vehicleid, color1, color2)
 public OnPlayerGiveDamage(playerid, damagedid, Float:amount, weaponid)
 {
 	if(damagedid == INVALID_PLAYER_ID || playerid == INVALID_PLAYER_ID) return 1;
+	
+	PlayerInfo[damagedid][tickLastShot] = GetTickCount() + 3600000;
 	
 	if(PlayerInfo[damagedid][bGod])
 	{
@@ -13304,6 +13308,11 @@ YCMD:god(playerid, params[], help)
 	    }
 	    else
 	    {
+			if(!silent && ((PlayerInfo[playerid][tickLastShot] + 5000) < (GetTickCount() + 3600000)))
+			{
+			    return GameTextForPlayer(playerid, "~b~~h~~h~You were shot in the last 5 seconds!", 2000, 3);
+			}
+			
 	        new Float:HP;
 	        GetPlayerHealth(playerid, HP);
 			if(HP < 40 && !silent) return GameTextForPlayer(playerid, "~b~~h~~h~Your health may not be below 40!", 2000, 3);
