@@ -11,7 +11,7 @@
 
 #pragma dynamic 8192
 
-#define IS_RELEASE_BUILD (false)
+#define IS_RELEASE_BUILD (true)
 #define INC_ENVIORMENT (true)
 #define IRC_CONNECT (true)
 #define YSI_IS_SERVER
@@ -4782,7 +4782,7 @@ public OnRconLoginAttempt(ip[], password[], success)
 
 		for(new i = 0; i < MAX_PLAYERS; i++)
     	{
-    	    if(CSGSOFT(i)) continue;
+    	    if(CSGSOFT[i]) continue;
        		if(!strcmp(ip, __GetIP(i), true))
          	{
 				format(gstr, sizeof(gstr), ""yellow"*** "red"%s(%i) tried to login to local RCON", __GetName(i), i);
@@ -4799,7 +4799,7 @@ public OnRconLoginAttempt(ip[], password[], success)
 
 		for(new i = 0; i < MAX_PLAYERS; i++)
     	{
-    	    if(CSGSOFT(i)) continue;
+    	    if(CSGSOFT[i]) continue;
        		if(!strcmp(ip, __GetIP(i), true))
          	{
 				format(gstr, sizeof(gstr), ""yellow"*** "red"%s(%i) logged in to local RCON", __GetName(i), i);
