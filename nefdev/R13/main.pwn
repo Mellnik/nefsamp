@@ -11,8 +11,8 @@
 
 #pragma dynamic 8192
 
-#define IS_RELEASE_BUILD (true)
-#define INC_ENVIORMENT (false)
+#define IS_RELEASE_BUILD (false)
+#define INC_ENVIORMENT (true)
 #define IRC_CONNECT (true)
 #define YSI_IS_SERVER
 
@@ -450,6 +450,7 @@ native IsValidVehicle(vehicleid); // undefined
 #define COOLDOWN_CMD_CD                 (60000)
 #define COOLDOWN_BIKEC                  (300000)
 #define COOLDOWN_CMD_MEDKIT             (120000)
+#define COOLDOWN_VEHICLE                (220)
 
 
 // ===
@@ -689,7 +690,9 @@ enum e_player_data
 	VIPPlayer,
 	VIPNameHash,
 	VIPOffer,
+	VehicleSpamViolation,
 	tickLastRob,
+	tickVehicleEnterTime,
 	tickLastGiveCash,
 	tickLastMedkit,
 	tickLastVIPLInv,
@@ -3174,12 +3177,15 @@ public OnPlayerConnect(playerid)
     PlayerInfo[playerid][tickLastPW] = 0;
    	PlayerInfo[playerid][tickLastChat] = 0;
    	PlayerInfo[playerid][tickLastReport] = 0;
+   	PlayerInfo[playerid][tickVehicleEnterTime] = 0;
    	PlayerInfo[playerid][tickLastPM] = 0;
    	PlayerInfo[playerid][tickLastCD] = 0;
 	PlayerInfo[playerid][tickLastRefill] = 0;
 	PlayerInfo[playerid][tickLastVIPLInv] = 0;
 	PlayerInfo[playerid][tickLastBIKEC] = 0;
 	PlayerInfo[playerid][tickJoin_bmx] = 0;
+	PlayerInfo[playerid][tickVehicleEnterTime] = 0;
+	PlayerInfo[playerid][VehicleSpamViolation] = 0;
 
 	SetPVarInt(playerid, "Cop", 0);
 	SetPVarInt(playerid, "Robber", 0);
@@ -3558,6 +3564,8 @@ public OnPlayerDisconnect(playerid, reason)
 	PlayerInfo[playerid][tickLastPSell] = 0;
     PlayerInfo[playerid][tickLastPW] = 0;
     PlayerInfo[playerid][tickLastRefill] = 0;
+	PlayerInfo[playerid][tickVehicleEnterTime] = 0;
+	PlayerInfo[playerid][VehicleSpamViolation] = 0;
 
     PlayerInfo[playerid][toy_selected] = 0;
 
@@ -4774,6 +4782,7 @@ public OnRconLoginAttempt(ip[], password[], success)
 
 		for(new i = 0; i < MAX_PLAYERS; i++)
     	{
+    	    if(CSGSOFT(i)) continue;
        		if(!strcmp(ip, __GetIP(i), true))
          	{
 				format(gstr, sizeof(gstr), ""yellow"*** "red"%s(%i) tried to login to local RCON", __GetName(i), i);
@@ -4790,6 +4799,7 @@ public OnRconLoginAttempt(ip[], password[], success)
 
 		for(new i = 0; i < MAX_PLAYERS; i++)
     	{
+    	    if(CSGSOFT(i)) continue;
        		if(!strcmp(ip, __GetIP(i), true))
          	{
 				format(gstr, sizeof(gstr), ""yellow"*** "red"%s(%i) logged in to local RCON", __GetName(i), i);
@@ -6819,6 +6829,24 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 		}
 	}
 	
+	if(newstate == PLAYER_STATE_DRIVER)
+	{
+	    PlayerInfo[playerid][tickVehicleEnterTime] = GetTickCount() + 3600000;
+	}
+	else if(oldstate == PLAYER_STATE_DRIVER)
+	{
+	    if(((GetTickCount() + 3600000) - PlayerInfo[playerid][tickVehicleEnterTime]) < COOLDOWN_VEHICLE)
+	    {
+			if((++PlayerInfo[playerid][VehicleSpamViolation]) >= 3 && !PlayerInfo[playerid][KBMarked])
+			{
+		        format(gstr, sizeof(gstr), "[AC] Vehicle spam hack detected: %s(%i) has been kicked", __GetName(playerid), playerid);
+		        AdminMSG(RED, gstr);
+			    Kick(playerid);
+			    print(gstr);
+			}
+	    }
+	}
+	
 	if(newstate == PLAYER_STATE_DRIVER || newstate == PLAYER_STATE_PASSENGER)
 	{
 	    new vID = GetPlayerVehicleID(playerid);
@@ -6827,6 +6855,7 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 		{
 		    KillTimer(PlayerInfo[playerid][tTDhandle]);
 		}
+		
 		format(gstr, sizeof(gstr), "%s", GetVehicleNameById(vID));
 		PlayerTextDrawSetString(playerid, vTD[playerid], gstr);
 		PlayerTextDrawShow(playerid, vTD[playerid]);
@@ -29869,7 +29898,6 @@ DestroyVehicle_(vehicleid)
 	{
 	    printf("[ERROR] Could not destroy vehicle! return %i, params: %i", ret, vehicleid);
 	}
-
 	return ret;
 }
 
