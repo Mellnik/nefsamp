@@ -13310,7 +13310,7 @@ YCMD:god(playerid, params[], help)
 	    }
 	    else
 	    {
-			if(!silent && ((PlayerInfo[playerid][tickLastShot] + 5000) < (GetTickCount() + 3600000)))
+			if(!silent && ((PlayerInfo[playerid][tickLastShot] + 5000) > (GetTickCount() + 3600000)))
 			{
 			    return GameTextForPlayer(playerid, "~b~~h~~h~You were shot in the last 5 seconds!", 2000, 3);
 			}
