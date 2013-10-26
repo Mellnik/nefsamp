@@ -3451,8 +3451,6 @@ public OnPlayerDisconnect(playerid, reason)
 			PlayerInfo[playerid][bRainbow] = false;
 		}
 
-        DestroyPlayerVehicles(playerid);
-
 		for(new i = 0; i < MAX_PLAYERS; i++)
 		{
 	    	if(gTeam[i] == SPEC && PlayerInfo[i][SpecID] == playerid)
@@ -3469,6 +3467,8 @@ public OnPlayerDisconnect(playerid, reason)
 	}
 
 	gTeam[playerid] = NORMAL;
+
+    DestroyPlayerVehicles(playerid);
 
     PlayerInfo[playerid][bFloodDect] = false;
 	PlayerInfo[playerid][Level] = 0;
@@ -12832,39 +12832,12 @@ YCMD:rv(playerid, params[], help)
 {
 	if(PlayerInfo[playerid][Level] >= 2)
 	{
-	    new reason[50];
-	    if(sscanf(params, "s[49]", reason))
+	    new reason[60];
+	    if(sscanf(params, "s[59]", reason))
 	    {
 	        SCM(playerid, NEF_GREEN, "Usage: /rv <reason>");
-	        SCM(playerid, NEF_GREEN, "Respawns all unoccupied vehicles");
+	        SCM(playerid, NEF_GREEN, "Destroys all unoccupied player vehicles");
 	        return 1;
-	    }
-
-		new Iterator:fVehicles<MAX_VEHICLES>, vehid;
-		for(new i = 0; i < MAX_PLAYERS; i++)
-		{
-			if(IsPlayerAvail(i))
-			{
-			    if(IsPlayerInAnyVehicle(i))
-			    {
-                    vehid = GetPlayerVehicleID(i);
-			        if(!Iter_Contains(fVehicles, vehid))
-			        {
-						Iter_Add(fVehicles, vehid);
-			        }
-			    }
-			}
-		}
-
-	    for(new i = 0; i < MAX_VEHICLES; i++)
-	    {
-	        if(IsValidVehicle(i))
-	        {
-	            if(!Iter_Contains(fVehicles, i))
-	            {
-	                SetVehicleToRespawn(i);
-	            }
-	        }
 	    }
 	    
 	    for(new i = 0; i < MAX_PLAYERS; i++)
@@ -12875,7 +12848,7 @@ YCMD:rv(playerid, params[], help)
 	        }
 	    }
 
-		format(gstr, sizeof(gstr), ""yellow"** "red"Admin %s(%i) respawned all unoccupied vehicles [Reason: %s]", __GetName(playerid), playerid, reason);
+		format(gstr, sizeof(gstr), ""yellow"** "red"Admin %s(%i) destroyed all unoccupied player vehicles [Reason: %s]", __GetName(playerid), playerid, reason);
 		SCMToAll(YELLOW, gstr);
 		print(gstr);
 	}
@@ -15670,7 +15643,7 @@ YCMD:stats(playerid, params[], help)
 
 		if(!islogged(playerid))
 		{
-		    strcat(finstring, "\n\n"nef_yellow"You are not registered!\nType /register to crate an account.");
+		    strcat(finstring, "\n\n"nef_yellow"You are not registered!\nType /register to create an account.");
 		}
 
 		ShowPlayerDialog(playerid, STATS_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" - Player Statistics", finstring, "OK", "");
