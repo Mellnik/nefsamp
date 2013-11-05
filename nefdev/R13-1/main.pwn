@@ -16221,7 +16221,7 @@ YCMD:givecash(playerid, params[], help)
 	if(GetPlayerScore(playerid) < 500) return SCM(playerid, -1, ""er"You need at least 500 score to share cash.");
 	
 	new player, cash, reason[100];
-	if(sscanf(params, "ris", player, cash, reason))
+	if(sscanf(params, "ris[99]", player, cash, reason))
 	{
 		return SCM(playerid, NEF_GREEN, "Usage: /givecash <playerid> <money> <reason>");
 	}
