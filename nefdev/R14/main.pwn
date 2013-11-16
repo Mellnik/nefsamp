@@ -11748,6 +11748,38 @@ YCMD:gcapture(playerid, params[], help)
 	return 1;
 }
 
+YCMD:gzones(playerid, params[], help)
+{
+    if(!islogged(playerid)) return notlogged(playerid);
+
+    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode. Use /exit");
+    if(PlayerInfo[playerid][GangID] == 0) return SCM(playerid, -1, ""er"You aren´t in any gang");
+    
+	new str[1024], count = 0;
+
+	for(new i = 0; i < gzoneid; i++)
+	{
+	    if(PlayerInfo[playerid][GangID] == GZoneInfo[i][localGang])
+	    {
+	        format(gstr, sizeof(gstr), "%i - %s\n", ++count, GZoneInfo[i][sZoneName]);
+	        strcat(str, gstr);
+	    }
+	}
+	
+	if(count > 0)
+	{
+	    strins(str, ""white"Occupied zones:", 0, sizeof(str));
+		ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, "Ongoing Gang Wars", str, "OK", "");
+	}
+	else
+	{
+	    strmid(str, ""white"Your gang does not control any zones.", 0, 1024, 1024);
+	}
+	
+	ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, "Gang Zones", str, "OK", "");
+	return 1;
+}
+
 YCMD:gwars(playerid, params[], help)
 {
 	new str[512], count = 0;
@@ -18813,6 +18845,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						strcat(cstring, ""yellow"/gclose "white"- destroy your gang\n");
 						strcat(cstring, ""yellow"/gdeny "white"- deny an invitation\n");
 						strcat(cstring, ""yellow"/gangs "white"- online gangs\n");
+						strcat(cstring, ""yellow"/gwars "white"- view ongoing gwars\n");
 		            }
 		            case 3: // House/Business
 		            {
@@ -19066,11 +19099,15 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		            
 		                ShowPlayerDialog(playerid, GMENU_DIALOG + 1, DIALOG_STYLE_MSGBOX, ""nef" - Gang commands", cstring, "OK", "Back");
 		            }
-		            case 3: // edit rank
+		            case 3: // view gang zones
+		            {
+                        Command_ReProcess(playerid, "/gzones", false);
+		            }
+		            case 4: // edit rank
 		            {
 		                Command_ReProcess(playerid, "/gsetrank", false);
 		            }
-		            case 4: // kick player
+		            case 5: // kick player
 					{
 						Command_ReProcess(playerid, "/gkick", false);
 					}
@@ -27394,15 +27431,15 @@ function:ShowDialog(playerid, dialogid)
 			{
 			    case GANG_POS_JUNIOR_MEMBER, GANG_POS_MEMBER, GANG_POS_SENIOR_MEMBER, GANG_POS_ADVISOR:
 			    {
-			        ShowPlayerDialog(playerid, GMENU_DIALOG, DIALOG_STYLE_LIST, gstr, ""dl"Gang Info\n"dl"Show all gang members\n"dl"View all gang commands", "Select", "Cancel");
+			        ShowPlayerDialog(playerid, GMENU_DIALOG, DIALOG_STYLE_LIST, gstr, ""dl"Gang Info\n"dl"Show all gang members\n"dl"View all gang commands\n"dl"View gang zones", "Select", "Cancel");
 			    }
 			    case GANG_POS_LEADER:
 			    {
-			        ShowPlayerDialog(playerid, GMENU_DIALOG, DIALOG_STYLE_LIST, gstr, ""dl"Gang Info\n"dl"Show All Gang Members\n"dl"View All Gang Commands\n"dl"Set Player Rank", "Select", "Cancel");
+			        ShowPlayerDialog(playerid, GMENU_DIALOG, DIALOG_STYLE_LIST, gstr, ""dl"Gang Info\n"dl"Show All Gang Members\n"dl"View All Gang Commands\n"dl"View gang zones\n"dl"Set Player Rank", "Select", "Cancel");
 			    }
 			    case GANG_POS_MAIN_LEADER:
 			    {
-			    	ShowPlayerDialog(playerid, GMENU_DIALOG, DIALOG_STYLE_LIST, gstr, ""dl"Gang Info\n"dl"Show All Gang Members\n"dl"View All Gang Commands\n"dl"Set Player Rank\n"dl"Kick Player From Gang", "Select", "Cancel");
+			    	ShowPlayerDialog(playerid, GMENU_DIALOG, DIALOG_STYLE_LIST, gstr, ""dl"Gang Info\n"dl"Show All Gang Members\n"dl"View All Gang Commands\n"dl"View gang zones\n"dl"Set Player Rank\n"dl"Kick Player From Gang", "Select", "Cancel");
 			    }
 			}
 		}
