@@ -17161,6 +17161,9 @@ function:OnPlayerNameChangeRequest(newname[], playerid)
 
             format(query, sizeof(query), "UPDATE `online` SET `name` = '%s' WHERE `name` = '%s';", newname, oldname);
             mysql_tquery(g_SQL_handle, query, "", "");
+            
+            format(query, sizeof(query), "UPDATE `creditsorder` SET `Player` = '%s' WHERE `Player` = '%s';", newname, oldname);
+            mysql_tquery(g_SQL_handle, query, "", "");
 
 			PlayerInfo[playerid][LastNameChange] = gettime();
 			
@@ -27565,6 +27568,7 @@ function:InitSession(playerid)
 	PlayerTextDrawSetSelectable(playerid, TXTPlayerInfo[playerid], 0);
 
 	PreloadAnimLib(playerid, "DANCING");
+    PreloadAnimLib(playerid, "DANCING");
 
 	// quarry
 	RemoveBuildingForPlayer(playerid, 16078, 662.8125, 833.6875, -39.3672, 0.25);
