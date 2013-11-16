@@ -6200,6 +6200,27 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 		  		InfoTD_MSG(playerid, 5000, "~r~~h~~h~Congratulations!~n~~w~You finished the 5th skydive challange~n~~r~~h~~h~8 score and $8,000!");
 			}
 	 	}
+		case 38: //Skydive6 Prize
+		{
+			if(GetPVarInt(playerid, "doingStunt") == 2)
+	  		{
+	  			if(GetPlayerWeapon(playerid) != 46)
+	  			{
+	  				SCM(playerid, COLOR_YELLOW, ">> "RED_E"Challenge failed, you must have a parachute to complete this challenge.");
+	  				return 1;
+	  			}
+				GameTextForPlayer(playerid, "~r~~h~Congrats!~n~~w~You finished the skydive6 challenge.",6000,5);
+				PlayerPlaySound(playerid, 1149,0,0,0);
+				format(str, sizeof(str), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /skydive6.", GetColor__(playerid) >>> 8, __GetName(playerid), playerid);
+				SCMToAll(COLOR_WHITE, str);
+				GivePlayerScore_(playerid, 8, true, true);
+				GivePlayerCash(playerid, 8000, true, true);
+		  		ResetPlayerWeapons(playerid);
+		  		SetPVarInt(playerid, "doingStunt", 0);
+		  		PlayerInfo[playerid][tickJoin_bmx] = 0;
+		  		InfoTD_MSG(playerid, 5000, "~r~~h~~h~Congratulations!~n~~w~You finished the 6th skydive challange~n~~r~~h~~h~8 score and $8,000!");
+			}
+	 	}
 	}
 	return 1;
 }
@@ -7897,6 +7918,16 @@ YCMD:skydive4(playerid, params[], help)
 YCMD:skydive5(playerid, params[], help)
 {
     if(PortPlayerMap(playerid, 239.3282, 3754.8267, 888.9833, 332.5006, "Skydive 5", "skydive5"))
+    {
+        CheckPlayerGod(playerid);
+        Command_ReProcess(playerid, "/parch", false);
+        SetPVarInt(playerid, "doingStunt", 2);
+    }
+    return 1;
+}
+YCMD:skydive6(playerid, params[], help)
+{
+    if(PortPlayerMap(playerid, -1769.5000000, -3814.1999500, 1159.8419200, 90, "Skydive 6", "skydive6"))
     {
         CheckPlayerGod(playerid);
         Command_ReProcess(playerid, "/parch", false);
@@ -23254,6 +23285,7 @@ LoadVisualStaticMeshes()
 	CreateDynamicCP(1902.1838,-1404.4944,14.3474, 3.0, 0, -1, -1, 100.0); // Gold Credits
 	CreateDynamicCP(3360.8054,-1934.1283,43.3184, 3.5, 0, -1, -1, 50.0); // bmx bike spawn
 	CreateDynamicCP(249.9905, 3772.1204, 5.3780, 12.0, 0, -1, -1, 100.0); // skydive5 checkpoint
+	CreateDynamicCP(-1839.5253, -3856.7036, 6.9936, 12.0, 0, -1, -1, 100.0); // skydive6 checkpoint
 
 	//Stores
 	CreateDynamicMapIcon(2539.3477,2081.2295,10.8203, 6, 0, CNR_WORLD, -1, -1); //Ammunation 1
@@ -23389,6 +23421,7 @@ LoadVisualStaticMeshes()
 	AddTeleport(2, "Skydive 3", "skydive3", 2875,-3233,3268);
 	AddTeleport(2, "Skydive 4", "skydive4", 118.210845,3658.245859,836.183776);
 	AddTeleport(2, "Skydive 5", "skydive5", 239.3282, 3754.8267, 888.9833);
+	AddTeleport(2, "Skydive 6", "skydive6", -1769.5000000, -3814.1999500, 1159.8419200);
 	AddTeleport(0, "BMX Parkour", "bmx", 3362.586, -1939.724, 43.027);
 	AddTeleport(0, "Quad Parkour", "qp", -2904.806, 880.312, 5.354);
 	AddTeleport(0, "Quad Parkour 2", "qp2", 2121.9146,2397.7786,51.2586);
@@ -27532,6 +27565,29 @@ function:InitSession(playerid)
 	PlayerTextDrawSetSelectable(playerid, TXTPlayerInfo[playerid], 0);
 
 	PreloadAnimLib(playerid, "DANCING");
+
+	// quarry
+	RemoveBuildingForPlayer(playerid, 16078, 662.8125, 833.6875, -39.3672, 0.25);
+	RemoveBuildingForPlayer(playerid, 16079, 625.9141, 838.4141, -35.3359, 0.25);
+	RemoveBuildingForPlayer(playerid, 16085, 627.8672, 850.2734, -42.7734, 0.25);
+	RemoveBuildingForPlayer(playerid, 16071, 674.7734, 854.5156, -39.3672, 0.25);
+	RemoveBuildingForPlayer(playerid, 3214, 676.5859, 827.3281, -35.3672, 0.25);
+	RemoveBuildingForPlayer(playerid, 3398, 668.3672, 815.2422, -30.1172, 0.25);
+	RemoveBuildingForPlayer(playerid, 3214, 687.6250, 847.1094, -35.3828, 0.25);
+	RemoveBuildingForPlayer(playerid, 3398, 684.2031, 835.6563, -30.8984, 0.25);
+	RemoveBuildingForPlayer(playerid, 16075, 568.5234, 916.3438, -35.3359, 0.25);
+	RemoveBuildingForPlayer(playerid, 16309, 566.6484, 874.4844, -39.5313, 0.25);
+	RemoveBuildingForPlayer(playerid, 3398, 576.1563, 934.9219, -30.0938, 0.25);
+	RemoveBuildingForPlayer(playerid, 16310, 581.3750, 875.6094, -43.9609, 0.25);
+	RemoveBuildingForPlayer(playerid, 16311, 585.8438, 869.6328, -39.3672, 0.25);
+	RemoveBuildingForPlayer(playerid, 16325, 590.2969, 870.2734, -44.2656, 0.25);
+	RemoveBuildingForPlayer(playerid, 16073, 610.1641, 908.4766, -39.3672, 0.25);
+	RemoveBuildingForPlayer(playerid, 16074, 605.0859, 902.1563, -39.3672, 0.25);
+	RemoveBuildingForPlayer(playerid, 16077, 594.9297, 926.4141, -41.1953, 0.25);
+	RemoveBuildingForPlayer(playerid, 16076, 623.3047, 893.7734, -39.7656, 0.25);
+	RemoveBuildingForPlayer(playerid, 3398, 620.8359, 884.2422, -29.5156, 0.25);
+	RemoveBuildingForPlayer(playerid, 16072, 640.3125, 874.7891, -35.3359, 0.25);
+	// quarry end
 
 	// Gold Credits
 	RemoveBuildingForPlayer(playerid, 5575, 1919.5234, -1400.8984, 16.1719, 0.25);
