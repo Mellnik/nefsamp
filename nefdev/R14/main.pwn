@@ -122,7 +122,7 @@ native IsValidVehicle(vehicleid); // undefined
 #define server_sign                     "{FFFFFF}[{FF005F}SERVER{FFFFFF}]"
 #define gang_sign                       "{FFFFFF}[{FFA000}GANG{FFFFFF}]"
 #define nef                             "{FFFFFF}[{FFE600}"SVRSC"{FFFFFF}]"
-#define NO_PERM                     	"{F42626}[INFO] {F42626}Insufficient Permissions"
+#define NO_PERM                     	"{F42626}[INFO] {F42626}Insufficient permissions"
 #define NOT_AVAIL                       "{F42626}[INFO] {F42626}You can´t use this command now! Use /exit to leave."
 #define er                              "{F42626}[INFO] {F42626}"
 // D2D2D2
@@ -2800,12 +2800,10 @@ public OnPlayerSpawn(playerid)
 			GivePlayerWeapon(playerid, 34, 99999);
 			SetPlayerInterior(playerid, 0);
 
+            LoadMap(playerid);
 			new rand = random(14);
-
-			SetPlayerPosEx(playerid, Sniper_Spawns[rand][0], Sniper_Spawns[rand][1], floatadd(Sniper_Spawns[rand][2], 2.5));
+			SetPlayerPosEx(playerid, Sniper_Spawns[rand][0], Sniper_Spawns[rand][1], floatadd(Sniper_Spawns[rand][2], 3.5));
 			SetPlayerFacingAngle(playerid, Sniper_Spawns[rand][3]);
-			
-			LoadMap(playerid);
 		}
 		case MINIGUN:
 		{
@@ -2829,13 +2827,11 @@ public OnPlayerSpawn(playerid)
 		case GUNGAME:
   		{
 			ResetPlayerWeapons(playerid);
-
+            LoadMap(playerid);
             new rand = random(9);
-			SetPlayerPosEx(playerid, GunGame_Spawns[rand][0], GunGame_Spawns[rand][1], floatadd(GunGame_Spawns[rand][2], 2.5));
+			SetPlayerPosEx(playerid, GunGame_Spawns[rand][0], GunGame_Spawns[rand][1], floatadd(GunGame_Spawns[rand][2], 3.5));
 			SetPlayerFacingAngle(playerid, GunGame_Spawns[rand][3]);
 			SetCameraBehindPlayer(playerid);
-
-			LoadMap(playerid);
 
 			GivePlayerWeapon(playerid, 4, 1);
 			GivePlayerWeapon(playerid, GunGame_Weapons[GunGame_Player[playerid][level]], 65535);
@@ -6369,11 +6365,11 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
   		{
   		    if(PlayerInfo[playerid][VIP] == 1 || PlayerInfo[playerid][Level] > 0)
   		    {
+  		        LoadMap(playerid);
 	    		SetPlayerPosition(playerid, -3939.1855, 1308.7438, 3.4587, 86.1611, 3);
 	  		    gTeam[playerid] = VIPL;
 	  		    PlayerPlaySound(playerid, 1068, 0, 0, 0);
 	  		    ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
-	  		    LoadMap(playerid);
 			}
 			else
 			{
@@ -6442,19 +6438,19 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 	}
 	else if(pickupid == aussenrein)
 	{
+	    LoadMap(playerid);
 	    SetPlayerInterior(playerid, 15);
 	    SetPlayerPosEx(playerid, -1405.5538, 989.1526, floatadd(1049.0078, 3.0));
 		ResetPlayerWeapons(playerid);
 		gTeam[playerid] = BUYCAR;
-		LoadMap(playerid);
 	}
 	else if(pickupid == innenraus)
 	{
+	    LoadMap(playerid);
 		SetPlayerInterior(playerid, 0);
 	    SetPlayerPosEx(playerid, 1798.0952, -1410.8192, floatadd(13.5458, 3.0));
 	    RandomWeapon(playerid);
 		gTeam[playerid] = NORMAL;
-		LoadMap(playerid);
 	}
 	else if(pickupid == vehiclebuy)
 	{
@@ -9332,14 +9328,12 @@ YCMD:gungame(playerid, params[], help)
 
 	gTeam[playerid] = GUNGAME;
 
+    ResetPlayerWeapons(playerid);
+    LoadMap(playerid);
 	new rand = random(9);
-	ResetPlayerWeapons(playerid);
-
-	SetPlayerPosEx(playerid, GunGame_Spawns[rand][0], GunGame_Spawns[rand][1], floatadd(GunGame_Spawns[rand][2], 2.5));
+	SetPlayerPosEx(playerid, GunGame_Spawns[rand][0], GunGame_Spawns[rand][1], floatadd(GunGame_Spawns[rand][2], 3.5));
 	SetPlayerFacingAngle(playerid, GunGame_Spawns[rand][3]);
 	SetCameraBehindPlayer(playerid);
-
-	LoadMap(playerid);
 
 	GivePlayerWeapon(playerid, 4, 1);
 	GivePlayerWeapon(playerid, GunGame_Weapons[GunGame_Player[playerid][level]], 65535);
@@ -9623,13 +9617,11 @@ YCMD:sniper(playerid, params[], help)
 	GivePlayerWeapon(playerid, 34, 99999);
 	SetPlayerVirtualWorld(playerid, SNIPER_WORLD);
 	SetPlayerInterior(playerid, 0);
-
 	HidePlayerInfoTextdraws(playerid);
-
-	new rand = random(7);
-	SetPlayerPosEx(playerid, Sniper_Spawns[rand][0], Sniper_Spawns[rand][1], Sniper_Spawns[rand][2] + 2.5);
-	SetPlayerFacingAngle(playerid, Sniper_Spawns[rand][3]);
     LoadMap(playerid);
+	new rand = random(7);
+	SetPlayerPosEx(playerid, Sniper_Spawns[rand][0], Sniper_Spawns[rand][1], Sniper_Spawns[rand][2] + 5.5);
+	SetPlayerFacingAngle(playerid, Sniper_Spawns[rand][3]);
 
 	NewMinigameJoin(playerid, "Sniper", "sniper");
    	return 1;
@@ -15198,7 +15190,7 @@ YCMD:spec(playerid, params[], help)
 		{
 			if(PlayerInfo[playerid][Level] == 0 && PlayerInfo[playerid][VIP] == 1 && PlayerInfo[player][Level] > 0)
 			{
-				return SCM(playerid, -1, ""er"You cannot spectate admins");
+				return SCM(playerid, -1, ""er"You may not spectate admins");
 			}
 
 			if(PlayerInfo[player][Level] == MAX_ADMIN_LEVEL && PlayerInfo[playerid][Level] != MAX_ADMIN_LEVEL)
@@ -15213,7 +15205,7 @@ YCMD:spec(playerid, params[], help)
 			
 			if(PlayerInfo[player][bIsDead])
 			{
-				return SCM(playerid, -1, ""er"Player is dead");
+				return SCM(playerid, -1, ""er"Player is not alive");
 			}
 
 			if(gTeam[playerid] != NORMAL)
@@ -22315,6 +22307,7 @@ RandomSpawn(playerid, bool:_load_old_pos = false)
 RandomBGSpawn(playerid, Map, Team)
 {
 	SetPlayerHealth(playerid, 100.0);
+	LoadMap(playerid);
 	switch(Map)
 	{
 	    case BG_MAP1:
@@ -22408,7 +22401,6 @@ RandomBGSpawn(playerid, Map, Team)
 			}
 	    }
 	}
-	LoadMap(playerid);
 	return 1;
 }
 
@@ -28798,17 +28790,14 @@ ExitPlayer(playerid)
 	    }
 	    case BUYCAR:
 	    {
+	        LoadMap(playerid);
 			SetPlayerInterior(playerid, 0);
 		    SetPlayerPosEx(playerid, 1798.0952, -1410.8192, floatadd(13.5458, 4.5));
 		    RandomWeapon(playerid);
+		    
 			gTeam[playerid] = NORMAL;
-
-		    RandomWeapon(playerid);
-
 			SetPVarInt(playerid, "doingStunt", 0);
 			PlayerInfo[playerid][tickJoin_bmx] = 0;
-			
-			LoadMap(playerid);
 			return 0;
 	    }
 	    case STORE:
@@ -28838,13 +28827,14 @@ ExitPlayer(playerid)
 		    	if(GetPlayerInterior(playerid) == HouseIntTypes[HouseInfo[i][interior]][interior] && GetPlayerVirtualWorld(playerid) == (HouseInfo[i][iID] + 1000))
 				{
 				    found = true;
+				    
+				    LoadMap(playerid);
 			    	SetPlayerPos(playerid, HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z]);
 			    	SetPlayerInterior(playerid, 0);
 			    	SetPlayerVirtualWorld(playerid, 0);
 			    	CancelEdit(playerid);
-			    	gTeam[playerid] = NORMAL;
 			    	
-			    	LoadMap(playerid);
+			    	gTeam[playerid] = NORMAL;
 			    	break;
 		    	}
 		    	else continue;
@@ -29086,9 +29076,9 @@ ExitPlayer(playerid)
 
 LoadMap(playerid)
 {
+    TogglePlayerControllable(playerid, 0);
 	Streamer_Update(playerid);
 	PlayerInfo[playerid][bLoadMap] = true;
-	TogglePlayerControllable(playerid, 0);
 	TextDrawShowForPlayer(playerid, TXTLoading);
 	new ping = GetPlayerPing(playerid);
 	if(ping < 65)
