@@ -2014,12 +2014,12 @@ new Float:BG_M5_T2_Spawns[4][4] =
 	{1852.3188, -3045.4287, 6.0944, 34.0036},
 	{1826.1392, -3048.5820, 6.1044, 41.0139}
 };
-new Float:WorldSpawns[4][4] =
+new Float:WorldSpawns[3][4] =
 {
 	{341.8535, -1852.6327, 8.2618, 90.2136}, //beach
 	{-1196.3280, -17.4523, 15.8281, 42.5799}, //sfa
-	{386.0204, 2541.1179, 19.0953, 181.2326}, // /aa
-	{680.2595, -1361.8927, 2551.2214, 90.0} // /speed
+	{386.0204, 2541.1179, 19.0953, 181.2326} // /aa
+	//{680.2595, -1361.8927, 2551.2214, 90.0} // /speed
 };
 new Float:DM_MAP_1[2][4] =
 {
@@ -22325,7 +22325,7 @@ RandomSpawn(playerid, bool:_load_old_pos = false)
 	}
 	else
 	{
-		new rand = random(4);
+		new rand = random(3);
 		SetPlayerPosEx(playerid, WorldSpawns[rand][0], WorldSpawns[rand][1], floatadd(WorldSpawns[rand][2], 3.0));
 		SetPlayerFacingAngle(playerid, WorldSpawns[rand][3]);
 		SetCameraBehindPlayer(playerid);
