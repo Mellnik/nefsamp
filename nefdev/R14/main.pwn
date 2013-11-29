@@ -23,6 +23,7 @@
 // timerfix.so | v1.3
 // streamer.so | R84
 // mysql_static.so | R34
+// crashdetect.so | v4.12
 // irc.so | 1.4.3
 // dns.so | 2.4
 
@@ -43,6 +44,7 @@
 #include <floodcontrol>     // 28/06/2012
 #include <mSelection>       // 1.1 R3
 #include <a_mysql_R34>  	// R34
+#include <crashdetect>      // v4.12
 #include <dini>         	// 1.6
 #include <irc>          	// 1.4.3
 #include <md-sort>      	// 16/07/2013
@@ -428,6 +430,7 @@ native IsValidVehicle(vehicleid); // undefined
 // - Player
 // -
 #define COOLDOWN_CHAT                   (5500)
+#define COOLDOWN_CMD_AR                 (1000)
 #define COOLDOWN_CMD_ROB                (10000)
 #define COOLDOWN_CMD_BUY                (30000)
 #define COOLDOWN_CMD_PBUY               (30000)
@@ -691,6 +694,7 @@ enum e_player_data
 	VIPNameHash,
 	VIPOffer,
 	VehicleSpamViolation,
+    tickLastAr,
 	tickLastShot,
 	tickLastRob,
 	tickVehicleEnterTime,
@@ -3163,6 +3167,7 @@ public OnPlayerConnect(playerid)
 	PlayerInfo[playerid][SavedColor] = 0;
 	PlayerInfo[playerid][tickLastHitman] = 0;
 	PlayerInfo[playerid][tickLastRob] = 0;
+	PlayerInfo[playerid][tickLastAr] = 0;
 	PlayerInfo[playerid][tickLastMedkit] = 0;
 	PlayerInfo[playerid][tickLastGiveCash] = 0;
 	PlayerInfo[playerid][tickLastGInvite] = 0;
@@ -3559,6 +3564,7 @@ public OnPlayerDisconnect(playerid, reason)
 	PlayerInfo[playerid][tickLastPBuy] = 0;
 	PlayerInfo[playerid][tickLastBuy] = 0;
 	PlayerInfo[playerid][tickLastRob] = 0;
+	PlayerInfo[playerid][tickLastAr] = 0;
 	PlayerInfo[playerid][tickLastSell] = 0;
 	PlayerInfo[playerid][tickLastPSell] = 0;
     PlayerInfo[playerid][tickLastPW] = 0;
@@ -16822,7 +16828,6 @@ YCMD:rob(playerid, params[], help)
 			}
 		}
 		
-		new str[255];
 		if(GetPVarInt(playerid, "Robber") == 1)
 		{
 			if(GetPVarInt(playerid, "InStore") != 0)
@@ -16847,12 +16852,12 @@ YCMD:rob(playerid, params[], help)
 
                     PlayerInfo[playerid][tickLastRob] = tick;
 
-                    format(str, sizeof(str), "COP RADIO: "LB_E"Suspect %s(%i) has started a robbery at the %s!", __GetName(playerid), playerid, GetStoreName(playerid));
+                    format(gstr, sizeof(gstr), "COP RADIO: "LB_E"Suspect %s(%i) has started a robbery at the %s!", __GetName(playerid), playerid, GetStoreName(playerid));
 					for(new i = 0; i < MAX_PLAYERS; i++)
 				   	{
 			     		if(GetPVarInt(i, "Cop") != 0)
 						{
-							SCM(i, COLOR_BLUE, str);
+							SCM(i, COLOR_BLUE, gstr);
 		  				}
 	  				}
 				}
@@ -16863,30 +16868,33 @@ YCMD:rob(playerid, params[], help)
 			}
 	  		else // Robing players.
 	  		{
-				new Float:x, Float:y, Float:z, rangepass;
+				new Float:POS[3], rangepass;
 				for(new i = 0; i < MAX_PLAYERS; i++)
 				{
 		    		if(i == playerid) continue;
 		    		if(IsPlayerInAnyVehicle(i)) continue;
-					GetPlayerPos(i, x, y, z);
-	   		 		if(IsPlayerInRangeOfPoint(playerid, 3.2, x, y, z) && GetPlayerInterior(playerid) == GetPlayerInterior(i) && GetPlayerVirtualWorld(playerid) == GetPlayerVirtualWorld(i))
+		    		if(gTeam[i] != CNR) continue;
+		    		
+					GetPlayerPos(i, POS[0], POS[1], POS[2]);
+	   		 		if(IsPlayerInRangeOfPoint(playerid, 3.2, POS[0], POS[1], POS[2]) && GetPlayerInterior(playerid) == GetPlayerInterior(i) && GetPlayerVirtualWorld(playerid) == GetPlayerVirtualWorld(i))
 	    			{
 	    				rangepass++;
 
-	    				if(gTeam[i] == CNR) // Make sure the other player is in CNR.
-						{
-							GameTextForPlayer(i, "~w~Someone has robbed you!~r~-$5,000~w~!", 4000, 5);
-							GivePlayerCash(i, -5000);
-							GivePlayerCash(playerid, 5000);
-					    	GameTextForPlayer(playerid, "~w~Robbed him~n~~g~+$5,000", 4000, 5);
-	  					}
+						GameTextForPlayer(i, "~w~Someone has robbed you!~r~-$5,000~w~!", 4000, 5);
+						GivePlayerCash(i, -5000);
+						GivePlayerCash(playerid, 5000);
+				    	GameTextForPlayer(playerid, "~w~Robbed him~n~~g~+$5,000", 4000, 5);
 					}
 				}
+				
 				if(rangepass == 0)
 				{
 					SCM(playerid, COLOR_RED, "Server: "GREY2_E"No players to rob near you.");
 				}
-				else PlayerInfo[playerid][tickLastRob] = tick;
+				else
+				{
+					PlayerInfo[playerid][tickLastRob] = tick;
+				}
 			}
 		}
 		else
@@ -16907,22 +16915,31 @@ YCMD:rob(playerid, params[], help)
 
 YCMD:ar(playerid, params[], help)
 {
+	new tick = GetTickCount() + 3600000;
+	if(PlayerInfo[playerid][Level] != MAX_ADMIN_LEVEL)
+	{
+		if((PlayerInfo[playerid][tickLastAr] + COOLDOWN_CMD_AR) >= tick)
+		{
+	    	return SCM(playerid, -1, ""er"Please wait a bit before using this cmd again!");
+		}
+	}
+	
 	if(GetPVarInt(playerid, "Cop") != 0)
 	{
 		if(IsPlayerInAnyVehicle(playerid)) return 1;
 		if(IsPlayerInRangeOfPoint(playerid, 75.0, 1312.5220, 2672.7532, 11.2392) || IsPlayerInRangeOfPoint(playerid, 75.0, 1276.4218, 2670.2009, 10.8203))
 		{
-			SCM(playerid, COLOR_RED, "Server: "GREY2_E"You can't make arrests near the criminal spawn zone!");
-	        return 1;
+			return SCM(playerid, COLOR_RED, "Server: "GREY2_E"You can't make arrests near the criminal spawn zone!");
 		}
 
-		new Float:x, Float:y, Float:z, rangepass, str[255];
+		new Float:POS[3], rangepass;
 		for(new i = 0; i < MAX_PLAYERS; i++)
 		{
 	    	if(i == playerid) continue;
       		if(IsPlayerInAnyVehicle(i)) continue;
-			GetPlayerPos(i, x, y, z);
-   		 	if(IsPlayerInRangeOfPoint(playerid, 3.8, x, y, z) && GetPlayerInterior(playerid) == GetPlayerInterior(i) && GetPlayerVirtualWorld(playerid) == GetPlayerVirtualWorld(i))
+      		if(gTeam[i] != CNR) continue;
+			GetPlayerPos(i, POS[0], POS[1], POS[2]);
+   		 	if(IsPlayerInRangeOfPoint(playerid, 3.8, POS[0], POS[1], POS[2]) && GetPlayerInterior(playerid) == GetPlayerInterior(i) && GetPlayerVirtualWorld(playerid) == GetPlayerVirtualWorld(i))
     		{
     			if(GetPVarInt(i, "Robber") == 1 && GetPVarInt(i, "Cop") == 0)
 				{
@@ -16931,8 +16948,8 @@ YCMD:ar(playerid, params[], help)
     				SetPlayerSpecialAction(i, SPECIAL_ACTION_CUFFED);
     				SetPVarInt(i, "InStore", 0);
 				    ApplyAnimation(playerid, "PED", "ARRESTgun", 4.0, 0, 0, 0, 0, 0);
-				    format(str, sizeof(str), "Server: "GREY2_E"Suspect %s(%d) has been arrested by Officer %s(%d).", __GetName(i), i, __GetName(playerid), playerid);
-					SCMToAll(COLOR_RED, str);
+				    format(gstr2, sizeof(gstr2), "Server: "GREY2_E"Suspect %s(%d) has been arrested by Officer %s(%d).", __GetName(i), i, __GetName(playerid), playerid);
+					SCMToAll(COLOR_RED, gstr2);
 					gTeam[i] = JAIL;
 				    pJail[i] = 30;
 				    SetPVarInt(i, "JailedByAdmin", 0);
@@ -16955,14 +16972,15 @@ YCMD:ar(playerid, params[], help)
   		}
   		if(rangepass == 0)
 		{
-			SCM(playerid, COLOR_RED, "Server: "GREY2_E"No criminals near your range.");
+			SCM(playerid, COLOR_RED, "Server: "GREY2_E"No criminals nearby.");
 		}
+		else PlayerInfo[playerid][tickLastAr] = tick;
 	}
 	else
 	{
 		Error(playerid, "You must be a cop while in a /CNR minigame to use this command!");
 	}
-	return true;
+	return 1;
 }
 
 YCMD:escape(playerid, params[], help)
@@ -16977,7 +16995,7 @@ YCMD:escape(playerid, params[], help)
 		return Error(playerid, "You are not in jail");
 
 	SetPVarInt(playerid, "HasEscaped", 1);
-	new str[255];
+
 	switch(random(5))
 	{
 	    case 0, 1:
@@ -16989,12 +17007,12 @@ YCMD:escape(playerid, params[], help)
 			SetPlayerInterior(playerid, 0);
 			SetPlayerVirtualWorld(playerid, 20);
 
-            format(str, sizeof(str), "COP RADIO: "LB_E"Suspect %s(%d) has escaped from prision, units respond!", __GetName(playerid), playerid);
+            format(gstr2, sizeof(gstr2), "COP RADIO: "LB_E"Suspect %s(%d) has escaped from prision, units respond!", __GetName(playerid), playerid);
 			for(new i = 0; i < MAX_PLAYERS; i++)
    			{
     			if(GetPVarInt(i, "Cop") != 0)
 				{
-					SCM(i, COLOR_BLUE, str);
+					SCM(i, COLOR_BLUE, gstr2);
 				}
 			}
 
@@ -17014,17 +17032,17 @@ YCMD:escape(playerid, params[], help)
 			GameTextForPlayer(playerid, "~r~escaped failed", 5000, 3);
 			SCM(playerid, COLOR_WHITE, "*** "RED_E"Your escape has failed, 20 seconds added to your jail sentence!");
 
-            format(str, sizeof(str), "COP RADIO: "GREY_E"Suspect %s(%d) has failed an attempt escape from jail.", __GetName(playerid), playerid);
+            format(gstr2, sizeof(gstr2), "COP RADIO: "GREY_E"Suspect %s(%d) has failed an attempt escape from jail.", __GetName(playerid), playerid);
             for(new i = 0; i < MAX_PLAYERS; i++)
    			{
     			if(GetPVarInt(i, "Cop") != 0)
 				{
-					SCM(i, COLOR_BLUE, str);
+					SCM(i, COLOR_BLUE, gstr2);
 				}
 			}
 		}
 	}
-	return true;
+	return 1;
 }
 
 YCMD:w(playerid, params[], help)
