@@ -616,6 +616,7 @@ enum (<<= 1)
 
 enum e_player_data
 {
+    AccountID,
 	bool:GotVIPLInv,
 	bool:bIsDead,
 	bool:bShowToys,
@@ -664,7 +665,6 @@ enum e_player_data
 	tRainbow,
 	tTDhandle,
 	ExitType,
-	GlobalID,
 	Level,
 	Kills,
 	Deaths,
@@ -3062,6 +3062,7 @@ public OnPlayerConnect(playerid)
 	format(gstr, sizeof(gstr), "DELETE FROM `online` WHERE `name` = '%s';", __GetName(playerid));
 	mysql_tquery(g_SQL_handle, gstr, "", "");
 
+	PlayerInfo[playerid][AccountID] = 0;
     RobberyCount[playerid] = 0;
 	PlayerInfo[playerid][Level] = 0;
     LabelActive[playerid] = false;
@@ -3470,6 +3471,7 @@ public OnPlayerDisconnect(playerid, reason)
 
     DestroyPlayerVehicles(playerid);
 
+    PlayerInfo[playerid][AccountID] = 0;
     PlayerInfo[playerid][bFloodDect] = false;
 	PlayerInfo[playerid][Level] = 0;
     LabelActive[playerid] = false;
@@ -4119,7 +4121,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 			
 			if(rows > 0)
 			{
-			    PlayerInfo[extraid][GlobalID] = cache_get_row_int(0, 0, g_SQL_handle);
+			    PlayerInfo[extraid][AccountID] = cache_get_row_int(0, 0, g_SQL_handle);
 			    PlayerInfo[extraid][SavedColor] = cache_get_row_int(0, 2, g_SQL_handle) != 0 ? cache_get_row_int(0, 2, g_SQL_handle) : 0;
 			    PlayerInfo[extraid][Level] = cache_get_row_int(0, 5, g_SQL_handle);
 			    PlayerInfo[extraid][Score] = cache_get_row_int(0, 6, g_SQL_handle);
@@ -4526,7 +4528,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				format(gstr, sizeof(gstr), "~y~[] ~w~%i", PlayerInfo[extraid][Wanteds]);
 				PlayerTextDrawSetString(extraid, TXTWantedsTD[extraid], gstr);
                 
-			    format(gstr2, sizeof(gstr2), "INSERT INTO `login_log` VALUES (NULL, %i, '%s', UNIX_TIMESTAMP(), 0);", PlayerInfo[extraid][GlobalID], __GetIP(extraid));
+			    format(gstr2, sizeof(gstr2), "INSERT INTO `login_log` VALUES (NULL, %i, '%s', UNIX_TIMESTAMP(), 0);", PlayerInfo[extraid][AccountID], __GetIP(extraid));
 			    mysql_tquery(g_SQL_handle, gstr2, "", "");
                 
 				if(PlayerInfo[extraid][Level] > 0)
@@ -4694,6 +4696,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		}
 		case THREAD_CREATE_ACCOUNT2:
 		{
+		    PlayerInfo[extraid][AccountID] = cache_insert_id(g_SQL_handle);
 		    PlayerInfo[extraid][bLogged] = true;
 		    
 			format(gstr, sizeof gstr, "["SVRSC"] %s(%i) "GREEN_E"has registered, making the server have a total of "LB2_E"%i "GREEN_E"players registered.", __GetName(extraid), extraid, cache_insert_id(g_SQL_handle));
@@ -4710,6 +4713,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		}
 		case THREAD_CREATE_ACCOUNT:
 		{
+		    PlayerInfo[extraid][AccountID] = cache_insert_id(g_SQL_handle);
 		    PlayerInfo[extraid][RegDate] = gettime();
 			PlayerInfo[extraid][ExitType] = EXIT_LOGGED;
 			PlayerInfo[extraid][PayDay] = 60;
@@ -8723,6 +8727,7 @@ YCMD:sellgc(playerid, params[], help)
 	if(IsPlayerAvail(player) && player != playerid)
 	{
 	    if(PlayerInfo[player][Credits] >= 10000000) return SCM(playerid, -1, ""er"This player reached the max gc limit of 10kk.");
+        if(!islogged(player)) return SCM(playerid, -1, ""er"This player is not registered!");
 
 	    PlayerInfo[player][GCPlayer] = playerid;
 	    PlayerInfo[player][GCOffer] = gc;
@@ -8766,6 +8771,9 @@ YCMD:buygc(playerid, params[], help)
 
 		MySQL_SavePlayer(playerid, false);
 		MySQL_SavePlayer(PlayerInfo[playerid][GCPlayer], false);
+
+	    format(gstr2, sizeof(gstr2), "INSERT INTO `sells` VALUES (NULL, 2, %i, %i, %i, %i);", PlayerInfo[playerid][GCOffer], PlayerInfo[playerid][GCPrice], PlayerInfo[PlayerInfo[playerid][GCPlayer]][AccountID], PlayerInfo[playerid][AccountID]);
+	    mysql_tquery(g_SQL_handle, gstr2, "", "");
 
 	    format(gstr, sizeof(gstr), ""blue"You have accepted %s´s offer and bough %sGC for $%s", __GetName(PlayerInfo[playerid][GCPlayer]), ToCurrency(PlayerInfo[playerid][GCOffer]), ToCurrency(PlayerInfo[playerid][GCPrice]));
 	    SCM(playerid, -1, gstr);
@@ -8870,6 +8878,7 @@ YCMD:sellvip(playerid, params[], help)
 	if(IsPlayerAvail(player) && player != playerid)
 	{
 	    if(PlayerInfo[player][VIP] == 1) return SCM(playerid, -1, ""er"This player already owns VIP!");
+	    if(!islogged(player)) return SCM(playerid, -1, ""er"This player is not registered!");
 	    
 	    PlayerInfo[player][VIPPlayer] = playerid;
 	    PlayerInfo[player][VIPOffer] = money;
@@ -8915,6 +8924,9 @@ YCMD:buyvip(playerid, params[], help)
 
 		MySQL_SavePlayer(playerid, false);
 		MySQL_SavePlayer(PlayerInfo[playerid][VIPPlayer], false);
+
+	    format(gstr2, sizeof(gstr2), "INSERT INTO `sells` VALUES (NULL, 1, 1, %i, %i, %i);", PlayerInfo[playerid][VIPOffer], PlayerInfo[PlayerInfo[playerid][VIPPlayer]][AccountID], PlayerInfo[playerid][AccountID]);
+	    mysql_tquery(g_SQL_handle, gstr2, "", "");
 
 	    format(gstr, sizeof(gstr), ""blue"You have accepted %s´s offer and bough VIP for $%s", __GetName(PlayerInfo[playerid][VIPPlayer]), ToCurrency(PlayerInfo[playerid][VIPOffer]));
 	    SCM(playerid, -1, gstr);
@@ -15655,9 +15667,10 @@ YCMD:stats(playerid, params[], help)
 		}
 		else strmid(vip, "No", 0, 5, 5);
 
- 		format(string1, sizeof(string1), ""nef_green"Stats of the player: "white"%s\n\n\
+ 		format(string1, sizeof(string1), ""nef_green"Stats of the player: "white"%s (%i)\n\n\
 	 	Kills: "LB_E"%i\n"white"Deaths: "LB_E"%i\n"white"K/D: "LB_E"%0.2f\n"white"Score: "LB_E"%i\n"white"Money: "LB_E"$%s\n"white"Bank: "LB_E"$%s\n"white"Gold Credits: "LB_E"%sGC\n",
    			__GetName(player1),
+   			PlayerInfo[player1][AccountID],
 	 		PlayerInfo[player1][Kills],
         	PlayerInfo[player1][Deaths],
         	Float:PlayerInfo[player1][Kills] / Float:pDeaths,
