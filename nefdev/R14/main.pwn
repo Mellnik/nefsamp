@@ -13079,7 +13079,7 @@ YCMD:pweaps(playerid, params[], help)
 
 YCMD:admins(playerid, params[], help)
 {
-	new tempstring[128], finstring[2048], count = 0;
+	new finstring[2048], count = 0;
 	format(finstring, sizeof(finstring), ""nef_yellow"Administrators:\n"white"");
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
@@ -13089,13 +13089,13 @@ YCMD:admins(playerid, params[], help)
 	    {
 	        if(IsPlayerOnDesktop(i))
 	        {
-				format(tempstring, sizeof(tempstring), "%s(%i) | %s | [AFK]\n", __GetName(i), i, GetRankByLevel(PlayerInfo[i][Level]));
+				format(gstr, sizeof(gstr), "%s(%i) | %s | [AFK]\n", __GetName(i), i, GetRankByLevel(PlayerInfo[i][Level]));
 			}
 			else
 			{
-			    format(tempstring, sizeof(tempstring), "%s(%i) | %s\n", __GetName(i), i, GetRankByLevel(PlayerInfo[i][Level]));
+			    format(gstr, sizeof(gstr), "%s(%i) | %s\n", __GetName(i), i, GetRankByLevel(PlayerInfo[i][Level]));
 			}
-			strcat(finstring, tempstring);
+			strcat(finstring, gstr);
 			count++;
 	    }
 	}
@@ -13108,13 +13108,13 @@ YCMD:admins(playerid, params[], help)
 	    {
 	        if(IsPlayerOnDesktop(i))
 	        {
-				format(tempstring, sizeof(tempstring), "%s(%i) | [AFK]\n", __GetName(i), i);
+				format(gstr, sizeof(gstr), "%s(%i) | [AFK]\n", __GetName(i), i);
 	        }
 			else
 			{
-			    format(tempstring, sizeof(tempstring), "%s(%i)\n", __GetName(i), i);
+			    format(gstr, sizeof(gstr), "%s(%i)\n", __GetName(i), i);
 			}
-	        strcat(finstring, tempstring);
+	        strcat(finstring, gstr);
 			count++;
 	    }
 	}
@@ -13124,8 +13124,8 @@ YCMD:admins(playerid, params[], help)
 	}
 	else
 	{
-	    format(tempstring, sizeof(tempstring), "\n"white"Total of "nef_yellow"%i "white"admins/VIPs online!", count);
-	    strcat(finstring, tempstring);
+	    format(gstr, sizeof(gstr), "\n"white"Total of "nef_yellow"%i "white"admins/VIPs online!", count);
+	    strcat(finstring, gstr);
 		ShowPlayerDialog(playerid, ADMINS_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" - Admins", finstring, "OK", "");
 	}
 	return 1;
@@ -13133,7 +13133,7 @@ YCMD:admins(playerid, params[], help)
 
 YCMD:vips(playerid, params[], help)
 {
-	new tempstring[128], finstring[1024], count = 0;
+	new finstring[1024], count = 0;
 	format(finstring, sizeof(finstring), ""yellow"ID:\t\tName:\n"white"");
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
@@ -13143,13 +13143,13 @@ YCMD:vips(playerid, params[], help)
 	    {
             if(IsPlayerOnDesktop(i))
             {
-				format(tempstring, sizeof(tempstring), "%i\t\t%s | [AFK]\n", i, __GetName(i));
+				format(gstr, sizeof(gstr), "%i\t\t%s | [AFK]\n", i, __GetName(i));
 			}
 			else
 			{
-			    format(tempstring, sizeof(tempstring), "%i\t\t%s\n", i, __GetName(i));
+			    format(gstr, sizeof(gstr), "%i\t\t%s\n", i, __GetName(i));
 			}
-			strcat(finstring, tempstring);
+			strcat(finstring, gstr);
 			count++;
 	    }
 	}
@@ -13159,8 +13159,8 @@ YCMD:vips(playerid, params[], help)
 	}
 	else
 	{
-	    format(tempstring, sizeof(tempstring), "\n\n"white"Total of "nef_yellow"%i "white"aVIPs online!", count);
-	    strcat(finstring, tempstring);
+	    format(gstr, sizeof(gstr), "\n\n"white"Total of "nef_yellow"%i "white"aVIPs online!", count);
+	    strcat(finstring, gstr);
 		ShowPlayerDialog(playerid, ADMINS_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" - VIPs", finstring, "OK", "");
 	}
 	return 1;
