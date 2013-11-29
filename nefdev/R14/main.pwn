@@ -631,7 +631,7 @@ enum e_player_data
 	bool:SavedPos,
 	bool:bHasSpawn,
 	bool:bFirstSpawn,
-	bool:bFooterEnabled,
+	bool:bTDEnabled,
 	bool:bRainbow,
 	bool:vTDShown,
 	bool:RampActive,
@@ -2996,7 +2996,7 @@ public OnPlayerSpawn(playerid)
 		SetPlayerHealth(playerid, 99999.0);
 	}
 	
-    if(!PlayerInfo[playerid][bFooterEnabled]) Command_ReProcess(playerid, "/hidef", false);
+    if(!PlayerInfo[playerid][bTDEnabled]) Command_ReProcess(playerid, "/hidef", false);
 	if(gTeam[playerid] == NORMAL) PlayerTextDrawShow(playerid, TXTWantedsTD[playerid]);
 	
     PlayerInfo[playerid][bIsDead] = false;
@@ -3111,7 +3111,7 @@ public OnPlayerConnect(playerid)
 	PlayerInfo[playerid][SuperJump] = false;
 	PlayerInfo[playerid][Frozen] = false;
 	PlayerInfo[playerid][SavedPos] = false;
-	PlayerInfo[playerid][bFooterEnabled] = true;
+	PlayerInfo[playerid][bTDEnabled] = true;
 	PlayerInfo[playerid][SniperAiming] = false;
 	PlayerInfo[playerid][HitmanHit] = 0;
 	PlayerInfo[playerid][Deaths] = 0;
@@ -8339,7 +8339,7 @@ YCMD:dm4(playerid, params[], help)
 
 YCMD:textdraws(playerid, params[], help)
 {
-	if(PlayerInfo[playerid][bFooterEnabled])
+	if(PlayerInfo[playerid][bTDEnabled])
 	{
 	    Command_ReProcess(playerid, "/hidef", false);
 	}
@@ -8349,7 +8349,7 @@ YCMD:textdraws(playerid, params[], help)
 
 YCMD:hidef(playerid, params[], help)
 {
-    PlayerInfo[playerid][bFooterEnabled] = false;
+    PlayerInfo[playerid][bTDEnabled] = false;
 	TextDrawHideForPlayer(playerid, TXTTeleportInfo);
     TextDrawHideForPlayer(playerid, TXTFooter);
     TextDrawHideForPlayer(playerid, TXTFooterBlack);
@@ -8362,7 +8362,7 @@ YCMD:hidef(playerid, params[], help)
 
 YCMD:showf(playerid, params[], help)
 {
-    PlayerInfo[playerid][bFooterEnabled] = true;
+    PlayerInfo[playerid][bTDEnabled] = true;
 	TextDrawShowForPlayer(playerid, TXTTeleportInfo);
 	TextDrawShowForPlayer(playerid, TXTFooter);
 	TextDrawShowForPlayer(playerid, TXTFooterBlack);
@@ -18661,7 +18661,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					}
 					case 2:
 					{
-					    if(PlayerInfo[playerid][bFooterEnabled]) Command_ReProcess(playerid, "/hidef", false);
+					    if(PlayerInfo[playerid][bTDEnabled]) Command_ReProcess(playerid, "/hidef", false);
 					    else Command_ReProcess(playerid, "/showf", false);
 					    ShowDialog(playerid, SETTINGS_DIALOG);
 					}
@@ -23062,6 +23062,7 @@ LoadServerStaticMeshes()
 	Command_AddAltNamed("hidef", "hidefooter");
 	Command_AddAltNamed("showf", "showfooter");
 	Command_AddAltNamed("textdraws", "textdraw");
+	Command_AddAltNamed("textdraws", "moviemode");
 	Command_AddAltNamed("s", "sp");
 	Command_AddAltNamed("s", "spos");
 	Command_AddAltNamed("l", "lpos");
@@ -27835,14 +27836,14 @@ GetPlayerSettings(playerid)
 	    strcat(string, tmpstring);
 	}
 	
-	if(PlayerInfo[playerid][bFooterEnabled])
+	if(PlayerInfo[playerid][bTDEnabled])
 	{
-	    format(tmpstring, sizeof(tmpstring), ""white"3)\tFooter\t\t"vgreen"[ON]\n");
+	    format(tmpstring, sizeof(tmpstring), ""white"3)\tTextdraws\t\t"vgreen"[ON]\n");
 	    strcat(string, tmpstring);
 	}
 	else
 	{
-	    format(tmpstring, sizeof(tmpstring), ""white"3)\tFooter\t\t"red"[OFF]\n");
+	    format(tmpstring, sizeof(tmpstring), ""white"3)\tTextdraws\t\t"red"[OFF]\n");
 	    strcat(string, tmpstring);
 	}
 
