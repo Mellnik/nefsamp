@@ -20,7 +20,6 @@
 // - Plugins
 // -
 // sscanf.so | 2.8.1
-// timerfix.so | v1.3
 // streamer.so | R84
 // mysql_static.so | R34
 // crashdetect.so | v4.12
@@ -37,7 +36,6 @@
 #include <YSI\y_commands>   // 21/09/2013
 #include <YSI\y_master>     // 21/09/2013
 #include <YSI\y_stringhash> // 21/09/2013
-#include <timerfix>         // v1.3
 #include <a_zones>          // 0.3x-R2
 #include <sscanf2>      	// 2.8.1
 #include <streamer>     	// 2.6.1 R84
