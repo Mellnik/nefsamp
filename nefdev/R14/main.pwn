@@ -6180,7 +6180,7 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 		    
 			if(GetPlayerState(playerid) == PLAYER_STATE_ONFOOT)
 			{
-				CarSpawner(playerid, 481);
+				CarSpawner(playerid, 481, -1, false);
 			}
 		}
 		case 37: //Skydive5 Prize
@@ -13414,7 +13414,7 @@ YCMD:v70(playerid, params[], help) // Cheetah
 YCMD:v71(playerid, params[], help)// Infernus
 {
 	if(PlayerInfo[playerid][VIP] == 0) return 1;
-
+	
     CarSpawner(playerid, 411);
 
     new vID = GetPlayerVehicleID(playerid);
@@ -13445,7 +13445,7 @@ YCMD:v71(playerid, params[], help)// Infernus
 YCMD:v72(playerid, params[], help) // Huntley
 {
 	if(PlayerInfo[playerid][VIP] == 0) return 1;
-
+	
     CarSpawner(playerid, 579);
 
     new vID = GetPlayerVehicleID(playerid);
@@ -13497,7 +13497,7 @@ YCMD:v72(playerid, params[], help) // Huntley
 YCMD:v73(playerid, params[], help) // Bullet
 {
 	if(PlayerInfo[playerid][VIP] == 0) return 1;
-
+	
     CarSpawner(playerid, 541);
 
     new vID = GetPlayerVehicleID(playerid);
@@ -13534,7 +13534,7 @@ YCMD:v73(playerid, params[], help) // Bullet
 YCMD:v74(playerid, params[], help) // NRG
 {
 	if(PlayerInfo[playerid][VIP] == 0) return 1;
-
+	
     CarSpawner(playerid, 522);
 
     new vID = GetPlayerVehicleID(playerid);
@@ -15165,6 +15165,13 @@ YCMD:vmenu(playerid, params[], help)
     if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
     if(gTeam[playerid] != NORMAL) return SCM(playerid, RED, NOT_AVAIL);
     if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't spawn a car now");
+	for(new ii = 0; ii < sizeof(g_SpawnAreas); ii++)
+	{
+	    if(IsPlayerInDynamicArea(playerid, g_SpawnAreas[ii]))
+	    {
+	        return GameTextForPlayer(playerid, "~w~No vehicles at spawn point!", 4000, 4);
+	    }
+	}
     
    	ShowDialog(playerid, VMENU_DIALOG);
 	return 1;
@@ -17095,7 +17102,7 @@ YCMD:v(playerid, params[], help)
     if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't spawn a car now");
 	if(IsPlayerInRangeOfPoint(playerid, 70.0, 1786.5049, -1298.0465, 120.2656) && PlayerInfo[playerid][Level] < 2) return SCM(playerid, -1, ""er"Can´t spawn vehicle at this place!");
 	if(IsPlayerInRangeOfPoint(playerid, 50.0, -377.2038, 2131.4634, 133.1797) && PlayerInfo[playerid][Level] < 2) return SCM(playerid, -1, ""er"Can´t spawn vehicle at this place!");
-	if(strlen(params) > 29) return SCM(playerid, NEF_GREEN, "I don´t know that vehicle...");
+	if(strlen(params) > 29) return SCM(playerid, NEF_YELLOW, "I don´t know that vehicle...");
 
 	if(gTeam[playerid] == NORMAL)
 	{
@@ -21358,7 +21365,7 @@ GetPlayingTimeFormat(playerid)
 	return ptime;
 }
 
-CarSpawner(playerid, model, respawn_delay = -1)
+CarSpawner(playerid, model, respawn_delay = -1, bool:spawnzone_check = true)
 {
 	if(model == 432 || model == 425 || model == 447 || model == 571 || model == 568 || model == 539 || model == 545 || model == 464)
 	{
@@ -21373,6 +21380,17 @@ CarSpawner(playerid, model, respawn_delay = -1)
 	if(model == 538 || model == 537 || model == 449)
 	{
 		return SCM(playerid, -1, ""er"Cannot spawn these vehicles");
+	}
+	
+	if(spawnzone_check)
+	{
+		for(new ii = 0; ii < sizeof(g_SpawnAreas); ii++)
+		{
+		    if(IsPlayerInDynamicArea(playerid, g_SpawnAreas[ii]))
+		    {
+		        return GameTextForPlayer(playerid, "~w~No vehicles at spawn point!", 4000, 4);
+		    }
+		}
 	}
 	
 	DestroyPlayerVehicles(playerid);
