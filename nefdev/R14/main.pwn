@@ -11769,7 +11769,7 @@ YCMD:gzones(playerid, params[], help)
 	{
 	    if(PlayerInfo[playerid][GangID] == GZoneInfo[i][localGang])
 	    {
-	        format(gstr, sizeof(gstr), "%i - %s\n", ++count, GZoneInfo[i][sZoneName]);
+	        format(gstr, sizeof(gstr), "\n%i - %s", ++count, GZoneInfo[i][sZoneName]);
 	        strcat(str, gstr);
 	    }
 	}
@@ -27869,12 +27869,12 @@ GetPlayerSettings(playerid)
 	
 	if(PlayerInfo[playerid][bTDEnabled])
 	{
-	    format(tmpstring, sizeof(tmpstring), ""white"3)\tTextdraws\t\t"vgreen"[ON]\n");
+	    format(tmpstring, sizeof(tmpstring), ""white"3)\tTextdraws\t"vgreen"[ON]\n");
 	    strcat(string, tmpstring);
 	}
 	else
 	{
-	    format(tmpstring, sizeof(tmpstring), ""white"3)\tTextdraws\t\t"red"[OFF]\n");
+	    format(tmpstring, sizeof(tmpstring), ""white"3)\tTextdraws\t"red"[OFF]\n");
 	    strcat(string, tmpstring);
 	}
 
