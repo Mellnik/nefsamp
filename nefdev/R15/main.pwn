@@ -129,7 +129,7 @@ native IsValidVehicle(vehicleid); // undefined
 #define Error(%1,%2) 					SendClientMessage(%1, -1, "{F42626}[INFO] "GREY2_E""%2)
 #define dl                              "{FFE600}• {F0F0F0}"
 #define notlogged(%1)                   ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef"", ""white"You need to be logged in to use this feature.\n\n"nef_yellow"Type /register to create an account for you current name.", "OK", "")
-#define MAX_ADMIN_LEVEL         		(6)
+#define MAX_ADMIN_LEVEL         		(5)
 #define MAX_WARNINGS 					(3)
 #define ELEVATOR_SPEED      			(5.0)
 #define DOORS_SPEED         			(4.0)
@@ -605,6 +605,14 @@ enum e_gang_pos
 // -
 // - player enum
 // -
+enum E_staff_levels
+{
+	e_level,
+	e_rank[32],
+	e_department[32],
+	e_color[10]
+};
+
 enum (<<= 1)
 {
 	BOOST_MONEY_x2,
@@ -1428,6 +1436,16 @@ new const GangPositions[7][e_gang_pos] =
 	{"Advisor"},
 	{"Leader"},
 	{"Founder"}
+};
+
+new const StaffLevels[MAX_ADMIN_LEVEL + 1][E_staff_levels] =
+{
+	{0, "Player", "Players", "{FFFFFF}"},
+	{1, "Junior Administrator", "Junior Administration", "{1607a1}"},
+	{2, "General Administrator", "General Administration", "{0e5c0b}"},
+	{3, "Senior Administrator", "Senior Administration", "{DB5F70}"},
+	{4, "Head Administrator", "Head Administration", "{ae2a2a}"},
+    {5, "Executive Administrator", "Executive Administration", "{0069ff}"}
 };
 
 new const PVCategorys[11][] =
@@ -3654,7 +3672,7 @@ public OnPlayerCommandPerformed(playerid, cmdtext[], success)
 	{
 	    return GameTextForPlayer(playerid, "~b~~h~stop command spam!", 2000, 3);
 	}
-	else if(PlayerInfo[playerid][iCoolDownCommand] >= 12 && PlayerInfo[playerid][Level] < 5)
+	else if(PlayerInfo[playerid][iCoolDownCommand] >= 12 && PlayerInfo[playerid][Level] < 2)
 	{
 		format(gstr, sizeof(gstr), "Command-Spam detected! %s(%i) has been kicked!", __GetName(playerid), playerid);
 		AdminMSG(RED, gstr);
@@ -4533,7 +4551,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
                 
 				if(PlayerInfo[extraid][Level] > 0)
 				{
-					format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"Successfully logged in. (Adminlevel %i)", PlayerInfo[extraid][Level]);
+					format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"Successfully logged in. (Level: %s)", PlayerInfo[extraid][Level], StaffLevels[PlayerInfo[extraid][Level]][e_rank]);
 					SCM(extraid, -1, gstr2);
 					format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"You were last online at %s and registered on %s", UnixTimeToDate(PlayerInfo[extraid][LastLogin]), UnixTimeToDate(PlayerInfo[extraid][RegDate]));
   					SCM(extraid, -1, gstr2);
@@ -4902,7 +4920,7 @@ public OnPlayerText(playerid, text[])
 	    GameTextForPlayer(playerid, "~b~~h~Do not spam!", 2000, 3);
 	    return 0;
 	}
-	else if(PlayerInfo[playerid][iCoolDownText] >= 15 && PlayerInfo[playerid][Level] < 5)
+	else if(PlayerInfo[playerid][iCoolDownText] >= 15 && PlayerInfo[playerid][Level] < 2)
 	{
 	    new string[100];
 		format(string, sizeof(string), "Chat-Spam detected! %s(%i) has been kicked!", __GetName(playerid), playerid);
@@ -9575,15 +9593,23 @@ YCMD:adminhelp(playerid, params[], help)
 {
 	if(PlayerInfo[playerid][Level] >= 1)
 	{
-	    new string[1024];
+	    new string[1500];
 
+		format(gstr, sizeof(gstr), "%s%s\n", StaffLevels[1][e_color], StaffLevels[1][e_rank]);
+		strcat(string, gstr);
+		strcat(string, "/rplayers /dplayers /asay /warn /slap /reports /spec /specoff /disarm\n/pweaps /getin /gotoxyza /spectators /caps /day /night /dawn\n/kick /mute /unmute /adminhq /ncrecords\n\n");
+
+		format(gstr, sizeof(gstr), "%s%s\n", StaffLevels[2][e_color], StaffLevels[2][e_rank]);
+		strcat(string, gstr);
+		strcat(string, "/tban /online /offline /onduty /offduty /akill /rv\n/move /ban /ipban /cuff /uncuff /jail /unjail /unfreeze\n\n");
+/*
 	    strcat(string, ""yellow_e"Level 1:\n"white"/rplayers /dplayers /asay /warn /slap /reports /spec /specoff /disarm\n/pweaps /getin /gotoxyza /spectators /caps /day /night /dawn\n");
 	    strcat(string, "/kick /mute /unmute /adminhq /ncrecords\n\n");
 	    strcat(string, ""yellow_e"Level 2:\n"white"/tban /online /offline /onduty /offduty /akill /rv\n/move /ban /ipban /cuff /uncuff /jail /unjail /unfreeze\n\n");
 	    strcat(string, ""yellow_e"Level 3:\n"white"/freeze /eject /go /burn /mkick /clearchat\n/giveweapon /announce /connectbots /raceforcemap /deleterecord\n\n");
 	    strcat(string, ""yellow_e"Level 4:\n"white"/unban /oban /sethealth /get /getip /healall /armorall /cashfall /scorefall\n/announce2 /iplookup\n\n");
 	    strcat(string, ""yellow_e"Level 5:\n"white"/setcash /setbcash /setscore /gdestroy /addcash /addscore\n\n");
-	    strcat(string, ""yellow_e"Level 6:\n"white"/resethouse /resetbizz /sethouseprice /sethousescore\n/setbizzlevel /createhouse /createbizz /createstore /gzonecreate");
+	    strcat(string, ""yellow_e"Level 6:\n"white"/resethouse /resetbizz /sethouseprice /sethousescore\n/setbizzlevel /createhouse /createbizz /createstore /gzonecreate");*/
 
         ShowPlayerDialog(playerid, ADMIN_CMD_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" - Admin Commands", string, "OK", "");
 	}
