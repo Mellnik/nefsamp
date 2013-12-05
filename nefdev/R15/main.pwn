@@ -9595,21 +9595,25 @@ YCMD:adminhelp(playerid, params[], help)
 	{
 	    new string[1500];
 
-		format(gstr, sizeof(gstr), "%s%s\n", StaffLevels[1][e_color], StaffLevels[1][e_rank]);
+		format(gstr, sizeof(gstr), ""white"%s\n", StaffLevels[1][e_rank]);
 		strcat(string, gstr);
 		strcat(string, "/rplayers /dplayers /asay /warn /slap /reports /spec /specoff /disarm\n/pweaps /getin /gotoxyza /spectators /caps /day /night /dawn\n/kick /mute /unmute /adminhq /ncrecords\n\n");
 
-		format(gstr, sizeof(gstr), "%s%s\n", StaffLevels[2][e_color], StaffLevels[2][e_rank]);
+		format(gstr, sizeof(gstr), "%s\n", StaffLevels[2][e_rank]);
 		strcat(string, gstr);
 		strcat(string, "/tban /online /offline /onduty /offduty /akill /rv\n/move /ban /ipban /cuff /uncuff /jail /unjail /unfreeze\n\n");
-/*
-	    strcat(string, ""yellow_e"Level 1:\n"white"/rplayers /dplayers /asay /warn /slap /reports /spec /specoff /disarm\n/pweaps /getin /gotoxyza /spectators /caps /day /night /dawn\n");
-	    strcat(string, "/kick /mute /unmute /adminhq /ncrecords\n\n");
-	    strcat(string, ""yellow_e"Level 2:\n"white"/tban /online /offline /onduty /offduty /akill /rv\n/move /ban /ipban /cuff /uncuff /jail /unjail /unfreeze\n\n");
-	    strcat(string, ""yellow_e"Level 3:\n"white"/freeze /eject /go /burn /mkick /clearchat\n/giveweapon /announce /connectbots /raceforcemap /deleterecord\n\n");
-	    strcat(string, ""yellow_e"Level 4:\n"white"/unban /oban /sethealth /get /getip /healall /armorall /cashfall /scorefall\n/announce2 /iplookup\n\n");
-	    strcat(string, ""yellow_e"Level 5:\n"white"/setcash /setbcash /setscore /gdestroy /addcash /addscore\n\n");
-	    strcat(string, ""yellow_e"Level 6:\n"white"/resethouse /resetbizz /sethouseprice /sethousescore\n/setbizzlevel /createhouse /createbizz /createstore /gzonecreate");*/
+		
+		format(gstr, sizeof(gstr), "%s\n", StaffLevels[3][e_rank]);
+		strcat(string, gstr);
+		strcat(string, "/freeze /eject /go /burn /mkick /clearchat\n/giveweapon /announce /connectbots /raceforcemap /deleterecord\n\n");
+		
+		format(gstr, sizeof(gstr), "%s\n", StaffLevels[4][e_rank]);
+		strcat(string, gstr);
+		strcat(string, "/unban /oban /sethealth /get /getip /healall /armorall /cashfall /scorefall\n/announce2 /iplookup\n\n");
+		
+		format(gstr, sizeof(gstr), "%s\n", StaffLevels[5][e_rank]);
+		strcat(string, gstr);
+		strcat(string, "/setcash /setbcash /setscore /gdestroy /addcash /addscore\n/resethouse /resetbizz /sethouseprice /sethousescore\n/setbizzlevel /createhouse /createbizz /createstore /gzonecreate");
 
         ShowPlayerDialog(playerid, ADMIN_CMD_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" - Admin Commands", string, "OK", "");
 	}
@@ -13127,11 +13131,11 @@ YCMD:admins(playerid, params[], help)
 	    {
 	        if(IsPlayerOnDesktop(i))
 	        {
-				format(gstr, sizeof(gstr), "%s(%i) | %s | [AFK]\n", __GetName(i), i, GetRankByLevel(PlayerInfo[i][Level]));
+				format(gstr, sizeof(gstr), "%s(%i) | %s | [AFK]\n", __GetName(i), i, StaffLevels[PlayerInfo[i][Level]][e_rank]);
 			}
 			else
 			{
-			    format(gstr, sizeof(gstr), "%s(%i) | %s\n", __GetName(i), i, GetRankByLevel(PlayerInfo[i][Level]));
+			    format(gstr, sizeof(gstr), "%s(%i) | %s\n", __GetName(i), i, StaffLevels[PlayerInfo[i][Level]][e_rank]);
 			}
 			strcat(finstring, gstr);
 			count++;
@@ -29477,23 +29481,6 @@ function:HideScoreTD(playerid, namehash)
 	{
     	PlayerTextDrawHide(playerid, TXTScore[playerid]);
 	}
-}
-
-GetRankByLevel(alevel)
-{
-	new rank[20];
-	
-	switch(alevel)
-	{
-	    case 1: rank = "Trial Admin";
-	    case 2: rank = "Admin";
-	    case 3: rank = "Senior Admin";
-	    case 4: rank = "Moderator";
-	 	case 5: rank = "Head Admin";
-	 	case 6: rank = "Founder";
-	 	default: rank = "Player";
-	}
-	return rank;
 }
 
 function:OnIpLookUp(playerid, ip[])
