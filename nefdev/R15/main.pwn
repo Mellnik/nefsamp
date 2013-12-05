@@ -17289,7 +17289,10 @@ function:OnPlayerNameChangeRequest(newname[], playerid)
             format(query, sizeof(query), "UPDATE `online` SET `name` = '%s' WHERE `name` = '%s';", newname, oldname);
             mysql_tquery(g_SQL_handle, query, "", "");
             
-            format(query, sizeof(query), "UPDATE `creditsorder` SET `Player` = '%s' WHERE `Player` = '%s';", newname, oldname);
+            format(query, sizeof(query), "UPDATE `creditsorder` SET `receiver` = '%s' WHERE `receiver` = '%s';", newname, oldname);
+            mysql_tquery(g_SQL_handle, query, "", "");
+
+            format(query, sizeof(query), "UPDATE `viporder` SET `receiver` = '%s' WHERE `receiver` = '%s';", newname, oldname);
             mysql_tquery(g_SQL_handle, query, "", "");
 
 			PlayerInfo[playerid][LastNameChange] = gettime();
