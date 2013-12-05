@@ -1775,11 +1775,14 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
 	Text:CheckTD,
 	Text:NewMsgTD,
 	Text:ErrorTD,
-	Text:TXTFooterBlack,
     Text:AchTD[6],
 	Text:TXTWelcome[5],
 	Text:JailTD,
 	Text:TXTFooter,
+	#if WINTER_EDITION == true
+	Text:TXTWinterEdition,
+	#endif
+	Text:TXTFooterBlack,
 	Text:TXTOnJoin[2],
 	Text:TXTVersionInfo,
 	Text:TXTRandomInfo,
@@ -2553,6 +2556,9 @@ public OnPlayerRequestClass(playerid, classid)
 	TextDrawShowForPlayer(playerid, TXTRandomInfo);
 	TextDrawShowForPlayer(playerid, TXTVersionInfo);
 	TextDrawShowForPlayer(playerid, TXTFooter);
+	#if WINTER_EDITION == true
+	TextDrawShowForPlayer(playerid, TXTWinterEdition);
+	#endif
 
 	PlayerInfo[playerid][bFirstSpawn] = true;
 
@@ -4552,7 +4558,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
                 
 				if(PlayerInfo[extraid][Level] > 0)
 				{
-					format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"Successfully logged in. (Level: %s)", PlayerInfo[extraid][Level], StaffLevels[PlayerInfo[extraid][Level]][e_rank]);
+					format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"Successfully logged in. (Level: %s)", StaffLevels[PlayerInfo[extraid][Level]][e_rank]);
 					SCM(extraid, -1, gstr2);
 					format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"You were last online at %s and registered on %s", UnixTimeToDate(PlayerInfo[extraid][LastLogin]), UnixTimeToDate(PlayerInfo[extraid][RegDate]));
   					SCM(extraid, -1, gstr2);
@@ -8380,6 +8386,9 @@ YCMD:hidef(playerid, params[], help)
     TextDrawHideForPlayer(playerid, TXTVersionInfo);
     TextDrawHideForPlayer(playerid, TXTGodTD);
     PlayerTextDrawHide(playerid, TXTWantedsTD[playerid]);
+	#if WINTER_EDITION == true
+	TextDrawHideForPlayer(playerid, TXTWinterEdition);
+	#endif
 	return 1;
 }
 
@@ -8393,6 +8402,9 @@ YCMD:showf(playerid, params[], help)
     TextDrawShowForPlayer(playerid, TXTVersionInfo);
 	PlayerTextDrawShow(playerid, TXTWantedsTD[playerid]);
 	if(PlayerInfo[playerid][bGod]) TextDrawShowForPlayer(playerid, TXTGodTD);
+	#if WINTER_EDITION == true
+	TextDrawShowForPlayer(playerid, TXTWinterEdition);
+	#endif
 	return 1;
 }
 
@@ -22589,6 +22601,17 @@ CreateTextdraws()
 {
     new count = GetTickCount() + 3600000;
 	
+	#if WINTER_EDITION == true
+	TXTWinterEdition = TextDrawCreate(545.000000, 405.000000, "Winter Edition");
+	TextDrawBackgroundColor(TXTWinterEdition, 255);
+	TextDrawFont(TXTWinterEdition, 0);
+	TextDrawLetterSize(TXTWinterEdition, 0.490000, 1.000000);
+	TextDrawColor(TXTWinterEdition, 12189695);
+	TextDrawSetOutline(TXTWinterEdition, 1);
+	TextDrawSetProportional(TXTWinterEdition, 1);
+	TextDrawSetSelectable(TXTWinterEdition, 0);
+	#endif
+	
 	TXTSpeedo_Main = TextDrawCreate(126.500000, 333.666687, "KM/H");
 	TextDrawLetterSize(TXTSpeedo_Main, 0.209998, 0.905833);
 	TextDrawAlignment(TXTSpeedo_Main, 1);
@@ -22646,14 +22669,15 @@ CreateTextdraws()
 	TextDrawColor(JailTD, -1);
 	TextDrawFont(JailTD, 4);
 
-	TXTFooter = TextDrawCreate(322.000000, 437.000000, "~y~~h~/derby ~b~~h~0 ~y~~h~/cnr ~b~~h~0 ~y~~h~/race ~b~~h~0 ~y~~h~/fallout ~b~~h~0 ~y~~h~/gungame ~b~~h~0 ~y~~h~/tdm ~b~~h~0 ~y~~h~/war ~b~~h~0 ~y~~h~/minigun ~b~~h~0 ~y~~h~/sniper ~b~~h~0");
+	TXTFooter = TextDrawCreate(303.000000, 437.000000, "~w~/derby 0 /cnr 0 /race 0 /fallout 0 /gungame 0 /tdm 0 /war 0 /minigun 0 /sniper 0 /jpdm 0 /rocketdm 0");
 	TextDrawAlignment(TXTFooter, 2);
-	TextDrawBackgroundColor(TXTFooter, 168430202);
-	TextDrawFont(TXTFooter, 2);
-	TextDrawLetterSize(TXTFooter, 0.219999, 1.000000);
+	TextDrawBackgroundColor(TXTFooter, 255);
+	TextDrawFont(TXTFooter, 1);
+	TextDrawLetterSize(TXTFooter, 0.240000, 0.899999);
 	TextDrawColor(TXTFooter, -1);
-	TextDrawSetOutline(TXTFooter, 1);
+	TextDrawSetOutline(TXTFooter, 0);
 	TextDrawSetProportional(TXTFooter, 1);
+	TextDrawSetShadow(TXTFooter, 1);
 	TextDrawSetSelectable(TXTFooter, 0);
 
 	TXTFooterBlack = TextDrawCreate(300.000000, 436.000000, "     ");
@@ -26320,7 +26344,7 @@ function:ProcessTick()
 	    }
 	}
                              
-	format(gstr2, sizeof(gstr2), "~y~~h~/derby ~b~~h~%i ~y~~h~/cnr ~b~~h~%i ~y~~h~/race ~b~~h~%i ~y~~h~/fallout ~b~~h~%i ~y~~h~/gungame ~b~~h~%i ~y~~h~/tdm ~b~~h~%i ~y~~h~/war ~b~~h~%i ~y~~h~/minigun ~b~~h~%i ~y~~h~/sniper ~b~~h~%i",
+	format(gstr2, sizeof(gstr2), "~w~/derby %i /cnr %i /race %i /fallout %i /gungame %i /tdm %i /war %i /minigun %i /sniper %i /jpdm %i /rocketdm %i",
         T_DerbyPlayers,
         T_CNRPlayers,
 		T_RacePlayers,
