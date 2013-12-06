@@ -23,7 +23,6 @@
 // sscanf.so | 2.8.1
 // streamer.so | R84
 // mysql_static.so | R34
-// crashdetect.so | v4.12
 // irc.so | 1.4.3
 // dns.so | 2.4
 
@@ -43,7 +42,6 @@
 #include <floodcontrol>     // 28/06/2012
 #include <mSelection>       // 1.1 R3
 #include <a_mysql_R34>  	// R34
-#include <crashdetect>      // v4.12
 #include <dini>         	// 1.6
 #include <irc>          	// 1.4.3
 #include <md-sort>      	// 16/07/2013
@@ -9626,7 +9624,7 @@ YCMD:adminhelp(playerid, params[], help)
 		
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[5][e_rank]);
 		strcat(string, gstr);
-		strcat(string, "/onlinefix /setcash /setbcash /setscore /gdestroy /addcash /addscore\n/resethouse /resetbizz /sethouseprice /sethousescore\n/setbizzlevel /createhouse /createbizz /createstore /gzonecreate");
+		strcat(string, "/grantnc /onlinefix /setcash /setbcash /setscore /gdestroy /addcash /addscore\n/resethouse /resetbizz /sethouseprice /sethousescore\n/setbizzlevel /createhouse /createbizz /createstore /gzonecreate");
 
         ShowPlayerDialog(playerid, ADMIN_CMD_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" - Admin Commands", string, "OK", "");
 	}
@@ -9960,6 +9958,54 @@ YCMD:setbcash(playerid, params[], help)
 			print(gstr);
 			
 			PlayerInfo[player][Bank] = amount;
+		}
+		else
+		{
+			SCM(playerid, -1, ""er"Player is not connected or unavailable");
+		}
+	}
+	else
+	{
+		SCM(playerid, -1, NO_PERM);
+	}
+	return 1;
+}
+
+YCMD:grantnc(playerid, params[], help)
+{
+	if(PlayerInfo[playerid][Level] >= 5)
+	{
+	    new player;
+	    if(sscanf(params, "r", player))
+	    {
+	        return SCM(playerid, NEF_GREEN, "Usage: /grantnc <playerid>");
+	    }
+
+	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
+		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
+
+        if(!islogged(player)) return SCM(playerid, -1, ""er"This player is not registered!");
+
+		if(IsPlayerAvail(player))
+		{
+		
+		    PlayerInfo[player][LastNameChange] = gettime() - 7786000;
+
+			if(player != playerid)
+			{
+				format(gstr, sizeof(gstr), "Admin %s(%i) has reset your NC cooldown.", __GetName(playerid), playerid);
+				SCM(player, YELLOW, gstr);
+				format(gstr, sizeof(gstr), "You have reset %s's NC cooldown.", __GetName(player));
+				SCM(playerid, YELLOW, gstr);
+			}
+			else
+			{
+				SCM(playerid, YELLOW, "You have reset your NC cooldown.");
+			}
+
+			format(gstr, sizeof(gstr), ""red"Adm: %s's(%i) has reset %s's NC cooldown", __GetName(playerid), playerid, __GetName(player));
+			AdminMSG(-1, gstr);
+			print(gstr);
 		}
 		else
 		{
