@@ -1,4 +1,4 @@
-gservers
+samp-server-nef
 ============
 
 SA-MP Studio Mellnik
