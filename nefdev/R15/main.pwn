@@ -1175,7 +1175,7 @@ enum e_firework
 // global
 // ===
 
-new const szRandomInfoTXTs[14][] =
+new const szRandomInfoTXTs[13][] =
 {
 	"Don't wanna get killed? Type ~g~~h~~h~/god",
 	"Flip your car with key ~g~~h~~h~'2'",
@@ -1186,7 +1186,6 @@ new const szRandomInfoTXTs[14][] =
 	"If you see a hacker in game use /report <id> <reason>",
 	"Type ~y~/cnr ~w~to join Cops and Robbers game",
 	"Use ~y~/m ~w~and select a minigame to play in!",
-	"~y~/tune ~w~your vehicle randomly",
 	"Join minigames to earn money and score! ~g~~h~~h~/m",
 	"Want money and score fast? Read ~g~~h~~h~/help",
 	"Go to ~g~~h~~h~/vs ~w~and get a private vehicle which you can tune!",
@@ -6298,16 +6297,18 @@ public OnPlayerEnterRaceCheckpoint(playerid)
 			new TimeStamp,
 			    TotalRaceTime,
 				rTime[3],
-				Prize[2];
+				Prize[2],
+				points = 0;
 
 			TimeStamp = GetTickCount() + 3600000;
 			TotalRaceTime = TimeStamp - g_RaceTick;
 			ConvertTime(var, TotalRaceTime, rTime[0], rTime[1], rTime[2]);
-			
+
 			switch(++g_rPosition)
 			{
 		        case 1:
 		        {
+		            points = 3;
 					Prize[0] = random(10000);
 					Prize[1] = 10;
 					PlayerInfo[playerid][RaceWins]++;
@@ -6320,11 +6321,13 @@ public OnPlayerEnterRaceCheckpoint(playerid)
 		        }
 			    case 2:
 				{
+				    points = 2;
 					Prize[0] = random(9000);
 					Prize[1] = 9;
 				}
 				case 3:
 				{
+				    points = 1;
 					Prize[0] = random(8000);
 					Prize[1] = 8;
 				}
@@ -6364,6 +6367,9 @@ public OnPlayerEnterRaceCheckpoint(playerid)
 					Prize[1] = 1;
 				}
 			}
+			
+			format(gstr, sizeof(gstr), "UPDATE `accounts` SET `RacePoints` = `RacePoints` + %i WHERE `Name` = '%s' LIMIT 1;", points, __GetName(playerid));
+			mysql_tquery(g_SQL_handle, gstr, "", "");
 			
 			format(gstr, sizeof(gstr), "» %s(%i) has finished the race %i. in %02i:%02i.%03i", __GetName(playerid), playerid, g_rPosition, rTime[0], rTime[1], rTime[2]);
 			SCMToAll(YELLOW, gstr);
@@ -7427,7 +7433,7 @@ YCMD:mh(playerid, params[], help)
 {
 	if(PortPlayerMapVeh(playerid,-182.9842,-2245.7412,31.1492,125.6378,-182.9842,-2245.7412,31.1492,125.6378, "Mellnik´s House", "mh"))
 	{
-	    PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=656213", -182.9842,-2245.7412,31.1492, 100.0, 1);
+	    PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=83836", -182.9842,-2245.7412,31.1492, 100.0, 1);
 	}
 	return 1;
 }
@@ -7435,7 +7441,7 @@ YCMD:ah(playerid, params[], help)
 {
 	if(PortPlayerMap(playerid, 3133.7415, -1107.2448, 2.1289, 352.5349, "Adam's House", "ah"))
 	{
-	    PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=656213", 3133.7415, -1107.2448, 2.1289, 100.0, 1);
+	    PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=83836", 3133.7415, -1107.2448, 2.1289, 100.0, 1);
 	}
 	return 1;
 }
@@ -7530,7 +7536,7 @@ YCMD:party(playerid, params[], help)
 {
     if(PortPlayerMap(playerid, -377.2038,2131.4634,133.1797,227.9924, "Party", "party"))
 	{
-	    PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=656213", -377.2038, 2131.4634, 133.1797, 50.0, 1);
+	    PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=83836", -377.2038, 2131.4634, 133.1797, 50.0, 1);
 	}
     return 1;
 }
@@ -9649,7 +9655,7 @@ YCMD:adminhelp(playerid, params[], help)
 	{
 	    new string[1500];
 
-		format(gstr, sizeof(gstr), ""white"%s\n", StaffLevels[1][e_rank]);
+		format(gstr, sizeof(gstr), "%s\n", StaffLevels[1][e_rank]);
 		strcat(string, gstr);
 		strcat(string, "/rplayers /dplayers /asay /warn /slap /reports /spec /specoff /disarm\n/pweaps /getin /gotoxyza /spectators /caps /day /night /dawn\n/kick /mute /unmute /adminhq /ncrecords\n\n");
 
@@ -9667,7 +9673,7 @@ YCMD:adminhelp(playerid, params[], help)
 		
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[5][e_rank]);
 		strcat(string, gstr);
-		strcat(string, "/grantnc /onlinefix /setcash /setbcash /setscore /gdestroy /addcash /addscore\n/resethouse /resetbizz /sethouseprice /sethousescore\n/setbizzlevel /createhouse /createbizz /createstore /gzonecreate");
+		strcat(string, "/grantnc /onlinefix /setcash /setbcash /setscore /gdestroy /addcash /addscore\n/resetrc /resethouse /resetbizz /sethouseprice /sethousescore\n/setbizzlevel /createhouse /createbizz /createstore /gzonecreate");
 
         ShowPlayerDialog(playerid, ADMIN_CMD_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" - Admin Commands", string, "OK", "");
 	}
@@ -12652,6 +12658,33 @@ YCMD:ban(playerid, params[], help)
 	return 1;
 }
 
+YCMD:resetrc(playerid, params[], help)
+{
+	if(PlayerInfo[playerid][Level] == MAX_ADMIN_LEVEL)
+	{
+	    new map;
+		if(sscanf(params, "i", map))
+		{
+		    return SCM(playerid, NEF_GREEN, "Usage: /resetrc <map>");
+		}
+
+		format(gstr, sizeof(gstr), "/Race/%03i.race", map);
+		if(!fexist(gstr))
+		{
+		    return SCM(playerid, -1, ""er"Map does not exist");
+		}
+
+		format(gstr, sizeof(gstr), "DELETE FROM `race_records` WHERE `track` = %i;", map);
+		mysql_tquery(g_SQL_handle, gstr, "", "");
+		SCM(playerid, -1, ""er"Race records of the specific race have been deleted!");
+	}
+	else
+	{
+		SCM(playerid, -1, NO_PERM);
+	}
+	return 1;
+}
+
 YCMD:deleterecord(playerid, params[], help)
 {
 	if(PlayerInfo[playerid][Level] >= 3)
@@ -13763,7 +13796,7 @@ YCMD:adminhq(playerid, params[], help)
 		format(gstr, sizeof(gstr), ""nef" Admin %s(%i) teleported to Admin´s Headquarter! (/adminhq)", __GetName(playerid), playerid);
 		SCMToAll(-1, gstr);
 	 	ResetPlayerWorld(playerid);
-	 	PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=656213", 1797.3141, -1302.0978, 120.2659, 50.0, 1);
+	 	PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=83836", 1797.3141, -1302.0978, 120.2659, 50.0, 1);
 	}
 	else if(PlayerInfo[playerid][VIP] == 1)
 	{
@@ -13771,7 +13804,7 @@ YCMD:adminhq(playerid, params[], help)
 		format(gstr, sizeof(gstr), ""nef" VIP %s(%i) teleported to Admin´s Headquarter! (/adminhq)", __GetName(playerid), playerid);
 		SCMToAll(-1, gstr);
 	 	ResetPlayerWorld(playerid);
-	 	PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=656213", 1797.3141, -1302.0978, 120.2659, 50.0, 1);
+	 	PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=83836", 1797.3141, -1302.0978, 120.2659, 50.0, 1);
 	}
 	else
 	{
@@ -13779,7 +13812,7 @@ YCMD:adminhq(playerid, params[], help)
 		format(gstr, sizeof(gstr), ""nef" Player %s(%i) teleported to Admin´s Headquarter! (/adminhq)", __GetName(playerid), playerid);
 		SCMToAll(-1, gstr);
 	    ResetPlayerWorld(playerid);
-		PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=656213", 1797.3141, -1302.0978, 120.2659, 50.0, 1);
+		PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=83836", 1797.3141, -1302.0978, 120.2659, 50.0, 1);
 	}
 	return 1;
 }
@@ -18954,7 +18987,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						strcat(cstring, ""yellow"/sb "white"- toggle speedboost\n");
 						strcat(cstring, ""yellow"/sj "white"- toggle superjump\n");
 		                strcat(cstring, ""yellow"/fs "white"- fightstyles\n");
-		                strcat(cstring, ""yellow"/tune "white"- randomly tune your car\n");
 		            }
 		            case 1: // Account
 		            {
