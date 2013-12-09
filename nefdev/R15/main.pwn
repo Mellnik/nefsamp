@@ -12753,8 +12753,8 @@ YCMD:main(playerid, params[], help)
 		{
 			SCMToAll(GREEN, " ");
 		}
-		SCMToAll(RED, "The server is going down in 1 minute. Please logout before that time.");
-	    ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" - Notice", ""white"_______________________________________________________________________\n\nThe Server is going down in 1 minute. Please logout before that time.\n_______________________________________________________________________", "OK", "");
+		SCMToAll(RED, "The server is going under maintenance in 1 minute. Please logout before that time.");
+	    ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" - Notice", ""white"_______________________________________________________________________\n\nThe server is going under maintenance in 1 minute. Please logout before that time.\n_______________________________________________________________________", "OK", "");
  	}
 	return 1;
 }
