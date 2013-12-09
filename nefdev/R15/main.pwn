@@ -579,6 +579,7 @@ enum
 	MINIGUN,
 	SNIPER,
 	ROCKETDM,
+	JETPACKDM,
 	BG,
 	DM,
 	WAR,
@@ -22744,7 +22745,7 @@ CreateTextdraws()
 	TextDrawColor(JailTD, -1);
 	TextDrawFont(JailTD, 4);
 
-	TXTFooter = TextDrawCreate(303.000000, 437.000000, "~w~/derby 0 /cnr 0 /race 0 /fallout 0 /gungame 0 /tdm 0 /war 0 /minigun 0 /sniper 0 /jpdm 0 /rocketdm 0");
+	TXTFooter = TextDrawCreate(303.000000, 437.000000, "~w~/derby 0 /cnr 0 /race 0 /fallout 0 /gungame 0 /tdm 0 /war 0 /minigun 0 /sniper 0 /rocketdm 0");
 	TextDrawAlignment(TXTFooter, 2);
 	TextDrawBackgroundColor(TXTFooter, 255);
 	TextDrawFont(TXTFooter, 1);
@@ -23202,6 +23203,10 @@ LoadServerStaticMeshes()
 		TextDrawSetSelectable(GZoneInfo[i][E_Txt], 0);
 	}
 
+	#if WINTER_EDITION == true
+    Command_AddAltNamed("xmas", "christmas");
+    Command_AddAltNamed("xmas", "christ");
+	#endif
     Command_AddAltNamed("rv", "respawnvehicles");
     Command_AddAltNamed("rv", "resetvehicles");
     Command_AddAltNamed("ah", "fh");
@@ -26013,6 +26018,10 @@ function:ProcessTick()
 			    {
 			        T_RocketDMPlayers++;
 			    }
+			    case JETPACKDM:
+			    {
+			        T_JPDMPlayers++;
+			    }
 			    case JAIL:
 			    {
 					if(pJail[i] > 0)
@@ -26044,7 +26053,7 @@ function:ProcessTick()
 	    }
 	}
                              
-	format(gstr2, sizeof(gstr2), "~w~/derby %i /cnr %i /race %i /fallout %i /gungame %i /tdm %i /war %i /minigun %i /sniper %i /jpdm %i /rocketdm %i",
+	format(gstr2, sizeof(gstr2), "~w~/derby %i /cnr %i /race %i /fallout %i /gungame %i /tdm %i /war %i /minigun %i /sniper %i /rocketdm %i",
         T_DerbyPlayers,
         T_CNRPlayers,
 		T_RacePlayers,
@@ -26054,7 +26063,6 @@ function:ProcessTick()
 		T_WarPlayers,
 		T_MinigunPlayers,
 		T_SniperPlayers,
-		T_JPDMPlayers,
 		T_RocketDMPlayers);
 
 	TextDrawSetString(TXTFooter, gstr2);
