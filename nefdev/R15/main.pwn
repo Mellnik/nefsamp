@@ -301,6 +301,7 @@ native IsValidVehicle(vehicleid); // undefined
 #define PreloadAnimLib(%1,%2)			ApplyAnimation(%1,%2,"NULL",0.0,0,0,0,0,0)
 #define MINIGUN_WORLD                   (68565)
 #define SNIPER_WORLD                    (57412)
+#define ROCKETDM_WORLD                  (57411)
 #define SERVERMSGS_TIME                 (900000)
 #define MAX_PLAYER_PVS	                (8)
 
@@ -577,6 +578,7 @@ enum
 	gBG_TEAM2,
 	MINIGUN,
 	SNIPER,
+	ROCKETDM,
 	BG,
 	DM,
 	WAR,
@@ -1954,6 +1956,17 @@ new Float:Sniper_Spawns[14][4] =
 	{-1550.1138, -307.6401, 270.5767, 52.7860},
 	{-1560.4999, -317.0979, 285.0981, 163.2189}
 };
+new Float:RocketDM_Spawns[8][4] =
+{
+	{-1073.5320,-657.2906,59.5660,182.2739},
+	{-1077.9768,-613.3954,50.5078,187.6731},
+	{-1112.2423,-628.5490,50.5078,230.9135},
+	{-1111.1577,-656.5370,59.6051,258.1738},
+	{-1100.4790,-735.2442,59.5487,301.0774},
+	{-1055.5299,-735.7858,59.6239,332.7244},
+	{-1039.2628,-700.3466,64.5321,8.7347},
+	{-1058.5487,-696.2102,67.1242,89.5754}
+};
 new Float:GunGame_Spawns[9][4] =
 {
 	{133.2702, 2076.2271, 70.1628, 182.0589},
@@ -2820,6 +2833,18 @@ public OnPlayerSpawn(playerid)
 		    RandomBGSpawn(playerid, CurrentBGMap, BG_TEAM2);
 		    SetPlayerHealth(playerid, 100.0);
 		}
+		case ROCKETDM:
+		{
+  			ResetPlayerWeapons(playerid);
+			SetPlayerVirtualWorld(playerid, ROCKETDM_WORLD);
+			GivePlayerWeapon(playerid, 35, 99999);
+			SetPlayerInterior(playerid, 0);
+
+            LoadMap(playerid);
+			new rand = random(14);
+			SetPlayerPosEx(playerid, RocketDM_Spawns[rand][0], RocketDM_Spawns[rand][1], floatadd(RocketDM_Spawns[rand][2], 2.5));
+			SetPlayerFacingAngle(playerid, RocketDM_Spawns[rand][3]);
+		}
 		case SNIPER:
 		{
   			ResetPlayerWeapons(playerid);
@@ -2840,7 +2865,6 @@ public OnPlayerSpawn(playerid)
 			SetPlayerInterior(playerid, 0);
 
 			new rand = random(10);
-
 			SetPlayerPosEx(playerid, Minigun_Spawns[rand][0], Minigun_Spawns[rand][1], floatadd(Minigun_Spawns[rand][2], 0.5));
 			SetPlayerFacingAngle(playerid, Minigun_Spawns[rand][3]);
 		}
@@ -5519,6 +5543,14 @@ public OnPlayerDeath(playerid, killerid, reason)
 		    {
 				GivePlayerScore_(killerid, 2, true, true);
 				GivePlayerCash(killerid, 3000, true, true);
+		    }
+		}
+		case ROCKETDM:
+		{
+		    if(IsPlayerAvail(killerid))
+		    {
+				GivePlayerScore_(killerid, 1, true, true);
+				GivePlayerCash(killerid, 2000, true, true);
 		    }
 		}
 		case gBG_TEAM1:
@@ -9685,11 +9717,35 @@ YCMD:sniper(playerid, params[], help)
 	SetPlayerInterior(playerid, 0);
 	HidePlayerInfoTextdraws(playerid);
     LoadMap(playerid);
-	new rand = random(7);
+	new rand = random(14);
 	SetPlayerPosEx(playerid, Sniper_Spawns[rand][0], Sniper_Spawns[rand][1], Sniper_Spawns[rand][2] + 5.5);
 	SetPlayerFacingAngle(playerid, Sniper_Spawns[rand][3]);
 
 	NewMinigameJoin(playerid, "Sniper", "sniper");
+   	return 1;
+}
+
+YCMD:rocketdm(playerid, params[], help)
+{
+    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't join minigames while being in a Gang War, type /exit");
+    if(gTeam[playerid] == ROCKETDM) return SCM(playerid, -1, ""er"You are already in this minigame!");
+    if(gTeam[playerid] != NORMAL) return GameTextForPlayer(playerid, "~w~Type ~p~/exit ~w~to leave first!", 4000, 4);
+
+    SavePos(playerid);
+    CheckPlayerGod(playerid);
+    Command_ReProcess(playerid, "/stopanims", false);
+	gTeam[playerid] = ROCKETDM;
+	ResetPlayerWeapons(playerid);
+	GivePlayerWeapon(playerid, 35, 99999);
+	SetPlayerVirtualWorld(playerid, ROCKETDM_WORLD);
+	SetPlayerInterior(playerid, 0);
+	HidePlayerInfoTextdraws(playerid);
+    LoadMap(playerid);
+	new rand = random(8);
+	SetPlayerPosEx(playerid, RocketDM_Spawns[rand][0], RocketDM_Spawns[rand][1], RocketDM_Spawns[rand][2] + 5.5);
+	SetPlayerFacingAngle(playerid, RocketDM_Spawns[rand][3]);
+
+	NewMinigameJoin(playerid, "Rocket DM", "rocketdm");
    	return 1;
 }
 
@@ -25990,6 +26046,10 @@ function:ProcessTick()
 			    {
 					T_CNRPlayers++;
 			    }
+			    case ROCKETDM:
+			    {
+			        T_RocketDMPlayers++;
+			    }
 			    case JAIL:
 			    {
 					if(pJail[i] > 0)
@@ -29444,7 +29504,7 @@ ExitPlayer(playerid)
 	        SCM(playerid, -1, ""er"Leave the store by entering the pickup");
 	        return 0;
 	    }
-	    case MINIGUN, SNIPER:
+	    case MINIGUN, SNIPER, ROCKETDM:
 	    {
 			gTeam[playerid] = NORMAL;
 			ResetPlayerWeapons(playerid);
