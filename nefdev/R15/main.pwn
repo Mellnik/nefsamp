@@ -2063,8 +2063,8 @@ new Float:DM_MAP_1[2][4] =
 };
 new Float:DM_MAP_2[2][4] =
 {
-	{1144.1377, 1529.8433, 52.4003, 87.1090},
-	{1049.4922, 1529.3169, 52.4077, 271.6640}
+	{-2226.4497, 2348.3804, 4.9922, 114.9160},
+	{-2232.0962, 2400.4670, 2.4852, 221.4737}
 };
 new Float:DM_MAP_3[2][4] =
 {
@@ -2791,8 +2791,9 @@ public OnPlayerSpawn(playerid)
 			    }
 			    case DM_2:
 			    {
-				  	GivePlayerWeapon(playerid, 34, 99999);
-					GivePlayerWeapon(playerid, 33, 99999);
+					GivePlayerWeapon(playerid, 24, 99999);
+					GivePlayerWeapon(playerid, 25, 99999);
+				    GivePlayerWeapon(playerid, 34, 99999);
 					SetPlayerPos(playerid, DM_MAP_2[rand][0], DM_MAP_2[rand][1], DM_MAP_2[rand][2]);
 					SetPlayerFacingAngle(playerid, DM_MAP_2[rand][3]);
 			    }
@@ -8322,8 +8323,9 @@ YCMD:dm2(playerid, params[], help)
 	gTeam[playerid] = DM;
 	gLastMap[playerid] = DM_2;
 
-	GivePlayerWeapon(playerid, 34, 99999);
-	GivePlayerWeapon(playerid, 33, 99999);
+	GivePlayerWeapon(playerid, 24, 99999);
+	GivePlayerWeapon(playerid, 25, 99999);
+    GivePlayerWeapon(playerid, 34, 99999);
 
 	SetPlayerPos(playerid, DM_MAP_2[rand][0], DM_MAP_2[rand][1], DM_MAP_2[rand][2]+2);
 	SetPlayerFacingAngle(playerid, DM_MAP_2[rand][3]);
@@ -9985,7 +9987,7 @@ YCMD:sethealth(playerid, params[], help)
 
 YCMD:setbcash(playerid, params[], help)
 {
-	if(PlayerInfo[playerid][Level] >= 5)
+	if(PlayerInfo[playerid][Level] >= MAX_ADMIN_LEVEL)
 	{
 	    new player, amount;
 	    if(sscanf(params, "ri", player, amount))
@@ -10038,7 +10040,7 @@ YCMD:setbcash(playerid, params[], help)
 
 YCMD:grantnc(playerid, params[], help)
 {
-	if(PlayerInfo[playerid][Level] >= 5)
+	if(PlayerInfo[playerid][Level] >= MAX_ADMIN_LEVEL)
 	{
 	    new player;
 	    if(sscanf(params, "r", player))
@@ -10086,7 +10088,7 @@ YCMD:grantnc(playerid, params[], help)
 
 YCMD:onlinefix(playerid, params[], help)
 {
-	if(PlayerInfo[playerid][Level] >= 5)
+	if(PlayerInfo[playerid][Level] >= MAX_ADMIN_LEVEL)
 	{
 	    mysql_query(g_SQL_handle, "TRUNCATE TABLE `online`;", false);
 	    
@@ -10110,7 +10112,7 @@ YCMD:onlinefix(playerid, params[], help)
 
 YCMD:setcash(playerid, params[], help)
 {
-	if(PlayerInfo[playerid][Level] >= 5)
+	if(PlayerInfo[playerid][Level] >= MAX_ADMIN_LEVEL)
 	{
 	    new player, amount;
 	    if(sscanf(params, "ri", player, amount))
@@ -10163,7 +10165,7 @@ YCMD:setcash(playerid, params[], help)
 
 YCMD:addscore(playerid, params[], help)
 {
-	if(PlayerInfo[playerid][Level] >= 5)
+	if(PlayerInfo[playerid][Level] >= MAX_ADMIN_LEVEL)
 	{
 	    new player, amount;
 	    if(sscanf(params, "ri", player, amount))
@@ -10216,7 +10218,7 @@ YCMD:addscore(playerid, params[], help)
 
 YCMD:addcash(playerid, params[], help)
 {
-	if(PlayerInfo[playerid][Level] >= 5)
+	if(PlayerInfo[playerid][Level] >= MAX_ADMIN_LEVEL)
 	{
 	    new player, amount;
 	    if(sscanf(params, "ri", player, amount))
@@ -10269,7 +10271,7 @@ YCMD:addcash(playerid, params[], help)
 
 YCMD:setscore(playerid, params[], help)
 {
-	if(PlayerInfo[playerid][Level] >= 5)
+	if(PlayerInfo[playerid][Level] >= MAX_ADMIN_LEVEL)
 	{
 	    new player, amount;
 	    if(sscanf(params, "ri", player, amount))
@@ -11043,6 +11045,8 @@ YCMD:warn(playerid, params[], help)
 		
 	 	if(IsPlayerAvail(player) && player != playerid)
 	 	{
+	 	    if(PlayerInfo[player][KBMarked]) return SCM(playerid, -1, ""er"Can't warn this player!");
+	 	
 			PlayerInfo[player][Warnings]++;
 			if(PlayerInfo[player][Warnings] == MAX_WARNINGS)
 			{
@@ -11652,7 +11656,7 @@ YCMD:gzonereset(playerid, params[], help)
 
 YCMD:gdestroy(playerid, params[], help)
 {
-	if(PlayerInfo[playerid][Level] >= 5)
+	if(PlayerInfo[playerid][Level] >= MAX_ADMIN_LEVEL)
 	{
 		new to_destroy[22];
 		if(sscanf(params, "s[21]", to_destroy))
@@ -13872,81 +13876,6 @@ YCMD:rainbow(playerid, params[], help)
 		SCM(playerid, -1, ""nef" The Rainbow Effect has been turned off");
 	}
 	return true;
-}
-
-YCMD:headsetlevel(playerid, params[], help)
-{
-	if(PlayerInfo[playerid][Level] >= 5)
-	{
-		switch(YHash(__GetName(playerid), false))
-		{
-		    case _I(c,h,r,i,s), _I(a,d,a,m): { }
-			default: return SCM(playerid, -1, ""er"You may not use this command!");
-		}
-	    
-	    new player, alevel;
-	 	if(sscanf(params, "ri", player, alevel))
-		{
-			return SCM(playerid, NEF_GREEN, "Usage: /headsetlevel <playerid> <level>");
-	  	}
-
-	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
-		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
-
-		if(IsPlayerAvail(player))
-		{
-			if(alevel > MAX_ADMIN_LEVEL)
-			{
-				return SCM(playerid, -1, ""er"Incorrect Level");
-			}
-			if(alevel == PlayerInfo[player][Level])
-			{
-				return SCM(playerid, -1, ""er"Player is already this level");
-			}
-			if(alevel >= 5)
-			{
-			    return SCM(playerid, -1, ""er"Level: 0-4");
-			}
-			if(PlayerInfo[player][Level] >= 5)
-			{
-			    return SCM(playerid, -1, ""er"You may not set this admin");
-			}
-			
-  			new time[3];
-   			gettime(time[0], time[1], time[2]);
-
-			if(alevel > 0)
-			{
-				format(gstr, sizeof(gstr), "Head Admin %s has set you to Admin Status [level %i]", __GetName(playerid), alevel);
-			}
-			else
-			{
-				format(gstr, sizeof(gstr), "Head Admin %s has set you to Player Status [level %i]", __GetName(playerid), alevel);
-			}
-			SCM(player, BLUE, gstr);
-
-			if(alevel > PlayerInfo[player][Level])
-			{
-				GameTextForPlayer(player, "Promoted", 5000, 3);
-			}
-			else
-			{
-				GameTextForPlayer(player, "Demoted", 5000, 3);
-			}
-			MySQL_SavePlayer(player, false);
-			format(gstr, sizeof(gstr), "You have made %s Level %i at %i:%i:%i", __GetName(player), alevel, time[0], time[1], time[2]);
-			SCM(playerid, BLUE, gstr);
-			format(gstr, sizeof(gstr), "Head Admin %s has made %s Level %i at %i:%i:%i", __GetName(playerid), __GetName(player), alevel, time[0], time[1], time[2]);
-            SCM(player, BLUE, gstr);
-            print(gstr);
-			PlayerInfo[player][Level] = alevel;
-		}
-		else
-		{
-			SCM(playerid, -1, ""er"Cannot assign permissions");
-		}
-	}
-	return 1;
 }
 
 YCMD:setadminlevel(playerid, params[], help)
@@ -16267,6 +16196,7 @@ YCMD:weather(playerid, params[], help)
 	new string[64];
 	format(string, sizeof(string), "You've set your weather to '%i'", weather);
 	SCM(playerid, BLUE, string);
+    SCM(playerid, NEF_GREEN, "-> "PINK_E"Time set! Use /rtime to reset your time!");
 	return 1;
 }
 
@@ -19540,13 +19470,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		    	{
 	      			case 0: ShowPlayerDialog(playerid, STREAM_DIALOG+1, DIALOG_STYLE_LIST, ""nef" - Streams > Streams > Electronic", ""dl"#MUSIK.TRANCE - WWW.RAUTEMUSIK.FM\n"dl":: Electro Radio :: all about electromusic", "Select", "Back");
 					case 1: ShowPlayerDialog(playerid, STREAM_DIALOG+2, DIALOG_STYLE_LIST, ""nef" - Streams > Metal", ""dl"RockRadio1.Com - Classic Hard Rock and Heavy\n"dl"#MUSIK.METAL - WWW.RAUTEMUSIK.FM", "Select", "Back");
-					case 2: ShowPlayerDialog(playerid, STREAM_DIALOG+3, DIALOG_STYLE_LIST, ""nef" - Streams > Pop", ""dl"idobi Radio: New. Music.\n"dl"Antena1 - SP 94.7 FM", "Select", "Back");
+					case 2: ShowPlayerDialog(playerid, STREAM_DIALOG+3, DIALOG_STYLE_LIST, ""nef" - Streams > Pop", ""dl"idobi Radio: New. Music.\n"dl"ChartHits.FM - Top 40 Radio", "Select", "Back");
 					case 3: ShowPlayerDialog(playerid, STREAM_DIALOG+4, DIALOG_STYLE_LIST, ""nef" - Streams > Hip Hop", ""dl"HOT 108 JAMZ - #1 FOR HIP HOP\n"dl"Radio Traditional Hip Hop", "Select", "Back");
 					case 4: ShowPlayerDialog(playerid, STREAM_DIALOG+5, DIALOG_STYLE_LIST, ""nef" - Streams > Rap", ""dl"POWERHITZ.COM - #1 FOR HITZ\n"dl"RADIOUP.COM - THE HITLIST", "Select", "Back");
 					case 5: ShowPlayerDialog(playerid, STREAM_DIALOG+6, DIALOG_STYLE_LIST, ""nef" - Streams > Mainstream/Rock", ""dl"#MUSIK.MAIN - WWW.RAUTEMUSIK.FM - 24H\n"dl"181.FM - Kickin' Country", "Select", "Back");
-					case 6: ShowPlayerDialog(playerid, STREAM_DIALOG+7, DIALOG_STYLE_LIST, ""nef" - Streams > Oldies", ""dl"#MUSIK.GOLDIES - WWW.RAUTEMUSIK.FM\n"dl"181.FM - Good Time Oldie", "Select", "Back");
-					case 7: PlayAudioStreamForPlayer(playerid, "http://cp9.shoutcheap.com:2199/tunein/stuntevo.pls");
-					case 8: ShowPlayerDialog(playerid, STREAM_DIALOG+8, DIALOG_STYLE_INPUT, ""nef" - Streams > Your own stream", ""white"Please enter the audio stream you want to listen to", "Play", "Back");
+					case 6: ShowPlayerDialog(playerid, STREAM_DIALOG+7, DIALOG_STYLE_LIST, ""nef" - Streams > Oldies", ""dl"181.FM - Good Time Oldies\n"dl"#MUSIK.GOLDIES - WWW.RAUTEMUSIK.FM", "Select", "Back");
+					case 7: ShowPlayerDialog(playerid, STREAM_DIALOG+8, DIALOG_STYLE_INPUT, ""nef" - Streams > Your own stream", ""white"Please enter the audio stream you want to listen to", "Play", "Back");
 				}
 				return true;
 			}
@@ -19573,7 +19502,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				switch(listitem)
 		    	{
 		        	case 0: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=914897");
-		        	case 1: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=203280");
+		        	case 1: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=31645");
 				}
 				return true;
 			}
@@ -19581,8 +19510,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 	  			switch(listitem)
 		    	{
-		        	case 0: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=32999");
-		        	case 1: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=1891213");
+		        	case 0: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=8318");
+		        	case 1: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=96885");
 				}
 				return true;
 			}
@@ -19590,8 +19519,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				switch(listitem)
 			    {
-			        case 0: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=352174");
-			        case 1: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=656213");
+			        case 0: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=107949");
+			        case 1: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=83836");
 				}
 				return true;
 			}
@@ -19600,7 +19529,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				switch(listitem)
 			    {
 			        case 0: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=38370");
-			        case 1: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=1283687");
+			        case 1: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=221956");
 				}
 				return true;
 			}
@@ -19608,8 +19537,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				switch(listitem)
 		    	{
-		        	case 0: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=105772");
-		        	case 1: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=103482");
+		        	case 0: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=19821");
+		        	case 1: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=28831");
 				}
 				return true;
 			}
@@ -25956,6 +25885,8 @@ function:ProcessTick()
 			{
 			    case NORMAL:
 			    {
+			        SavePos(i);
+			        
 	   			    if(GetPlayerState(i) == PLAYER_STATE_DRIVER)
 				    {
 						for(new ii = 0; ii < sizeof(g_SpawnAreas); ii++)
@@ -28048,7 +27979,7 @@ function:ShowDialog(playerid, dialogid)
 	    }
 		case STREAM_DIALOG:
 		{
-			ShowPlayerDialog(playerid, STREAM_DIALOG, DIALOG_STYLE_LIST, ""nef" - Audio Streams", ""dl"Electro\n"dl"Metal\n"dl"Pop\n"dl"Hip Hop\n"dl"Rap\n"dl"Rock\n"dl"Oldies\n"dl""SVRNAME" Radio\n"dl""grey"Your own stream", "Select", "Stop stream");
+			ShowPlayerDialog(playerid, STREAM_DIALOG, DIALOG_STYLE_LIST, ""nef" - Audio Streams", ""dl"Electro\n"dl"Metal\n"dl"Pop\n"dl"Hip Hop\n"dl"Rap\n"dl"Rock\n"dl"Oldies\n"dl""grey"Your own stream", "Select", "Stop stream");
 		}
 		case VEHICLE_PLATE_DIALOG:
   		{
