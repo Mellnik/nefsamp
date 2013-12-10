@@ -11,7 +11,7 @@
 
 #pragma dynamic 8192
 
-#define IS_RELEASE_BUILD (false)
+#define IS_RELEASE_BUILD (true)
 #define INC_ENVIORMENT (true)
 #define IRC_CONNECT (true)
 #define WINTER_EDITION (true)
