@@ -346,7 +346,7 @@ native IsValidVehicle(vehicleid); // undefined in a_samp
 #define NEF_YELLOW                      (0xFFE600FF)
 #define GREEN 							(0x0BDDC400)
 #define GREEN2		 					(0x3BBD44FF)
-#define RED        						(0xF4262600)
+#define RED        						(0xFF0019FF)
 #define ORANGE 							(0xFF96008B)
 #define BLUE 							(0x3793FAFF)
 #define YELLOW 							(0xF2F853FF)
@@ -378,7 +378,7 @@ native IsValidVehicle(vehicleid); // undefined in a_samp
 #define blue							"{0087FF}"
 #define orange                          "{FFA000}"
 #define grey                            "{969696}"
-#define red                             "{F42626}"
+#define red                             "{FF0019}"
 #define lb_e 							"{15D4ED}"
 #define nef_green                      	"{2DFF00}"
 #define nef_yellow                      "{FFE600}"
@@ -16532,6 +16532,11 @@ YCMD:pm(playerid, params[], help)
 	    return SCM(playerid, -1, ""er"This player has blocked you from PMing him");
 	}
 	
+	if(IsPlayerOnDesktop(player))
+	{
+	    SCM(playerid, -1, ""er"This player is on desktop and may not receive your message");
+	}
+	
 	TextDrawShowForPlayer(playerid, CheckTD);
 	TextDrawShowForPlayer(player, NewMsgTD);
 	SetTimerEx("hideMsgTD", 3000, false, "i", player);
@@ -16586,6 +16591,12 @@ YCMD:r(playerid, params[], help)
 	{
 	    return SCM(playerid, -1, ""er"This player has blocked you from PMing him");
 	}
+	
+	if(IsPlayerOnDesktop(lID))
+	{
+	    SCM(playerid, -1, ""er"This player is on desktop and may not receive your message");
+	}
+	
 	format(gstr, sizeof(gstr), "***[PM] from %s(%i): %s", __GetName(playerid), playerid, msg);
     SCM(lID, YELLOW, gstr);
 	format(gstr, sizeof(gstr), ">>>[PM] to %s(%i): %s", __GetName(lID), lID, msg);
