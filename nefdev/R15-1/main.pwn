@@ -12661,21 +12661,29 @@ YCMD:resetrc(playerid, params[], help)
 {
 	if(PlayerInfo[playerid][Level] == MAX_ADMIN_LEVEL)
 	{
-	    new map;
-		if(sscanf(params, "i", map))
+	    if(!strcmp(params, "all", true))
+	    {
+			mysql_tquery(g_SQL_handle, "TRUNCATE TABLE `race_records`;", "", "");
+			SCM(playerid, -1, ""er"All race records have been deleted!");
+	    }
+		else
 		{
-		    return SCM(playerid, NEF_GREEN, "Usage: /resetrc <map>");
-		}
+		    new map;
+			if(sscanf(params, "i", map))
+			{
+			    return SCM(playerid, NEF_GREEN, "Usage: /resetrc <map>");
+			}
 
-		format(gstr, sizeof(gstr), "/Race/%03i.race", map);
-		if(!fexist(gstr))
-		{
-		    return SCM(playerid, -1, ""er"Map does not exist");
-		}
+			format(gstr, sizeof(gstr), "/Race/%03i.race", map);
+			if(!fexist(gstr))
+			{
+			    return SCM(playerid, -1, ""er"Map does not exist");
+			}
 
-		format(gstr, sizeof(gstr), "DELETE FROM `race_records` WHERE `track` = %i;", map);
-		mysql_tquery(g_SQL_handle, gstr, "", "");
-		SCM(playerid, -1, ""er"Race records of the specific race have been deleted!");
+			format(gstr, sizeof(gstr), "DELETE FROM `race_records` WHERE `track` = %i;", map);
+			mysql_tquery(g_SQL_handle, gstr, "", "");
+			SCM(playerid, -1, ""er"Race records of the specific race have been deleted!");
+		}
 	}
 	else
 	{
@@ -13570,9 +13578,12 @@ YCMD:god(playerid, params[], help)
 	    }
 	    else
 	    {
-			if(!silent && ((PlayerInfo[playerid][tickLastShot] + 5000) > (GetTickCount() + 3600000)))
-			{
-			    return GameTextForPlayer(playerid, "~b~~h~~h~You were shot in the last 5 seconds!", 2000, 3);
+	        if(!silent)
+	        {
+				if(((PlayerInfo[playerid][tickLastShot] + 5000) > (GetTickCount() + 3600000)))
+				{
+				    return GameTextForPlayer(playerid, "~b~~h~~h~You were shot in the last 5 seconds!", 2000, 3);
+				}
 			}
 			
 	        new Float:HP;
@@ -23914,11 +23925,16 @@ LoadVisualStaticMeshes()
 	CreateDynamicObject(19055, -1228.39331, 13.85308, 13.74400,   0.00000, 0.00000, -50.40001);
 	
 	// /aa xmas tree + gifts
-	CreateDynamicObject(19076, 404.60391, 2535.42041, 15.21057,   0.00000, 0.00000, 0.00000);
-	CreateDynamicObject(19058, 403.95459, 2532.91675, 16.03786,   0.00000, 0.00000, 0.00000);
-	CreateDynamicObject(19054, 403.34106, 2535.32617, 16.05472,   0.00000, 0.00000, -49.86000);
-	CreateDynamicObject(19055, 402.69922, 2534.09546, 15.83111,   0.00000, 0.00000, 0.00000);
-	CreateDynamicObject(19057, 405.78897, 2535.81055, 15.88580,   0.00000, 0.00000, -20.52000);
+	CreateDynamicObject(19076, 398.50684, 2507.79150, 15.53978,   0.00000, 0.00000, 0.00000);
+	CreateDynamicObject(19058, 398.99847, 2508.93213, 16.00566,   0.00000, 0.00000, 0.00000);
+	CreateDynamicObject(19057, 400.05566, 2506.91431, 15.98826,   0.00000, 0.00000, -71.75999);
+	CreateDynamicObject(19055, 397.18692, 2507.30273, 15.78823,   0.00000, 0.00000, -28.80000);
+	CreateDynamicObject(19054, 396.50635, 2509.77783, 15.83313,   0.00000, 0.00000, -56.75998);
+	CreateDynamicObject(19056, 397.88464, 2505.68677, 15.81423,   0.00000, 0.00000, 0.00000);
+	CreateDynamicObject(3891, 406.17706, 2475.50293, 14.98146,   7.08000, -2.76000, -4.26001);
+	CreateDynamicObject(3891, 382.23135, 2537.15796, 15.11454,   7.08000, -2.76000, -168.36002);
+	CreateDynamicObject(3891, 431.83859, 2495.83105, 15.11454,   7.02000, -4.02000, -308.09958);
+	CreateDynamicObject(19054, 396.12781, 2508.60010, 15.83313,   0.00000, 0.00000, -81.05999);
 	
 	AddStaticVehicleEx(539, 1104.3873,-1758.3083,13.6477,105.2126, randomColors[random(23)], randomColors[random(23)], 30);
 	AddStaticVehicleEx(539, 1104.8311,-1764.4894,13.6477,95.1859, randomColors[random(23)], randomColors[random(23)], 30);
