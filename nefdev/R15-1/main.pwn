@@ -1184,7 +1184,7 @@ new const szRandomInfoTXTs[13][] =
 	"Get ~p~VIP ~w~today! Go to "SVRURLWWW"/vip",
 	"Get some ~y~Gold Credits ~w~at "SVRURLWWW"/credits",
 	"Player Control: ~g~~h~~h~/settings",
-	"If you see a hacker in game use /report <id> <reason>",
+	"Report rulebreakers /report <id> <reason>",
 	"Type ~y~/cnr ~w~to join Cops and Robbers game",
 	"Use ~y~/m ~w~and select a minigame to play in!",
 	"Join minigames to earn money and score! ~g~~h~~h~/m",
@@ -9699,9 +9699,7 @@ YCMD:minigun(playerid, params[], help)
 	GivePlayerWeapon(playerid, 38, 99999);
    	SetPlayerVirtualWorld(playerid, MINIGUN_WORLD);
 	SetPlayerInterior(playerid, 0);
-
 	HidePlayerInfoTextdraws(playerid);
-
 	new rand = random(10);
 	SetPlayerPos(playerid, Minigun_Spawns[rand][0], Minigun_Spawns[rand][1], Minigun_Spawns[rand][2]);
 	SetPlayerFacingAngle(playerid, Minigun_Spawns[rand][3]);
