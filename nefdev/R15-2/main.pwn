@@ -1,6 +1,6 @@
 /*======================================================================*\
 || #################################################################### ||
-|| # Project New Evolution Freeroam - Release 15-1         			  # ||
+|| # Project New Evolution Freeroam - Release 15-2         			  # ||
 || # ---------------------------------------------------------------- # ||
 || # Copyright ©2011-2013 New Evolution Freeroam	  				  # ||
 || # Created by Mellnik                                               # ||
@@ -89,11 +89,11 @@ native IsValidVehicle(vehicleid); // undefined in a_samp
 #define HOSTNAME                        " 	        NEF » ×DM/Stunt/Race/Freeroam/Minigames×"
 //#define HOSTNAME 						"NEF 0.3x (R11)     «Stunt/Race/Freeroam/DM»"
 #if IS_RELEASE_BUILD == true
-#define CURRENT_VERSION                 "Release R15-1"
-#define CURRENT_VERISON_SHORT           "R15-1"
+#define CURRENT_VERSION                 "Release R15-2"
+#define CURRENT_VERISON_SHORT           "R15-2"
 #else
-#define CURRENT_VERSION                 "PTS:R15-1"
-#define CURRENT_VERSION_SHORT           "PTS:R15-1"
+#define CURRENT_VERSION                 "PTS:R15-2"
+#define CURRENT_VERSION_SHORT           "PTS:R15-2"
 #endif
 #define HOTFIX_REV                      "Hotfix #0"
 #define SAMP_VERSION                    "SA-MP 0.3x-R2"
@@ -1594,19 +1594,19 @@ new const PVMatrix[98][e_pv_matrix] =
 // Toy slots, pvs slots, house slots, house obj slots, business slot, instant namechange, medkit x20, medkit x100, money boost x2, money boost x3, scoreboost x2, scoreboost x3
 new const CreditsProductMatrix[13][e_credits_matrix] =
 {
-	{"Toy Slot", 1500, 1, "Permanent", "This item expands your toy slots by 1.You can have 10 toy slots at most."},
-    {"Private Vehicle Slot", 2000, 1, "Permanent", "This item expands your private vehicle slots by 1.\nYou can have 8 pv slots at most."},
-    {"House Slot", 4000, 1, "Permanent", "This item expands your house slots by 1. You can have 5 house slots at most."},
+	{"Toy Slot", 1000, 1, "Permanent", "This item expands your toy slots by 1.You can have 10 toy slots at most."},
+    {"Private Vehicle Slot", 1500, 1, "Permanent", "This item expands your private vehicle slots by 1.\nYou can have 8 pv slots at most."},
+    {"House Slot", 2000, 1, "Permanent", "This item expands your house slots by 1. You can have 5 house slots at most."},
     {"House Object Slot", 1000, 1, "Permanent", "This item expands your house object slots by 1. You can have 10 house object slots at most."},
-    {"Business Slot", 4000, 1, "Permanent", "This item expands your business slots by 1. You can have 5 business slots at most."},
-    {"Instant Name Change Access", 2000, 1, "Usable 1 time", "This item grants you instant access to /changename."},
+    {"Business Slot", 2000, 1, "Permanent", "This item expands your business slots by 1. You can have 5 business slots at most."},
+    {"Instant Name Change Access", 1000, 1, "Usable 1 time", "This item grants you instant access to /changename."},
     {"20 Medits", 1000, 20, "Usable 20 times", "This item is usable in minigames only. Use /mk to consume 1 medkit.\nHeals you by 50hp in 10 seconds."},
     {"100 Medits", 2500, 100, "Usable 100 times", "This item is usable in minigames only. Use /mk to consume 1 medkit.\nHeals you by 50hp in 10 seconds."},
-    {"Money Boost x2", 1500, 1, "24 Hours", "This item gives an addtitional double money.\nAfter purchase the boost remains active for 24 hours. You can\nonly have 1 of the 5 available boost active at the same time!"},
-    {"Money Boost x3", 2000, 1, "24 Hours", "This item gives an addtitional triple money.\nAfter purchase the boost remains active for 24 hours. You can\nonly have 1 of the 5 available boost active at the same time!"},
-    {"Score Boost x2", 1500, 1, "24 Hours", "This item gives an addtitional double score.\nAfter purchase the boost remains active for 24 hours. You can\nonly have 1 of the 5 available boost active at the same time!"},
-    {"Score Boost x3", 2000, 1, "24 Hours", "This item gives an addtitional triple score.\nAfter purchase the boost remains active for 24 hours. You can\nonly have 1 of the 5 available boost active at the same time!"},
-    {"Master Boost", 5000, 1, "24 Hours", "The Master Boost gives you an addtitional triple score and money!\nAfter purchase the boost remains active for 24 hours. You can\nonly have 1 of the 5 available boost active at the same time!"}
+    {"Money Boost x2", 1000, 1, "24 Hours", "This item gives an addtitional double money.\nAfter purchase the boost remains active for 24 hours. You can\nonly have 1 of the 5 available boost active at the same time!"},
+    {"Money Boost x3", 1500, 1, "24 Hours", "This item gives an addtitional triple money.\nAfter purchase the boost remains active for 24 hours. You can\nonly have 1 of the 5 available boost active at the same time!"},
+    {"Score Boost x2", 1000, 1, "24 Hours", "This item gives an addtitional double score.\nAfter purchase the boost remains active for 24 hours. You can\nonly have 1 of the 5 available boost active at the same time!"},
+    {"Score Boost x3", 1500, 1, "24 Hours", "This item gives an addtitional triple score.\nAfter purchase the boost remains active for 24 hours. You can\nonly have 1 of the 5 available boost active at the same time!"},
+    {"Master Boost", 2500, 1, "24 Hours", "The Master Boost gives you an addtitional triple score and money!\nAfter purchase the boost remains active for 24 hours. You can\nonly have 1 of the 5 available boost active at the same time!"}
 };
 
 new const HouseIntTypes[15][e_house_type] =
@@ -6791,9 +6791,9 @@ public OnPlayerModelSelection(playerid, response, listid, modelid)
 	{
 	    if(response)
 	    {
-		    if(GetPlayerCash(playerid) < 20000)
+		    if(GetPlayerCash(playerid) < 10000)
 		    {
-				SCM(playerid, -1, ""er"Each toy costs $20,000");
+				SCM(playerid, -1, ""er"Each toy costs $10,000");
 				return 1;
 		    }
 		    GivePlayerCash(playerid, -10000);
@@ -6803,7 +6803,7 @@ public OnPlayerModelSelection(playerid, response, listid, modelid)
 
 			EditAttachedObject(playerid, PlayerInfo[playerid][toy_selected]);
 		    ShowPlayerToyTextdraws(playerid);
-		    SCM(playerid, GREEN, "Successfully bought the toy for $20,000!");
+		    SCM(playerid, GREEN, "Successfully bought the toy for $10,000!");
 		    
 		    if(pAch[playerid][E_ach_styler] == 0)
 		    {
@@ -16476,7 +16476,7 @@ YCMD:givecash(playerid, params[], help)
 
 		if(!strcmp(__GetIP(playerid), __GetIP(player), true))
 		{
-		    return SCM(playerid, RED, "The player has the same ip as you");
+		    return SCM(playerid, RED, "The player has the same ip as you.");
 		}
 
       	GivePlayerCash(playerid, -cash);
