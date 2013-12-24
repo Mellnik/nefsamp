@@ -259,9 +259,9 @@ native IsValidVehicle(vehicleid); // undefined in a_samp
 // -
 // - GWARS
 // -
-#define MAX_GZONES						(45)
+#define MAX_GZONES						(100)
 #define MAX_GZONES_PER_GANG             (15)
-#define GZONE_SIZE                      (75.0)
+#define GZONE_SIZE                      (70.0)
 #define COLOR_HOSTILE                   (0x95133496)
 #define COLOR_FRIENDLY                  (0x33FF33AA)
 #define COLOR_NONE                      (0xFFFFFFAA)
@@ -11575,6 +11575,14 @@ YCMD:gzonecreate(playerid, params[], help)
 {
 	if(PlayerInfo[playerid][Level] == MAX_ADMIN_LEVEL)
 	{
+	    new c = 0;
+    	for(new i = 0; i < gzoneid; i++)
+		{
+			c++;
+		}
+		
+		if(c >= MAX_GZONES) return SCM(playerid, -1, ""er"Max. GZones reached.");
+
 		new tmp[41];
 		if(sscanf(params, "s[40]", tmp))
 		{
@@ -26162,7 +26170,7 @@ function:ProcessTick()
 	{
 		TextDrawSetString(TXTDerbyInfo, "Timeleft: ~r~~h~~h~--:--~n~~w~Players: ~b~~h~~h~--/--~n~~w~Map: ~g~~h~~h~Voting");
 	}
-	
+
 	for(new i = 0; i < gzoneid; i++)
 	{
 		if(GZoneInfo[i][bUnderAttack])
