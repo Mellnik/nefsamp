@@ -25760,6 +25760,9 @@ function:OnQueueReceived()
 	
 	if(rows > 0)
 	{
+	    new Cache:Data = cache_save(g_SQL_handle);
+	    cache_set_active(Data, g_SQL_handle);
+	
 		for(new i = 0; i < rows; i++)
 		{
 		    new action = cache_get_row_int(i, 1, g_SQL_handle);
@@ -25882,6 +25885,8 @@ function:OnQueueReceived()
 		            }
 		            else
 		            {
+						cache_set_active(Cache:0, g_SQL_handle);
+		                
 						mysql_format(g_SQL_handle, gstr, sizeof(gstr), "SELECT `AdditionalPVSlots`, `AdditionalHouseSlots`, `AdditionalPropSlots` FROM `accounts` WHERE `Name` = '%e';", name);
 						new Cache:res = mysql_query(g_SQL_handle, gstr);
 						
@@ -25918,6 +25923,8 @@ function:OnQueueReceived()
 						}
 						
 						cache_delete(res);
+						
+						cache_set_active(Data, g_SQL_handle);
 		            }
 		            
 					format(gstr, sizeof(gstr), "~p~%s received VIP for donating $%s!", name, payment);
@@ -25930,6 +25937,8 @@ function:OnQueueReceived()
 			format(gstr2, sizeof(gstr2), "DELETE FROM `queue` WHERE `ID` = %i LIMIT 1;", cache_get_row_int(i, 0, g_SQL_handle));
 			mysql_tquery(g_SQL_handle, gstr2, "", "");
 		}
+		
+		cache_delete(Data, g_SQL_handle);
 	}
 	return 1;
 }
