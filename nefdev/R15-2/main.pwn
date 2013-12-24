@@ -95,7 +95,7 @@ native IsValidVehicle(vehicleid); // undefined in a_samp
 #define CURRENT_VERSION                 "PTS:R15-2"
 #define CURRENT_VERSION_SHORT           "PTS:R15-2"
 #endif
-#define HOTFIX_REV                      "Hotfix #0"
+#define HOTFIX_REV                      "Hotfix #1"
 #define SAMP_VERSION                    "SA-MP 0.3x-R2"
 #define MAX_REPORTS 					(7)
 #define MAX_ADS                         (10)
