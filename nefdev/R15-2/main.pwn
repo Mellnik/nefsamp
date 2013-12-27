@@ -1619,7 +1619,7 @@ new const HouseIntTypes[15][e_house_type] =
     {4, 302.180999, 300.722991, 999.148437, "Underground", 500000}, 	//5			// 10, nette bude
     {2, 271.884979, 306.631988, 999.148437, "Nice Small Hotel Room", 600000},//6 			// 8, nice one /white
 	{3, 2496.049804, -1695.238159, 1014.742187, "CJs House", 750000}, //7			// 4, muss raus exec // jetzt ist CJ drinne
-	{3, 235.508994, 1189.169897, 1080.339966, "Luxus House", 900000}, //8			// 0,  schönes haus mit roten boden pic 429
+	{3, 235.508994, 1189.169897, 1080.339966, "Luxury House", 900000}, //8			// 0,  schönes haus mit roten boden pic 429
 	{2, 1204.809936, -11.586799, 1000.921875, "Strip Club", 1000000}, //9			// 6, mus raus exec // jetzt ist strip club drinne
 	{15,2215.454833, -1147.475585, 1025.796875, "Entire Motel", 1200000}, //10					// 12, muss raus // jetzt ist jeff motel drinne
 	{12,2324.419921, -1145.568359, 1050.710083, "Small Villa", 1500000}, 	//11			// 11, muss raus // jetzt ist small villa drinne
@@ -28067,7 +28067,7 @@ function:ShowDialog(playerid, dialogid)
 				string2[256];
 
 			format(string, sizeof(string), ""dl"Barrack\n"dl"Standard\n"dl"Advanced Standard\n"dl"Ryders House\n"dl"Bunker House\n"dl"Underground\n"dl"Nice Small Hotel Room\n"dl"CJs House");
-			format(string2, sizeof(string2), "\n"dl"Luxus House\n"dl"Strip Club\n"dl"Entire Motel\n"dl"Small Villa\n"dl"Big Villa\n"dl"Madd Doggs Mansion\n"dl"Sweets House");
+			format(string2, sizeof(string2), "\n"dl"Luxury House\n"dl"Strip Club\n"dl"Entire Motel\n"dl"Small Villa\n"dl"Big Villa\n"dl"Madd Doggs Mansion\n"dl"Sweets House");
 			strcat(string, string2);
 
 	        ShowPlayerDialog(playerid, HOUSE_UPGRADE_DIALOG, DIALOG_STYLE_LIST, ""nef" - House Upgrade", string, "Select", "Cancel");
