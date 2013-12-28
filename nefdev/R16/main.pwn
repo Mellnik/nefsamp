@@ -9472,6 +9472,11 @@ YCMD:cnrhelp(playerid, params[], help)
 	return 1;
 }
 
+YCMD:duel(playerid, params[], help)
+{
+	return 1;
+}
+
 YCMD:tdm(playerid, params[], help)
 {
     if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't join minigames while being in a Gang War, type /exit");
