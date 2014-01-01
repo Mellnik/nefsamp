@@ -23017,6 +23017,10 @@ LoadServerStaticMeshes()
     Command_AddAltNamed("xmas", "christmas");
     Command_AddAltNamed("xmas", "christ");
 	#endif
+    Command_AddAltNamed("time", "stime");
+    Command_AddAltNamed("gmenu", "gstats");
+    Command_AddAltNamed("gmenu", "gmembers");
+    Command_AddAltNamed("gsetrank", "gsetlevel");
     Command_AddAltNamed("rv", "respawnvehicles");
     Command_AddAltNamed("rv", "resetvehicles");
     Command_AddAltNamed("ah", "fh");
