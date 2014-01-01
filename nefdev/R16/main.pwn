@@ -23394,6 +23394,10 @@ LoadVisualStaticMeshes()
 	CreateObject(3458, -295.32, 3682.53, 21.10,   0.00, 0.00, 0.00); //Static Base
 	CreateObject(8040,564.91992188,860.32714844,7107.35400391,0,21.99462891,0); // GoingDown
 	CreateObject(8040,2977.97949219,-1437.01464844,1243.90209961,0,0,189.99755859); // skyroad (/skr)
+	
+	// derby townhall fix
+	CreateDynamicObject(8558, 1544.65198, -1843.98779, 17.14610,   1.80000, -88.90002, -89.69999);
+	CreateDynamicObject(8558, 1541.62708, -1843.84485, 17.14610,   1.80000, -88.90002, -89.69999);
 	// anti vehicle drop end
 
 	// vehicle shop
