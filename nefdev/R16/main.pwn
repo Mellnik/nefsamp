@@ -15,6 +15,7 @@
 #define INC_ENVIORMENT (true)
 #define IRC_CONNECT (true)
 #define WINTER_EDITION (false) // LOAD ferriswheelfair.amx
+#define YSI_IS_SERVER
 
 // -
 // - Plugins
@@ -7157,7 +7158,7 @@ YCMD:mi(playerid, params[], help)
 }
 YCMD:mh(playerid, params[], help)
 {
-	if(PortPlayerMapVeh(playerid,-182.9842,-2245.7412,31.1492,125.6378,-182.9842,-2245.7412,31.1492,125.6378, "Mellnik´s House", "mh"))
+	if(PortPlayerMapVeh(playerid,-182.9842, -2245.7412, 31.1492, 125.6378, -182.9842, -2245.7412, 31.1492, 125.6378, "Mellnik´s House", "mh"))
 	{
 	    PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=83836", -182.9842,-2245.7412,31.1492, 100.0, 1);
 	}
@@ -7169,6 +7170,11 @@ YCMD:ah(playerid, params[], help)
 	{
 	    PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=83836", 3133.7415, -1107.2448, 2.1289, 100.0, 1);
 	}
+	return 1;
+}
+YCMD:ezh(playerid, params[], help)
+{
+    PortPlayerMap(playerid, -2357.8022, -3158.3811, 4.3641, 80, "Ezio´s House", "ezh");
 	return 1;
 }
 YCMD:bikec(playerid, params[], help)
