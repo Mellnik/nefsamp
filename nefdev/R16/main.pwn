@@ -699,7 +699,6 @@ enum e_player_data
 	tMedkit,
 	MedkitTime,
 	PayDay,
-	tInfo,
   	Houses,
 	Props,
 	GCPlayer,
@@ -1755,7 +1754,6 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
   	PlayerText:DynamicAchTD[MAX_PLAYERS][2],
   	PlayerText:TXTKillerText[MAX_PLAYERS],
   	PlayerText:TXTGunGameInfo[MAX_PLAYERS],
-  	PlayerText:TXTPlayerInfo[MAX_PLAYERS],
   	PlayerText:vTD[MAX_PLAYERS],
 	PlayerText:TXTRaceInfo[MAX_PLAYERS],
 	PlayerText:TXTInfoTD[MAX_PLAYERS],
@@ -1779,7 +1777,6 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
 	Text:TXTGodTD,
 	Text:CheckTD,
 	Text:NewMsgTD,
-	Text:ErrorTD,
     Text:AchTD[6],
 	Text:TXTWelcome[5],
 	Text:JailTD,
@@ -3343,7 +3340,7 @@ public OnPlayerDisconnect(playerid, reason)
 	    	if(gTeam[i] == SPEC && PlayerInfo[i][SpecID] == playerid)
 	    	{
 	    	    Command_ReProcess(i, "/specoff", false);
-				SendInfo(i, "~r~~h~~h~Player disconnected!", 4000);
+	    	    ShowInfo(i, "Player disconnected", "");
 			}
 			
 	  		if(Iter_Contains(PlayerIgnore[i], playerid))
@@ -3442,10 +3439,7 @@ public OnPlayerCommandPerformed(playerid, cmdtext[], success)
 
 	if(!success)
 	{
-	    format(gstr, sizeof(gstr), "~g~~h~~h~Unknown command: %s!~n~~n~~w~These commands may help you~n~~g~~h~~h~/help /cmds /tele /rules", cmdtext);
-	    SendInfo(playerid, gstr, 4000);
- 		TextDrawShowForPlayer(playerid, ErrorTD);
-		SetTimerEx("hideError", 4000, false, "i", playerid);
+	    ShowInfo(playerid, "unknown command", "type ~g~/c ~w~for all commands");
 	}
 	return 1;
 }
@@ -13066,11 +13060,11 @@ YCMD:admins(playerid, params[], help)
 	    {
 	        if(IsPlayerOnDesktop(i))
 	        {
-				format(gstr, sizeof(gstr), "%s(%i) | %s | [AFK]\n", __GetName(i), i, StaffLevels[PlayerInfo[i][Level]][e_rank]);
+				format(gstr, sizeof(gstr), "* %s(%i) (%s) [AFK]\n", __GetName(i), i, StaffLevels[PlayerInfo[i][Level]][e_rank]);
 			}
 			else
 			{
-			    format(gstr, sizeof(gstr), "%s(%i) | %s\n", __GetName(i), i, StaffLevels[PlayerInfo[i][Level]][e_rank]);
+			    format(gstr, sizeof(gstr), "* %s(%i) (%s)\n", __GetName(i), i, StaffLevels[PlayerInfo[i][Level]][e_rank]);
 			}
 			strcat(finstring, gstr);
 			count++;
@@ -13085,16 +13079,17 @@ YCMD:admins(playerid, params[], help)
 	    {
 	        if(IsPlayerOnDesktop(i))
 	        {
-				format(gstr, sizeof(gstr), "%s(%i) | [AFK]\n", __GetName(i), i);
+				format(gstr, sizeof(gstr), "* %s(%i) | [AFK]\n", __GetName(i), i);
 	        }
 			else
 			{
-			    format(gstr, sizeof(gstr), "%s(%i)\n", __GetName(i), i);
+			    format(gstr, sizeof(gstr), "* %s(%i)\n", __GetName(i), i);
 			}
 	        strcat(finstring, gstr);
 			count++;
 	    }
 	}
+	
 	if(count == 0)
 	{
 	    SendInfo(playerid, "~y~~h~No admins/VIPs online!", 2100);
@@ -13103,7 +13098,7 @@ YCMD:admins(playerid, params[], help)
 	{
 	    format(gstr, sizeof(gstr), "\n"white"Total of "nef_yellow"%i "white"admins/VIPs online!", count);
 	    strcat(finstring, gstr);
-		ShowPlayerDialog(playerid, ADMINS_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" - Admins", finstring, "OK", "");
+		ShowPlayerDialog(playerid, ADMINS_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" :: Admins", finstring, "OK", "");
 	}
 	return 1;
 }
@@ -15873,12 +15868,6 @@ YCMD:rampdown(playerid, params[], help)
     if(IsMellnikRampMoving) return SCM(playerid, -1, ""er"Ramp is currently working");
     IsMellnikRampMoving = true;
     MoveDynamicObject(MellnikRamp, -153.74190, -2210.68457, 2.17288, 2.50);
-	return 1;
-}
-
-YCMD:t1(playerid, params[], help)
-{
-	GameTextForPlayer(playerid, "~y~unknown command~n~~w~type ~y~/c ~w~for all commands", 3000, 3);
 	return 1;
 }
 
@@ -22678,17 +22667,6 @@ CreateTextdraws()
 	TextDrawSetProportional(AchTD[5], 1);
 	TextDrawSetShadow(AchTD[5], 0);
 
-	ErrorTD = TextDrawCreate(385.777801, 335.004394, "LD_CHAT:badchat");
-	TextDrawLetterSize(ErrorTD, 0.449999, 1.600000);
-	TextDrawTextSize(ErrorTD, 42.222240, 31.360012);
-	TextDrawAlignment(ErrorTD, 2);
-	TextDrawColor(ErrorTD, -1);
-	TextDrawSetShadow(ErrorTD, 0);
-	TextDrawSetOutline(ErrorTD, 1);
-	TextDrawBackgroundColor(ErrorTD, 51);
-	TextDrawFont(ErrorTD, 4);
-	TextDrawSetProportional(ErrorTD, 1);
-
 	NewMsgTD = TextDrawCreate(370.222778, 329.031158, "LD_CHAT:goodcha");
 	TextDrawLetterSize(NewMsgTD, 0.000000, 0.000000);
 	TextDrawTextSize(NewMsgTD, 32.444427, 28.871093);
@@ -23049,6 +23027,7 @@ LoadServerStaticMeshes()
     Command_AddAltNamed("xmas", "christ");
 	#endif
     Command_AddAltNamed("time", "stime");
+    Command_AddAltNamed("rocketdm", "rocket");
     Command_AddAltNamed("gmenu", "gstats");
     Command_AddAltNamed("gmenu", "gmembers");
     Command_AddAltNamed("gsetrank", "gsetlevel");
@@ -28132,18 +28111,6 @@ function:InitSession(playerid)
 	PlayerTextDrawTextSize(playerid, TXTGunGameInfo[playerid], 640.000000, -7.000000);
 	PlayerTextDrawSetSelectable(playerid, TXTGunGameInfo[playerid], 0);
 
-	TXTPlayerInfo[playerid] = CreatePlayerTextDraw(playerid, 16.000000, 178.000000, "---");
-	PlayerTextDrawBackgroundColor(playerid, TXTPlayerInfo[playerid], 168430202);
-	PlayerTextDrawFont(playerid, TXTPlayerInfo[playerid], 1);
-	PlayerTextDrawLetterSize(playerid, TXTPlayerInfo[playerid], 0.230000, 1.199998);
-	PlayerTextDrawColor(playerid, TXTPlayerInfo[playerid], -1);
-	PlayerTextDrawSetOutline(playerid, TXTPlayerInfo[playerid], 1);
-	PlayerTextDrawSetProportional(playerid, TXTPlayerInfo[playerid], 1);
-	PlayerTextDrawUseBox(playerid, TXTPlayerInfo[playerid], 1);
-	PlayerTextDrawBoxColor(playerid, TXTPlayerInfo[playerid], 168430165);
-	PlayerTextDrawTextSize(playerid, TXTPlayerInfo[playerid], 201.000000, -7.000000);
-	PlayerTextDrawSetSelectable(playerid, TXTPlayerInfo[playerid], 0);
-
 	PreloadAnimLib(playerid, "DANCING");
     PreloadAnimLib(playerid, "DANCING");
 
@@ -28307,7 +28274,7 @@ function:InitSession(playerid)
 	return 1;
 }
 
-function:SendInfo(playerid, info[], time)
+/*function:SendInfo(playerid, info[], time)
 {
 	if(strlen(info) > 250) return 1;
 	KillTimer(PlayerInfo[playerid][tInfo]);
@@ -28316,11 +28283,13 @@ function:SendInfo(playerid, info[], time)
 	PlayerTextDrawShow(playerid, TXTPlayerInfo[playerid]);
 	PlayerPlaySound(playerid, 1085, 0.0, 0.0, 0.0);
 	return 1;
-}
+}*/
 
-function:HideInfo(playerid)
+function:ShowInfo(playerid, top[], desc[], time = 3000, type = 3)
 {
-	PlayerTextDrawHide(playerid, TXTPlayerInfo[playerid]);
+	if(strlen(info) > 200) return 1;
+	format(gstr, sizeof(gstr), "~y~%s~n~~w~%s", top, desc);
+    GameTextForPlayer(playerid, gstr, time, type);
 	return 1;
 }
 
@@ -28817,12 +28786,6 @@ CheckPlayerGod(playerid)
 function:hideCheck(playerid)
 {
     TextDrawHideForPlayer(playerid, CheckTD);
-	return 1;
-}
-
-function:hideError(playerid)
-{
-    TextDrawHideForPlayer(playerid, ErrorTD);
 	return 1;
 }
 
@@ -30609,7 +30572,6 @@ ResetPlayerModules(playerid)
 	PlayerInfo[playerid][tMedkit] = -1;
 	PlayerInfo[playerid][MedkitTime] = 0;
 	PlayerInfo[playerid][PayDay] = 60;
-	PlayerInfo[playerid][tInfo] = -1;
   	PlayerInfo[playerid][Houses] = 0;
 	PlayerInfo[playerid][Props] = 0;
 	PlayerInfo[playerid][GCPlayer] = INVALID_PLAYER_ID;
