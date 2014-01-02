@@ -1780,10 +1780,12 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
     Text:AchTD[6],
 	Text:TXTWelcome[5],
 	Text:JailTD,
-	Text:TXTFooter,
+	Text:TXTMinigames,
 	#if WINTER_EDITION == true
 	Text:TXTWinterEdition,
 	#endif
+	Text:TXTFooterP1,
+	Text:TXTFooterP2,
 	Text:TXTFooterBlack,
 	Text:TXTOnJoin[2],
 	Text:TXTVersionInfo,
@@ -2565,9 +2567,11 @@ public OnPlayerRequestClass(playerid, classid)
 
 	ShowPlayerWelcomeTextdraws(playerid);
 	TextDrawShowForPlayer(playerid, TXTFooterBlack);
+	TextDrawShowForPlayer(playerid, TXTFooterP1);
+	TextDrawShowForPlayer(playerid, TXTFooterP2);
 	TextDrawShowForPlayer(playerid, TXTRandomInfo);
 	TextDrawShowForPlayer(playerid, TXTVersionInfo);
-	TextDrawShowForPlayer(playerid, TXTFooter);
+	TextDrawShowForPlayer(playerid, TXTMinigames);
 	#if WINTER_EDITION == true
 	TextDrawShowForPlayer(playerid, TXTWinterEdition);
 	#endif
@@ -4414,7 +4418,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		}
 		case THREAD_ASSIGN_RANK_2:
 		{
-		    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s큦 Rank has been assigned to %s", PlayerInfo[extraid][GangAssignRank], GangPositions[PlayerInfo[extraid][RankSelected]][E_gang_pos_name]);
+		    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s's Rank has been assigned to %s", PlayerInfo[extraid][GangAssignRank], GangPositions[PlayerInfo[extraid][RankSelected]][E_gang_pos_name]);
 			GangMSG(PlayerInfo[extraid][GangID], gstr);
 
 			PlayerInfo[extraid][RankSelected] = 0;
@@ -7149,12 +7153,12 @@ YCMD:dfun2(playerid, params[], help)
 }
 YCMD:mi(playerid, params[], help)
 {
-    PortPlayerMap(playerid, -3801.8572, 498.8828, 16.5183, 121.5722, "Mellnik큦 Island", "mi");
+    PortPlayerMap(playerid, -3801.8572, 498.8828, 16.5183, 121.5722, "Mellnik's Island", "mi");
     return 1;
 }
 YCMD:mh(playerid, params[], help)
 {
-	if(PortPlayerMapVeh(playerid,-182.9842, -2245.7412, 31.1492, 125.6378, -182.9842, -2245.7412, 31.1492, 125.6378, "Mellnik큦 House", "mh"))
+	if(PortPlayerMapVeh(playerid,-182.9842, -2245.7412, 31.1492, 125.6378, -182.9842, -2245.7412, 31.1492, 125.6378, "Mellnik's House", "mh"))
 	{
 	    PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=83836", -182.9842,-2245.7412,31.1492, 100.0, 1);
 	}
@@ -7170,7 +7174,7 @@ YCMD:ah(playerid, params[], help)
 }
 YCMD:ezh(playerid, params[], help)
 {
-    PortPlayerMap(playerid, -2357.8022, -3158.3811, 4.3641, 80, "Ezio큦 House", "ezh");
+    PortPlayerMap(playerid, -2357.8022, -3158.3811, 4.3641, 80, "Ezio's House", "ezh");
 	return 1;
 }
 YCMD:bikec(playerid, params[], help)
@@ -8155,8 +8159,10 @@ YCMD:hidef(playerid, params[], help)
 {
     PlayerInfo[playerid][bTDEnabled] = false;
 	TextDrawHideForPlayer(playerid, TXTTeleportInfo);
-    TextDrawHideForPlayer(playerid, TXTFooter);
+    TextDrawHideForPlayer(playerid, TXTMinigames);
     TextDrawHideForPlayer(playerid, TXTFooterBlack);
+	TextDrawHideForPlayer(playerid, TXTFooterP1);
+	TextDrawHideForPlayer(playerid, TXTFooterP2);
     TextDrawHideForPlayer(playerid, TXTRandomInfo);
     TextDrawHideForPlayer(playerid, TXTVersionInfo);
     TextDrawHideForPlayer(playerid, TXTGodTD);
@@ -8171,8 +8177,10 @@ YCMD:showf(playerid, params[], help)
 {
     PlayerInfo[playerid][bTDEnabled] = true;
 	TextDrawShowForPlayer(playerid, TXTTeleportInfo);
-	TextDrawShowForPlayer(playerid, TXTFooter);
+	TextDrawShowForPlayer(playerid, TXTMinigames);
 	TextDrawShowForPlayer(playerid, TXTFooterBlack);
+	TextDrawShowForPlayer(playerid, TXTFooterP1);
+	TextDrawShowForPlayer(playerid, TXTFooterP2);
     TextDrawShowForPlayer(playerid, TXTRandomInfo);
     TextDrawShowForPlayer(playerid, TXTVersionInfo);
 	PlayerTextDrawShow(playerid, TXTWantedsTD[playerid]);
@@ -8581,7 +8589,7 @@ YCMD:buygc(playerid, params[], help)
 	    format(gstr2, sizeof(gstr2), "INSERT INTO `sells` VALUES (NULL, 2, %i, %i, %i, %i);", PlayerInfo[playerid][GCOffer], PlayerInfo[playerid][GCPrice], PlayerInfo[PlayerInfo[playerid][GCPlayer]][AccountID], PlayerInfo[playerid][AccountID]);
 	    mysql_tquery(g_SQL_handle, gstr2, "", "");
 
-	    format(gstr, sizeof(gstr), ""blue"You have accepted %s큦 offer and bough %sGC for $%s", __GetName(PlayerInfo[playerid][GCPlayer]), ToCurrency(PlayerInfo[playerid][GCOffer]), ToCurrency(PlayerInfo[playerid][GCPrice]));
+	    format(gstr, sizeof(gstr), ""blue"You have accepted %s's offer and bough %sGC for $%s", __GetName(PlayerInfo[playerid][GCPlayer]), ToCurrency(PlayerInfo[playerid][GCOffer]), ToCurrency(PlayerInfo[playerid][GCPrice]));
 	    SCM(playerid, -1, gstr);
 	    format(gstr, sizeof(gstr), ""blue"%s(%i) has accepted your offer. You sold %sGC for $%s", __GetName(playerid), playerid, ToCurrency(PlayerInfo[playerid][GCOffer]), ToCurrency(PlayerInfo[playerid][GCPrice]));
 	    SCM(PlayerInfo[playerid][GCPlayer], -1, gstr);
@@ -8734,7 +8742,7 @@ YCMD:buyvip(playerid, params[], help)
 	    format(gstr2, sizeof(gstr2), "INSERT INTO `sells` VALUES (NULL, 1, 1, %i, %i, %i);", PlayerInfo[playerid][VIPOffer], PlayerInfo[PlayerInfo[playerid][VIPPlayer]][AccountID], PlayerInfo[playerid][AccountID]);
 	    mysql_tquery(g_SQL_handle, gstr2, "", "");
 
-	    format(gstr, sizeof(gstr), ""blue"You have accepted %s큦 offer and bough VIP for $%s", __GetName(PlayerInfo[playerid][VIPPlayer]), ToCurrency(PlayerInfo[playerid][VIPOffer]));
+	    format(gstr, sizeof(gstr), ""blue"You have accepted %s's offer and bough VIP for $%s", __GetName(PlayerInfo[playerid][VIPPlayer]), ToCurrency(PlayerInfo[playerid][VIPOffer]));
 	    SCM(playerid, -1, gstr);
 	    format(gstr, sizeof(gstr), ""blue"%s(%i) has accepted your offer. You sold your VIP for $%s", __GetName(playerid), playerid, ToCurrency(PlayerInfo[playerid][VIPOffer]));
 	    SCM(PlayerInfo[playerid][VIPPlayer], -1, gstr);
@@ -8881,7 +8889,7 @@ YCMD:buy(playerid, params[], help)
 	    PlayerPlaySound(playerid, 1149, 0.0, 0.0, 0.0);
 	    format(gstr, sizeof(gstr), ""nef" "yellow_e"%s(%i) bought the house %i for $%s!", __GetName(playerid), playerid, HouseInfo[i][iID], ToCurrency(HouseInfo[i][price]));
 	    SCMToAll(-1, gstr);
-	    ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""white"House bought!", ""white"You can now use these commands:\n\n/hmenu\n/lock\n/enter\n/exit\n/sell\n\nCustomize your house큦 interior by using /hmenu", "OK", "");
+	    ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""white"House bought!", ""white"You can now use these commands:\n\n/hmenu\n/lock\n/enter\n/exit\n/sell\n\nCustomize your house's interior by using /hmenu", "OK", "");
 	    break;
 	}
 	if(!found) SCM(playerid, -1, ""er"You aren't near of any house");
@@ -9616,7 +9624,7 @@ YCMD:hitman(playerid, params[], help)
 
 				format(gstr, sizeof(gstr), ""nef" "YELLOW_E"%s(%i) has been last seen in '%s'", __GetName(player), player, zone);
 				SCMToAll(-1, gstr);
-				format(gstr, sizeof(gstr), "You큩e placed a bounty on %s(%i) for $%s", __GetName(player), player, ToCurrency(amount));
+				format(gstr, sizeof(gstr), "You've placed a bounty on %s(%i) for $%s", __GetName(player), player, ToCurrency(amount));
 				SCM(playerid, YELLOW, gstr);
 		    }
 		    else if(PlayerInfo[player][HitmanHit] != 0)
@@ -9627,7 +9635,7 @@ YCMD:hitman(playerid, params[], help)
 
 				format(gstr, sizeof(gstr), ""nef" "YELLOW_E"%s(%i) has been last seen in '%s'", __GetName(player), player, zone);
 				SCMToAll(-1, gstr);
-				format(gstr, sizeof(gstr), "You큩e placed a bounty on %s(%i) for $%s", __GetName(player), player, ToCurrency(amount));
+				format(gstr, sizeof(gstr), "You've placed a bounty on %s(%i) for $%s", __GetName(player), player, ToCurrency(amount));
 				SCM(playerid, YELLOW, gstr);
 		    }
 			PlayerInfo[playerid][tickLastHitman] = tick;
@@ -10871,7 +10879,7 @@ YCMD:ping(playerid, params[], help)
     if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 	if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 	
-	format(gstr, sizeof(gstr), ""nef_green"%s큦(%i) ping is %i", __GetName(player), player, GetPlayerPing(player));
+	format(gstr, sizeof(gstr), ""nef_green"%s's(%i) ping is %i", __GetName(player), player, GetPlayerPing(player));
 	SCM(playerid, -1, gstr);
 	return 1;
 }
@@ -10936,13 +10944,13 @@ YCMD:caps(playerid, params[], help)
 	 	{
 			if(PlayerInfo[player][bCaps])
 			{
-				format(gstr, sizeof(gstr), ""yellow"** "red"Admin %s(%i) has disabled %s큦 caps", __GetName(playerid), playerid, __GetName(player));
+				format(gstr, sizeof(gstr), ""yellow"** "red"Admin %s(%i) has disabled %s's caps", __GetName(playerid), playerid, __GetName(player));
 				SCMToAll(YELLOW, gstr);
 				PlayerInfo[player][bCaps] = false;
 			}
 			else
 			{
-				format(gstr, sizeof(gstr), ""yellow"** "red"Admin %s(%i) has re-enabled %s큦 caps", __GetName(playerid), playerid, __GetName(player));
+				format(gstr, sizeof(gstr), ""yellow"** "red"Admin %s(%i) has re-enabled %s's caps", __GetName(playerid), playerid, __GetName(player));
 				SCMToAll(YELLOW, gstr);
 				PlayerInfo[player][bCaps] = true;
 			}
@@ -11615,6 +11623,8 @@ YCMD:gcapture(playerid, params[], help)
 		{
 		    return ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" Gang War", ""white"This zone does not belong to your gang.", "OK", "");
 		}
+
+		if(!PlayerInfo[i][bGWarMode]) return SCM(playerid, -1, ""orange"You are not participating in this gang war");
 
 		new Float:POS[3], Iterator:Players<MAX_PLAYERS>;
 		for(new ii = 0; ii < MAX_PLAYERS; ii++)
@@ -12682,12 +12692,12 @@ YCMD:jail(playerid, params[], help)
 
 			if(strlen(reason) > 50)
 			{
-			 	Error(playerid, "Reason too long! Must be smaller than 50 characters!");
+			 	Error(playerid, "Keep the reason below 50 characters!");
 			   	return 1;
 			}
 			if(time < 10 || time > 300)
 			{
-			    Error(playerid, "Jail time must remain between 10 and 300 seconds");
+			    Error(playerid, "Jail time must be between 10 and 300 seconds");
 			    return 1;
 			}
 
@@ -13258,7 +13268,7 @@ YCMD:vip(playerid, params[], help)
 	strcat(string, ""nef_yellow"Very Important Player (VIP)\n\n"yellow_e"Features:"white"\n Access to VIP vehicles in /v\n $1,000,000 to your bank (/bank)\n");
 	strcat(string, " 2 PV slots + 1 house/bizz slot\n");
 	strcat(string, " VIP Chat (/p)\n 100\% Armor On Spawn\n Jetpack Spawn (/jetpack)\n Hydra Spawn (/hydra)\n");
-	strcat(string, " Countdown command (/cd)\n Namechange all 30 days (/changename)\n Open/Close Mellnik큦 Gate (/opengate /closegate)");
+	strcat(string, " Countdown command (/cd)\n Namechange all 30 days (/changename)\n Open/Close Mellnik's Gate (/opengate /closegate)");
 	strcat(string, "\n Spectate Players (/spec)\n More interest each PayDay\n Access to VIP Forums\n Access to Beta Changelogs\n Rainbow effect (/rainbow)\n Custom Label (/label)\n");
 	strcat(string, " Get listed in /vips and /admins\n Namechange lookup (/ncrecords)\n Play as "BLUE_E"SWAT "white"in CNR");
 	strcat(string, "\n Message to all players when joining the server\n Vehicle Control System (/vcs)\n VIP Lounge (/vipl)\n VIP Lounge Invite (/vipli)\n Direct Spawn in /adminhq\n Access to VIP Private Vehicles");
@@ -13537,7 +13547,7 @@ YCMD:adminhq(playerid, params[], help)
 	if(PlayerInfo[playerid][Level] > 0)
 	{
 		SetPlayerPos(playerid, 1797.4270,-1300.9581,120.2656);
-		format(gstr, sizeof(gstr), ""nef" Admin %s(%i) teleported to Admin큦 Headquarter! (/adminhq)", __GetName(playerid), playerid);
+		format(gstr, sizeof(gstr), ""nef" Admin %s(%i) teleported to Admin's Headquarter! (/adminhq)", __GetName(playerid), playerid);
 		SCMToAll(-1, gstr);
 	 	ResetPlayerWorld(playerid);
 	 	PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=83836", 1797.3141, -1302.0978, 120.2659, 50.0, 1);
@@ -13545,7 +13555,7 @@ YCMD:adminhq(playerid, params[], help)
 	else if(PlayerInfo[playerid][VIP] == 1)
 	{
 		SetPlayerPos(playerid, 1797.4270,-1300.9581,120.2656);
-		format(gstr, sizeof(gstr), ""nef" VIP %s(%i) teleported to Admin큦 Headquarter! (/adminhq)", __GetName(playerid), playerid);
+		format(gstr, sizeof(gstr), ""nef" VIP %s(%i) teleported to Admin's Headquarter! (/adminhq)", __GetName(playerid), playerid);
 		SCMToAll(-1, gstr);
 	 	ResetPlayerWorld(playerid);
 	 	PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=83836", 1797.3141, -1302.0978, 120.2659, 50.0, 1);
@@ -13553,7 +13563,7 @@ YCMD:adminhq(playerid, params[], help)
 	else
 	{
 	    SetPlayerPos(playerid, 1786.5049,-1298.0465,120.2656);
-		format(gstr, sizeof(gstr), ""nef" Player %s(%i) teleported to Admin큦 Headquarter! (/adminhq)", __GetName(playerid), playerid);
+		format(gstr, sizeof(gstr), ""nef" Player %s(%i) teleported to Admin's Headquarter! (/adminhq)", __GetName(playerid), playerid);
 		SCMToAll(-1, gstr);
 	    ResetPlayerWorld(playerid);
 		PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=83836", 1797.3141, -1302.0978, 120.2659, 50.0, 1);
@@ -15813,7 +15823,28 @@ YCMD:advsave(playerid, params[], help)
 
 YCMD:minigames(playerid, params[], help)
 {
-	ShowPlayerDialog(playerid, HELP_DIALOG + 3, DIALOG_STYLE_LIST, ""nef" - Minigames", "Race (/race)\nDerby (/derby)\nFallout (/fallout)\nGungame (/gungame)\nMinigun (/minigun)\nSniper (/sniper)\nDeath Match (/dm1-4)\nTeam Death Match (/tdm)\nWAR (/war)", "Select", "");
+	new string[1024];
+	format(string, sizeof(string), "Derby (/derby) "green"[%i/20]\n"white"CNR (/cnr) "green"[%i]\n"white"Race (/race) "green"[%i/12]\n"white"Rocket DM (/rocket) "green"[%i]",
+	    T_DerbyPlayers,
+	    T_CNRPlayers,
+	    T_RacePlayers,
+        T_RocketDMPlayers);
+
+	format(gstr2, sizeof(gstr2), "\n"white"Fallout (/fallout) "green"[%i]\n"white"Gungame (/gungame) "green"[%i]\nMinigun (/minigun) "green"[%i]",
+        T_FalloutPlayers,
+        T_GunGamePlayers,
+        T_MinigunPlayers);
+        
+	strcat(string, gstr2);
+
+	format(gstr2, sizeof(gstr2), "\n"white"Sniper (/sniper) "green"[%i]\n"white"Death Match (/dm1-4)\n"white"Team Death Match (/tdm) "green"[%i]\n"white"WAR (/war) "green"[%i]",
+	    T_SniperPlayers,
+	    T_TDMPlayers,
+	    T_WarPlayers);
+	    
+	strcat(string, gstr2);
+	
+	ShowPlayerDialog(playerid, HELP_DIALOG + 3, DIALOG_STYLE_LIST, ""nef" :: Minigames", string, "Select", "");
 	return 1;
 }
 
@@ -16572,7 +16603,7 @@ YCMD:handsup(playerid, params[], help)
 {
     if(gTeam[playerid] != NORMAL && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
-    GameTextForPlayer(playerid, "~w~Type /stopanim to quit anims!", 4000, 4);
+    ShowInfo(playerid, "Type ~y~/stopanim ~w~to quit", "");
     
     SetPlayerSpecialAction(playerid, SPECIAL_ACTION_HANDSUP);
 	return 1;
@@ -16582,7 +16613,7 @@ YCMD:cigar(playerid, params[], help)
 {
     if(gTeam[playerid] != NORMAL && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
-    GameTextForPlayer(playerid, "~w~Type /stopanim to quit anims!", 4000, 4);
+    ShowInfo(playerid, "Type ~y~/stopanim ~w~to quit", "");
     
     SetPlayerSpecialAction(playerid, SPECIAL_ACTION_SMOKE_CIGGY);
 	return 1;
@@ -16592,7 +16623,7 @@ YCMD:carry(playerid, params[], help)
 {
     if(gTeam[playerid] != NORMAL && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
-    GameTextForPlayer(playerid, "~w~Type /stopanim to quit anims!", 4000, 4);
+    ShowInfo(playerid, "Type ~y~/stopanim ~w~to quit", "");
     
     SetPlayerSpecialAction(playerid, SPECIAL_ACTION_CARRY);
 	return 1;
@@ -16602,7 +16633,7 @@ YCMD:piss(playerid, params[], help)
 {
     if(gTeam[playerid] != NORMAL && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
-    GameTextForPlayer(playerid, "~w~Type /stopanim to quit anims!", 4000, 4);
+    ShowInfo(playerid, "Type ~y~/stopanim ~w~to quit", "");
     
     ApplyAnimation(playerid, "PAULNMAC", "Piss_loop", 4.1, 1, 0, 0, 0, 0);
     SetPlayerSpecialAction(playerid, 68);
@@ -16613,7 +16644,7 @@ YCMD:wank(playerid, params[], help)
 {
     if(gTeam[playerid] != NORMAL && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
-    GameTextForPlayer(playerid, "~w~Type /stopanim to quit anims!", 4000, 4);
+    ShowInfo(playerid, "Type ~y~/stopanim ~w~to quit", "");
     
     ApplyAnimation(playerid, "PAULNMAC", "wank_loop", 4.1, 1, 0, 0, 0, 0);
 	return 1;
@@ -16629,7 +16660,7 @@ YCMD:crossarms(playerid, params[], help)
 	}
 
     Command_ReProcess(playerid, "/stopanims", false);
-    GameTextForPlayer(playerid, "~w~Type /stopanim to quit anims!", 4000, 4);
+    ShowInfo(playerid, "Type ~y~/stopanim ~w~to quit", "");
 
 	switch(crossarms)
 	{
@@ -16650,7 +16681,7 @@ YCMD:sit(playerid, params[], help)
     }
 
     Command_ReProcess(playerid, "/stopanims", false);
-    GameTextForPlayer(playerid, "~w~Type /stopanim to quit anims!", 4000, 4);
+    ShowInfo(playerid, "Type ~y~/stopanim ~w~to quit", "");
 
 	switch(sit)
 	{
@@ -16675,7 +16706,7 @@ YCMD:dance(playerid, params[], help)
     }
 
     Command_ReProcess(playerid, "/stopanims", false);
-    GameTextForPlayer(playerid, "~w~Type /stopanim to quit anims!", 4000, 4);
+    ShowInfo(playerid, "Type ~y~/stopanim ~w~to quit", "");
     
   	if(dance == 1)
   	{
@@ -16699,7 +16730,7 @@ YCMD:dance(playerid, params[], help)
   	}
   	else
   	{
-  	    SCM(playerid, NEF_GREEN, "Usage: /dance <1-4>");
+  	    SCM(playerid, NEF_GREEN, "Usage: /dance <1-5>");
   	}
 	return 1;
 }
@@ -16708,7 +16739,7 @@ YCMD:vomit(playerid, params[], help)
 {
     if(gTeam[playerid] != NORMAL && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
-    GameTextForPlayer(playerid, "~w~Type /stopanim to quit anims!", 4000, 4);
+    ShowInfo(playerid, "Type ~y~/stopanim ~w~to quit", "");
     
     ApplyAnimation(playerid, "FOOD", "EAT_Vomit_P", 4.1, 1, 0, 0, 0, 0);
 	return 1;
@@ -16718,7 +16749,7 @@ YCMD:drunk(playerid, params[], help)
 {
     if(gTeam[playerid] != NORMAL && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
-    GameTextForPlayer(playerid, "~w~Type /stopanim to quit anims!", 4000, 4);
+    ShowInfo(playerid, "Type ~y~/stopanim ~w~to quit", "");
 
     ApplyAnimation(playerid, "PED", "WALK_DRUNK", 4.1, 1, 0, 0, 0, 0);
 	return 1;
@@ -16728,7 +16759,7 @@ YCMD:wave(playerid, params[], help)
 {
     if(gTeam[playerid] != NORMAL && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
-    GameTextForPlayer(playerid, "~w~Type /stopanim to quit anims!", 4000, 4);
+    ShowInfo(playerid, "Type ~y~/stopanim ~w~to quit", "");
     
     ApplyAnimation(playerid, "ON_LOOKERS", "wave_loop", 4.1, 1, 0, 0, 0, 0);
 	return 1;
@@ -16738,7 +16769,7 @@ YCMD:lay(playerid, params[], help)
 {
     if(gTeam[playerid] != NORMAL && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
-    GameTextForPlayer(playerid, "~w~Type /stopanim to quit anims!", 4000, 4);
+    ShowInfo(playerid, "Type ~y~/stopanim ~w~to quit", "");
     
     ApplyAnimation(playerid, "BEACH", "Lay_Bac_Loop", 4.1, 1, 0, 0, 0, 0);
 	return 1;
@@ -16748,7 +16779,7 @@ YCMD:smoke(playerid, params[], help)
 {
     if(gTeam[playerid] != NORMAL && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
-    GameTextForPlayer(playerid, "~w~Type /stopanim to quit anims!", 4000, 4);
+    ShowInfo(playerid, "Type ~y~/stopanim ~w~to quit", "");
     
     ApplyAnimation(playerid, "SHOP", "Smoke_RYD", 4.1, 1, 0, 0, 0, 0);
 	return 1;
@@ -16758,7 +16789,7 @@ YCMD:laugh(playerid, params[], help)
 {
     if(gTeam[playerid] != NORMAL && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
-    GameTextForPlayer(playerid, "~w~Type /stopanim to quit anims!", 4000, 4);
+    ShowInfo(playerid, "Type ~y~/stopanim ~w~to quit", "");
 
     ApplyAnimation(playerid, "RAPPING", "Laugh_01", 4.1, 1, 0, 0, 0, 0);
 	return 1;
@@ -16768,7 +16799,7 @@ YCMD:fucku(playerid, params[], help)
 {
     if(gTeam[playerid] != NORMAL && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
-    GameTextForPlayer(playerid, "~w~Type /stopanim to quit anims!", 4000, 4);
+    ShowInfo(playerid, "Type ~y~/stopanim ~w~to quit", "");
 
     ApplyAnimation(playerid, "PED", "fucku", 4.1, 1, 0, 0, 0, 0);
 	return 1;
@@ -16865,7 +16896,7 @@ YCMD:rob(playerid, params[], help)
 	{
 	    if(gTeam[playerid] != NORMAL && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
 		Command_ReProcess(playerid, "/stopanims", false);
-		GameTextForPlayer(playerid, "~w~Type /stopanim to quit anims!", 4000, 4);
+		ShowInfo(playerid, "Type ~y~/stopanim ~w~to quit", "");
 	    
 	    ApplyAnimation(playerid, "SHOP", "ROB_Loop", 4.1, 1, 0, 0, 0, 0);
 	}
@@ -18473,7 +18504,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 		  			MySQL_SavePlayer(ID, false);
 
-				    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s set %s큦 rank to %s", __GetName(playerid), __GetName(ID), GangPositions[PlayerInfo[playerid][RankSelected]][E_gang_pos_name]);
+				    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s set %s's rank to %s", __GetName(playerid), __GetName(ID), GangPositions[PlayerInfo[playerid][RankSelected]][E_gang_pos_name]);
 					GangMSG(PlayerInfo[playerid][GangID], gstr);
 					
 					PlayerInfo[playerid][RankSelected] = 0;
@@ -18703,7 +18734,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	                }
 	                case 3: // Minigames
 	                {
-	                    ShowPlayerDialog(playerid, HELP_DIALOG + 3, DIALOG_STYLE_LIST, ""nef" - Minigames", "Race (/race)\nDerby (/derby)\nFallout (/fallout)\nGungame (/gungame)\nMinigun (/minigun)\nSniper (/sniper)\nDeath Match (/dm1-4)", "Select", "");
+	                    Command_ReProcess(playerid, "/minigames", false);
 	                }
 	                case 4: // Maps
 	                {
@@ -18738,15 +18769,17 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        {
 	            switch(listitem)
 	            {
-	                case 0: Command_ReProcess(playerid, "/race", false);
-	                case 1: Command_ReProcess(playerid, "/derby", false);
-	                case 2: Command_ReProcess(playerid, "/fallout", false);
-	                case 3: Command_ReProcess(playerid, "/gungame", false);
-	                case 4: Command_ReProcess(playerid, "/minigun", false);
-	                case 5: Command_ReProcess(playerid, "/sniper", false);
-	                case 6: ShowPlayerDialog(playerid, HELP_DIALOG + 4, DIALOG_STYLE_MSGBOX, ""nef" - Minigames", ""white"Death Match (/dm1-4)", "OK", "Back");
-	                case 7: Command_ReProcess(playerid, "/tdm", false);
-	                case 8: Command_ReProcess(playerid, "/war", false);
+	                case 0: Command_ReProcess(playerid, "/derby", false);
+	                case 1: Command_ReProcess(playerid, "/cnr", false);
+	                case 2: Command_ReProcess(playerid, "/race", false);
+	                case 3: Command_ReProcess(playerid, "/rocket", false);
+	                case 4: Command_ReProcess(playerid, "/fallout", false);
+	                case 5: Command_ReProcess(playerid, "/gungame", false);
+	                case 6: Command_ReProcess(playerid, "/minigun", false);
+	                case 7: Command_ReProcess(playerid, "/sniper", false);
+	                case 8: ShowPlayerDialog(playerid, HELP_DIALOG + 4, DIALOG_STYLE_MSGBOX, ""nef" - Minigames", ""white"Death Match (/dm1-4)", "OK", "Back");
+	                case 9: Command_ReProcess(playerid, "/tdm", false);
+	                case 10: Command_ReProcess(playerid, "/war", false);
 	            }
 	            return true;
 	        }
@@ -18849,7 +18882,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						strcat(cstring, ""yellow"/skin "white"- change your current skin\n");
 						strcat(cstring, ""yellow"/netstats "white"- servers network stats\n");
 						strcat(cstring, ""yellow"/mynetstats "white"- your network stats\n");
-						strcat(cstring, ""yellow"/ping "white"- check somebody큦 ping\n");
+						strcat(cstring, ""yellow"/ping "white"- check somebody's ping\n");
 						strcat(cstring, ""yellow"/toggletoys "white"- hide/show your toys\n");
 					}
 					case 6: return Command_ReProcess(playerid, "/vip", false);
@@ -18882,7 +18915,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					    break;
 					}
 				}
-
 				Command_ReProcess(playerid, command, false);
 		        return true;
 		    }
@@ -19736,7 +19768,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						new Float:POS[4],
 						    vlabel[128];
 
-                        format(vlabel, sizeof(vlabel), ""nef_yellow"%s큦 \n"white"private vehicle", __GetName(playerid));
+                        format(vlabel, sizeof(vlabel), ""nef_yellow"%s's \n"white"private vehicle", __GetName(playerid));
 
 						GetPlayerPos(playerid, POS[0], POS[1], POS[2]);
 						GetPlayerFacingAngle(playerid, POS[3]);
@@ -19891,7 +19923,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				new Float:POS[4],
 				    vlabel[128];
 
-                format(vlabel, sizeof(vlabel), ""nef_yellow"%s큦 \n"white"private vehicle", __GetName(playerid));
+                format(vlabel, sizeof(vlabel), ""nef_yellow"%s's \n"white"private vehicle", __GetName(playerid));
 
 				GetPlayerPos(playerid, POS[0], POS[1], POS[2]);
 				GetPlayerFacingAngle(playerid, POS[3]);
@@ -20163,7 +20195,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				new Float:POS[4],
 				    vlabel[128];
 
-                format(vlabel, sizeof(vlabel), ""nef_yellow"%s큦 \n"white"private vehicle", __GetName(playerid));
+                format(vlabel, sizeof(vlabel), ""nef_yellow"%s's \n"white"private vehicle", __GetName(playerid));
 
 				GetPlayerPos(playerid, POS[0], POS[1], POS[2]);
 				GetPlayerFacingAngle(playerid, POS[3]);
@@ -20819,7 +20851,7 @@ function:BGVoting()
 
 	if(highestmapvotes == BGMapVotes[0])
 	{
-	    BGMSG("Map 'Forest' won! Let큦 start!");
+	    BGMSG("Map 'Forest' won! Let's start!");
 		CurrentBGMap = BG_MAP1;
 		ClearBGVotes();
 		ExecBGTimer();
@@ -20872,7 +20904,7 @@ function:BGVoting()
 	}
 	else if(highestmapvotes == BGMapVotes[1])
 	{
-	    BGMSG("Map 'Quaters' won! Let큦 start!");
+	    BGMSG("Map 'Quaters' won! Let's start!");
 	    CurrentBGMap = BG_MAP2;
 	    ClearBGVotes();
 	    ExecBGTimer();
@@ -20925,7 +20957,7 @@ function:BGVoting()
 	}
 	else if(highestmapvotes == BGMapVotes[2])
 	{
-	    BGMSG("Map 'Rust' won! Let큦 start!");
+	    BGMSG("Map 'Rust' won! Let's start!");
 	    CurrentBGMap = BG_MAP3;
 	    ClearBGVotes();
 	    ExecBGTimer();
@@ -20978,7 +21010,7 @@ function:BGVoting()
 	}
 	else if(highestmapvotes == BGMapVotes[3])
 	{
-	    BGMSG("Map 'Italy' won! Let큦 start!");
+	    BGMSG("Map 'Italy' won! Let's start!");
 	    CurrentBGMap = BG_MAP4;
 	    ClearBGVotes();
 	    ExecBGTimer();
@@ -21031,7 +21063,7 @@ function:BGVoting()
 	}
 	else if(highestmapvotes == BGMapVotes[4])
 	{
-	    BGMSG("Map 'Medieval' won! Let큦 start!");
+	    BGMSG("Map 'Medieval' won! Let's start!");
 	    CurrentBGMap = BG_MAP5;
 	    ClearBGVotes();
 	    ExecBGTimer();
@@ -22560,30 +22592,47 @@ CreateTextdraws()
 	TextDrawColor(JailTD, -1);
 	TextDrawFont(JailTD, 4);
 
-	TXTFooter = TextDrawCreate(303.000000, 437.000000, "~w~/derby 0 /cnr 0 /race 0 /fallout 0 /gungame 0 /tdm 0 /war 0 /minigun 0 /sniper 0 /rocketdm 0");
-	TextDrawAlignment(TXTFooter, 2);
-	TextDrawBackgroundColor(TXTFooter, 255);
-	TextDrawFont(TXTFooter, 1);
-	TextDrawLetterSize(TXTFooter, 0.239999, 0.899999);
-	TextDrawColor(TXTFooter, -1);
-	TextDrawSetOutline(TXTFooter, 0);
-	TextDrawSetProportional(TXTFooter, 1);
-	TextDrawSetShadow(TXTFooter, 1);
-	TextDrawSetSelectable(TXTFooter, 0);
+	TXTMinigames = TextDrawCreate(637.000000, 3.000000, "~g~~h~~h~/derby 0 ~y~/cnr 0 ~b~~h~/race 0 ~r~~h~/tdm 0 ~p~/fallout 0 ~w~/gungame 0 ~y~/war 0 ~g~~h~/sniper 0 ~b~~h~~h~/mini 0 ~r~/rocket 0");
+	TextDrawAlignment(TXTMinigames, 3);
+	TextDrawBackgroundColor(TXTMinigames, 255);
+	TextDrawFont(TXTMinigames, 3);
+	TextDrawLetterSize(TXTMinigames, 0.209997, 1.000000);
+	TextDrawColor(TXTMinigames, -1);
+	TextDrawSetOutline(TXTMinigames, 1);
+	TextDrawSetProportional(TXTMinigames, 1);
+	TextDrawSetSelectable(TXTMinigames, 0);
 
-	TXTFooterBlack = TextDrawCreate(300.000000, 436.000000, "     ");
+	TXTFooterBlack = TextDrawCreate(321.000000, 434.000000, "~n~");
 	TextDrawAlignment(TXTFooterBlack, 2);
 	TextDrawBackgroundColor(TXTFooterBlack, 255);
 	TextDrawFont(TXTFooterBlack, 1);
-	TextDrawLetterSize(TXTFooterBlack, 0.500000, 1.000000);
+	TextDrawLetterSize(TXTFooterBlack, 0.409999, 1.100000);
 	TextDrawColor(TXTFooterBlack, -1);
 	TextDrawSetOutline(TXTFooterBlack, 0);
 	TextDrawSetProportional(TXTFooterBlack, 1);
 	TextDrawSetShadow(TXTFooterBlack, 1);
 	TextDrawUseBox(TXTFooterBlack, 1);
 	TextDrawBoxColor(TXTFooterBlack, 168430165);
-	TextDrawTextSize(TXTFooterBlack, 0.000000, -1051.000000);
+	TextDrawTextSize(TXTFooterBlack, 0.000000, 729.000000);
 	TextDrawSetSelectable(TXTFooterBlack, 0);
+
+	TXTFooterP1 = TextDrawCreate(4.000000, 434.000000, "~r~www.nefserver.net ~<~~>~ Release 16 ~<~~>~");
+	TextDrawBackgroundColor(TXTFooterP1, -84215262);
+	TextDrawFont(TXTFooterP1, 3);
+	TextDrawLetterSize(TXTFooterP1, 0.209998, 1.000000);
+	TextDrawColor(TXTFooterP1, -16776961);
+	TextDrawSetOutline(TXTFooterP1, 1);
+	TextDrawSetProportional(TXTFooterP1, 1);
+	TextDrawSetSelectable(TXTFooterP1, 0);
+
+	TXTFooterP2 = TextDrawCreate(161.000000, 434.000000, "~w~Commands: /c Teleports: /t Vehicles: /v Weapons: /w Toys: /o Animations: /a Help: /h Minigames: /m");
+	TextDrawBackgroundColor(TXTFooterP2, 255);
+	TextDrawFont(TXTFooterP2, 1);
+	TextDrawLetterSize(TXTFooterP2, 0.209999, 1.000000);
+	TextDrawColor(TXTFooterP2, -1);
+	TextDrawSetOutline(TXTFooterP2, 1);
+	TextDrawSetProportional(TXTFooterP2, 1);
+	TextDrawSetSelectable(TXTFooterP2, 0);
 
 	AchTD[0] = TextDrawCreate(495.000000, 190.000000, "Box0");
 	TextDrawBackgroundColor(AchTD[0], 255);
@@ -23168,6 +23217,7 @@ LoadServerStaticMeshes()
 	Command_AddAltNamed("ar", "arrest");
 	Command_AddAltNamed("ar", "arest");
 	Command_AddAltNamed("ar", "arr");
+	Command_AddAltNamed("help", "h");
 	Command_AddAltNamed("rob", "robstore");
 	Command_AddAltNamed("hmenu", "gotomyhouse");
 	Command_AddAltNamed("hmenu", "upgrade");
@@ -23444,8 +23494,8 @@ LoadVisualStaticMeshes()
 	AddTeleport(3, "Infernus Paradise 3", "ip3", 4546.4175,655.6476,13.4803);
 	AddTeleport(3, "Speed", "speed", 680.2595, -1361.8927, 2551.2214);
 	AddTeleport(3, "Disney", "disney", 400.2232,636.9904,16.8194);
-	AddTeleport(4, "Mellnik큦 Island", "mi", -3801.8572, 498.8828, 16.5183);
-	AddTeleport(4, "Mellnik큦 House", "mh", -182.9842,-2245.7412,31.1492);
+	AddTeleport(4, "Mellnik's Island", "mi", -3801.8572, 498.8828, 16.5183);
+	AddTeleport(4, "Mellnik's House", "mh", -182.9842,-2245.7412,31.1492);
 	AddTeleport(4, "Treehouse", "treehouse", -804.6822, -2075.3076, 47.1331);
 	AddTeleport(4, "Party", "party", -377.2038,2131.4634,133.1797);
 	AddTeleport(4, "Balloon", "balloon", 295.4890,-1813.5734,52.0518);
@@ -23553,19 +23603,19 @@ LoadVisualStaticMeshes()
 	AddTeleport(7, "Market Station", "ms",  800.6712,-1330.6608,13.1061);
 	AddTeleport(5, "NRG", "nrg", 442.4455, 816.6687, 9.6865);
 	AddTeleport(8, "San Fierro Airport", "sfa", -1196.3280, -17.4523, 15.8281);
-	AddTeleport(8, "Mellnik큦 Island", "mi", -3801.8572, 498.8828, 16.5183);
+	AddTeleport(8, "Mellnik's Island", "mi", -3801.8572, 498.8828, 16.5183);
 	AddTeleport(5, "Racemap", "racemap", -2904.3860, -415.5923, 4.6274);
 	AddTeleport(5, "Racemap 2", "racemap2", 2741.1375,1969.4594,5269.7466);
 
     CreateDynamic3DTextLabel(""white"["nef_green"Private Vehicle Shop"white"]", -1, 1795.2469,-1406.5632,13.6531+0.5, 550.0);
     CreateDynamic3DTextLabel(""white"["nef_green"Gold Credits"white"]", -1, 1902.1838,-1404.4944,16.3474+0.5, 550.0);
     CreateDynamic3DTextLabel(""red">>> SLOW DOWN <<<", RED, 477.7281,1399.4580,735.2565+0.5, 60.0);
-    CreateDynamic3DTextLabel(""white"["lila"Mellnik큦 Office"white"]", -1, 1794.8202,-1311.3057,120.6237+0.5, 35.0);
+    CreateDynamic3DTextLabel(""white"["lila"Mellnik's Office"white"]", -1, 1794.8202,-1311.3057,120.6237+0.5, 35.0);
     CreateDynamic3DTextLabel(""white"["yellow"Admin Liberty City"white"]", -1, 1805.7494,-1302.6721,120.2656+0.5, 35.0);
     CreateDynamic3DTextLabel(""white"["nef_green"Private Vehicle Shop"white"]", -1, -1407.0137,1013.8229,1049.0288+0.5, 500.0);
     CreateDynamic3DTextLabel(""white"["nef_yellow"VIP"white"]\nLounge Entrance", -1, -2624.3010,1411.4360,7.2303+0.5, 35.0);
-    CreateDynamic3DTextLabel(""white"["nef_green"Mellnik큦 Ramp"white"]\n"light_yellow"/rampdown to move it down", -1, -153.74190, -2210.68457, 27.16690+0.5, 20.0);
-    CreateDynamic3DTextLabel(""white"["nef_green"Mellnik큦 Ramp"white"]\n"light_yellow"/rampup to move it up", -1, -153.74190, -2210.68457, 2.17288+0.5, 20.0);
+    CreateDynamic3DTextLabel(""white"["nef_green"Mellnik's Ramp"white"]\n"light_yellow"/rampdown to move it down", -1, -153.74190, -2210.68457, 27.16690+0.5, 20.0);
+    CreateDynamic3DTextLabel(""white"["nef_green"Mellnik's Ramp"white"]\n"light_yellow"/rampup to move it up", -1, -153.74190, -2210.68457, 2.17288+0.5, 20.0);
     CreateDynamic3DTextLabel(""white"["yellow"Bank"white"]\nPress 'SPACE'", -1, 2311.63, -3.89, 26.74+0.5, 20.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, -1, -1, -1, 20.0);
 
     // Create3DTextLabel("{ffffff}You must to enter in the balloon to start it!\nIf you are in it, write "vgreen"'/ballonup'", 0xF67E0FF, 836.0856, -2000.4789, 14.7462, 40.0, 0);
@@ -24220,7 +24270,7 @@ CreateFinalCar(playerid, pv_slot)
     
 	new vlabel[100];
 
-	format(vlabel, sizeof(vlabel), ""nef_yellow"%s큦 \n"white"private vehicle", __GetName(playerid));
+	format(vlabel, sizeof(vlabel), ""nef_yellow"%s's \n"white"private vehicle", __GetName(playerid));
 
 	PlayerPV[playerid][PVSelect[playerid]][PVehicleID] = CreateVehicle_(PlayerPV[playerid][PVSelect[playerid]][Model], 1826.9821, -1383.8724, 25.3348, 180.0407, 0, 0, -1);
 	PlayerPV[playerid][PVSelect[playerid]][PVehicleLabel] = CreateDynamic3DTextLabel(vlabel, -1, 0.0, 0.0, 0.0, 30.0, INVALID_PLAYER_ID, PlayerPV[playerid][PVSelect[playerid]][PVehicleID], 0, -1, -1, -1, 30.0);
@@ -24273,7 +24323,7 @@ PortPlayerMap(playerid, Float:X, Float:Y, Float:Z, Float:Angle, const mapname[],
 	SetPlayerFacingAngle(playerid, Angle);
 
     PlayerPlaySound(playerid, 1039, 0.0, 0.0, 0.0);
-	GameTextForPlayer(playerid, mapname, 1000, 6);
+	ShowInfo(playerid, mapname, "");
     SetCameraBehindPlayer(playerid);
     if(populate) NewMapEvent(playerid, cmd);
 	return 1;
@@ -24317,7 +24367,7 @@ PortPlayerMapVeh(playerid, Float:X, Float:Y, Float:Z, Float:Angle, Float:XVeh, F
 	}
 	
 	PlayerPlaySound(playerid, 1039, 0.0, 0.0, 0.0);
-    GameTextForPlayer(playerid, mapname, 1000, 6);
+    ShowInfo(playerid, mapname, "");
     SetCameraBehindPlayer(playerid);
     if(populate) NewMapEvent(playerid, cmd);
 	return 1;
@@ -24500,7 +24550,7 @@ function:StartDerbyMap1()
     CurrentDerbyMap = 1;
     new pcount = 0;
 	ClearDerbyVotes();
-	DerbyMSG("Map 'Lighthouse' won! Let큦 start!");
+	DerbyMSG("Map 'Lighthouse' won! Let's start!");
 
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -24595,7 +24645,7 @@ function:StartDerbyMap2()
     CurrentDerbyMap = 2;
     new pcount = 0;
 	ClearDerbyVotes();
-    DerbyMSG("Map 'Truncat' won! Let큦 start!");
+    DerbyMSG("Map 'Truncat' won! Let's start!");
 
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -24690,7 +24740,7 @@ function:StartDerbyMap3()
     CurrentDerbyMap = 3;
     new pcount = 0;
 	ClearDerbyVotes();
-	DerbyMSG("Map 'Sky Skiing' won! Let큦 start!");
+	DerbyMSG("Map 'Sky Skiing' won! Let's start!");
 
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -24785,7 +24835,7 @@ function:StartDerbyMap4()
     CurrentDerbyMap = 4;
     new pcount = 0;
 	ClearDerbyVotes();
-	DerbyMSG("Map 'Townhall' won! Let큦 start!");
+	DerbyMSG("Map 'Townhall' won! Let's start!");
 
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -24880,7 +24930,7 @@ function:StartDerbyMap5()
     CurrentDerbyMap = 5;
     new pcount = 0;
 	ClearDerbyVotes();
-	DerbyMSG("Map 'Glazz' won! Let큦 start!");
+	DerbyMSG("Map 'Glazz' won! Let's start!");
 
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -24975,7 +25025,7 @@ function:StartDerbyMap6()
     CurrentDerbyMap = 6;
     new pcount = 0;
 	ClearDerbyVotes();
-	DerbyMSG("Map 'Rambo' won! Let큦 start!");
+	DerbyMSG("Map 'Rambo' won! Let's start!");
 
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -25060,7 +25110,7 @@ function:StartDerbyMap7()
     CurrentDerbyMap = 7;
     new pcount = 0;
 	ClearDerbyVotes();
-	DerbyMSG("Map 'SilverGround' won! Let큦 start!");
+	DerbyMSG("Map 'SilverGround' won! Let's start!");
 
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -25145,7 +25195,7 @@ function:StartDerbyMap8()
     CurrentDerbyMap = 8;
     new pcount = 0;
 	ClearDerbyVotes();
-	DerbyMSG("Map 'Anubis' won! Let큦 start!");
+	DerbyMSG("Map 'Anubis' won! Let's start!");
 
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -25230,7 +25280,7 @@ function:StartDerbyMap9()
     CurrentDerbyMap = 9;
     new pcount = 0;
 	ClearDerbyVotes();
-	DerbyMSG("Map 'Confusing' won! Let큦 start!");
+	DerbyMSG("Map 'Confusing' won! Let's start!");
 
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -25893,19 +25943,19 @@ function:ProcessTick()
 	    }
 	}
                              
-	format(gstr2, sizeof(gstr2), "~w~/derby %i /cnr %i /race %i /fallout %i /gungame %i /tdm %i /war %i /minigun %i /sniper %i /rocketdm %i",
+	format(gstr2, sizeof(gstr2), "~g~~h~~h~/derby %i ~y~/cnr %i ~b~~h~/race %i ~r~~h~/tdm %i ~p~/fallout %i ~w~/gungame %i ~y~/war %i ~g~~h~/sniper %i ~b~~h~~h~/mini %i ~r~/rocket %i",
         T_DerbyPlayers,
         T_CNRPlayers,
 		T_RacePlayers,
+		T_TDMPlayers,
 		T_FalloutPlayers,
 		T_GunGamePlayers,
-		T_TDMPlayers,
 		T_WarPlayers,
 		T_MinigunPlayers,
 		T_SniperPlayers,
 		T_RocketDMPlayers);
 
-	TextDrawSetString(TXTFooter, gstr2);
+	TextDrawSetString(TXTMinigames, gstr2);
 
 	if(g_FalloutStatus != e_Fallout_Inactive)
 	{
@@ -28259,7 +28309,7 @@ function:InitSession(playerid)
 	return 1;
 }
 
-ShowInfo(playerid, top[], desc[], time = 3000, type = 3)
+ShowInfo(playerid, const top[], const desc[], time = 3000, type = 3)
 {
 	format(gstr, sizeof(gstr), "~y~%s~n~~w~%s", top, desc);
     GameTextForPlayer(playerid, gstr, time, type);
