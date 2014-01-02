@@ -1604,7 +1604,7 @@ new const CreditsProductMatrix[13][e_credits_matrix] =
 	{"Toy Slot", 1000, 1, "Permanent", "This item expands your toy slots by 1.You can have 10 toy slots at most."},
     {"Private Vehicle Slot", 1500, 1, "Permanent", "This item expands your private vehicle slots by 1.\nYou can have 8 pv slots at most."},
     {"House Slot", 2000, 1, "Permanent", "This item expands your house slots by 1. You can have 5 house slots at most."},
-    {"House Object Slot", 1000, 1, "Permanent", "This item expands your house object slots by 1. You can have 10 house object slots at most."},
+    {"House Item Slot", 1000, 1, "Permanent", "This item expands your house item slots by 1. You can have 10 house item slots at most."},
     {"Business Slot", 2000, 1, "Permanent", "This item expands your business slots by 1. You can have 5 business slots at most."},
     {"Instant Name Change Access", 1000, 1, "Usable 1 time", "This item grants you instant access to /changename."},
     {"20 Medits", 1000, 20, "Usable 20 times", "This item is usable in minigames only. Use /mk to consume 1 medkit.\nHeals you by 50hp in 10 seconds."},
@@ -3439,7 +3439,7 @@ public OnPlayerCommandPerformed(playerid, cmdtext[], success)
 
 	if(!success)
 	{
-	    ShowInfo(playerid, "unknown command", "type ~g~/c ~w~for all commands");
+	    ShowInfo(playerid, "Unknown Command", "Type ~y~/c ~w~for all commands");
 	}
 	return 1;
 }
@@ -4993,8 +4993,7 @@ public OnPlayerDeath(playerid, killerid, reason)
  		if(gTeam[i] == SPEC && PlayerInfo[i][SpecID] == playerid)
 	    {
 	        Command_ReProcess(i, "/specoff", false);
-	        format(gstr, sizeof(gstr), "~r~~h~~h~Spectated player %s(%i) died!~n~~w~", __GetName(playerid), playerid);
-       		SendInfo(i, gstr, 4000);
+	        ShowInfo(i, "Spectated player died", "");
 		}
 	}
 	
@@ -5045,7 +5044,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 				{
 				    case 3:
 				    {
-            			SendInfo(killerid, "~r~~h~~h~Triple Kill~n~~b~~h~~h~$2,000 and 1 score Bonus!", 4000);
+				        ShowInfo(killerid, "Triple Kill", "+$2,000");
         				format(gstr, sizeof(gstr), "* {%06x}%s(%i) "RED_E"is on a kill streak with 3 kills!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
 						SCMToAll(COLOR_RED, gstr);
 						GivePlayerScore_(killerid, 1, true, true);
@@ -5053,7 +5052,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 				    }
 				    case 5:
 					{
-					    SendInfo(killerid, "~r~~h~~h~MULTI Kill~n~~b~~h~~h~$4,000 and 2 score!", 4000);
+					    ShowInfo(killerid, "Multi Kill", "+$4,000");
         				format(gstr, sizeof(gstr), "* {%06x}%s(%i) "RED_E"is on a kill streak with 5 kills!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
 						SCMToAll(COLOR_RED, gstr);
 						GivePlayerScore_(killerid, 2, true, true);
@@ -5061,7 +5060,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 					}
 					case 10:
   					{
-					    SendInfo(killerid, "~r~~h~~h~ULTRA Kill~n~~b~~h~~h~$7,000 and 3 score!", 4000);
+					    ShowInfo(killerid, "Ultra Kill", "+$7,000");
      					format(gstr, sizeof(gstr), "* {%06x}%s(%i) "RED_E"is unstoppable with a 10 streak kill!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
 						SCMToAll(COLOR_RED, gstr);
 						GivePlayerScore_(killerid, 3, true, true);
@@ -5069,7 +5068,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 					}
 					case 15:
   					{
-					    SendInfo(killerid, "~r~~h~~h~MONSTER Kill~n~~b~~h~~h~$10,000 and 4 score!", 4000);
+					    ShowInfo(killerid, "~r~~h~~h~Monster Kill", "+$10,000");
    						format(gstr, sizeof(gstr), "* {%06x}%s(%i) "RED_E"can't be stopped with a 15 streak kill!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
 						SCMToAll(COLOR_RED, gstr);
 						GivePlayerScore_(killerid, 4, true, true);
@@ -5077,7 +5076,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 					}
 					case 25:
   					{
-					    SendInfo(killerid, "~r~~h~~h~Incredible Kill~n~~b~~h~~h~$15,000 and 5 score!", 4000);
+  					    ShowInfo(killerid, "~r~~h~~h~Incredible Kill", "+$15,000");
           				format(gstr, sizeof(gstr), "* {%06x}%s(%i) "RED_E"can't be stopped with a 25 streak kill!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
 						SCMToAll(COLOR_RED, gstr);
 						GivePlayerScore_(killerid, 5, true, true);
@@ -5090,7 +5089,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 					}
 					case 30:
   					{
-					    SendInfo(killerid, "~r~~h~~h~Unbelievable~n~~b~~h~~h~$20,000 and 6 score!", 4000);
+  					    ShowInfo(killerid, "~r~~h~~h~Fantastic Kill", "+$20,000");
           				format(gstr, sizeof(gstr), "* {%06x}%s(%i) "RED_E"can't be stopped with a 30 streak kill!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
 						SCMToAll(COLOR_RED, gstr);
 						GivePlayerScore_(killerid, 6, true, true);
@@ -5098,7 +5097,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 					}
 					case 40:
   					{
-   						SendInfo(killerid, "~r~~h~~h~MEGA Kill~n~~b~~h~~h~$25,000 and 7 score!", 4000);
+  					    ShowInfo(killerid, "~r~~h~~h~Mega Kill", "+$25,000");
           				format(gstr, sizeof(gstr), "* {%06x}%s(%i) "RED_E"is godlike with a 40 streak kill!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
 						SCMToAll(COLOR_RED, gstr);
 						GivePlayerScore_(killerid, 7, true, true);
@@ -5106,7 +5105,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 					}
 					case 50:
   					{
-					    SendInfo(killerid, "~r~~h~~h~Fantastic Kill~n~~b~~h~~h~$30,000 and 8 score!", 4000);
+        				ShowInfo(killerid, "~r~Unbelievable!!!", "+$30,000");
                  		format(gstr, sizeof(gstr), "* {%06x}%s(%i) "RED_E"shitting on everyone with a 50 streak kill!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
 						SCMToAll(COLOR_RED, gstr);
 						GivePlayerScore_(killerid, 8, true, true);
@@ -6191,14 +6190,11 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 				{
 				    new Float:h;
 				    GetPlayerHealth(playerid, h);
-				    if(h >= 100.0)
-				    {
-				        SendInfo(playerid, "~g~~h~~h~You are already at full heatlh!", 2500);
-				    }
-				    else
+				    
+				    if(h < 100.0)
 				    {
 					    PlayerPlaySound(playerid, 1150, 0.0, 0.0, 0.0);
-					    SendInfo(playerid, "~g~~h~~h~Health refueled!", 2500);
+					    ShowInfo(playerid, "Health refilled", "");
 						SetPlayerHealth(playerid, 100.0);
 					}
 					return 1;
@@ -6553,7 +6549,7 @@ public OnPlayerModelSelection(playerid, response, listid, modelid)
 			    
 			    if(GetPlayerCash(playerid) < 5000)
 			    {
-					SCM(playerid, -1, ""er"Each house object costs $5,000");
+					SCM(playerid, -1, ""er"Each house item costs $5,000");
 					return 1;
 			    }
 			    GivePlayerCash(playerid, -5000);
@@ -6572,9 +6568,9 @@ public OnPlayerModelSelection(playerid, response, listid, modelid)
 				
 				EditDynamicObject(playerid, HouseInfo[h_id][E_Obj_ObjectID][PlayerInfo[playerid][houseobj_selected]]);
 
-				SCM(playerid, GREEN, "Successfully bought the house object for $5,000!");
+				SCM(playerid, GREEN, "Successfully bought the house item for $5,000!");
 			}
-			else SendInfo(playerid, "~y~~h~Error couldn't find the house in that slot! Report on forums!", 2500);
+			else ShowInfo(playerid, "Couldn't find the house in that slot", "Report on forums", 5000);
 	    }
 	}
 	return 1;
@@ -6645,7 +6641,7 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 			else if(newstate == PLAYER_STATE_SPECTATING)
 			{
 			    Command_ReProcess(i, "/specoff", false);
-			    SendInfo(i, "~y~~h~Player started spectating someone else!", 4000);
+				ShowInfo(i, "Player spectating someone else", "");
 			}
 		}
 	}
@@ -6940,7 +6936,7 @@ public OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y,
 
     if(response == EDIT_RESPONSE_CANCEL)
     {
-        SendInfo(playerid, "~r~~h~~h~House object edition canceled!", 2500);
+        ShowInfo(playerid, "House item edition canceled", "");
     }
     else if(response == EDIT_RESPONSE_FINAL)
     {
@@ -6951,7 +6947,7 @@ public OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y,
 		{
 		    if(GetPlayerVirtualWorld(playerid) != (HouseInfo[h_id][iID] + 1000)) return SCM(playerid, -1, ""er"You need to be in the house you selected!");
 
-	        SendInfo(playerid, "~g~~h~~h~New house object position saved!", 2500);
+	        ShowInfo(playerid, "House item position saved", "");
 	        MoveDynamicObject(objectid, x, y, z, 5.0, rx, ry, rz);
 	        
 	        new str[64];
@@ -6961,7 +6957,7 @@ public OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y,
 	        
 			MySQL_SaveHouse(h_id, true);
 		}
-		else SendInfo(playerid, "~y~~h~Error couldn't find the house in that slot! Report on forums!", 2500);
+		else ShowInfo(playerid, "Couldn't find the house in that slot", "Report on forums", 5000);
     }
 	return 1;
 }
@@ -6972,7 +6968,7 @@ public OnPlayerEditAttachedObject(playerid, response, index, modelid, boneid, Fl
     
     if(response)
     {
-        SendInfo(playerid, "~g~~h~~h~New Toy position saved!", 2500);
+        ShowInfo(playerid, "Toy position saved", "");
 
         PlayerToys[playerid][index][toy_x] = fOffsetX;
         PlayerToys[playerid][index][toy_y] = fOffsetY;
@@ -6986,7 +6982,7 @@ public OnPlayerEditAttachedObject(playerid, response, index, modelid, boneid, Fl
     }
     else
     {
-        SendInfo(playerid, "~r~~h~~h~Toy edition canceled!", 2500);
+        ShowInfo(playerid, "Toy edition canceled", "");
 
         SetPlayerAttachedObject(playerid,
 			index,
@@ -8498,7 +8494,7 @@ YCMD:enter(playerid, params[], help)
 		SetPlayerVirtualWorld(playerid, HouseInfo[i][iID] + 1000);
   		SetPlayerPos(playerid, HouseIntTypes[HouseInfo[i][interior]][house_x], HouseIntTypes[HouseInfo[i][interior]][house_y], HouseIntTypes[HouseInfo[i][interior]][house_z]);
 		gTeam[playerid] = HOUSE;
-		SendInfo(playerid, "~g~~h~~h~House entered!~n~Type /exit to leave", 3000);
+		ShowInfo(playerid, "House entered", "type ~y~/exit ~w~to leave", 4000);
 		SCM(playerid, -1, ""er"Type /exit to leave the house");
 	}
 	else
@@ -8808,10 +8804,10 @@ YCMD:bbuy(playerid, params[], help)
 	    format(gstr, sizeof(gstr), ""business_mark"\nOwner: %s\nID: %i\nLevel: %i", __GetName(playerid), PropInfo[i][iID], PropInfo[i][E_Level]);
 	    UpdateDynamic3DTextLabelText(PropInfo[i][label], -1, gstr);
 	    DestroyDynamicMapIcon(PropInfo[i][iconid]);
-	    PropInfo[i][iconid] = CreateDynamicMapIcon(PropInfo[i][E_x], PropInfo[i][E_y], PropInfo[i][E_z], 36, 1, 0, -1, -1, 150.0);
+	    PropInfo[i][iconid] = -1; //CreateDynamicMapIcon(PropInfo[i][E_x], PropInfo[i][E_y], PropInfo[i][E_z], 36, 1, 0, -1, -1, 150.0);
 	    PropInfo[i][date] = gettime();
 	    PlayerInfo[playerid][Props]++;
-	    SendInfo(playerid, "~g~~h~~h~Business purchased!", 3500);
+	    ShowInfo(playerid, "Business bought", "");
 	    MySQL_SaveProp(i);
 	    MySQL_SavePlayer(playerid, false);
 	    PlayerInfo[playerid][tickLastPBuy] = tick;
@@ -8873,12 +8869,12 @@ YCMD:buy(playerid, params[], help)
 	    UpdateDynamic3DTextLabelText(HouseInfo[i][label], -1, gstr);
 	    DestroyDynamicMapIcon(HouseInfo[i][iconid]);
 	    DestroyDynamicPickup(HouseInfo[i][pickid]);
-	    HouseInfo[i][iconid] = CreateDynamicMapIcon(HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], 32, 1, 0, -1, -1, 150.0);
+	    HouseInfo[i][iconid] = -1; //CreateDynamicMapIcon(HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], 32, 1, 0, -1, -1, 150.0);
 	    HouseInfo[i][pickid] = CreateDynamicPickup(1272, 1, HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], -1, -1, -1, 30.0);
 	    GivePlayerCash(playerid, -HouseInfo[i][price]);
 	    HouseInfo[i][date] = gettime();
 	    PlayerInfo[playerid][Houses]++;
-	    SendInfo(playerid, "~g~~h~~h~House bought!", 3500);
+	    ShowInfo(playerid, "House bought", "");
 	    MySQL_SaveHouse(i);
 	    MySQL_SavePlayer(playerid, false);
 	    PlayerInfo[playerid][tickLastBuy] = tick;
@@ -8932,7 +8928,7 @@ YCMD:bsell(playerid, params[], help)
 	    PropInfo[i][iconid] = CreateDynamicMapIcon(PropInfo[i][E_x], PropInfo[i][E_y], PropInfo[i][E_z], 52, 1, 0, -1, -1, 150.0);
 	    PlayerInfo[playerid][Props]--;
 	    PropInfo[i][date] = 0;
-	    SendInfo(playerid, "~g~~h~~h~Business sold!", 3500);
+	    ShowInfo(playerid, "Business sold", "");
 	    MySQL_SaveProp(i);
 	    MySQL_SavePlayer(playerid, false);
 	    PlayerInfo[playerid][tickLastPSell] = tick;
@@ -9000,7 +8996,7 @@ YCMD:sell(playerid, params[], help)
 	    PlayerInfo[playerid][Houses]--;
 	    HouseInfo[i][date] = 0;
 	    GivePlayerCash(playerid, floatround(HouseInfo[i][price] / 4));
-	    SendInfo(playerid, "~g~~h~~h~House sold!", 3500);
+	    ShowInfo(playerid, "House sold", "");
 	    MySQL_SaveHouse(i, true);
 	    MySQL_SavePlayer(playerid, false);
 	    PlayerInfo[playerid][tickLastSell] = tick;
@@ -9031,7 +9027,7 @@ YCMD:unlock(playerid, params[], help)
 				        SetVehicleParamsForPlayer(GetPlayerVehicleID(playerid), i, 0, 0);
 				        PlayerPlaySound(playerid, 1027, 0.0, 0.0, 0.0);
 				    }
-				    return SendInfo(playerid, "~r~~h~~h~Unlocked!", 2000);
+				    return ShowInfo(playerid, "~r~Unlocked", "");
 			    }
 			    else SCM(playerid, -1, ""er"You are not in your private vehicle");
 			}
@@ -9063,7 +9059,7 @@ YCMD:lock(playerid, params[], help)
 				        SetVehicleParamsForPlayer(GetPlayerVehicleID(playerid), i, 0, 1);
 				        PlayerPlaySound(playerid, 1027, 0.0, 0.0, 0.0);
 				    }
-				    return SendInfo(playerid, "~g~~h~~h~Locked!", 2000);
+				    return ShowInfo(playerid, "Locked", "");
 			    }
 			}
 		}
@@ -10067,7 +10063,7 @@ YCMD:online(playerid, params[], help)
 {
 	if(PlayerInfo[playerid][Level] >= 2)
 	{
-	    SendInfo(playerid, "~g~~h~~h~You will be shown in the list", 2500);
+	    ShowInfo(playerid, "~w~Adminlist: ~g~Online", "");
 		PlayerInfo[playerid][AOnline] = true;
  	}
 	else
@@ -10081,7 +10077,7 @@ YCMD:offline(playerid, params[], help)
 {
 	if(PlayerInfo[playerid][Level] >= 2)
 	{
-	    SendInfo(playerid, "~r~~h~~h~You won't be shown in the list", 2500);
+	    ShowInfo(playerid, "~w~Adminlist: ~r~Offline", "");
 		PlayerInfo[playerid][AOnline] = false;
  	}
 	else
@@ -10479,7 +10475,7 @@ YCMD:spectators(playerid, params[], help)
 
 		if(Iter_Count(speccers) == 0)
 		{
-			return SendInfo(playerid, "~y~~h~No spectators found!", 2100);
+			return ShowInfo(playerid, "There are no spectators", "");
 		}
 
 		format(gstr, sizeof(gstr), ""nef" Displaying a list of %i admin(s)/VIP(s) spectating:", Iter_Count(speccers));
@@ -10505,7 +10501,7 @@ YCMD:jetpack(playerid, params[], help)
 	if(gTeam[playerid] != NORMAL) return SCM(playerid, RED, NOT_AVAIL);
     if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't use this command now");
 
-	SendInfo(playerid, "~y~~h~Jetpack spawned!", 2000);
+	ShowInfo(playerid, "Jetpack spawned", "");
 	SetPlayerSpecialAction(playerid, SPECIAL_ACTION_USEJETPACK);
 	return 1;
 }
@@ -12911,8 +12907,8 @@ YCMD:disarm(playerid, params[], help)
 
 			ResetPlayerWeapons(player);
 
-			SendInfo(player, "~y~~h~An Admin reset your weapons!", 2500);
-			SendInfo(playerid, "~y~~h~Player has been disarmed!", 2500);
+			ShowInfo(player, "Admin reset your weapons", "");
+			ShowInfo(playerid, "Player has been disarmed", "");
 		}
 		else
 		{
@@ -13092,7 +13088,7 @@ YCMD:admins(playerid, params[], help)
 	
 	if(count == 0)
 	{
-	    SendInfo(playerid, "~y~~h~No admins/VIPs online!", 2100);
+	    ShowInfo(playerid, "No Admins/VIPs online", "");
 	}
 	else
 	{
@@ -13127,7 +13123,7 @@ YCMD:vips(playerid, params[], help)
 	}
 	if(count == 0)
 	{
-	    SendInfo(playerid, "~y~~h~No VIPs online!", 2100);
+	    ShowInfo(playerid, "No VIPs online", "");
 	}
 	else
 	{
@@ -13885,7 +13881,7 @@ YCMD:sethouseowner(playerid, params[], help)
 	    if(HouseInfo[i][sold] == 1) return SCM(playerid, -1, ""er"House connot be sold");
 
 
-		SendInfo(playerid, "~g~~h~~h~House price has been set!", 2000);
+		ShowInfo(playerid, "~g~~h~~h~House price has been set!", 2000);
 	    break;
 	}
     if(!found) SCM(playerid, -1, ""er"You need to stand in the house pickup (Entrance)");
@@ -13915,7 +13911,7 @@ YCMD:sethouseprice(playerid, params[], help)
 	    UpdateDynamic3DTextLabelText(HouseInfo[i][label], -1, gstr);
 	    MySQL_SaveHouse(i);
 
-		SendInfo(playerid, "~g~~h~~h~House price has been set!", 2000);
+		ShowInfo(playerid, "House price has been set", "");
 	    break;
 	}
     if(!found) SCM(playerid, -1, ""er"You need to stand in the house pickup (Entrance)");
@@ -13945,7 +13941,7 @@ YCMD:sethousescore(playerid, params[], help)
 	    UpdateDynamic3DTextLabelText(HouseInfo[i][label], -1, gstr);
 	    MySQL_SaveHouse(i);
 
-		SendInfo(playerid, "~g~~h~~h~House score has been set!", 2000);
+		ShowInfo(playerid, "House score has been set", "");
 	    break;
 	}
     if(!found) SCM(playerid, -1, ""er"You need to stand in the house pickup (Entrance)");
@@ -14002,7 +13998,7 @@ YCMD:resethouse(playerid, params[], help)
 	    HouseInfo[i][iconid] = CreateDynamicMapIcon(HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], 31, 1, 0, -1, -1, 150.0);
 	    HouseInfo[i][pickid] = CreateDynamicPickup(1273, 1, HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], -1, -1, -1, 30.0);
 
-		SendInfo(playerid, "~g~~h~~h~The house has been reset!", 2000);
+		ShowInfo(playerid, "The house has been reset", "");
   		break;
 	}
     if(!found) SCM(playerid, -1, ""er"You need to stand in the house pickup (Entrance)");
@@ -14039,7 +14035,7 @@ YCMD:setbizzlevel(playerid, params[], help)
 		UpdateDynamic3DTextLabelText(PropInfo[i][label], -1, gstr);
 	    MySQL_SaveProp(i);
 
-		SendInfo(playerid, "~g~~h~~h~Business level has been set!", 2000);
+		ShowInfo(playerid, "Business level has been set", "");
 	    break;
 	}
     if(!found) SCM(playerid, -1, ""er"You need to stand in the business pickup (Entrance)");
@@ -14086,7 +14082,7 @@ YCMD:resetbizz(playerid, params[], help)
 	    DestroyDynamicMapIcon(PropInfo[i][iconid]);
 	    PropInfo[i][iconid] = CreateDynamicMapIcon(PropInfo[i][E_x], PropInfo[i][E_y], PropInfo[i][E_z], 52, 1, 0, -1, -1, 150.0);
 
-        SendInfo(playerid, "~g~~h~~h~The business has been reset!", 2000);
+        ShowInfo(playerid, "The business has been reset", "");
   		break;
 	}
     if(!found) SCM(playerid, -1, ""er"You need to stand in the business pickup (Entrance)");
@@ -14890,7 +14886,7 @@ YCMD:gangs(playerid, params[], help)
 	}
 	else
 	{
-	    SendInfo(playerid, "~r~~h~~h~No Gangs Online!", 2100);
+	    ShowInfo(playerid, "No gangs online", "");
 	}
 	return 1;
 }
@@ -15049,7 +15045,7 @@ YCMD:trailer(playerid, params[], help)
 			
 			AttachTrailerToVehicle(PlayerInfo[playerid][TrailerVid], vid);
 			
-			SendInfo(playerid, "~g~~h~~h~Trailer attached", 2000);
+			ShowInfo(playerid, "Trailer attached", "");
 		}
 		else
 		{
@@ -15223,7 +15219,7 @@ YCMD:spec(playerid, params[], help)
 
 			GameTextForPlayer(playerid, gstr, 30000, 3);
 
-			SendInfo(playerid, "~y~~h~Now spectating!", 2500);
+			ShowInfo(playerid, "Now spectating", "");
  		}
 		else
 		{
@@ -15247,14 +15243,14 @@ YCMD:specoff(playerid, params[], help)
 		    PlayerInfo[playerid][SpecID] = INVALID_PLAYER_ID;
 			TogglePlayerSpectating(playerid, false);
 			GameTextForPlayer(playerid, "~n~~n~~n~~w~Spectate mode ended", 1000, 3);
-			SendInfo(playerid, "~y~~h~No longer spectating!", 2500);
+			ShowInfo(playerid, "No longer spectating", "");
 			gTeam[playerid] = NORMAL;
 			
 			if(GetPVarInt(playerid, "HadGod") == 1) Command_ReProcess(playerid, "/god silent", false);
 		}
 		else
 		{
-			SendInfo(playerid, "~r~~h~~h~You are not spectating!", 2500);
+			ShowInfo(playerid, "You are not spectating", "");
 		}
 	}
 	else
@@ -15463,7 +15459,7 @@ YCMD:cc(playerid, params[], help)
 
 	ChangeVehicleColor(GetPlayerVehicleID(playerid), color1, color2);
 	PlayerPlaySound(playerid, 1133, 0.0, 0.0, 0.0);
-	SendInfo(playerid, "~y~~h~Changed Vehicle Color", 2000);
+	ShowInfo(playerid, "Vehicle color changed", "");
 	return 1;
 }
 
@@ -15953,9 +15949,8 @@ YCMD:lotto(playerid, params[], help)
 	
 	GivePlayerCash(playerid, -500);
 	
-	new str[50];
-	format(str, sizeof(str), "~g~~h~~h~Your lotto number: %i", PlayerInfo[playerid][DrawnNumber]);
-	SendInfo(playerid, str, 5000);
+	format(gstr, sizeof(gstr), "~w~Your lotto number: ~y~%i", PlayerInfo[playerid][DrawnNumber]);
+	ShowInfo(playerid, gstr, "", 5000);
 	return 1;
 }
 
@@ -16004,7 +15999,7 @@ YCMD:answer(playerid, params[], help)
 	GivePlayerCash(playerid, mathsAward, true, true);
 
 	mathsAnswered = 1;
-	SendInfo(playerid, "~p~Congratulations!~n~~r~You gave the right maths answer!", 4000);
+	ShowInfo(playerid, "~p~Congratulations!", "You gave the right maths answer", 4000);
 
 	format(str, sizeof(str), "Won a math challenge.\n%s", mathsCurrent, answer);
 	SetPlayerChatBubble(playerid, str, NEF_GREEN, 40.0, 12000);
@@ -17302,7 +17297,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 				    if(listitem >= PlayerInfo[playerid][Props])
 				    {
-				        SendInfo(playerid, "This business slot is currently not in use!", 2500);
+				        ShowInfo(playerid, "Business slot not in use", "");
 				    }
 				    else
 				    {
@@ -17315,7 +17310,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        {
 		        if(gTeam[playerid] != NORMAL)
 				{
-					SendInfo(playerid, "~y~~h~You can't perform this action now!", 2500);
+					ShowInfo(playerid, "You can't upgrade it now", "Type ~y~/exit ~w~to leave");
 					return 1;
 				}
 						
@@ -17332,7 +17327,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				   			SetPVarInt(playerid, "doingStunt", 0);
 				   			PlayerInfo[playerid][tickJoin_bmx] = 0;
 						}
-						else SendInfo(playerid, "Error couldn't find the business in that slot! Report on forums!", 2500);
+						else ShowInfo(playerid, "Couldn't find the business in that slot", "Report on forums", 5000);
 				    }
 				    case 1:
 				    {
@@ -17371,7 +17366,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				    
 					MySQL_SaveProp(p_id);
 				}
-				else return SendInfo(playerid, "~y~~h~Error couldn't find the business in that slot! Report on forums!", 2500);
+				else return ShowInfo(playerid, "Couldn't find the business in that slot", "Report on forums", 5000);
 
                 format(tmp, sizeof(tmp), ""nef" - Business Level Upgrade > Slot: %i", PlayerInfo[playerid][PropSlotSelected] + 1);
 				ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, tmp, string, "OK", "");
@@ -17419,9 +17414,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				
 				PlayerInfo[playerid][AdditionalToySlots]++;
 				
-				new string[128];
-				format(string, sizeof(string), "Item purchased!~n~~b~~h~Item: ~w~%s~n~~b~~h~Gold Credits: ~w~-%sGC", CreditsProductMatrix[0][E_item_name], ToCurrency(CreditsProductMatrix[0][E_item_credits]));
-				SendInfo(playerid, string, 5000);
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", ToCurrency(CreditsProductMatrix[0][E_item_credits]));
+				ShowInfo(playerid, "Item purchased", gstr, 5000);
 				
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[0][E_item_credits]);
 
@@ -17446,9 +17440,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				PlayerInfo[playerid][AdditionalPVSlots]++;
 
-				new string[128];
-				format(string, sizeof(string), "Item purchased!~n~~b~~h~Item: ~w~%s~n~~b~~h~Gold Credits: ~w~-%sGC", CreditsProductMatrix[1][E_item_name], ToCurrency(CreditsProductMatrix[1][E_item_credits]));
-                SendInfo(playerid, string, 5000);
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", ToCurrency(CreditsProductMatrix[1][E_item_credits]));
+				ShowInfo(playerid, "Item purchased", gstr, 5000);
                 
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[1][E_item_credits]);
 
@@ -17473,9 +17466,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				PlayerInfo[playerid][AdditionalHouseSlots]++;
 
-				new string[128];
-				format(string, sizeof(string), "Item purchased!~n~~b~~h~Item: ~w~%s~n~~b~~h~Gold Credits: ~w~-%sGC", CreditsProductMatrix[2][E_item_name], ToCurrency(CreditsProductMatrix[2][E_item_credits]));
-                SendInfo(playerid, string, 5000);
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", ToCurrency(CreditsProductMatrix[2][E_item_credits]));
+				ShowInfo(playerid, "Item purchased", gstr, 5000);
                 
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[2][E_item_credits]);
 
@@ -17493,16 +17485,15 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				if(PlayerInfo[playerid][AdditionalHouseObjSlots] >= 7)
 				{
-				    SCM(playerid, -1, ""er"You already have 7 additional house object slots!");
+				    SCM(playerid, -1, ""er"You already have 7 additional house item slots!");
 				    ShowDialog(playerid, CM_DIALOG);
 				    return 1;
 				}
 
 				PlayerInfo[playerid][AdditionalHouseObjSlots]++;
 
-				new string[128];
-				format(string, sizeof(string), "Item purchased!~n~~b~~h~Item: ~w~%s~n~~b~~h~Gold Credits: ~w~-%s", CreditsProductMatrix[3][E_item_name], ToCurrency(CreditsProductMatrix[3][E_item_credits]));
-                SendInfo(playerid, string, 5000);
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", ToCurrency(CreditsProductMatrix[3][E_item_credits]));
+				ShowInfo(playerid, "Item purchased", gstr, 5000);
                 
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[3][E_item_credits]);
 
@@ -17526,10 +17517,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 
 				PlayerInfo[playerid][AdditionalPropSlots]++;
-
-				new string[128];
-				format(string, sizeof(string), "Item purchased!~n~~b~~h~Item: ~w~%s~n~~b~~h~Gold Credits: ~w~-%sGC", CreditsProductMatrix[4][E_item_name], ToCurrency(CreditsProductMatrix[4][E_item_credits]));
-                SendInfo(playerid, string, 5000);
+				
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", ToCurrency(CreditsProductMatrix[4][E_item_credits]));
+				ShowInfo(playerid, "Item purchased", gstr, 5000);
                 
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[4][E_item_credits]);
 
@@ -17555,9 +17545,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				PlayerInfo[playerid][LastNameChange] = 0;
                 
-				new string[128];
-				format(string, sizeof(string), "Item purchased!~n~~b~~h~Item: ~w~%s~n~~b~~h~Gold Credits: ~w~-%sGC", CreditsProductMatrix[5][E_item_name], ToCurrency(CreditsProductMatrix[5][E_item_credits]));
-                SendInfo(playerid, string, 5000);
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", ToCurrency(CreditsProductMatrix[5][E_item_credits]));
+				ShowInfo(playerid, "Item purchased", gstr, 5000);
 
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[5][E_item_credits]);
 
@@ -17575,9 +17564,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				PlayerInfo[playerid][Medkits] += 20;
 
-				new string[128];
-				format(string, sizeof(string), "Item purchased!~n~~b~~h~Item: ~w~%s~n~~b~~h~Gold Credits: ~w~-%sGC", CreditsProductMatrix[6][E_item_name], ToCurrency(CreditsProductMatrix[6][E_item_credits]));
-                SendInfo(playerid, string, 5000);
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", ToCurrency(CreditsProductMatrix[6][E_item_credits]));
+				ShowInfo(playerid, "Item purchased", gstr, 5000);
                 
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[6][E_item_credits]);
 
@@ -17595,9 +17583,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				PlayerInfo[playerid][Medkits] += 100;
 
-				new string[128];
-				format(string, sizeof(string), "Item purchased!~n~~b~~h~Item: ~w~%s~n~~b~~h~Gold Credits: ~w~-%sGC", CreditsProductMatrix[7][E_item_name], ToCurrency(CreditsProductMatrix[7][E_item_credits]));
-                SendInfo(playerid, string, 5000);
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", ToCurrency(CreditsProductMatrix[7][E_item_credits]));
+				ShowInfo(playerid, "Item purchased", gstr, 5000);
                 
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[7][E_item_credits]);
 
@@ -17623,8 +17610,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				PlayerInfo[playerid][Boost] |= BOOST_MONEY_x2;
 
-				format(gstr, sizeof(gstr), "Item purchased!~n~~b~~h~Item: ~w~%s~n~~b~~h~Gold Credits: ~w~-%sGC", CreditsProductMatrix[8][E_item_name], ToCurrency(CreditsProductMatrix[8][E_item_credits]));
-                SendInfo(playerid, gstr, 5000);
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", ToCurrency(CreditsProductMatrix[8][E_item_credits]));
+				ShowInfo(playerid, "Item purchased", gstr, 5000);
                 
                 format(gstr, sizeof(gstr), "INSERT INTO `queue` VALUES (NULL, 2, UNIX_TIMESTAMP() + 86400, '%s');", __GetName(playerid));
                 mysql_tquery(g_SQL_handle, gstr, "", "");
@@ -17653,9 +17640,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				PlayerInfo[playerid][Boost] |= BOOST_MONEY_x3;
 
-				format(gstr, sizeof(gstr), "Item purchased!~n~~b~~h~Item: ~w~%s~n~~b~~h~Gold Credits: ~w~-%sGC", CreditsProductMatrix[9][E_item_name], ToCurrency(CreditsProductMatrix[9][E_item_credits]));
-                SendInfo(playerid, gstr, 5000);
-                
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", ToCurrency(CreditsProductMatrix[9][E_item_credits]));
+				ShowInfo(playerid, "Item purchased", gstr, 5000);
+				
                 format(gstr, sizeof(gstr), "INSERT INTO `queue` VALUES (NULL, 3, UNIX_TIMESTAMP() + 86400, '%s');", __GetName(playerid));
                 mysql_tquery(g_SQL_handle, gstr, "", "");
                 
@@ -17683,8 +17670,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				PlayerInfo[playerid][Boost] |= BOOST_SCORE_x2;
 
-				format(gstr, sizeof(gstr), "Item purchased!~n~~b~~h~Item: ~w~%s~n~~b~~h~Gold Credits: ~w~-%sGC", CreditsProductMatrix[10][E_item_name], ToCurrency(CreditsProductMatrix[10][E_item_credits]));
-                SendInfo(playerid, gstr, 5000);
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", ToCurrency(CreditsProductMatrix[10][E_item_credits]));
+				ShowInfo(playerid, "Item purchased", gstr, 5000);
                 
                 format(gstr, sizeof(gstr), "INSERT INTO `queue` VALUES (NULL, 4, UNIX_TIMESTAMP() + 86400, '%s');", __GetName(playerid));
                 mysql_tquery(g_SQL_handle, gstr, "", "");
@@ -17713,8 +17700,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				PlayerInfo[playerid][Boost] |= BOOST_SCORE_x3;
 
-				format(gstr, sizeof(gstr), "Item purchased!~n~~b~~h~Item: ~w~%s~n~~b~~h~Gold Credits: ~w~-%sGC", CreditsProductMatrix[11][E_item_name], ToCurrency(CreditsProductMatrix[11][E_item_credits]));
-                SendInfo(playerid, gstr, 5000);
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", ToCurrency(CreditsProductMatrix[11][E_item_credits]));
+				ShowInfo(playerid, "Item purchased", gstr, 5000);
                 
                 format(gstr, sizeof(gstr), "INSERT INTO `queue` VALUES (NULL, 5, UNIX_TIMESTAMP() + 86400, '%s');", __GetName(playerid));
                 mysql_tquery(g_SQL_handle, gstr, "", "");
@@ -17743,12 +17730,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				PlayerInfo[playerid][Boost] |= BOOST_MASTER;
 
-				new string[128];
-				format(string, sizeof(string), "Item purchased!~n~~b~~h~Item: ~w~%s~n~~b~~h~Gold Credits: ~w~-%sGC", CreditsProductMatrix[12][E_item_name], ToCurrency(CreditsProductMatrix[12][E_item_credits]));
-                SendInfo(playerid, string, 5000);
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", ToCurrency(CreditsProductMatrix[12][E_item_credits]));
+				ShowInfo(playerid, "Item purchased", gstr, 5000);
                 
-                format(string, sizeof(string), "INSERT INTO `queue` VALUES (NULL, 6, UNIX_TIMESTAMP() + 86400, '%s');", __GetName(playerid));
-                mysql_tquery(g_SQL_handle, string, "", "");
+                format(gstr2, sizeof(gstr2), "INSERT INTO `queue` VALUES (NULL, 6, UNIX_TIMESTAMP() + 86400, '%s');", __GetName(playerid));
+                mysql_tquery(g_SQL_handle, gstr2, "", "");
                 
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[12][E_item_credits]);
 
@@ -18078,7 +18064,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 				    if(listitem >= PlayerInfo[playerid][Houses])
 				    {
-				        SendInfo(playerid, "This house slot is currently not in use!", 2500);
+				        ShowInfo(playerid, "House slot is not in use", "");
 				    }
 				    else
 				    {
@@ -18095,7 +18081,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				    {
 				        if(gTeam[playerid] != NORMAL)
 						{
-							SendInfo(playerid, "~y~~h~You can't perform this action now!", 2500);
+							ShowInfo(playerid, "You can't do this now", "Type ~y~/exit ~w~to leave");
 							return 1;
 						}
 						
@@ -18108,13 +18094,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				   			SetPVarInt(playerid, "doingStunt", 0);
 				   			PlayerInfo[playerid][tickJoin_bmx] = 0;
 						}
-						else SendInfo(playerid, "Error couldn't find the house in that slot! Report on forums!", 2500);
+						else ShowInfo(playerid, "Couldn't find the house in that slot", "Report on forums", 5000);
 				    }
 				    case 1:
 				    {
 				        if(gTeam[playerid] != NORMAL)
 						{
-							SendInfo(playerid, "~y~~h~You can't perform this action now!", 2500);
+							ShowInfo(playerid, "Get out to upgrade the house", "");
 							return 1;
 						}
 						
@@ -18122,7 +18108,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				    }
 				    case 2:
 				    {
-				        if(gTeam[playerid] != HOUSE) return SCM(playerid, -1, ""er"You need to be in your house!");
+				        if(gTeam[playerid] != HOUSE) return ShowInfo(playerid, "You are not in your house", "");
 
 						new h_id = GetHouseIdByPlayerSlotSel(playerid);
 
@@ -18137,17 +18123,17 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							{
 								if(i > PlayerInfo[playerid][AdditionalHouseObjSlots] + 2)
 								{
-								    format(tmp, sizeof(tmp), "House Object Slot %i "red"(Locked)\n", i + 1);
+								    format(tmp, sizeof(tmp), "House Item Slot %i "red"(Locked)\n", i + 1);
 								}
 							    else
 							    {
 								    if(HouseInfo[h_id][E_Obj_Model][i] == 0)
 									{
-									    format(tmp, sizeof(tmp), "House Object Slot %i\n", i + 1);
+									    format(tmp, sizeof(tmp), "House Item Slot %i\n", i + 1);
 									}
 									else
 									{
-									    format(tmp, sizeof(tmp), "House Object Slot %i "green2"(Used)\n", i + 1);
+									    format(tmp, sizeof(tmp), "House Item Slot %i "green2"(Used)\n", i + 1);
 									}
 								}
 								strcat(string2, tmp);
@@ -18155,7 +18141,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 							ShowPlayerDialog(playerid, HOUSE_MENU_DIALOG + 2, DIALOG_STYLE_LIST, string, string2, "Select", "Cancel");
 						}
-						else SendInfo(playerid, "Error couldn't find the house in that slot! Report on forums!", 2500);
+						else ShowInfo(playerid, "Couldn't find the house in that slot", "Report on forums", 5000);
 				    }
 				}
 	            return true;
@@ -18165,11 +18151,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	            if(gTeam[playerid] != HOUSE) return SCM(playerid, -1, ""er"You need to be in your house!");
 
 				new string[128];
-				format(string, sizeof(string), ""nef" - House Menu > Slot: %i > House Object Slot %i", PlayerInfo[playerid][HouseSlotSelected] + 1, listitem + 1);
+				format(string, sizeof(string), ""nef" :: House Menu > Slot: %i > Item Slot %i", PlayerInfo[playerid][HouseSlotSelected] + 1, listitem + 1);
 
 				if(listitem > PlayerInfo[playerid][AdditionalHouseObjSlots] + 2)
 				{
-				    ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, string, ""nef_green"This house object slot is locked.\n\n"white"You may unlock it by purchasing an extra slot at Gold Credits (/gc)", "OK", "");
+				    ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, string, ""nef_green"This house item slot is locked.\n\n"white"You may unlock it by purchasing an extra slot at Gold Credits (/gc)", "OK", "");
 				}
 				else
 				{
@@ -18183,14 +18169,14 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					    
 	                    if(HouseInfo[h_id][E_Obj_Model][listitem] == 0)
 	                    {
-	                        ShowModelSelectionMenu(playerid, hobjslist, "Select House Object", 0x0500009C, 0x050000FF, 0xFAFAFA4D);
+	                        ShowModelSelectionMenu(playerid, hobjslist, "Select House Item", 0x0500009C, 0x050000FF, 0xFAFAFA4D);
 	                    }
 	                    else
 	                    {
-	                        ShowPlayerDialog(playerid, HOUSE_MENU_DIALOG + 3, DIALOG_STYLE_LIST, string, "Edit House Object Position\n"grey"Remove House Object", "Select", "Cancel");
+	                        ShowPlayerDialog(playerid, HOUSE_MENU_DIALOG + 3, DIALOG_STYLE_LIST, string, "Edit House Item Position\n"grey"Remove House Item", "Select", "Cancel");
 	                    }
 					}
-					else SendInfo(playerid, "Error couldn't find the house in that slot! Report on forums!", 2500);
+					else ShowInfo(playerid, "Couldn't find the house in that slot", "Report on forums", 5000);
 				}
 	            return true;
 	        }
@@ -18223,11 +18209,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		                    DestroyDynamic3DTextLabel(HouseInfo[h_id][E_Obj_Label][PlayerInfo[playerid][houseobj_selected]]);
 		                    HouseInfo[h_id][E_Obj_Label][PlayerInfo[playerid][houseobj_selected]] = Text3D:-1;
 		                    HouseInfo[h_id][E_Obj_ObjectID][PlayerInfo[playerid][houseobj_selected]] = -1;
-		                    SendInfo(playerid, "~y~~h~House object has been removed!", 2500);
+		                    ShowInfo(playerid, "House item has been removed", "");
 		                }
 		            }
 				}
-				else SendInfo(playerid, "Error couldn't find the house in that slot! Report on forums!", 2500);
+				else ShowInfo(playerid, "Couldn't find the house in that slot", "Report on forums", 5000);
 	            return true;
 	        }
 	        case PV_SLOT_SELECT_DIALOG:
@@ -18438,14 +18424,14 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	            {
 	                SetPlayerHealth(playerid, 100.0);
 	                SetPlayerChatBubble(playerid, "Refilled "red"Health "white"using VIP rights", -1, 40.0, 5000);
-	                SendInfo(playerid, "~g~~h~~h~Health refilled", 2000);
+	                ShowInfo(playerid, "Health refilled", "");
              	    GivePlayerCash(playerid, -5000);
 	            }
 	            else
 	            {
 	                SetPlayerArmour(playerid, 100.0);
 	                SetPlayerChatBubble(playerid, "Refilled "nef_yellow"Armor "white"using VIP rights", -1, 40.0, 5000);
-					SendInfo(playerid, "~g~~h~~h~Armor refilled", 2000);
+					ShowInfo(playerid, "Armor refilled", "");
 	    			GivePlayerCash(playerid, -2500);
 	            }
 				PlayerInfo[playerid][tickLastRefill] = GetTickCount() + 3600000;
@@ -18912,7 +18898,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        {
 		        if(gTeam[playerid] != NORMAL)
 				{
-					SendInfo(playerid, "~y~~h~You can't perform this action now!", 2500);
+					ShowInfo(playerid, "Get out to upgrade the house", "");
 					return 1;
 				}
 	            if(GetPlayerCash(playerid) < HouseIntTypes[PlayerInfo[playerid][HouseIntSelected]][price])
@@ -18964,7 +18950,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	                MySQL_SavePlayer(playerid, false);
 	                SCM(playerid, GREEN, "Successfully upgraded the interior!");
                 }
-                else SendInfo(playerid, "~y~~h~Error couldn't find the house in that slot!~n~Report on forums!", 2500);
+                else ShowInfo(playerid, "Couldn't find the house in that slot", "Report on forums", 5000);
 	            return true;
 	        }
 	        case TOPLIST_DIALOG:
@@ -19446,7 +19432,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				    {
 				        EditAttachedObject(playerid, PlayerInfo[playerid][toy_selected]);
 				        ShowPlayerToyTextdraws(playerid);
-				        SendInfo(playerid, "~y~~h~You are now editing the toy", 2500);
+				        ShowInfo(playerid, "You are now editing the toy", "");
 				    }
 				    case 1: // change bone
 					{
@@ -19467,7 +19453,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							RemovePlayerAttachedObject(playerid, PlayerInfo[playerid][toy_selected]);
 						}
 						PlayerToys[playerid][PlayerInfo[playerid][toy_selected]][toy_model] = 0;
-						SendInfo(playerid, "~y~~h~Toy removed!", 3500);
+						ShowInfo(playerid, "Toy removed", "");
 					}
 				}
 			    return true;
@@ -19498,7 +19484,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	                PlayerToys[playerid][listitem][toy_sy],
 	                PlayerToys[playerid][listitem][toy_sz]);
 
-			    SendInfo(playerid, "~g~~h~~h~Bone changed", 2500);
+			    ShowInfo(playerid, "Bone changed", "");
 			    return true;
 			}
 			case VEHICLE_DIALOG:
@@ -19728,7 +19714,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			        
 				   	if(PlayerPV[playerid][PVVMenuSel[playerid]][Model] == 0)
 					{
-					    SendInfo(playerid, "~y~~h~This pv slot is currently not in use!", 2500);
+					    ShowInfo(playerid, "PV slot is not in use", "");
 					    return 1;
 					}
 
@@ -19765,7 +19751,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 						PutPlayerInVehicle(playerid, PlayerPV[playerid][PVSelect[playerid]][PVehicleID], 0);
 
-						SendInfo(playerid, "~y~~h~Private Vehicle Spawned", 2500);
+						ShowInfo(playerid, "Private Vehicle Spawned", "");
 					}
 					case 1:
 					{
@@ -19834,7 +19820,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                         
                         MySQL_SavePlayer(playerid, true);
                         
-                        SendInfo(playerid, "~r~~h~~h~You sold your vehicle!", 4000);
+                        ShowInfo(playerid, "Vehicle sold", "");
 					}
 				}
 				return true;
@@ -19937,7 +19923,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					        AttachDynamicObjectToVehicle(PlayerPV[playerid][PVSelect[playerid]][Neon1], PlayerPV[playerid][PVSelect[playerid]][PVehicleID], -0.8, 0.0, -0.70, 0.0, 0.0, 0.0);
 					        AttachDynamicObjectToVehicle(PlayerPV[playerid][PVSelect[playerid]][Neon2], PlayerPV[playerid][PVSelect[playerid]][PVehicleID],  0.8, 0.0, -0.70, 0.0, 0.0, 0.0);
 						}
-				        SendInfo(playerid, "~g~~h~~h~Neon attached", 2500);
+				        ShowInfo(playerid, "Neon attached", "");
 	     			}
 				    case 1:
 				    {
@@ -19953,7 +19939,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					        AttachDynamicObjectToVehicle(PlayerPV[playerid][PVSelect[playerid]][Neon1], PlayerPV[playerid][PVSelect[playerid]][PVehicleID], -0.8, 0.0, -0.70, 0.0, 0.0, 0.0);
 					        AttachDynamicObjectToVehicle(PlayerPV[playerid][PVSelect[playerid]][Neon2], PlayerPV[playerid][PVSelect[playerid]][PVehicleID],  0.8, 0.0, -0.70, 0.0, 0.0, 0.0);
 						}
-				        SendInfo(playerid, "~g~~h~~h~Neon attached", 2500);
+				        ShowInfo(playerid, "Neon attached", "");
 					}
 	    			case 2:
 				    {
@@ -19969,7 +19955,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					        AttachDynamicObjectToVehicle(PlayerPV[playerid][PVSelect[playerid]][Neon1], PlayerPV[playerid][PVSelect[playerid]][PVehicleID], -0.8, 0.0, -0.70, 0.0, 0.0, 0.0);
 					        AttachDynamicObjectToVehicle(PlayerPV[playerid][PVSelect[playerid]][Neon2], PlayerPV[playerid][PVSelect[playerid]][PVehicleID],  0.8, 0.0, -0.70, 0.0, 0.0, 0.0);
                         }
-				        SendInfo(playerid, "~g~~h~~h~Neon attached", 2500);
+				        ShowInfo(playerid, "Neon attached", "");
 				    }
 				    case 3:
 				    {
@@ -19985,7 +19971,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					        AttachDynamicObjectToVehicle(PlayerPV[playerid][PVSelect[playerid]][Neon1], PlayerPV[playerid][PVSelect[playerid]][PVehicleID], -0.8, 0.0, -0.70, 0.0, 0.0, 0.0);
 					        AttachDynamicObjectToVehicle(PlayerPV[playerid][PVSelect[playerid]][Neon2], PlayerPV[playerid][PVSelect[playerid]][PVehicleID],  0.8, 0.0, -0.70, 0.0, 0.0, 0.0);
                         }
-				        SendInfo(playerid, "~g~~h~~h~Neon attached", 2500);
+				        ShowInfo(playerid, "Neon attached", "");
 					}
 	    			case 4:
 				    {
@@ -20001,7 +19987,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					        AttachDynamicObjectToVehicle(PlayerPV[playerid][PVSelect[playerid]][Neon1], PlayerPV[playerid][PVSelect[playerid]][PVehicleID], -0.8, 0.0, -0.70, 0.0, 0.0, 0.0);
 					        AttachDynamicObjectToVehicle(PlayerPV[playerid][PVSelect[playerid]][Neon2], PlayerPV[playerid][PVSelect[playerid]][PVehicleID],  0.8, 0.0, -0.70, 0.0, 0.0, 0.0);
 				        }
-				        SendInfo(playerid, "~g~~h~~h~Neon attached", 2500);
+				        ShowInfo(playerid, "Neon attached", "");
 	       			}
 	    			case 5:
 				    {
@@ -20017,11 +20003,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					        AttachDynamicObjectToVehicle(PlayerPV[playerid][PVSelect[playerid]][Neon1], PlayerPV[playerid][PVSelect[playerid]][PVehicleID], -0.8, 0.0, -0.70, 0.0, 0.0, 0.0);
 					        AttachDynamicObjectToVehicle(PlayerPV[playerid][PVSelect[playerid]][Neon2], PlayerPV[playerid][PVSelect[playerid]][PVehicleID],  0.8, 0.0, -0.70, 0.0, 0.0, 0.0);
 				        }
-				        SendInfo(playerid, "~g~~h~~h~Neon attached", 2500);
+				        ShowInfo(playerid, "Neon attached", "");
 	       			}
 				    case 6:
 				    {
-						SendInfo(playerid, "~g~~h~~h~Neon removed", 2500);
+						ShowInfo(playerid, "Neon removed", "");
 				   	}
 				}
 			    return true;
@@ -20192,7 +20178,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				PutPlayerInVehicle(playerid, PlayerPV[playerid][PVSelect[playerid]][PVehicleID], 0);
 
-				SendInfo(playerid, "~y~~h~Plate changed!", 2500);
+				ShowInfo(playerid, "Plate changed", "");
 			    return true;
 			}
 			case BGVOTING_DIALOG:
@@ -20490,7 +20476,8 @@ function:OnHouseLoadEx(index)
 
 		HouseInfo[index][label] = CreateDynamic3DTextLabel(line, (HouseInfo[index][sold]) ? (0xFF0000FF) : (0x00FF00FF), HouseInfo[index][E_x], HouseInfo[index][E_y], floatadd(HouseInfo[index][E_z], 0.3), 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 30.0);
 		HouseInfo[index][pickid] = CreateDynamicPickup((HouseInfo[index][sold]) ? (1272) : (1273), 1, HouseInfo[index][E_x], HouseInfo[index][E_y], HouseInfo[index][E_z], -1, -1, -1, 30.0);
-		HouseInfo[index][iconid] = CreateDynamicMapIcon(HouseInfo[index][E_x], HouseInfo[index][E_y], HouseInfo[index][E_z], (HouseInfo[index][sold]) ? (32) : (31), 1, 0, -1, -1, 150.0);
+		HouseInfo[index][iconid] = CreateDynamicMapIcon(HouseInfo[index][E_x], HouseInfo[index][E_y], HouseInfo[index][E_z], 31, 1, 0, -1, -1, 150.0);
+
 		index++;
 	}
 	return 1;
@@ -20545,7 +20532,7 @@ function:OnHouseLoad()
 
 			HouseInfo[houseid][label] = CreateDynamic3DTextLabel(line, (HouseInfo[houseid][sold]) ? (0xFF0000FF) : (0x00FF00FF), HouseInfo[houseid][E_x], HouseInfo[houseid][E_y], floatadd(HouseInfo[houseid][E_z], 0.3), 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 30.0);
 			HouseInfo[houseid][pickid] = CreateDynamicPickup((HouseInfo[houseid][sold]) ? (1272) : (1273), 1, HouseInfo[houseid][E_x], HouseInfo[houseid][E_y], HouseInfo[houseid][E_z], -1, -1, -1, 30.0);
-			HouseInfo[houseid][iconid] = CreateDynamicMapIcon(HouseInfo[houseid][E_x], HouseInfo[houseid][E_y], HouseInfo[houseid][E_z], (HouseInfo[houseid][sold]) ? (32) : (31), 1, 0, -1, -1, 150.0);
+			if(!HouseInfo[houseid][sold]) HouseInfo[houseid][iconid] = CreateDynamicMapIcon(HouseInfo[houseid][E_x], HouseInfo[houseid][E_y], HouseInfo[houseid][E_z], 31, 1, 0, -1, -1, 150.0);
 			
 			houseid++;
 		}
@@ -20617,7 +20604,7 @@ function:OnPropLoad()
 			}
 			PropInfo[propid][label] = CreateDynamic3DTextLabel(string, WHITE, PropInfo[propid][E_x], PropInfo[propid][E_y], floatadd(PropInfo[propid][E_z], 0.3), 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 30.0);
 			PropInfo[propid][pickid] = CreateDynamicPickup(1274, 1, PropInfo[propid][E_x], PropInfo[propid][E_y], PropInfo[propid][E_z], -1, -1, -1, 30.0);
-			PropInfo[propid][iconid] = CreateDynamicMapIcon(PropInfo[propid][E_x], PropInfo[propid][E_y], PropInfo[propid][E_z], (PropInfo[propid][sold]) ? (36) : (52), 1, 0, -1, -1, 150.0);
+			if(!PropInfo[propid][sold]) PropInfo[propid][iconid] = CreateDynamicMapIcon(PropInfo[propid][E_x], PropInfo[propid][E_y], PropInfo[propid][E_z], 52, 1, 0, -1, -1, 150.0);
 			
 			propid++;
 		}
@@ -21369,7 +21356,6 @@ CarSpawner(playerid, model, respawn_delay = -1, bool:spawnzone_check = true)
 	DestroyPlayerVehicles(playerid);
 		
 	new Float:POS[4],
-		string[255],
 		color1 = (random(128) + 127),
 		color2 = (random(128) + 127);
 
@@ -21388,8 +21374,7 @@ CarSpawner(playerid, model, respawn_delay = -1, bool:spawnzone_check = true)
 	SetVehicleToRespawn(PlayerInfo[playerid][Vehicle]);
 	if(IsComponentIdCompatible(GetVehicleModel(PlayerInfo[playerid][Vehicle]), 1010)) AddVehicleComponent(PlayerInfo[playerid][Vehicle], 1010);
 	PutPlayerInVehicle(playerid, PlayerInfo[playerid][Vehicle], 0);
-	format(string, sizeof(string), "Vehicle Spawned!~n~~b~~h~~h~Name: ~w~%s~n~~g~~h~~h~Model: ~w~%i~n~~r~~h~~h~Colors: ~w~%i, %i", GetVehicleNameById(PlayerInfo[playerid][Vehicle]), GetVehicleModel(PlayerInfo[playerid][Vehicle]), color1, color2);
-	SendInfo(playerid, string, 2500);
+	ShowInfo(playerid, "Vehicle spawned", "");
 	
 	if(PlayerInfo[playerid][bGod])
 	{
@@ -24209,14 +24194,14 @@ CreateFinalCar(playerid, pv_slot)
 {
 	if(pv_slot > PlayerInfo[playerid][AdditionalPVSlots])
 	{
-	    SendInfo(playerid, "~y~~h~This pv slot is locked!", 2500);
+	    ShowInfo(playerid, "This PV slot is locked", "");
 	    PVSlotSelect(playerid);
 	    return 1;
 	}
 
 	if(PlayerPV[playerid][pv_slot][Model] != 0)
 	{
-	    SendInfo(playerid, "~y~~h~This pv slot is currently in use!", 2500);
+	    ShowInfo(playerid, "This PV slot is in use", "");
 	    PVSlotSelect(playerid);
 	    return 1;
 	}
@@ -24251,7 +24236,7 @@ CreateFinalCar(playerid, pv_slot)
 
     TogglePlayerControllable(playerid, true);
     PutPlayerInVehicle(playerid, PlayerPV[playerid][PVSelect[playerid]][PVehicleID], 0);
-    SendInfo(playerid, "~y~~h~Private vehicle purchased!", 3500);
+    ShowInfo(playerid, "Private vehicle purchased", "");
     gTeam[playerid] = NORMAL;
 
     RandomWeapon(playerid);
@@ -25617,31 +25602,31 @@ function:OnQueueReceived()
 							{
 							    if(PlayerInfo[playerid][Boost] & BOOST_MONEY_x2) PlayerInfo[playerid][Boost] &= ~BOOST_MONEY_x2;
 							    SCM(playerid, -1, ""server_sign" "green"Your Money Boost x2 ran out!");
-							    SendInfo(playerid, "~b~~h~~h~Your Money Boost x2 ran out!", 2500);
+							    ShowInfo(playerid, "~b~~h~~h~Your Money Boost x2 ran out!", "", 4000);
 							}
 							case 3:
 							{
 							    if(PlayerInfo[playerid][Boost] & BOOST_MONEY_x3) PlayerInfo[playerid][Boost] &= ~BOOST_MONEY_x3;
 							    SCM(playerid, -1, ""server_sign" "green"Your Money Boost x3 ran out!");
-							    SendInfo(playerid, "~b~~h~~h~Your Money Boost x3 ran out!", 2500);
+							    ShowInfo(playerid, "~b~~h~~h~Your Money Boost x3 ran out!", "", 4000);
 							}
 							case 4:
 							{
 							    if(PlayerInfo[playerid][Boost] & BOOST_SCORE_x2) PlayerInfo[playerid][Boost] &= ~BOOST_SCORE_x2;
 							    SCM(playerid, -1, ""server_sign" "green"Your Score Boost x2 ran out!");
-							    SendInfo(playerid, "~b~~h~~h~Your Score Boost x2 ran out!", 2500);
+							    ShowInfo(playerid, "~b~~h~~h~Your Score Boost x2 ran out!", "", 4000);
 							}
 							case 5:
 							{
 							    if(PlayerInfo[playerid][Boost] & BOOST_SCORE_x3) PlayerInfo[playerid][Boost] &= ~BOOST_SCORE_x3;
 							    SCM(playerid, -1, ""server_sign" "green"Your Score Boost x3 ran out!");
-							    SendInfo(playerid, "~b~~h~~h~Your Score Boost x3 ran out!", 2500);
+							    ShowInfo(playerid, "~b~~h~~h~Your Score Boost x3 ran out!", "", 4000);
 							}
 							case 6:
 							{
 							    if(PlayerInfo[playerid][Boost] & BOOST_MASTER) PlayerInfo[playerid][Boost] &= ~BOOST_MASTER;
 							    SCM(playerid, -1, ""server_sign" "green"Your Master Boost ran out!");
-							    SendInfo(playerid, "~b~~h~~h~Your Master Boost ran out!", 2500);
+							    ShowInfo(playerid, "~b~~h~~h~Your Master Boost ran out!", "", 4000);
 							}
 		                }
 		            }
@@ -27709,7 +27694,7 @@ function:ShowDialog(playerid, dialogid)
 					strcat(string, tmp);
 				}
 			}
-			else return SendInfo(playerid, "Error couldn't find the business in that slot! Report on forums!", 2500);
+			else return ShowInfo(playerid, "Couldn't find the business in that slot", "Report on forums", 4000);
 	        
 	        format(tmp, sizeof(tmp), ""nef" - Business Level Upgrade > Slot: %i", PlayerInfo[playerid][PropSlotSelected] + 1);
 
@@ -27726,7 +27711,7 @@ function:ShowDialog(playerid, dialogid)
 	    {
 	        new string[1024];
 
-	        strcat(string, ""red"How to get Gold Credits\nToy Slots\nPrivate Vehicle Slots\nHouse Slots\nHouse Object Slots\nBusiness Slots\nInstant Namechange Access");
+	        strcat(string, ""red"How to get Gold Credits\nToy Slots\nPrivate Vehicle Slots\nHouse Slots\nHouse Item Slots\nBusiness Slots\nInstant Namechange Access");
 	        strcat(string, "\nMedkit x20\nMedkit x100\nMoney Boost x2\nMoney Boost x3\nScore Boost x2\nScore Boost x3\nMaster Boost");
 
 	        ShowPlayerDialog(playerid, CM_DIALOG, DIALOG_STYLE_LIST, ""nef" - Gold Credits", string, "Select", "Cancel");
@@ -28274,20 +28259,8 @@ function:InitSession(playerid)
 	return 1;
 }
 
-/*function:SendInfo(playerid, info[], time)
+ShowInfo(playerid, top[], desc[], time = 3000, type = 3)
 {
-	if(strlen(info) > 250) return 1;
-	KillTimer(PlayerInfo[playerid][tInfo]);
-	PlayerTextDrawSetString(playerid, TXTPlayerInfo[playerid], info);
-	PlayerInfo[playerid][tInfo] = SetTimerEx("HideInfo", time, false, "i", playerid);
-	PlayerTextDrawShow(playerid, TXTPlayerInfo[playerid]);
-	PlayerPlaySound(playerid, 1085, 0.0, 0.0, 0.0);
-	return 1;
-}*/
-
-function:ShowInfo(playerid, top[], desc[], time = 3000, type = 3)
-{
-	if(strlen(info) > 200) return 1;
 	format(gstr, sizeof(gstr), "~y~%s~n~~w~%s", top, desc);
     GameTextForPlayer(playerid, gstr, time, type);
 	return 1;
@@ -28949,7 +28922,7 @@ function:LottoDraw()
 	        strcat(string, str);
 	        GivePlayerCash(i, lotto_jackpot, true, true);
 	        PlayerPlaySound(i, 5448, 0, 0, 0);
-	        SendInfo(i, "~g~~h~~h~You won the lotto jackpot!", 5000);
+	        ShowInfo(i, "~g~~h~~h~You won the lotto jackpot!", "", 4000);
 	 		format(str, sizeof(str), "5%s(%i)3 won the lottery! Prize: $%s", __GetName(i), i, ToCurrency(lotto_jackpot));
 	        IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, str);
 	        found = true;
