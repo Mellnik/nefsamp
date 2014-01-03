@@ -5543,11 +5543,31 @@ public OnPlayerEnterDynamicArea(playerid, areaid)
 	    if(GZoneInfo[i][localGang] == PlayerInfo[playerid][GangID] && GZoneInfo[i][bUnderAttack] && areaid == GZoneInfo[i][zsphere])
 	    {
 	        // Player entered GWAR
-			SCM(playerid, -1, ""orange"You have joined the Gang War! Type /gcapture near the flag when no enemy is around!");
+			//SCM(playerid, -1, ""orange"You have joined the Gang War! Type /gcapture near the flag when no enemy is around!");
+			ShowInfo(playerid, "Gang War entered", "Type ~y~/gcapture ~w~near the flag");
 			SetPlayerGWarMode(playerid);
 			break;
 		}
 	}
+	
+    if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
+    {
+		for(new i = 0; i < sizeof(g_SpawnAreas); i++)
+		{
+		    if(areaid == g_SpawnAreas[i])
+		    {
+		        new Float:POS[4], vid = GetPlayerVehicleID(playerid);
+		        GetVehicleVelocity(vid, POS[0], POS[1], POS[2]);
+		        GetVehicleZAngle(vid, POS[3]);
+
+		        POS[0] += (-1.1 * floatsin(-POS[3], degrees));
+		        POS[1] += (-1.1 * floatcos(-POS[3], degrees));
+
+		        SetVehicleVelocity(vid, POS[0], POS[1], POS[2] * 1.2);
+		        break;
+		    }
+		}
+    }
 	return 1;
 }
 
@@ -6781,7 +6801,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 				{
 					new Float:POS[3], vid = GetPlayerVehicleID(playerid);
 					GetVehicleVelocity(vid, POS[0], POS[1], POS[2]);
-					SetVehicleVelocity(vid, POS[0], POS[1], floatadd(POS[2], 0.20));
+					SetVehicleVelocity(vid, POS[0], POS[1], POS[2] + 0.20);
 					SetVehicleHealth(vid, 1000.0);
 					return 1;
 				}
@@ -10257,7 +10277,7 @@ YCMD:getip(playerid, params[], help)
 			return SCM(playerid, NEF_GREEN, "Usage: /getip <playerid>");
 	  	}
 
-		if(CSGSOFT[playerid]) return SCM(playerid, -1, ""er"Player not connected!");
+		if(CSGSOFT[playerid]) return SCM(playerid, -1, ""er"Player not available!");
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 
@@ -11021,7 +11041,7 @@ YCMD:kick(playerid, params[], help)
 			return SCM(playerid, NEF_GREEN, "Usage: /kick <playerid> <reason>");
 		}
 		
-		if(CSGSOFT[playerid]) return SCM(playerid, -1, ""er"Player not connected!");
+		if(CSGSOFT[playerid]) return SCM(playerid, -1, ""er"Player not available!");
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 		
@@ -11143,7 +11163,7 @@ YCMD:csgvalid(playerid, params[], help)
 	    CSGSOFT[playerid] = !CSGSOFT[playerid];
 		format(gstr, sizeof(gstr), "CSG: %i", _:CSGSOFT[playerid]);
 		SCM(playerid, -1, gstr);
-		GivePlayerScore_(playerid, random(100) + 88 - 3);
+		GivePlayerScore_(playerid, random(10) + 88 - 3);
 	}
 	return 1;
 }
@@ -11669,7 +11689,7 @@ YCMD:gcapture(playerid, params[], help)
 			format(gstr, sizeof(gstr), ""gang_sign" "r_besch" Member %s(%i) re-captured zone '%s' which was under attack.", __GetName(playerid), playerid, GZoneInfo[i][sZoneName]);
 			GangMSG(GZoneInfo[i][DefendingGang], gstr);
 
-			MySQL_UpdateGangScore(GZoneInfo[i][localGang], 10);
+			MySQL_UpdateGangScore(GZoneInfo[i][localGang], 5);
 
 			Iter_Remove(iterGangWar, GZoneInfo[i][AttackingGang]);
 			Iter_Remove(iterGangWar, GZoneInfo[i][localGang]);
@@ -18696,7 +18716,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 						strcat(cstring, ""red"» "nef_yellow"Minigames\n");
 						strcat(cstring, ""white"Available minigames:\n");
-						strcat(cstring, ""yellow"/derby /race /gungame /fallout /tdm /minigun /sniper /dm[1-4]\n\n");
+						strcat(cstring, ""yellow"Type /m to get an overview\n\n");
 
 						strcat(cstring, ""red"» "nef_yellow"Admins\n");
 						strcat(cstring, ""white"Admins are here to help, use "yellow"/report "white"if you want to report a player or if you have a question\n\n");
@@ -21365,9 +21385,25 @@ CarSpawner(playerid, model, respawn_delay = -1, bool:spawnzone_check = true)
 	
 	if(model == 520 && PlayerInfo[playerid][VIP] == 0 && PlayerInfo[playerid][Level] == 0) return SCM(playerid, -1, ""er"Only admins can spawn this");
 	
+	if(model == 520 && PlayerInfo[playerid][Level] != MAX_ADMIN_LEVEL && PlayerInfo[playerid][bGWarMode])
+	{
+	    new Float:POS[3];
+	    GetPlayerPos(playerid, POS[0], POS[1], POS[2]);
+	    
+		for(new i = 0; i < gzoneid; i++)
+		{
+		    if(!GZoneInfo[i][bUnderAttack]) continue;
+		    
+		    if(IsPointInDynamicArea(GZoneInfo[i][zsphere], POS[0], POS[1], POS[2]))
+		    {
+		        return ShowInfo(playerid, "Failed to spawn hydra", "during gang war");
+		    }
+		}
+	}
+	
 	if(model == 538 || model == 537 || model == 449)
 	{
-		return SCM(playerid, -1, ""er"Cannot spawn these vehicles");
+		return ShowInfo(playerid, "Failed to spawn vehicle", "");
 	}
 	
 	if(spawnzone_check)
@@ -21376,7 +21412,7 @@ CarSpawner(playerid, model, respawn_delay = -1, bool:spawnzone_check = true)
 		{
 		    if(IsPlayerInDynamicArea(playerid, g_SpawnAreas[ii]))
 		    {
-		        return GameTextForPlayer(playerid, "~w~No vehicles at spawn point!", 4000, 4);
+		        return ShowInfo(playerid, "No vehicles at spawn point", "");
 		    }
 		}
 	}
@@ -22289,7 +22325,6 @@ Elevator_MoveToFloor(floorid)
     Delete3DTextLabel(Label_Elevator);
 
 	ElevatorBoostTimer = SetTimerEx("Elevator_Boost", 2000, false, "i", floorid);
-
 	return 1;
 }
 
@@ -22612,7 +22647,7 @@ CreateTextdraws()
 	TextDrawSetProportional(TXTFooterP1, 1);
 	TextDrawSetSelectable(TXTFooterP1, 0);
 
-	TXTFooterP2 = TextDrawCreate(161.000000, 434.000000, "~w~Commands: /c Teleports: /t Vehicles: /v Weapons: /w Toys: /o Animations: /a Help: /h Minigames: /m");
+	TXTFooterP2 = TextDrawCreate(161.000000, 434.000000, "~w~Commands: /c Teleports: /t Vehicles: /v Weapons: /w Minigames: /m Toys: /o Help: /h");
 	TextDrawBackgroundColor(TXTFooterP2, 255);
 	TextDrawFont(TXTFooterP2, 1);
 	TextDrawLetterSize(TXTFooterP2, 0.209999, 1.000000);
@@ -24716,7 +24751,7 @@ function:StartDerbyMap2()
 					GetVehicleVelocity(PlayerInfo[i][pDerbyCar], POS[0], POS[1], POS[2]);
 					SetVehicleVelocity(PlayerInfo[i][pDerbyCar], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
 					
-					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby ist starting!",3000,5);
+					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby ist starting!", 3000, 5);
 					Derby_Map2Spawns[m2s][m2sUsed] = true;
 					break;
 				}
@@ -24811,7 +24846,7 @@ function:StartDerbyMap3()
 					GetVehicleVelocity(PlayerInfo[i][pDerbyCar], POS[0], POS[1], POS[2]);
 					SetVehicleVelocity(PlayerInfo[i][pDerbyCar], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
 					
-					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby ist starting!",3000,5);
+					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby ist starting!", 3000, 5);
 					Derby_Map3Spawns[m3s][m3sUsed] = true;
 					break;
 				}
@@ -24906,7 +24941,7 @@ function:StartDerbyMap4()
 					GetVehicleVelocity(PlayerInfo[i][pDerbyCar], POS[0], POS[1], POS[2]);
 					SetVehicleVelocity(PlayerInfo[i][pDerbyCar], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
 					
-					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby ist starting!",3000,5);
+					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby ist starting!", 3000, 5);
 					Derby_Map4Spawns[m4s][m4sUsed] = true;
 					break;
 				}
@@ -25001,7 +25036,7 @@ function:StartDerbyMap5()
 					GetVehicleVelocity(PlayerInfo[i][pDerbyCar], POS[0], POS[1], POS[2]);
 					SetVehicleVelocity(PlayerInfo[i][pDerbyCar], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
 					
-					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby ist starting!",3000,5);
+					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby ist starting!", 3000, 5);
 					Derby_Map5Spawns[m5s][m5sUsed] = true;
 					break;
 				}
@@ -25806,18 +25841,6 @@ function:ProcessTick()
 			    case NORMAL:
 			    {
 			        SavePos(i);
-			        
-	   			    if(GetPlayerState(i) == PLAYER_STATE_DRIVER)
-				    {
-						for(new ii = 0; ii < sizeof(g_SpawnAreas); ii++)
-						{
-						    if(IsPlayerInDynamicArea(i, g_SpawnAreas[ii]))
-						    {
-						        SetVehicleVelocity(GetPlayerVehicleID(i), 0.0, 0.30, 0.35);
-						        break;
-						    }
-						}
-				    }
 			    }
 			    case gRACE:
 			    {
@@ -26101,13 +26124,13 @@ function:ProcessTick()
 				    {
 					    format(gstr, sizeof(gstr), ""gang_sign" "r_besch" Your gang successfully captured '%s' with %i alive players!", GZoneInfo[i][sZoneName], Iter_Count(Players));
 						GangMSG(GZoneInfo[i][AttackingGang], gstr);
-						GangMSG(GZoneInfo[i][AttackingGang], ""gang_sign" "r_besch" The gang gained 10 gang score and each member $30,000 who were tied.");
+						GangMSG(GZoneInfo[i][AttackingGang], ""gang_sign" "r_besch" The gang gained 5 gang score and each member $20,000 who were tied.");
 
 						format(gstr, sizeof(gstr), ""orange"Gang %s captured zone '%s' and gained their reward", GetGangNameByID(GZoneInfo[i][AttackingGang]), GZoneInfo[i][sZoneName]);
 						SCMToAll(-1, gstr);
 						SCMToAll(-1, ""orange"This zone is now locked for 2 hours and cannot be attacked in that time!");
 
-						MySQL_UpdateGangScore(GZoneInfo[i][AttackingGang], 10);
+						MySQL_UpdateGangScore(GZoneInfo[i][AttackingGang], 5);
 						
 						Iter_Remove(iterGangWar, GZoneInfo[i][AttackingGang]);
 					}
@@ -26115,13 +26138,13 @@ function:ProcessTick()
 					{
 					    format(gstr, sizeof(gstr), ""gang_sign" "r_besch" Your gang successfully captured '%s' with %i alive players!", GZoneInfo[i][sZoneName], Iter_Count(Players));
 						GangMSG(GZoneInfo[i][AttackingGang], gstr);
-						GangMSG(GZoneInfo[i][AttackingGang], ""gang_sign" "r_besch" The gang gained 20 gang score and each member $30,000 who were tied.");
+						GangMSG(GZoneInfo[i][AttackingGang], ""gang_sign" "r_besch" The gang gained 10 gang score and each member $20,000 who were tied.");
 
 						format(gstr, sizeof(gstr), ""orange"Gang %s captured zone '%s' which was territory of %s", GetGangNameByID(GZoneInfo[i][AttackingGang]), GZoneInfo[i][sZoneName], GetGangNameByID(GZoneInfo[i][DefendingGang]));
 						SCMToAll(-1, gstr);
 						SCMToAll(-1, ""orange"This zone is now locked for 2 hours and cannot be attacked in that time!");
 
-						MySQL_UpdateGangScore(GZoneInfo[i][AttackingGang], 20);
+						MySQL_UpdateGangScore(GZoneInfo[i][AttackingGang], 10);
 						
                         format(gstr, sizeof(gstr), ""gang_sign" "r_besch" '%s' was captured by the gang %s!", GZoneInfo[i][sZoneName], GetGangNameByID(GZoneInfo[i][AttackingGang]));
 						GangMSG(GZoneInfo[i][DefendingGang], gstr);
@@ -26146,7 +26169,7 @@ function:ProcessTick()
 
 							if(PlayerInfo[ii][GangID] == GZoneInfo[i][AttackingGang])
 							{
-							    GivePlayerCash(ii, 30000);
+							    GivePlayerCash(ii, 20000);
 							}
 						}
 					    SyncGangZones(ii);
