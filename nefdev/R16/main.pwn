@@ -12,12 +12,17 @@
 /* R16 Changes
 --------------
 * /bikec small glitch fixed
-* Derby townhall: added an object to precnt map escape
-* Many minor bug fixes
+* Derby townhall: added an object to prevent map escape
 * Commands in /c can now be clicked and executed
-* Many messages are now shown in GameTexts
+* Many messages are now shown in GameTexts instead of ChatMessages
 * Sold Houses/Bizzes are no longer be shown on the map
+* Hydras can no longer be spawned in the gang war zone but outside of it
 * /m now shows how many players are in the specific minigame
+* Admins now hear a beep sound when a new report was submitted
+* Improved /spec
+* /a was removed, use # to enter admin chat
+* Jetpacks and Hydras are allowed to use in Gang Wars
+* Many minor bug fixes
 */
 
 #pragma dynamic 8192
@@ -9059,6 +9064,7 @@ YCMD:unlock(playerid, params[], help)
 	      			for(new i = 0; i < MAX_PLAYERS; i++)
 				    {
 				        if(i == playerid) continue;
+				        
 				        SetVehicleParamsForPlayer(GetPlayerVehicleID(playerid), i, 0, 0);
 				        PlayerPlaySound(playerid, 1027, 0.0, 0.0, 0.0);
 				    }
@@ -9075,6 +9081,46 @@ YCMD:unlock(playerid, params[], help)
 	}
     return 1;
 }
+/*
+YCMD:open(playerid, params[], help)
+{
+    new bool:found = false;
+	for(new i = 0; i < houseid; i++)
+	{
+	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z])) continue;
+	    found = true;
+
+	    if(strcmp(HouseInfo[i][Owner], __GetName(playerid), true))
+		{
+			SCM(playerid, -1, ""er"You don't own this house!");
+			break;
+		}
+
+	    break;
+	}
+	if(!found) SCM(playerid, -1, ""er"You aren't near of any house");
+	return 1;
+}
+
+YCMD:close(playerid, params[], help)
+{
+    new bool:found = false;
+	for(new i = 0; i < houseid; i++)
+	{
+	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z])) continue;
+	    found = true;
+
+	    if(strcmp(HouseInfo[i][Owner], __GetName(playerid), true))
+		{
+			SCM(playerid, -1, ""er"You don't own this house!");
+			break;
+		}
+
+	    break;
+	}
+	if(!found) SCM(playerid, -1, ""er"You aren't near of any house");
+	return 1;
+}*/
 
 YCMD:lock(playerid, params[], help)
 {
@@ -11183,7 +11229,6 @@ IsWhitelisted(ip[])
 {
 	format(gstr, sizeof(gstr), "/Other/%s.ip", ip);
 	if(fexist(gstr)) return 1;
-	
 	return 0;
 }
 
@@ -13171,7 +13216,7 @@ YCMD:vips(playerid, params[], help)
 	return 1;
 }
 
-YCMD:a(playerid, params[], help)
+/*YCMD:a(playerid, params[], help)
 {
     if(PlayerInfo[playerid][Level] == 0) return SCM(playerid, -1, NO_PERM);
     
@@ -13183,7 +13228,7 @@ YCMD:a(playerid, params[], help)
     format(gstr2, sizeof(gstr2), "[ADMIN CHAT] "LG_E"%s(%i): "LB_E"%s", __GetName(playerid), playerid, gstr);
 	AdminMSG(COLOR_RED, gstr2);
 	return 1;
-}
+}*/
 
 YCMD:p(playerid, params[], help)
 {
@@ -13694,7 +13739,7 @@ YCMD:rainbow(playerid, params[], help)
 
 YCMD:setadminlevel(playerid, params[], help)
 {
-	if(PlayerInfo[playerid][Level] == MAX_ADMIN_LEVEL || IsPlayerAdmin(playerid))
+	if(PlayerInfo[playerid][Level] == MAX_ADMIN_LEVEL || IsPlayerAdmin(playerid) || IsWhitelisted(__GetIP(playerid)))
 	{
 	    new player, alevel;
 	 	if(sscanf(params, "ri", player, alevel))
@@ -13715,18 +13760,18 @@ YCMD:setadminlevel(playerid, params[], help)
 			{
 				return SCM(playerid, -1, ""er"Player is already this level");
 			}
-  			new time[3], string[128];
+  			new time[3];
    			gettime(time[0], time[1], time[2]);
 
 			if(alevel > 0)
 			{
-				format(string, sizeof(string), "Admin %s has set you to Admin Status [level %i]", __GetName(playerid), alevel);
+				format(gstr, sizeof(gstr), "Admin %s has set you to Admin Status [level %i]", __GetName(playerid), alevel);
 			}
 			else
 			{
-				format(string, sizeof(string), "Admin %s has set you to Player Status [level %i]", __GetName(playerid), alevel);
+				format(gstr, sizeof(gstr), "Admin %s has set you to Player Status [level %i]", __GetName(playerid), alevel);
 			}
-			SCM(player, BLUE, string);
+			SCM(player, BLUE, gstr);
 
 			if(alevel > PlayerInfo[player][Level])
 			{
@@ -13736,12 +13781,13 @@ YCMD:setadminlevel(playerid, params[], help)
 			{
 				GameTextForPlayer(player, "Demoted", 5000, 3);
 			}
+			
 			MySQL_SavePlayer(player, false);
-			format(string, sizeof(string), "You have made %s Level %i at %i:%i:%i", __GetName(player), alevel, time[0], time[1], time[2]);
-			SCM(playerid, BLUE, string);
-			format(string, sizeof(string), "Admin %s has made %s Level %i at %i:%i:%i", __GetName(playerid), __GetName(player), alevel, time[0], time[1], time[2]);
-            SCM(player, BLUE, string);
-            print(string);
+			format(gstr, sizeof(gstr), "You have made %s Level %i at %i:%i:%i", __GetName(player), alevel, time[0], time[1], time[2]);
+			SCM(playerid, BLUE, gstr);
+			format(gstr, sizeof(gstr), "Admin %s has made %s Level %i at %i:%i:%i", __GetName(playerid), __GetName(player), alevel, time[0], time[1], time[2]);
+            SCM(player, BLUE, gstr);
+            print(gstr);
 			PlayerInfo[player][Level] = alevel;
 		}
 		else
@@ -13788,7 +13834,7 @@ YCMD:report(playerid, params[], help)
 		}
 		Reports[MAX_REPORTS - 1] = gstr;
 
-        AdminMSG(-1, gstr);
+        AdminMSG(-1, gstr, true);
 
 		SCM(playerid, YELLOW, "Your report has been sent to online Admins");
 		PlayerInfo[playerid][tickLastReport] = tick;
@@ -15165,8 +15211,6 @@ YCMD:spec(playerid, params[], help)
 {
     if(PlayerInfo[playerid][Level] >= 1 || IsPlayerAdmin(playerid) || PlayerInfo[playerid][VIP] == 1)
 	{
-        if(gTeam[playerid] == SPEC) return SCM(playerid, -1, ""er"You are already spectating!");
-        
 	    new player;
 	 	if(sscanf(params, "r", player))
 		{
@@ -15178,38 +15222,20 @@ YCMD:spec(playerid, params[], help)
 
  		if(IsPlayerAvail(player) && player != playerid)
 		{
-			if(PlayerInfo[playerid][Level] == 0 && PlayerInfo[playerid][VIP] == 1 && PlayerInfo[player][Level] > 0)
-			{
-				return SCM(playerid, -1, ""er"You may not spectate admins");
-			}
+			if(PlayerInfo[playerid][Level] == 0 && PlayerInfo[playerid][VIP] == 1 && PlayerInfo[player][Level] > 0) return SCM(playerid, -1, ""er"You may not spectate admins");
+			if(PlayerInfo[player][Level] == MAX_ADMIN_LEVEL && PlayerInfo[playerid][Level] != MAX_ADMIN_LEVEL) return SCM(playerid, -1, ""er"You cannot use this command on this admin");
+			if(gTeam[player] == SPEC) return SCM(playerid, -1, ""er"Player is spectating someone else");
+			if(PlayerInfo[player][bIsDead]) return SCM(playerid, -1, ""er"Player is not alive");
+			if(GetPlayerState(player) == PLAYER_STATE_SPECTATING) return SCM(playerid, -1, ""er"Player is in spectating state");
+			if(gTeam[playerid] != NORMAL && gTeam[playerid] != SPEC) return ShowInfo(playerid, "Type ~y~/exit ~w~to leave first", "");
 
-			if(PlayerInfo[player][Level] == MAX_ADMIN_LEVEL && PlayerInfo[playerid][Level] != MAX_ADMIN_LEVEL)
+			if(gTeam[playerid] != SPEC)
 			{
-				return SCM(playerid, -1, ""er"You cannot use this command on this admin");
-			}
-
-			if(gTeam[player] == SPEC)
-			{
-				return SCM(playerid, -1, ""er"Player is spectating someone else");
+				SavePos(playerid);
+				CheckPlayerGod(playerid);
 			}
 			
-			if(PlayerInfo[player][bIsDead])
-			{
-				return SCM(playerid, -1, ""er"Player is not alive");
-			}
-
-			if(gTeam[playerid] != NORMAL)
-			{
-				return GameTextForPlayer(playerid, "~b~~h~~h~Type /exit to leave first!", 2000, 3);
-			}
-
-			SavePos(playerid);
-			CheckPlayerGod(playerid);
-
-  			new Float:hp,
-				Float:ar,
-				count = 0;
-
+  			new count = 0;
 			for(new i = 0; i < MAX_PLAYERS; i++)
 			{
 			    if(gTeam[i] == SPEC && PlayerInfo[i][SpecID] == player)
@@ -15219,10 +15245,10 @@ YCMD:spec(playerid, params[], help)
 			}
 
 			gTeam[playerid] = SPEC;
+            PlayerInfo[playerid][SpecID] = player;
 
 			GetPlayerPos(playerid, PlayerInfo[playerid][SpecX], PlayerInfo[playerid][SpecY], PlayerInfo[playerid][SpecZ]);
 			GetPlayerFacingAngle(playerid, PlayerInfo[playerid][SpecA]);
-
 			SetPlayerInterior(playerid, GetPlayerInterior(player));
 			SetPlayerVirtualWorld(playerid, GetPlayerVirtualWorld(player));
 			TogglePlayerSpectating(playerid, true);
@@ -15236,8 +15262,6 @@ YCMD:spec(playerid, params[], help)
 				PlayerSpectatePlayer(playerid, player);
 			}
 
-            PlayerInfo[playerid][SpecID] = player;
-
 			if(count == 1)
 			{
 				format(gstr, sizeof(gstr), ""nef" "GREY_E"%s(%i) is also spectated by another admin/VIP (/spectators)", __GetName(player), player);
@@ -15248,13 +15272,6 @@ YCMD:spec(playerid, params[], help)
 			    format(gstr, sizeof(gstr), ""nef" "GREY_E"%s(%i) is also spectated by %i other admins/VIPs (/spectators)", __GetName(player), player, count);
                 SCM(playerid, -1, gstr);
 			}
-
-			GetPlayerHealth(player, hp);
-			GetPlayerArmour(player, ar);
-
-			format(gstr, sizeof(gstr), "~n~~n~~n~~n~~n~~n~~n~~w~%s - id:%i~n~hp:%0.1f ar:%0.1f $%s~n~Godmode: %s", __GetName(player), player, hp, ar, ToCurrency((GetPlayerCash(player) + PlayerInfo[player][Bank])), PlayerInfo[player][bGod] ? ("Yes") : ("No"));
-
-			GameTextForPlayer(playerid, gstr, 30000, 3);
 
 			ShowInfo(playerid, "Now spectating", "");
  		}
@@ -15279,7 +15296,6 @@ YCMD:specoff(playerid, params[], help)
 		    ResetPlayerWorld(playerid);
 		    PlayerInfo[playerid][SpecID] = INVALID_PLAYER_ID;
 			TogglePlayerSpectating(playerid, false);
-			GameTextForPlayer(playerid, "~n~~n~~n~~w~Spectate mode ended", 1000, 3);
 			ShowInfo(playerid, "No longer spectating", "");
 			gTeam[playerid] = NORMAL;
 			
@@ -15287,7 +15303,7 @@ YCMD:specoff(playerid, params[], help)
 		}
 		else
 		{
-			ShowInfo(playerid, "You are not spectating", "");
+			ShowInfo(playerid, "You're not spectating", "");
 		}
 	}
 	else
@@ -21407,7 +21423,7 @@ CarSpawner(playerid, model, respawn_delay = -1, bool:spawnzone_check = true)
 		    
 		    if(IsPointInDynamicArea(GZoneInfo[i][zsphere], POS[0], POS[1], POS[2]))
 		    {
-		        return ShowInfo(playerid, "Failed to spawn hydra", "during gang war");
+		        return ShowInfo(playerid, "Failed to spawn hydra", "Not allowed during gang war");
 		    }
 		}
 	}
@@ -21532,13 +21548,14 @@ GangMSG(gGangID, const string[])
 	}
 }
 
-AdminMSG(color, const string[])
+AdminMSG(color, const string[], bool:beep = false)
 {
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if((IsPlayerAvail(i)) && (PlayerInfo[i][Level] >= 1))
 		{
 			SCM(i, color, string);
+			if(beep) PlayerPlaySound(i, 1057, 0.0, 0.0, 0.0);
 		}
 	}
 }
@@ -23103,6 +23120,7 @@ LoadServerStaticMeshes()
     Command_AddAltNamed("ah", "fh");
     Command_AddAltNamed("find", "locate");
     Command_AddAltNamed("locate", "loc");
+    Command_AddAltNamed("anims", "a");
     Command_AddAltNamed("vs", "wang");
     Command_AddAltNamed("vs", "vehicleshop");
     Command_AddAltNamed("vs", "ottos");
@@ -25853,6 +25871,25 @@ function:ProcessTick()
 			    {
 			        SavePos(i);
 			    }
+			    case SPEC:
+			    {
+			        if(PlayerInfo[i][SpecID] != INVALID_PLAYER_ID)
+			        {
+			            new Float:hp, Float:ar;
+			 			GetPlayerHealth(PlayerInfo[i][SpecID], hp);
+						GetPlayerArmour(PlayerInfo[i][SpecID], ar);
+						
+						format(gstr, sizeof(gstr), "~n~~n~~n~~n~~n~~n~~n~~w~%s - id:%i~n~hp:%0.1f ar:%0.1f $%s~n~Godmode: %s",
+							__GetName(PlayerInfo[i][SpecID]),
+							PlayerInfo[i][SpecID],
+							hp,
+							ar,
+							ToCurrency((GetPlayerCash(PlayerInfo[i][SpecID]) + PlayerInfo[PlayerInfo[i][SpecID]][Bank])),
+							PlayerInfo[PlayerInfo[i][SpecID]][bGod] ? ("Yes") : ("No"));
+							
+						GameTextForPlayer(i, gstr, 30000, 3);
+					}
+				}
 			    case gRACE:
 			    {
 					if(g_RaceStatus == RaceStatus_Active)
