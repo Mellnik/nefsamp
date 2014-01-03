@@ -1182,7 +1182,7 @@ enum e_firework
 // ===
 // global
 // ===
-
+/*
 new const szRandomInfoTXTs[13][] =
 {
 	"Don't wanna get killed? Type ~g~~h~~h~/god",
@@ -1198,7 +1198,7 @@ new const szRandomInfoTXTs[13][] =
 	"Want money and score fast? Read ~g~~h~~h~/help",
 	"Go to ~g~~h~~h~/vs ~w~and get a private vehicle which you can tune!",
 	"Go to ~g~~h~~h~/vs ~w~and get a private vehicle which you can tune!"
-};
+};*/
 
 new const ServerMSGS[15][] =
 {
@@ -1764,7 +1764,7 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
 	Text:TXTSpeedo_Main,
   	Text:TXTGunGameSign,
   	Text:TXTLoading,
-  	Text:TXTTeleportInfo,
+  	//Text:TXTTeleportInfo,
   	Text:TXTRaceSign,
   	Text:TXTDerbySign,
   	Text:TXTDerbyInfo,
@@ -1788,8 +1788,7 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
 	Text:TXTFooterP2,
 	Text:TXTFooterBlack,
 	Text:TXTOnJoin[2],
-	Text:TXTVersionInfo,
-	Text:TXTRandomInfo,
+	//Text:TXTRandomInfo,
 	toyslist = mS_INVALID_LISTID,
 	hobjslist = mS_INVALID_LISTID,
 	skinlist = mS_INVALID_LISTID,
@@ -2477,7 +2476,7 @@ public OnGameModeInit()
 	SetTimer("Maths", 980000, true);
 	SetTimer("RandomSvrMsg", SERVERMSGS_TIME, true);
 	SetTimer("DoLotto", 100000, false);
-	SetTimer("RandomTXTInfo", 30000, true);
+	//SetTimer("RandomTXTInfo", 30000, true);
 
     SollIchDirMaEtWatSagen();
 
@@ -2561,16 +2560,15 @@ public OnPlayerRequestClass(playerid, classid)
 		return 1;
 	}
 
-	TextDrawShowForPlayer(playerid, TXTTeleportInfo);
+	//TextDrawShowForPlayer(playerid, TXTTeleportInfo);
 
 	HidePlayerInfoTextdraws(playerid);
-
 	ShowPlayerWelcomeTextdraws(playerid);
+	
 	TextDrawShowForPlayer(playerid, TXTFooterBlack);
 	TextDrawShowForPlayer(playerid, TXTFooterP1);
 	TextDrawShowForPlayer(playerid, TXTFooterP2);
-	TextDrawShowForPlayer(playerid, TXTRandomInfo);
-	TextDrawShowForPlayer(playerid, TXTVersionInfo);
+	//TextDrawShowForPlayer(playerid, TXTRandomInfo);
 	TextDrawShowForPlayer(playerid, TXTMinigames);
 	#if WINTER_EDITION == true
 	TextDrawShowForPlayer(playerid, TXTWinterEdition);
@@ -3153,7 +3151,7 @@ public OnPlayerConnect(playerid)
 	{
 		TextDrawShowForPlayer(playerid, TXTOnJoin[0]);
 		TextDrawShowForPlayer(playerid, TXTOnJoin[1]);
-		TextDrawHideForPlayer(playerid, TXTTeleportInfo);
+		//TextDrawHideForPlayer(playerid, TXTTeleportInfo);
 
         InitSession(playerid);
 
@@ -8158,13 +8156,12 @@ YCMD:textdraws(playerid, params[], help)
 YCMD:hidef(playerid, params[], help)
 {
     PlayerInfo[playerid][bTDEnabled] = false;
-	TextDrawHideForPlayer(playerid, TXTTeleportInfo);
+	//TextDrawHideForPlayer(playerid, TXTTeleportInfo);
     TextDrawHideForPlayer(playerid, TXTMinigames);
     TextDrawHideForPlayer(playerid, TXTFooterBlack);
 	TextDrawHideForPlayer(playerid, TXTFooterP1);
 	TextDrawHideForPlayer(playerid, TXTFooterP2);
-    TextDrawHideForPlayer(playerid, TXTRandomInfo);
-    TextDrawHideForPlayer(playerid, TXTVersionInfo);
+    //TextDrawHideForPlayer(playerid, TXTRandomInfo);
     TextDrawHideForPlayer(playerid, TXTGodTD);
     PlayerTextDrawHide(playerid, TXTWantedsTD[playerid]);
 	#if WINTER_EDITION == true
@@ -8176,13 +8173,12 @@ YCMD:hidef(playerid, params[], help)
 YCMD:showf(playerid, params[], help)
 {
     PlayerInfo[playerid][bTDEnabled] = true;
-	TextDrawShowForPlayer(playerid, TXTTeleportInfo);
+	//TextDrawShowForPlayer(playerid, TXTTeleportInfo);
 	TextDrawShowForPlayer(playerid, TXTMinigames);
 	TextDrawShowForPlayer(playerid, TXTFooterBlack);
 	TextDrawShowForPlayer(playerid, TXTFooterP1);
 	TextDrawShowForPlayer(playerid, TXTFooterP2);
-    TextDrawShowForPlayer(playerid, TXTRandomInfo);
-    TextDrawShowForPlayer(playerid, TXTVersionInfo);
+    //TextDrawShowForPlayer(playerid, TXTRandomInfo);
 	PlayerTextDrawShow(playerid, TXTWantedsTD[playerid]);
 	if(PlayerInfo[playerid][bGod]) TextDrawShowForPlayer(playerid, TXTGodTD);
 	#if WINTER_EDITION == true
@@ -22545,7 +22541,7 @@ CreateTextdraws()
 	TextDrawFont(TXTSpeedo_Main, 1);
 	TextDrawSetProportional(TXTSpeedo_Main, 1);
 
-	TXTRandomInfo = TextDrawCreate(636.000000, 421.000000, "Don't wanna get killed? Type ~g~~h~~h~/god");
+	/*TXTRandomInfo = TextDrawCreate(636.000000, 421.000000, "Don't wanna get killed? Type ~g~~h~~h~/god");
 	TextDrawAlignment(TXTRandomInfo, 3);
 	TextDrawBackgroundColor(TXTRandomInfo, 168430202);
 	TextDrawFont(TXTRandomInfo, 1);
@@ -22553,16 +22549,7 @@ CreateTextdraws()
 	TextDrawColor(TXTRandomInfo, -1);
 	TextDrawSetOutline(TXTRandomInfo, 1);
 	TextDrawSetProportional(TXTRandomInfo, 1);
-	TextDrawSetSelectable(TXTRandomInfo, 0);
-
-	TXTVersionInfo = TextDrawCreate(4.000000, 422.000000, ""CURRENT_VERSION" - "SVRURL"");
-	TextDrawBackgroundColor(TXTVersionInfo, 168430202);
-	TextDrawFont(TXTVersionInfo, 1);
-	TextDrawLetterSize(TXTVersionInfo, 0.259999, 1.199998);
-	TextDrawColor(TXTVersionInfo, -1);
-	TextDrawSetOutline(TXTVersionInfo, 1);
-	TextDrawSetProportional(TXTVersionInfo, 1);
-	TextDrawSetSelectable(TXTVersionInfo, 0);
+	TextDrawSetSelectable(TXTRandomInfo, 0);*/
 
 	// TXTOnJoin[0] = TextDrawCreate(323.000000, 188.000000, "~y~~h~S~w~tunt ~g~~h~~h~E~w~volution~n~~n~"SVRURLWWW"");
 	TXTOnJoin[0] = TextDrawCreate(323.000000, 188.000000, "~y~~h~N~w~ew ~g~~h~~h~E~w~volution ~r~~h~~h~F~w~reeroam~n~~n~"SVRURLWWW"");
@@ -22823,14 +22810,14 @@ CreateTextdraws()
 	TextDrawSetProportional(TXTGunGameSign, 1);
 	TextDrawSetSelectable(TXTGunGameSign, 0);
 
-    TXTTeleportInfo = TextDrawCreate(500.000000, 5.000000, "~g~~h~~h~Mellnik ~w~has gone to ~b~~h~~h~/trackmania");
+    /*TXTTeleportInfo = TextDrawCreate(500.000000, 5.000000, "~g~~h~~h~Mellnik ~w~has gone to ~b~~h~~h~/trackmania");
 	TextDrawBackgroundColor(TXTTeleportInfo, 168430202);
 	TextDrawFont(TXTTeleportInfo, 1);
 	TextDrawLetterSize(TXTTeleportInfo, 0.189999, 1.099998);
 	TextDrawColor(TXTTeleportInfo, -1);
 	TextDrawSetOutline(TXTTeleportInfo, 1);
 	TextDrawSetProportional(TXTTeleportInfo, 1);
-	TextDrawSetSelectable(TXTTeleportInfo, 0);
+	TextDrawSetSelectable(TXTTeleportInfo, 0);*/
 
     TXTFalloutInfo = TextDrawCreate(513.000000, 344.000000, "Timeleft: ~r~~h~~h~--:--~n~~w~Players: ~b~~h~~h~0~n~~w~Status: ~g~~h~~h~Waiting");
 	TextDrawBackgroundColor(TXTFalloutInfo, 168430202);
@@ -24325,7 +24312,10 @@ PortPlayerMap(playerid, Float:X, Float:Y, Float:Z, Float:Angle, const mapname[],
     PlayerPlaySound(playerid, 1039, 0.0, 0.0, 0.0);
 	ShowInfo(playerid, mapname, "");
     SetCameraBehindPlayer(playerid);
-    if(populate) NewMapEvent(playerid, cmd);
+    if(populate)
+	{
+
+	} //NewMapEvent(playerid, cmd);
 	return 1;
 }
 
@@ -24369,7 +24359,10 @@ PortPlayerMapVeh(playerid, Float:X, Float:Y, Float:Z, Float:Angle, Float:XVeh, F
 	PlayerPlaySound(playerid, 1039, 0.0, 0.0, 0.0);
     ShowInfo(playerid, mapname, "");
     SetCameraBehindPlayer(playerid);
-    if(populate) NewMapEvent(playerid, cmd);
+    if(populate)
+	{
+
+	} //NewMapEvent(playerid, cmd);
 	return 1;
 }
 
@@ -26405,7 +26398,7 @@ HidePlayerWelcomeTextdraws(playerid)
 
 ShowPlayerGunGameTextdraws(playerid)
 {
-    TextDrawHideForPlayer(playerid, TXTTeleportInfo);
+    //TextDrawHideForPlayer(playerid, TXTTeleportInfo);
 	TextDrawShowForPlayer(playerid, TXTGunGameSign);
 	PlayerTextDrawShow(playerid, TXTGunGameInfo[playerid]);
 	PlayerTextDrawHide(playerid, TXTWantedsTD[playerid]);
@@ -26413,7 +26406,7 @@ ShowPlayerGunGameTextdraws(playerid)
 
 HidePlayerGunGameTextdraws(playerid)
 {
-    TextDrawShowForPlayer(playerid, TXTTeleportInfo);
+    //TextDrawShowForPlayer(playerid, TXTTeleportInfo);
 	TextDrawHideForPlayer(playerid, TXTGunGameSign);
 	PlayerTextDrawHide(playerid, TXTGunGameInfo[playerid]);
 	PlayerTextDrawShow(playerid, TXTWantedsTD[playerid]);
@@ -26421,7 +26414,7 @@ HidePlayerGunGameTextdraws(playerid)
 
 HidePlayerRaceTextdraws(playerid)
 {
-    TextDrawShowForPlayer(playerid, TXTTeleportInfo);
+    //TextDrawShowForPlayer(playerid, TXTTeleportInfo);
 	TextDrawHideForPlayer(playerid, TXTRaceSign);
 	PlayerTextDrawHide(playerid, TXTRaceInfo[playerid]);
 	PlayerTextDrawShow(playerid, TXTWantedsTD[playerid]);
@@ -26429,7 +26422,7 @@ HidePlayerRaceTextdraws(playerid)
 
 ShowPlayerRaceTextdraws(playerid)
 {
-    TextDrawHideForPlayer(playerid, TXTTeleportInfo);
+    //TextDrawHideForPlayer(playerid, TXTTeleportInfo);
 	TextDrawShowForPlayer(playerid, TXTRaceSign);
 	PlayerTextDrawShow(playerid, TXTRaceInfo[playerid]);
 	PlayerTextDrawHide(playerid, TXTWantedsTD[playerid]);
@@ -26449,19 +26442,19 @@ HidePlayerToyTextdraws(playerid)
 
 ShowPlayerCNRTextdraws(playerid)
 {
-    TextDrawHideForPlayer(playerid, TXTTeleportInfo);
+    //TextDrawHideForPlayer(playerid, TXTTeleportInfo);
     PlayerTextDrawHide(playerid, TXTWantedsTD[playerid]);
 }
 
 HidePlayerCNRTextdraws(playerid)
 {
-    TextDrawShowForPlayer(playerid, TXTTeleportInfo);
+    //TextDrawShowForPlayer(playerid, TXTTeleportInfo);
     PlayerTextDrawShow(playerid, TXTWantedsTD[playerid]);
 }
 
 ShowPlayerDerbyTextdraws(playerid)
 {
-    TextDrawHideForPlayer(playerid, TXTTeleportInfo);
+    //TextDrawHideForPlayer(playerid, TXTTeleportInfo);
 	TextDrawShowForPlayer(playerid, TXTDerbyInfo);
 	TextDrawShowForPlayer(playerid, TXTDerbySign);
 	PlayerTextDrawHide(playerid, TXTWantedsTD[playerid]);
@@ -26469,7 +26462,7 @@ ShowPlayerDerbyTextdraws(playerid)
 
 HidePlayerDerbyTextdraws(playerid)
 {
-    TextDrawShowForPlayer(playerid, TXTTeleportInfo);
+    //TextDrawShowForPlayer(playerid, TXTTeleportInfo);
 	TextDrawHideForPlayer(playerid, TXTDerbyInfo);
 	TextDrawHideForPlayer(playerid, TXTDerbySign);
 	PlayerTextDrawShow(playerid, TXTWantedsTD[playerid]);
@@ -26477,7 +26470,7 @@ HidePlayerDerbyTextdraws(playerid)
 
 ShowPlayerBGTextdraws(playerid)
 {
-    TextDrawHideForPlayer(playerid, TXTTeleportInfo);
+    //TextDrawHideForPlayer(playerid, TXTTeleportInfo);
 	TextDrawShowForPlayer(playerid, TXTTdmInfo);
 	TextDrawShowForPlayer(playerid, TXTTdmSign);
 	PlayerTextDrawHide(playerid, TXTWantedsTD[playerid]);
@@ -26485,7 +26478,7 @@ ShowPlayerBGTextdraws(playerid)
 
 HidePlayerBGTextdraws(playerid)
 {
-    TextDrawShowForPlayer(playerid, TXTTeleportInfo);
+    //TextDrawShowForPlayer(playerid, TXTTeleportInfo);
 	TextDrawHideForPlayer(playerid, TXTTdmInfo);
 	TextDrawHideForPlayer(playerid, TXTTdmSign);
 	PlayerTextDrawShow(playerid, TXTWantedsTD[playerid]);
@@ -26493,7 +26486,7 @@ HidePlayerBGTextdraws(playerid)
 
 ShowPlayerFalloutTextdraws(playerid)
 {
-    TextDrawHideForPlayer(playerid, TXTTeleportInfo);
+    //TextDrawHideForPlayer(playerid, TXTTeleportInfo);
 	TextDrawShowForPlayer(playerid, TXTFalloutInfo);
 	TextDrawShowForPlayer(playerid, TXTFalloutSign);
 	PlayerTextDrawHide(playerid, TXTWantedsTD[playerid]);
@@ -26501,7 +26494,7 @@ ShowPlayerFalloutTextdraws(playerid)
 
 HidePlayerFalloutTextdraws(playerid)
 {
-    TextDrawShowForPlayer(playerid, TXTTeleportInfo);
+    //TextDrawShowForPlayer(playerid, TXTTeleportInfo);
 	TextDrawHideForPlayer(playerid, TXTFalloutInfo);
 	TextDrawHideForPlayer(playerid, TXTFalloutSign);
 	PlayerTextDrawShow(playerid, TXTWantedsTD[playerid]);
@@ -26509,24 +26502,32 @@ HidePlayerFalloutTextdraws(playerid)
 
 HidePlayerDMTextdraws(playerid)
 {
-    TextDrawShowForPlayer(playerid, TXTTeleportInfo);
+    //TextDrawShowForPlayer(playerid, TXTTeleportInfo);
     PlayerTextDrawShow(playerid, TXTWantedsTD[playerid]);
 }
 
 ShowPlayerDMTextdraws(playerid)
 {
-    TextDrawHideForPlayer(playerid, TXTTeleportInfo);
+    //TextDrawHideForPlayer(playerid, TXTTeleportInfo);
     PlayerTextDrawHide(playerid, TXTWantedsTD[playerid]);
 }
 
 HidePlayerInfoTextdraws(playerid)
 {
-	TextDrawHideForPlayer(playerid, TXTTeleportInfo);
+	if(playerid)
+	{
+	
+	}
+	//TextDrawHideForPlayer(playerid, TXTTeleportInfo);
 }
 
 ShowPlayerInfoTextdraws(playerid)
 {
-	TextDrawShowForPlayer(playerid, TXTTeleportInfo);
+	if(playerid)
+	{
+
+	}
+	//TextDrawShowForPlayer(playerid, TXTTeleportInfo);
 }
 
 Fallout_BuildMap()
@@ -27363,12 +27364,12 @@ NewMinigameJoin(playerid, const minigame[], const cmd[])
 	format(gstr, sizeof(gstr), "3,1JOIN:4 %s(%i) just joined %s [/%s]", __GetName(playerid), playerid, minigame, cmd);
 	IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 }
-
+/*
 NewMapEvent(playerid, const cmd[])
 {
 	format(gstr, sizeof(gstr), "~g~~h~~h~%s ~w~has gone to ~b~~h~~h~/%s", __GetName(playerid), cmd);
     TextDrawSetString(TXTTeleportInfo, gstr);
-}
+}*/
 
 IsValidVehicleModel(vmodel)
 {
@@ -29846,12 +29847,12 @@ islogged(playerid)
 	}
 	return 0;
 }
-
+/*
 function:RandomTXTInfo()
 {
 	TextDrawSetString(TXTRandomInfo, szRandomInfoTXTs[random(sizeof(szRandomInfoTXTs))]);
 	return 1;
-}
+}*/
 
 function:OnUnbanAttempt(playerid, unban[])
 {
