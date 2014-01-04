@@ -9,24 +9,6 @@
 || #################################################################### ||
 \*======================================================================*/
 
-/* R16 Changes
---------------
-* /bikec small glitch fixed
-* Derby townhall: added an object to prevent map escape
-* Commands in /c can now be clicked and executed
-* Added /gcolor for gang leaders+ this has no use yet
-* Many messages are now shown in GameTexts instead of ChatMessages
-* Sold Houses/Bizzes are no longer be shown on the map
-* Hydras can no longer be spawned in the gang war zone but outside of it
-* /m now shows how many players are in the specific minigame
-* Admins now hear a beep sound when a new report was submitted
-* /bbuy did not take $1,000,000 from you when buying WTF?! why nobody reported this?
-* Improved /spec
-* /a was removed, use # to enter admin chat
-* Jetpacks and Hydras are allowed to use in Gang Wars
-* Many minor bug fixes
-*/
-
 #pragma dynamic 8192
 
 #define IS_RELEASE_BUILD (true)
@@ -107,7 +89,7 @@ native IsValidVehicle(vehicleid); // undefined in a_samp
 #define HOSTNAME                        " 	        NEF » ×DM/Stunt/Race/Freeroam/Minigames×"
 //#define HOSTNAME 						"NEF 0.3x (R11)     «Stunt/Race/Freeroam/DM»"
 #if IS_RELEASE_BUILD == true
-#define CURRENT_VERSION                 "Release R16"
+#define CURRENT_VERSION                 "Release 16"
 #define CURRENT_VERISON_SHORT           "R16"
 #else
 #define CURRENT_VERSION                 "PTS:R16"
@@ -1798,12 +1780,11 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
     Text:AchTD[6],
 	Text:TXTWelcome[5],
 	Text:JailTD,
-	Text:TXTMinigames,
+	Text:TXTCommandsTop,
 	#if WINTER_EDITION == true
 	Text:TXTWinterEdition,
 	#endif
-	Text:TXTFooterP1,
-	Text:TXTFooterP2,
+	Text:TXTFooter,
 	Text:TXTFooterBlack,
 	Text:TXTOnJoin[2],
 	//Text:TXTRandomInfo,
@@ -1863,7 +1844,6 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
   	iCountdownVIP = 5,
  	bool:IsCountDownRunning = false,
  	tVIPCountdown = -1,
- 	randomColors[24] = {6, 7, 126, 128, 130, 152, 158, 228, 181, 229, 205, 1, 6, 243, 3, 175, 137, 155, 158, 79, 161, 162, 192, 3},
  	veh_cnr[101],
  	Gate[2],
  	pArrests[MAX_PLAYERS],
@@ -2584,10 +2564,9 @@ public OnPlayerRequestClass(playerid, classid)
 	ShowPlayerWelcomeTextdraws(playerid);
 	
 	TextDrawShowForPlayer(playerid, TXTFooterBlack);
-	TextDrawShowForPlayer(playerid, TXTFooterP1);
-	TextDrawShowForPlayer(playerid, TXTFooterP2);
+	TextDrawShowForPlayer(playerid, TXTFooter);
 	//TextDrawShowForPlayer(playerid, TXTRandomInfo);
-	TextDrawShowForPlayer(playerid, TXTMinigames);
+	TextDrawShowForPlayer(playerid, TXTCommandsTop);
 	#if WINTER_EDITION == true
 	TextDrawShowForPlayer(playerid, TXTWinterEdition);
 	#endif
@@ -7546,7 +7525,7 @@ YCMD:sfdrift(playerid, params[], help)
 }
 YCMD:driftcity(playerid, params[], help)
 {
-	PortPlayerMapVeh(playerid, 3431.8589, 484.3132, 1788.7490, 180, 3431.8589, 484.3132, 1788.7490, 180, "Drift City", "driftcity");
+	PortPlayerMapVeh(playerid, 3431.8403,485.7794,1788.2438,359.8336,3431.8403,485.7794,1788.2438,359.8336, "Drift City", "driftcity");
 	return 1;
 }
 YCMD:driftisland(playerid, params[], help)
@@ -8197,10 +8176,9 @@ YCMD:hidef(playerid, params[], help)
 {
     PlayerInfo[playerid][bTDEnabled] = false;
 	//TextDrawHideForPlayer(playerid, TXTTeleportInfo);
-    TextDrawHideForPlayer(playerid, TXTMinigames);
+    TextDrawHideForPlayer(playerid, TXTCommandsTop);
     TextDrawHideForPlayer(playerid, TXTFooterBlack);
-	TextDrawHideForPlayer(playerid, TXTFooterP1);
-	TextDrawHideForPlayer(playerid, TXTFooterP2);
+	TextDrawHideForPlayer(playerid, TXTFooter);
     //TextDrawHideForPlayer(playerid, TXTRandomInfo);
     TextDrawHideForPlayer(playerid, TXTGodTD);
     PlayerTextDrawHide(playerid, TXTWantedsTD[playerid]);
@@ -8214,10 +8192,9 @@ YCMD:showf(playerid, params[], help)
 {
     PlayerInfo[playerid][bTDEnabled] = true;
 	//TextDrawShowForPlayer(playerid, TXTTeleportInfo);
-	TextDrawShowForPlayer(playerid, TXTMinigames);
+	TextDrawShowForPlayer(playerid, TXTCommandsTop);
 	TextDrawShowForPlayer(playerid, TXTFooterBlack);
-	TextDrawShowForPlayer(playerid, TXTFooterP1);
-	TextDrawShowForPlayer(playerid, TXTFooterP2);
+	TextDrawShowForPlayer(playerid, TXTFooter);
     //TextDrawShowForPlayer(playerid, TXTRandomInfo);
 	PlayerTextDrawShow(playerid, TXTWantedsTD[playerid]);
 	if(PlayerInfo[playerid][bGod]) TextDrawShowForPlayer(playerid, TXTGodTD);
@@ -22680,15 +22657,14 @@ CreateTextdraws()
 	TextDrawColor(JailTD, -1);
 	TextDrawFont(JailTD, 4);
 
-	TXTMinigames = TextDrawCreate(637.000000, 3.000000, "~g~~h~~h~/derby 0 ~y~/cnr 0 ~b~~h~/race 0 ~r~~h~/tdm 0 ~p~/fallout 0 ~w~/gungame 0 ~y~/war 0 ~g~~h~/sniper 0 ~b~~h~~h~/mini 0 ~r~/rocket 0");
-	TextDrawAlignment(TXTMinigames, 3);
-	TextDrawBackgroundColor(TXTMinigames, 255);
-	TextDrawFont(TXTMinigames, 3);
-	TextDrawLetterSize(TXTMinigames, 0.209997, 1.000000);
-	TextDrawColor(TXTMinigames, -1);
-	TextDrawSetOutline(TXTMinigames, 1);
-	TextDrawSetProportional(TXTMinigames, 1);
-	TextDrawSetSelectable(TXTMinigames, 0);
+	TXTCommandsTop = TextDrawCreate(392.000000, 2.000000, "~w~Commands: ~y~/c ~w~Teleports: ~y~/t ~w~Vehicles: ~y~/v ~w~Weapons: ~y~/w ~w~Minigames: ~y~/m ~w~Toys: ~y~/o");
+	TextDrawBackgroundColor(TXTCommandsTop, 255);
+	TextDrawFont(TXTCommandsTop, 3);
+	TextDrawLetterSize(TXTCommandsTop, 0.169999, 0.899999);
+	TextDrawColor(TXTCommandsTop, -1);
+	TextDrawSetOutline(TXTCommandsTop, 1);
+	TextDrawSetProportional(TXTCommandsTop, 1);
+	TextDrawSetSelectable(TXTCommandsTop, 0);
 
 	TXTFooterBlack = TextDrawCreate(321.000000, 434.000000, "~n~");
 	TextDrawAlignment(TXTFooterBlack, 2);
@@ -22704,23 +22680,14 @@ CreateTextdraws()
 	TextDrawTextSize(TXTFooterBlack, 0.000000, 729.000000);
 	TextDrawSetSelectable(TXTFooterBlack, 0);
 
-	TXTFooterP1 = TextDrawCreate(4.000000, 434.000000, "~r~www.nefserver.net ~<~~>~ Release 16 ~<~~>~");
-	TextDrawBackgroundColor(TXTFooterP1, -84215262);
-	TextDrawFont(TXTFooterP1, 3);
-	TextDrawLetterSize(TXTFooterP1, 0.209998, 1.000000);
-	TextDrawColor(TXTFooterP1, -16776961);
-	TextDrawSetOutline(TXTFooterP1, 1);
-	TextDrawSetProportional(TXTFooterP1, 1);
-	TextDrawSetSelectable(TXTFooterP1, 0);
-
-	TXTFooterP2 = TextDrawCreate(161.000000, 434.000000, "~w~Commands: /c Teleports: /t Vehicles: /v Weapons: /w Minigames: /m Toys: /o Help: /h");
-	TextDrawBackgroundColor(TXTFooterP2, 255);
-	TextDrawFont(TXTFooterP2, 1);
-	TextDrawLetterSize(TXTFooterP2, 0.209999, 1.000000);
-	TextDrawColor(TXTFooterP2, -1);
-	TextDrawSetOutline(TXTFooterP2, 1);
-	TextDrawSetProportional(TXTFooterP2, 1);
-	TextDrawSetSelectable(TXTFooterP2, 0);
+	TXTFooter = TextDrawCreate(4.000000, 435.000000, ""SVRURLWWW" ~<~~>~ "CURRENT_VERSION" ~<~~>~ ~g~~h~~h~/derby 0 ~y~/cnr 0 ~b~~h~/race 0 ~r~~h~/tdm 0 ~p~/fallout 0 ~w~/gungame 0 ~y~/war 0 ~g~/sniper 0 ~b~~h~~h~/mini 0 ~r~/rocket 0");
+	TextDrawBackgroundColor(TXTFooter, 255);
+	TextDrawFont(TXTFooter, 3);
+	TextDrawLetterSize(TXTFooter, 0.219999, 0.899999);
+	TextDrawColor(TXTFooter, -1);
+	TextDrawSetOutline(TXTFooter, 1);
+	TextDrawSetProportional(TXTFooter, 1);
+	TextDrawSetSelectable(TXTFooter, 0);
 
 	AchTD[0] = TextDrawCreate(495.000000, 190.000000, "Box0");
 	TextDrawBackgroundColor(AchTD[0], 255);
@@ -26045,7 +26012,7 @@ function:ProcessTick()
 	    }
 	}
                              
-	format(gstr2, sizeof(gstr2), "~g~~h~~h~/derby %i ~y~/cnr %i ~b~~h~/race %i ~r~~h~/tdm %i ~p~/fallout %i ~w~/gungame %i ~y~/war %i ~g~~h~/sniper %i ~b~~h~~h~/mini %i ~r~/rocket %i",
+	format(gstr2, sizeof(gstr2), ""SVRURLWWW" ~<~~>~ "CURRENT_VERSION" ~<~~>~ ~g~~h~~h~/derby %i ~y~/cnr %i ~b~~h~/race %i ~r~~h~/tdm %i ~p~/fallout %i ~w~/gungame %i ~y~/war %i ~g~/sniper %i ~b~~h~~h~/mini %i ~r~/rocket %i",
         T_DerbyPlayers,
         T_CNRPlayers,
 		T_RacePlayers,
@@ -26057,7 +26024,7 @@ function:ProcessTick()
 		T_SniperPlayers,
 		T_RocketDMPlayers);
 
-	TextDrawSetString(TXTMinigames, gstr2);
+	TextDrawSetString(TXTFooter, gstr2);
 
 	if(g_FalloutStatus != e_Fallout_Inactive)
 	{

@@ -1,6 +1,16 @@
+new randomColors[24] = {6, 7, 126, 128, 130, 152, 158, 228, 181, 229, 205, 1, 6, 243, 3, 175, 137, 155, 158, 79, 161, 162, 192, 3};
+
 LoadServerVehicles()
 {
 	new count = GetTickCount() + 3600000;
+	
+	// Trains
+	AddStaticVehicle(538,1791.7875,-1953.9087,13.3232,90.1791, randomColors[random(23)], randomColors[random(23)]); // train 1
+	AddStaticVehicle(537,-196.6394,-1043.5342,12.7869,294.8998, randomColors[random(23)], randomColors[random(23)]); // train 2
+	AddStaticVehicle(538,1437.2987,2632.3979,10.6443,268.8147, randomColors[random(23)], randomColors[random(23)]); // train 3
+	AddStaticVehicle(537,737.6113,1938.5317,5.1083,180.7864, randomColors[random(23)], randomColors[random(23)]); // train 4
+	AddStaticVehicle(538,347.0196,1210.8834,21.5925,83.6686, randomColors[random(23)], randomColors[random(23)]); // train 5
+	AddStaticVehicle(537,-1948.3076,74.3284,25.5852,180.2566, randomColors[random(23)], randomColors[random(23)]); // train 6
 	
 	// CreditMarket
 	AddStaticVehicleEx(487, 1872.6511, -1410.3031, 16.4532, 90.7800, -1, -1, 100);
@@ -9,17 +19,17 @@ LoadServerVehicles()
 	AddStaticVehicleEx(522, 1870.4458, -1425.1857, 13.3091, -182.8800, -1, -1, 100);
 	
 	// BikeC
-	AddStaticVehicleEx(522, 1118.1583,1360.4303,10.3473,175.9955, -1, -1, 20);
-	AddStaticVehicleEx(522, 1115.3757,1360.6385,10.3727,174.0724, -1, -1, 20);
-	AddStaticVehicleEx(522, 1116.8628,1360.7001,10.3819,172.6443, -1, -1, 20);
-	AddStaticVehicleEx(522, 1112.3943,1360.8801,10.5144,171.3476, -1, -1, 20);
-	AddStaticVehicleEx(522, 1113.9193,1360.6929,10.4211,176.0134, -1, -1, 20);
-	AddStaticVehicleEx(522, 1110.9777,1360.7141,10.4370,172.4175, -1, -1, 20);
-	AddStaticVehicleEx(522, 1109.4070,1360.8016,10.4031,177.9902, -1, -1, 20);
-	AddStaticVehicleEx(522, 1107.9777,1360.6622,10.4074,181.0323, -1, -1, 20);
-	AddStaticVehicleEx(522, 1106.0084,1360.6349,10.4130,179.7719, -1, -1, 20);
-	AddStaticVehicleEx(522, 1102.4650,1360.4196,10.3990,166.7076, -1, -1, 20);
-	AddStaticVehicleEx(522, 1104.2096,1360.3617,10.3406,180.0261, -1, -1, 20);
+	AddStaticVehicleEx(522, 1118.1583,1360.4303,10.3473,175.9955, randomColors[random(23)], randomColors[random(23)], 20);
+	AddStaticVehicleEx(522, 1115.3757,1360.6385,10.3727,174.0724, randomColors[random(23)], randomColors[random(23)], 20);
+	AddStaticVehicleEx(522, 1116.8628,1360.7001,10.3819,172.6443, randomColors[random(23)], randomColors[random(23)], 20);
+	AddStaticVehicleEx(522, 1112.3943,1360.8801,10.5144,171.3476, randomColors[random(23)], randomColors[random(23)], 20);
+	AddStaticVehicleEx(522, 1113.9193,1360.6929,10.4211,176.0134, randomColors[random(23)], randomColors[random(23)], 20);
+	AddStaticVehicleEx(522, 1110.9777,1360.7141,10.4370,172.4175, randomColors[random(23)], randomColors[random(23)], 20);
+	AddStaticVehicleEx(522, 1109.4070,1360.8016,10.4031,177.9902, randomColors[random(23)], randomColors[random(23)], 20);
+	AddStaticVehicleEx(522, 1107.9777,1360.6622,10.4074,181.0323, randomColors[random(23)], randomColors[random(23)], 20);
+	AddStaticVehicleEx(522, 1106.0084,1360.6349,10.4130,179.7719, randomColors[random(23)], randomColors[random(23)], 20);
+	AddStaticVehicleEx(522, 1102.4650,1360.4196,10.3990,166.7076, randomColors[random(23)], randomColors[random(23)], 20);
+	AddStaticVehicleEx(522, 1104.2096,1360.3617,10.3406,180.0261, randomColors[random(23)], randomColors[random(23)], 20);
 	
 	// Trackmania 2
 	AddStaticVehicleEx(411,-1914.40002441,6623.29980469,11.60000038,90.0,-1, -1, 100);
