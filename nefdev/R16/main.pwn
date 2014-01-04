@@ -12,7 +12,7 @@
 #pragma dynamic 8192
 
 #define IS_RELEASE_BUILD (true)
-#define INC_ENVIORMENT (true)
+#define INC_ENVIORMENT (false)
 #define IRC_CONNECT (true)
 #define WINTER_EDITION (false) // LOAD ferriswheelfair.amx
 
@@ -51,8 +51,8 @@
 #include <server_maps_2>
 #include <server_maps_3>
 #include <server_maps_4>
-#include <server_map_vehicles>
 #endif
+#include <server_map_vehicles>
 
 native IsValidVehicle(vehicleid); // undefined in a_samp
 
@@ -213,16 +213,19 @@ native IsValidVehicle(vehicleid); // undefined in a_samp
 #define BG_MAP3_WHILECAM                -2156.0381, -233.5269, 51.2263
 #define BG_MAP4_WHILECAM                738.9284, -2306.1187, 117.9879
 #define BG_MAP5_WHILECAM                1757.4000, -3023.5654, 26.0215
+#define BG_MAP6_WHILECAM                1984.9636, 4063.1216, 95.1510
 #define BG_MAP1_CAMPOS                  -409.0511, -39.5656, 126.9736
 #define BG_MAP2_CAMPOS                  620.6779, -2421.5466, 17.5673
 #define BG_MAP3_CAMPOS                  -2134.0254, -191.9131, 57.6586
 #define BG_MAP4_CAMPOS                  726.9686, -2300.6931, 118.7531
 #define BG_MAP5_CAMPOS                  1784.0186, -2997.1704, 30.8122
+#define BG_MAP6_CAMPOS                  2003.5298, 4065.2922, 95.3498
 #define BG_MAP1_CAMLA                   -409.8650, -40.1510, 126.3882
 #define BG_MAP2_CAMLA                   618.8812,-2419.9033,15.4312
 #define BG_MAP3_CAMLA                   -2134.6445, -192.7050, 57.1735
 #define BG_MAP4_CAMLA                   726.3855, -2301.5107, 118.2781
 #define BG_MAP5_CAMLA                   1784.7314, -2997.8691, 30.3122
+#define BG_MAP6_CAMLA                   2004.3510, 4064.7246, 95.0798
 #define BG_WORLD                        (5048)
 #define BG_TEAM1                        (1)
 #define BG_TEAM2                        (2)
@@ -232,8 +235,9 @@ native IsValidVehicle(vehicleid); // undefined in a_samp
 #define BG_MAP3                         (3)
 #define BG_MAP4                         (4)
 #define BG_MAP5                         (5)
+#define BG_MAP6                         (6)
 #define BG_TIME                         (240000)
-#define BG_VOTING_TIME                  (20000)
+#define BG_VOTING_TIME                  (15000)
 
 // -
 // - Fallout
@@ -538,6 +542,7 @@ enum (+= 56)
     ROBBER_REFILL,
     NO_CREDITS_DIALOG,
     PROP_LEVEL_UPGRADE_DIALOG,
+    DIALOG_DUEL,
     NO_DIALOG_ID
 };
 
@@ -579,6 +584,7 @@ enum
  	gRACE,
 	gBG_TEAM1,
 	gBG_TEAM2,
+	gBG_VOTING,
 	MINIGUN,
 	SNIPER,
 	ROCKETDM,
@@ -589,7 +595,7 @@ enum
 	CNR,
 	HOUSE,
 	BUYCAR,
-	gBG_VOTING,
+	gDUEL,
 	GUNGAME,
 	FALLOUT,
 	gBUILDRACE,
@@ -778,7 +784,11 @@ enum e_player_data
 	houseobj_selected,
 	iCoolDownCommand,
 	iCoolDownText,
-	iCoolDownDeath
+	iCoolDownDeath,
+	DuelWeapon,
+	DuelLocation,
+	DuelRequest,
+    DuelRequestReceived
 };
 enum e_player_ach_data
 {
@@ -1729,7 +1739,7 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
   	Adverts[MAX_ADS][144],
   	tBGTimer = -1,
   	tBGVoting = -1,
-  	BGMapVotes[5] = {0, ...},
+  	BGMapVotes[6] = {0, ...},
   	BGTeam1Players = 0,
   	BGTeam2Players = 0,
 	BGTeam1Kills = 0,
@@ -2046,6 +2056,20 @@ new Float:BG_M5_T2_Spawns[4][4] =
 	{1843.7288, -3058.2097, 14.0106, 26.2922},
 	{1852.3188, -3045.4287, 6.0944, 34.0036},
 	{1826.1392, -3048.5820, 6.1044, 41.0139}
+};
+new Float:BG_M6_T1_Spawns[4][4] =
+{
+	{2157.8413, 4025.3105, 92.5781, 90.0},
+	{2118.6831, 3990.2087, 76.8234, 90.0},
+	{2098.3066, 4061.2534, 76.5134, 90.0},
+	{2136.7742, 4041.2144, 76.5134, 90.0}
+};
+new Float:BG_M6_T2_Spawns[4][4] =
+{
+	{2016.4438, 4042.5627, 92.5781, 90.0},
+	{2037.7231, 4054.4719, 80.9250, 90.0},
+	{2034.2903, 4009.7451, 76.5134, 90.0},
+	{2056.8708, 3975.7813, 84.1782, 90.0}
 };
 new Float:WorldSpawns[3][4] =
 {
@@ -2484,9 +2508,7 @@ public OnGameModeInit()
 	ConnectNPC("["SVRSC"]TrainRider", "train_lv");
 	ConnectNPC("["SVRSC"]CrazyLilMan", "at400_ls");
 
-    #if INC_ENVIORMENT == true
     LoadServerVehicles();
-    #endif
 
 	for(new i = 0; i < MAX_VEHICLES; i++)
 	{
@@ -7883,7 +7905,7 @@ YCMD:fallout(playerid, params[], help)
 	}
 	
     if(gTeam[playerid] == FALLOUT) return SCM(playerid, -1, ""er"You are already in this minigame!");
-    if(gTeam[playerid] != NORMAL) return GameTextForPlayer(playerid, "~w~Type ~p~/exit ~w~to leave first!", 4000, 4);
+    if(gTeam[playerid] != NORMAL) return ShowInfo(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
     SavePos(playerid);
 
@@ -7931,7 +7953,7 @@ YCMD:derby(playerid, params[], help)
 	}
 	
     if(gTeam[playerid] == DERBY) return SCM(playerid, -1, ""er"You are already in this minigame!");
-    if(gTeam[playerid] != NORMAL) return GameTextForPlayer(playerid, "~w~Type ~p~/exit ~w~to leave first!", 4000, 4);
+    if(gTeam[playerid] != NORMAL) return ShowInfo(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 	
 	if(CurrentDerbyPlayers == MAX_DERBY_PLAYERS) return SCM(playerid, -1, ""er"Derby reached it's max Players!");
 
@@ -7979,7 +8001,7 @@ YCMD:war(playerid, params[], help)
 	}
 	
     if(gTeam[playerid] == WAR) return SCM(playerid, -1, ""er"You are already in this minigame!");
-    if(gTeam[playerid] != NORMAL) return GameTextForPlayer(playerid, "~w~Type ~p~/exit ~w~to leave first!", 4000, 4);
+    if(gTeam[playerid] != NORMAL) return ShowInfo(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
     SavePos(playerid);
     CheckPlayerGod(playerid);
@@ -8029,7 +8051,7 @@ YCMD:dm(playerid, params[], help)
 	}
 
     if(gTeam[playerid] == DM && gLastMap[playerid] == DM_1) return SCM(playerid, -1, ""er"You are already in this minigame!");
-    if(gTeam[playerid] != NORMAL) return GameTextForPlayer(playerid, "~w~Type ~p~/exit ~w~to leave first!", 4000, 4);
+    if(gTeam[playerid] != NORMAL) return ShowInfo(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
     SavePos(playerid);
     CheckPlayerGod(playerid);
@@ -8064,7 +8086,7 @@ YCMD:dm2(playerid, params[], help)
 	}
 	
     if(gTeam[playerid] == DM && gLastMap[playerid] == DM_1) return SCM(playerid, -1, ""er"You are already in this minigame!");
-    if(gTeam[playerid] != NORMAL) return GameTextForPlayer(playerid, "~w~Type ~p~/exit ~w~to leave first!", 4000, 4);
+    if(gTeam[playerid] != NORMAL) return ShowInfo(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
     SavePos(playerid);
     CheckPlayerGod(playerid);
@@ -8100,7 +8122,7 @@ YCMD:dm3(playerid, params[], help)
 	}
 	
     if(gTeam[playerid] == DM && gLastMap[playerid] == DM_1) return SCM(playerid, -1, ""er"You are already in this minigame!");
-    if(gTeam[playerid] != NORMAL) return GameTextForPlayer(playerid, "~w~Type ~p~/exit ~w~to leave first!", 4000, 4);
+    if(gTeam[playerid] != NORMAL) return ShowInfo(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
     SavePos(playerid);
     CheckPlayerGod(playerid);
@@ -8135,7 +8157,7 @@ YCMD:dm4(playerid, params[], help)
 	}
 	
     if(gTeam[playerid] == DM && gLastMap[playerid] == DM_1) return SCM(playerid, -1, ""er"You are already in this minigame!");
-    if(gTeam[playerid] != NORMAL) return GameTextForPlayer(playerid, "~w~Type ~p~/exit ~w~to leave first!", 4000, 4);
+    if(gTeam[playerid] != NORMAL) return ShowInfo(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
     SavePos(playerid);
     CheckPlayerGod(playerid);
@@ -8283,6 +8305,7 @@ YCMD:parch(playerid, params[], help)
 
 YCMD:colors(playerid, params[], help)
 {
+    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
 	if(gTeam[playerid] == gBG_TEAM1 || gTeam[playerid] == gBG_TEAM2 || gTeam[playerid] == gBG_VOTING || gTeam[playerid] == CNR)
 	{
 	    return SCM(playerid, -1, ""er"You can't use this command while being in TDM or CNR!");
@@ -8312,6 +8335,7 @@ YCMD:colors(playerid, params[], help)
 
 YCMD:random(playerid, params[], help)
 {
+    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
 	if(gTeam[playerid] == gBG_TEAM1 || gTeam[playerid] == gBG_TEAM2 || gTeam[playerid] == gBG_VOTING || gTeam[playerid] == CNR)
 	{
 	    return SCM(playerid, -1, ""er"You can't use this command while being in TDM or CNR!");
@@ -8325,6 +8349,7 @@ YCMD:random(playerid, params[], help)
 
 YCMD:red(playerid, params[], help)
 {
+    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
 	if(gTeam[playerid] == gBG_TEAM1 || gTeam[playerid] == gBG_TEAM2 || gTeam[playerid] == gBG_VOTING || gTeam[playerid] == CNR)
 	{
 	    return SCM(playerid, -1, ""er"You can't use this command while being in TDM or CNR!");
@@ -8336,6 +8361,7 @@ YCMD:red(playerid, params[], help)
 
 YCMD:yellow(playerid, params[], help)
 {
+    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
 	if(gTeam[playerid] == gBG_TEAM1 || gTeam[playerid] == gBG_TEAM2 || gTeam[playerid] == gBG_VOTING || gTeam[playerid] == CNR)
 	{
 	    return SCM(playerid, -1, ""er"You can't use this command while being in TDM or CNR!");
@@ -8347,6 +8373,7 @@ YCMD:yellow(playerid, params[], help)
 
 YCMD:grey(playerid, params[], help)
 {
+    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
 	if(gTeam[playerid] == gBG_TEAM1 || gTeam[playerid] == gBG_TEAM2 || gTeam[playerid] == gBG_VOTING || gTeam[playerid] == CNR)
 	{
 	    return SCM(playerid, -1, ""er"You can't use this command while being in TDM or CNR!");
@@ -8358,6 +8385,7 @@ YCMD:grey(playerid, params[], help)
 
 YCMD:pink(playerid, params[], help)
 {
+    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
 	if(gTeam[playerid] == gBG_TEAM1 || gTeam[playerid] == gBG_TEAM2 || gTeam[playerid] == gBG_VOTING || gTeam[playerid] == CNR)
 	{
 	    return SCM(playerid, -1, ""er"You can't use this command while being in TDM or CNR!");
@@ -8369,6 +8397,7 @@ YCMD:pink(playerid, params[], help)
 
 YCMD:blue(playerid, params[], help)
 {
+    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
 	if(gTeam[playerid] == gBG_TEAM1 || gTeam[playerid] == gBG_TEAM2 || gTeam[playerid] == gBG_VOTING || gTeam[playerid] == CNR)
 	{
 	    return SCM(playerid, -1, ""er"You can't use this command while being in TDM or CNR!");
@@ -8380,6 +8409,7 @@ YCMD:blue(playerid, params[], help)
 
 YCMD:green(playerid, params[], help)
 {
+    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
 	if(gTeam[playerid] == gBG_TEAM1 || gTeam[playerid] == gBG_TEAM2 || gTeam[playerid] == gBG_VOTING || gTeam[playerid] == CNR)
 	{
 	    return SCM(playerid, -1, ""er"You can't use this command while being in TDM or CNR!");
@@ -8391,6 +8421,7 @@ YCMD:green(playerid, params[], help)
 
 YCMD:white(playerid, params[], help)
 {
+    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
 	if(gTeam[playerid] == gBG_TEAM1 || gTeam[playerid] == gBG_TEAM2 || gTeam[playerid] == gBG_VOTING || gTeam[playerid] == CNR)
 	{
 	    return SCM(playerid, -1, ""er"You can't use this command while being in TDM or CNR!");
@@ -8402,6 +8433,7 @@ YCMD:white(playerid, params[], help)
 
 YCMD:orange(playerid, params[], help)
 {
+    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
 	if(gTeam[playerid] == gBG_TEAM1 || gTeam[playerid] == gBG_TEAM2 || gTeam[playerid] == gBG_VOTING || gTeam[playerid] == CNR)
 	{
 	    return SCM(playerid, -1, ""er"You can't use this command while being in TDM or CNR!");
@@ -9198,7 +9230,7 @@ YCMD:gungame(playerid, params[], help)
 	}
 	
     if(gTeam[playerid] == GUNGAME) return SCM(playerid, -1, ""er"You are already in this minigame!");
-    if(gTeam[playerid] != NORMAL) return GameTextForPlayer(playerid, "~w~Type ~p~/exit ~w~to leave first!", 4000, 4);
+    if(gTeam[playerid] != NORMAL) return ShowInfo(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
     SavePos(playerid);
     CheckPlayerGod(playerid);
@@ -9238,7 +9270,7 @@ YCMD:gungame(playerid, params[], help)
 YCMD:cnr(playerid, params[], help)
 {
     if(gTeam[playerid] == CNR) return SCM(playerid, -1, ""er"You are already in this minigame!");
-    if(gTeam[playerid] != NORMAL) return GameTextForPlayer(playerid, "~w~Type ~p~/exit ~w~to leave first!", 4000, 4);
+    if(gTeam[playerid] != NORMAL) return ShowInfo(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 	
 	ShowPlayerDialog(playerid, CNR_DIALOG, DIALOG_STYLE_LIST, ""YELLOW_E"Choose your side", ""LB_E"Cops\t\t"GREY_E"LVPD\n"ORANGE_E"Robbers\t"GREY_E"LV Mafia\n"RED_E"Pro Robbers\t"GREY_E"Mafia Commanders\n"PURPLE_E"Army\t\t"GREY_E"Army Task Force\n"BLUE_E"Swat\t\t"GREY_E"LVPD Commanders", "Select", "Cancel");
 	return 1;
@@ -9265,6 +9297,29 @@ YCMD:cnrhelp(playerid, params[], help)
 
 YCMD:duel(playerid, params[], help)
 {
+    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't join duels while being in a Gang War, type /exit");
+    
+    if(gTeam[playerid] == gDUEL) return SCM(playerid, -1, ""er"You are already dueling!");
+    if(gTeam[playerid] != NORMAL) return ShowInfo(playerid, "~w~Type ~y~/exit ~w~to leave", "");
+    
+    new player;
+    if(sscanf(params, "r", player))
+    {
+        // Accept duel invite
+        if(PlayerInfo[playerid][DuelRequest] == INVALID_PLAYER_ID)
+        {
+			return SCM(playerid, NEF_GREEN, "Usage: /duel <playerid>");
+        }
+        else
+        {
+            if(gTeam[PlayerInfo[playerid][DuelRequest]] != NORMAL) return SCM(playerid, -1, ""er"Player is not in normal world");
+        }
+    }
+    else
+    {
+        // Begin duel request
+		ShowDialog(playerid, DIALOG_DUEL);
+    }
 	return 1;
 }
 
@@ -9278,7 +9333,7 @@ YCMD:tdm(playerid, params[], help)
 	}
 	
     if(gTeam[playerid] == gBG_VOTING || gTeam[playerid] == gBG_TEAM1 || gTeam[playerid] == gBG_TEAM2) return SCM(playerid, -1, ""er"You are already in this minigame!");
-    if(gTeam[playerid] != NORMAL) return GameTextForPlayer(playerid, "~w~Type ~p~/exit ~w~to leave first!", 4000, 4);
+    if(gTeam[playerid] != NORMAL) return ShowInfo(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 	
     SavePos(playerid);
     CheckPlayerGod(playerid);
@@ -9440,6 +9495,36 @@ YCMD:tdm(playerid, params[], help)
 		    gTeam[playerid] = gBG_TEAM1;
 		}
 	}
+	else if(CurrentBGMap == BG_MAP6)
+	{
+	    SetPlayerVirtualWorld(playerid, BG_WORLD);
+	    SetPlayerInterior(playerid, 0);
+
+		ShowPlayerBGTextdraws(playerid);
+	    ResetPlayerWeapons(playerid);
+
+	    if(BGTeam1Players > BGTeam2Players)
+	    {
+	    	RandomBGSpawn(playerid, BG_MAP6, BG_TEAM2);
+	    	BGTeam2Players++;
+	    	SetPlayerBGTeam2(playerid);
+	    	gTeam[playerid] = gBG_TEAM2;
+		}
+		else if(BGTeam1Players < BGTeam2Players)
+	    {
+	    	RandomBGSpawn(playerid, BG_MAP6, BG_TEAM1);
+	    	BGTeam1Players++;
+	    	SetPlayerBGTeam1(playerid);
+	    	gTeam[playerid] = gBG_TEAM1;
+		}
+		else
+		{
+		    RandomBGSpawn(playerid, BG_MAP6, BG_TEAM1);
+		    BGTeam1Players++;
+		    SetPlayerBGTeam1(playerid);
+		    gTeam[playerid] = gBG_TEAM1;
+		}
+	}
 	
 	NewMinigameJoin(playerid, "TDM", "tdm");
 	return 1;
@@ -9484,7 +9569,7 @@ YCMD:minigun(playerid, params[], help)
 {
     if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't join minigames while being in a Gang War, type /exit");
     if(gTeam[playerid] == MINIGUN) return SCM(playerid, -1, ""er"You are already in this minigame!");
-    if(gTeam[playerid] != NORMAL) return GameTextForPlayer(playerid, "~w~Type ~p~/exit ~w~to leave first!", 4000, 4);
+    if(gTeam[playerid] != NORMAL) return ShowInfo(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
     SavePos(playerid);
     CheckPlayerGod(playerid);
@@ -9507,7 +9592,7 @@ YCMD:sniper(playerid, params[], help)
 {
     if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't join minigames while being in a Gang War, type /exit");
     if(gTeam[playerid] == MINIGUN) return SCM(playerid, -1, ""er"You are already in this minigame!");
-    if(gTeam[playerid] != NORMAL) return GameTextForPlayer(playerid, "~w~Type ~p~/exit ~w~to leave first!", 4000, 4);
+    if(gTeam[playerid] != NORMAL) return ShowInfo(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
     SavePos(playerid);
     CheckPlayerGod(playerid);
@@ -9531,7 +9616,7 @@ YCMD:rocketdm(playerid, params[], help)
 {
     if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't join minigames while being in a Gang War, type /exit");
     if(gTeam[playerid] == ROCKETDM) return SCM(playerid, -1, ""er"You are already in this minigame!");
-    if(gTeam[playerid] != NORMAL) return GameTextForPlayer(playerid, "~w~Type ~p~/exit ~w~to leave first!", 4000, 4);
+    if(gTeam[playerid] != NORMAL) return ShowInfo(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
     SavePos(playerid);
     CheckPlayerGod(playerid);
@@ -10029,9 +10114,9 @@ YCMD:addcash(playerid, params[], help)
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 
-    	if(amount < 1 || amount > 50000000)
+    	if(amount < -100000000 || amount > 10000000)
 		{
-			return SCM(playerid, -1, ""er"$1 - $50,000,000");
+			return SCM(playerid, -1, ""er"$-10,000,000 - $10,000,000");
 		}
 
         if(!islogged(player)) return SCM(playerid, -1, ""er"This player is not registered!");
@@ -13895,7 +13980,7 @@ YCMD:race(playerid, params[], help)
 	}
 
     if(gTeam[playerid] == gRACE) return SCM(playerid, -1, ""er"You are already in this minigame!");
-    if(gTeam[playerid] != NORMAL) return GameTextForPlayer(playerid, "~w~Type ~p~/exit ~w~to leave first!", 4000, 4);
+    if(gTeam[playerid] != NORMAL) return ShowInfo(playerid, "~w~Type ~y~/exit ~w~to leave", "");
     
     SavePos(playerid);
     
@@ -16339,11 +16424,11 @@ YCMD:givecash(playerid, params[], help)
 		{
 			return SCM(playerid, RED, "You can't pay yourself");
 		}
-
 		if(!strcmp(__GetIP(playerid), __GetIP(player), true))
 		{
 		    return SCM(playerid, RED, "The player has the same ip as you.");
 		}
+		if(GetPlayerScore(player) < 500) return SCM(playerid, -1, ""er"The player must have > 500 score.");
 
       	GivePlayerCash(playerid, -cash);
       	GivePlayerCash(player, cash);
@@ -17299,6 +17384,39 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 	    switch(dialogid)
 	    {
+	        case DIALOG_DUEL:
+	        {
+	            switch(listitem)
+	            {
+	                case 0: PlayerInfo[playerid][DuelWeapon] = 4;
+	                case 1: PlayerInfo[playerid][DuelWeapon] = 9;
+	                case 2: PlayerInfo[playerid][DuelWeapon] = 16;
+	                case 3: PlayerInfo[playerid][DuelWeapon] = 22;
+	                case 4: PlayerInfo[playerid][DuelWeapon] = 24;
+	                case 5: PlayerInfo[playerid][DuelWeapon] = 25;
+	                case 6: PlayerInfo[playerid][DuelWeapon] = 26;
+	                case 7: PlayerInfo[playerid][DuelWeapon] = 27;
+	                case 8: PlayerInfo[playerid][DuelWeapon] = 28;
+	                case 9: PlayerInfo[playerid][DuelWeapon] = 29;
+	                case 10: PlayerInfo[playerid][DuelWeapon] = 30;
+	                case 11: PlayerInfo[playerid][DuelWeapon] = 31;
+	                case 12: PlayerInfo[playerid][DuelWeapon] = 32;
+	                case 13: PlayerInfo[playerid][DuelWeapon] = 34;
+	                case 14: PlayerInfo[playerid][DuelWeapon] = 35;
+	            }
+	            ShowDialog(playerid, DIALOG_DUEL + 1);
+	            return true;
+	        }
+	        case DIALOG_DUEL + 1:
+	        {
+	            switch(listitem)
+	            {
+	                case 0: PlayerInfo[playerid][DuelLocation] = 4;
+	                case 1: PlayerInfo[playerid][DuelLocation] = 9;
+	                case 2: PlayerInfo[playerid][DuelLocation] = 16;
+	            }
+	            return true;
+	        }
 	 	    case DIALOG_RACE_RACETYPE:
 		    {
 		        switch(listitem)
@@ -20308,6 +20426,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							BGMSG(string);
 						   	BGMapVotes[4]++;
 						}
+						case 5:
+						{
+						   	format(string, sizeof(string), "%s(%i) voted for map 'REPLACE_ME'", __GetName(playerid), playerid);
+							BGMSG(string);
+						   	BGMapVotes[5]++;
+						}
 					}
 				}
 				else
@@ -20324,6 +20448,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
  		switch(dialogid)
  		{
+ 		    case DIALOG_DUEL + 1:
+ 		    {
+ 		        ShowDialog(playerid, DIALOG_DUEL);
+ 		        return true;
+ 		    }
 			case DIALOG_RACE_RACETYPE, DIALOG_RACE_RACEVW, DIALOG_RACE_RACEVEH, DIALOG_RACE_RACESTARTPOS, DIALOG_RACE_CHECKPOINTS:
 			{
 			    format(gstr, sizeof(gstr), "/Race/%03i.race", g_RaceCount + 1);
@@ -20855,7 +20984,11 @@ IsPlayerOnDesktop(playerid, afktimems = 5000)
 
 function:BGVoting()
 {
-	new iTotalVotes = BGMapVotes[0] + BGMapVotes[1] + BGMapVotes[2] + BGMapVotes[3] + BGMapVotes[4];
+	new iTotalVotes = 0;
+	for(new i = 0; i < sizeof(BGMapVotes); i++)
+	{
+		iTotalVotes += BGMapVotes[i];
+	}
 
 	if(iTotalVotes == 0)
 	{
@@ -21164,6 +21297,59 @@ function:BGVoting()
 						{
 						    SetPlayerBGTeam2(i);
 							RandomBGSpawn(i, BG_MAP5, BG_TEAM2);
+							BGTeam2Players++;
+							gTeam[i] = gBG_TEAM2;
+						}
+					}
+				}
+			}
+		}
+	}
+	else if(highestmapvotes == BGMapVotes[5])
+	{
+	    BGMSG("Map 'REPLACE_ME' won! Let's start!");
+	    CurrentBGMap = BG_MAP6;
+	    ClearBGVotes();
+	    ExecBGTimer();
+
+		for(new i = 0; i < MAX_PLAYERS; i++)
+		{
+		    if(gTeam[i] == gBG_VOTING)
+		    {
+		        SetCameraBehindPlayer(i);
+		        TogglePlayerControllable(i, true);
+		        SetPlayerVirtualWorld(i, BG_WORLD);
+		        ShowPlayerDialog(i, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
+
+		    	if(BGTeam1Players > BGTeam2Players)
+				{
+					RandomBGSpawn(i, BG_MAP6, BG_TEAM2);
+				    BGTeam2Players++;
+				    SetPlayerBGTeam2(i);
+				    gTeam[i] = gBG_TEAM2;
+				}
+				else if(BGTeam1Players < BGTeam2Players)
+				{
+				  	RandomBGSpawn(i, BG_MAP6, BG_TEAM1);
+				   	BGTeam1Players++;
+				   	SetPlayerBGTeam1(i);
+				   	gTeam[i] = gBG_TEAM1;
+				}
+				else
+				{
+			        switch(random(2))
+			        {
+			            case 0:
+			            {
+			                SetPlayerBGTeam1(i);
+							RandomBGSpawn(i, BG_MAP6, BG_TEAM1);
+							BGTeam1Players++;
+							gTeam[i] = gBG_TEAM1;
+						}
+						case 1:
+						{
+						    SetPlayerBGTeam2(i);
+							RandomBGSpawn(i, BG_MAP6, BG_TEAM2);
 							BGTeam2Players++;
 							gTeam[i] = gBG_TEAM2;
 						}
@@ -22508,6 +22694,24 @@ RandomBGSpawn(playerid, Map, Team)
     				new BGSpawn = random(4);
 					SetPlayerPosEx(playerid, BG_M5_T2_Spawns[BGSpawn][0], BG_M5_T2_Spawns[BGSpawn][1], floatadd(BG_M5_T2_Spawns[BGSpawn][2], 3.0));
 					SetPlayerFacingAngle(playerid, BG_M5_T2_Spawns[BGSpawn][3]);
+	            }
+			}
+	    }
+	    case BG_MAP6:
+	    {
+	        switch(Team)
+	        {
+	            case BG_TEAM1:
+	            {
+			        new BGSpawn = random(4);
+					SetPlayerPosEx(playerid, BG_M6_T1_Spawns[BGSpawn][0], BG_M6_T1_Spawns[BGSpawn][1], floatadd(BG_M6_T1_Spawns[BGSpawn][2], 3.0));
+					SetPlayerFacingAngle(playerid, BG_M6_T1_Spawns[BGSpawn][3]);
+				}
+	            case BG_TEAM2:
+	            {
+    				new BGSpawn = random(4);
+					SetPlayerPosEx(playerid, BG_M6_T2_Spawns[BGSpawn][0], BG_M6_T2_Spawns[BGSpawn][1], floatadd(BG_M6_T2_Spawns[BGSpawn][2], 3.0));
+					SetPlayerFacingAngle(playerid, BG_M6_T2_Spawns[BGSpawn][3]);
 	            }
 			}
 	    }
@@ -24492,6 +24696,12 @@ SetPlayerBGStaticMeshes(playerid)
 	       	SetPlayerCameraPos(playerid, BG_MAP5_CAMPOS);
 	       	SetPlayerCameraLookAt(playerid, BG_MAP5_CAMLA);
         }
+        case BG_MAP6:
+        {
+     		SetPlayerPos(playerid, BG_MAP6_WHILECAM);
+	       	SetPlayerCameraPos(playerid, BG_MAP6_CAMPOS);
+	       	SetPlayerCameraLookAt(playerid, BG_MAP6_CAMLA);
+        }
     }
 	return 1;
 }
@@ -26054,6 +26264,7 @@ function:ProcessTick()
             case BG_MAP3: format(gstr2, sizeof(gstr2), "Timelft: ~r~~h~~h~%s~n~~w~Players: ~b~~h~~h~%i~n~~w~Map: ~g~~h~~h~Rust~n~~w~Ranger Kills: ~g~~h~~h~%i~n~~w~Spetsnaz Kills: ~g~~h~~h~%i", GameTimeConvert(BGGameTime), bg_players, BGTeam1Kills, BGTeam2Kills);
             case BG_MAP4: format(gstr2, sizeof(gstr2), "Timelft: ~r~~h~~h~%s~n~~w~Players: ~b~~h~~h~%i~n~~w~Map: ~g~~h~~h~Italy~n~~w~Ranger Kills: ~g~~h~~h~%i~n~~w~Spetsnaz Kills: ~g~~h~~h~%i", GameTimeConvert(BGGameTime), bg_players, BGTeam1Kills, BGTeam2Kills);
             case BG_MAP5: format(gstr2, sizeof(gstr2), "Timelft: ~r~~h~~h~%s~n~~w~Players: ~b~~h~~h~%i~n~~w~Map: ~g~~h~~h~Medieval~n~~w~Ranger Kills: ~g~~h~~h~%i~n~~w~Spetsnaz Kills: ~g~~h~~h~%i", GameTimeConvert(BGGameTime), bg_players, BGTeam1Kills, BGTeam2Kills);
+            case BG_MAP6: format(gstr2, sizeof(gstr2), "Timelft: ~r~~h~~h~%s~n~~w~Players: ~b~~h~~h~%i~n~~w~Map: ~g~~h~~h~REPLACE_ME~n~~w~Ranger Kills: ~g~~h~~h~%i~n~~w~Spetsnaz Kills: ~g~~h~~h~%i", GameTimeConvert(BGGameTime), bg_players, BGTeam1Kills, BGTeam2Kills);
 		}
 		TextDrawSetString(TXTTdmInfo, gstr2);
 	}
@@ -27300,6 +27511,7 @@ GameTimeConvert(seconds)
 SetPlayerCash(playerid, amount)
 {
 	if(playerid == INVALID_PLAYER_ID) return 1;
+	if(PlayerInfo[playerid][Money] >= 1000000000) return 1;
     ResetPlayerMoney(playerid);
 	PlayerInfo[playerid][Money] = amount;
     GivePlayerMoney(playerid, PlayerInfo[playerid][Money]);
@@ -27309,7 +27521,8 @@ SetPlayerCash(playerid, amount)
 GivePlayerCash(playerid, amount, bool:populate = true, bool:boost = false)
 {
 	if(playerid == INVALID_PLAYER_ID) return 1;
-	
+	if(PlayerInfo[playerid][Money] >= 1000000000) return 1;
+
     ResetPlayerMoney(playerid);
     
     if(amount < 0)
@@ -27772,6 +27985,14 @@ function:ShowDialog(playerid, dialogid)
 {
 	switch(dialogid)
 	{
+	    case DIALOG_DUEL + 1:
+	    {
+	        ShowPlayerDialog(playerid, DIALOG_DUEL + 1, DIALOG_STYLE_LIST, ""nef" :: Duel > Locations (Step 2/2)", "", "Send", "Back");
+	    }
+	    case DIALOG_DUEL:
+	    {
+	        ShowPlayerDialog(playerid, DIALOG_DUEL, DIALOG_STYLE_LIST, ""nef" :: Duel > Weapons (Step 1/2)", "Knife\nChainsaw\nGrenade\nPistol\nDesert Eagle\nPumpgun\nSawn-off Shotgun\nCombat Shotgun\nUZI\nMP5\nAK-47\nM4\nTEC-9\nSniper Rifle\nRPG", "Next", "Cancel");
+	    }
 		case DIALOG_RACE_RACESTARTPOS:
 		{
 			ShowPlayerDialog(playerid, DIALOG_RACE_RACESTARTPOS, DIALOG_STYLE_MSGBOX, ""nef" :: Race Creation "white"- (Step 4/5)", ""white"Set start postions 'KEY_FIRE'", "GO", "Exit");
@@ -30740,4 +30961,8 @@ ResetPlayerModules(playerid)
 	PlayerInfo[playerid][iCoolDownCommand] = 0;
 	PlayerInfo[playerid][iCoolDownText] = 0;
 	PlayerInfo[playerid][iCoolDownDeath] = 0;
+	PlayerInfo[playerid][DuelWeapon] = 0;
+	PlayerInfo[playerid][DuelLocation] = 0;
+	PlayerInfo[playerid][DuelRequest] = INVALID_PLAYER_ID;
+	PlayerInfo[playerid][DuelRequestReceived] = INVALID_PLAYER_ID;
 }
