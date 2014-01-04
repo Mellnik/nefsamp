@@ -14,11 +14,13 @@
 * /bikec small glitch fixed
 * Derby townhall: added an object to prevent map escape
 * Commands in /c can now be clicked and executed
+* Added /gcolor for gang leaders+ this has no use yet
 * Many messages are now shown in GameTexts instead of ChatMessages
 * Sold Houses/Bizzes are no longer be shown on the map
 * Hydras can no longer be spawned in the gang war zone but outside of it
 * /m now shows how many players are in the specific minigame
 * Admins now hear a beep sound when a new report was submitted
+* /bbuy did not take $1,000,000 from you when buying WTF?! why nobody reported this?
 * Improved /spec
 * /a was removed, use # to enter admin chat
 * Jetpacks and Hydras are allowed to use in Gang Wars
@@ -3749,6 +3751,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 					score,
 					udate,
 					count = 0,
+					color,
 					members[1536],
 					string[2048];
 
@@ -3756,6 +3759,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				cache_get_row(0, 2, gangtag, g_SQL_handle, sizeof(gangtag));
 				score = cache_get_row_int(0, 3, g_SQL_handle);
 				udate = cache_get_row_int(0, 4, g_SQL_handle);
+				color = cache_get_row_int(0, 5, g_SQL_handle);
 
 				for(new i = 0; i < MAX_PLAYERS; i++)
 				{
@@ -3774,12 +3778,12 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				if(count > 20)
 				{
 					format(string, sizeof(string),
-					""white"Gang name:\t"nef_yellow"%s\n"white"Gang tag:\t"nef_yellow"%s\n"white"Gang created:\t"nef_yellow"%s\n"white"Gang score:\t"nef_yellow"%i\n"white"Users online:\t"nef_yellow"%i\n\n"white"Online:%s\n"white"[... to many online]", gangname, gangtag, UnixTimeToDate(udate), score, count, members);
+					""white"Gang name:\t"nef_yellow"%s\n"white"Gang tag:\t"nef_yellow"%s\n"white"Gang created:\t"nef_yellow"%s\n"white"Gang score:\t"nef_yellow"%i\n"white"Gang color:\t{%06x}COLOR\n"white"Users online:\t"nef_yellow"%i\n\n"white"Online:%s\n"white"[... too many online]", gangname, gangtag, UnixTimeToDate(udate), score, color >>> 8, count, members);
 				}
 				else
 				{
 				    format(string, sizeof(string),
-					""white"Gang name:\t"nef_yellow"%s\n"white"Gang tag:\t"nef_yellow"%s\n"white"Gang created:\t"nef_yellow"%s\n"white"Gang score:\t"nef_yellow"%i\n"white"Users online:\t"nef_yellow"%i\n\n"white"Online:%s", gangname, gangtag, UnixTimeToDate(udate), score, count, members);
+					""white"Gang name:\t"nef_yellow"%s\n"white"Gang tag:\t"nef_yellow"%s\n"white"Gang created:\t"nef_yellow"%s\n"white"Gang score:\t"nef_yellow"%i\n"white"Gang color:\t{%06x}COLOR\n"white"Users online:\t"nef_yellow"%i\n\n"white"Online:%s", gangname, gangtag, UnixTimeToDate(udate), score, color >>> 8, count, members);
 				}
 
 				ShowPlayerDialog(extraid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Gang Info", string, "OK", "");
@@ -8833,9 +8837,9 @@ YCMD:bbuy(playerid, params[], help)
 			SCM(playerid, -1, ""er"You need at least 1000 score to start a business!");
 			break;
 		}
-		if(GetPlayerCash(playerid) < 1000000)
+		if(GetPlayerCash(playerid) < 1250000)
 		{
-			SCM(playerid, -1, ""er"You need at least $1,000,000 to start a business!");
+			SCM(playerid, -1, ""er"You need at least $1,250,000 to start a business!");
 			break;
 		}
 		strmid(PropInfo[i][Owner], __GetName(playerid), 0, 25, 25);
@@ -8847,6 +8851,7 @@ YCMD:bbuy(playerid, params[], help)
 	    PropInfo[i][iconid] = -1; //CreateDynamicMapIcon(PropInfo[i][E_x], PropInfo[i][E_y], PropInfo[i][E_z], 36, 1, 0, -1, -1, 150.0);
 	    PropInfo[i][date] = gettime();
 	    PlayerInfo[playerid][Props]++;
+	    GivePlayerCash(playerid, -1250000);
 	    ShowInfo(playerid, "Business bought", "");
 	    MySQL_SaveProp(i);
 	    MySQL_SavePlayer(playerid, false);
@@ -12150,6 +12155,37 @@ YCMD:gkick(playerid, params[], help)
 	ShowDialog(playerid, GANG_KICK_DIALOG);
 	
 	PlayerInfo[playerid][tickLastGKick] = tick;
+	return 1;
+}
+
+YCMD:gcolor(playerid, params[], help)
+{
+    if(!islogged(playerid)) return notlogged(playerid);
+
+    if(PlayerInfo[playerid][GangID] == 0) return SCM(playerid, -1, ""er"You aren't in any gang!");
+    if(PlayerInfo[playerid][GangPosition] < GANG_POS_LEADER) return SCM(playerid, -1, ""er"You have to be at least the gang leader to set colors");
+    
+	new r, g, b;
+	if(sscanf(params, "iii", r, g, b) || !(0 <= r <= 255) || !(0 <= g <= 255) || !(0 <= b <= 255))
+	{
+	    SCM(playerid, NEF_GREEN, "Usage: /gcolor <R> <G> <B>");
+	    SCM(playerid, NEF_GREEN, "Colors must be in RGB format, look on google for codes");
+	}
+	else
+	{
+		if(r < 30 || g < 30 || b < 30)
+		{
+   			return SCM(playerid, -1, ""er"Color too dark! RGB values under 30 are not allowed!");
+		}
+		new col = RGBA(r, g, b, 99);
+		SetPlayerColor(playerid, col);
+
+		format(gstr, sizeof(gstr), "UPDATE `gangs` SET `Color` = %i WHERE `ID` = %i;", col, PlayerInfo[playerid][GangID]);
+		mysql_tquery(g_SQL_handle, gstr, "", "");
+
+	    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s set the gang color to {%06x}NEW COLOR", __GetName(playerid), col >>> 8);
+		GangMSG(PlayerInfo[playerid][GangID], gstr);
+	}
 	return 1;
 }
 
@@ -18875,6 +18911,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						strcat(cstring, ""yellow"/gzones "white"- view your zones\n");
 						strcat(cstring, ""yellow"/gcapture "white"- recapture a zone while it is begin attacked\n");
 						strcat(cstring, ""yellow"/gmenu "white"- gang menu\n");
+						strcat(cstring, ""yellow"/gcolor "white"- set the gang color\n");
 						strcat(cstring, ""yellow"/gsetrank "white"- set a players rank\n");
 						strcat(cstring, ""yellow"/ginvite "white"- invite someone to your gang\n");
 						strcat(cstring, ""yellow"/gkick "white"- kick someone off your gang\n");
@@ -19152,6 +19189,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						
 						strcat(cstring, ""yellow"/gcreate "white"- create a gang\n");
 						strcat(cstring, ""yellow"/gmenu "white"- gang menu\n");
+						strcat(cstring, ""yellow"/gcolor "white"- set the gang color\n");
 						strcat(cstring, ""yellow"/gsetrank "white"- set a players rank\n");
 						strcat(cstring, ""yellow"/ginvite "white"- invite someone to your gang\n");
 						strcat(cstring, ""yellow"/gkick "white"- kick someone off your gang\n");
