@@ -12,7 +12,7 @@
 #pragma dynamic 8192
 
 #define IS_RELEASE_BUILD (true)
-#define INC_ENVIORMENT (false)
+#define INC_ENVIORMENT (true)
 #define IRC_CONNECT (true)
 #define WINTER_EDITION (false) // LOAD ferriswheelfair.amx
 
@@ -3815,7 +3815,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 			PlayerInfo[extraid][GangPosition] = GANG_POS_MAIN_LEADER;
 			PlayerInfo[extraid][GangID] = cache_insert_id(g_SQL_handle);
 
-            GivePlayerCash(extraid, -1000000);
+            GivePlayerCash(extraid, -500000);
 
             MySQL_SavePlayer(extraid, false);
 
@@ -9313,6 +9313,7 @@ YCMD:duel(playerid, params[], help)
         else
         {
             if(gTeam[PlayerInfo[playerid][DuelRequest]] != NORMAL) return SCM(playerid, -1, ""er"Player is not in normal world");
+            if(!IsPlayerAvail(PlayerInfo[playerid][DuelRequest])) return SCM(playerid, -1, ""er"Player is not available");
         }
     }
     else
@@ -11583,13 +11584,13 @@ YCMD:gcreate(playerid, params[], help)
 	}
 
 	if(PlayerInfo[playerid][GangID] != 0) return SCM(playerid, -1, ""er"You are already in a gang");
-	if(GetPlayerCash(playerid) < 1000000) return SCM(playerid, -1, ""er"You need at least "nef_green"$1,000,000 {D2D2D2}for creating a gang!");
- 	if(GetPlayerScore_(playerid) < 1000) return SCM(playerid, -1, ""er"You need at least "nef_green"1,000 Score {D2D2D2}for creating a gang!");
+	if(GetPlayerCash(playerid) < 500000) return SCM(playerid, -1, ""er"You need at least "nef_green"$500,000 "nef_red"for creating a gang!");
+ 	if(GetPlayerScore_(playerid) < 500) return SCM(playerid, -1, ""er"You need at least "nef_green"500 Score "nef_red"for creating a gang!");
  	
     PlayerInfo[playerid][TotalTime] = PlayerInfo[playerid][TotalTime] + (gettime() - PlayerInfo[playerid][ConnectTime]);
     PlayerInfo[playerid][ConnectTime] = gettime();
 
-	if(PlayerInfo[playerid][TotalTime] < 72000) return SCM(playerid, -1, ""er"You need at least "nef_green"20 hours playing time {D2D2D2}for creating a gang!");
+	if(PlayerInfo[playerid][TotalTime] < 36000) return SCM(playerid, -1, ""er"You need at least "nef_green"10 hours playing time {D2D2D2}for creating a gang!");
 
 	new ntmp[144],
 	    ttmp[144];
@@ -26222,7 +26223,7 @@ function:ProcessTick()
 	    }
 	}
                              
-	format(gstr2, sizeof(gstr2), ""SVRURLWWW" ~<~~>~ "CURRENT_VERSION" ~<~~>~ ~g~~h~~h~/derby %i ~y~/cnr %i ~b~~h~/race %i ~r~~h~/tdm %i ~p~/fallout %i ~w~/gungame %i ~y~/war %i ~g~/sniper %i ~b~~h~~h~/mini %i ~r~/rocket %i",
+	format(gstr2, sizeof(gstr2), ""SVRURLWWW" ~<~~>~ "CURRENT_VERSION" ~<~~>~ ~g~~h~~h~/derby %i ~y~/cnr %i ~b~~h~/race %i ~r~~h~/tdm %i ~p~/fallout %i ~w~/gungame %i ~y~/war %i ~b~~h~~h~/mini %i ~g~/sniper %i ~r~/rocket %i",
         T_DerbyPlayers,
         T_CNRPlayers,
 		T_RacePlayers,
