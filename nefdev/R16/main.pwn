@@ -2649,7 +2649,7 @@ public OnPlayerSpawn(playerid)
 		}
         else if(!strcmp(botname, "["SVRSC"]SS_FatGuy", true))
 		{
-		 	format(gstr, sizeof(gstr), ""vgreen"MC ate to many burgers\n\n["SVRSC"]SS_FatGuy\nID: %i", playerid);
+		 	format(gstr, sizeof(gstr), ""vgreen"MC ate too many burgers\n\n["SVRSC"]SS_FatGuy\nID: %i", playerid);
 			NPCLabelHandle[2] = CreateDynamic3DTextLabel(gstr, -1, 0.0, 0.0, 0.5, 20.0, playerid, INVALID_VEHICLE_ID, 0, -1, -1, -1, 20.0);
 			SetPlayerSkin(playerid, 5);
 		}
@@ -15059,7 +15059,7 @@ YCMD:gangs(playerid, params[], help)
 			}
 			else
 			{
-			    format(tmpstring, sizeof(tmpstring), "\n[... to many online]");
+			    format(tmpstring, sizeof(tmpstring), "\n[... too many online]");
 			    strcat(finstring, tmpstring);
 			    break;
 			}
