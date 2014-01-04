@@ -2,7 +2,7 @@
 || #################################################################### ||
 || # Project New Evolution Freeroam - Release 16         			  # ||
 || # ---------------------------------------------------------------- # ||
-|| # Copyright ©2011-2013 New Evolution Freeroam	  				  # ||
+|| # Copyright ©2011-2014 New Evolution Freeroam	  				  # ||
 || # Created by Mellnik                                               # ||
 || # ---------------------------------------------------------------- # ||
 || # http://nefserver.net	    	                      			  # ||
@@ -31,10 +31,10 @@
 #include <a_samp>   		// 0.3x-R2
 #undef MAX_PLAYERS
 #define MAX_PLAYERS (405)
-#include <YSI\y_iterate>	// 21/09/2013
-#include <YSI\y_commands>   // 21/09/2013
-#include <YSI\y_master>     // 21/09/2013
-#include <YSI\y_stringhash> // 21/09/2013
+#include <YSI\y_iterate>	// 04/01/2014
+#include <YSI\y_commands>   // 04/01/2014
+#include <YSI\y_master>     // 04/01/2014
+#include <YSI\y_stringhash> // 04/01/2014
 #include <a_zones>          // 0.3x-R2
 #include <sscanf2>      	// 2.8.1
 #include <streamer>     	// 2.6.1 R84
@@ -43,7 +43,7 @@
 #include <a_mysql_R34>  	// R34
 #include <dini>         	// 1.6
 #include <irc>          	// 1.4.3
-#include <md-sort>      	// 16/07/2013
+#include <md-sort>      	// 04/01/2014
 #include <unixtimetodate> 	// 2.0
 #include <dns>              // v2.4
 #if INC_ENVIORMENT == true
@@ -2070,6 +2070,21 @@ new Float:BG_M6_T2_Spawns[4][4] =
 	{2037.7231, 4054.4719, 80.9250, 90.0},
 	{2034.2903, 4009.7451, 76.5134, 90.0},
 	{2056.8708, 3975.7813, 84.1782, 90.0}
+};
+new Float:DuelMaps[3][2][4] =
+{
+	{
+		{90.0, 90.0, 90.0, 90.0},
+		{90.0, 90.0, 90.0, 90.0}
+	},
+	{
+		{90.0, 90.0, 90.0, 90.0},
+		{90.0, 90.0, 90.0, 90.0}
+	},
+	{
+		{90.0, 90.0, 90.0, 90.0},
+		{90.0, 90.0, 90.0, 90.0}
+	}
 };
 new Float:WorldSpawns[3][4] =
 {
@@ -9306,19 +9321,44 @@ YCMD:duel(playerid, params[], help)
     if(sscanf(params, "r", player))
     {
         // Accept duel invite
-        if(PlayerInfo[playerid][DuelRequest] == INVALID_PLAYER_ID)
+        if(PlayerInfo[playerid][DuelRequestReceived] == INVALID_PLAYER_ID)
         {
 			return SCM(playerid, NEF_GREEN, "Usage: /duel <playerid>");
         }
         else
         {
-            if(gTeam[PlayerInfo[playerid][DuelRequest]] != NORMAL) return SCM(playerid, -1, ""er"Player is not in normal world");
-            if(!IsPlayerAvail(PlayerInfo[playerid][DuelRequest])) return SCM(playerid, -1, ""er"Player is not available");
+            if(gTeam[PlayerInfo[playerid][DuelRequestReceived]] != NORMAL) return SCM(playerid, -1, ""er"Player is not in normal world");
+            if(!IsPlayerAvail(PlayerInfo[playerid][DuelRequestReceived])) return SCM(playerid, -1, ""er"Player is not available");
+            if(IsPlayerOnDesktop(PlayerInfo[playerid][DuelRequestReceived], 1500)) return SCM(playerid, -1, ""er"Player is on desktop");
+            if(PlayerInfo[PlayerInfo[playerid][DuelRequestReceived]][DuelRequest] != playerid) return SCM(playerid, -1, ""er"Error: Players do not match");
+
+			SavePos(playerid);
+			SavePos(PlayerInfo[playerid][DuelRequestReceived]);
+			
+			CheckPlayerGod(playerid);
+			CheckPlayerGod(PlayerInfo[playerid][DuelRequestReceived]);
+
+            SetPlayerPos(playerid, DuelMaps[PlayerInfo[PlayerInfo[playerid][DuelRequestReceived]][DuelLocation] - 1][0][0], DuelMaps[PlayerInfo[PlayerInfo[playerid][DuelRequestReceived]][DuelLocation] - 1][0][1], DuelMaps[PlayerInfo[PlayerInfo[playerid][DuelRequestReceived]][DuelLocation] - 1][0][2]);
+            SetPlayerPos(PlayerInfo[playerid][DuelRequestReceived], DuelMaps[PlayerInfo[PlayerInfo[playerid][DuelRequestReceived]][DuelLocation] - 1][1][0], DuelMaps[PlayerInfo[PlayerInfo[playerid][DuelRequestReceived]][DuelLocation] - 1][1][1], DuelMaps[PlayerInfo[PlayerInfo[playerid][DuelRequestReceived]][DuelLocation] - 1][1][2]);
+            
+            GivePlayerWeapon(playerid, PlayerInfo[PlayerInfo[playerid][DuelRequestReceived]][DuelWeapon], 700000);
+            GivePlayerWeapon(PlayerInfo[playerid][DuelRequestReceived], PlayerInfo[PlayerInfo[playerid][DuelRequestReceived]][DuelWeapon], 700000);
+            
+            format(gstr, sizeof(gstr), ">> Duel started between %s and %s!", __GetName(PlayerInfo[playerid][DuelRequestReceived]), __GetName(playerid));
+            SCMToAll(NEF_RED, gstr);
         }
     }
     else
     {
         // Begin duel request
+        if(PlayerInfo[playerid][DuelRequest] != INVALID_PLAYER_ID)
+        {
+        	format(gstr, sizeof(gstr), ">> %s(%i) cancelled the duel request!", __GetName(playerid), playerid);
+        	SCM(PlayerInfo[playerid][DuelRequest], NEF_RED, gstr);
+        	
+        	PlayerInfo[PlayerInfo[playerid][DuelRequest]][DuelRequestReceived] = INVALID_PLAYER_ID;
+		}
+		PlayerInfo[playerid][DuelRequest] = player;
 		ShowDialog(playerid, DIALOG_DUEL);
     }
 	return 1;
@@ -11339,10 +11379,6 @@ YCMD:grename(playerid, params[], help)
 	    return SCM(playerid, -1, ""er"Invalid gangtag length");
 	}
 	
-	if(!strcmp(__GetName(playerid), buff, true))
-	{
-	    return SCM(playerid, -1, ""er"Don't name your gang as your nick");
-	}
     if(strfind(buff, " ", false) != -1)
 	{
         return SCM(playerid, -1, ""er"Spaces are not allowed");
@@ -11391,10 +11427,6 @@ YCMD:grename(playerid, params[], help)
 	new gangname[21];
 	mysql_escape_string(buff, gangname, g_SQL_handle, 21);
 
-	if(!strcmp(__GetName(playerid), buff2, true))
-	{
-	    return SCM(playerid, -1, ""er"Don't tag your gang as your nick");
-	}
     if(strfind(buff2, " ", false) != -1)
 	{
         return SCM(playerid, -1, ""er"Spaces are not allowed");
@@ -11610,11 +11642,6 @@ YCMD:gcreate(playerid, params[], help)
 	    return SCM(playerid, -1, ""er"Gang tag length: 2 - 4 characters");
 	}
 
-	if(!strcmp(__GetName(playerid), ntmp, true))
-	{
-	    CancelGangCreation(playerid);
-	    return SCM(playerid, -1, ""er"Don't name your gang as your nick");
-	}
     if(strfind(ntmp, " ", false) != -1)
 	{
         CancelGangCreation(playerid);
@@ -11672,11 +11699,6 @@ YCMD:gcreate(playerid, params[], help)
 	}
 	mysql_escape_string(ntmp, PlayerInfo[playerid][GangName], g_SQL_handle, 21);
 
-	if(!strcmp(__GetName(playerid), ttmp, true))
-	{
-	    CancelGangCreation(playerid);
-	    return SCM(playerid, -1, ""er"Don't tag your gang as your nick");
-	}
     if(strfind(ttmp, " ", false) != -1)
 	{
         CancelGangCreation(playerid);
@@ -17412,10 +17434,25 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        {
 	            switch(listitem)
 	            {
-	                case 0: PlayerInfo[playerid][DuelLocation] = 4;
-	                case 1: PlayerInfo[playerid][DuelLocation] = 9;
-	                case 2: PlayerInfo[playerid][DuelLocation] = 16;
+	                case 0: PlayerInfo[playerid][DuelLocation] = 1;
+	                case 1: PlayerInfo[playerid][DuelLocation] = 2;
+	                case 2: PlayerInfo[playerid][DuelLocation] = 3;
 	            }
+	            
+	            if(gTeam[PlayerInfo[playerid][DuelRequest]] != NORMAL) return SCM(playerid, -1, ""er"Player is not in normal world");
+	            if(!IsPlayerAvail(PlayerInfo[playerid][DuelRequest])) return SCM(playerid, -1, ""er"Player is not available");
+	            if(gTeam[playerid] != NORMAL) return ShowInfo(playerid, "You must be in Freeroam", "");
+	            if(IsPlayerOnDesktop(PlayerInfo[playerid][DuelRequest])) return SCM(playerid, -1, ""er"Player is on desktop");
+	            
+	            PlayerInfo[PlayerInfo[playerid][DuelRequest]][DuelRequestReceived] = playerid;
+	            
+	            new tmp[50];
+	            GetWeaponName(PlayerInfo[playerid][DuelWeapon], tmp, sizeof(tmp));
+	            
+	            format(gstr, sizeof(gstr), ">> %s(%i) requests a duel with you! Type /duel to accept (Weapon: %s)", __GetName(playerid), playerid, tmp);
+	            SCM(PlayerInfo[playerid][DuelRequest], NEF_RED, gstr);
+	            
+	            ShowInfo(playerid, "DUEL REQUESTED", "Wait for accept");
 	            return true;
 	        }
 	 	    case DIALOG_RACE_RACETYPE:
@@ -27988,7 +28025,7 @@ function:ShowDialog(playerid, dialogid)
 	{
 	    case DIALOG_DUEL + 1:
 	    {
-	        ShowPlayerDialog(playerid, DIALOG_DUEL + 1, DIALOG_STYLE_LIST, ""nef" :: Duel > Locations (Step 2/2)", "", "Send", "Back");
+	        ShowPlayerDialog(playerid, DIALOG_DUEL + 1, DIALOG_STYLE_LIST, ""nef" :: Duel > Locations (Step 2/2)", "Stadium Top", "Send", "Back");
 	    }
 	    case DIALOG_DUEL:
 	    {
