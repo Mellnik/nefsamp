@@ -9,6 +9,11 @@
 || #################################################################### ||
 \*======================================================================*/
 
+/*
+R16:
+- Add `Color` end of table in `gangs` int 10 default -84215197
+*/
+
 #pragma dynamic 8192
 
 #define IS_RELEASE_BUILD (true)
@@ -2603,7 +2608,7 @@ public OnPlayerRequestClass(playerid, classid)
 	TextDrawShowForPlayer(playerid, TXTFooterBlack);
 	TextDrawShowForPlayer(playerid, TXTFooter);
 	//TextDrawShowForPlayer(playerid, TXTRandomInfo);
-	TextDrawShowForPlayer(playerid, TXTCommandsTop);
+	//TextDrawShowForPlayer(playerid, TXTCommandsTop);
 	#if WINTER_EDITION == true
 	TextDrawShowForPlayer(playerid, TXTWinterEdition);
 	#endif
@@ -3188,6 +3193,8 @@ public OnPlayerConnect(playerid)
 		//TextDrawHideForPlayer(playerid, TXTTeleportInfo);
 
         InitSession(playerid);
+        
+        PlayerPlaySound(playerid, 1183, 0, 0, 0);
 
 		format(gstr, sizeof(gstr), "SELECT * FROM `bans` WHERE `PlayerName` = '%s';", __GetName(playerid));
 		mysql_tquery(g_SQL_handle, gstr, "OnQueryFinish", "siii", gstr, THREAD_IS_BANNED, playerid, g_SQL_handle);
@@ -3837,8 +3844,6 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 
             if(rows == 0) // ip not banned
             {
-                PlayerPlaySound(extraid, 1183, 0, 0, 0); // not banned so let the party start
-            
 				format(gstr, sizeof(gstr), "SELECT `ID` FROM `accounts` WHERE `Name` = '%s';", __GetName(extraid));
 				mysql_tquery(g_SQL_handle, gstr, "OnQueryFinish", "siii", gstr, THREAD_ACCOUNT_EXIST, extraid, g_SQL_handle); // cehcking if acc exists
             }
@@ -4360,7 +4365,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 			 	SetPlayerCash(extraid, PlayerInfo[extraid][Money]);
 			 	PlayerInfo[extraid][ConnectTime] = gettime();
 
-				SendWelcomeMSG(extraid);
+				//SendWelcomeMSG(extraid);
 
 				format(gstr, sizeof(gstr), "~y~[] ~w~%i", PlayerInfo[extraid][Wanteds]);
 				PlayerTextDrawSetString(extraid, TXTWantedsTD[extraid], gstr);
@@ -7276,6 +7281,14 @@ YCMD:mh(playerid, params[], help)
 	}
 	return 1;
 }
+YCMD:ch(playerid, params[], help)
+{
+	if(PortPlayerMapVeh(playerid,2002.9380, -3656.5505, 5.4980, 90, 2002.9380, -3656.5505, 5.4980, 90, "Chris House", "ch"))
+	{
+	    PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=83836", 2002.9380, -3656.5505, 5.4980, 100.0, 1);
+	}
+	return 1;
+}
 YCMD:ah(playerid, params[], help)
 {
 	if(PortPlayerMap(playerid, 3133.7415, -1107.2448, 2.1289, 352.5349, "Adam's House", "ah"))
@@ -8271,7 +8284,7 @@ YCMD:hidef(playerid, params[], help)
 {
     PlayerInfo[playerid][bTDEnabled] = false;
 	//TextDrawHideForPlayer(playerid, TXTTeleportInfo);
-    TextDrawHideForPlayer(playerid, TXTCommandsTop);
+    //TextDrawHideForPlayer(playerid, TXTCommandsTop);
     TextDrawHideForPlayer(playerid, TXTFooterBlack);
 	TextDrawHideForPlayer(playerid, TXTFooter);
     //TextDrawHideForPlayer(playerid, TXTRandomInfo);
@@ -8287,7 +8300,7 @@ YCMD:showf(playerid, params[], help)
 {
     PlayerInfo[playerid][bTDEnabled] = true;
 	//TextDrawShowForPlayer(playerid, TXTTeleportInfo);
-	TextDrawShowForPlayer(playerid, TXTCommandsTop);
+	//TextDrawShowForPlayer(playerid, TXTCommandsTop);
 	TextDrawShowForPlayer(playerid, TXTFooterBlack);
 	TextDrawShowForPlayer(playerid, TXTFooter);
     //TextDrawShowForPlayer(playerid, TXTRandomInfo);
@@ -17505,6 +17518,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	            if(!IsPlayerAvail(PlayerInfo[playerid][DuelRequest])) return SCM(playerid, -1, ""er"Player is not available");
 	            if(gTeam[playerid] != NORMAL) return ShowInfo(playerid, "You must be in Freeroam", "");
 	            if(IsPlayerOnDesktop(PlayerInfo[playerid][DuelRequest])) return SCM(playerid, -1, ""er"Player is on desktop");
+	            if(playerid == PlayerInfo[playerid][DuelRequest]) return SCM(playerid, -1, ""er"You can't duel yourself");
 	            
 	            PlayerInfo[PlayerInfo[playerid][DuelRequest]][DuelRequestReceived] = playerid;
 	            
@@ -21625,7 +21639,7 @@ function:SkipRegistration(playerid)
 	GameTextForPlayer(playerid, "~n~+$20,000~n~Startcash", 3000, 1);
 	PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
 	
-	SendWelcomeMSG(playerid);
+	//SendWelcomeMSG(playerid);
 	return 1;
 }
 
@@ -21656,7 +21670,7 @@ function:SkipLogin(playerid)
 		format(string, sizeof(string), ""white"Your name has been changed to %s because you failed to log in.\n\n"nef_yellow"Please restart the game if this is incorrect.", newname);
 		ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef"", string, "OK", "");
 		
-		SendWelcomeMSG(playerid);
+		//SendWelcomeMSG(playerid);
 		
 	    PlayerInfo[playerid][RegDate] = gettime();
 		PlayerInfo[playerid][PayDay] = 60;
@@ -24739,7 +24753,7 @@ PortPlayerMapVeh(playerid, Float:X, Float:Y, Float:Z, Float:Angle, Float:XVeh, F
 	return 1;
 }
 
-SendWelcomeMSG(playerid)
+/*SendWelcomeMSG(playerid)
 {
 	SCM(playerid, GREY, "===================="white""CURRENT_VERSION""grey"=======================");
 	SCM(playerid, NEF_GREEN, "» Type /help for further information");
@@ -24750,7 +24764,7 @@ SendWelcomeMSG(playerid)
 	SCM(playerid, RED, "» Welcome on "SVRLOGO"");
 	SCM(playerid, GREY, "===================="white""CURRENT_VERSION""grey"=======================");
 	return 1;
-}
+}*/
 
 SetPlayerBGStaticMeshes(playerid)
 {
