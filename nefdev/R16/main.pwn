@@ -272,8 +272,8 @@ native IsValidVehicle(vehicleid); // undefined in a_samp
 #define MAX_GZONES						(100)
 #define MAX_GZONES_PER_GANG             (15)
 #define GZONE_SIZE                      (70.0)
-#define COLOR_HOSTILE                   (0x95133496)
-#define COLOR_FRIENDLY                  (0x33FF33AA)
+#define COLOR_HOSTILE                   (0x95133499)
+#define COLOR_FRIENDLY                  (0x33FF3399)
 #define COLOR_NONE                      (0xFFFFFFAA)
 
 // -
@@ -355,7 +355,7 @@ native IsValidVehicle(vehicleid); // undefined in a_samp
 #define NEF_GREEN                      	(0x2DFF00FF)
 #define NEF_YELLOW                      (0xFFE600FF)
 #define NEF_RED		                    (0xFF000FFF)
-#define GREEN 							(0x0BDDC400)
+#define GREEN 							(0x0BDDC4FF)
 #define GREEN2		 					(0x3BBD44FF)
 #define RED        						(0xFF000FFF)
 #define ORANGE 							(0xFF96008B)
@@ -1458,7 +1458,7 @@ new const GangPositions[7][e_gang_pos] =
 	{"Senior Member"},
 	{"Advisor"},
 	{"Leader"},
-	{"Founder"}
+	{"Gang Founder"}
 };
 
 new const StaffLevels[MAX_ADMIN_LEVEL + 1][E_staff_levels] =
@@ -2076,15 +2076,11 @@ new Float:BG_M6_T2_Spawns[4][4] =
 	{2034.2903, 4009.7451, 76.5134, 90.0},
 	{2056.8708, 3975.7813, 84.1782, 90.0}
 };
-new Float:DuelMaps[3][2][4] =
+new Float:DuelMaps[2][2][4] =
 {
 	{
 		{1144.1377, 1529.8433, 52.4003, 87.1090},
 		{1049.4922, 1529.3169, 52.4077, 271.6640}
-	},
-	{
-		{90.0, 90.0, 90.0, 90.0},
-		{90.0, 90.0, 90.0, 90.0}
 	},
 	{
 		{90.0, 90.0, 90.0, 90.0},
@@ -5647,6 +5643,22 @@ public OnPlayerEnterDynamicArea(playerid, areaid)
 			SetPlayerGWarMode(playerid);
 			break;
 		}
+		else if(GZoneInfo[i][bUnderAttack] && GZoneInfo[i][localGang] != PlayerInfo[playerid][GangID] && GZoneInfo[i][AttackingGang] != PlayerInfo[playerid][GangID])
+		{
+		    if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
+			{
+			    ShowInfo(playerid, "Gang War", "ongoing");
+		        new Float:POS[4], vid = GetPlayerVehicleID(playerid);
+		        GetVehicleVelocity(vid, POS[0], POS[1], POS[2]);
+		        GetVehicleZAngle(vid, POS[3]);
+
+		        POS[0] += (-1.1 * floatsin(-POS[3], degrees));
+		        POS[1] += (-1.1 * floatcos(-POS[3], degrees));
+
+		        SetVehicleVelocity(vid, POS[0], POS[1], POS[2] * 1.2);
+		        break;
+			}
+		}
 	}
 	
     if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
@@ -8391,7 +8403,6 @@ YCMD:parch(playerid, params[], help)
 
 YCMD:colors(playerid, params[], help)
 {
-    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
 	if(gTeam[playerid] == gBG_TEAM1 || gTeam[playerid] == gBG_TEAM2 || gTeam[playerid] == gBG_VOTING || gTeam[playerid] == CNR)
 	{
 	    return SCM(playerid, -1, ""er"You can't use this command while being in TDM or CNR!");
@@ -8421,7 +8432,6 @@ YCMD:colors(playerid, params[], help)
 
 YCMD:random(playerid, params[], help)
 {
-    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
 	if(gTeam[playerid] == gBG_TEAM1 || gTeam[playerid] == gBG_TEAM2 || gTeam[playerid] == gBG_VOTING || gTeam[playerid] == CNR)
 	{
 	    return SCM(playerid, -1, ""er"You can't use this command while being in TDM or CNR!");
@@ -8435,7 +8445,6 @@ YCMD:random(playerid, params[], help)
 
 YCMD:red(playerid, params[], help)
 {
-    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
 	if(gTeam[playerid] == gBG_TEAM1 || gTeam[playerid] == gBG_TEAM2 || gTeam[playerid] == gBG_VOTING || gTeam[playerid] == CNR)
 	{
 	    return SCM(playerid, -1, ""er"You can't use this command while being in TDM or CNR!");
@@ -8447,7 +8456,6 @@ YCMD:red(playerid, params[], help)
 
 YCMD:yellow(playerid, params[], help)
 {
-    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
 	if(gTeam[playerid] == gBG_TEAM1 || gTeam[playerid] == gBG_TEAM2 || gTeam[playerid] == gBG_VOTING || gTeam[playerid] == CNR)
 	{
 	    return SCM(playerid, -1, ""er"You can't use this command while being in TDM or CNR!");
@@ -8459,7 +8467,6 @@ YCMD:yellow(playerid, params[], help)
 
 YCMD:grey(playerid, params[], help)
 {
-    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
 	if(gTeam[playerid] == gBG_TEAM1 || gTeam[playerid] == gBG_TEAM2 || gTeam[playerid] == gBG_VOTING || gTeam[playerid] == CNR)
 	{
 	    return SCM(playerid, -1, ""er"You can't use this command while being in TDM or CNR!");
@@ -8471,7 +8478,6 @@ YCMD:grey(playerid, params[], help)
 
 YCMD:pink(playerid, params[], help)
 {
-    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
 	if(gTeam[playerid] == gBG_TEAM1 || gTeam[playerid] == gBG_TEAM2 || gTeam[playerid] == gBG_VOTING || gTeam[playerid] == CNR)
 	{
 	    return SCM(playerid, -1, ""er"You can't use this command while being in TDM or CNR!");
@@ -8483,7 +8489,6 @@ YCMD:pink(playerid, params[], help)
 
 YCMD:blue(playerid, params[], help)
 {
-    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
 	if(gTeam[playerid] == gBG_TEAM1 || gTeam[playerid] == gBG_TEAM2 || gTeam[playerid] == gBG_VOTING || gTeam[playerid] == CNR)
 	{
 	    return SCM(playerid, -1, ""er"You can't use this command while being in TDM or CNR!");
@@ -8495,7 +8500,6 @@ YCMD:blue(playerid, params[], help)
 
 YCMD:green(playerid, params[], help)
 {
-    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
 	if(gTeam[playerid] == gBG_TEAM1 || gTeam[playerid] == gBG_TEAM2 || gTeam[playerid] == gBG_VOTING || gTeam[playerid] == CNR)
 	{
 	    return SCM(playerid, -1, ""er"You can't use this command while being in TDM or CNR!");
@@ -8507,7 +8511,6 @@ YCMD:green(playerid, params[], help)
 
 YCMD:white(playerid, params[], help)
 {
-    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
 	if(gTeam[playerid] == gBG_TEAM1 || gTeam[playerid] == gBG_TEAM2 || gTeam[playerid] == gBG_VOTING || gTeam[playerid] == CNR)
 	{
 	    return SCM(playerid, -1, ""er"You can't use this command while being in TDM or CNR!");
@@ -8519,7 +8522,6 @@ YCMD:white(playerid, params[], help)
 
 YCMD:orange(playerid, params[], help)
 {
-    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
 	if(gTeam[playerid] == gBG_TEAM1 || gTeam[playerid] == gBG_TEAM2 || gTeam[playerid] == gBG_VOTING || gTeam[playerid] == CNR)
 	{
 	    return SCM(playerid, -1, ""er"You can't use this command while being in TDM or CNR!");
@@ -9417,6 +9419,9 @@ YCMD:duel(playerid, params[], help)
             
             SetPlayerVirtualWorld(playerid, playerid + 10000);
             SetPlayerVirtualWorld(PlayerInfo[playerid][DuelRequestReceived], playerid + 10000);
+            
+            gTeam[playerid] = gDUEL;
+            gTeam[PlayerInfo[playerid][DuelRequestReceived]] = gDUEL;
             
             format(gstr, sizeof(gstr), ">> Duel started between %s and %s!", __GetName(PlayerInfo[playerid][DuelRequestReceived]), __GetName(playerid));
             SCMToAll(NEF_RED, gstr);
@@ -11906,7 +11911,7 @@ YCMD:gcapture(playerid, params[], help)
 				}
 			}
 
-			format(gstr, sizeof(gstr), ""gang_sign" "r_besch" Member %s(%i) re-captured zone '%s' which was under attack.", __GetName(playerid), playerid, GZoneInfo[i][sZoneName]);
+			format(gstr, sizeof(gstr), ""gang_sign" "r_besch" %s %s(%i) re-captured zone '%s' which was under attack.", GangPositions[PlayerInfo[playerid][GangPosition]][E_gang_pos_name], __GetName(playerid), playerid, GZoneInfo[i][sZoneName]);
 			GangMSG(GZoneInfo[i][DefendingGang], gstr);
 
 			MySQL_UpdateGangScore(GZoneInfo[i][localGang], 5);
@@ -20542,7 +20547,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						}
 						case 5:
 						{
-						   	format(string, sizeof(string), "%s(%i) voted for map 'REPLACE_ME'", __GetName(playerid), playerid);
+						   	format(string, sizeof(string), "%s(%i) voted for map 'Hangar War'", __GetName(playerid), playerid);
 							BGMSG(string);
 						   	BGMapVotes[5]++;
 						}
@@ -21421,7 +21426,7 @@ function:BGVoting()
 	}
 	else if(highestmapvotes == BGMapVotes[5])
 	{
-	    BGMSG("Map 'REPLACE_ME' won! Let's start!");
+	    BGMSG("Map 'Hangar War' won! Let's start!");
 	    CurrentBGMap = BG_MAP6;
 	    ClearBGVotes();
 	    ExecBGTimer();
@@ -26378,7 +26383,7 @@ function:ProcessTick()
             case BG_MAP3: format(gstr2, sizeof(gstr2), "Timelft: ~r~~h~~h~%s~n~~w~Players: ~b~~h~~h~%i~n~~w~Map: ~g~~h~~h~Rust~n~~w~Ranger Kills: ~g~~h~~h~%i~n~~w~Spetsnaz Kills: ~g~~h~~h~%i", GameTimeConvert(BGGameTime), bg_players, BGTeam1Kills, BGTeam2Kills);
             case BG_MAP4: format(gstr2, sizeof(gstr2), "Timelft: ~r~~h~~h~%s~n~~w~Players: ~b~~h~~h~%i~n~~w~Map: ~g~~h~~h~Italy~n~~w~Ranger Kills: ~g~~h~~h~%i~n~~w~Spetsnaz Kills: ~g~~h~~h~%i", GameTimeConvert(BGGameTime), bg_players, BGTeam1Kills, BGTeam2Kills);
             case BG_MAP5: format(gstr2, sizeof(gstr2), "Timelft: ~r~~h~~h~%s~n~~w~Players: ~b~~h~~h~%i~n~~w~Map: ~g~~h~~h~Medieval~n~~w~Ranger Kills: ~g~~h~~h~%i~n~~w~Spetsnaz Kills: ~g~~h~~h~%i", GameTimeConvert(BGGameTime), bg_players, BGTeam1Kills, BGTeam2Kills);
-            case BG_MAP6: format(gstr2, sizeof(gstr2), "Timelft: ~r~~h~~h~%s~n~~w~Players: ~b~~h~~h~%i~n~~w~Map: ~g~~h~~h~REPLACE_ME~n~~w~Ranger Kills: ~g~~h~~h~%i~n~~w~Spetsnaz Kills: ~g~~h~~h~%i", GameTimeConvert(BGGameTime), bg_players, BGTeam1Kills, BGTeam2Kills);
+            case BG_MAP6: format(gstr2, sizeof(gstr2), "Timelft: ~r~~h~~h~%s~n~~w~Players: ~b~~h~~h~%i~n~~w~Map: ~g~~h~~h~Hangar War~n~~w~Ranger Kills: ~g~~h~~h~%i~n~~w~Spetsnaz Kills: ~g~~h~~h~%i", GameTimeConvert(BGGameTime), bg_players, BGTeam1Kills, BGTeam2Kills);
 		}
 		TextDrawSetString(TXTTdmInfo, gstr2);
 	}
