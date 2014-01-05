@@ -2074,8 +2074,8 @@ new Float:BG_M6_T2_Spawns[4][4] =
 new Float:DuelMaps[3][2][4] =
 {
 	{
-		{90.0, 90.0, 90.0, 90.0},
-		{90.0, 90.0, 90.0, 90.0}
+		{1144.1377, 1529.8433, 52.4003, 87.1090},
+		{1049.4922, 1529.3169, 52.4077, 271.6640}
 	},
 	{
 		{90.0, 90.0, 90.0, 90.0},
@@ -3211,6 +3211,31 @@ public OnPlayerDisconnect(playerid, reason)
 
 		switch(gTeam[playerid])
 		{
+		    case gDUEL:
+		    {
+		        if(PlayerInfo[playerid][DuelRequest] == INVALID_PLAYER_ID)
+		        {
+		            format(gstr, sizeof(gstr), ">> Duel cancelled between %s and %s. Reason: Disconnect", __GetName(PlayerInfo[playerid][DuelRequestReceived]), __GetName(playerid));
+		            SCMToAll(NEF_RED, gstr);
+
+					gTeam[PlayerInfo[playerid][DuelRequestReceived]] = NORMAL;
+					RandomSpawn(PlayerInfo[playerid][DuelRequestReceived]);
+
+					PlayerInfo[PlayerInfo[playerid][DuelRequestReceived]][DuelRequest] = INVALID_PLAYER_ID;
+					PlayerInfo[playerid][DuelRequestReceived] = INVALID_PLAYER_ID;
+		        }
+		        else if(PlayerInfo[playerid][DuelRequest] != INVALID_PLAYER_ID)
+		        {
+		            format(gstr, sizeof(gstr), ">> Duel cancelled between %s and %s. Reason: Disconnect", __GetName(PlayerInfo[playerid][DuelRequest]), __GetName(playerid));
+		            SCMToAll(NEF_RED, gstr);
+
+					gTeam[PlayerInfo[playerid][DuelRequest]] = NORMAL;
+					RandomSpawn(PlayerInfo[playerid][DuelRequest]);
+
+					PlayerInfo[PlayerInfo[playerid][DuelRequest]][DuelRequestReceived] = INVALID_PLAYER_ID;
+					PlayerInfo[playerid][DuelRequest] = INVALID_PLAYER_ID;
+		        }
+		    }
 		    case gBUILDRACE:
 		    {
 			    format(gstr, sizeof(gstr), "/Race/%03i.race", g_RaceCount + 1);
@@ -5060,6 +5085,39 @@ public OnPlayerDeath(playerid, killerid, reason)
 	
 	switch(gTeam[playerid])
 	{
+	    case gDUEL:
+	    {
+	        if(PlayerInfo[playerid][DuelRequest] == INVALID_PLAYER_ID)
+	        {
+	            format(gstr, sizeof(gstr), ">> DUEL: %s won the duel vs %s!", __GetName(PlayerInfo[playerid][DuelRequestReceived]), __GetName(playerid));
+	            SCMToAll(NEF_RED, gstr);
+	        
+				gTeam[PlayerInfo[playerid][DuelRequestReceived]] = NORMAL;
+				gTeam[playerid] = NORMAL;
+				ResetPlayerWorld(PlayerInfo[playerid][DuelRequestReceived]);
+				RandomSpawn(PlayerInfo[playerid][DuelRequestReceived]);
+				
+				PlayerInfo[PlayerInfo[playerid][DuelRequestReceived]][DuelRequest] = INVALID_PLAYER_ID;
+				PlayerInfo[playerid][DuelRequestReceived] = INVALID_PLAYER_ID;
+	        }
+	        else if(PlayerInfo[playerid][DuelRequest] != INVALID_PLAYER_ID)
+	        {
+	            format(gstr, sizeof(gstr), ">> DUEL: %s won the duel vs %s!", __GetName(PlayerInfo[playerid][DuelRequest]), __GetName(playerid));
+	            SCMToAll(NEF_RED, gstr);
+
+				gTeam[PlayerInfo[playerid][DuelRequest]] = NORMAL;
+				gTeam[playerid] = NORMAL;
+				ResetPlayerWorld(PlayerInfo[playerid][DuelRequest]);
+				RandomSpawn(PlayerInfo[playerid][DuelRequest]);
+
+				PlayerInfo[PlayerInfo[playerid][DuelRequest]][DuelRequestReceived] = INVALID_PLAYER_ID;
+				PlayerInfo[playerid][DuelRequest] = INVALID_PLAYER_ID;
+	        }
+	        else
+	        {
+	            gTeam[playerid] = NORMAL;
+	        }
+	    }
 		case gBUILDRACE:
 		{
 		    format(gstr, sizeof(gstr), "/Race/%03i.race", g_RaceCount + 1);
@@ -9344,6 +9402,9 @@ YCMD:duel(playerid, params[], help)
             GivePlayerWeapon(playerid, PlayerInfo[PlayerInfo[playerid][DuelRequestReceived]][DuelWeapon], 700000);
             GivePlayerWeapon(PlayerInfo[playerid][DuelRequestReceived], PlayerInfo[PlayerInfo[playerid][DuelRequestReceived]][DuelWeapon], 700000);
             
+            SetPlayerVirtualWorld(playerid, playerid + 10000);
+            SetPlayerVirtualWorld(PlayerInfo[playerid][DuelRequestReceived], playerid + 10000);
+            
             format(gstr, sizeof(gstr), ">> Duel started between %s and %s!", __GetName(PlayerInfo[playerid][DuelRequestReceived]), __GetName(playerid));
             SCMToAll(NEF_RED, gstr);
         }
@@ -12898,6 +12959,7 @@ YCMD:jail(playerid, params[], help)
 			{
 				if(ExitPlayer(player) != 0)
 				{
+				    Error(playerid, "Player is either in duel or unavailable");
 				    return 1;
 				}
 			}
@@ -29599,6 +29661,10 @@ ExitPlayer(playerid)
     
 	switch(gTeam[playerid])
 	{
+	    case gDUEL:
+	    {
+	        return 2;
+	    }
 	    case gBUILDRACE:
 	    {
 		    format(gstr, sizeof(gstr), "/Race/%03i.race", g_RaceCount + 1);
@@ -29940,7 +30006,7 @@ ExitPlayer(playerid)
 		}
 		default: return 1;
 	}
-	return 2;
+	return 3;
 }
 
 LoadMap(playerid)
