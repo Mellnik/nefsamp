@@ -100,7 +100,7 @@ native IsValidVehicle(vehicleid); // undefined in a_samp
 #define CURRENT_VERSION                 "PTS:R16"
 #define CURRENT_VERSION_SHORT           "PTS:R16"
 #endif
-#define HOTFIX_REV                      "Hotfix #0"
+#define HOTFIX_REV                      "Hotfix #1"
 #define SAMP_VERSION                    "SA-MP 0.3x-R2"
 #define MAX_REPORTS 					(7)
 #define MAX_ADS                         (10)
@@ -1739,7 +1739,7 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
   	tDerbyFallOver = -1,
   	DerbyPlayers = 0,
 	bool:IsDerbyRunning = false,
-  	bool:DerbyWinner[MAX_PLAYERS],
+  	bool:DerbyWinner[MAX_PLAYERS] = {false, ...},
   	Reports[MAX_REPORTS][144],
   	Adverts[MAX_ADS][144],
   	tBGTimer = -1,
@@ -28421,7 +28421,7 @@ function:ShowDialog(playerid, dialogid)
 		}
 		case BGVOTING_DIALOG:
 		{
-		    ShowPlayerDialog(playerid, BGVOTING_DIALOG, DIALOG_STYLE_LIST, ""nef" :: TDM Map Voting", "Forest\nQuarters\nRust\nItaly\nMedieval", "Vote", "");
+		    ShowPlayerDialog(playerid, BGVOTING_DIALOG, DIALOG_STYLE_LIST, ""nef" :: TDM Map Voting", "Forest\nQuarters\nRust\nItaly\nMedieval\nHangar War", "Vote", "");
 		}
 		case DERBY_VOTING_DIALOG:
 		{
@@ -30929,6 +30929,7 @@ ToggleSpeedo(playerid, bool:toggle)
 ResetPlayerModules(playerid)
 {
 	gTeam[playerid] = FREEROAM;
+	DerbyWinner[playerid] = false;
     LabelActive[playerid] = false;
     PlayerHit[playerid] = false;
 	CSGSOFT[playerid] = false;
