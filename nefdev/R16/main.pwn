@@ -1767,7 +1767,6 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
   	Text3D:Label_Elevator,
   	Text3D:Label_Floors[21],
   	PlayerText:DynamicAchTD[MAX_PLAYERS][2],
-  	PlayerText:TXTKillerText[MAX_PLAYERS],
   	PlayerText:TXTGunGameInfo[MAX_PLAYERS],
   	PlayerText:vTD[MAX_PLAYERS],
 	PlayerText:TXTRaceInfo[MAX_PLAYERS],
@@ -2683,8 +2682,6 @@ public OnPlayerSpawn(playerid)
 	 	}
 		return 1;
     }
-
-    PlayerTextDrawHide(playerid, TXTKillerText[playerid]);
 
     if(PlayerInfo[playerid][bShowToys]) AttachPlayerToys(playerid);
     SavePos(playerid);
@@ -5028,10 +5025,9 @@ public OnPlayerDeath(playerid, killerid, reason)
 	    SrvStat[3]++;
 		PlayerInfo[killerid][Kills]++;
  		GivePlayerCash(playerid, -250);
-  		new txt[64];
-		format(txt, sizeof(txt), "Killed by~n~~r~%s(%i)", __GetName(killerid), killerid);
-		PlayerTextDrawSetString(playerid, TXTKillerText[playerid], txt);
-		PlayerTextDrawShow(playerid, TXTKillerText[playerid]);
+
+ 		ShowInfo(playerid, "Killed By", __GetName(killerid));
+		ShowInfo(killerid, "You Killed", __GetName(playerid));
 		
 		if(pAch[killerid][E_ach_grimreaper] == 0 && PlayerInfo[killerid][Kills] >= 300)
 		{
@@ -28538,15 +28534,6 @@ function:InitSession(playerid)
 	PlayerTextDrawBackgroundColor(playerid, vTD[playerid], 51);
 	PlayerTextDrawFont(playerid, vTD[playerid], 2);
 	PlayerTextDrawSetProportional(playerid, vTD[playerid], 1);
-
-	TXTKillerText[playerid] = CreatePlayerTextDraw(playerid, 319.000000, 204.000000, "Killed by~n~~r~");
-	PlayerTextDrawAlignment(playerid, TXTKillerText[playerid], 2);
-	PlayerTextDrawBackgroundColor(playerid, TXTKillerText[playerid], 255);
-	PlayerTextDrawFont(playerid, TXTKillerText[playerid], 3);
-	PlayerTextDrawLetterSize(playerid, TXTKillerText[playerid], 0.290000, 1.099999);
-	PlayerTextDrawColor(playerid, TXTKillerText[playerid], -1);
-	PlayerTextDrawSetOutline(playerid, TXTKillerText[playerid], 1);
-	PlayerTextDrawSetProportional(playerid, TXTKillerText[playerid], 1);
 
 	TXTRaceInfo[playerid] = CreatePlayerTextDraw(playerid, 513.000000, 344.000000, "Position: ~r~~h~~h~-/-~n~~w~Checkpoint: ~b~~h~~h~-/-~n~~w~Players: ~g~~h~~h~--/12~n~~w~Map: ~y~~h~--~n~~w~Timeleft: ~r~~h~~h~--:--");
 	PlayerTextDrawBackgroundColor(playerid, TXTRaceInfo[playerid], 168430202);
