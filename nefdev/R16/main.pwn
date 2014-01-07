@@ -100,7 +100,7 @@ native IsValidVehicle(vehicleid); // undefined in a_samp
 #define CURRENT_VERSION                 "PTS:R16"
 #define CURRENT_VERSION_SHORT           "PTS:R16"
 #endif
-#define HOTFIX_REV                      "Hotfix #1"
+#define HOTFIX_REV                      "Hotfix #2"
 #define SAMP_VERSION                    "SA-MP 0.3x-R2"
 #define MAX_REPORTS 					(7)
 #define MAX_ADS                         (10)
@@ -3459,6 +3459,20 @@ public OnPlayerCommandReceived(playerid, cmdtext[])
    			}
 	    }
 	}
+	else
+	{
+		switch(YHash(cmdtext[1], false))
+		{
+		    case _I(b,i,k,e,c), _I(b,m,x): { }
+			case _I(s,k,y,d,i,v,e), _I(s,k,y,d,i,v,e,2), _I(s,k,y,d,i,v,e,3), _I(s,k,y,d,i,v,e,4), _I(s,k,y,d,i,v,e,5), _I(s,k,y,d,i,v,e,6): { }
+			default:
+			{
+				SetPVarInt(playerid, "doingStunt", 0);
+				PlayerInfo[playerid][tickJoin_bmx] = 0;
+			}
+		}
+	}
+	
 	if(PlayerInfo[playerid][bLoadMap])
 	{
 	    SCM(playerid, -1, ""er"You can't use commands now!");
@@ -7816,6 +7830,7 @@ YCMD:skydive(playerid, params[], help)
 {
     if(PortPlayerMap(playerid,3887.5874,3891.2942,2018.7869,91.8075, "Skydive 1", "skydive"))
     {
+        LoadMap(playerid);
         CheckPlayerGod(playerid);
         Command_ReProcess(playerid, "/parch", false);
         SetPVarInt(playerid, "doingStunt", 2);
@@ -7826,6 +7841,7 @@ YCMD:skydive2(playerid, params[], help)
 {
     if(PortPlayerMap(playerid,-1288.0760,-44.0085,4216.4507,93.1578, "Skydive 2", "skydive2"))
     {
+        LoadMap(playerid);
         CheckPlayerGod(playerid);
         Command_ReProcess(playerid, "/parch", false);
         SetPVarInt(playerid, "doingStunt", 2);
@@ -7836,6 +7852,7 @@ YCMD:skydive3(playerid, params[], help)
 {
     if(PortPlayerMap(playerid,2875,-3233,3268,0, "Skydive 3", "skydive3"))
     {
+        LoadMap(playerid);
         CheckPlayerGod(playerid);
         Command_ReProcess(playerid, "/parch", false);
         SetPVarInt(playerid, "doingStunt", 2);
@@ -7846,6 +7863,7 @@ YCMD:skydive4(playerid, params[], help)
 {
     if(PortPlayerMap(playerid,118.210845,3658.245859,836.183776,266.014678, "Skydive 4", "skydive4"))
     {
+        LoadMap(playerid);
         CheckPlayerGod(playerid);
         Command_ReProcess(playerid, "/parch", false);
         SetPVarInt(playerid, "doingStunt", 2);
@@ -7856,6 +7874,7 @@ YCMD:skydive5(playerid, params[], help)
 {
     if(PortPlayerMap(playerid, 239.3282, 3754.8267, 888.9833, 332.5006, "Skydive 5", "skydive5"))
     {
+        LoadMap(playerid);
         CheckPlayerGod(playerid);
         Command_ReProcess(playerid, "/parch", false);
         SetPVarInt(playerid, "doingStunt", 2);
@@ -7864,8 +7883,9 @@ YCMD:skydive5(playerid, params[], help)
 }
 YCMD:skydive6(playerid, params[], help)
 {
-    if(PortPlayerMap(playerid, -1769.5000000, -3814.1999500, 1159.8419200, 90, "Skydive 6", "skydive6"))
+    if(PortPlayerMap(playerid, -1866.3245, -3814.7351, 1162.8438, 180, "Skydive 6", "skydive6"))
     {
+        LoadMap(playerid);
         CheckPlayerGod(playerid);
         Command_ReProcess(playerid, "/parch", false);
         SetPVarInt(playerid, "doingStunt", 2);
@@ -10783,7 +10803,7 @@ YCMD:go(playerid, params[], help)
 {
     if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 
-	if((PlayerInfo[playerid][Level] == 0))
+	if(PlayerInfo[playerid][Level] == 0)
 	{
 	    if(gTeam[playerid] == FREEROAM)
 	    {
@@ -10809,6 +10829,7 @@ YCMD:go(playerid, params[], help)
 			if(PlayerInfo[player][Wanteds] != 0) return SCM(playerid, -1, ""er"This player has wanteds");
 			if(PlayerInfo[player][Level] != 0) return SCM(playerid, -1, ""er"You can't teleport to admins");
             if(PlayerInfo[player][bGWarMode]) return SCM(playerid, -1, ""er"This player is in Gang War");
+            if(GetPVarInt(player, "doingStunt") != 0) return SCM(playerid, -1, ""er"Player is doing stunts");
 
 			new Float:POS[3];
 
@@ -22225,7 +22246,7 @@ MySQL_ExistGang(playerid)
 
 MySQL_CreateGang(playerid)
 {
-    format(gstr2, sizeof(gstr2), "INSERT INTO `gangs` VALUES (NULL, '%s', '%s', 0, %i);", PlayerInfo[playerid][GangName], PlayerInfo[playerid][GangTag], gettime());
+    format(gstr2, sizeof(gstr2), "INSERT INTO `gangs` VALUES (NULL, '%s', '%s', 0, %i, -84215197);", PlayerInfo[playerid][GangName], PlayerInfo[playerid][GangTag], gettime());
     mysql_tquery(g_SQL_handle, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_CREATE_GANG, playerid, g_SQL_handle);
 }
 
@@ -23907,7 +23928,7 @@ LoadVisualStaticMeshes()
 	AddTeleport(2, "Skydive 3", "skydive3", 2875,-3233,3268);
 	AddTeleport(2, "Skydive 4", "skydive4", 118.210845,3658.245859,836.183776);
 	AddTeleport(2, "Skydive 5", "skydive5", 239.3282, 3754.8267, 888.9833);
-	AddTeleport(2, "Skydive 6", "skydive6", -1769.5000000, -3814.1999500, 1159.8419200);
+	AddTeleport(2, "Skydive 6", "skydive6", -1866.3245, -3814.7351, 1162.8438);
 	AddTeleport(0, "BMX Parkour", "bmx", 3362.586, -1939.724, 43.027);
 	AddTeleport(0, "Quad Parkour", "qp", -2904.806, 880.312, 5.354);
 	AddTeleport(0, "Quad Parkour 2", "qp2", 2121.9146,2397.7786,51.2586);
@@ -24692,22 +24713,15 @@ PortPlayerMap(playerid, Float:X, Float:Y, Float:Z, Float:Angle, const mapname[],
 	SetPlayerVirtualWorld(playerid, 0);
 	SetPlayerInterior(playerid, 0);
 
-	switch(YHash(cmd, false))
-	{
-	    case _I(b,i,k,e,c), _I(s,k,y,d,i,v,e), _I(s,k,y,d,i,v,e,2), _I(s,k,y,d,i,v,e,3), _I(s,k,y,d,i,v,e,4), _I(s,k,y,d,i,v,e,5): { }
-		default:
-		{
-			SetPVarInt(playerid, "doingStunt", 0);
-			PlayerInfo[playerid][tickJoin_bmx] = 0;
-		}
-	}
-
     Streamer_UpdateEx(playerid, X, Y, Z);
 	SetPlayerPos(playerid, X, Y, floatadd(Z, 3.0));
 	SetPlayerFacingAngle(playerid, Angle);
 
     PlayerPlaySound(playerid, 1039, 0.0, 0.0, 0.0);
-	ShowInfo(playerid, mapname, "");
+	new rcmd[32];
+	rcmd[0] = '/';
+	strcat(rcmd, cmd, sizeof(rcmd));
+	ShowInfo(playerid, mapname, rcmd);
     SetCameraBehindPlayer(playerid);
     if(populate)
 	{
@@ -24726,16 +24740,6 @@ PortPlayerMapVeh(playerid, Float:X, Float:Y, Float:Z, Float:Angle, Float:XVeh, F
 	
 	SetPlayerVirtualWorld(playerid, 0);
 	SetPlayerInterior(playerid, 0);
-
-	switch(YHash(cmd, false))
-	{
-	    case _I(b,i,k,e,c), _I(s,k,y,d,i,v,e), _I(s,k,y,d,i,v,e,2), _I(s,k,y,d,i,v,e,3), _I(s,k,y,d,i,v,e,4), _I(s,k,y,d,i,v,e,5): { }
-		default:
-		{
-			SetPVarInt(playerid, "doingStunt", 0);
-			PlayerInfo[playerid][tickJoin_bmx] = 0;
-		}
-	}
 	
 	if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
 	{
@@ -24754,7 +24758,10 @@ PortPlayerMapVeh(playerid, Float:X, Float:Y, Float:Z, Float:Angle, Float:XVeh, F
 	}
 	
 	PlayerPlaySound(playerid, 1039, 0.0, 0.0, 0.0);
-    ShowInfo(playerid, mapname, "");
+	new rcmd[32];
+	rcmd[0] = '/';
+	strcat(rcmd, cmd, sizeof(rcmd));
+    ShowInfo(playerid, mapname, rcmd);
     SetCameraBehindPlayer(playerid);
     if(populate)
 	{
@@ -25859,6 +25866,7 @@ function:DerbyFallOver()
 	    case 8: CURRENT_FALLOVER = DERBY_FALLOVER_M8;
 	    case 9: CURRENT_FALLOVER = DERBY_FALLOVER_M9;
 	}
+	
 	new Float:POS[3], string[64];
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -25901,7 +25909,7 @@ function:DerbyFallOver()
 						DestroyVehicle_(PlayerInfo[i][pDerbyCar]);
 				    	PlayerInfo[i][pDerbyCar] = -1;
 					}
-		 			PlayerInfo[i][pDerbyCar] = false;
+		 			DerbyWinner[i] = false;
 					SetPlayerDerbyStaticMeshes(i);
 		  			if((DerbyPlayers == 1) && (IsDerbyRunning))
 		  			{
@@ -29941,7 +29949,6 @@ ExitPlayer(playerid)
 				    ClearDerbyVotes();
 					ExecDerbyVotingTimer();
 				}
-				return 0;
 			}
 			else if(IsDerbyRunning && DerbyWinner[playerid])
 			{
