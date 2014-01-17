@@ -3578,7 +3578,7 @@ public OnPlayerGiveDamage(playerid, damagedid, Float:amount, weaponid)
 	    GameTextForPlayer(playerid, "~g~~h~~h~Player has GOD enabled", 2000, 3);
 	    SetPlayerHealth(damagedid, 99999.0);
 	}
-	if(gTeam[playerid] == DM || gTeam[playerid] == SNIPER)
+	if(gTeam[playerid] == DM || gTeam[playerid] == SNIPER || gTeam[playerid] == gDUEL)
 	{
 		PlayerPlaySound(playerid, 17802, 0, 0, 0);
 	}
