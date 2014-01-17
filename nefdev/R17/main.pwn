@@ -15509,7 +15509,7 @@ YCMD:spec(playerid, params[], help)
   			new count = 0;
 			for(new i = 0; i < MAX_PLAYERS; i++)
 			{
-			    if(gTeam[i] == SPEC && PlayerInfo[i][SpecID] == player)
+			    if(gTeam[i] == SPEC && PlayerInfo[i][SpecID] == player && i != playerid)
 			    {
 			        count++;
 			    }
