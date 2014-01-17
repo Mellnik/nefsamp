@@ -5,15 +5,15 @@
 || # Copyright ©2011-2014 New Evolution Freeroam	  				  # ||
 || # Created by Mellnik                                               # ||
 || # ---------------------------------------------------------------- # ||
-|| # http://nefserver.net	    	                      			  # ||
+|| # http://www.nefserver.net	    	                      		  # ||
 || #################################################################### ||
 \*======================================================================*/
 
 #pragma dynamic 8192
 
-#define IS_RELEASE_BUILD (true)
+#define IS_RELEASE_BUILD (false)
 #define INC_ENVIORMENT (true)
-#define IRC_CONNECT (true)
+#define IRC_CONNECT (false)
 #define WINTER_EDITION (false) // LOAD ferriswheelfair.amx
 
 // -
@@ -1609,7 +1609,7 @@ new const PVMatrix[98][e_pv_matrix] =
 };
 
 // Toy slots, pvs slots, house slots, house obj slots, business slot, instant namechange, medkit x20, medkit x100, money boost x2, money boost x3, scoreboost x2, scoreboost x3
-new const CreditsProductMatrix[13][e_credits_matrix] =
+new const CreditsProductMatrix[14][e_credits_matrix] =
 {
 	{"Toy Slot", 1000, 1, "Permanent", "This item expands your toy slots by 1.You can have 10 toy slots at most."},
     {"Private Vehicle Slot", 1500, 1, "Permanent", "This item expands your private vehicle slots by 1.\nYou can have 8 pv slots at most."},
@@ -1623,7 +1623,8 @@ new const CreditsProductMatrix[13][e_credits_matrix] =
     {"Money Boost x3", 1500, 1, "24 Hours", "This item gives an addtitional triple money.\nAfter purchase the boost remains active for 24 hours. You can\nonly have 1 of the 5 available boost active at the same time!"},
     {"Score Boost x2", 1000, 1, "24 Hours", "This item gives an addtitional double score.\nAfter purchase the boost remains active for 24 hours. You can\nonly have 1 of the 5 available boost active at the same time!"},
     {"Score Boost x3", 1500, 1, "24 Hours", "This item gives an addtitional triple score.\nAfter purchase the boost remains active for 24 hours. You can\nonly have 1 of the 5 available boost active at the same time!"},
-    {"Master Boost", 2500, 1, "24 Hours", "The Master Boost gives you an addtitional triple score and money!\nAfter purchase the boost remains active for 24 hours. You can\nonly have 1 of the 5 available boost active at the same time!"}
+    {"Master Boost", 2500, 1, "24 Hours", "The Master Boost gives you an addtitional triple score and money!\nAfter purchase the boost remains active for 24 hours. You can\nonly have 1 of the 5 available boost active at the same time!"},
+	{"Reset K/D", 3500, 1, "Permanent", "This item sets your kills and deaths to 0. Be careful you can't undo it."}
 };
 
 new const HouseIntTypes[15][e_house_type] =
@@ -2741,6 +2742,10 @@ public OnPlayerSpawn(playerid)
 			SetPlayerFacingAngle(playerid, PlayerInfo[playerid][SpecA]);
 			ResetPlayerWeapons(playerid);
 			gTeam[playerid] = FREEROAM;
+			
+			ShowInfo(playerid, "No longer spectating", "");
+
+			if(GetPVarInt(playerid, "HadGod") == 1) Command_ReProcess(playerid, "/god silent", false);
         }
         case FREEROAM:
         {
@@ -3356,54 +3361,49 @@ public OnPlayerDisconnect(playerid, reason)
 			    GunGamePlayers--;
 			}
 		}
+	}
+	
+    if(PlayerInfo[playerid][Muted]) KillTimer(PlayerInfo[playerid][tMute]);
 
-        if(PlayerInfo[playerid][Muted]) KillTimer(PlayerInfo[playerid][tMute]);
-
-		if(PlayerInfo[playerid][AdminDutyLabel] != Text3D:-1)
+	if(PlayerInfo[playerid][AdminDutyLabel] != Text3D:-1)
+	{
+	    DestroyDynamic3DTextLabel(PlayerInfo[playerid][AdminDutyLabel]);
+	    PlayerInfo[playerid][AdminDutyLabel] = Text3D:-1;
+	}
+	if(PlayerInfo[playerid][GangLabel] != Text3D:-1)
+	{
+	    DestroyDynamic3DTextLabel(PlayerInfo[playerid][GangLabel]);
+		PlayerInfo[playerid][GangLabel] = Text3D:-1;
+	}
+    if(PlayerInfo[playerid][VIPLabel] != Text3D:-1)
+    {
+        DestroyDynamic3DTextLabel(PlayerInfo[playerid][VIPLabel]);
+        PlayerInfo[playerid][VIPLabel] = Text3D:-1;
+    }
+    for(new i = 0; i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
+    {
+		if(IsPlayerAttachedObjectSlotUsed(playerid, i))
 		{
-		    DestroyDynamic3DTextLabel(PlayerInfo[playerid][AdminDutyLabel]);
-		    PlayerInfo[playerid][AdminDutyLabel] = Text3D:-1;
+			RemovePlayerAttachedObject(playerid, i);
+		}
+	}
+	if(PlayerInfo[playerid][bRainbow])
+	{
+		KillTimer(PlayerInfo[playerid][tRainbow]);
+		PlayerInfo[playerid][bRainbow] = false;
+	}
+	for(new i = 0; i < MAX_PLAYERS; i++)
+	{
+    	if(gTeam[i] == SPEC && PlayerInfo[i][SpecID] == playerid)
+    	{
+    	    Command_ReProcess(i, "/specoff", false);
+    	    ShowInfo(i, "Player disconnected", "");
 		}
 
-		if(PlayerInfo[playerid][GangLabel] != Text3D:-1)
-		{
-		    DestroyDynamic3DTextLabel(PlayerInfo[playerid][GangLabel]);
- 			PlayerInfo[playerid][GangLabel] = Text3D:-1;
-		}
-
-        if(PlayerInfo[playerid][VIPLabel] != Text3D:-1)
-        {
-            DestroyDynamic3DTextLabel(PlayerInfo[playerid][VIPLabel]);
-            PlayerInfo[playerid][VIPLabel] = Text3D:-1;
-        }
-
-        for(new i = 0; i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
-        {
-			if(IsPlayerAttachedObjectSlotUsed(playerid, i))
-			{
-				RemovePlayerAttachedObject(playerid, i);
-			}
-		}
-
-		if(PlayerInfo[playerid][bRainbow])
-		{
-			KillTimer(PlayerInfo[playerid][tRainbow]);
-			PlayerInfo[playerid][bRainbow] = false;
-		}
-
-		for(new i = 0; i < MAX_PLAYERS; i++)
-		{
-	    	if(gTeam[i] == SPEC && PlayerInfo[i][SpecID] == playerid)
-	    	{
-	    	    Command_ReProcess(i, "/specoff", false);
-	    	    ShowInfo(i, "Player disconnected", "");
-			}
-			
-	  		if(Iter_Contains(PlayerIgnore[i], playerid))
-		    {
-		        Iter_Remove(PlayerIgnore[i], playerid);
-		    }
-		}
+  		if(Iter_Contains(PlayerIgnore[i], playerid))
+	    {
+	        Iter_Remove(PlayerIgnore[i], playerid);
+	    }
 	}
 	
     DestroyPlayerVehicles(playerid);
@@ -15518,10 +15518,6 @@ YCMD:specoff(playerid, params[], help)
 		    ResetPlayerWorld(playerid);
 		    PlayerInfo[playerid][SpecID] = INVALID_PLAYER_ID;
 			TogglePlayerSpectating(playerid, false);
-			ShowInfo(playerid, "No longer spectating", "");
-			gTeam[playerid] = FREEROAM;
-			
-			if(GetPVarInt(playerid, "HadGod") == 1) Command_ReProcess(playerid, "/god silent", false);
 		}
 		else
 		{
@@ -17729,7 +17725,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	                    strcat(string, "\n\nGoto "SVRURLWWW"/credits to learn more about Gold Credits");
 	                    ShowPlayerDialog(playerid, CM_DIALOG + 1, DIALOG_STYLE_MSGBOX, ""nef" Gold Credits", string, "Back", "");
 	                }
-	                case 1..13:
+	                case 1..14:
 	                {
 	                    ShowPlayerDialog(playerid, CM_DIALOG + 1 + listitem, DIALOG_STYLE_MSGBOX, ""nef" Gold Credits", GetItem(listitem - 1), "Buy", "Back");
 	                }
@@ -18082,6 +18078,27 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 mysql_tquery(g_SQL_handle, gstr2, "", "");
                 
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[12][E_item_credits]);
+
+				MySQL_SavePlayer(playerid, false);
+	            return true;
+	        }
+	        case CM_DIALOG + 15: // kills/deaths reset
+	        {
+	            if(GetCredits(playerid) < CreditsProductMatrix[13][E_item_credits])
+	            {
+				    SCM(playerid, -1, ""er"You don't have enough Gold Credits!");
+				    ShowDialog(playerid, CM_DIALOG);
+	                return 1;
+	            }
+
+				PlayerInfo[playerid][Deaths] = 0;
+				PlayerInfo[playerid][Kills] = 0;
+
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", ToCurrency(CreditsProductMatrix[13][E_item_credits]));
+				ShowInfo(playerid, "Item purchased", gstr, 5000);
+				SCM(playerid, NEF_YELLOW, "Your K/D has been reset!");
+				
+				AlterPlayerCredits(playerid, -CreditsProductMatrix[13][E_item_credits]);
 
 				MySQL_SavePlayer(playerid, false);
 	            return true;
@@ -20603,7 +20620,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			    RemoveFromRaceBuilder(playerid);
 			    return true;
 			}
- 		    case CM_DIALOG + 1 .. CM_DIALOG + 14:
+ 		    case CM_DIALOG + 1 .. CM_DIALOG + 15:
  		    {
  		        ShowDialog(playerid, CM_DIALOG);
  		    }
@@ -28187,7 +28204,7 @@ function:ShowDialog(playerid, dialogid)
 	        new string[1024];
 
 	        strcat(string, ""red"How to get Gold Credits\nToy Slots\nPrivate Vehicle Slots\nHouse Slots\nHouse Item Slots\nBusiness Slots\nInstant Namechange Access");
-	        strcat(string, "\nMedkit x20\nMedkit x100\nMoney Boost x2\nMoney Boost x3\nScore Boost x2\nScore Boost x3\nMaster Boost");
+	        strcat(string, "\nMedkit x20\nMedkit x100\nMoney Boost x2\nMoney Boost x3\nScore Boost x2\nScore Boost x3\nMaster Boost\nReset K/D");
 
 	        ShowPlayerDialog(playerid, CM_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Gold Credits", string, "Select", "Cancel");
 	    }
@@ -29348,6 +29365,8 @@ IRC_SetUp(bool:restart = false)
 	IRC_Bots[4] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]CrazyLilMan_BETA", "["SVRSC"]CrazyLilMan_BETA", "crazylilman_BETA");
 	IRC_SetIntData(IRC_Bots[4], E_IRC_CONNECT_DELAY, 40);
 	#endif
+	#else
+	#pragma unused restart
 	#endif
 }
 
@@ -29631,7 +29650,6 @@ GetNearestHouse(playerid)
 
 	    return i;
 	}
-
 	return -1;
 }
 
