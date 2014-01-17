@@ -5668,6 +5668,8 @@ public OnPlayerDeath(playerid, killerid, reason)
 
 public OnPlayerEnterDynamicArea(playerid, areaid)
 {
+	if(gTeam[playerid] != FREEROAM) return 1;
+	
 	for(new i = 0; i < gzoneid; i++)
 	{
 	    if(GZoneInfo[i][localGang] == PlayerInfo[playerid][GangID] && GZoneInfo[i][bUnderAttack] && areaid == GZoneInfo[i][zsphere])
@@ -5678,7 +5680,8 @@ public OnPlayerEnterDynamicArea(playerid, areaid)
 			SetPlayerGWarMode(playerid);
 			break;
 		}
-		else if(GZoneInfo[i][bUnderAttack] && GZoneInfo[i][localGang] != PlayerInfo[playerid][GangID] && GZoneInfo[i][AttackingGang] != PlayerInfo[playerid][GangID])
+
+		if(GZoneInfo[i][zsphere] == areaid && GZoneInfo[i][bUnderAttack] && GZoneInfo[i][localGang] != PlayerInfo[playerid][GangID] && GZoneInfo[i][AttackingGang] != PlayerInfo[playerid][GangID])
 		{
 		    if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
 			{
