@@ -2073,15 +2073,11 @@ new Float:BG_M6_T2_Spawns[4][4] =
 	{2034.2903, 4009.7451, 76.5134, 90.0},
 	{2056.8708, 3975.7813, 84.1782, 90.0}
 };
-new Float:DuelMaps[2][2][4] =
+new Float:DuelMaps[1][2][4] =
 {
 	{
 		{1144.1377, 1529.8433, 52.4003, 87.1090},
 		{1049.4922, 1529.3169, 52.4077, 271.6640}
-	},
-	{
-		{90.0, 90.0, 90.0, 90.0},
-		{90.0, 90.0, 90.0, 90.0}
 	}
 };
 new Float:WorldSpawns[3][4] =
@@ -3215,27 +3211,22 @@ public OnPlayerDisconnect(playerid, reason)
 		{
 		    case gDUEL:
 		    {
-		        if(PlayerInfo[playerid][DuelRequest] == INVALID_PLAYER_ID)
+		        for(new i = 0; i < MAX_PLAYERS; i++)
 		        {
-		            format(gstr, sizeof(gstr), ">> Duel cancelled between %s and %s. Reason: Disconnect", __GetName(PlayerInfo[playerid][DuelRequestRecv]), __GetName(playerid));
-		            SCMToAll(NEF_RED, gstr);
+		            if(PlayerInfo[i][DuelRequestRecv] == playerid && gTeam[i] == gDUEL)
+		            {
+			            format(gstr, sizeof(gstr), ">> Duel cancelled between %s and %s. Reason: Disconnect", __GetName(playerid), __GetName(i));
+			            SCMToAll(NEF_RED, gstr);
 
-					gTeam[PlayerInfo[playerid][DuelRequestRecv]] = FREEROAM;
-					RandomSpawn(PlayerInfo[playerid][DuelRequestRecv]);
-
-					PlayerInfo[PlayerInfo[playerid][DuelRequestRecv]][DuelRequest] = INVALID_PLAYER_ID;
-					PlayerInfo[playerid][DuelRequestRecv] = INVALID_PLAYER_ID;
-		        }
-		        else if(PlayerInfo[playerid][DuelRequest] != INVALID_PLAYER_ID)
-		        {
-		            format(gstr, sizeof(gstr), ">> Duel cancelled between %s and %s. Reason: Disconnect", __GetName(PlayerInfo[playerid][DuelRequest]), __GetName(playerid));
-		            SCMToAll(NEF_RED, gstr);
-
-					gTeam[PlayerInfo[playerid][DuelRequest]] = FREEROAM;
-					RandomSpawn(PlayerInfo[playerid][DuelRequest]);
-
-					PlayerInfo[PlayerInfo[playerid][DuelRequest]][DuelRequestRecv] = INVALID_PLAYER_ID;
-					PlayerInfo[playerid][DuelRequest] = INVALID_PLAYER_ID;
+		                gTeam[i] = FREEROAM;
+		                ResetPlayerWorld(i);
+		                RandomSpawn(i);
+		                ResetPlayerWeapons(i);
+		                RandomWeapons(i);
+		                
+		                PlayerInfo[i][DuelRequestRecv] = INVALID_PLAYER_ID;
+		                PlayerInfo[i][DuelRequest] = INVALID_PLAYER_ID;
+		            }
 		        }
 		    }
 		    case gBUILDRACE:
@@ -3406,6 +3397,17 @@ public OnPlayerDisconnect(playerid, reason)
 	    {
 	        Iter_Remove(PlayerIgnore[i], playerid);
 	    }
+	    
+        if(PlayerInfo[i][DuelRequestRecv] == playerid)
+        {
+            if(gTeam[i] != gDUEL)
+            {
+	        	format(gstr, sizeof(gstr), ">> %s(%i) cancelled the duel request! Reason: Disconnect", __GetName(playerid), playerid);
+	        	SCM(i, NEF_RED, gstr);
+
+	        	PlayerInfo[i][DuelRequestRecv] = INVALID_PLAYER_ID;
+			}
+        }
 	}
 	
     DestroyPlayerVehicles(playerid);
@@ -5095,40 +5097,62 @@ public OnPlayerDeath(playerid, killerid, reason)
 	{
 	    case gDUEL:
 	    {
-	        if(PlayerInfo[playerid][DuelRequest] == INVALID_PLAYER_ID) // Sender won
-	        {
-	            format(gstr, sizeof(gstr), ">> DUEL: %s won the duel against %s!", __GetName(PlayerInfo[playerid][DuelRequestRecv]), __GetName(playerid));
-	            SCMToAll(NEF_RED, gstr);
-	        
-				gTeam[PlayerInfo[playerid][DuelRequestRecv]] = FREEROAM;
-				gTeam[playerid] = FREEROAM;
-				ResetPlayerWorld(PlayerInfo[playerid][DuelRequestRecv]);
-				RandomSpawn(PlayerInfo[playerid][DuelRequestRecv]);
-	            ResetPlayerWeapons(PlayerInfo[playerid][DuelRequestRecv]);
-	            RandomWeapons(PlayerInfo[playerid][DuelRequestRecv]);
-				
-				PlayerInfo[PlayerInfo[playerid][DuelRequestRecv]][DuelRequest] = INVALID_PLAYER_ID;
-				PlayerInfo[playerid][DuelRequestRecv] = INVALID_PLAYER_ID;
-	        }
-	        else if(PlayerInfo[playerid][DuelRequest] != INVALID_PLAYER_ID) // Receiver lost
-	        {
-	            format(gstr, sizeof(gstr), ">> DUEL: %s won the duel against %s!", __GetName(PlayerInfo[playerid][DuelRequest]), __GetName(playerid));
-	            SCMToAll(NEF_RED, gstr);
+	        new bool:found = false;
+	    
+			for(new i = 0; i < MAX_PLAYERS; i++)
+			{
+			    if(PlayerInfo[i][DuelRequestRecv] == playerid && gTeam[i] == gDUEL) // Sender lost
+			    {
+		            format(gstr, sizeof(gstr), ">> DUEL: %s won the duel against %s!", __GetName(i), __GetName(playerid));
+		            SCMToAll(NEF_RED, gstr);
+		            
+ 		            gTeam[i] = FREEROAM;
+		            gTeam[playerid] = FREEROAM;
+		            
+		            PlayerInfo[i][DuelRequestRecv] = INVALID_PLAYER_ID;
+		            PlayerInfo[playerid][DuelRequestRecv] = INVALID_PLAYER_ID;
+		            
+		            PlayerInfo[i][DuelRequest] = INVALID_PLAYER_ID;
+		            PlayerInfo[playerid][DuelRequest] = INVALID_PLAYER_ID;
+		            
+					ResetPlayerWorld(i);
+					RandomSpawn(i);
+		            ResetPlayerWeapons(i);
+		            RandomWeapons(i);
+		            
+		            found = true;
+		            break;
+			    }
+			}
+			
+			if(!found)
+			{
+			    for(new i = 0; i < MAX_PLAYERS; i++)
+			    {
+			        if(PlayerInfo[i][DuelRequest] == playerid) // Sender won
+			        {
+			            format(gstr, sizeof(gstr), ">> DUEL: %s won the duel against %s!", __GetName(i), __GetName(playerid));
+			            SCMToAll(NEF_RED, gstr);
 
-				gTeam[PlayerInfo[playerid][DuelRequest]] = FREEROAM;
-				gTeam[playerid] = FREEROAM;
-				ResetPlayerWorld(PlayerInfo[playerid][DuelRequest]);
-				RandomSpawn(PlayerInfo[playerid][DuelRequest]);
-	            ResetPlayerWeapons(PlayerInfo[playerid][DuelRequest]);
-	            RandomWeapons(PlayerInfo[playerid][DuelRequest]);
+	 		            gTeam[i] = FREEROAM;
+			            gTeam[playerid] = FREEROAM;
 
-				PlayerInfo[PlayerInfo[playerid][DuelRequest]][DuelRequestRecv] = INVALID_PLAYER_ID;
-				PlayerInfo[playerid][DuelRequest] = INVALID_PLAYER_ID;
-	        }
-	        else
-	        {
-	            gTeam[playerid] = FREEROAM;
-	        }
+			            PlayerInfo[i][DuelRequestRecv] = INVALID_PLAYER_ID;
+			            PlayerInfo[playerid][DuelRequestRecv] = INVALID_PLAYER_ID;
+
+			            PlayerInfo[i][DuelRequest] = INVALID_PLAYER_ID;
+			            PlayerInfo[playerid][DuelRequest] = INVALID_PLAYER_ID;
+
+						ResetPlayerWorld(i);
+						RandomSpawn(i);
+			            ResetPlayerWeapons(i);
+			            RandomWeapons(i);
+
+			            found = true;
+			            break;
+			        }
+			    }
+			}
 	    }
 		case gBUILDRACE:
 		{
@@ -9423,14 +9447,22 @@ YCMD:duel(playerid, params[], help)
             if(IsPlayerOnDesktop(PlayerInfo[playerid][DuelRequestRecv], 1500)) return SCM(playerid, -1, ""er"Player is on desktop");
             if(PlayerInfo[PlayerInfo[playerid][DuelRequestRecv]][DuelRequest] != playerid) return SCM(playerid, -1, ""er"Error: Players do not match");
 
+			for(new i = 0; i < MAX_PLAYERS; i++)
+			{
+			    if(PlayerInfo[i][DuelRequestRecv] == playerid)
+			    {
+		        	format(gstr, sizeof(gstr), ">> %s(%i) cancelled the duel request!", __GetName(playerid), playerid);
+		        	SCM(i, NEF_RED, gstr);
+
+		        	PlayerInfo[i][DuelRequestRecv] = INVALID_PLAYER_ID;
+			    }
+			}
+
 			SavePos(playerid);
 			SavePos(PlayerInfo[playerid][DuelRequestRecv]);
 			
 			CheckPlayerGod(playerid);
 			CheckPlayerGod(PlayerInfo[playerid][DuelRequestRecv]);
-
-            SetPlayerPos(playerid, DuelMaps[PlayerInfo[PlayerInfo[playerid][DuelRequestRecv]][DuelLocation] - 1][0][0], DuelMaps[PlayerInfo[PlayerInfo[playerid][DuelRequestRecv]][DuelLocation] - 1][0][1], DuelMaps[PlayerInfo[PlayerInfo[playerid][DuelRequestRecv]][DuelLocation] - 1][0][2]);
-            SetPlayerPos(PlayerInfo[playerid][DuelRequestRecv], DuelMaps[PlayerInfo[PlayerInfo[playerid][DuelRequestRecv]][DuelLocation] - 1][1][0], DuelMaps[PlayerInfo[PlayerInfo[playerid][DuelRequestRecv]][DuelLocation] - 1][1][1], DuelMaps[PlayerInfo[PlayerInfo[playerid][DuelRequestRecv]][DuelLocation] - 1][1][2]);
             
             ResetPlayerWeapons(playerid);
             ResetPlayerWeapons(PlayerInfo[playerid][DuelRequestRecv]);
@@ -9441,8 +9473,20 @@ YCMD:duel(playerid, params[], help)
             SetPlayerVirtualWorld(playerid, playerid + 10000);
             SetPlayerVirtualWorld(PlayerInfo[playerid][DuelRequestRecv], playerid + 10000);
             
+            SetPlayerPos(playerid, DuelMaps[PlayerInfo[PlayerInfo[playerid][DuelRequestRecv]][DuelLocation] - 1][0][0], DuelMaps[PlayerInfo[PlayerInfo[playerid][DuelRequestRecv]][DuelLocation] - 1][0][1], DuelMaps[PlayerInfo[PlayerInfo[playerid][DuelRequestRecv]][DuelLocation] - 1][0][2]);
+            SetPlayerPos(PlayerInfo[playerid][DuelRequestRecv], DuelMaps[PlayerInfo[PlayerInfo[playerid][DuelRequestRecv]][DuelLocation] - 1][1][0], DuelMaps[PlayerInfo[PlayerInfo[playerid][DuelRequestRecv]][DuelLocation] - 1][1][1], DuelMaps[PlayerInfo[PlayerInfo[playerid][DuelRequestRecv]][DuelLocation] - 1][1][2]);
+
+            SetPlayerFacingAngle(playerid, DuelMaps[PlayerInfo[PlayerInfo[playerid][DuelRequestRecv]][DuelLocation] - 1][0][3]);
+            SetPlayerFacingAngle(PlayerInfo[playerid][DuelRequestRecv], DuelMaps[PlayerInfo[PlayerInfo[playerid][DuelRequestRecv]][DuelLocation] - 1][1][3]);
+            
+            SetCameraBehindPlayer(playerid);
+            SetCameraBehindPlayer(PlayerInfo[playerid][DuelRequestRecv]);
+            
             gTeam[playerid] = gDUEL;
             gTeam[PlayerInfo[playerid][DuelRequestRecv]] = gDUEL;
+            
+            PlayerInfo[playerid][DuelRequest] = INVALID_PLAYER_ID;
+            PlayerInfo[PlayerInfo[playerid][DuelRequestRecv]][DuelRequestRecv] = INVALID_PLAYER_ID;
             
             format(gstr, sizeof(gstr), ">> Duel started between %s and %s!", __GetName(PlayerInfo[playerid][DuelRequestRecv]), __GetName(playerid));
             SCMToAll(NEF_RED, gstr);
@@ -17534,13 +17578,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        }
 	        case DIALOG_DUEL + 1:
 	        {
-	            switch(listitem)
-	            {
-	                case 0: PlayerInfo[playerid][DuelLocation] = 1;
-	                case 1: PlayerInfo[playerid][DuelLocation] = 2;
-	                case 2: PlayerInfo[playerid][DuelLocation] = 3;
-	            }
+	            PlayerInfo[playerid][DuelLocation] = listitem + 1;
 	            
+	            if(!islogged(PlayerInfo[playerid][DuelRequest])) return SCM(playerid, -1, ""er"Player does not have an account");
 	            if(gTeam[PlayerInfo[playerid][DuelRequest]] != FREEROAM) return SCM(playerid, -1, ""er"Player is not in normal world");
 	            if(!IsPlayerAvail(PlayerInfo[playerid][DuelRequest])) return SCM(playerid, -1, ""er"Player is not available");
 	            if(gTeam[playerid] != FREEROAM) return ShowInfo(playerid, "You must be in Freeroam", "");
@@ -17548,6 +17588,18 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	            if(playerid == PlayerInfo[playerid][DuelRequest]) return SCM(playerid, -1, ""er"You can't duel yourself");
 	            
 	            PlayerInfo[PlayerInfo[playerid][DuelRequest]][DuelRequestRecv] = playerid;
+	            
+	            for(new i = 0; i < MAX_PLAYERS; i++)
+	            {
+	                if(PlayerInfo[i][DuelRequest] == playerid)
+	                {
+			        	format(gstr, sizeof(gstr), ">> Duel request cancelled by %s(%i)", __GetName(playerid), playerid);
+			        	SCM(i, NEF_RED, gstr);
+			        	
+	                    PlayerInfo[i][DuelRequest] = INVALID_PLAYER_ID;
+	                }
+	            }
+	            PlayerInfo[playerid][DuelRequestRecv] = INVALID_PLAYER_ID;
 	            
 	            new tmp[50];
 	            GetWeaponName(PlayerInfo[playerid][DuelWeapon], tmp, sizeof(tmp));
