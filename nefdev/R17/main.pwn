@@ -4828,7 +4828,7 @@ public OnPlayerText(playerid, text[])
 			format(gstr, sizeof(gstr), "3,1ReactionTest:4 %s(%i) has won the reaction test in %2i.%03i seconds!", __GetName(playerid), playerid, second, rtime);
 			IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 
-		    format(gstr, sizeof(gstr), "» You have earned $%s + %i score.", ToCurrency(xCash), xScore);
+		    format(gstr, sizeof(gstr), "» You have earned $%s + %i score.", number_format(xCash), xScore);
 		    SCM(playerid, GREEN, gstr);
 
 			format(gstr, sizeof(gstr), "Won the Reaction Test in %2i.%03i seconds!", second, rtime);
@@ -5027,7 +5027,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 
 	if(reason <= 46 && gTeam[killerid] == FREEROAM && IsPlayerConnected(killerid) && PlayerInfo[playerid][HitmanHit] > 0)
 	{
-		format(gstr, sizeof(gstr), "%s(%i) killed %s(%i) and received $%s for a completed hit!", __GetName(killerid), killerid, __GetName(playerid), playerid, ToCurrency(PlayerInfo[playerid][HitmanHit]));
+		format(gstr, sizeof(gstr), "%s(%i) killed %s(%i) and received $%s for a completed hit!", __GetName(killerid), killerid, __GetName(playerid), playerid, number_format(PlayerInfo[playerid][HitmanHit]));
 		SCMToAll(YELLOW, gstr);
 		GivePlayerCash(killerid, PlayerInfo[playerid][HitmanHit]);
 		PlayerInfo[playerid][HitmanHit] = 0;
@@ -8689,6 +8689,25 @@ YCMD:enter(playerid, params[], help)
 	return 1;
 }
 
+YCMD:charts(playerid, params[], help)
+{
+	mysql_tquery(g_SQL_handle, "SELECT `quantity`, `price` FROM `sells` WHERE `item` = 2;", "OnChartRecv", "i", playerid);
+	return 1;
+}
+
+function:OnChartRecv(playerid)
+{
+	new items, pric3;
+	for(new i = 0; i < cache_get_row_count(); i++)
+	{
+		items += cache_get_row_int(i, 0, g_SQL_handle);
+		pric3 += cache_get_row_int(i, 1, g_SQL_handle);
+	}
+	format(gstr, sizeof(gstr), "Average price for 1000GC is $%s, based on %i transactions.", number_format((pric3 / items) * 1000), cache_get_row_count());
+	SCM(playerid, -1, gstr);
+	return 1;
+}
+
 YCMD:sellgc(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
@@ -8725,9 +8744,9 @@ YCMD:sellgc(playerid, params[], help)
 	    PlayerInfo[player][GCPrice] = money;
 	    PlayerInfo[player][GCNameHash] = YHash(__GetName(playerid), false);
 
-	    format(gstr, sizeof(gstr), ""blue"You have offered %s(%i) your %sGC for $%s", __GetName(player), player, ToCurrency(gc), ToCurrency(money));
+	    format(gstr, sizeof(gstr), ""blue"You have offered %s(%i) your %sGC for $%s", __GetName(player), player, number_format(gc), number_format(money));
 	    SCM(playerid, -1, gstr);
-	    format(gstr, sizeof(gstr), ""blue"%s(%i) is offering you their %sGC for $%s, type /buygc to accept", __GetName(playerid), playerid, ToCurrency(gc), ToCurrency(money));
+	    format(gstr, sizeof(gstr), ""blue"%s(%i) is offering you their %sGC for $%s, type /buygc to accept", __GetName(playerid), playerid, number_format(gc), number_format(money));
 	    SCM(player, -1, gstr);
 
 		PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
@@ -8766,17 +8785,17 @@ YCMD:buygc(playerid, params[], help)
 	    format(gstr2, sizeof(gstr2), "INSERT INTO `sells` VALUES (NULL, 2, %i, %i, %i, %i);", PlayerInfo[playerid][GCOffer], PlayerInfo[playerid][GCPrice], PlayerInfo[PlayerInfo[playerid][GCPlayer]][AccountID], PlayerInfo[playerid][AccountID]);
 	    mysql_tquery(g_SQL_handle, gstr2, "", "");
 
-	    format(gstr, sizeof(gstr), ""blue"You have accepted %s's offer and bough %sGC for $%s", __GetName(PlayerInfo[playerid][GCPlayer]), ToCurrency(PlayerInfo[playerid][GCOffer]), ToCurrency(PlayerInfo[playerid][GCPrice]));
+	    format(gstr, sizeof(gstr), ""blue"You have accepted %s's offer and bough %sGC for $%s", __GetName(PlayerInfo[playerid][GCPlayer]), number_format(PlayerInfo[playerid][GCOffer]), number_format(PlayerInfo[playerid][GCPrice]));
 	    SCM(playerid, -1, gstr);
-	    format(gstr, sizeof(gstr), ""blue"%s(%i) has accepted your offer. You sold %sGC for $%s", __GetName(playerid), playerid, ToCurrency(PlayerInfo[playerid][GCOffer]), ToCurrency(PlayerInfo[playerid][GCPrice]));
+	    format(gstr, sizeof(gstr), ""blue"%s(%i) has accepted your offer. You sold %sGC for $%s", __GetName(playerid), playerid, number_format(PlayerInfo[playerid][GCOffer]), number_format(PlayerInfo[playerid][GCPrice]));
 	    SCM(PlayerInfo[playerid][GCPlayer], -1, gstr);
         print(gstr);
 
-	    format(gstr, sizeof(gstr), ""orange"[NEF] %s(%i) has sold their %sGC to %s(%i) for $%s", __GetName(PlayerInfo[playerid][GCPlayer]), PlayerInfo[playerid][GCPlayer], ToCurrency(PlayerInfo[playerid][GCOffer]), __GetName(playerid), playerid, ToCurrency(PlayerInfo[playerid][GCPrice]));
+	    format(gstr, sizeof(gstr), ""orange"[NEF] %s(%i) has sold their %sGC to %s(%i) for $%s", __GetName(PlayerInfo[playerid][GCPlayer]), PlayerInfo[playerid][GCPlayer], number_format(PlayerInfo[playerid][GCOffer]), __GetName(playerid), playerid, number_format(PlayerInfo[playerid][GCPrice]));
 	    SCMToAll(-1, gstr);
 	    print(gstr);
 
-		format(gstr, sizeof(gstr), "3,1GC:4 %s(%i) has sold their %sGC to %s(%i) for $%s", __GetName(PlayerInfo[playerid][GCPlayer]), PlayerInfo[playerid][GCPlayer], ToCurrency(PlayerInfo[playerid][GCOffer]), __GetName(playerid), playerid, ToCurrency(PlayerInfo[playerid][GCPrice]));
+		format(gstr, sizeof(gstr), "3,1GC:4 %s(%i) has sold their %sGC to %s(%i) for $%s", __GetName(PlayerInfo[playerid][GCPlayer]), PlayerInfo[playerid][GCPlayer], number_format(PlayerInfo[playerid][GCOffer]), __GetName(playerid), playerid, number_format(PlayerInfo[playerid][GCPrice]));
 		IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 
 	    PlayerInfo[playerid][GCPlayer] = INVALID_PLAYER_ID;
@@ -8875,9 +8894,9 @@ YCMD:sellvip(playerid, params[], help)
 	    PlayerInfo[player][VIPOffer] = money;
 	    PlayerInfo[player][VIPNameHash] = YHash(__GetName(playerid), false);
 	    
-	    format(gstr, sizeof(gstr), ""blue"You have offered %s(%i) your V.I.P status for $%s", __GetName(player), player, ToCurrency(money));
+	    format(gstr, sizeof(gstr), ""blue"You have offered %s(%i) your V.I.P status for $%s", __GetName(player), player, number_format(money));
 	    SCM(playerid, -1, gstr);
-	    format(gstr, sizeof(gstr), ""blue"%s(%i) is offering you their V.I.P status for $%s, type /buyvip to accept", __GetName(playerid), playerid, ToCurrency(money));
+	    format(gstr, sizeof(gstr), ""blue"%s(%i) is offering you their V.I.P status for $%s, type /buyvip to accept", __GetName(playerid), playerid, number_format(money));
 	    SCM(player, -1, gstr);
 	    SCM(player, -1, ""red"PLEASE NOTE: "blue"You won't receive $1,000,000 nor the bizz/vehicle slots when buying VIP from a player");
 	    
@@ -8919,17 +8938,17 @@ YCMD:buyvip(playerid, params[], help)
 	    format(gstr2, sizeof(gstr2), "INSERT INTO `sells` VALUES (NULL, 1, 1, %i, %i, %i);", PlayerInfo[playerid][VIPOffer], PlayerInfo[PlayerInfo[playerid][VIPPlayer]][AccountID], PlayerInfo[playerid][AccountID]);
 	    mysql_tquery(g_SQL_handle, gstr2, "", "");
 
-	    format(gstr, sizeof(gstr), ""blue"You have accepted %s's offer and bough VIP for $%s", __GetName(PlayerInfo[playerid][VIPPlayer]), ToCurrency(PlayerInfo[playerid][VIPOffer]));
+	    format(gstr, sizeof(gstr), ""blue"You have accepted %s's offer and bough VIP for $%s", __GetName(PlayerInfo[playerid][VIPPlayer]), number_format(PlayerInfo[playerid][VIPOffer]));
 	    SCM(playerid, -1, gstr);
-	    format(gstr, sizeof(gstr), ""blue"%s(%i) has accepted your offer. You sold your VIP for $%s", __GetName(playerid), playerid, ToCurrency(PlayerInfo[playerid][VIPOffer]));
+	    format(gstr, sizeof(gstr), ""blue"%s(%i) has accepted your offer. You sold your VIP for $%s", __GetName(playerid), playerid, number_format(PlayerInfo[playerid][VIPOffer]));
 	    SCM(PlayerInfo[playerid][VIPPlayer], -1, gstr);
 		print(gstr);
 		
-	    format(gstr, sizeof(gstr), ""orange"[NEF] %s(%i) has sold his VIP stauts to %s(%i) for $%s", __GetName(PlayerInfo[playerid][VIPPlayer]), PlayerInfo[playerid][VIPPlayer], __GetName(playerid), playerid, ToCurrency(PlayerInfo[playerid][VIPOffer]));
+	    format(gstr, sizeof(gstr), ""orange"[NEF] %s(%i) has sold his VIP stauts to %s(%i) for $%s", __GetName(PlayerInfo[playerid][VIPPlayer]), PlayerInfo[playerid][VIPPlayer], __GetName(playerid), playerid, number_format(PlayerInfo[playerid][VIPOffer]));
 	    SCMToAll(-1, gstr);
 	    print(gstr);
 	    
-  		format(gstr, sizeof(gstr), "3,1GC:4 %s(%i) has sold his VIP stauts to %s(%i) for $%s", __GetName(PlayerInfo[playerid][VIPPlayer]), PlayerInfo[playerid][VIPPlayer], __GetName(playerid), playerid, ToCurrency(PlayerInfo[playerid][VIPOffer]));
+  		format(gstr, sizeof(gstr), "3,1GC:4 %s(%i) has sold his VIP stauts to %s(%i) for $%s", __GetName(PlayerInfo[playerid][VIPPlayer]), PlayerInfo[playerid][VIPPlayer], __GetName(playerid), playerid, number_format(PlayerInfo[playerid][VIPOffer]));
 		IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 	    
 	    PlayerInfo[playerid][VIPPlayer] = INVALID_PLAYER_ID;
@@ -9051,7 +9070,7 @@ YCMD:buy(playerid, params[], help)
 		strmid(HouseInfo[i][Owner], __GetName(playerid), 0, 25, 25);
 	    HouseInfo[i][sold] = 1;
 
-	    format(gstr, sizeof(gstr), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", __GetName(playerid), HouseInfo[i][iID], ToCurrency(HouseInfo[i][price]), HouseInfo[i][E_score], HouseIntTypes[HouseInfo[i][interior]][intname]);
+	    format(gstr, sizeof(gstr), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", __GetName(playerid), HouseInfo[i][iID], number_format(HouseInfo[i][price]), HouseInfo[i][E_score], HouseIntTypes[HouseInfo[i][interior]][intname]);
 	    UpdateDynamic3DTextLabelText(HouseInfo[i][label], -1, gstr);
 	    DestroyDynamicMapIcon(HouseInfo[i][iconid]);
 	    DestroyDynamicPickup(HouseInfo[i][pickid]);
@@ -9065,7 +9084,7 @@ YCMD:buy(playerid, params[], help)
 	    MySQL_SavePlayer(playerid, false);
 	    PlayerInfo[playerid][tickLastBuy] = tick;
 	    PlayerPlaySound(playerid, 1149, 0.0, 0.0, 0.0);
-	    format(gstr, sizeof(gstr), ""nef" "yellow_e"%s(%i) bought the house %i for $%s!", __GetName(playerid), playerid, HouseInfo[i][iID], ToCurrency(HouseInfo[i][price]));
+	    format(gstr, sizeof(gstr), ""nef" "yellow_e"%s(%i) bought the house %i for $%s!", __GetName(playerid), playerid, HouseInfo[i][iID], number_format(HouseInfo[i][price]));
 	    SCMToAll(-1, gstr);
 	    ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""white"House bought!", ""white"You can now use these commands:\n\n/hmenu\n/lock\n/enter\n/exit\n/sell\n\nCustomize your house's interior by using /hmenu", "OK", "");
 	    break;
@@ -9173,7 +9192,7 @@ YCMD:sell(playerid, params[], help)
 			}
 		}
 
-	    format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseInfo[i][iID], ToCurrency(HouseInfo[i][price]), HouseInfo[i][E_score], HouseIntTypes[HouseInfo[i][interior]][intname]);
+	    format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseInfo[i][iID], number_format(HouseInfo[i][price]), HouseInfo[i][E_score], HouseIntTypes[HouseInfo[i][interior]][intname]);
 	    UpdateDynamic3DTextLabelText(HouseInfo[i][label], -1, gstr);
 	    DestroyDynamicMapIcon(HouseInfo[i][iconid]);
 	    DestroyDynamicPickup(HouseInfo[i][pickid]);
@@ -9187,7 +9206,7 @@ YCMD:sell(playerid, params[], help)
 	    MySQL_SavePlayer(playerid, false);
 	    PlayerInfo[playerid][tickLastSell] = tick;
 	    PlayerPlaySound(playerid, 1149, 0.0, 0.0, 0.0);
-	    format(gstr, sizeof(gstr), ""nef" "yellow_e"%s(%i) sold the house %i for $%s!", __GetName(playerid), playerid, HouseInfo[i][iID], ToCurrency(floatround(HouseInfo[i][price] / 4)));
+	    format(gstr, sizeof(gstr), ""nef" "yellow_e"%s(%i) sold the house %i for $%s!", __GetName(playerid), playerid, HouseInfo[i][iID], number_format(floatround(HouseInfo[i][price] / 4)));
 	    SCMToAll(-1, gstr);
 	    break;
 	}
@@ -9837,7 +9856,7 @@ YCMD:bounties(playerid, params[], help)
 		if(IsPlayerAvail(i) && PlayerInfo[i][HitmanHit] > 0)
 		{
 			new string[100];
-			format(string, sizeof(string), "- Hit on %s(%i) for $%s", __GetName(i), i, ToCurrency(PlayerInfo[i][HitmanHit]));
+			format(string, sizeof(string), "- Hit on %s(%i) for $%s", __GetName(i), i, number_format(PlayerInfo[i][HitmanHit]));
 			SCM(playerid, GREY, string);
 			count++;
 		}
@@ -9951,23 +9970,23 @@ YCMD:hitman(playerid, params[], help)
 		    if(PlayerInfo[player][HitmanHit] == 0)
 		    {
 		        PlayerInfo[player][HitmanHit] += amount;
-				format(gstr, sizeof(gstr), ""nef" "YELLOW_E"%s(%i) has placed a bounty on %s(%i) for $%s get him!", __GetName(playerid), playerid, __GetName(player), player, ToCurrency(amount));
+				format(gstr, sizeof(gstr), ""nef" "YELLOW_E"%s(%i) has placed a bounty on %s(%i) for $%s get him!", __GetName(playerid), playerid, __GetName(player), player, number_format(amount));
 				SCMToAll(-1, gstr);
 
 				format(gstr, sizeof(gstr), ""nef" "YELLOW_E"%s(%i) has been last seen in '%s'", __GetName(player), player, zone);
 				SCMToAll(-1, gstr);
-				format(gstr, sizeof(gstr), "You've placed a bounty on %s(%i) for $%s", __GetName(player), player, ToCurrency(amount));
+				format(gstr, sizeof(gstr), "You've placed a bounty on %s(%i) for $%s", __GetName(player), player, number_format(amount));
 				SCM(playerid, YELLOW, gstr);
 		    }
 		    else if(PlayerInfo[player][HitmanHit] != 0)
 		    {
 		        PlayerInfo[player][HitmanHit] += amount;
-				format(gstr, sizeof(gstr), ""nef" "YELLOW_E"%s(%i) has placed another bounty on %s(%i) for $%s Total: "red"$%s", __GetName(playerid), playerid, __GetName(player), player, ToCurrency(amount), ToCurrency(PlayerInfo[player][HitmanHit]));
+				format(gstr, sizeof(gstr), ""nef" "YELLOW_E"%s(%i) has placed another bounty on %s(%i) for $%s Total: "red"$%s", __GetName(playerid), playerid, __GetName(player), player, number_format(amount), number_format(PlayerInfo[player][HitmanHit]));
 				SCMToAll(-1, gstr);
 
 				format(gstr, sizeof(gstr), ""nef" "YELLOW_E"%s(%i) has been last seen in '%s'", __GetName(player), player, zone);
 				SCMToAll(-1, gstr);
-				format(gstr, sizeof(gstr), "You've placed a bounty on %s(%i) for $%s", __GetName(player), player, ToCurrency(amount));
+				format(gstr, sizeof(gstr), "You've placed a bounty on %s(%i) for $%s", __GetName(player), player, number_format(amount));
 				SCM(playerid, YELLOW, gstr);
 		    }
 			PlayerInfo[playerid][tickLastHitman] = tick;
@@ -10086,14 +10105,14 @@ YCMD:setbcash(playerid, params[], help)
 		{
 			if(player != playerid)
 			{
-				format(gstr, sizeof(gstr), "Admin %s(%i) has set your bank cash to $%s.", __GetName(playerid), playerid, ToCurrency(amount));
+				format(gstr, sizeof(gstr), "Admin %s(%i) has set your bank cash to $%s.", __GetName(playerid), playerid, number_format(amount));
 				SCM(player, YELLOW, gstr);
-				format(gstr, sizeof(gstr), "You have set %s's bank cash to $%s.", __GetName(player), ToCurrency(amount));
+				format(gstr, sizeof(gstr), "You have set %s's bank cash to $%s.", __GetName(player), number_format(amount));
 				SCM(playerid, YELLOW, gstr);
 			}
 			else
 			{
-				format(gstr, sizeof(gstr), "You have set your bank cash to $%s.", ToCurrency(amount));
+				format(gstr, sizeof(gstr), "You have set your bank cash to $%s.", number_format(amount));
 				SCM(playerid, YELLOW, gstr);
 			}
 			
@@ -10211,14 +10230,14 @@ YCMD:setcash(playerid, params[], help)
 		{
 			if(player != playerid)
 			{
-				format(gstr, sizeof(gstr), "Admin %s(%i) has set your cash to $%s.", __GetName(playerid), playerid, ToCurrency(amount));
+				format(gstr, sizeof(gstr), "Admin %s(%i) has set your cash to $%s.", __GetName(playerid), playerid, number_format(amount));
 				SCM(player, YELLOW, gstr);
-				format(gstr, sizeof(gstr), "You have set %s's cash to $%s.", __GetName(player), ToCurrency(amount));
+				format(gstr, sizeof(gstr), "You have set %s's cash to $%s.", __GetName(player), number_format(amount));
 				SCM(playerid, YELLOW, gstr);
 			}
 			else
 			{
-				format(gstr, sizeof(gstr), "You have set your cash to $%s.", ToCurrency(amount));
+				format(gstr, sizeof(gstr), "You have set your cash to $%s.", number_format(amount));
 				SCM(playerid, YELLOW, gstr);
 			}
 			
@@ -10317,18 +10336,18 @@ YCMD:addcash(playerid, params[], help)
 		{
 			if(player != playerid)
 			{
-				format(gstr, sizeof(gstr), "Admin %s(%i) has given you $%s.", __GetName(playerid), playerid, ToCurrency(amount));
+				format(gstr, sizeof(gstr), "Admin %s(%i) has given you $%s.", __GetName(playerid), playerid, number_format(amount));
 				SCM(player, YELLOW, gstr);
-				format(gstr, sizeof(gstr), "You have given %s $%s.", __GetName(player), ToCurrency(amount));
+				format(gstr, sizeof(gstr), "You have given %s $%s.", __GetName(player), number_format(amount));
 				SCM(playerid, YELLOW, gstr);
 			}
 			else
 			{
-				format(gstr, sizeof(gstr), "You have given yourself $%s.", ToCurrency(amount));
+				format(gstr, sizeof(gstr), "You have given yourself $%s.", number_format(amount));
 				SCM(playerid, YELLOW, gstr);
 			}
 
-			format(gstr, sizeof(gstr), ""red"Adm: %s(%i) has been given $%s by %s(%i)", __GetName(player), player, ToCurrency(amount), __GetName(playerid), playerid);
+			format(gstr, sizeof(gstr), ""red"Adm: %s(%i) has been given $%s by %s(%i)", __GetName(player), player, number_format(amount), __GetName(playerid), playerid);
 			AdminMSG(-1, gstr);
 			print(gstr);
 
@@ -14264,7 +14283,7 @@ YCMD:sethouseprice(playerid, params[], help)
 
 	    HouseInfo[i][price] = hprice;
 
- 	   	format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseInfo[i][iID], ToCurrency(HouseInfo[i][price]), HouseInfo[i][E_score], HouseIntTypes[HouseInfo[i][interior]][intname]);
+ 	   	format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseInfo[i][iID], number_format(HouseInfo[i][price]), HouseInfo[i][E_score], HouseIntTypes[HouseInfo[i][interior]][intname]);
 	    UpdateDynamic3DTextLabelText(HouseInfo[i][label], -1, gstr);
 	    MySQL_SaveHouse(i);
 
@@ -14294,7 +14313,7 @@ YCMD:sethousescore(playerid, params[], help)
 
 	    HouseInfo[i][E_score] = hscore;
 
- 	   	format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseInfo[i][iID], ToCurrency(HouseInfo[i][price]), HouseInfo[i][E_score], HouseIntTypes[HouseInfo[i][interior]][intname]);
+ 	   	format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseInfo[i][iID], number_format(HouseInfo[i][price]), HouseInfo[i][E_score], HouseIntTypes[HouseInfo[i][interior]][intname]);
 	    UpdateDynamic3DTextLabelText(HouseInfo[i][label], -1, gstr);
 	    MySQL_SaveHouse(i);
 
@@ -14348,7 +14367,7 @@ YCMD:resethouse(playerid, params[], help)
         
 		MySQL_SaveHouse(i, true);
 
-	    format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseInfo[i][iID], ToCurrency(HouseInfo[i][price]), HouseInfo[i][E_score], HouseIntTypes[HouseInfo[i][interior]][intname]);
+	    format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseInfo[i][iID], number_format(HouseInfo[i][price]), HouseInfo[i][E_score], HouseIntTypes[HouseInfo[i][interior]][intname]);
 	    UpdateDynamic3DTextLabelText(HouseInfo[i][label], -1, gstr);
 	    DestroyDynamicMapIcon(HouseInfo[i][iconid]);
 	    DestroyDynamicPickup(HouseInfo[i][pickid]);
@@ -15110,7 +15129,7 @@ YCMD:richlist(playerid, params[], help)
 	{
 	    if(richlist[i][E_money] != -1)
 	    {
-		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Money: $%s\n", (GetColor__(richlist[i][E_playerid]) >>> 8), i + 1, __GetName(richlist[i][E_playerid]), richlist[i][E_playerid], ToCurrency(richlist[i][E_money]));
+		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Money: $%s\n", (GetColor__(richlist[i][E_playerid]) >>> 8), i + 1, __GetName(richlist[i][E_playerid]), richlist[i][E_playerid], number_format(richlist[i][E_money]));
 		    strcat(finstring, tmpstring);
 		}
 		else
@@ -15935,9 +15954,9 @@ YCMD:stats(playerid, params[], help)
         	PlayerInfo[player1][Deaths],
         	Float:PlayerInfo[player1][Kills] / Float:pDeaths,
         	GetPlayerScore_(player1),
-        	ToCurrency(GetPlayerCash(player1)),
-        	ToCurrency(PlayerInfo[player1][Bank]),
-			ToCurrency(PlayerInfo[player1][Credits]));
+        	number_format(GetPlayerCash(player1)),
+        	number_format(PlayerInfo[player1][Bank]),
+			number_format(PlayerInfo[player1][Credits]));
 
 		format(string2, sizeof(string2), ""white"Race wins: "LB_E"%i\n"white"Derby wins: "LB_E"%i\n"white"Reaction wins: "LB_E"%i\n"white"TDM wins: "LB_E"%i\n"white"Fallout wins: "LB_E"%i\n"white"Gungame wins: "LB_E"%i\n"white"Event wins: "LB_E"%i\n"white"Time until PayDay: "LB_E"%i minutes\n",
 	   		PlayerInfo[player1][RaceWins],
@@ -16336,7 +16355,7 @@ YCMD:answer(playerid, params[], help)
 		return true;
 	}
 
-	format(str, sizeof(str), ""RED_E"[MATHS] :: {%06x}%s(%i) "white"has correctly answered %s (answer: %i) winning 4 score and $%s!", GetColor__(playerid) >>> 8, __GetName(playerid), playerid, mathsCurrent, answer, ToCurrency(mathsAward));
+	format(str, sizeof(str), ""RED_E"[MATHS] :: {%06x}%s(%i) "white"has correctly answered %s (answer: %i) winning 4 score and $%s!", GetColor__(playerid) >>> 8, __GetName(playerid), playerid, mathsCurrent, answer, number_format(mathsAward));
 	SCMToAll(-1, str);
 
 	GivePlayerScore_(playerid, 4, true, true);
@@ -16386,7 +16405,7 @@ YCMD:cashfall(playerid, params[], help)
 			}
 		}
 
-		format(gstr, sizeof(gstr), "Admin %s(%i) has given all players $%s", __GetName(playerid), playerid, ToCurrency(money));
+		format(gstr, sizeof(gstr), "Admin %s(%i) has given all players $%s", __GetName(playerid), playerid, number_format(money));
 		SCMToAll(YELLOW, gstr);
 		print(gstr);
 	}
@@ -16604,10 +16623,10 @@ YCMD:givecash(playerid, params[], help)
 
       	GivePlayerCash(playerid, -cash);
       	GivePlayerCash(player, cash);
-        format(gstr, sizeof(gstr), "Info: %s(%i) paid you $%s reason: %s", __GetName(playerid), playerid, ToCurrency(cash), reason);
+        format(gstr, sizeof(gstr), "Info: %s(%i) paid you $%s reason: %s", __GetName(playerid), playerid, number_format(cash), reason);
         SCM(player, YELLOW, gstr);
         SCM(playerid, YELLOW, "Successfully paid the money!");
-		format(gstr, sizeof(gstr), ""red"Adm: %s(%i) paid $%s to %s reason: %s", __GetName(playerid), playerid, ToCurrency(cash), __GetName(player), reason);
+		format(gstr, sizeof(gstr), ""red"Adm: %s(%i) paid $%s to %s reason: %s", __GetName(playerid), playerid, number_format(cash), __GetName(player), reason);
 		AdminMSG(-1, gstr);
 		print(gstr);
     }
@@ -17472,7 +17491,7 @@ function:OnPlayerNameChangeRequest(newname[], playerid)
 
                     strmid(HouseInfo[i][Owner], newname, 0, 25, 25);
 
-				    format(query, sizeof(query), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", __GetName(playerid), HouseInfo[i][iID], ToCurrency(HouseInfo[i][price]), HouseInfo[i][E_score], HouseIntTypes[HouseInfo[i][interior]][intname]);
+				    format(query, sizeof(query), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", __GetName(playerid), HouseInfo[i][iID], number_format(HouseInfo[i][price]), HouseInfo[i][E_score], HouseIntTypes[HouseInfo[i][interior]][intname]);
 				    UpdateDynamic3DTextLabelText(HouseInfo[i][label], -1, query);
 				    MySQL_SaveHouse(i);
 				}
@@ -17758,7 +17777,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                     PropInfo[p_id][E_Level]++;
 
 					strcat(string, ""white"You have successfully upgraded your business's level!\n\nCurrent Business Level: ");
-                 	format(tmp, sizeof(tmp), "%i\nCurrent Business Earnings: $%s", PropInfo[p_id][E_Level], ToCurrency(GetPropEearnings(p_id)));
+                 	format(tmp, sizeof(tmp), "%i\nCurrent Business Earnings: $%s", PropInfo[p_id][E_Level], number_format(GetPropEearnings(p_id)));
                  	
                  	strcat(string, tmp);
                  	
@@ -17815,7 +17834,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				
 				PlayerInfo[playerid][AdditionalToySlots]++;
 				
-				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", ToCurrency(CreditsProductMatrix[0][E_item_credits]));
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[0][E_item_credits]));
 				ShowInfo(playerid, "Item purchased", gstr, 5000);
 				
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[0][E_item_credits]);
@@ -17841,7 +17860,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				PlayerInfo[playerid][AdditionalPVSlots]++;
 
-				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", ToCurrency(CreditsProductMatrix[1][E_item_credits]));
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[1][E_item_credits]));
 				ShowInfo(playerid, "Item purchased", gstr, 5000);
                 
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[1][E_item_credits]);
@@ -17867,7 +17886,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				PlayerInfo[playerid][AdditionalHouseSlots]++;
 
-				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", ToCurrency(CreditsProductMatrix[2][E_item_credits]));
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[2][E_item_credits]));
 				ShowInfo(playerid, "Item purchased", gstr, 5000);
                 
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[2][E_item_credits]);
@@ -17893,7 +17912,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				PlayerInfo[playerid][AdditionalHouseObjSlots]++;
 
-				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", ToCurrency(CreditsProductMatrix[3][E_item_credits]));
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[3][E_item_credits]));
 				ShowInfo(playerid, "Item purchased", gstr, 5000);
                 
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[3][E_item_credits]);
@@ -17919,7 +17938,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				PlayerInfo[playerid][AdditionalPropSlots]++;
 				
-				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", ToCurrency(CreditsProductMatrix[4][E_item_credits]));
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[4][E_item_credits]));
 				ShowInfo(playerid, "Item purchased", gstr, 5000);
                 
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[4][E_item_credits]);
@@ -17946,7 +17965,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				PlayerInfo[playerid][LastNameChange] = 0;
                 
-				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", ToCurrency(CreditsProductMatrix[5][E_item_credits]));
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[5][E_item_credits]));
 				ShowInfo(playerid, "Item purchased", gstr, 5000);
 
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[5][E_item_credits]);
@@ -17965,7 +17984,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				PlayerInfo[playerid][Medkits] += 20;
 
-				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", ToCurrency(CreditsProductMatrix[6][E_item_credits]));
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[6][E_item_credits]));
 				ShowInfo(playerid, "Item purchased", gstr, 5000);
                 
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[6][E_item_credits]);
@@ -17984,7 +18003,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				PlayerInfo[playerid][Medkits] += 100;
 
-				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", ToCurrency(CreditsProductMatrix[7][E_item_credits]));
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[7][E_item_credits]));
 				ShowInfo(playerid, "Item purchased", gstr, 5000);
                 
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[7][E_item_credits]);
@@ -18011,7 +18030,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				PlayerInfo[playerid][Boost] |= BOOST_MONEY_x2;
 
-				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", ToCurrency(CreditsProductMatrix[8][E_item_credits]));
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[8][E_item_credits]));
 				ShowInfo(playerid, "Item purchased", gstr, 5000);
                 
                 format(gstr, sizeof(gstr), "INSERT INTO `queue` VALUES (NULL, 2, UNIX_TIMESTAMP() + 86400, '%s');", __GetName(playerid));
@@ -18041,7 +18060,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				PlayerInfo[playerid][Boost] |= BOOST_MONEY_x3;
 
-				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", ToCurrency(CreditsProductMatrix[9][E_item_credits]));
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[9][E_item_credits]));
 				ShowInfo(playerid, "Item purchased", gstr, 5000);
 				
                 format(gstr, sizeof(gstr), "INSERT INTO `queue` VALUES (NULL, 3, UNIX_TIMESTAMP() + 86400, '%s');", __GetName(playerid));
@@ -18071,7 +18090,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				PlayerInfo[playerid][Boost] |= BOOST_SCORE_x2;
 
-				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", ToCurrency(CreditsProductMatrix[10][E_item_credits]));
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[10][E_item_credits]));
 				ShowInfo(playerid, "Item purchased", gstr, 5000);
                 
                 format(gstr, sizeof(gstr), "INSERT INTO `queue` VALUES (NULL, 4, UNIX_TIMESTAMP() + 86400, '%s');", __GetName(playerid));
@@ -18101,7 +18120,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				PlayerInfo[playerid][Boost] |= BOOST_SCORE_x3;
 
-				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", ToCurrency(CreditsProductMatrix[11][E_item_credits]));
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[11][E_item_credits]));
 				ShowInfo(playerid, "Item purchased", gstr, 5000);
                 
                 format(gstr, sizeof(gstr), "INSERT INTO `queue` VALUES (NULL, 5, UNIX_TIMESTAMP() + 86400, '%s');", __GetName(playerid));
@@ -18131,7 +18150,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				PlayerInfo[playerid][Boost] |= BOOST_MASTER;
 
-				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", ToCurrency(CreditsProductMatrix[12][E_item_credits]));
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[12][E_item_credits]));
 				ShowInfo(playerid, "Item purchased", gstr, 5000);
                 
                 format(gstr2, sizeof(gstr2), "INSERT INTO `queue` VALUES (NULL, 6, UNIX_TIMESTAMP() + 86400, '%s');", __GetName(playerid));
@@ -18154,7 +18173,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				PlayerInfo[playerid][Deaths] = 0;
 				PlayerInfo[playerid][Kills] = 0;
 
-				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", ToCurrency(CreditsProductMatrix[13][E_item_credits]));
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[13][E_item_credits]));
 				ShowInfo(playerid, "Item purchased", gstr, 5000);
 				SCM(playerid, NEF_YELLOW, "Your K/D has been reset!");
 				
@@ -19314,7 +19333,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        {
 				PlayerInfo[playerid][HouseIntSelected] = listitem;
 				new string[255];
-				format(string, sizeof(string), ""white"House Upgrade\n\n- Interior: %s\n- Price: $%s\n\nClick \"Upgrade\" in order to apply the new interior.\n"green"* "white"All House Items will be removed in this slot!", HouseIntTypes[listitem][intname], ToCurrency(HouseIntTypes[listitem][price]));
+				format(string, sizeof(string), ""white"House Upgrade\n\n- Interior: %s\n- Price: $%s\n\nClick \"Upgrade\" in order to apply the new interior.\n"green"* "white"All House Items will be removed in this slot!", HouseIntTypes[listitem][intname], number_format(HouseIntTypes[listitem][price]));
 				ShowPlayerDialog(playerid, HOUSE_UPGRADE_DIALOG + 1, DIALOG_STYLE_MSGBOX, ""nef" :: House Upgrade", string, "Upgrade", "Cancel");
 				return true;
 	        }
@@ -19368,7 +19387,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	       			SetPlayerPos(playerid, HouseInfo[h_id][E_x], HouseInfo[h_id][E_y], HouseInfo[h_id][E_z]);
 					ResetPlayerWorld(playerid);
 					gTeam[playerid] = FREEROAM;
-	      		    format(gstr, sizeof(gstr), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", __GetName(playerid), HouseInfo[h_id][iID], ToCurrency(HouseInfo[h_id][price]), HouseInfo[h_id][E_score], HouseIntTypes[PlayerInfo[playerid][HouseIntSelected]][intname]);
+	      		    format(gstr, sizeof(gstr), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", __GetName(playerid), HouseInfo[h_id][iID], number_format(HouseInfo[h_id][price]), HouseInfo[h_id][E_score], HouseIntTypes[PlayerInfo[playerid][HouseIntSelected]][intname]);
 	    			UpdateDynamic3DTextLabelText(HouseInfo[h_id][label], -1, gstr);
 	                MySQL_SaveHouse(h_id, true);
 	                MySQL_SavePlayer(playerid, false);
@@ -19609,17 +19628,17 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			    {
 				    case 0: // Deposit
 				    {
-				        format(string, sizeof(string), ""white"» You got "yellow"$%s"white" in your bank account.\n\nType in the amount you want to deposit below:", ToCurrency(PlayerInfo[playerid][Bank]));
+				        format(string, sizeof(string), ""white"» You got "yellow"$%s"white" in your bank account.\n\nType in the amount you want to deposit below:", number_format(PlayerInfo[playerid][Bank]));
 				        ShowPlayerDialog(playerid, BANK_DIALOG+1, DIALOG_STYLE_INPUT, ""nef" :: Bank > Deposit", string, "Deposit", "Cancel");
 				    }
 				    case 1: // Withdraw
 				    {
-				        format(string, sizeof(string), ""white"» You got "yellow"$%s"white" in your bank account.\n\nType in the amount you want to withdraw below:", ToCurrency(PlayerInfo[playerid][Bank]));
+				        format(string, sizeof(string), ""white"» You got "yellow"$%s"white" in your bank account.\n\nType in the amount you want to withdraw below:", number_format(PlayerInfo[playerid][Bank]));
 				        ShowPlayerDialog(playerid, BANK_DIALOG+2, DIALOG_STYLE_INPUT, ""nef" :: Bank > Withdraw", string, "Withdraw", "Cancel");
 				    }
 				    case 2: // Show Credit
 				    {
-				        format(string, sizeof(string), ""white"» You got "yellow"$%s"white" in your bank account.", ToCurrency(PlayerInfo[playerid][Bank]));
+				        format(string, sizeof(string), ""white"» You got "yellow"$%s"white" in your bank account.", number_format(PlayerInfo[playerid][Bank]));
 				        ShowPlayerDialog(playerid, 11231, DIALOG_STYLE_MSGBOX, ""nef" :: Bank > Balance", string, "OK", "");
 				    }
 			    }
@@ -19646,7 +19665,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					GivePlayerCash(playerid, -inamount);
 					PlayerInfo[playerid][Bank] += inamount;
-					format(string, sizeof(string), "» You have deposited {FF7800}$%s"white" into your bank account", ToCurrency(inamount));
+					format(string, sizeof(string), "» You have deposited {FF7800}$%s"white" into your bank account", number_format(inamount));
 					SCM(playerid, WHITE, string);
 				}
 				return true;
@@ -19672,7 +19691,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					GivePlayerCash(playerid, outamount);
 					PlayerInfo[playerid][Bank] -= outamount;
-					format(string, sizeof(string), "» You have withdrawn {FF7800}$%s"white" from your bank account", ToCurrency(outamount));
+					format(string, sizeof(string), "» You have withdrawn {FF7800}$%s"white" from your bank account", number_format(outamount));
 					SCM(playerid, WHITE, string);
 				}
 				return true;
@@ -20265,7 +20284,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
         	    {
         	        if(PVMatrix[i][pv_category] == listitem)
         	        {
-        	            format(tmp, sizeof(tmp), "%s "green"$%s\n", PVMatrix[i][pv_modelname], ToCurrency(PVMatrix[i][pv_price]));
+        	            format(tmp, sizeof(tmp), "%s "green"$%s\n", PVMatrix[i][pv_modelname], number_format(PVMatrix[i][pv_price]));
         	            strcat(string, tmp);
         	        }
         	    }
@@ -20908,7 +20927,7 @@ function:OnHouseLoadEx(index)
 		HouseInfo[index][sold] = cache_get_row_int(0, 8, g_SQL_handle);
 		HouseInfo[index][locked] = cache_get_row_int(0, 9, g_SQL_handle);
 
-		format(line, sizeof(line), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseInfo[index][iID], ToCurrency(HouseInfo[index][price]), HouseInfo[index][E_score], HouseIntTypes[HouseInfo[index][interior]][intname]);
+		format(line, sizeof(line), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseInfo[index][iID], number_format(HouseInfo[index][price]), HouseInfo[index][E_score], HouseIntTypes[HouseInfo[index][interior]][intname]);
 
 		HouseInfo[index][label] = CreateDynamic3DTextLabel(line, (HouseInfo[index][sold]) ? (0xFF0000FF) : (0x00FF00FF), HouseInfo[index][E_x], HouseInfo[index][E_y], floatadd(HouseInfo[index][E_z], 0.3), 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 30.0);
 		HouseInfo[index][pickid] = CreateDynamicPickup((HouseInfo[index][sold]) ? (1272) : (1273), 1, HouseInfo[index][E_x], HouseInfo[index][E_y], HouseInfo[index][E_z], -1, -1, -1, 30.0);
@@ -20945,11 +20964,11 @@ function:OnHouseLoad()
 
 			if(!HouseInfo[houseid][sold])
 			{
-			    format(line, sizeof(line), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseInfo[houseid][iID], ToCurrency(HouseInfo[houseid][price]), HouseInfo[houseid][E_score], HouseIntTypes[HouseInfo[houseid][interior]][intname]);
+			    format(line, sizeof(line), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseInfo[houseid][iID], number_format(HouseInfo[houseid][price]), HouseInfo[houseid][E_score], HouseIntTypes[HouseInfo[houseid][interior]][intname]);
 			}
 			else
 			{
-			    format(line, sizeof(line), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseInfo[houseid][Owner], HouseInfo[houseid][iID], ToCurrency(HouseInfo[houseid][price]), HouseInfo[houseid][E_score], HouseIntTypes[HouseInfo[houseid][interior]][intname]);
+			    format(line, sizeof(line), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseInfo[houseid][Owner], HouseInfo[houseid][iID], number_format(HouseInfo[houseid][price]), HouseInfo[houseid][E_score], HouseIntTypes[HouseInfo[houseid][interior]][intname]);
 
 				for(new ii = 0; ii < MAX_HOUSE_OBJECTS; ii++)
 				{
@@ -23419,7 +23438,7 @@ function:xReactionTest()
 	{
 		format(xChars, sizeof(xChars), "%s%s", xChars, xCharacters[random(sizeof(xCharacters))][0]);
 	}
-	format(gstr, sizeof(gstr), "["vlila"REACTION"white"]: The first who types '"vlila"%s"white"' wins $%s + %i score", xChars, ToCurrency(xCash), xScore);
+	format(gstr, sizeof(gstr), "["vlila"REACTION"white"]: The first who types '"vlila"%s"white"' wins $%s + %i score", xChars, number_format(xCash), xScore);
 	SCMToAll(WHITE, gstr);
 	tickReactionStart = GetTickCount() + 3600000;
 	KillTimer(tReactionTimer);
@@ -25889,7 +25908,7 @@ function:Derby()
 			    	
 			    	DerbyWinner[i] = false;
 			    	
-			    	format(string, sizeof(string), "%s won the Derby and earned "nef_yellow"$%s", __GetName(i), ToCurrency(money));
+			    	format(string, sizeof(string), "%s won the Derby and earned "nef_yellow"$%s", __GetName(i), number_format(money));
 					DerbyMSG(string);
 	   			}
 			    if(PlayerInfo[i][pDerbyCar] != -1)
@@ -26022,22 +26041,22 @@ function:QueueProcess()
 
 			GameTextForPlayer(i, "~g~~h~~h~PayDay~n~~w~Paycheck", 6000, 1);
 
-			format(string0, sizeof(string0), "Bank Balance before PayDay: "green"$%s", ToCurrency(PlayerInfo[i][Bank]));
-			format(string1, sizeof(string1), "Bank Interest Gained: "green"$%s", ToCurrency(interest));
+			format(string0, sizeof(string0), "Bank Balance before PayDay: "green"$%s", number_format(PlayerInfo[i][Bank]));
+			format(string1, sizeof(string1), "Bank Interest Gained: "green"$%s", number_format(interest));
 
 			if(PlayerInfo[i][VIP] == 1)
 			{
-	        	format(string4, sizeof(string4), "Bank Interest Gained "lb_e"(VIP BOOST)"white": "green"$%s", ToCurrency(vipinterest));
+	        	format(string4, sizeof(string4), "Bank Interest Gained "lb_e"(VIP BOOST)"white": "green"$%s", number_format(vipinterest));
 	        }
 	        else format(string4, sizeof(string4), "Bank Interest Gained "lb_e"(VIP BOOST)"white": "red"---");
 
 			if(PlayerInfo[i][Props] > 0)
 			{
 			    b_vipearnings = floatround(GetPlayerPropEearnings(i) / 2.5);
-			    format(string3, sizeof(string3), "Business earnings: "green"$%s", ToCurrency(GetPlayerPropEearnings(i)));
+			    format(string3, sizeof(string3), "Business earnings: "green"$%s", number_format(GetPlayerPropEearnings(i)));
 			   	if(PlayerInfo[i][VIP] == 1)
    				{
-			   		format(string5, sizeof(string5), "Business earnings "lb_e"(VIP BOOST)"white": "green"$%s", ToCurrency(b_vipearnings));
+			   		format(string5, sizeof(string5), "Business earnings "lb_e"(VIP BOOST)"white": "green"$%s", number_format(b_vipearnings));
 				}
 				else format(string5, sizeof(string5), "Business earnings "lb_e"(VIP BOOST)"white": "red"---");
 			}
@@ -26049,7 +26068,7 @@ function:QueueProcess()
 
 			PlayerInfo[i][Bank] = PlayerInfo[i][Bank] + interest + GetPlayerPropEearnings(i) + vipinterest + b_vipearnings;
 
-			format(string2, sizeof(string2), "Bank Balance after PayDay: "green"$%s", ToCurrency(PlayerInfo[i][Bank]));
+			format(string2, sizeof(string2), "Bank Balance after PayDay: "green"$%s", number_format(PlayerInfo[i][Bank]));
 
 			SCM(i, -1, ""green"|--------------------"yellow"PAY-DAY"green"-------------------|");
 			SCM(i, WHITE, string0);
@@ -26094,10 +26113,10 @@ function:OnQueueReceived()
 		            {
 						AlterPlayerCredits(playerid, credits);
 						
-						format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"You were given %sGC!", ToCurrency(credits));
+						format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"You were given %sGC!", number_format(credits));
 						SCM(playerid, -1, gstr2);
 
-						format(gstr2, sizeof(gstr2), "~r~~h~~h~You were given ~b~~h~~h~%sGC ~r~~h~~h~!", ToCurrency(credits));
+						format(gstr2, sizeof(gstr2), "~r~~h~~h~You were given ~b~~h~~h~%sGC ~r~~h~~h~!", number_format(credits));
 						InfoTD_MSG(playerid, 10000, gstr2);
 						MySQL_SavePlayer(playerid, true);
 		            }
@@ -26109,9 +26128,9 @@ function:OnQueueReceived()
 						mysql_tquery(g_SQL_handle, gstr2, "", "");
 		            }
 		            
-					format(gstr, sizeof(gstr), "~p~%s received %s credits for donating %s!", name, ToCurrency(credits), payment);
+					format(gstr, sizeof(gstr), "~p~%s received %s credits for donating %s!", name, number_format(credits), payment);
                     GameTextForAll(gstr, 10000, 3);
-                    format(gstr, sizeof(gstr), "%s received %s credits for donating %s!", name, ToCurrency(credits), payment);
+                    format(gstr, sizeof(gstr), "%s received %s credits for donating %s!", name, number_format(credits), payment);
                     SCMToAll(ORANGE, gstr);
 		        }
 		        case 2..6: // alter boost
@@ -26303,7 +26322,7 @@ function:ProcessTick()
 							PlayerInfo[i][SpecID],
 							hp,
 							ar,
-							ToCurrency((GetPlayerCash(PlayerInfo[i][SpecID]) + PlayerInfo[PlayerInfo[i][SpecID]][Bank])),
+							number_format((GetPlayerCash(PlayerInfo[i][SpecID]) + PlayerInfo[PlayerInfo[i][SpecID]][Bank])),
 							PlayerInfo[PlayerInfo[i][SpecID]][bGod] ? ("Yes") : ("No"));
 							
 						GameTextForPlayer(i, gstr, 30000, 3);
@@ -27732,7 +27751,7 @@ GivePlayerCash(playerid, amount, bool:populate = true, bool:boost = false)
     if(amount < 0)
     {
         PlayerInfo[playerid][Money] += amount;
-        format(gstr, sizeof(gstr), "~r~~h~~h~-$%s", ToCurrency(amount * -1));
+        format(gstr, sizeof(gstr), "~r~~h~~h~-$%s", number_format(amount * -1));
 	}
 	else
 	{
@@ -27741,23 +27760,23 @@ GivePlayerCash(playerid, amount, bool:populate = true, bool:boost = false)
 			if(PlayerInfo[playerid][Boost] & BOOST_MONEY_x2)
 			{
 			    PlayerInfo[playerid][Money] += amount * 2;
-			    format(gstr, sizeof(gstr), "~g~~h~~h~+$%s (x2 Boost)", ToCurrency(amount * 2));
+			    format(gstr, sizeof(gstr), "~g~~h~~h~+$%s (x2 Boost)", number_format(amount * 2));
 			}
 			else if(PlayerInfo[playerid][Boost] & BOOST_MONEY_x3 || PlayerInfo[playerid][Boost] & BOOST_MASTER)
 			{
 			    PlayerInfo[playerid][Money] += amount * 3;
-			    format(gstr, sizeof(gstr), "~g~~h~~h~+$%s (x3 Boost)", ToCurrency(amount * 3));
+			    format(gstr, sizeof(gstr), "~g~~h~~h~+$%s (x3 Boost)", number_format(amount * 3));
 			}
 			else
 			{
 		    	PlayerInfo[playerid][Money] += amount;
-		    	format(gstr, sizeof(gstr), "~g~~h~~h~+$%s (No Boost)", ToCurrency(amount));
+		    	format(gstr, sizeof(gstr), "~g~~h~~h~+$%s (No Boost)", number_format(amount));
 			}
 		}
 		else
 		{
 		    PlayerInfo[playerid][Money] += amount;
-		    format(gstr, sizeof(gstr), "~g~~h~~h~+$%s", ToCurrency(amount));
+		    format(gstr, sizeof(gstr), "~g~~h~~h~+$%s", number_format(amount));
 		}
 	}
 	
@@ -27793,23 +27812,23 @@ GivePlayerScore_(playerid, amount, bool:populate = true, bool:boost = false)
 			if(PlayerInfo[playerid][Boost] & BOOST_SCORE_x2)
 			{
 			    PlayerInfo[playerid][Score] += amount * 2;
-			    format(gstr, sizeof(gstr), "~y~~h~+%s Score (x2 Boost)", ToCurrency(amount * 2));
+			    format(gstr, sizeof(gstr), "~y~~h~+%s Score (x2 Boost)", number_format(amount * 2));
 			}
 			else if(PlayerInfo[playerid][Boost] & BOOST_SCORE_x3 || PlayerInfo[playerid][Boost] & BOOST_MASTER)
 			{
 			    PlayerInfo[playerid][Score] += amount * 3;
-			    format(gstr, sizeof(gstr), "~y~~h~+%s Score (x3 Boost)", ToCurrency(amount * 3));
+			    format(gstr, sizeof(gstr), "~y~~h~+%s Score (x3 Boost)", number_format(amount * 3));
 			}
 			else
 			{
 			    PlayerInfo[playerid][Score] += amount;
-			    format(gstr, sizeof(gstr), "~y~~h~+%s Score (No Boost)", ToCurrency(amount));
+			    format(gstr, sizeof(gstr), "~y~~h~+%s Score (No Boost)", number_format(amount));
 			}
 		}
 		else
 		{
 		    PlayerInfo[playerid][Score] += amount;
-		    format(gstr, sizeof(gstr), "~y~~h~+%s Score", ToCurrency(amount));
+		    format(gstr, sizeof(gstr), "~y~~h~+%s Score", number_format(amount));
 		}
 	}
 
@@ -28233,16 +28252,16 @@ function:ShowDialog(playerid, dialogid)
 			    
 			    if(PropInfo[p_id][E_Level] >= MAX_PROP_LEVEL)
 			    {
-				    format(tmp, sizeof(tmp), "%i\nCurrent Business Earnings: $%s\n\nThis business reached its max. level!", PropInfo[p_id][E_Level], ToCurrency(GetPropEearnings(p_id)));
+				    format(tmp, sizeof(tmp), "%i\nCurrent Business Earnings: $%s\n\nThis business reached its max. level!", PropInfo[p_id][E_Level], number_format(GetPropEearnings(p_id)));
 					strcat(string, tmp);
 			    }
 			    else
 			    {
 				    format(tmp, sizeof(tmp), "%i\nCurrent Business Earnings: $%s\nEarnings in next level: $%s\n\nUpgrade now for "yellow_e"$%s"white"!",
 						PropInfo[p_id][E_Level],
-						ToCurrency(GetPropEearnings(p_id)),
-						ToCurrency(BLevelMatrix[PropInfo[p_id][E_Level]][E_bearnings]),
-						ToCurrency(BLevelMatrix[PropInfo[p_id][E_Level]][E_bupradecoast]));
+						number_format(GetPropEearnings(p_id)),
+						number_format(BLevelMatrix[PropInfo[p_id][E_Level]][E_bearnings]),
+						number_format(BLevelMatrix[PropInfo[p_id][E_Level]][E_bupradecoast]));
 					strcat(string, tmp);
 				}
 			}
@@ -28904,7 +28923,7 @@ UnixTimeToDate(unixtime)
 	return u_date;
 }
 
-ToCurrency(CCash)
+number_format(CCash)
 {
     new szStr[16];
     format(szStr, sizeof(szStr), "%i", CCash);
@@ -29287,7 +29306,7 @@ function:Maths()
 		}
 	}
 	format(mathsCurrent, sizeof(mathsCurrent), "%i%s%i%s%i", NR1, FOP1, NR2, FOP2, NR3);
-	format(str, sizeof(str), ""RED_E"[MATHS] "white"Calculate %s and write /answer <answer> "YELLOW_E"(Score: 4 | Money: $%s)", mathsCurrent, ToCurrency(mathsAward));
+	format(str, sizeof(str), ""RED_E"[MATHS] "white"Calculate %s and write /answer <answer> "YELLOW_E"(Score: 4 | Money: $%s)", mathsCurrent, number_format(mathsAward));
 	SCMToAll(-1, str);
 	return 1;
 }
@@ -29437,7 +29456,7 @@ function:DoLotto()
 	lotto_jackpot = 200000 + random(100000);
 	lotto_active = true;
 
-	format(gstr, sizeof(gstr), "~g~~h~~<~ Lottery Information ~>~~n~~w~Buy a lotto in any 24/7 shop (/247) inside use /lotto <1-75>~n~~r~~h~Jackpot: $%s - Draw starts in 5 minutes!", ToCurrency(lotto_jackpot));
+	format(gstr, sizeof(gstr), "~g~~h~~<~ Lottery Information ~>~~n~~w~Buy a lotto in any 24/7 shop (/247) inside use /lotto <1-75>~n~~r~~h~Jackpot: $%s - Draw starts in 5 minutes!", number_format(lotto_jackpot));
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -29454,7 +29473,7 @@ function:LottoDraw()
     lotto_active = false;
 
 	new string[255];
-	format(string, sizeof(string), "~g~~h~~<~ Lottery Information ~>~~n~~w~Numbers have been drawn. Current jackpot is: $%s - Drawn number: %i~n~~b~~h~~h~", ToCurrency(lotto_jackpot), lotto_number);
+	format(string, sizeof(string), "~g~~h~~<~ Lottery Information ~>~~n~~w~Numbers have been drawn. Current jackpot is: $%s - Drawn number: %i~n~~b~~h~~h~", number_format(lotto_jackpot), lotto_number);
 	
 	new bool:found = false;
 	for(new i = 0; i < MAX_PLAYERS; i++)
@@ -29463,12 +29482,12 @@ function:LottoDraw()
 	    if(PlayerInfo[i][DrawnNumber] == lotto_number)
 	    {
 			new str[128];
-			format(str, sizeof(str), "We have a winner! %s(%i) has lotto %i and won the jackpot!", __GetName(i), i, lotto_number, ToCurrency(lotto_jackpot));
+			format(str, sizeof(str), "We have a winner! %s(%i) has lotto %i and won the jackpot!", __GetName(i), i, lotto_number, number_format(lotto_jackpot));
 	        strcat(string, str);
 	        GivePlayerCash(i, lotto_jackpot, true, true);
 	        PlayerPlaySound(i, 5448, 0, 0, 0);
 	        ShowInfo(i, "~g~~h~~h~You won the lotto jackpot!", "", 4000);
-	 		format(str, sizeof(str), "5%s(%i)3 won the lottery! Prize: $%s", __GetName(i), i, ToCurrency(lotto_jackpot));
+	 		format(str, sizeof(str), "5%s(%i)3 won the lottery! Prize: $%s", __GetName(i), i, number_format(lotto_jackpot));
 	        IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, str);
 	        found = true;
 	        break;
@@ -30155,7 +30174,7 @@ GetItem(index)
 	new string[2048], tmp[300];
 	format(string, sizeof(string), ""green"* "white"Item: %s\n"green"* "white"Gold Credits: "white"%sGC\n"green"* "white"Quantity: "white"%i\n"green"* "white"Duration: "white"%s\n",
 		CreditsProductMatrix[index][E_item_name],
-		ToCurrency(CreditsProductMatrix[index][E_item_credits]),
+		number_format(CreditsProductMatrix[index][E_item_credits]),
         CreditsProductMatrix[index][E_item_quantity],
         CreditsProductMatrix[index][E_item_duration]);
 	
