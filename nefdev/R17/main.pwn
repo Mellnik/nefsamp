@@ -22,6 +22,7 @@
 // sscanf.so | 2.8.1
 // streamer.so | R84
 // mysql_static.so | R34
+// crashdetect.so | v4.13
 // irc.so | 1.4.3
 // dns.so | 2.4
 
@@ -31,6 +32,7 @@
 #include <a_samp>   		// 0.3x-R2
 #undef MAX_PLAYERS
 #define MAX_PLAYERS (405)
+#include <crashdetect>      // v4.13
 #include <YSI\y_iterate>	// 04/01/2014
 #include <YSI\y_commands>   // 04/01/2014
 #include <YSI\y_master>     // 04/01/2014
@@ -788,7 +790,7 @@ enum e_player_data
 	DuelWeapon,
 	DuelLocation,
 	DuelRequest,
-    DuelRequestReceived
+    DuelRequestRecv
 };
 enum e_player_ach_data
 {
@@ -3215,14 +3217,14 @@ public OnPlayerDisconnect(playerid, reason)
 		    {
 		        if(PlayerInfo[playerid][DuelRequest] == INVALID_PLAYER_ID)
 		        {
-		            format(gstr, sizeof(gstr), ">> Duel cancelled between %s and %s. Reason: Disconnect", __GetName(PlayerInfo[playerid][DuelRequestReceived]), __GetName(playerid));
+		            format(gstr, sizeof(gstr), ">> Duel cancelled between %s and %s. Reason: Disconnect", __GetName(PlayerInfo[playerid][DuelRequestRecv]), __GetName(playerid));
 		            SCMToAll(NEF_RED, gstr);
 
-					gTeam[PlayerInfo[playerid][DuelRequestReceived]] = FREEROAM;
-					RandomSpawn(PlayerInfo[playerid][DuelRequestReceived]);
+					gTeam[PlayerInfo[playerid][DuelRequestRecv]] = FREEROAM;
+					RandomSpawn(PlayerInfo[playerid][DuelRequestRecv]);
 
-					PlayerInfo[PlayerInfo[playerid][DuelRequestReceived]][DuelRequest] = INVALID_PLAYER_ID;
-					PlayerInfo[playerid][DuelRequestReceived] = INVALID_PLAYER_ID;
+					PlayerInfo[PlayerInfo[playerid][DuelRequestRecv]][DuelRequest] = INVALID_PLAYER_ID;
+					PlayerInfo[playerid][DuelRequestRecv] = INVALID_PLAYER_ID;
 		        }
 		        else if(PlayerInfo[playerid][DuelRequest] != INVALID_PLAYER_ID)
 		        {
@@ -3232,7 +3234,7 @@ public OnPlayerDisconnect(playerid, reason)
 					gTeam[PlayerInfo[playerid][DuelRequest]] = FREEROAM;
 					RandomSpawn(PlayerInfo[playerid][DuelRequest]);
 
-					PlayerInfo[PlayerInfo[playerid][DuelRequest]][DuelRequestReceived] = INVALID_PLAYER_ID;
+					PlayerInfo[PlayerInfo[playerid][DuelRequest]][DuelRequestRecv] = INVALID_PLAYER_ID;
 					PlayerInfo[playerid][DuelRequest] = INVALID_PLAYER_ID;
 		        }
 		    }
@@ -5095,18 +5097,18 @@ public OnPlayerDeath(playerid, killerid, reason)
 	    {
 	        if(PlayerInfo[playerid][DuelRequest] == INVALID_PLAYER_ID) // Sender won
 	        {
-	            format(gstr, sizeof(gstr), ">> DUEL: %s won the duel against %s!", __GetName(PlayerInfo[playerid][DuelRequestReceived]), __GetName(playerid));
+	            format(gstr, sizeof(gstr), ">> DUEL: %s won the duel against %s!", __GetName(PlayerInfo[playerid][DuelRequestRecv]), __GetName(playerid));
 	            SCMToAll(NEF_RED, gstr);
 	        
-				gTeam[PlayerInfo[playerid][DuelRequestReceived]] = FREEROAM;
+				gTeam[PlayerInfo[playerid][DuelRequestRecv]] = FREEROAM;
 				gTeam[playerid] = FREEROAM;
-				ResetPlayerWorld(PlayerInfo[playerid][DuelRequestReceived]);
-				RandomSpawn(PlayerInfo[playerid][DuelRequestReceived]);
-	            ResetPlayerWeapons(PlayerInfo[playerid][DuelRequestReceived]);
-	            RandomWeapons(PlayerInfo[playerid][DuelRequestReceived]);
+				ResetPlayerWorld(PlayerInfo[playerid][DuelRequestRecv]);
+				RandomSpawn(PlayerInfo[playerid][DuelRequestRecv]);
+	            ResetPlayerWeapons(PlayerInfo[playerid][DuelRequestRecv]);
+	            RandomWeapons(PlayerInfo[playerid][DuelRequestRecv]);
 				
-				PlayerInfo[PlayerInfo[playerid][DuelRequestReceived]][DuelRequest] = INVALID_PLAYER_ID;
-				PlayerInfo[playerid][DuelRequestReceived] = INVALID_PLAYER_ID;
+				PlayerInfo[PlayerInfo[playerid][DuelRequestRecv]][DuelRequest] = INVALID_PLAYER_ID;
+				PlayerInfo[playerid][DuelRequestRecv] = INVALID_PLAYER_ID;
 	        }
 	        else if(PlayerInfo[playerid][DuelRequest] != INVALID_PLAYER_ID) // Receiver lost
 	        {
@@ -5120,7 +5122,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 	            ResetPlayerWeapons(PlayerInfo[playerid][DuelRequest]);
 	            RandomWeapons(PlayerInfo[playerid][DuelRequest]);
 
-				PlayerInfo[PlayerInfo[playerid][DuelRequest]][DuelRequestReceived] = INVALID_PLAYER_ID;
+				PlayerInfo[PlayerInfo[playerid][DuelRequest]][DuelRequestRecv] = INVALID_PLAYER_ID;
 				PlayerInfo[playerid][DuelRequest] = INVALID_PLAYER_ID;
 	        }
 	        else
@@ -9409,54 +9411,57 @@ YCMD:duel(playerid, params[], help)
     new player;
     if(sscanf(params, "r", player))
     {
-        // Accept duel invite
-        if(PlayerInfo[playerid][DuelRequestReceived] == INVALID_PLAYER_ID)
+        if(PlayerInfo[playerid][DuelRequestRecv] == INVALID_PLAYER_ID) // Accept duel invite
         {
 			return SCM(playerid, NEF_GREEN, "Usage: /duel <playerid>");
         }
         else
         {
-            if(PlayerInfo[playerid][DuelRequestReceived] == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Player is not available");
-            if(!IsPlayerAvail(PlayerInfo[playerid][DuelRequestReceived])) return SCM(playerid, -1, ""er"Player is not available");
-            if(gTeam[PlayerInfo[playerid][DuelRequestReceived]] != FREEROAM) return SCM(playerid, -1, ""er"Player is not in normal world");
-            if(IsPlayerOnDesktop(PlayerInfo[playerid][DuelRequestReceived], 1500)) return SCM(playerid, -1, ""er"Player is on desktop");
-            if(PlayerInfo[PlayerInfo[playerid][DuelRequestReceived]][DuelRequest] != playerid) return SCM(playerid, -1, ""er"Error: Players do not match");
+            if(PlayerInfo[playerid][DuelRequestRecv] == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Player is not available");
+            if(!IsPlayerAvail(PlayerInfo[playerid][DuelRequestRecv])) return SCM(playerid, -1, ""er"Player is not available");
+            if(gTeam[PlayerInfo[playerid][DuelRequestRecv]] != FREEROAM) return SCM(playerid, -1, ""er"Player is not in normal world");
+            if(IsPlayerOnDesktop(PlayerInfo[playerid][DuelRequestRecv], 1500)) return SCM(playerid, -1, ""er"Player is on desktop");
+            if(PlayerInfo[PlayerInfo[playerid][DuelRequestRecv]][DuelRequest] != playerid) return SCM(playerid, -1, ""er"Error: Players do not match");
 
 			SavePos(playerid);
-			SavePos(PlayerInfo[playerid][DuelRequestReceived]);
+			SavePos(PlayerInfo[playerid][DuelRequestRecv]);
 			
 			CheckPlayerGod(playerid);
-			CheckPlayerGod(PlayerInfo[playerid][DuelRequestReceived]);
+			CheckPlayerGod(PlayerInfo[playerid][DuelRequestRecv]);
 
-            SetPlayerPos(playerid, DuelMaps[PlayerInfo[PlayerInfo[playerid][DuelRequestReceived]][DuelLocation] - 1][0][0], DuelMaps[PlayerInfo[PlayerInfo[playerid][DuelRequestReceived]][DuelLocation] - 1][0][1], DuelMaps[PlayerInfo[PlayerInfo[playerid][DuelRequestReceived]][DuelLocation] - 1][0][2]);
-            SetPlayerPos(PlayerInfo[playerid][DuelRequestReceived], DuelMaps[PlayerInfo[PlayerInfo[playerid][DuelRequestReceived]][DuelLocation] - 1][1][0], DuelMaps[PlayerInfo[PlayerInfo[playerid][DuelRequestReceived]][DuelLocation] - 1][1][1], DuelMaps[PlayerInfo[PlayerInfo[playerid][DuelRequestReceived]][DuelLocation] - 1][1][2]);
+            SetPlayerPos(playerid, DuelMaps[PlayerInfo[PlayerInfo[playerid][DuelRequestRecv]][DuelLocation] - 1][0][0], DuelMaps[PlayerInfo[PlayerInfo[playerid][DuelRequestRecv]][DuelLocation] - 1][0][1], DuelMaps[PlayerInfo[PlayerInfo[playerid][DuelRequestRecv]][DuelLocation] - 1][0][2]);
+            SetPlayerPos(PlayerInfo[playerid][DuelRequestRecv], DuelMaps[PlayerInfo[PlayerInfo[playerid][DuelRequestRecv]][DuelLocation] - 1][1][0], DuelMaps[PlayerInfo[PlayerInfo[playerid][DuelRequestRecv]][DuelLocation] - 1][1][1], DuelMaps[PlayerInfo[PlayerInfo[playerid][DuelRequestRecv]][DuelLocation] - 1][1][2]);
             
             ResetPlayerWeapons(playerid);
-            ResetPlayerWeapons(PlayerInfo[playerid][DuelRequestReceived]);
+            ResetPlayerWeapons(PlayerInfo[playerid][DuelRequestRecv]);
             
-            GivePlayerWeapon(playerid, PlayerInfo[PlayerInfo[playerid][DuelRequestReceived]][DuelWeapon], 700000);
-            GivePlayerWeapon(PlayerInfo[playerid][DuelRequestReceived], PlayerInfo[PlayerInfo[playerid][DuelRequestReceived]][DuelWeapon], 700000);
+            GivePlayerWeapon(playerid, PlayerInfo[PlayerInfo[playerid][DuelRequestRecv]][DuelWeapon], 700000);
+            GivePlayerWeapon(PlayerInfo[playerid][DuelRequestRecv], PlayerInfo[PlayerInfo[playerid][DuelRequestRecv]][DuelWeapon], 700000);
             
             SetPlayerVirtualWorld(playerid, playerid + 10000);
-            SetPlayerVirtualWorld(PlayerInfo[playerid][DuelRequestReceived], playerid + 10000);
+            SetPlayerVirtualWorld(PlayerInfo[playerid][DuelRequestRecv], playerid + 10000);
             
             gTeam[playerid] = gDUEL;
-            gTeam[PlayerInfo[playerid][DuelRequestReceived]] = gDUEL;
+            gTeam[PlayerInfo[playerid][DuelRequestRecv]] = gDUEL;
             
-            format(gstr, sizeof(gstr), ">> Duel started between %s and %s!", __GetName(PlayerInfo[playerid][DuelRequestReceived]), __GetName(playerid));
+            format(gstr, sizeof(gstr), ">> Duel started between %s and %s!", __GetName(PlayerInfo[playerid][DuelRequestRecv]), __GetName(playerid));
             SCMToAll(NEF_RED, gstr);
         }
     }
     else
     {
         // Begin duel request
-        if(PlayerInfo[playerid][DuelRequest] != INVALID_PLAYER_ID)
+        for(new i = 0; i < MAX_PLAYERS; i++)
         {
-        	format(gstr, sizeof(gstr), ">> %s(%i) cancelled the duel request!", __GetName(playerid), playerid);
-        	SCM(PlayerInfo[playerid][DuelRequest], NEF_RED, gstr);
-        	
-        	PlayerInfo[PlayerInfo[playerid][DuelRequest]][DuelRequestReceived] = INVALID_PLAYER_ID;
-		}
+			if(PlayerInfo[i][DuelRequestRecv] == playerid)
+			{
+	        	format(gstr, sizeof(gstr), ">> %s(%i) cancelled the duel request!", __GetName(playerid), playerid);
+	        	SCM(i, NEF_RED, gstr);
+	        	
+	        	PlayerInfo[i][DuelRequestRecv] = INVALID_PLAYER_ID;
+			}
+        }
+        
 		PlayerInfo[playerid][DuelRequest] = player;
 		ShowDialog(playerid, DIALOG_DUEL);
     }
@@ -14130,7 +14135,7 @@ YCMD:race(playerid, params[], help)
     {
 		if(Iter_Contains(RaceJoins, playerid))
 		{
-			SCM(playerid, -1, ""er"You already joined this race round!");
+			SCM(playerid, -1, ""er"Please wait for the next race, you already joined this race round once!");
 		}
 		else
 		{
@@ -17542,7 +17547,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	            if(IsPlayerOnDesktop(PlayerInfo[playerid][DuelRequest])) return SCM(playerid, -1, ""er"Player is on desktop");
 	            if(playerid == PlayerInfo[playerid][DuelRequest]) return SCM(playerid, -1, ""er"You can't duel yourself");
 	            
-	            PlayerInfo[PlayerInfo[playerid][DuelRequest]][DuelRequestReceived] = playerid;
+	            PlayerInfo[PlayerInfo[playerid][DuelRequest]][DuelRequestRecv] = playerid;
 	            
 	            new tmp[50];
 	            GetWeaponName(PlayerInfo[playerid][DuelWeapon], tmp, sizeof(tmp));
@@ -31104,5 +31109,5 @@ ResetPlayerModules(playerid)
 	PlayerInfo[playerid][DuelWeapon] = 0;
 	PlayerInfo[playerid][DuelLocation] = 0;
 	PlayerInfo[playerid][DuelRequest] = INVALID_PLAYER_ID;
-	PlayerInfo[playerid][DuelRequestReceived] = INVALID_PLAYER_ID;
+	PlayerInfo[playerid][DuelRequestRecv] = INVALID_PLAYER_ID;
 }
