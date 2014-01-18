@@ -2073,11 +2073,15 @@ new Float:BG_M6_T2_Spawns[4][4] =
 	{2034.2903, 4009.7451, 76.5134, 90.0},
 	{2056.8708, 3975.7813, 84.1782, 90.0}
 };
-new Float:DuelMaps[1][2][4] =
+new Float:DuelMaps[2][2][4] =
 {
 	{
 		{1144.1377, 1529.8433, 52.4003, 87.1090},
 		{1049.4922, 1529.3169, 52.4077, 271.6640}
+	},
+	{
+		{-2220.6504, 640.9958, 49.4492, 270.8222},
+		{-2176.0908, 641.5275, 49.4375, 89.4239}
 	}
 };
 new Float:WorldSpawns[3][4] =
@@ -7529,12 +7533,12 @@ YCMD:et(playerid, params[], help)
 }
 YCMD:lv(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid,2039.8860,1546.1112,10.4450,180.4970,2039.8860,1546.1112,10.4450,180.4970, "Las Ventuars", "lv");
+    PortPlayerMapVeh(playerid,2039.8860,1546.1112,10.4450,180.4970,2039.8860,1546.1112,10.4450,180.4970, "Las Venturas", "lv");
     return 1;
 }
 YCMD:lva(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid,1320.6082,1268.7208,13.5903,2.6780,1338.3005,1275.2460,11.8100,358.8224, "Las Ventuars Airport", "lva");
+    PortPlayerMapVeh(playerid,1320.6082,1268.7208,13.5903,2.6780,1338.3005,1275.2460,11.8100,358.8224, "Las Venturas Airport", "lva");
     return 1;
 }
 YCMD:bs(playerid, params[], help)
@@ -10405,7 +10409,7 @@ YCMD:setscore(playerid, params[], help)
 				SCM(playerid, YELLOW, gstr);
 			}
 			
-			format(gstr, sizeof(gstr), ""red"Adm: %s(%i) has been given %i Score by %s(%i)", __GetName(player), player, amount, __GetName(playerid), playerid);
+			format(gstr, sizeof(gstr), ""red"Adm: %s(%i) has set %s(%i) score to %i", __GetName(playerid), playerid, __GetName(playerid), playerid, amount);
 			AdminMSG(-1, gstr);
 			print(gstr);
 			
@@ -14756,10 +14760,10 @@ YCMD:createstore(playerid, params[], help)
 				}
 			}
 	    }
-	    new lstring[128];
-	    format(lstring, sizeof(lstring), ""white"["yellow"Store"white"]\n%s", labeltext);
-		CreateDynamic3DTextLabel(lstring, YELLOW, POS[0], POS[1], floatadd(POS[2], 0.7), 25.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 25.0);
-		dini_Set(file, "StoreName", labeltext);
+
+	    format(gstr, sizeof(gstr), ""white"["yellow"Store"white"]\n%s", labeltext);
+		CreateDynamic3DTextLabel(gstr, YELLOW, POS[0], POS[1], floatadd(POS[2], 0.7), 25.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 25.0);
+		dini_Set(file, "StoreName", gstr);
 		dini_FloatSet(file, "PickOutX", POS[0]);
 		dini_FloatSet(file, "PickOutY", POS[1]);
 		dini_FloatSet(file, "PickOutZ", POS[2]);
@@ -14780,7 +14784,7 @@ YCMD:rules(playerid, params[], help)
 
 	strcat(rules, ""white"- No cheating of any kind\n- Do not ask others to gift you money\n- No mods that affect other player's gameplay\n- No insults\n- No advertising of any kind\n- No (command)spamming\n");
 	strcat(rules, "- No abusing bugs/glitches/commands\n- Do not share your account\n- No AFK in minigames\n- Do not ask for an unban ingame\n- Do not ask for an admin level/free VIP\n- Do not use Vortex to driveby players\n- Do not driveby at Hotspots/Spawnareas");
-	strcat(rules, "\n- No score/money farming\n- Do not use joypad\n- No impersonating\n\nNever give your password to anyone!");
+	strcat(rules, "\n- No score/money farming\n- Do not use joypad\n- No impersonating\n\nNever tell your password to anyone!");
 
     ShowPlayerDialog(playerid, RULES_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" :: Rules", rules, "OK", "");
 	return 1;
@@ -21638,21 +21642,20 @@ function:BattleGround()
     BGTeam1Players = 0;
     BGTeam2Players = 0;
 
-	new string[128],
-		money;
+	new money;
 
 	if(BGTeam1Kills == BGTeam2Kills)
 	{
-	    format(string, sizeof(string), "Standoff! Rangers kills: %i Spetsnaz kills: %i", BGTeam1Kills, BGTeam2Kills);
-		BGMSG(string);
+	    format(gstr, sizeof(gstr), "Standoff! Rangers kills: %i Spetsnaz kills: %i", BGTeam1Kills, BGTeam2Kills);
+		BGMSG(gstr);
 		BGMSG("New Voting starting!");
 		BGTeam1Kills = 0;
 		BGTeam2Kills = 0;
 	}
 	else if(BGTeam1Kills > BGTeam2Kills)
 	{
-	    format(string, sizeof(string), "Rangers won! Rangers kills: %i Spetsnaz kills: %i", BGTeam1Kills, BGTeam2Kills);
-		BGMSG(string);
+	    format(gstr, sizeof(gstr), "Rangers won! Rangers kills: %i Spetsnaz kills: %i", BGTeam1Kills, BGTeam2Kills);
+		BGMSG(gstr);
 		BGMSG("New Voting starting!");
 		BGTeam1Kills = 0;
 		BGTeam2Kills = 0;
@@ -21664,15 +21667,15 @@ function:BattleGround()
 		    if(gTeam[i] == gBG_TEAM1)
 		    {
 		        GivePlayerCash(i, money, true, true);
-		        GivePlayerScore_(i, 5, true, true);
+		        GivePlayerScore_(i, 10, true, true);
 		        PlayerInfo[i][BGWins]++;
 		    }
 		}
 	}
 	else if(BGTeam1Kills < BGTeam2Kills)
 	{
-	    format(string, sizeof(string), "Spetsnaz won! Rangers kills: %i Spetsnaz kills: %i", BGTeam1Kills, BGTeam2Kills);
-		BGMSG(string);
+	    format(gstr, sizeof(gstr), "Spetsnaz won! Rangers kills: %i Spetsnaz kills: %i", BGTeam1Kills, BGTeam2Kills);
+		BGMSG(gstr);
 		BGMSG("New Voting starting!");
 		BGTeam1Kills = 0;
 		BGTeam2Kills = 0;
@@ -21684,7 +21687,7 @@ function:BattleGround()
 		    if(gTeam[i] == gBG_TEAM2)
 		    {
 		        GivePlayerCash(i, money, true, true);
-		        GivePlayerScore_(i, 5, true, true);
+		        GivePlayerScore_(i, 10, true, true);
 		        PlayerInfo[i][BGWins]++;
 		    }
 		}
@@ -21882,7 +21885,7 @@ CarSpawner(playerid, model, respawn_delay = -1, bool:spawnzone_check = true)
 	
 	if(model == 538 || model == 537 || model == 449)
 	{
-		return ShowInfo(playerid, "Failed to spawn vehicle", "");
+		return ShowInfo(playerid, "Failed to spawn vehicle", "not allowed");
 	}
 	
 	if(spawnzone_check)
@@ -22525,8 +22528,7 @@ MySQL_Connect()
 LoadStores()
 {
 	new file[50],
-		count = GetTickCount() + 3600000,
-		lstring[128];
+		count = GetTickCount() + 3600000;
 
 	for(new b = 0; b < MAX_BANKS; b++)
 	{
@@ -22537,8 +22539,8 @@ LoadStores()
 	  		BankPickInt[b] = CreateDynamicPickup(1559, 1, 2304.69, -16.19, 26.74, (b + 1000), -1, -1, 50.0);
 	  		BankPickMenu[b] = CreateDynamicPickup(1559, 1, 2311.63, -3.89, 26.74, (b + 1000), -1, -1, 50.0);
 	  		BankMIcon[b] = CreateDynamicMapIcon(dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ"), 25, -1, 0, 0, -1, 300.0);
-	  		format(lstring, sizeof(lstring), ""white"["yellow"Store"white"]\n%s", dini_Get(file, "StoreName"));
-	  		CreateDynamic3DTextLabel(lstring, YELLOW, dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ") + 0.7, 25.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 25.0);
+	  		format(gstr, sizeof(gstr), ""white"["yellow"Store"white"]\n%s", dini_Get(file, "StoreName"));
+	  		CreateDynamic3DTextLabel(gstr, YELLOW, dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ") + 0.7, 25.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 25.0);
 		}
 	}
     for(new a = 0; a < MAX_AMMUNATIONS; a++)
@@ -22549,8 +22551,8 @@ LoadStores()
 			AmmunationPickOut[a] = CreateDynamicPickup(1559, 1, dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ"), 0, 0, -1, 50.0);
 	  		AmmunationPickInt[a] = CreateDynamicPickup(1559, 1, 315.81, -143.65, 999.60, (a + 1000), 7, -1, 50.0);
 			AmmunationMIcon[a] = CreateDynamicMapIcon(dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ"), 6, -1, 0, 0, -1, 300.0);
-			format(lstring, sizeof(lstring), ""white"["yellow"Store"white"]\n%s", dini_Get(file, "StoreName"));
-			CreateDynamic3DTextLabel(lstring, YELLOW, dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ") + 0.7, 25.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 25.0);
+			format(gstr, sizeof(gstr), ""white"["yellow"Store"white"]\n%s", dini_Get(file, "StoreName"));
+			CreateDynamic3DTextLabel(gstr, YELLOW, dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ") + 0.7, 25.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 25.0);
 		}
 	}
 	for(new bs = 0; bs < MAX_BURGERSHOTS; bs++)
@@ -22561,8 +22563,8 @@ LoadStores()
 			BurgerPickOut[bs] = CreateDynamicPickup(1559, 1, dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ"), 0, 0, -1, 50.0);
 	  		BurgerPickInt[bs] = CreateDynamicPickup(1559, 1, 362.87, -75.17, 1001.50, (bs + 1000), 10, -1, 50.0);
 		   	BurgerMIcon[bs] = CreateDynamicMapIcon(dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ"), 10, -1, 0, 0, -1, 300.0);
-		   	format(lstring, sizeof(lstring), ""white"["yellow"Store"white"]\n%s", dini_Get(file, "StoreName"));
-	  		CreateDynamic3DTextLabel(lstring, YELLOW, dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ") + 0.7, 25.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 25.0);
+		   	format(gstr, sizeof(gstr), ""white"["yellow"Store"white"]\n%s", dini_Get(file, "StoreName"));
+	  		CreateDynamic3DTextLabel(gstr, YELLOW, dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ") + 0.7, 25.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 25.0);
 		}
 	}
 	for(new cb = 0; cb < MAX_CLUCKINBELLS; cb++)
@@ -22573,8 +22575,8 @@ LoadStores()
 			CluckinBellPickOut[cb] = CreateDynamicPickup(1559, 1, dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ"), 0, 0, -1, 50.0);
 	  		CluckinBellPickInt[cb] = CreateDynamicPickup(1559, 1, 364.87, -11.74, 1001.85, (cb + 1000), 9, -1, 50.0);
 			CluckinBellMIcon[cb] = CreateDynamicMapIcon(dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ"), 14, -1, 0, 0, -1, 300.0);
-			format(lstring, sizeof(lstring), ""white"["yellow"Store"white"]\n%s", dini_Get(file, "StoreName"));
-	  		CreateDynamic3DTextLabel(lstring, YELLOW, dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ") + 0.7, 25.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 25.0);
+			format(gstr, sizeof(gstr), ""white"["yellow"Store"white"]\n%s", dini_Get(file, "StoreName"));
+	  		CreateDynamic3DTextLabel(gstr, YELLOW, dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ") + 0.7, 25.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 25.0);
 		}
 	}
 	for(new ps = 0; ps < MAX_PIZZASTACKS; ps++)
@@ -22585,8 +22587,8 @@ LoadStores()
 			PizzaPickOut[ps] = CreateDynamicPickup(1559, 1, dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ"), 0, 0, -1, 50.0);
 	  		PizzaPickInt[ps] = CreateDynamicPickup(1559, 1, 372.36, -133.50, 1001.49, (ps + 1000), 5, -1, 50.0);
 			PizzaMIcon[ps] = CreateDynamicMapIcon(dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ"), 29, -1, 0, 0, -1, 300.0);
-			format(lstring, sizeof(lstring), ""white"["yellow"Store"white"]\n%s", dini_Get(file, "StoreName"));
-	  		CreateDynamic3DTextLabel(lstring, YELLOW, dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ") + 0.7, 25.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 25.0);
+			format(gstr, sizeof(gstr), ""white"["yellow"Store"white"]\n%s", dini_Get(file, "StoreName"));
+	  		CreateDynamic3DTextLabel(gstr, YELLOW, dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ") + 0.7, 25.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 25.0);
 		}
 	}
 	for(new tfs = 0; tfs < MAX_TFS; tfs++)
@@ -22597,8 +22599,8 @@ LoadStores()
 			TFSPickOut[tfs] = CreateDynamicPickup(1559, 1, dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ"), 0, 0, -1, 50.0);
 	  		TFSPickInt[tfs] = CreateDynamicPickup(1559, 1, -25.884, -185.868, 1003.546, (tfs + 1000), 17, -1, 50.0);
 			TFSMIcon[tfs] = CreateDynamicMapIcon(dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ"), 17, -1, 0, 0, -1, 300.0);
-			format(lstring, sizeof(lstring), ""white"["yellow"Store"white"]\n%s", dini_Get(file, "StoreName"));
-	  		CreateDynamic3DTextLabel(lstring, YELLOW, dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ") + 0.7, 25.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 25.0);
+			format(gstr, sizeof(gstr), ""white"["yellow"Store"white"]\n%s", dini_Get(file, "StoreName"));
+	  		CreateDynamic3DTextLabel(gstr, YELLOW, dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ") + 0.7, 25.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 25.0);
 		}
 	}
  	printf("#Stores loaded in %i ms", (GetTickCount() + 3600000) - count);
@@ -24065,7 +24067,7 @@ LoadVisualStaticMeshes()
 	AddTeleport(6, "Transfender 3", "trans3", 2386.2788,1021.7114,10.8203);
 	AddTeleport(6, "Loco Low", "lw", 2645.5457, -2004.5851,13.3828);
 	AddTeleport(6, "Arch Wheel Angels", "arch", -2689.1001,217.8290,3.9509);
-	AddTeleport(7, "Las Ventuars Airport", "lva", 1320.6082,1268.7208,13.5903);
+	AddTeleport(7, "Las Venturas Airport", "lva", 1320.6082,1268.7208,13.5903);
 	AddTeleport(7, "Las Venturas", "lv", 2039.8860,1546.1112,10.4450);
 	AddTeleport(6, "Vehicle Shop", "vs", 1850.7683,-1459.0325,13.3984);
 	AddTeleport(4, "RectAngle", "rect", 742.8961,533.1397,461.9956);
@@ -28229,7 +28231,7 @@ function:ShowDialog(playerid, dialogid)
 	{
 	    case DIALOG_DUEL + 1:
 	    {
-	        ShowPlayerDialog(playerid, DIALOG_DUEL + 1, DIALOG_STYLE_LIST, ""nef" :: Duel > Locations (Step 2/2)", "Stadium Top", "Send", "Back");
+	        ShowPlayerDialog(playerid, DIALOG_DUEL + 1, DIALOG_STYLE_LIST, ""nef" :: Duel > Locations (Step 2/2)", "Stadium Top\nChinatown", "Send", "Back");
 	    }
 	    case DIALOG_DUEL:
 	    {
