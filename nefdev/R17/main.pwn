@@ -7970,6 +7970,11 @@ YCMD:restaurant(playerid, params[], help)
     PortPlayerMap(playerid, 370.4659, -1717.2151, 15.0337, 1.9053, "Restaurant", "restaurant");
     return 1;
 }
+YCMD:concert(playerid, params[], help)
+{
+    PortPlayerMap(playerid, 1477.8225,-1714.1190,14.1400,359.7089, "Concert", "concert");
+    return 1;
+}
 YCMD:247(playerid, params[], help)
 {
 	switch(random(8))
@@ -23573,6 +23578,7 @@ LoadServerStaticMeshes()
     Command_AddAltNamed("xmas", "christ");
 	#endif
     Command_AddAltNamed("time", "stime");
+    Command_AddAltNamed("concert", "gig");
     Command_AddAltNamed("radio", "streams");
     Command_AddAltNamed("stopradio", "stopstreams");
     Command_AddAltNamed("stopradio", "stopstream");
@@ -24123,6 +24129,7 @@ LoadVisualStaticMeshes()
 	AddTeleport(8, "Mellnik's Island", "mi", -3801.8572, 498.8828, 16.5183);
 	AddTeleport(5, "Racemap", "racemap", -2904.3860, -415.5923, 4.6274);
 	AddTeleport(5, "Racemap 2", "racemap2", 2741.1375,1969.4594,5269.7466);
+	AddTeleport(5, "Concert", "concert", 1477.8225,-1714.1190,14.1400);
 
     CreateDynamic3DTextLabel(""white"["nef_green"Private Vehicle Shop"white"]", -1, 1795.2469,-1406.5632,13.6531+0.5, 550.0);
     CreateDynamic3DTextLabel(""white"["nef_green"Gold Credits"white"]", -1, 1902.1838,-1404.4944,16.3474+0.5, 550.0);
