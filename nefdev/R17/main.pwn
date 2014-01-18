@@ -309,7 +309,7 @@ native IsValidVehicle(vehicleid); // undefined in a_samp.inc
 #define MINIGUN_WORLD                   (68565)
 #define SNIPER_WORLD                    (57412)
 #define ROCKETDM_WORLD                  (57411)
-#define SERVERMSGS_TIME                 (900000)
+#define SERVERMSGS_TIME                 (850000)
 #define MAX_PLAYER_PVS	                (8)
 
 #define function:%1(%2) \
@@ -2692,7 +2692,8 @@ public OnPlayerSpawn(playerid)
 		SetCameraBehindPlayer(playerid);
 		PlayerInfo[playerid][tickLastChat] = 0;
 		StopAudioStreamForPlayer(playerid);
-		PlayerPlaySound(playerid, 1184, 0, 0, 0);
+		//PlayerPlaySound(playerid, 1184, 0, 0, 0);
+		StopAudioStreamForPlayer(playerid);
 		RandomSpawn(playerid);
 		RandomWeapons(playerid);
 		HidePlayerWelcomeTextdraws(playerid);
@@ -2706,6 +2707,38 @@ public OnPlayerSpawn(playerid)
     }
     else switch(gTeam[playerid])
     {
+        case FREEROAM:
+        {
+            ResetPlayerWorld(playerid);
+            /*if(PlayerInfo[playerid][bHasSpawn]) Moved to OPD system
+            {
+        		SetPlayerPos(playerid, PlayerInfo[playerid][CSpawnX], PlayerInfo[playerid][CSpawnY], PlayerInfo[playerid][CSpawnZ]);
+			    SetPlayerFacingAngle(playerid, PlayerInfo[playerid][CSpawnA]);
+            }
+            else
+            {
+                RandomSpawn(playerid);
+            }*/
+			SetCameraBehindPlayer(playerid);
+
+			if(PlayerInfo[playerid][bGod])
+			{
+			    SetPlayerHealth(playerid, 99999.0);
+			    ResetPlayerWeapons(playerid);
+			    TextDrawShowForPlayer(playerid, TXTGodTD);
+			}
+			else
+			{
+			    RandomWeapons(playerid);
+			}
+
+			SyncGangZones(playerid);
+
+			if(PlayerInfo[playerid][VIP] == 1)
+			{
+			    SetPlayerArmour(playerid, 100.0);
+			}
+		}
         case JAIL:
         {
 			SetPlayerInterior(playerid, 3);
@@ -2745,39 +2778,6 @@ public OnPlayerSpawn(playerid)
 
 			if(GetPVarInt(playerid, "HadGod") == 1) Command_ReProcess(playerid, "/god silent", false);
         }
-        case FREEROAM:
-        {
-            ResetPlayerWorld(playerid);
-            if(PlayerInfo[playerid][bHasSpawn])
-            {
-        		SetPlayerPos(playerid, PlayerInfo[playerid][CSpawnX], PlayerInfo[playerid][CSpawnY], PlayerInfo[playerid][CSpawnZ]);
-			    SetPlayerFacingAngle(playerid, PlayerInfo[playerid][CSpawnA]);
-			    SetCameraBehindPlayer(playerid);
-            }
-            else
-            {
-                RandomSpawn(playerid);
-            }
-			SetCameraBehindPlayer(playerid);
-			
-			if(PlayerInfo[playerid][bGod])
-			{
-			    SetPlayerHealth(playerid, 99999.0);
-			    ResetPlayerWeapons(playerid);
-			    TextDrawShowForPlayer(playerid, TXTGodTD);
-			}
-			else
-			{
-			    RandomWeapons(playerid);
-			}
-			
-			SyncGangZones(playerid);
-			
-			if(PlayerInfo[playerid][VIP] == 1)
-			{
-			    SetPlayerArmour(playerid, 100.0);
-			}
-		}
 		case DERBY:
 		{
 		    SetPlayerDerbyStaticMeshes(playerid);
@@ -3185,7 +3185,8 @@ public OnPlayerConnect(playerid)
 
         InitSession(playerid);
         
-        PlayerPlaySound(playerid, 1183, 0, 0, 0);
+        //PlayerPlaySound(playerid, 1183, 0, 0, 0);
+		PlayAudioStreamForPlayer(playerid, "http://www.nefserver.net/s/NEFLogin.mp3");
 
 		format(gstr, sizeof(gstr), "SELECT * FROM `bans` WHERE `PlayerName` = '%s';", __GetName(playerid));
 		mysql_tquery(g_SQL_handle, gstr, "OnQueryFinish", "siii", gstr, THREAD_IS_BANNED, playerid, g_SQL_handle);
@@ -4787,9 +4788,8 @@ public OnPlayerText(playerid, text[])
 	}
 	strmid(LastPlayerText[playerid], text, 0, 144, 144);
 
-	if(strfind(text, "/q", true) != -1 || strfind(text, "/ q", true) != -1)
+	if(strfind(text, "/q", true) != -1 || strfind(text, "/ q", true) != -1 || strfind(text, "/quit", true) != -1 || strfind(text, "/ quit", true) != -1)
 	{
-		SCM(playerid, -1, ""er"Please do not type /q in chat!");
   		return 0;
   	}
 
@@ -5165,6 +5165,16 @@ public OnPlayerDeath(playerid, killerid, reason)
 		}
 	    case FREEROAM:
 	    {
+            if(PlayerInfo[playerid][bHasSpawn])
+            {
+                SetSpawnInfo(playerid, NO_TEAM, GetPlayerSkin(playerid), PlayerInfo[playerid][CSpawnX], PlayerInfo[playerid][CSpawnY], PlayerInfo[playerid][CSpawnZ], PlayerInfo[playerid][CSpawnA], 0, 0, 0, 0, 0, 0);
+            }
+            else
+            {
+                new rand = random(3);
+                SetSpawnInfo(playerid, NO_TEAM, GetPlayerSkin(playerid), WorldSpawns[rand][0], WorldSpawns[rand][1], floatadd(WorldSpawns[rand][2], 3.0), WorldSpawns[rand][3], 0, 0, 0, 0, 0, 0);
+            }
+	    
 	        if(IsPlayerAvail(killerid) && (playerid != killerid) && gTeam[killerid] == FREEROAM)
      		{
 			    PlayerInfo[killerid][Wanteds]++;
@@ -8721,7 +8731,8 @@ YCMD:sellgc(playerid, params[], help)
 	new player, gc, money;
 	if(sscanf(params, "rii", player, gc, money))
 	{
-		return SCM(playerid, NEF_GREEN, "Usage: /sellgc <playerid> <gc amount> <money>");
+	    SCM(playerid, NEF_GREEN, "Usage: /sellgc <playerid> <gc amount> <money>");
+		return SCM(playerid, NEF_GREEN, "Info: Type /charts to see the average price for 1000GC!");
 	}
 
     if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
@@ -8753,6 +8764,7 @@ YCMD:sellgc(playerid, params[], help)
 	    SCM(playerid, -1, gstr);
 	    format(gstr, sizeof(gstr), ""blue"%s(%i) is offering you their %sGC for $%s, type /buygc to accept", __GetName(playerid), playerid, number_format(gc), number_format(money));
 	    SCM(player, -1, gstr);
+	    SCM(player, NEF_GREEN, "Info: Type /charts to see the average price for 1000GC!");
 
 		PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
 		PlayerPlaySound(player, 1057, 0.0, 0.0, 0.0);
@@ -9927,19 +9939,7 @@ YCMD:radio(playerid, params[], help)
     return 1;
 }
 
-YCMD:streams(playerid, params[], help)
-{
-    ShowDialog(playerid, STREAM_DIALOG);
-    return 1;
-}
-
-YCMD:stopstreams(playerid, params[], help)
-{
-    StopAudioStreamForPlayer(playerid);
-    return 1;
-}
-
-YCMD:stopstream(playerid, params[], help)
+YCMD:stopradio(playerid, params[], help)
 {
     StopAudioStreamForPlayer(playerid);
     return 1;
@@ -19774,7 +19774,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					case 4: ShowPlayerDialog(playerid, STREAM_DIALOG+5, DIALOG_STYLE_LIST, ""nef" :: Streams > Rap", "POWERHITZ.COM - #1 FOR HITZ\nRADIOUP.COM - THE HITLIST", "Select", "Back");
 					case 5: ShowPlayerDialog(playerid, STREAM_DIALOG+6, DIALOG_STYLE_LIST, ""nef" :: Streams > Mainstream/Rock", "#MUSIK.MAIN - WWW.RAUTEMUSIK.FM - 24H\n181.FM - Kickin' Country", "Select", "Back");
 					case 6: ShowPlayerDialog(playerid, STREAM_DIALOG+7, DIALOG_STYLE_LIST, ""nef" :: Streams > Oldies", "181.FM - Good Time Oldies\n#MUSIK.GOLDIES - WWW.RAUTEMUSIK.FM", "Select", "Back");
-					case 7: ShowPlayerDialog(playerid, STREAM_DIALOG+8, DIALOG_STYLE_INPUT, ""nef" :: Streams > Your own stream", ""white"Please enter the audio stream you want to listen to", "Play", "Back");
+					case 7: ShowPlayerDialog(playerid, STREAM_DIALOG+7, DIALOG_STYLE_LIST, ""nef" :: Streams > Dubstep", "#MUSIK.DRUMSTEP - WWW.RAUTEMUSIK.FM\nSinister Souls Dubstep, Dub and Deep Bass", "Select", "Back");
+					case 8: ShowPlayerDialog(playerid, STREAM_DIALOG+8, DIALOG_STYLE_INPUT, ""nef" :: Streams > Your own stream", ""white"Please enter the audio stream you want to listen to", "Play", "Back");
 				}
 				return true;
 			}
@@ -19842,6 +19843,15 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				return true;
 			}
 			case STREAM_DIALOG+8:
+			{
+				switch(listitem)
+		    	{
+		        	case 0: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=5415");
+		        	case 1: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=50909");
+				}
+				return true;
+			}
+			case STREAM_DIALOG+9:
 			{
 			    extract inputtext -> new string:link[144]; else
 			    {
@@ -20821,7 +20831,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
  		        StopAudioStreamForPlayer(playerid);
  		        return true;
 			}
-			case STREAM_DIALOG+1..STREAM_DIALOG+8:
+			case STREAM_DIALOG+1..STREAM_DIALOG+9:
 			{
 				ShowDialog(playerid, STREAM_DIALOG);
 				return true;
@@ -23561,6 +23571,9 @@ LoadServerStaticMeshes()
     Command_AddAltNamed("xmas", "christ");
 	#endif
     Command_AddAltNamed("time", "stime");
+    Command_AddAltNamed("radio", "streams");
+    Command_AddAltNamed("stopradio", "stopstreams");
+    Command_AddAltNamed("stopradio", "stopstream");
     Command_AddAltNamed("rocketdm", "rocket");
     Command_AddAltNamed("gmenu", "gstats");
     Command_AddAltNamed("gmenu", "gmembers");
@@ -28438,7 +28451,7 @@ function:ShowDialog(playerid, dialogid)
 	    }
 		case STREAM_DIALOG:
 		{
-			ShowPlayerDialog(playerid, STREAM_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Audio Streams", "Electro\nMetal\nPop\nHip Hop\nRap\nRock\nOldies\n"grey"Your own stream", "Select", "Stop stream");
+			ShowPlayerDialog(playerid, STREAM_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Audio Streams", "Electro\nMetal\nPop\nHip Hop\nRap\nRock\nOldies\nDubstep\n"grey"Your own stream", "Select", "Stop stream");
 		}
 		case VEHICLE_PLATE_DIALOG:
   		{
