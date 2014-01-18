@@ -2897,7 +2897,7 @@ public OnPlayerSpawn(playerid)
 			SetPlayerInterior(playerid, 0);
 
 			new rand = random(10);
-			SetPlayerPosEx(playerid, Minigun_Spawns[rand][0], Minigun_Spawns[rand][1], floatadd(Minigun_Spawns[rand][2], 2.0));
+			SetPlayerPosEx(playerid, Minigun_Spawns[rand][0], Minigun_Spawns[rand][1], floatadd(Minigun_Spawns[rand][2], 2.5));
 			SetPlayerFacingAngle(playerid, Minigun_Spawns[rand][3]);
 		}
 		case HOUSE:
@@ -7424,6 +7424,11 @@ YCMD:wj(playerid, params[], help)
     PortPlayerMapVeh(playerid, 341.6029,2008.7330,571.1588,174.7883,341.6029,2008.7330,571.1588,174.7883, "Water Jump", "wj");
     return 1;
 }
+YCMD:jj(playerid, params[], help)
+{
+    PortPlayerMapVeh(playerid, -1683.663452, 2010.888916, 1104.387393, 65.1886, -1683.663452, 2010.888916, 1104.387393, 65.1886, "Jizzy Jump", "jj");
+    return 1;
+}
 YCMD:snow(playerid, params[], help)
 {
     PortPlayerMapVeh(playerid, -719.7679,1723.9852,7.0400,255.2436,-719.7679,1723.9852,7.0400,255.2436, "Snow Market", "snow");
@@ -9792,7 +9797,7 @@ YCMD:minigun(playerid, params[], help)
 	SetPlayerInterior(playerid, 0);
 	HidePlayerInfoTextdraws(playerid);
 	new rand = random(10);
-	SetPlayerPos(playerid, Minigun_Spawns[rand][0], Minigun_Spawns[rand][1], Minigun_Spawns[rand][2] + 2.0);
+	SetPlayerPos(playerid, Minigun_Spawns[rand][0], Minigun_Spawns[rand][1], Minigun_Spawns[rand][2] + 2.5);
 	SetPlayerFacingAngle(playerid, Minigun_Spawns[rand][3]);
 	
     NewMinigameJoin(playerid, "Minigun", "minigun");
@@ -24040,6 +24045,7 @@ LoadVisualStaticMeshes()
 	AddTeleport(3, "Skyroad 3", "skyroad3", 205.0412,2481.6416,16.5166);
 	AddTeleport(3, "Skyroad 4", "skyroad4", 587.9016,1400.4779,1228.1453);
 	AddTeleport(3, "Water Jump", "wj", 341.6029,2008.7330,571.1588);
+	AddTeleport(3, "Jizzy Jump", "jj", -1683.663452, 2010.888916, 1104.387393);
 	AddTeleport(8, "Abandoned Airport", "aa", 386.0204, 2541.1179, 18.0953);
 	AddTeleport(6, "Transfender", "trans", 1034.5165,-1039.7190,31.6651);
 	AddTeleport(6, "Transfender 2", "trans2", -1932.7380,228.3443,34.1563);
