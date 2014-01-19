@@ -1664,7 +1664,7 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
 	Float:g_RaceVehCoords[RACE_MAX_PLAYERS][4],
 	Float:g_RaceCPs[RACE_MAX_CHECKPOINTS][3],
 	bool:CSGSOFT[MAX_PLAYERS] = {false, ...},
-	g_SpawnAreas[4],
+	g_SpawnAreas[5],
 	g_RaceForceMap = 0,
 	g_BuildRace = INVALID_PLAYER_ID,
 	g_BuildDeployTime = 0,
@@ -1767,6 +1767,10 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
  	aussenrein,
  	innenraus,
   	g_SQL_handle,
+  	mc_dive,
+  	mc_tp,
+  	mc_weps,
+	bb_mcc,
   	houseid,
   	propid,
   	gzoneid,
@@ -1878,6 +1882,7 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
 	T_CNRPlayers = 0,
 	T_JPDMPlayers = 0,
 	T_RocketDMPlayers = 0,
+	T_ServerPlayers = 0,
 	IRC_Bots[IRC_MAX_BOTS],
 	IRC_GroupID;
 	
@@ -2114,12 +2119,12 @@ new Float:DuelMaps[2][2][4] =
 		{-2176.0908, 641.5275, 49.4375, 89.4239}
 	}
 };
-new Float:WorldSpawns[3][4] =
+new Float:WorldSpawns[4][4] =
 {
-	{341.8535, -1852.6327, 8.2618, 90.2136}, //beach
-	{-1196.3280, -17.4523, 15.8281, 42.5799}, //sfa
-	{386.0204, 2541.1179, 19.0953, 181.2326} // /aa
-	//{680.2595, -1361.8927, 2551.2214, 90.0} // /speed
+	{341.8535, -1852.6327, 8.2618, 90.2136}, // /beach
+	{-1196.3280, -17.4523, 15.8281, 42.5799}, // /sfa
+	{386.0204, 2541.1179, 19.0953, 181.2326}, // /aa
+	{-2330.8264, -1636.1765, 485.6543, 265.8250} // /mc
 };
 new Float:DM_MAP_1[2][4] =
 {
@@ -2623,7 +2628,7 @@ public OnPlayerRequestClass(playerid, classid)
 		return 1;
 	}
 
-    new rand = random(3);
+    new rand = random(4);
     SetSpawnInfo(playerid, NO_TEAM, GetPlayerSkin(playerid), WorldSpawns[rand][0], WorldSpawns[rand][1], floatadd(WorldSpawns[rand][2], 3.0), WorldSpawns[rand][3], 0, 0, 0, 0, 0, 0);
 
 	//TextDrawShowForPlayer(playerid, TXTTeleportInfo);
@@ -5219,7 +5224,7 @@ public OnPlayerDeath(playerid, killerid, reason)
             }
             else
             {
-                new rand = random(3);
+                new rand = random(4);
                 SetSpawnInfo(playerid, NO_TEAM, GetPlayerSkin(playerid), WorldSpawns[rand][0], WorldSpawns[rand][1], floatadd(WorldSpawns[rand][2], 3.0), WorldSpawns[rand][3], 0, 0, 0, 0, 0, 0);
             }
 	    
@@ -6388,6 +6393,22 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 {
 	if(gTeam[playerid] == FREEROAM)
 	{
+	    if(pickupid == mc_tp)
+	    {
+	        Command_ReProcess(playerid, "/tele", false);
+	        return 1;
+	    }
+	    if(pickupid == mc_dive)
+	    {
+	        Command_ReProcess(playerid, "/dive", false);
+	        return 1;
+	    }
+	    if(pickupid == mc_weps)
+	    {
+	        Command_ReProcess(playerid, "/w", false);
+	        return 1;
+	    }
+	    
   		if(pickupid == VIPLpickup)
   		{
   		    if(PlayerInfo[playerid][VIP] == 1 || PlayerInfo[playerid][Level] > 0)
@@ -7293,7 +7314,7 @@ YCMD:beach(playerid, params[], help)
 }
 YCMD:mc(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid, -2335.2832, -1644.9913, 486.0481, 279.2750, -2308.8811, -1614.4382, 483.8531, 197.2544, "Mount Chiliad", "mc");
+    PortPlayerMapVeh(playerid, -2330.8264,-1636.1765,485.6543,265.8250,-2330.8264,-1636.1765,485.6543,265.8250, "Mount Chiliad", "mc");
     return 1;
 }
 YCMD:sf(playerid, params[], help)
@@ -23001,7 +23022,7 @@ RandomSpawn(playerid, bool:_load_old_pos = false)
 	}
 	else
 	{
-		new rand = random(3);
+		new rand = random(4);
 		SetPlayerPosEx(playerid, WorldSpawns[rand][0], WorldSpawns[rand][1], floatadd(WorldSpawns[rand][2], 3.0));
 		SetPlayerFacingAngle(playerid, WorldSpawns[rand][3]);
 		SetCameraBehindPlayer(playerid);
@@ -23698,6 +23719,7 @@ LoadServerStaticMeshes()
     g_SpawnAreas[1] = CreateDynamicSphere(385.4325, 2541.2456, 14.5953, 13.5); // <- AA sphere
     g_SpawnAreas[2] = CreateDynamicSphere(-1203.3666, -27.8846, 15.8403, 15.0); // <- SFA 1 sphere
     g_SpawnAreas[3] = CreateDynamicSphere(-1183.3441, -9.4441, 15.8403, 15.0); // <- SFA 2 sphere
+    g_SpawnAreas[4] = CreateDynamicSphere(-2338.0479, -1636.5223, 485.6543, 13.5); // <- MC sphere
 
 	toyslist = LoadModelSelectionMenu("Other/toys.txt");
 	hobjslist = LoadModelSelectionMenu("Other/hobjs.txt");
@@ -23965,8 +23987,8 @@ LoadVisualStaticMeshes()
 	
     new count = GetTickCount() + 3600000;
     
-	new mcc = CreateDynamicObject(8323, -2322.76880, -1704.56067, 499.98999,   0.00000, 0.00000, 69.30000);
-	SetDynamicObjectMaterialText(mcc, 0, "Welcome to New Evolution Freeroam!\n"green"Server Realtime:\nPlayers online: ", OBJECT_MATERIAL_SIZE_256x128, "Calibri", 0, 0, -32256, -16777216, OBJECT_MATERIAL_TEXT_ALIGN_LEFT);
+	bb_mcc = CreateDynamicObject(8323, -2322.76880, -1704.56067, 499.98999,   0.00000, 0.00000, 69.30000);
+	SetDynamicObjectMaterialText(bb_mcc, 0, "Welcome to New Evolution Freeroam!\nServer Realtime: \n"green"Players online: ", OBJECT_MATERIAL_SIZE_256x128, "Calibri", 0, 0, -32256, -16777216, OBJECT_MATERIAL_TEXT_ALIGN_LEFT);
 
     new object_id = CreateDynamicObject(11317, 1914.20313, -1377.58191, 26.29986,   0.00000, 0.00000, 91.91999); // Gold Credits Wang Cars
     SetDynamicObjectMaterial(object_id, 2, 19341, "egg_texts", "easter_egg01");
@@ -23990,6 +24012,10 @@ LoadVisualStaticMeshes()
     pick_life[11] = CreateDynamicPickup(1240, 3, -1405.9728,492.3374,18.0023);
     pick_life[12] = CreateDynamicPickup(1240, 3, 2035.2893,-2348.9136,13.6844);
     pick_life[13] = CreateDynamicPickup(1240, 3, 400.7469, 2544.7986, 19.6311);
+
+	mc_dive = CreateDynamicPickup(371, 3, -2338.6001,-1627.5149,485.6543);
+	mc_tp = CreateDynamicPickup(19130, 3, -2330.7739,-1644.0229,485.6543);
+	mc_weps = CreateDynamicPickup(356, 3, -2340.0862,-1644.3979,485.6543);
 
     AdminLC = CreateDynamicPickup(1559, 23, 1805.7494,-1302.6721,120.2656);
     AdminLC2 = CreateDynamicPickup(1559, 23, -794.806396,497.738037,1376.195312);
@@ -24120,6 +24146,11 @@ LoadVisualStaticMeshes()
 	CreateObject(3458, -295.32, 3682.53, 21.10,   0.00, 0.00, 0.00); //Static Base
 	CreateObject(8040,564.91992188,860.32714844,7107.35400391,0,21.99462891,0); // GoingDown
 	CreateObject(8040,2977.97949219,-1437.01464844,1243.90209961,0,0,189.99755859); // skyroad (/skr)
+	CreateObject(18769, -2333.23315, -1650.64453, 483.17276,   0.00000, 0.00000, -1.74001); // mc vspawn
+	CreateObject(18769, -2332.09180, -1610.96912, 483.17276,   0.00000, 0.00000, -1.74001); // mc vspawn
+	CreateObject(18769, -2320.75146, -1696.56824, 483.17276,   0.00000, 0.00000, 50.64000); // mc vspawn
+	CreateObject(18769, -2332.69995, -1630.66577, 483.17276,   0.00000, 0.00000, -2.10001); // mc vspawn
+	CreateObject(9241, -2339.24951, -1636.16699, 483.82617,   0.00000, 0.00000, -271.79977); // mc spawn
 	
 	// derby townhall fix
 	CreateDynamicObject(8558, 1544.65198, -1843.98779, 17.14610,   1.80000, -88.90002, -89.69999);
@@ -24205,7 +24236,7 @@ LoadVisualStaticMeshes()
 	AddTeleport(0, "Quad Parkour", "qp", -2904.806, 880.312, 5.354);
 	AddTeleport(0, "Quad Parkour 2", "qp2", 2121.9146,2397.7786,51.2586);
 	AddTeleport(8, "Los Santos Beach", "beach", 341.8535, -1852.6327, 8.2618);
-	AddTeleport(4, "Mount Chilliad", "mc", -2335.2832, -1644.9913, 486.0481);
+	AddTeleport(4, "Mount Chilliad", "mc", -2330.8264,-1636.1765,485.6543);
 	AddTeleport(7, "Bayside", "bayside", -2227.2446,2326.8723,7.5469);
 	AddTeleport(7, "San Fierro Airport", "sfa", -1196.3280, -17.4523, 15.8281);
 	AddTeleport(7, "Los Santos Airport", "lsa",  2003.1035,-2455.4905,15.8403);
@@ -26481,11 +26512,13 @@ task ProcessTick[1000]()
 	T_CNRPlayers = 0;
 	T_JPDMPlayers = 0;
 	T_RocketDMPlayers = 0;
+	T_ServerPlayers = 0;
 	
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(IsPlayerConnected(i) && !IsPlayerNPC(i))
 	    {
+			++T_ServerPlayers;
 			switch(gTeam[i])
 			{
 			    case FREEROAM:
@@ -26641,6 +26674,9 @@ task ProcessTick[1000]()
 		T_RocketDMPlayers);
 
 	TextDrawSetString(TXTFooter, gstr2);
+
+	format(gstr, sizeof(gstr), "Welcome to New Evolution Freeroam!\nServer Realtime: %02i:%02i | %02i.%02i\n"green"Players online: %i", hour, minute, day, month, T_ServerPlayers);
+	SetDynamicObjectMaterialText(bb_mcc, 0, gstr, OBJECT_MATERIAL_SIZE_256x128, "Calibri", 0, 0, -32256, -16777216, OBJECT_MATERIAL_TEXT_ALIGN_LEFT);
 
 	if(g_FalloutStatus != e_Fallout_Inactive)
 	{
@@ -28479,7 +28515,8 @@ function:ShowDialog(playerid, dialogid)
 	        new string[650];
 	        format(string, sizeof(string), "%s since %s. During that time...\n\n... "yellow_e"%i "white"commands have been performed\n... "yellow_e"%i "white"chat messages have been sent\n... "yellow_e"%i "white"new players have registered\n... "yellow_e"%i "white"players have been murdered",
 				GetUptime(), UnixTimeToDate(StartTime), SrvStat[0], SrvStat[1], SrvStat[2], SrvStat[3]);
-	        
+				
+	        strcat(string, "\n\nStreamed client objects: %i", Streamer_CountVisibleItems(playerid, STREAMER_TYPE_OBJECT));
 	        strcat(string, "\n\nServer version: "SVRNAME" "CURRENT_VERSION", "HOTFIX_REV" on "SAMP_VERSION"");
 	        
 	        ShowPlayerDialog(playerid, SERVERSTATS_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" :: Server Stats", string, "OK", "");
