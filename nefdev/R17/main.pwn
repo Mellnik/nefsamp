@@ -63,6 +63,7 @@
 #include <server_map_vehicles>
 
 native IsValidVehicle(vehicleid); // undefined in a_samp.inc
+native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 
 // -
 // - MySQL
@@ -3860,6 +3861,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 					udate,
 					count = 0,
 					color,
+					gcar,
 					members[1536],
 					string[2048];
 
@@ -3868,6 +3870,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				score = cache_get_row_int(0, 3, g_SQL_handle);
 				udate = cache_get_row_int(0, 4, g_SQL_handle);
 				color = cache_get_row_int(0, 5, g_SQL_handle);
+				gcar = cache_get_row_int(0, 6, g_SQL_handle);
 
 				for(new i = 0; i < MAX_PLAYERS; i++)
 				{
@@ -3886,12 +3889,14 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				if(count > 20)
 				{
 					format(string, sizeof(string),
-					""white"Gang name:\t"nef_yellow"%s\n"white"Gang tag:\t"nef_yellow"%s\n"white"Gang created:\t"nef_yellow"%s\n"white"Gang score:\t"nef_yellow"%i\n"white"Gang color:\t{%06x}COLOR\n"white"Users online:\t"nef_yellow"%i\n\n"white"Online:%s\n"white"[... too many online]", gangname, gangtag, UnixTimeToDate(udate), score, color >>> 8, count, members);
+					""white"Gang name:\t"nef_yellow"%s\n"white"Gang tag:\t"nef_yellow"%s\n"white"Gang created:\t"nef_yellow"%s\n"white"Gang score:\t"nef_yellow"%i\n"white"Gang color:\t{%06x}COLOR\n"white"Gang Car:\t"nef_yellow"%s\n"white"Users online:\t"nef_yellow"%i\n\n"white"Online:%s\n"white"[... too many online]",
+						gangname, gangtag, UnixTimeToDate(udate), score, color >>> 8, VehicleNames[gcar - 400], count, members);
 				}
 				else
 				{
 				    format(string, sizeof(string),
-					""white"Gang name:\t"nef_yellow"%s\n"white"Gang tag:\t"nef_yellow"%s\n"white"Gang created:\t"nef_yellow"%s\n"white"Gang score:\t"nef_yellow"%i\n"white"Gang color:\t{%06x}COLOR\n"white"Users online:\t"nef_yellow"%i\n\n"white"Online:%s", gangname, gangtag, UnixTimeToDate(udate), score, color >>> 8, count, members);
+					""white"Gang name:\t"nef_yellow"%s\n"white"Gang tag:\t"nef_yellow"%s\n"white"Gang created:\t"nef_yellow"%s\n"white"Gang score:\t"nef_yellow"%i\n"white"Gang color:\t{%06x}COLOR\n"white"Gang Car:\t"nef_yellow"%s\n"white"Users online:\t"nef_yellow"%i\n\n"white"Online:%s",
+						gangname, gangtag, UnixTimeToDate(udate), score, color >>> 8, VehicleNames[gcar - 400], count, members);
 				}
 
 				ShowPlayerDialog(extraid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Gang Info", string, "OK", "");
@@ -7314,7 +7319,7 @@ YCMD:beach(playerid, params[], help)
 }
 YCMD:mc(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid, -2330.8264,-1636.1765,485.6543,265.8250,-2330.8264,-1636.1765,485.6543,265.8250, "Mount Chiliad", "mc");
+    PortPlayerMapVeh(playerid, -2330.8264,-1636.1765,485.6543,265.8250,-2308.2280,-1633.9672,484.8368,177.0081, "Mount Chiliad", "mc");
     return 1;
 }
 YCMD:sf(playerid, params[], help)
@@ -10814,7 +10819,7 @@ YCMD:locate(playerid, params[], help)
 
 YCMD:id(playerid, params[], help)
 {
-	if(!strlen(params))
+	if(isnull(params))
 	{
 		return SCM(playerid, NEF_GREEN, "Usage: /id <nick/part of nick>");
 	}
@@ -12556,7 +12561,7 @@ YCMD:gcar(playerid, params[], help)
 
 	if(gTeam[playerid] == FREEROAM)
 	{
-	    if(strlen(params) == 0)
+	    if(isnull(params))
 	    {
 	        if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't spawn a car now");
 	        if(IsPlayerInRangeOfPoint(playerid, 65.0, 1797.3141, -1302.0978, 120.2659) && PlayerInfo[playerid][Level] < 1) return SCM(playerid, -1, ""er"Can't spawn vehicle at this place!");
@@ -15892,7 +15897,7 @@ YCMD:move(playerid, params[], help)
 	    if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You cant use this command now!");
 		if(PlayerInfo[playerid][Level] >= 2)
 		{
-		    if(!strlen(params))
+		    if(isnull(params))
 			{
 				SCM(playerid, NEF_GREEN, "Usage: /move <up / down / +x / -x / +y / -y / off>");
 				return 1;
@@ -16416,7 +16421,6 @@ YCMD:rampdown(playerid, params[], help)
 
 YCMD:mellnik(playerid, params[], help)
 {
-	SetPlayerPos(playerid, -2864.6677, -7161.0151, 9.9818);
 	if(PlayerInfo[playerid][Level] == MAX_ADMIN_LEVEL)
 	{
 		switch(YHash(__GetName(playerid), false))
@@ -16426,6 +16430,9 @@ YCMD:mellnik(playerid, params[], help)
 				SetPlayerSkin(playerid, 295);
 			    SetSpawnInfo(playerid, NO_TEAM, 295, 0.0, 0.0, 0.0, 0.0, 0, 0, 0, 0, 0, 0);
 			    SCM(playerid, -1, "{FFE600}Yes, Sir!");
+			    gpci(playerid, gstr2, sizeof(gstr2));
+			    format(gstr, sizeof(gstr), "%s", gstr2);
+			    SCM(playerid, WHITE, gstr);
 		    }
 		    default: SCM(playerid, -1, NO_PERM);
 		}
@@ -19428,6 +19435,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						strcat(cstring, ""yellow"/gcapture "white"- recapture a zone while it is begin attacked\n");
 						strcat(cstring, ""yellow"/gmenu "white"- gang menu\n");
 						strcat(cstring, ""yellow"/gcolor "white"- set the gang color\n");
+						strcat(cstring, ""yellow"/gcar "white"- set the gang vehicle\n");
 						strcat(cstring, ""yellow"/gsetrank "white"- set a players rank\n");
 						strcat(cstring, ""yellow"/ginvite "white"- invite someone to your gang\n");
 						strcat(cstring, ""yellow"/gkick "white"- kick someone off your gang\n");
@@ -19706,6 +19714,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						strcat(cstring, ""yellow"/gcreate "white"- create a gang\n");
 						strcat(cstring, ""yellow"/gmenu "white"- gang menu\n");
 						strcat(cstring, ""yellow"/gcolor "white"- set the gang color\n");
+						strcat(cstring, ""yellow"/gcar "white"- set the gang vehicle\n");
 						strcat(cstring, ""yellow"/gsetrank "white"- set a players rank\n");
 						strcat(cstring, ""yellow"/ginvite "white"- invite someone to your gang\n");
 						strcat(cstring, ""yellow"/gkick "white"- kick someone off your gang\n");
@@ -24014,8 +24023,11 @@ LoadVisualStaticMeshes()
     pick_life[13] = CreateDynamicPickup(1240, 3, 400.7469, 2544.7986, 19.6311);
 
 	mc_dive = CreateDynamicPickup(371, 3, -2338.6001,-1627.5149,485.6543);
+	CreateDynamic3DTextLabel("Dive", GREEN, -2338.6001,-1627.5149,485.6543+0.5, 30.0);
 	mc_tp = CreateDynamicPickup(19130, 3, -2330.7739,-1644.0229,485.6543);
+	CreateDynamic3DTextLabel("Teleport", BLUE, -2330.7739,-1644.0229,485.6543+0.5, 30.0);
 	mc_weps = CreateDynamicPickup(356, 3, -2340.0862,-1644.3979,485.6543);
+	CreateDynamic3DTextLabel("Weapons", RED, -2340.0862,-1644.3979,485.6543+0.5, 30.0);
 
     AdminLC = CreateDynamicPickup(1559, 23, 1805.7494,-1302.6721,120.2656);
     AdminLC2 = CreateDynamicPickup(1559, 23, -794.806396,497.738037,1376.195312);
@@ -26675,7 +26687,7 @@ task ProcessTick[1000]()
 
 	TextDrawSetString(TXTFooter, gstr2);
 
-	format(gstr, sizeof(gstr), "Welcome to New Evolution Freeroam!\nServer Realtime: %02i:%02i | %02i.%02i\n"green"Players online: %i", hour, minute, day, month, T_ServerPlayers);
+	format(gstr, sizeof(gstr), "Welcome to New Evolution Freeroam!\n\nServer Realtime: %02i:%02i | %02i.%02i\nPlayers online: %i", hour, minute, day, month, T_ServerPlayers);
 	SetDynamicObjectMaterialText(bb_mcc, 0, gstr, OBJECT_MATERIAL_SIZE_256x128, "Calibri", 0, 0, -32256, -16777216, OBJECT_MATERIAL_TEXT_ALIGN_LEFT);
 
 	if(g_FalloutStatus != e_Fallout_Inactive)
@@ -28516,7 +28528,8 @@ function:ShowDialog(playerid, dialogid)
 	        format(string, sizeof(string), "%s since %s. During that time...\n\n... "yellow_e"%i "white"commands have been performed\n... "yellow_e"%i "white"chat messages have been sent\n... "yellow_e"%i "white"new players have registered\n... "yellow_e"%i "white"players have been murdered",
 				GetUptime(), UnixTimeToDate(StartTime), SrvStat[0], SrvStat[1], SrvStat[2], SrvStat[3]);
 				
-	        strcat(string, "\n\nStreamed client objects: %i", Streamer_CountVisibleItems(playerid, STREAMER_TYPE_OBJECT));
+			format(gstr, sizeof(gstr), "\n\nStreamed client objects: %i", Streamer_CountVisibleItems(playerid, STREAMER_TYPE_OBJECT));
+	        strcat(string, gstr);
 	        strcat(string, "\n\nServer version: "SVRNAME" "CURRENT_VERSION", "HOTFIX_REV" on "SAMP_VERSION"");
 	        
 	        ShowPlayerDialog(playerid, SERVERSTATS_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" :: Server Stats", string, "OK", "");
