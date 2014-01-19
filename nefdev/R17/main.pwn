@@ -42,6 +42,7 @@
 #include <YSI\y_commands>   // 04/01/2014
 #include <YSI\y_master>     // 04/01/2014
 #include <YSI\y_stringhash> // 04/01/2014
+#include <YSI\y_timers>     // 04/01/2014
 #include <a_zones>          // 0.3x-R2
 #include <sscanf2>      	// 2.8.1
 #include <streamer>     	// 2.6.1 R84
@@ -311,9 +312,10 @@ native IsValidVehicle(vehicleid); // undefined in a_samp.inc
 #define HOLDING(%0) 					((newkeys & (%0)) == (%0))
 #define RELEASED(%0) 					(((newkeys & (%0)) != (%0)) && ((oldkeys & (%0)) == (%0)))
 #define PreloadAnimLib(%1,%2)			ApplyAnimation(%1,%2,"NULL",0.0,0,0,0,0,0)
-#define MINIGUN_WORLD                   (68565)
-#define SNIPER_WORLD                    (57412)
-#define ROCKETDM_WORLD                  (57411)
+#define MINIGUN_WORLD                   (1268565)
+#define MINIGUN2_WORLD                  (168566)
+#define SNIPER_WORLD                    (157412)
+#define ROCKETDM_WORLD                  (157411)
 #define SERVERMSGS_TIME                 (850000)
 #define MAX_PLAYER_PVS	                (8)
 
@@ -593,6 +595,7 @@ enum
 	gBG_TEAM2,
 	gBG_VOTING,
 	MINIGUN,
+	MINIGUN2,
 	SNIPER,
 	ROCKETDM,
 	JETPACKDM,
@@ -1954,6 +1957,28 @@ new Float:Minigun_Spawns[10][4] =
 	{16.0684, 1552.2834, 28.2681, 151.2032},
 	{-4.4292, 1508.5903, 20.0397, 338.7700}
 };
+new Float:Minigun2_Spawns[19][4] =
+{
+	{2566.7075,1682.9153,10.8203,267.6416},
+	{2632.4512,1658.9364,10.8203,356.0025},
+	{2628.0430,1663.1805,26.9442,353.4489},
+	{2635.4561,1683.8428,15.0390,97.4765},
+	{2622.8230,1717.2472,11.0234,354.7022},
+	{2604.3816,1733.9994,10.8203,89.9564},
+	{2605.7612,1766.4749,10.8203,270.1014},
+	{2596.8813,1823.4506,10.8203,268.5347},
+	{2596.9121,1889.5470,11.0312,94.6564},
+	{2549.2439,1883.8960,18.8093,177.6437},
+	{2535.0269,1787.8772,26.3558,274.1513},
+	{2546.2554,1775.0450,18.8093,269.4512},
+	{2589.8413,1649.2517,30.6641,357.1855},
+	{2653.4441,1681.2477,19.7100,90.5597},
+	{2652.6572,1823.1228,26.3242,92.1265},
+	{2651.3879,1889.4817,18.8092,359.6923},
+	{2632.0039,1918.0391,20.3243,177.6673},
+	{2598.1194,1900.5646,23.6854,172.0273},
+	{2561.9282,1897.9984,10.8222,263.8113}
+};
 new Float:Sniper_Spawns[14][4] =
 {
 	{-1528.3020, -330.2366, 267.8116, 182.4561},
@@ -2509,8 +2534,8 @@ public OnGameModeInit()
 	LoadHouses();
 	LoadProps();
 
-	SetTimer("ProcessTick", 1000, true);
-    SetTimer("QueueProcess", 60000, true);
+	//SetTimer("ProcessTick", 1000, true);
+    //SetTimer("QueueProcess", 60000, true);
 	tReactionTimer = SetTimer("xReactionTest", REAC_TIME, true);
 	g_tRaceOpenSelection = SetTimer("OpenNewRace", 40307, false);
 	SetTimer("Maths", 980000, true);
@@ -2597,6 +2622,9 @@ public OnPlayerRequestClass(playerid, classid)
 		}
 		return 1;
 	}
+
+    new rand = random(3);
+    SetSpawnInfo(playerid, NO_TEAM, GetPlayerSkin(playerid), WorldSpawns[rand][0], WorldSpawns[rand][1], floatadd(WorldSpawns[rand][2], 3.0), WorldSpawns[rand][3], 0, 0, 0, 0, 0, 0);
 
 	//TextDrawShowForPlayer(playerid, TXTTeleportInfo);
 
@@ -2703,7 +2731,7 @@ public OnPlayerSpawn(playerid)
 		StopAudioStreamForPlayer(playerid);
 		//PlayerPlaySound(playerid, 1184, 0, 0, 0);
 		StopAudioStreamForPlayer(playerid);
-		RandomSpawn(playerid);
+		//RandomSpawn(playerid);
 		RandomWeapons(playerid);
 		HidePlayerWelcomeTextdraws(playerid);
 		ShowPlayerInfoTextdraws(playerid);
@@ -2908,6 +2936,17 @@ public OnPlayerSpawn(playerid)
 			new rand = random(10);
 			SetPlayerPosEx(playerid, Minigun_Spawns[rand][0], Minigun_Spawns[rand][1], floatadd(Minigun_Spawns[rand][2], 2.5));
 			SetPlayerFacingAngle(playerid, Minigun_Spawns[rand][3]);
+		}
+		case MINIGUN2:
+		{
+	        ResetPlayerWeapons(playerid);
+	        GivePlayerWeapon(playerid, 38, 99999);
+	        SetPlayerVirtualWorld(playerid, MINIGUN2_WORLD);
+			SetPlayerInterior(playerid, 0);
+
+			new rand = random(19);
+			SetPlayerPosEx(playerid, Minigun2_Spawns[rand][0], Minigun2_Spawns[rand][1], floatadd(Minigun2_Spawns[rand][2], 2.5));
+			SetPlayerFacingAngle(playerid, Minigun2_Spawns[rand][3]);
 		}
 		case HOUSE:
 		{
@@ -5406,7 +5445,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 				Fallout_Cancel();
 			}
 	  	}
-		case MINIGUN:
+		case MINIGUN, MINIGUN2:
 		{
 		    if(IsPlayerAvail(killerid))
 		    {
@@ -9829,6 +9868,30 @@ YCMD:minigun(playerid, params[], help)
     NewMinigameJoin(playerid, "Minigun", "minigun");
     return 1;
 }
+
+YCMD:minigun2(playerid, params[], help)
+{
+    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't join minigames while being in a Gang War, type /exit");
+    if(gTeam[playerid] == MINIGUN2) return SCM(playerid, -1, ""er"You are already in this minigame!");
+    if(gTeam[playerid] != FREEROAM) return ShowInfo(playerid, "~w~Type ~y~/exit ~w~to leave", "");
+
+    SavePos(playerid);
+    CheckPlayerGod(playerid);
+    Command_ReProcess(playerid, "/stopanims", false);
+	gTeam[playerid] = MINIGUN2;
+	ResetPlayerWeapons(playerid);
+	GivePlayerWeapon(playerid, 38, 99999);
+   	SetPlayerVirtualWorld(playerid, MINIGUN2_WORLD);
+	SetPlayerInterior(playerid, 0);
+	HidePlayerInfoTextdraws(playerid);
+	new rand = random(19);
+	SetPlayerPos(playerid, Minigun2_Spawns[rand][0], Minigun2_Spawns[rand][1], Minigun2_Spawns[rand][2] + 2.5);
+	SetPlayerFacingAngle(playerid, Minigun2_Spawns[rand][3]);
+
+    NewMinigameJoin(playerid, "Minigun 2", "minigun2");
+    return 1;
+}
+
 
 YCMD:sniper(playerid, params[], help)
 {
@@ -16332,6 +16395,7 @@ YCMD:rampdown(playerid, params[], help)
 
 YCMD:mellnik(playerid, params[], help)
 {
+	SetPlayerPos(playerid, -2864.6677, -7161.0151, 9.9818);
 	if(PlayerInfo[playerid][Level] == MAX_ADMIN_LEVEL)
 	{
 		switch(YHash(__GetName(playerid), false))
@@ -23745,6 +23809,8 @@ LoadServerStaticMeshes()
 	Command_AddAltNamed("adminhelp", "acmds");
 	Command_AddAltNamed("minigun", "mini");
 	Command_AddAltNamed("minigun", "mg");
+	Command_AddAltNamed("minigun2", "mini2");
+	Command_AddAltNamed("minigun2", "mg2");
 	Command_AddAltNamed("ff", "dive");
 	Command_AddAltNamed("ff", "freefall");
 	Command_AddAltNamed("exit", "leave");
@@ -26129,7 +26195,7 @@ function:DerbyFallOver()
 	}
 }
 
-function:QueueProcess()
+task QueueProcess[60000]()
 {
 	mysql_tquery(g_SQL_handle, "SELECT * FROM `queue` WHERE `ExecutionDate` < UNIX_TIMESTAMP();", "OnQueueReceived", "");
 	
@@ -26390,7 +26456,7 @@ function:OnQueueReceived()
 	return 1;
 }
 
-function:ProcessTick()
+task ProcessTick[1000]()
 {
 	static year, month, day, hour, minute, second;
 	getdate(year, month, day);
@@ -27829,7 +27895,7 @@ function:IsPlayerAvail(playerid)
 	return 0;
 }
 
-SollIchDirMaEtWatSagen()
+stock SollIchDirMaEtWatSagen()
 {
 	new a[][] =
 	{
@@ -29973,7 +30039,7 @@ ExitPlayer(playerid)
 	        SCM(playerid, -1, ""er"Leave the store by entering the pickup");
 	        return 0;
 	    }
-	    case MINIGUN, SNIPER, ROCKETDM:
+	    case MINIGUN, SNIPER, ROCKETDM, MINIGUN2:
 	    {
 			gTeam[playerid] = FREEROAM;
 			ResetPlayerWeapons(playerid);

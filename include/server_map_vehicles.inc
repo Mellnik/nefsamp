@@ -4,7 +4,22 @@ LoadServerVehicles()
 {
 	new count = GetTickCount() + 3600000;
 	
-	// jj
+	// /mc
+	AddStaticVehicleEx(443, -2330.9238, -1620.1328, 485.6623, -91.7400, randomColors[random(23)], randomColors[random(23)], 100);
+	AddStaticVehicleEx(429, -2334.0386, -1599.7668, 485.3716, -108.9000, randomColors[random(23)], randomColors[random(23)], 100);
+	AddStaticVehicleEx(444, -2336.7344, -1611.8007, 485.3953, -90.6600, randomColors[random(23)], randomColors[random(23)], 100);
+	AddStaticVehicleEx(451, -2336.5381, -1607.4681, 485.2020, -98.5200, randomColors[random(23)], randomColors[random(23)], 100);
+	AddStaticVehicleEx(423, -2335.1470, -1603.2950, 485.9581, -102.4800, randomColors[random(23)], randomColors[random(23)], 100);
+	AddStaticVehicleEx(562, -2323.0425, -1627.0776, 485.1393, -0.5400, randomColors[random(23)], randomColors[random(23)], 100);
+	AddStaticVehicleEx(522, -2323.8269, -1639.5215, 485.4092, -120.5400, randomColors[random(23)], randomColors[random(23)], 100);
+	AddStaticVehicleEx(522, -2323.8894, -1641.3555, 485.4092, -120.5400, randomColors[random(23)], randomColors[random(23)], 100);
+	AddStaticVehicleEx(522, -2324.0090, -1643.1068, 485.4092, -120.5400, randomColors[random(23)], randomColors[random(23)], 100);
+	AddStaticVehicleEx(429, -2337.0481, -1616.0170, 484.9226, -91.6200, randomColors[random(23)], randomColors[random(23)], 100);
+	AddStaticVehicleEx(562, -2336.9749, -1653.6908, 485.8159, -137.4600, randomColors[random(23)], randomColors[random(23)], 100);
+	AddStaticVehicleEx(451, -2332.7922, -1653.0896, 485.0860, -140.3999, randomColors[random(23)], randomColors[random(23)], 100);
+	AddStaticVehicleEx(411, -2328.0505, -1652.9418, 484.9182, -139.9200, randomColors[random(23)], randomColors[random(23)], 100);
+
+	// /jj
 	AddStaticVehicleEx(411, -1682.8873, 2030.9122, 1102.6147, 123.7800, randomColors[random(23)], randomColors[random(23)], 100);
 	AddStaticVehicleEx(599, -1680.1252, 2027.9183, 1102.4152, 123.4200, randomColors[random(23)], randomColors[random(23)], 100);
 	AddStaticVehicleEx(603, -1676.9233, 2025.1667, 1102.2438, 124.2600, randomColors[random(23)], randomColors[random(23)], 100);
