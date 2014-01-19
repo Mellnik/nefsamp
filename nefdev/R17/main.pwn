@@ -3266,6 +3266,8 @@ public OnPlayerDisconnect(playerid, reason)
 		{
 		    case gDUEL:
 		    {
+				new bool:found = false;
+				
 		        for(new i = 0; i < MAX_PLAYERS; i++)
 		        {
 		            if(PlayerInfo[i][DuelRequestRecv] == playerid && gTeam[i] == gDUEL)
@@ -3281,8 +3283,35 @@ public OnPlayerDisconnect(playerid, reason)
 		                
 		                PlayerInfo[i][DuelRequestRecv] = INVALID_PLAYER_ID;
 		                PlayerInfo[i][DuelRequest] = INVALID_PLAYER_ID;
+		                
+		                found = true;
 		            }
 		        }
+		        
+				if(!found)
+				{
+				    for(new i = 0; i < MAX_PLAYERS; i++)
+				    {
+				        if(PlayerInfo[i][DuelRequest] == playerid) // Sender won
+				        {
+				            format(gstr, sizeof(gstr),  ">> Duel cancelled between %s and %s. Reason: Disconnect", __GetName(playerid), __GetName(i));
+				            SCMToAll(NEF_RED, gstr);
+
+		 		            gTeam[i] = FREEROAM;
+
+				            PlayerInfo[i][DuelRequestRecv] = INVALID_PLAYER_ID;
+				            PlayerInfo[i][DuelRequest] = INVALID_PLAYER_ID;
+
+							ResetPlayerWorld(i);
+							RandomSpawn(i);
+				            ResetPlayerWeapons(i);
+				            RandomWeapons(i);
+
+				            found = true;
+				            break;
+				        }
+				    }
+				}
 		    }
 		    case gBUILDRACE:
 		    {
@@ -3889,14 +3918,14 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				if(count > 20)
 				{
 					format(string, sizeof(string),
-					""white"Gang name:\t"nef_yellow"%s\n"white"Gang tag:\t"nef_yellow"%s\n"white"Gang created:\t"nef_yellow"%s\n"white"Gang score:\t"nef_yellow"%i\n"white"Gang color:\t{%06x}COLOR\n"white"Gang Car:\t"nef_yellow"%s\n"white"Users online:\t"nef_yellow"%i\n\n"white"Online:%s\n"white"[... too many online]",
-						gangname, gangtag, UnixTimeToDate(udate), score, color >>> 8, VehicleNames[gcar - 400], count, members);
+					""white"Gang name:\t"nef_yellow"%s\n"white"Gang tag:\t"nef_yellow"%s\n"white"Gang created:\t"nef_yellow"%s\n"white"Gang score:\t"nef_yellow"%i\n"white"Gang color:\t{%06x}COLOR\n"white"Gang car:\t"nef_yellow"%s\n"white"Users online:\t"nef_yellow"%i\n\n"white"Online:%s\n"white"[... too many online]",
+						gangname, gangtag, UnixTimeToDate(udate), score, color >>> 8, IsValidVehicleModel(gcar) ? VehicleNames[gcar - 400] : "not set", count, members);
 				}
 				else
 				{
 				    format(string, sizeof(string),
-					""white"Gang name:\t"nef_yellow"%s\n"white"Gang tag:\t"nef_yellow"%s\n"white"Gang created:\t"nef_yellow"%s\n"white"Gang score:\t"nef_yellow"%i\n"white"Gang color:\t{%06x}COLOR\n"white"Gang Car:\t"nef_yellow"%s\n"white"Users online:\t"nef_yellow"%i\n\n"white"Online:%s",
-						gangname, gangtag, UnixTimeToDate(udate), score, color >>> 8, VehicleNames[gcar - 400], count, members);
+					""white"Gang name:\t"nef_yellow"%s\n"white"Gang tag:\t"nef_yellow"%s\n"white"Gang created:\t"nef_yellow"%s\n"white"Gang score:\t"nef_yellow"%i\n"white"Gang color:\t{%06x}COLOR\n"white"Gang car:\t"nef_yellow"%s\n"white"Users online:\t"nef_yellow"%i\n\n"white"Online:%s",
+						gangname, gangtag, UnixTimeToDate(udate), score, color >>> 8, IsValidVehicleModel(gcar) ? VehicleNames[gcar - 400] : "not set", count, members);
 				}
 
 				ShowPlayerDialog(extraid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Gang Info", string, "OK", "");
@@ -16586,7 +16615,7 @@ YCMD:cashfall(playerid, params[], help)
 			return SCM(playerid, NEF_GREEN, "Usage: /cashfall <cash>");
 		}
 
-		if(money > 25000 || money < 1000) return SCM(playerid, -1, ""er"Cash: $1,000 - $25,000");
+		if(money > 25000 || money < 1) return SCM(playerid, -1, ""er"Cash: $1 - $25,000");
 
 		for(new i = 0; i < MAX_PLAYERS; i++)
 		{
@@ -16877,11 +16906,6 @@ YCMD:pm(playerid, params[], help)
 	    return SCM(playerid, -1, ""er"This player has blocked you from PMing him");
 	}
 	
-	if(IsPlayerOnDesktop(player))
-	{
-	    SCM(playerid, -1, ""er"This player is on desktop and may not receive your message");
-	}
-	
 	TextDrawShowForPlayer(playerid, CheckTD);
 	TextDrawShowForPlayer(player, NewMsgTD);
 	SetTimerEx("hideMsgTD", 3000, false, "i", player);
@@ -16900,6 +16924,11 @@ YCMD:pm(playerid, params[], help)
 
 	PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
 	PlayerPlaySound(player, 1057, 0.0, 0.0, 0.0);
+
+	if(IsPlayerOnDesktop(player))
+	{
+	    SCM(playerid, -1, ""er"This player is on desktop and may not receive your message");
+	}
 
 	format(gstr, sizeof(gstr), "[PM] from %s(%i) to %s(%i): %s", __GetName(playerid), playerid, __GetName(player), player, msg);
 	AdminMSG(GREY, gstr);
@@ -16937,11 +16966,6 @@ YCMD:r(playerid, params[], help)
 	    return SCM(playerid, -1, ""er"This player has blocked you from PMing him");
 	}
 	
-	if(IsPlayerOnDesktop(lID))
-	{
-	    SCM(playerid, -1, ""er"This player is on desktop and may not receive your message");
-	}
-	
 	format(gstr, sizeof(gstr), "***[PM] from %s(%i): %s", __GetName(playerid), playerid, msg);
     SCM(lID, YELLOW, gstr);
 	format(gstr, sizeof(gstr), ">>>[PM] to %s(%i): %s", __GetName(lID), lID, msg);
@@ -16960,6 +16984,11 @@ YCMD:r(playerid, params[], help)
 
 	PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
 	PlayerPlaySound(lID, 1057, 0.0, 0.0, 0.0);
+
+	if(IsPlayerOnDesktop(lID))
+	{
+	    SCM(playerid, -1, ""er"This player is on desktop and may not receive your message");
+	}
 
 	format(gstr, sizeof(gstr), ""grey"[PM] from %s(%i) to %s(%i): %s", __GetName(playerid), playerid, __GetName(lID), lID, msg);
 	AdminMSG(GREY, gstr);
