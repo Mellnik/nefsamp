@@ -16,6 +16,11 @@
 #define IRC_CONNECT (false)
 #define WINTER_EDITION (false) // LOAD ferriswheelfair.amx
 
+/* NOTES
+- Add new toys file
+- Add Vehicle mediumint to gangs
+*/
+
 // -
 // - Plugins
 // -
@@ -10685,7 +10690,6 @@ YCMD:car(playerid, params[], help)
 	if(gTeam[playerid] == FREEROAM)
 	{
 	    if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't spawn a car now");
-	
 	    if(IsPlayerInRangeOfPoint(playerid, 65.0, 1797.3141, -1302.0978, 120.2659) && PlayerInfo[playerid][Level] < 1) return SCM(playerid, -1, ""er"Can't spawn vehicle at this place!");
 
 		CarSpawner(playerid, 415, 120);
@@ -12455,6 +12459,88 @@ YCMD:gcolor(playerid, params[], help)
 
 	    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s set the gang color to {%06x}NEW COLOR", __GetName(playerid), col >>> 8);
 		GangMSG(PlayerInfo[playerid][GangID], gstr);
+	}
+	return 1;
+}
+
+YCMD:gcar(playerid, params[], help)
+{
+    if(!islogged(playerid)) return notlogged(playerid);
+
+    if(PlayerInfo[playerid][GangID] == 0) return SCM(playerid, -1, ""er"You aren't in any gang!");
+    if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
+
+	if(gTeam[playerid] == FREEROAM)
+	{
+	    if(strlen(params) == 0)
+	    {
+	        if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't spawn a car now");
+	        if(IsPlayerInRangeOfPoint(playerid, 65.0, 1797.3141, -1302.0978, 120.2659) && PlayerInfo[playerid][Level] < 1) return SCM(playerid, -1, ""er"Can't spawn vehicle at this place!");
+	        
+	        format(gstr, sizeof(gstr), "SELECT `Vehicle` FROM `gangs` WHERE `ID` = %i;", PlayerInfo[playerid][GangID]);
+			new Cache:res = mysql_query(g_SQL_handle, gstr);
+			
+			if(cache_get_row_count(g_SQL_handle) != 0)
+			{
+			    if(IsValidVehicleModel(cache_get_row_int(0, 0, g_SQL_handle)))
+				{
+					CarSpawner(playerid, cache_get_row_int(0, 0, g_SQL_handle), 120);
+				}
+				else
+				{
+				    SCM(playerid, -1, ""er"Gang car has not been set yet");
+				}
+			}
+		  	else
+		  	{
+		  	    SCM(playerid, -1, ""er"Gang car has not been set yet");
+		  	}
+
+			cache_delete(res);
+		}
+		else
+		{
+		    if(strlen(params) > 29) return SCM(playerid, NEF_YELLOW, "I don't know that vehicle...");
+		    if(PlayerInfo[playerid][GangPosition] < GANG_POS_LEADER) return SCM(playerid, -1, ""er"You have to be at least the gang leader to set the gang car");
+		    
+	 	    new gcar = -1;
+
+		    if(IsNumeric(params))
+		    {
+				if(!IsValidVehicleModel(strval(params)))
+				{
+					return SCM(playerid, NEF_YELLOW, "I don't know that vehicle...");
+				}
+
+	        	gcar = strval(params);
+		    }
+		    else
+		    {
+				if(!sscanf(params, "s[144]", gstr))
+				{
+					new veh = GetVehicleModelID(gstr);
+					if(!IsValidVehicleModel(veh))
+					{
+						return SCM(playerid, NEF_YELLOW, "I don't know that vehicle...");
+					}
+
+			        gcar = veh;
+				}
+			}
+
+			if(gcar != -1)
+			{
+				format(gstr, sizeof(gstr), "UPDATE `gangs` SET `Vehicle` = %i WHERE `ID` = %i;", gcar, PlayerInfo[playerid][GangID]);
+				mysql_tquery(g_SQL_handle, gstr, "", "");
+
+			    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s set the gang vehicle to %s", __GetName(playerid), VehicleNames[gcar - 400]);
+				GangMSG(PlayerInfo[playerid][GangID], gstr);
+			}
+		}
+	}
+	else
+	{
+  		SCM(playerid, RED, NOT_AVAIL);
 	}
 	return 1;
 }
@@ -23813,6 +23899,9 @@ LoadVisualStaticMeshes()
 	
     new count = GetTickCount() + 3600000;
     
+	new mcc = CreateDynamicObject(8323, -2322.76880, -1704.56067, 499.98999,   0.00000, 0.00000, 69.30000);
+	SetDynamicObjectMaterialText(mcc, 0, "Welcome to New Evolution Freeroam!\n"green"Server Realtime:\nPlayers online: ", OBJECT_MATERIAL_SIZE_256x128, "Calibri", 0, 0, -32256, -16777216, OBJECT_MATERIAL_TEXT_ALIGN_LEFT);
+
     new object_id = CreateDynamicObject(11317, 1914.20313, -1377.58191, 26.29986,   0.00000, 0.00000, 91.91999); // Gold Credits Wang Cars
     SetDynamicObjectMaterial(object_id, 2, 19341, "egg_texts", "easter_egg01");
     SetDynamicObjectMaterial(object_id, 3, 19341, "egg_texts", "easter_egg01");
