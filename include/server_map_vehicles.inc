@@ -18,6 +18,8 @@ LoadServerVehicles()
 	AddStaticVehicleEx(562, -2336.9749, -1653.6908, 485.8159, -137.4600, randomColors[random(23)], randomColors[random(23)], 100);
 	AddStaticVehicleEx(451, -2332.7922, -1653.0896, 485.0860, -140.3999, randomColors[random(23)], randomColors[random(23)], 100);
 	AddStaticVehicleEx(411, -2328.0505, -1652.9418, 484.9182, -139.9200, randomColors[random(23)], randomColors[random(23)], 100);
+	AddStaticVehicleEx(406, -2320.4536, -1691.3804, 487.1952, 0.0000, randomColors[random(23)], randomColors[random(23)], 100);
+	AddStaticVehicleEx(486, -2327.6707, -1686.9471, 486.2130, 0.0000, randomColors[random(23)], randomColors[random(23)], 100);
 
 	// /jj
 	AddStaticVehicleEx(411, -1682.8873, 2030.9122, 1102.6147, 123.7800, randomColors[random(23)], randomColors[random(23)], 100);
