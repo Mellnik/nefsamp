@@ -3263,7 +3263,7 @@ public OnPlayerConnect(playerid)
         //PlayerPlaySound(playerid, 1183, 0, 0, 0);
 		PlayAudioStreamForPlayer(playerid, "http://www.nefserver.net/s/NEFLogin.mp3");
 
-		format(gstr, sizeof(gstr), "SELECT * FROM `bans` WHERE `PlayerName` = '%s';", __GetName(playerid));
+		format(gstr, sizeof(gstr), "SELECT * FROM `bans` WHERE `PlayerName` = '%s' LIMIT 1;", __GetName(playerid));
 		mysql_tquery(g_SQL_handle, gstr, "OnQueryFinish", "siii", gstr, THREAD_IS_BANNED, playerid, g_SQL_handle);
  	}
  	return 1;
@@ -3959,7 +3959,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 
             if(rows == 0) // ip not banned
             {
-				format(gstr, sizeof(gstr), "SELECT `ID` FROM `accounts` WHERE `Name` = '%s';", __GetName(extraid));
+				format(gstr, sizeof(gstr), "SELECT `ID` FROM `accounts` WHERE `Name` = '%s' LIMIT 1;", __GetName(extraid));
 				mysql_tquery(g_SQL_handle, gstr, "OnQueryFinish", "siii", gstr, THREAD_ACCOUNT_EXIST, extraid, g_SQL_handle); // cehcking if acc exists
 				
 				SendWelcomeMSG(extraid);
@@ -4030,7 +4030,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				    
 				    SCM(extraid, -1, ""nef" Your time ban expired, you've benn unbanned!");
 
-					format(string, sizeof(string), "SELECT * FROM `blacklist` WHERE `IP` = '%s';", __GetIP(extraid));
+					format(string, sizeof(string), "SELECT * FROM `blacklist` WHERE `IP` = '%s' LIMIT 1;", __GetIP(extraid));
 					mysql_tquery(g_SQL_handle, string, "OnQueryFinish", "siii", string, THREAD_CHECK_IP, extraid, g_SQL_handle); // Continuing with progress
 				}
 				else
@@ -4042,7 +4042,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		    }
 		    else
 		    {
-				format(gstr, sizeof(gstr), "SELECT * FROM `blacklist` WHERE `IP` = '%s';", __GetIP(extraid));
+				format(gstr, sizeof(gstr), "SELECT * FROM `blacklist` WHERE `IP` = '%s' LIMIT 1;", __GetIP(extraid));
 				mysql_tquery(g_SQL_handle, gstr, "OnQueryFinish", "siii", gstr, THREAD_CHECK_IP, extraid, g_SQL_handle);
 		    }
 		}
@@ -4065,7 +4065,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 
 		    if(rows != 0) // acc exists
 		    {
-				format(gstr, sizeof(gstr), "SELECT `ID` FROM `accounts` WHERE `Name` = '%s' AND `IP` = '%s';", __GetName(extraid), __GetIP(extraid));
+				format(gstr, sizeof(gstr), "SELECT `ID` FROM `accounts` WHERE `Name` = '%s' AND `IP` = '%s' LIMIT 1;", __GetName(extraid), __GetIP(extraid));
 				mysql_tquery(g_SQL_handle, gstr, "OnQueryFinish", "siii", gstr, THREAD_CHECK_AUTO_LOGIN, extraid, g_SQL_handle); // check auto login
 		    }
 		    else
@@ -12625,7 +12625,7 @@ YCMD:gcar(playerid, params[], help)
 	        if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't spawn a car now");
 	        if(IsPlayerInRangeOfPoint(playerid, 65.0, 1797.3141, -1302.0978, 120.2659) && PlayerInfo[playerid][Level] < 1) return SCM(playerid, -1, ""er"Can't spawn vehicle at this place!");
 	        
-	        format(gstr, sizeof(gstr), "SELECT `Vehicle` FROM `gangs` WHERE `ID` = %i;", PlayerInfo[playerid][GangID]);
+	        format(gstr, sizeof(gstr), "SELECT `Vehicle` FROM `gangs` WHERE `ID` = %i LIMIT 1;", PlayerInfo[playerid][GangID]);
 			new Cache:res = mysql_query(g_SQL_handle, gstr);
 			
 			if(cache_get_row_count(g_SQL_handle) != 0)
@@ -12802,7 +12802,7 @@ YCMD:unban(playerid, params[], help)
 	    new escape[25];
 	    mysql_escape_string(gstr, escape, g_SQL_handle, sizeof(escape));
 
-	    format(gstr, sizeof(gstr), "SELECT `ID` FROM `bans` WHERE `PlayerName` = '%s';", escape);
+	    format(gstr, sizeof(gstr), "SELECT `ID` FROM `bans` WHERE `PlayerName` = '%s' LIMIT 1;", escape);
 	    mysql_tquery(g_SQL_handle, gstr, "OnUnbanAttempt", "is", playerid, escape);
 	}
 	else
@@ -12831,7 +12831,7 @@ YCMD:oban(playerid, params[], help)
 	    mysql_escape_string(player, escape, g_SQL_handle, sizeof(escape));
 	    mysql_escape_string(reason, ereason, g_SQL_handle, sizeof(ereason));
 
-	    format(player, sizeof(player), "SELECT `AdminName` FROM `bans` WHERE `PlayerName` = '%s';", escape);
+	    format(player, sizeof(player), "SELECT `AdminName` FROM `bans` WHERE `PlayerName` = '%s' LIMIT 1;", escape);
 	    mysql_tquery(g_SQL_handle, player, "OnOfflineBanAttempt", "iss", playerid, escape, ereason);
 	}
 	else
@@ -19979,7 +19979,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				new query[255], escape[33];
 				mysql_escape_string(password, escape, g_SQL_handle, 33);
 
-				format(query, sizeof(query), "SELECT `ID` FROM `accounts` WHERE `Name` = '%s' AND (`Hash` = MD5('%s') OR `Hash` = SHA1('%s'));", __GetName(playerid), escape, escape); // SHA1 because of Stunt Evolution server merge
+				format(query, sizeof(query), "SELECT `ID` FROM `accounts` WHERE `Name` = '%s' AND (`Hash` = MD5('%s') OR `Hash` = SHA1('%s')) LIMIT 1;", __GetName(playerid), escape, escape); // SHA1 because of Stunt Evolution server merge
 				mysql_tquery(g_SQL_handle, query, "OnQueryFinish", "siii", query, THREAD_CHECK_PLAYER_PASSWD, playerid, g_SQL_handle);
 			    return true;
 			}
@@ -21430,7 +21430,7 @@ SyncGangZones(playerid)
 
 GetGangNameByID(id)
 {
-	format(gstr, sizeof(gstr), "SELECT `GangName` FROM `gangs` WHERE `ID` = %i;", id);
+	format(gstr, sizeof(gstr), "SELECT `GangName` FROM `gangs` WHERE `ID` = %i LIMIT 1;", id);
 	new Cache:res = mysql_query(g_SQL_handle, gstr), name[21];
 	if(cache_get_row_count(g_SQL_handle) != 0)
 	{
@@ -22272,7 +22272,7 @@ VIPMSG(color, const msg[])
 
 MySQL_FetchGangInfo(playerid, gGangID)
 {
-	format(gstr, sizeof(gstr), "SELECT * FROM `gangs` WHERE `ID` = %i;", gGangID);
+	format(gstr, sizeof(gstr), "SELECT * FROM `gangs` WHERE `ID` = %i LIMIT 1;", gGangID);
 	mysql_tquery(g_SQL_handle, gstr, "OnQueryFinish", "siii", gstr, THREAD_FETCH_GANG_INFO, playerid, g_SQL_handle);
 }
 
@@ -22284,13 +22284,13 @@ MySQL_UpdateGangScore(gGangID, value)
 
 MySQL_LoadPlayer(playerid)
 {
-	format(gstr2, sizeof(gstr2), "SELECT * FROM `accounts` WHERE `Name` = '%s';", __GetName(playerid));
+	format(gstr2, sizeof(gstr2), "SELECT * FROM `accounts` WHERE `Name` = '%s' LIMIT 1;", __GetName(playerid));
 	mysql_tquery(g_SQL_handle, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_LOAD_PLAYER, playerid, g_SQL_handle);
 }
 
 MySQL_LoadPlayerGang(playerid)
 {
-	format(gstr2, sizeof(gstr2), "SELECT `GangName`, `GangTag` FROM `gangs` WHERE `ID` = %i;", PlayerInfo[playerid][GangID]);
+	format(gstr2, sizeof(gstr2), "SELECT `GangName`, `GangTag` FROM `gangs` WHERE `ID` = %i LIMIT 1;", PlayerInfo[playerid][GangID]);
 	mysql_tquery(g_SQL_handle, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_LOAD_PLAYER_GANG, playerid, g_SQL_handle);
 }
 
@@ -22593,7 +22593,7 @@ MySQL_BanIP(const ip[])
 
 MySQL_ExistGang(playerid)
 {
-	format(gstr, sizeof(gstr), "SELECT `ID` FROM `gangs` WHERE `GangName` = '%s';", PlayerInfo[playerid][GangName]);
+	format(gstr, sizeof(gstr), "SELECT `ID` FROM `gangs` WHERE `GangName` = '%s' LIMIT 1;", PlayerInfo[playerid][GangName]);
 	mysql_tquery(g_SQL_handle, gstr, "OnQueryFinish", "siii", gstr, THREAD_GANG_EXIST, playerid, g_SQL_handle);
 }
 
@@ -30727,7 +30727,7 @@ function:OnOfflineBanAttempt(playerid, ban[], reason[])
 	}
 	else
 	{
-	    format(gstr, sizeof(gstr), "SELECT `Level`, `IP` FROM `accounts` WHERE `Name` = '%s';", ban);
+	    format(gstr, sizeof(gstr), "SELECT `Level`, `IP` FROM `accounts` WHERE `Name` = '%s' LIMIT 1;", ban);
 	    mysql_tquery(g_SQL_handle, gstr, "OnOfflineBanAttempt2", "iss", playerid, ban, reason);
 	}
 	return 1;
