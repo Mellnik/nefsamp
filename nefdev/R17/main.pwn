@@ -104,7 +104,7 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define CURRENT_VERSION                 "PTS:R17"
 #define CURRENT_VERSION_SHORT           "PTS:R17"
 #endif
-#define HOTFIX_REV                      "Hotfix #0"
+#define HOTFIX_REV                      "Hotfix #1"
 #define SAMP_VERSION                    "SA-MP 0.3x-R2"
 #define MAX_REPORTS 					(7)
 #define MAX_ADS                         (10)
@@ -3495,7 +3495,7 @@ public OnPlayerDisconnect(playerid, reason)
     	if(gTeam[i] == SPEC && PlayerInfo[i][SpecID] == playerid)
     	{
     	    Command_ReProcess(i, "/specoff", false);
-    	    ShowInfo(i, "Player disconnected", "");
+    	    SCM(i, -1, ""red"Player disconnected!");
 		}
 
   		if(Iter_Contains(PlayerIgnore[i], playerid))
@@ -5818,25 +5818,6 @@ public OnPlayerEnterDynamicArea(playerid, areaid)
 			}
 		}
 	}
-	
-    if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
-    {
-		for(new i = 0; i < sizeof(g_SpawnAreas); i++)
-		{
-		    if(areaid == g_SpawnAreas[i])
-		    {
-		        new Float:POS[4], vid = GetPlayerVehicleID(playerid);
-		        GetVehicleVelocity(vid, POS[0], POS[1], POS[2]);
-		        GetVehicleZAngle(vid, POS[3]);
-
-		        POS[0] += (-1.1 * floatsin(-POS[3], degrees));
-		        POS[1] += (-1.1 * floatcos(-POS[3], degrees));
-
-		        SetVehicleVelocity(vid, POS[0], POS[1], POS[2] * 1.2);
-		        break;
-		    }
-		}
-    }
 	return 1;
 }
 
@@ -6463,6 +6444,8 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 	    }
 	    if(pickupid == mc_weps)
 	    {
+            if(PlayerInfo[playerid][bGod]) ResetPlayerWeapons(playerid);
+            
 	        Command_ReProcess(playerid, "/w", false);
 	        return 1;
 	    }
@@ -17853,12 +17836,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        {
 	            PlayerInfo[playerid][DuelLocation] = listitem + 1;
 	            
-	            if(!islogged(PlayerInfo[playerid][DuelRequest])) return SCM(playerid, -1, ""er"Player does not have an account");
 	            if(gTeam[PlayerInfo[playerid][DuelRequest]] != FREEROAM) return SCM(playerid, -1, ""er"Player is not in normal world");
 	            if(!IsPlayerAvail(PlayerInfo[playerid][DuelRequest])) return SCM(playerid, -1, ""er"Player is not available");
 	            if(gTeam[playerid] != FREEROAM) return ShowInfo(playerid, "You must be in Freeroam", "");
 	            if(IsPlayerOnDesktop(PlayerInfo[playerid][DuelRequest])) return SCM(playerid, -1, ""er"Player is on desktop");
 	            if(playerid == PlayerInfo[playerid][DuelRequest]) return SCM(playerid, -1, ""er"You can't duel yourself");
+	            if(!islogged(PlayerInfo[playerid][DuelRequest])) return SCM(playerid, -1, ""er"Player does not have an account");
 	            
 	            PlayerInfo[PlayerInfo[playerid][DuelRequest]][DuelRequestRecv] = playerid;
 	            
@@ -24116,7 +24099,7 @@ LoadVisualStaticMeshes()
 	CreateDynamic3DTextLabel("Dive", GREEN, -2338.6001,-1627.5149,485.6543+0.5, 30.0);
 	mc_tp = CreateDynamicPickup(19130, 2, -2330.7739,-1644.0229,485.6543);
 	CreateDynamic3DTextLabel("Teleports "red"(/t)", BLUE, -2330.7739,-1644.0229,485.6543+0.5, 30.0);
-	mc_weps = CreateDynamicPickup(355, 2, -2340.0862,-1644.3979,485.6543);
+	mc_weps = CreateDynamicPickup(1254, 2, -2340.0862,-1644.3979,485.6543);
 	CreateDynamic3DTextLabel("Weapons "green"(/w)", RED, -2340.0862,-1644.3979,485.6543+0.5, 30.0);
 
     AdminLC = CreateDynamicPickup(1559, 23, 1805.7494,-1302.6721,120.2656);
@@ -26625,6 +26608,25 @@ task ProcessTick[1000]()
 			    case FREEROAM:
 			    {
 			        SavePos(i);
+			        
+				    if(GetPlayerState(i) == PLAYER_STATE_DRIVER)
+				    {
+						for(new ii = 0; ii < sizeof(g_SpawnAreas); ii++)
+						{
+						    if(IsPlayerInDynamicArea(i, g_SpawnAreas[ii]))
+						    {
+						        new Float:POS[4], vid = GetPlayerVehicleID(i);
+						        GetVehicleVelocity(vid, POS[0], POS[1], POS[2]);
+						        GetVehicleZAngle(vid, POS[3]);
+
+						        POS[0] += (-1.1 * floatsin(-POS[3], degrees));
+						        POS[1] += (-1.1 * floatcos(-POS[3], degrees));
+
+						        SetVehicleVelocity(vid, POS[0], POS[1], POS[2] * 1.2);
+						        break;
+						    }
+						}
+				    }
 			    }
 			    case SPEC:
 			    {
@@ -28359,7 +28361,7 @@ RemovePlayerToys(playerid)
 {
 	for(new i = 0; i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
 	{
-	    if(IsPlayerAttachedObjectSlotUsed(playerid, 1))
+	    if(IsPlayerAttachedObjectSlotUsed(playerid, i))
 	    {
 			RemovePlayerAttachedObject(playerid, i);
 	    }
@@ -30678,6 +30680,7 @@ SavePos(playerid)
 
 islogged(playerid)
 {
+	if(playerid == INVALID_PLAYER_ID) return 0;
 	if(PlayerInfo[playerid][ExitType] == EXIT_FIRST_SPAWNED && PlayerInfo[playerid][bLogged])
 	{
 	    return 1;
