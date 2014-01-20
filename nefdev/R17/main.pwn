@@ -1211,7 +1211,7 @@ new const szRandomInfoTXTs[13][] =
 	"~w~Want access to ~y~bonus commands~w~? Check out ~r~~h~/premium~w~!",
 	"~w~Edit your server prefrences and features using ~r~~h~/settings~w~!",
 	"~w~Flip your vehicle with key ~g~~h~~h~'2'",
-	"~w~Join our ~r~~h~forums~w~! Register at ~b~~h~"SVRURLWWW"!",
+	"~w~Join our ~r~~h~forums~w~! Register at ~b~~h~~h~"SVRURLWWW"~w~!",
 	"~w~Get some ~y~Gold Credits ~w~at "SVRURLWWW"/gc/",
 	"~w~Try our ~y~Cops and Robbers ~w~Minigame! ~y~/cnr",
 	"~w~Type ~g~~h~~h~/c ~b~~h~~h~/t~w~ for ~y~commands ~w~and ~y~teleports!",
@@ -1813,6 +1813,7 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
 	Text:TXTFooterBlack,
 	Text:TXTOnJoin[2],
 	Text:TXTRandomInfo,
+	Text:NEFLOGO[3],
 	toyslist = mS_INVALID_LISTID,
 	hobjslist = mS_INVALID_LISTID,
 	skinlist = mS_INVALID_LISTID,
@@ -2547,7 +2548,6 @@ public OnGameModeInit()
 	SetTimer("Maths", 980000, true);
 	SetTimer("RandomSvrMsg", SERVERMSGS_TIME, true);
 	SetTimer("DoLotto", 100000, false);
-	//SetTimer("RandomTXTInfo", 30000, true);
 
     SollIchDirMaEtWatSagen();
 
@@ -2639,6 +2639,9 @@ public OnPlayerRequestClass(playerid, classid)
 	
 	TextDrawShowForPlayer(playerid, TXTFooterBlack);
 	TextDrawShowForPlayer(playerid, TXTFooter);
+	TextDrawShowForPlayer(playerid, NEFLOGO[0]);
+	TextDrawShowForPlayer(playerid, NEFLOGO[1]);
+	TextDrawShowForPlayer(playerid, NEFLOGO[2]);
 	TextDrawShowForPlayer(playerid, TXTRandomInfo);
 	//TextDrawShowForPlayer(playerid, TXTCommandsTop);
 	#if WINTER_EDITION == true
@@ -8487,6 +8490,9 @@ YCMD:hidef(playerid, params[], help)
     //TextDrawHideForPlayer(playerid, TXTCommandsTop);
     TextDrawHideForPlayer(playerid, TXTFooterBlack);
 	TextDrawHideForPlayer(playerid, TXTFooter);
+	TextDrawHideForPlayer(playerid, NEFLOGO[0]);
+	TextDrawHideForPlayer(playerid, NEFLOGO[1]);
+	TextDrawHideForPlayer(playerid, NEFLOGO[2]);
     TextDrawHideForPlayer(playerid, TXTRandomInfo);
     TextDrawHideForPlayer(playerid, TXTGodTD);
     PlayerTextDrawHide(playerid, TXTWantedsTD[playerid]);
@@ -8503,6 +8509,9 @@ YCMD:showf(playerid, params[], help)
 	//TextDrawShowForPlayer(playerid, TXTCommandsTop);
 	TextDrawShowForPlayer(playerid, TXTFooterBlack);
 	TextDrawShowForPlayer(playerid, TXTFooter);
+	TextDrawShowForPlayer(playerid, NEFLOGO[0]);
+	TextDrawShowForPlayer(playerid, NEFLOGO[1]);
+	TextDrawShowForPlayer(playerid, NEFLOGO[2]);
     TextDrawShowForPlayer(playerid, TXTRandomInfo);
 	PlayerTextDrawShow(playerid, TXTWantedsTD[playerid]);
 	if(PlayerInfo[playerid][bGod]) TextDrawShowForPlayer(playerid, TXTGodTD);
@@ -23311,9 +23320,9 @@ CreateTextdraws()
 	TextDrawFont(TXTSpeedo_Main, 1);
 	TextDrawSetProportional(TXTSpeedo_Main, 1);
 	
-	TXTRandomInfo = TextDrawCreate(601.000000, 425.000000, "~w~Need a ~b~~h~vehicle~w~? Spawn one using ~r~~h~/v~w~!");
+	TXTRandomInfo = TextDrawCreate(599.000000, 426.000000, "~w~Need a ~b~~h~vehicle~w~? Spawn one using ~r~~h~/v~w~!");
 	TextDrawAlignment(TXTRandomInfo, 3);
-	TextDrawBackgroundColor(TXTRandomInfo, 255);
+	TextDrawBackgroundColor(TXTRandomInfo, 168430233);
 	TextDrawFont(TXTRandomInfo, 1);
 	TextDrawLetterSize(TXTRandomInfo, 0.250000, 1.200000);
 	TextDrawColor(TXTRandomInfo, -1);
@@ -23322,7 +23331,7 @@ CreateTextdraws()
 	TextDrawSetSelectable(TXTRandomInfo, 0);
 
 	// TXTOnJoin[0] = TextDrawCreate(323.000000, 188.000000, "~y~~h~S~w~tunt ~g~~h~~h~E~w~volution~n~~n~"SVRURLWWW"");
-	TXTOnJoin[0] = TextDrawCreate(323.000000, 188.000000, "~y~~h~N~w~ew ~g~~h~~h~E~w~volution ~r~~h~~h~F~w~reeroam~n~~n~"SVRURLWWW"");
+	TXTOnJoin[0] = TextDrawCreate(323.000000, 188.000000, "~y~N~w~ew ~g~~h~~h~E~w~volution ~r~~h~~h~F~w~reeroam~n~~n~"SVRURLWWW"");
 	TextDrawAlignment(TXTOnJoin[0], 2);
 	TextDrawBackgroundColor(TXTOnJoin[0], 168430202);
 	TextDrawFont(TXTOnJoin[0], 1);
@@ -23381,6 +23390,36 @@ CreateTextdraws()
 	TextDrawSetOutline(TXTFooter, 1);
 	TextDrawSetProportional(TXTFooter, 1);
 	TextDrawSetSelectable(TXTFooter, 0);
+	
+	NEFLOGO[0] = TextDrawCreate(88.000000, 426.000000, "~y~N~w~ew ~g~~h~~h~E~w~volution ~r~~h~~h~F~w~reeroam");
+	TextDrawAlignment(NEFLOGO[0], 2);
+	TextDrawBackgroundColor(NEFLOGO[0], 51);
+	TextDrawFont(NEFLOGO[0], 3);
+	TextDrawLetterSize(NEFLOGO[0], 0.290000, 1.000000);
+	TextDrawColor(NEFLOGO[0], -1);
+	TextDrawSetOutline(NEFLOGO[0], 1);
+	TextDrawSetProportional(NEFLOGO[0], 1);
+	TextDrawSetSelectable(NEFLOGO[0], 0);
+
+	NEFLOGO[1] = TextDrawCreate(89.000000, 432.000000, "-");
+	TextDrawAlignment(NEFLOGO[1], 2);
+	TextDrawBackgroundColor(NEFLOGO[2], 51);
+	TextDrawFont(NEFLOGO[1], 1);
+	TextDrawLetterSize(NEFLOGO[1], 7.619995, 1.000000);
+	TextDrawColor(NEFLOGO[1], -1);
+	TextDrawSetOutline(NEFLOGO[1], 1);
+	TextDrawSetProportional(NEFLOGO[1], 1);
+	TextDrawSetSelectable(NEFLOGO[1], 0);
+
+	NEFLOGO[2] = TextDrawCreate(89.000000, 439.000000, "~b~~h~~h~Stunt~w~/~g~~h~Drift~w~/~y~Race~w~/~r~~h~DM~w~/~p~Fun");
+	TextDrawAlignment(NEFLOGO[2], 2);
+	TextDrawBackgroundColor(NEFLOGO[2], 51);
+	TextDrawFont(NEFLOGO[2], 1);
+	TextDrawLetterSize(NEFLOGO[2], 0.260000, 0.899999);
+	TextDrawColor(NEFLOGO[2], -1);
+	TextDrawSetOutline(NEFLOGO[2], 1);
+	TextDrawSetProportional(NEFLOGO[2], 1);
+	TextDrawSetSelectable(NEFLOGO[2], 0);
 
 	AchTD[0] = TextDrawCreate(495.000000, 190.000000, "Box0");
 	TextDrawBackgroundColor(AchTD[0], 255);
@@ -30646,7 +30685,7 @@ islogged(playerid)
 	return 0;
 }
 
-function:RandomTXTInfo()
+task RandomTXTInfo[30000]()
 {
 	TextDrawSetString(TXTRandomInfo, szRandomInfoTXTs[random(sizeof(szRandomInfoTXTs))]);
 	return 1;
