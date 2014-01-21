@@ -22,7 +22,6 @@
 // sscanf.so | 2.8.1
 // streamer.so | R84
 // mysql_static.so | R34
-// crashdetect.so | v4.13
 // irc.so | 1.4.3
 // dns.so | 2.4
 
@@ -32,7 +31,6 @@
 #include <a_samp>   		// 0.3x-R2
 #undef MAX_PLAYERS
 #define MAX_PLAYERS (405)
-#include <crashdetect>      // v4.13
 #include <YSI\y_iterate>	// 04/01/2014
 #include <YSI\y_commands>   // 04/01/2014
 #include <YSI\y_master>     // 04/01/2014
@@ -2716,7 +2714,6 @@ public OnPlayerSpawn(playerid)
     }
 
     if(PlayerInfo[playerid][bShowToys] && !PlayerInfo[playerid][bFirstSpawn]) AttachPlayerToys(playerid);
-    SavePos(playerid);
     
     if(PlayerInfo[playerid][bFirstSpawn])
     {
@@ -2743,7 +2740,7 @@ public OnPlayerSpawn(playerid)
 		{
 		    SetPlayerArmour(playerid, 100.0);
 		}
-		
+		SavePos(playerid);
 		SyncGangZones(playerid);
     }
     else switch(gTeam[playerid])
@@ -2772,7 +2769,7 @@ public OnPlayerSpawn(playerid)
 			{
 			    RandomWeapons(playerid);
 			}
-
+            SavePos(playerid);
 			SyncGangZones(playerid);
 
 			if(PlayerInfo[playerid][VIP] == 1)
@@ -3293,7 +3290,7 @@ public OnPlayerDisconnect(playerid, reason)
 
 		                gTeam[i] = FREEROAM;
 		                ResetPlayerWorld(i);
-		                RandomSpawn(i);
+		                RandomSpawn(i, true);
 		                ResetPlayerWeapons(i);
 		                RandomWeapons(i);
 		                
@@ -3319,7 +3316,7 @@ public OnPlayerDisconnect(playerid, reason)
 				            PlayerInfo[i][DuelRequest] = INVALID_PLAYER_ID;
 
 							ResetPlayerWorld(i);
-							RandomSpawn(i);
+							RandomSpawn(i, true);
 				            ResetPlayerWeapons(i);
 				            RandomWeapons(i);
 
@@ -5224,7 +5221,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 		            PlayerInfo[playerid][DuelRequest] = INVALID_PLAYER_ID;
 		            
 					ResetPlayerWorld(i);
-					RandomSpawn(i);
+					RandomSpawn(i, true);
 		            ResetPlayerWeapons(i);
 		            RandomWeapons(i);
 		            
@@ -5252,7 +5249,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 			            PlayerInfo[playerid][DuelRequest] = INVALID_PLAYER_ID;
 
 						ResetPlayerWorld(i);
-						RandomSpawn(i);
+						RandomSpawn(i, true);
 			            ResetPlayerWeapons(i);
 			            RandomWeapons(i);
 
@@ -17835,8 +17832,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        {
 	            PlayerInfo[playerid][DuelLocation] = listitem + 1;
 	            
-	            if(gTeam[PlayerInfo[playerid][DuelRequest]] != FREEROAM) return SCM(playerid, -1, ""er"Player is not in normal world");
 	            if(!IsPlayerAvail(PlayerInfo[playerid][DuelRequest])) return SCM(playerid, -1, ""er"Player is not available");
+	            if(gTeam[PlayerInfo[playerid][DuelRequest]] != FREEROAM) return SCM(playerid, -1, ""er"Player is not in normal world");
 	            if(gTeam[playerid] != FREEROAM) return ShowInfo(playerid, "You must be in Freeroam", "");
 	            if(IsPlayerOnDesktop(PlayerInfo[playerid][DuelRequest])) return SCM(playerid, -1, ""er"Player is on desktop");
 	            if(playerid == PlayerInfo[playerid][DuelRequest]) return SCM(playerid, -1, ""er"You can't duel yourself");
@@ -22581,7 +22578,7 @@ MySQL_ExistGang(playerid)
 
 MySQL_CreateGang(playerid)
 {
-    format(gstr2, sizeof(gstr2), "INSERT INTO `gangs` VALUES (NULL, '%s', '%s', 0, %i, -84215197);", PlayerInfo[playerid][GangName], PlayerInfo[playerid][GangTag], gettime());
+    format(gstr2, sizeof(gstr2), "INSERT INTO `gangs` VALUES (NULL, '%s', '%s', 0, %i, -84215197, 0);", PlayerInfo[playerid][GangName], PlayerInfo[playerid][GangTag], gettime());
     mysql_tquery(g_SQL_handle, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_CREATE_GANG, playerid, g_SQL_handle);
 }
 
