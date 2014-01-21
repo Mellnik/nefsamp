@@ -1197,7 +1197,7 @@ enum e_firework
 // global
 // ===
 
-new const szRandomInfoTXTs[13][] =
+new const szRandomInfoTXTs[14][] =
 {
     "~w~Need a ~b~~h~vehicle~w~? Spawn one using ~r~~h~/v~w~!",
 	"~w~Don't wanna get killed? Type ~g~~h~~h~/god",
@@ -1211,7 +1211,8 @@ new const szRandomInfoTXTs[13][] =
 	"~w~Go to ~g~~h~~h~/vs ~w~and get a private vehicle which you can tune!",
     "~w~Join minigames to earn money and score! ~g~~h~~h~/m",
 	"~w~Spawn vehicles using ~r~~h~/v ~w~or ~r~~h~/car",
-	"~w~Edit your server prefrences and features using ~r~/settings~w~!"
+	"~w~Edit your server prefrences and features using ~r~/settings~w~!",
+	"~w~Challenge your friends in ~r~~h~~h~/duel"
 };
 
 new const ServerMSGS[15][] =
@@ -3472,10 +3473,7 @@ public OnPlayerDisconnect(playerid, reason)
     }
     for(new i = 0; i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
     {
-		if(IsPlayerAttachedObjectSlotUsed(playerid, i))
-		{
-			RemovePlayerAttachedObject(playerid, i);
-		}
+		RemovePlayerAttachedObject(playerid, i);
 	}
 	if(PlayerInfo[playerid][bRainbow])
 	{
@@ -9890,11 +9888,11 @@ YCMD:adminhelp(playerid, params[], help)
 		
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[3][e_rank]);
 		strcat(string, gstr);
-		strcat(string, "/freeze /eject /go /burn /getip /mkick /clearchat\n/giveweapon /announce /connectbots /raceforcemap /deleterecord\n\n");
+		strcat(string, "/freeze /eject /go /burn /getip /mkick /clearchat /iplookup\n/giveweapon /announce /connectbots /raceforcemap /deleterecord\n\n");
 		
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[4][e_rank]);
 		strcat(string, gstr);
-		strcat(string, "/unban /oban /sethealth /get /healall /armorall /cashfall /scorefall\n/announce2 /iplookup\n\n");
+		strcat(string, "/unban /oban /sethealth /get /healall /armorall /cashfall\n/scorefall /announce2\n\n");
 		
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[5][e_rank]);
 		strcat(string, gstr);
@@ -10787,7 +10785,7 @@ YCMD:getip(playerid, params[], help)
 
 YCMD:iplookup(playerid, params[], help)
 {
-	if(PlayerInfo[playerid][Level] >= 4)
+	if(PlayerInfo[playerid][Level] >= 3)
 	{
 	    extract params -> new string:ip[144]; else
 	    {
@@ -26570,6 +26568,39 @@ function:OnQueueReceived()
 		
 		cache_delete(Data, g_SQL_handle);
 	}
+	return 1;
+}
+
+task LogoUpdate[300]()
+{
+	static phase_, red_, blue_, green_;
+	switch(phase_)
+	{
+		case 0:
+		{
+		    red_ += 5;
+		    if(red_ >= 255) phase_ = 1;
+		}
+		case 1:
+		{
+		    red_ -= 5;
+		    blue_ += 5;
+		    if(blue_ >= 255) phase_ = 2;
+		}
+		case 2:
+		{
+		    green_ += 5;
+		    blue_ -= 5;
+		    if(green_ >= 255) phase_ = 3;
+		}
+		case 3:
+		{
+		    red_ += 5;
+		    green_ -= 5;
+		    if(red_ >= 255) phase_ = 1;
+		}
+	}
+	TextDrawColor(NEFLOGO[1], RGBA(red_, green_, blue_, 255));
 	return 1;
 }
 
