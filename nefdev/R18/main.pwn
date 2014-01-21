@@ -13551,7 +13551,7 @@ YCMD:getin(playerid, params[], help)
 				return 1;
 			}
 
-			if(IsVehicleOneSeater(GetPlayerVehicleID(player)))
+			if(GetVehicleModelSeats(GetVehicleModel(GetPlayerVehicleID(player))) == 1)
 			{
 				format(gstr, sizeof(gstr), ""er"%s(%i) is currently driving a one seat vehicle!", __GetName(player), player);
 				SCM(playerid, -1, gstr);
@@ -13563,17 +13563,23 @@ YCMD:getin(playerid, params[], help)
 				return SCM(playerid, NEF_GREEN, "Usage: /getin <playerid> <seat id 1-3>");
 			}
 
-			new vID = GetPlayerVehicleID(player), vM = GetVehicleModel(vID);
+			new vID = GetPlayerVehicleID(player), vM = GetVehicleModel(vID), count = 0;
 
 			for(new i = 0; i < MAX_PLAYERS; i++)
 			{
 			    if(!IsPlayerInVehicle(i, vID)) continue;
+			    count++;
 			    if(GetPlayerVehicleSeat(i) == seat)
 			    {
 					format(gstr, sizeof(gstr), ""er"Seat %i in %s(%i)'s %s is occupied by %s(%i)", seat, __GetName(player), player, VehicleNames[vM - 400], __GetName(i), i);
 					SCM(playerid, -1, gstr);
 					return 1;
 				}
+			}
+			
+			if(count >= GetVehicleModelSeats(GetVehicleModel(GetPlayerVehicleID(player))))
+			{
+			    return SCM(playerid, -1, ""er"All vehicles seats occupied!");
 			}
 
 			SetPlayerInterior(playerid, GetPlayerInterior(player));
@@ -29292,16 +29298,20 @@ function:DestroyRampObject(objid, playerid)
 	PlayerInfo[playerid][RampActive] = false;
 }
 
-IsVehicleOneSeater(vehicleid)
+GetVehicleModelSeats(modelid)
 {
-	switch(GetVehicleModel(vehicleid))
-	{
-		case 406, 425, 430, 432, 435, 441, 446, 448, 449, 450, 452..454, 460, 464, 465, 472,
-		473, 476, 481, 484..486, 493, 501, 509, 510, 512, 513, 519, 520, 530, 531, 532,
-	 	539, 553, 564, 568, 571, 572, 574, 577, 584, 590..595, 606,
-	 	607, 608, 610, 611: return 1;
-	}
-	return 0;
+    static const gVehicleSeats[] =
+    {
+        4, 2, 2, 2, 4, 4, 1, 2, 2, 4, 2, 2, 2, 4, 2, 2, 4, 2, 4, 2, 4, 4, 2, 2, 2, 1, 4, 4, 4, 2,
+        1, 7, 1, 2, 2, 0, 2, 7, 4, 2, 4, 1, 2, 2, 2, 4, 1, 2, 1, 0, 0, 2, 1, 1, 1, 2, 2, 2, 4,
+        4, 2, 2, 2, 2, 1, 1, 4, 4, 2, 2, 4, 2, 1, 1, 2, 2, 1, 2, 2, 4, 2, 1, 4, 3, 1, 1, 1, 4, 2,
+        2, 4, 2, 4, 1, 2, 2, 2, 4, 4, 2, 2, 1, 2, 2, 2, 2, 2, 4, 2, 1, 1, 2, 1, 1, 2, 2, 4, 2, 2,
+        1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 4, 1, 1, 1, 2, 2, 2, 2, 7, 7, 1, 4, 2, 2, 2, 2, 2, 4, 4,
+        2, 2, 4, 4, 2, 1, 2, 2, 2, 2, 2, 2, 4, 4, 2, 2, 1, 2, 4, 4, 1, 0, 0, 1, 1, 2, 1, 2, 2, 1, 2,
+        4, 4, 2, 4, 1, 0, 4, 2, 2, 2, 2, 0, 0, 7, 2, 2, 1, 4, 4, 4, 2, 2, 2, 2, 2, 4, 2, 0, 0, 0,
+        4, 0, 0
+    };
+    return (modelid < 400 || modelid > 611) ? 0 : gVehicleSeats[modelid - 400];
 }
 
 AddTeleport(teleport_category, const teleport_name[], const teleport_cmd[], Float:x, Float:y, Float:z)
