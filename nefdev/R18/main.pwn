@@ -16114,7 +16114,7 @@ YCMD:mk(playerid, params[], help)
 
 YCMD:credits(playerid, params[], help)
 {
-	ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, "Gold Credits information", ""white"GC is a virtual currency used throughout all "SVRNAME" gameservers.\nGC can be used to buy in-game items and to add new features. It's a great way to enhance\nyour gaming experience.\n\n"nef_green"Go to "SVRURLWWW"/credits", "OK", "");
+	ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, "Gold Credits information", ""white"GC is a virtual currency used throughout all "SVRNAME" gameservers.\nIt can be used to buy in-game items and to add new features. It's a great way to enhance\nyour gaming experience.\n\n"nef_green"Go to "SVRURLWWW"/credits", "OK", "");
 	return 1;
 }
 
@@ -20005,8 +20005,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					case 4: ShowPlayerDialog(playerid, STREAM_DIALOG+5, DIALOG_STYLE_LIST, ""nef" :: Streams > Rap", "POWERHITZ.COM - #1 FOR HITZ\nRADIOUP.COM - THE HITLIST", "Select", "Back");
 					case 5: ShowPlayerDialog(playerid, STREAM_DIALOG+6, DIALOG_STYLE_LIST, ""nef" :: Streams > Mainstream/Rock", "#MUSIK.MAIN - WWW.RAUTEMUSIK.FM - 24H\n181.FM - Kickin' Country", "Select", "Back");
 					case 6: ShowPlayerDialog(playerid, STREAM_DIALOG+7, DIALOG_STYLE_LIST, ""nef" :: Streams > Oldies", "181.FM - Good Time Oldies\n#MUSIK.GOLDIES - WWW.RAUTEMUSIK.FM", "Select", "Back");
-					case 7: ShowPlayerDialog(playerid, STREAM_DIALOG+7, DIALOG_STYLE_LIST, ""nef" :: Streams > Dubstep", "#MUSIK.DRUMSTEP - WWW.RAUTEMUSIK.FM\nSinister Souls Dubstep, Dub and Deep Bass", "Select", "Back");
-					case 8: ShowPlayerDialog(playerid, STREAM_DIALOG+8, DIALOG_STYLE_INPUT, ""nef" :: Streams > Your own stream", ""white"Please enter the audio stream you want to listen to", "Play", "Back");
+					case 7: ShowPlayerDialog(playerid, STREAM_DIALOG+8, DIALOG_STYLE_LIST, ""nef" :: Streams > Dubstep", "#MUSIK.DRUMSTEP - WWW.RAUTEMUSIK.FM\nSinister Souls Dubstep, Dub and Deep Bass", "Select", "Back");
+					case 8: ShowPlayerDialog(playerid, STREAM_DIALOG+9, DIALOG_STYLE_INPUT, ""nef" :: Streams > Your own stream", ""white"Please enter the audio stream you want to listen to", "Play", "Back");
 				}
 				return true;
 			}
@@ -20086,7 +20086,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 			    extract inputtext -> new string:link[144]; else
 			    {
-					return ShowPlayerDialog(playerid, STREAM_DIALOG+8, DIALOG_STYLE_INPUT, ""nef" :: Streams > Your own stream", ""white"Please enter the audio stream you want to listen to", "Play", "Back");
+					return ShowPlayerDialog(playerid, STREAM_DIALOG+9, DIALOG_STYLE_INPUT, ""nef" :: Streams > Your own stream", ""white"Please enter the audio stream you want to listen to", "Play", "Back");
 			    }
 				PlayAudioStreamForPlayer(playerid, link);
 				return true;
