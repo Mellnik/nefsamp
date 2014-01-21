@@ -1,6 +1,6 @@
 /*======================================================================*\
 || #################################################################### ||
-|| # Project New Evolution Freeroam - Release 17         			  # ||
+|| # Project New Evolution Freeroam - Release 18         			  # ||
 || # ---------------------------------------------------------------- # ||
 || # Copyright ©2011-2014 New Evolution Freeroam	  				  # ||
 || # Created by Mellnik                                               # ||
@@ -11,15 +11,10 @@
 
 #pragma dynamic 8192
 
-#define IS_RELEASE_BUILD (true)
+#define IS_RELEASE_BUILD (false)
 #define INC_ENVIORMENT (true)
-#define IRC_CONNECT (true)
+#define IRC_CONNECT (false)
 #define WINTER_EDITION (false) // LOAD ferriswheelfair.amx
-
-/* NOTES
-- Add new toys file
-- Add Vehicle mediumint to gangs
-*/
 
 // -
 // - Plugins
@@ -98,13 +93,13 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define HOSTNAME                        " 	        NEF » ×DM/Stunt/Race/Freeroam/Minigames×"
 //#define HOSTNAME 						"NEF 0.3x (R11)     «Stunt/Race/Freeroam/DM»"
 #if IS_RELEASE_BUILD == true
-#define CURRENT_VERSION                 "Release 17"
-#define CURRENT_VERISON_SHORT           "R17"
+#define CURRENT_VERSION                 "Release 18"
+#define CURRENT_VERISON_SHORT           "R18"
 #else
-#define CURRENT_VERSION                 "PTS:R17"
-#define CURRENT_VERSION_SHORT           "PTS:R17"
+#define CURRENT_VERSION                 "PTS:R18"
+#define CURRENT_VERSION_SHORT           "PTS:R18"
 #endif
-#define HOTFIX_REV                      "Hotfix #1"
+#define HOTFIX_REV                      "Hotfix #0"
 #define SAMP_VERSION                    "SA-MP 0.3x-R2"
 #define MAX_REPORTS 					(7)
 #define MAX_ADS                         (10)
@@ -4814,14 +4809,17 @@ public OnPlayerUpdate(playerid)
 	    }
 	    case FREEROAM:
 	    {
-	        switch(GetPlayerWeapon(playerid))
+	        if(PlayerInfo[playerid][Level] != MAX_ADMIN_LEVEL)
 	        {
-	            case 38, 36, 35:
-	            {
-		            ResetPlayerWeapons(playerid);
-		            return 0;
-	            }
-	        }
+		        switch(GetPlayerWeapon(playerid))
+		        {
+		            case 38, 36, 35:
+		            {
+			            ResetPlayerWeapons(playerid);
+			            return 0;
+		            }
+		        }
+			}
 	    }
 	}
 	
@@ -9887,11 +9885,11 @@ YCMD:adminhelp(playerid, params[], help)
 
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[1][e_rank]);
 		strcat(string, gstr);
-		strcat(string, "/rplayers /dplayers /asay /warn /slap /reports /spec /specoff /disarm\n/pweaps /getin /gotoxyza /spectators /caps /day /night /dawn\n/kick /mute /unmute /adminhq /ncrecords\n\n");
+		strcat(string, "/rplayers /dplayers /asay /warn /slap /reports /spec /specoff /disarm\n/pweaps /getin /gotoxyza /spectators /caps\n/kick /mute /unmute /adminhq /ncrecords\n\n");
 
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[2][e_rank]);
 		strcat(string, gstr);
-		strcat(string, "/tban /online /offline /onduty /offduty /akill /rv\n/move /ban /ipban /cuff /uncuff /jail /unjail /unfreeze\n\n");
+		strcat(string, "/tban /online /offline /onduty /offduty /akill /rv /day /night /dawn\n/move /ban /ipban /cuff /uncuff /jail /unjail /unfreeze\n\n");
 		
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[3][e_rank]);
 		strcat(string, gstr);
@@ -11470,7 +11468,7 @@ YCMD:caps(playerid, params[], help)
 
 YCMD:day(playerid, params[], help)
 {
-	if(PlayerInfo[playerid][Level] >= 1)
+	if(PlayerInfo[playerid][Level] >= 2)
 	{
 	    SetWorldTime(12);
 	    SetWeather(1);
@@ -11486,7 +11484,7 @@ YCMD:day(playerid, params[], help)
 
 YCMD:dawn(playerid, params[], help)
 {
-	if(PlayerInfo[playerid][Level] >= 1)
+	if(PlayerInfo[playerid][Level] >= 2)
 	{
 		SetWorldTime(6);
 		SetWeather(1);
@@ -11502,7 +11500,7 @@ YCMD:dawn(playerid, params[], help)
 
 YCMD:night(playerid, params[], help)
 {
-	if(PlayerInfo[playerid][Level] >= 1)
+	if(PlayerInfo[playerid][Level] >= 2)
 	{
 	    SetWorldTime(0);
 	    SetWeather(17);
@@ -12582,8 +12580,8 @@ YCMD:gcolor(playerid, params[], help)
 		{
    			return SCM(playerid, -1, ""er"Color too dark! RGB values under 30 are not allowed!");
 		}
-		new col = RGBA(r, g, b, 99);
-		SetPlayerColor(playerid, col);
+		
+		new col = RGBA(r, g, b, 200);
 
 		format(gstr, sizeof(gstr), "UPDATE `gangs` SET `Color` = %i WHERE `ID` = %i;", col, PlayerInfo[playerid][GangID]);
 		mysql_tquery(g_SQL_handle, gstr, "", "");
@@ -12619,12 +12617,12 @@ YCMD:gcar(playerid, params[], help)
 				}
 				else
 				{
-				    SCM(playerid, -1, ""er"Gang car has not been set yet");
+				    SCM(playerid, -1, ""er"Gang car has not been set yet. Type /gcar <vehicle>");
 				}
 			}
 		  	else
 		  	{
-		  	    SCM(playerid, -1, ""er"Gang car has not been set yet");
+		  	    SCM(playerid, -1, ""er"Gang car has not been set yet. Type /gcar <vehicle>");
 		  	}
 
 			cache_delete(res);
@@ -13130,7 +13128,8 @@ YCMD:giveweapon(playerid, params[], help)
 			    return 1;
 			}
 
-	        if(weaponID == 38 || weaponID == 36 || weaponID == 35 || weaponID == 39 || weaponID == 44 || weaponID == 45|| weaponID == 40) return SCM(playerid, -1, ""er"Can't give restriced weapon");
+	        if(weaponID == 38 || weaponID == 36 || weaponID == 39 || weaponID == 44 || weaponID == 45|| weaponID == 40) return SCM(playerid, -1, ""er"Can't give restriced weapon");
+			if(weaponID == 35 && PlayerInfo[playerid][Level] != MAX_ADMIN_LEVEL) return SCM(playerid, -1, NO_PERM);
 
 			if(weaponID <= 0 && weaponID >= 47)
 			{
@@ -15500,7 +15499,7 @@ YCMD:gangs(playerid, params[], help)
 
 YCMD:gtop(playerid, params[], help)
 {
-	mysql_tquery(g_SQL_handle, "SELECT `GangName`, `GangTag`, `GangScore` FROM `gangs` ORDER BY `GangScore` DESC LIMIT 30;", "OnGTopReceived", "i", playerid);
+	mysql_tquery(g_SQL_handle, "SELECT `GangName`, `GangTag`, `GangScore`, `Color` FROM `gangs` ORDER BY `GangScore` DESC LIMIT 30;", "OnGTopReceived", "i", playerid);
 	return 1;
 }
 
@@ -15517,7 +15516,7 @@ function:OnGTopReceived(playerid)
 	    {
 	        cache_get_row(i, 0, tmp, g_SQL_handle, sizeof(tmp));
 	        cache_get_row(i, 1, tmp2, g_SQL_handle, sizeof(tmp2));
-	        format(tmpstring, sizeof(tmpstring), "%i - [%s]%s [%i]\n", i + 1, tmp2, tmp, cache_get_row_int(i, 2, g_SQL_handle));
+	        format(tmpstring, sizeof(tmpstring), "{%06x}%i - [%s]%s [%i]\n", cache_get_row_int(i, 3, g_SQL_handle) >>> 8, i + 1, tmp2, tmp, cache_get_row_int(i, 2, g_SQL_handle));
 	        strcat(finstring, tmpstring);
 	    }
 	    ShowPlayerDialog(playerid, TOP_GANGS_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" :: Top Gangs", finstring, "OK", "");
@@ -26622,7 +26621,7 @@ task ProcessTick[1000]()
 						        POS[0] += (-1.1 * floatsin(-POS[3], degrees));
 						        POS[1] += (-1.1 * floatcos(-POS[3], degrees));
 
-						        SetVehicleVelocity(vid, POS[0], POS[1], POS[2] * 1.2);
+						        SetVehicleVelocity(vid, POS[0], POS[1], POS[2] + 0.20);
 						        break;
 						    }
 						}
