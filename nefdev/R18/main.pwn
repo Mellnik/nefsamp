@@ -368,7 +368,7 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define BROWN 							(0xA52A2AAA)
 #define BLACK       					(0x0A0A0AFF)
 #define ADMIN       					(0xF50000FF)
-#define BESCH                           (0xE8D04C00)
+#define BESCH                           (0xE8D04CFF)
 #define R_BESCH                         (0x00FFB4FF)
 #define r_besch                         "{00FFB4}"
 #define besch                           "{E8D04C}"
@@ -4071,7 +4071,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 			if(rows > 0)
 			{
 			    PlayerInfo[extraid][AccountID] = cache_get_row_int(0, 0, g_SQL_handle);
-			    PlayerInfo[extraid][SavedColor] = cache_get_row_int(0, 2, g_SQL_handle) != 0 ? cache_get_row_int(0, 2, g_SQL_handle) : 0;
+			    PlayerInfo[extraid][SavedColor] = cache_get_row_int(0, 2, g_SQL_handle) != 0 ? cache_get_row_int(0, 2, g_SQL_handle) & 0xFF : 0;
 			    PlayerInfo[extraid][Level] = cache_get_row_int(0, 5, g_SQL_handle);
 			    PlayerInfo[extraid][Score] = cache_get_row_int(0, 6, g_SQL_handle);
 			    PlayerInfo[extraid][Money] = cache_get_row_int(0, 7, g_SQL_handle);
@@ -8597,7 +8597,7 @@ YCMD:colors(playerid, params[], help)
 		{
    			return SCM(playerid, -1, ""er"Color too dark! RGB values under 30 are not allowed!");
 		}
-		new col = RGBA(r, g, b, 99);
+		new col = RGBA(r, g, b, 255);
 		SetPlayerColor(playerid, col);
 
 		format(gstr, sizeof(gstr), ""nef" Your nickname color has been changed to %i-%i-%i in RGB", r, g, b);
@@ -12421,7 +12421,7 @@ YCMD:gcolor(playerid, params[], help)
    			return SCM(playerid, -1, ""er"Color too dark! RGB values under 30 are not allowed!");
 		}
 		
-		new col = RGBA(r, g, b, 200);
+		new col = RGBA(r, g, b, 255);
 
 		format(gstr, sizeof(gstr), "UPDATE `gangs` SET `Color` = %i WHERE `ID` = %i;", col, PlayerInfo[playerid][GangID]);
 		mysql_tquery(g_SQL_handle, gstr, "", "");
@@ -26248,7 +26248,7 @@ function:OnQueueReceived()
 	return 1;
 }
 
-task LogoUpdate[300]()
+task LogoColUpdate[300]()
 {
 	static phase_, red_, blue_, green_;
 	switch(phase_)
@@ -26278,6 +26278,30 @@ task LogoUpdate[300]()
 		}
 	}
 	TextDrawColor(NEFLOGO[1], RGBA(red_, green_, blue_, 255));
+	return 1;
+}
+
+task LogoSwitch[10000]()
+{
+	static Phase;
+	switch(Phase)
+	{
+	    case 0:
+	    {
+	        TextDrawSetString(NEFLOGO[2], "~w~NEF "CURRENT_VERSION"");
+	        Phase = 1;
+	    }
+	    case 1:
+	    {
+            TextDrawSetString(NEFLOGO[2], "~b~~h~~h~Stunt~w~/~g~~h~Drift~w~/~y~Race~w~/~r~~h~DM~w~/~p~Fun");
+	        Phase = 2;
+	    }
+	    case 2:
+	    {
+			TextDrawSetString(NEFLOGO[2], "~b~~h~~h~Stunt~w~/~g~~h~Drift~w~/~y~Race~w~/~r~~h~DM~w~/~p~Fun");
+	        Phase = 0;
+	    }
+	}
 	return 1;
 }
 
