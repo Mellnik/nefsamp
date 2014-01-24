@@ -5128,12 +5128,15 @@ public OnPlayerDeath(playerid, killerid, reason)
     SendDeathMessage(killerid, playerid, reason);
 	PlayerInfo[playerid][Deaths]++;
 
-	if(reason <= 46 && gTeam[killerid] == FREEROAM && IsPlayerConnected(killerid) && PlayerInfo[playerid][HitmanHit] > 0)
+	if(killerid != INVALID_PLAYER_ID)
 	{
-		format(gstr, sizeof(gstr), "%s(%i) killed %s(%i) and received $%s for a completed hit!", __GetName(killerid), killerid, __GetName(playerid), playerid, number_format(PlayerInfo[playerid][HitmanHit]));
-		SCMToAll(YELLOW, gstr);
-		GivePlayerCash(killerid, PlayerInfo[playerid][HitmanHit]);
-		PlayerInfo[playerid][HitmanHit] = 0;
+		if(reason <= 46 && gTeam[killerid] == FREEROAM && IsPlayerConnected(killerid) && PlayerInfo[playerid][HitmanHit] > 0)
+		{
+			format(gstr, sizeof(gstr), "%s(%i) killed %s(%i) and received $%s for a completed hit!", __GetName(killerid), killerid, __GetName(playerid), playerid, number_format(PlayerInfo[playerid][HitmanHit]));
+			SCMToAll(YELLOW, gstr);
+			GivePlayerCash(killerid, PlayerInfo[playerid][HitmanHit]);
+			PlayerInfo[playerid][HitmanHit] = 0;
+		}
 	}
 
 	if(IsPlayerAvail(killerid))
@@ -10797,6 +10800,11 @@ YCMD:iplookup(playerid, params[], help)
 
 	    if(strlen(escape) > 16 || strlen(escape) < 7) return SCM(playerid, -1, ""er"This is not an ip");
 
+		if(badsql(escape) != 0)
+		{
+		    return SCM(playerid, -1, ""er"You have specified invalid characters");
+		}
+
 	    format(gstr, sizeof(gstr), "SELECT `Name` FROM `accounts` WHERE `IP` = '%s' AND `Level` != 5;", escape);
 	    mysql_tquery(g_SQL_handle, gstr, "OnIpLookUp", "is", playerid, escape);
 	}
@@ -11691,46 +11699,9 @@ YCMD:grename(playerid, params[], help)
 	{
 	    return SCM(playerid, -1, ""er"Invalid gangtag length");
 	}
-	
-    if(strfind(buff, " ", false) != -1)
+	if(badsql(buff) != 0)
 	{
-        return SCM(playerid, -1, ""er"Spaces are not allowed");
-	}
-    if(strfind(buff, "-", false) != -1)
-	{
-        return SCM(playerid, -1, ""er"- ist not allowed");
-	}
-    if(strfind(buff, "|", false) != -1)
-	{
-        return SCM(playerid, -1, ""er"| ist not allowed");
-	}
-    if(strfind(buff, ",", false) != -1)
-	{
-        return SCM(playerid, -1, ""er", ist not allowed");
-	}
-    if(strfind(buff, "@", false) != -1)
-	{
-        return SCM(playerid, -1, ""er"@ ist not allowed");
-	}
-    if(strfind(buff, "*", false) != -1)
-	{
-        return SCM(playerid, -1, ""er"* ist not allowed");
-	}
-    if(strfind(buff, "'", false) != -1)
-	{
-        return SCM(playerid, -1, ""er"' ist not allowed");
-	}
-    if(strfind(buff, "\"", false) != -1)
-	{
-        return SCM(playerid, -1, ""er"\" ist not allowed");
-	}
-	if(strfind(buff, "\\", false) != -1)
-	{
-        return SCM(playerid, -1, ""er"\\ ist not allowed");
-	}
-    if((strfind(buff, "`", false) != -1) || (strfind(buff, "´", false) != -1))
-	{
-        return SCM(playerid, -1, ""er"`´ ist not allowed");
+	    return SCM(playerid, -1, ""er"You have specified invalid characters");
 	}
     if(strfind(buff, "admin", false) != -1)
 	{
@@ -11740,45 +11711,9 @@ YCMD:grename(playerid, params[], help)
 	new gangname[21];
 	mysql_escape_string(buff, gangname, g_SQL_handle, 21);
 
-    if(strfind(buff2, " ", false) != -1)
+	if(badsql(buff) != 0)
 	{
-        return SCM(playerid, -1, ""er"Spaces are not allowed");
-	}
-    if(strfind(buff2, "-", false) != -1)
-	{
-        return SCM(playerid, -1, ""er"- ist not allowed");
-	}
-    if(strfind(buff2, "*", false) != -1)
-	{
-        return SCM(playerid, -1, ""er"* ist not allowed");
-	}
-    if(strfind(buff2, "|", false) != -1)
-	{
-        return SCM(playerid, -1, ""er"| ist not allowed");
-	}
-    if(strfind(buff2, ",", false) != -1)
-	{
-        return SCM(playerid, -1, ""er", ist not allowed");
-	}
-    if(strfind(buff2, "@", false) != -1)
-	{
-        return SCM(playerid, -1, ""er"@ ist not allowed");
-	}
-    if(strfind(buff2, "'", false) != -1)
-	{
-        return SCM(playerid, -1, ""er"' ist not allowed");
-	}
-    if(strfind(buff2, "\"", false) != -1)
-	{
-        return SCM(playerid, -1, ""er"\" ist not allowed");
-	}
-	if(strfind(buff2, "\\", false) != -1)
-	{
-        return SCM(playerid, -1, ""er"\\ ist not allowed");
-	}
-    if(strfind(buff2, "`", false) != -1 || strfind(buff2, "´", false) != -1)
-	{
-        return SCM(playerid, -1, ""er"`´ ist not allowed");
+	    return SCM(playerid, -1, ""er"You have specified invalid characters");
 	}
     if(strfind(buff2, "admin", false) != -1)
 	{
@@ -11955,55 +11890,10 @@ YCMD:gcreate(playerid, params[], help)
 	    return SCM(playerid, -1, ""er"Gang tag length: 2 - 4 characters");
 	}
 
-    if(strfind(ntmp, " ", false) != -1)
+	if(badsql(ntmp) != 0)
 	{
-        CancelGangCreation(playerid);
-        return SCM(playerid, -1, ""er"Spaces are not allowed");
-	}
-    if(strfind(ntmp, "-", false) != -1)
-	{
-        CancelGangCreation(playerid);
-        return SCM(playerid, -1, ""er"- ist not allowed");
-	}
-    if(strfind(ntmp, "|", false) != -1)
-	{
-        CancelGangCreation(playerid);
-        return SCM(playerid, -1, ""er"| ist not allowed");
-	}
-    if(strfind(ntmp, ",", false) != -1)
-	{
-        CancelGangCreation(playerid);
-        return SCM(playerid, -1, ""er", ist not allowed");
-	}
-    if(strfind(ntmp, "@", false) != -1)
-	{
-        CancelGangCreation(playerid);
-        return SCM(playerid, -1, ""er"@ ist not allowed");
-	}
-    if(strfind(ntmp, "*", false) != -1)
-	{
-        CancelGangCreation(playerid);
-        return SCM(playerid, -1, ""er"* ist not allowed");
-	}
-    if(strfind(ntmp, "'", false) != -1)
-	{
-        CancelGangCreation(playerid);
-        return SCM(playerid, -1, ""er"' ist not allowed");
-	}
-    if(strfind(ntmp, "\"", false) != -1)
-	{
-        CancelGangCreation(playerid);
-        return SCM(playerid, -1, ""er"\" ist not allowed");
-	}
-	if(strfind(ntmp, "\\", false) != -1)
-	{
-        CancelGangCreation(playerid);
-        return SCM(playerid, -1, ""er"\\ ist not allowed");
-	}
-    if((strfind(ntmp, "`", false) != -1) || (strfind(ntmp, "´", false) != -1))
-	{
-        CancelGangCreation(playerid);
-        return SCM(playerid, -1, ""er"`´ ist not allowed");
+	    CancelGangCreation(playerid);
+	    return SCM(playerid, -1, ""er"You have specified invalid characters");
 	}
     if(strfind(ntmp, "admin", false) != -1)
 	{
@@ -12012,55 +11902,10 @@ YCMD:gcreate(playerid, params[], help)
 	}
 	mysql_escape_string(ntmp, PlayerInfo[playerid][GangName], g_SQL_handle, 21);
 
-    if(strfind(ttmp, " ", false) != -1)
+	if(badsql(ttmp) != 0)
 	{
-        CancelGangCreation(playerid);
-        return SCM(playerid, -1, ""er"Spaces are not allowed");
-	}
-    if(strfind(ttmp, "-", false) != -1)
-	{
-        CancelGangCreation(playerid);
-        return SCM(playerid, -1, ""er"- ist not allowed");
-	}
-    if(strfind(ttmp, "*", false) != -1)
-	{
-        CancelGangCreation(playerid);
-        return SCM(playerid, -1, ""er"* ist not allowed");
-	}
-    if(strfind(ttmp, "|", false) != -1)
-	{
-        CancelGangCreation(playerid);
-        return SCM(playerid, -1, ""er"| ist not allowed");
-	}
-    if(strfind(ttmp, ",", false) != -1)
-	{
-        CancelGangCreation(playerid);
-        return SCM(playerid, -1, ""er", ist not allowed");
-	}
-    if(strfind(ttmp, "@", false) != -1)
-	{
-        CancelGangCreation(playerid);
-        return SCM(playerid, -1, ""er"@ ist not allowed");
-	}
-    if(strfind(ttmp, "'", false) != -1)
-	{
-        CancelGangCreation(playerid);
-        return SCM(playerid, -1, ""er"' ist not allowed");
-	}
-    if(strfind(ttmp, "\"", false) != -1)
-	{
-        CancelGangCreation(playerid);
-        return SCM(playerid, -1, ""er"\" ist not allowed");
-	}
-	if(strfind(ttmp, "\\", false) != -1)
-	{
-        CancelGangCreation(playerid);
-        return SCM(playerid, -1, ""er"\\ ist not allowed");
-	}
-    if(strfind(ttmp, "`", false) != -1 || strfind(ttmp, "´", false) != -1)
-	{
-        CancelGangCreation(playerid);
-        return SCM(playerid, -1, ""er"`´ ist not allowed");
+	    CancelGangCreation(playerid);
+	    return SCM(playerid, -1, ""er"You have specified invalid characters");
 	}
     if(strfind(ttmp, "admin", false) != -1)
 	{
@@ -12695,33 +12540,9 @@ YCMD:ipban(playerid, params[], help)
 	  	if(IsPlayerNPC(player)) return SCM(playerid, -1, ""er"Invalid player!");
         if(PlayerInfo[player][KBMarked]) return SCM(playerid, -1, ""er"Can't ban this player!");
         
-	    if(strfind(reason, "-", false) != -1)
+		if(badsql(reason) != 0)
 		{
-	        return SCM(playerid, -1, ""er"- ist not allowed");
-		}
-	    if(strfind(reason, "|", false) != -1)
-		{
-	        return SCM(playerid, -1, ""er"| ist not allowed");
-		}
-	    if(strfind(reason, ",", false) != -1)
-		{
-	        return SCM(playerid, -1, ""er", ist not allowed");
-		}
-	    if(strfind(reason, "@", false) != -1)
-		{
-	        return SCM(playerid, -1, ""er"@ ist not allowed");
-		}
-	    if(strfind(reason, "*", false) != -1)
-		{
-	        return SCM(playerid, -1, ""er"* ist not allowed");
-		}
-	    if(strfind(reason, "'", false) != -1)
-		{
-	        return SCM(playerid, -1, ""er"' ist not allowed");
-		}
-	    if((strfind(reason, "`", false) != -1) || (strfind(reason, "´", false) != -1))
-		{
-	        return SCM(playerid, -1, ""er"`´ ist not allowed");
+		    return SCM(playerid, -1, ""er"You have specified invalid characters");
 		}
 
 	  	if(PlayerInfo[player][Level] != MAX_ADMIN_LEVEL)
@@ -12838,33 +12659,9 @@ YCMD:tban(playerid, params[], help)
         if(PlayerInfo[player][KBMarked]) return SCM(playerid, -1, ""er"Can't ban this player!");
 		if(!islogged(player)) return SCM(playerid, -1, ""er"Cannot ban tmp accounts, use /ipban");
 
-	    if(strfind(reason, "-", false) != -1)
+		if(badsql(reason) != 0)
 		{
-	        return SCM(playerid, -1, ""er"- ist not allowed");
-		}
-	    if(strfind(reason, "|", false) != -1)
-		{
-	        return SCM(playerid, -1, ""er"| ist not allowed");
-		}
-	    if(strfind(reason, ",", false) != -1)
-		{
-	        return SCM(playerid, -1, ""er", ist not allowed");
-		}
-	    if(strfind(reason, "@", false) != -1)
-		{
-	        return SCM(playerid, -1, ""er"@ ist not allowed");
-		}
-	    if(strfind(reason, "*", false) != -1)
-		{
-	        return SCM(playerid, -1, ""er"* ist not allowed");
-		}
-	    if(strfind(reason, "'", false) != -1)
-		{
-	        return SCM(playerid, -1, ""er"' ist not allowed");
-		}
-	    if((strfind(reason, "`", false) != -1) || (strfind(reason, "´", false) != -1))
-		{
-	        return SCM(playerid, -1, ""er"`´ ist not allowed");
+		    return SCM(playerid, -1, ""er"You have specified invalid characters");
 		}
 
 	  	if(PlayerInfo[player][Level] != MAX_ADMIN_LEVEL)
@@ -12920,33 +12717,9 @@ YCMD:ban(playerid, params[], help)
 	  	if(IsPlayerNPC(player)) return SCM(playerid, -1, ""er"Invalid player!");
         if(PlayerInfo[player][KBMarked]) return SCM(playerid, -1, ""er"Can't ban this player!");
         
-	    if(strfind(reason, "-", false) != -1)
+		if(badsql(reason) != 0)
 		{
-	        return SCM(playerid, -1, ""er"- ist not allowed");
-		}
-	    if(strfind(reason, "|", false) != -1)
-		{
-	        return SCM(playerid, -1, ""er"| ist not allowed");
-		}
-	    if(strfind(reason, ",", false) != -1)
-		{
-	        return SCM(playerid, -1, ""er", ist not allowed");
-		}
-	    if(strfind(reason, "@", false) != -1)
-		{
-	        return SCM(playerid, -1, ""er"@ ist not allowed");
-		}
-	    if(strfind(reason, "*", false) != -1)
-		{
-	        return SCM(playerid, -1, ""er"* ist not allowed");
-		}
-	    if(strfind(reason, "'", false) != -1)
-		{
-	        return SCM(playerid, -1, ""er"' ist not allowed");
-		}
-	    if((strfind(reason, "`", false) != -1) || (strfind(reason, "´", false) != -1))
-		{
-	        return SCM(playerid, -1, ""er"`´ ist not allowed");
+		    return SCM(playerid, -1, ""er"You have specified invalid characters");
 		}
 
 	  	if(PlayerInfo[player][Level] != MAX_ADMIN_LEVEL)
@@ -19082,7 +18855,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        }
 	        case NAME_CHANGE_DIALOG:
 	        {
-	            if(strlen(inputtext) > 21 || strlen(inputtext) < 3) return SCM(playerid, -1, ""er"Name length: 3-21");
+	            if(strlen(inputtext) > 20 || strlen(inputtext) < 3) return SCM(playerid, -1, ""er"Name length: 3-20");
                 if(!strcmp(inputtext, __GetName(playerid), false)) return SCM(playerid, -1, ""er"You are already using that name");
 	            if(!strcmp(inputtext, __GetName(playerid), true)) return SCM(playerid, -1, ""er"The name only differs in case. Just relog with that.");
 
@@ -20710,59 +20483,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			 		ShowDialog(playerid, VEHICLE_PLATE_DIALOG);
 					return 1;
 				}
-    			if(strfind(inputtext, " ", false) != -1)
+				if(badsql(inputtext) != 0)
 				{
-					SCM(playerid, RED, ""er"You entered an invalid character!");
-			 		ShowDialog(playerid, VEHICLE_PLATE_DIALOG);
-					return 1;
-				}
-    			if(strfind(inputtext, "|", false) != -1)
-				{
-					SCM(playerid, RED, ""er"You entered an invalid character!");
-			 		ShowDialog(playerid, VEHICLE_PLATE_DIALOG);
-					return 1;
-				}
-    			if(strfind(inputtext, ",", false) != -1)
-				{
-					SCM(playerid, RED, ""er"You entered an invalid character!");
-			 		ShowDialog(playerid, VEHICLE_PLATE_DIALOG);
-					return 1;
-				}
-    			if(strfind(inputtext, "'", false) != -1)
-				{
-					SCM(playerid, RED, ""er"You entered an invalid character!");
-			 		ShowDialog(playerid, VEHICLE_PLATE_DIALOG);
-					return 1;
-				}
-			    if(strfind(inputtext, "@", false) != -1)
-				{
-					SCM(playerid, RED, ""er"You entered an invalid character!");
-			 		ShowDialog(playerid, VEHICLE_PLATE_DIALOG);
-					return 1;
-				}
-			    if(strfind(inputtext, "`", false) != -1)
-				{
-					SCM(playerid, RED, ""er"You entered an invalid character!");
-			 		ShowDialog(playerid, VEHICLE_PLATE_DIALOG);
-					return 1;
-				}
-			    if(strfind(inputtext, "\\", false) != -1)
-				{
-					SCM(playerid, RED, ""er"You entered an invalid character!");
-			 		ShowDialog(playerid, VEHICLE_PLATE_DIALOG);
-					return 1;
-				}
-   			    if(strfind(inputtext, "\"", false) != -1)
-				{
-					SCM(playerid, RED, ""er"You entered an invalid character!");
-			 		ShowDialog(playerid, VEHICLE_PLATE_DIALOG);
-					return 1;
-				}
-			    if(strfind(inputtext, "´", false) != -1)
-				{
-					SCM(playerid, RED, ""er"You entered an invalid character!");
-			 		ShowDialog(playerid, VEHICLE_PLATE_DIALOG);
-					return 1;
+				    ShowDialog(playerid, VEHICLE_PLATE_DIALOG);
+				    SCM(playerid, -1, ""er"You have specified invalid characters");
+				    return 1;
 				}
 				if(sscanf(inputtext, "s[13]", PlayerPVTMPPlate[playerid]))
 				{
@@ -20783,55 +20508,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				 	ShowDialog(playerid, CUSTOM_PLATE_DIALOG);
 				 	return 1;
 				}
-    			if(strfind(inputtext, "|", false) != -1)
-				{
-					SCM(playerid, RED, ""er"You entered an invalid character!");
-				 	ShowDialog(playerid, CUSTOM_PLATE_DIALOG);
-					return 1;
-				}
-    			if(strfind(inputtext, ",", false) != -1)
-				{
-					SCM(playerid, RED, ""er"You entered an invalid character!");
-				 	ShowDialog(playerid, CUSTOM_PLATE_DIALOG);
-					return 1;
-				}
-    			if(strfind(inputtext, " ", false) != -1)
-				{
-					SCM(playerid, RED, ""er"You entered an invalid character!");
-				 	ShowDialog(playerid, CUSTOM_PLATE_DIALOG);
-					return 1;
-				}
-    			if(strfind(inputtext, "'", false) != -1)
-				{
-					SCM(playerid, RED, ""er"You entered an invalid character!");
-				 	ShowDialog(playerid, CUSTOM_PLATE_DIALOG);
-					return 1;
-				}
-			    if(strfind(inputtext, "@", false) != -1)
-				{
-					SCM(playerid, RED, ""er"You entered an invalid character!");
-				 	ShowDialog(playerid, CUSTOM_PLATE_DIALOG);
-					return 1;
-				}
-			    if(strfind(inputtext, "`", false) != -1)
-				{
-					SCM(playerid, RED, ""er"You entered an invalid character!");
-				 	ShowDialog(playerid, CUSTOM_PLATE_DIALOG);
-					return 1;
-				}
-   			    if(strfind(inputtext, "\\", false) != -1)
-				{
-					SCM(playerid, RED, ""er"You entered an invalid character!");
-			 		ShowDialog(playerid, CUSTOM_PLATE_DIALOG);
-					return 1;
-				}
-   			    if(strfind(inputtext, "\"", false) != -1)
-				{
-					SCM(playerid, RED, ""er"You entered an invalid character!");
-			 		ShowDialog(playerid, CUSTOM_PLATE_DIALOG);
-					return 1;
-				}
-			    if(strfind(inputtext, "´", false) != -1)
+				if(badsql(inputtext) != 0)
 				{
 					SCM(playerid, RED, ""er"You entered an invalid character!");
 				 	ShowDialog(playerid, CUSTOM_PLATE_DIALOG);
@@ -31228,7 +30905,7 @@ Race_CalculatePosition()
 				vehicleid = GetPlayerVehicleID(i);
 				GetVehiclePos(vehicleid, POS[0], POS[1], POS[2]);
 				cp = g_CPProgress[i] + 1;
-				POS[3] = GetDistance2D(POS[0], POS[1], POS[2], g_RaceCPs[cp][0], g_RaceCPs[cp][1], g_RaceCPs[cp][2]);
+				POS[3] = GetDistance3D(POS[0], POS[1], POS[2], g_RaceCPs[cp][0], g_RaceCPs[cp][1], g_RaceCPs[cp][2]);
 				if(POS[3] > OFFSET_VALUE)
 				{
 				    POS[3] = OFFSET_VALUE;
@@ -31253,12 +30930,12 @@ Race_CalculatePosition()
 	return 1;
 }
 
-GetDistance2D(Float:xPos, Float:yPos, Float:zPos, Float:xPos2, Float:yPos2, Float:zPos2)
+GetDistance3D(Float:xPos, Float:yPos, Float:zPos, Float:xPos2, Float:yPos2, Float:zPos2)
 {
 	xPos -= xPos2;
 	yPos -= yPos2;
 	zPos -= zPos2;
-	return floatround(floatpower((xPos * xPos) + (yPos * yPos) + (zPos * zPos), 0.5));
+	return floatround(floatpower((xPos * xPos) + (yPos * yPos) + (zPos * zPos), 0.5)); // Float:VectorSize(xPos, yPos, zPos); for 0.3z
 }
 
 function:DestroyPlayerVehicles(playerid)
@@ -31546,4 +31223,24 @@ ResetPlayerModules(playerid)
 	PlayerInfo[playerid][DuelLocation] = 0;
 	PlayerInfo[playerid][DuelRequest] = INVALID_PLAYER_ID;
 	PlayerInfo[playerid][DuelRequestRecv] = INVALID_PLAYER_ID;
+}
+
+badsql(const string[])
+{
+	if(strfind(string, " ", true) != -1) return 1;
+	if(strfind(string, "-", true) != -1) return 1;
+	if(strfind(string, "|", true) != -1) return 1;
+	if(strfind(string, ",", true) != -1) return 1;
+	if(strfind(string, "@", true) != -1) return 1;
+	if(strfind(string, "*", true) != -1) return 1;
+	if(strfind(string, "'", true) != -1) return 1;
+	if(strfind(string, "/", true) != -1) return 1;
+	if(strfind(string, "\\", true) != -1) return 1;
+	if(strfind(string, "´", true) != -1) return 1;
+	if(strfind(string, "`", true) != -1) return 1;
+	if(strfind(string, "~", true) != -1) return 1;
+	if(strfind(string, "#", true) != -1) return 1;
+	if(strfind(string, "\"", true) != -1) return 1;
+
+	return 0;
 }
