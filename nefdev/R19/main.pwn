@@ -1,6 +1,6 @@
 /*======================================================================*\
 || #################################################################### ||
-|| # Project New Evolution Freeroam - Release 18         			  # ||
+|| # Project New Evolution Freeroam - Release 19         			  # ||
 || # ---------------------------------------------------------------- # ||
 || # Copyright ©2011-2014 New Evolution Freeroam	  				  # ||
 || # Created by Mellnik                                               # ||
@@ -15,10 +15,6 @@
 #define INC_ENVIORMENT (true)
 #define IRC_CONNECT (true)
 #define WINTER_EDITION (false) // LOAD ferriswheelfair.amx
-
-/* R18 db change:
-UPDATE `accounts` SET `Color` = 0 WHERE `Color` != 0;
-*/
 
 // -
 // - Plugins
@@ -95,11 +91,11 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define HOSTNAME                        " 	        NEF » ×DM/Stunt/Race/Freeroam/Minigames×"
 //#define HOSTNAME 						"NEF 0.3x (R11)     «Stunt/Race/Freeroam/DM»"
 #if IS_RELEASE_BUILD == true
-#define CURRENT_VERSION                 "Release 18"
-#define CURRENT_VERISON_SHORT           "R18"
+#define CURRENT_VERSION                 "Release 19"
+#define CURRENT_VERISON_SHORT           "R19"
 #else
-#define CURRENT_VERSION                 "PTS:R18"
-#define CURRENT_VERSION_SHORT           "PTS:R18"
+#define CURRENT_VERSION                 "PTS:R19"
+#define CURRENT_VERSION_SHORT           "PTS:R19"
 #endif
 #define HOTFIX_REV                      "Hotfix #0"
 #define SAMP_VERSION                    "SA-MP 0.3x-R2"
@@ -12549,7 +12545,7 @@ YCMD:ipban(playerid, params[], help)
 	  	if(IsPlayerNPC(player)) return SCM(playerid, -1, ""er"Invalid player!");
         if(PlayerInfo[player][KBMarked]) return SCM(playerid, -1, ""er"Can't ban this player!");
         
-		if(badsql(reason) != 0)
+		if(badsql(reason, true) != 0)
 		{
 		    return SCM(playerid, -1, ""er"You have specified invalid characters");
 		}
@@ -12668,7 +12664,7 @@ YCMD:tban(playerid, params[], help)
         if(PlayerInfo[player][KBMarked]) return SCM(playerid, -1, ""er"Can't ban this player!");
 		if(!islogged(player)) return SCM(playerid, -1, ""er"Cannot ban tmp accounts, use /ipban");
 
-		if(badsql(reason) != 0)
+		if(badsql(reason, true) != 0)
 		{
 		    return SCM(playerid, -1, ""er"You have specified invalid characters");
 		}
@@ -12726,7 +12722,7 @@ YCMD:ban(playerid, params[], help)
 	  	if(IsPlayerNPC(player)) return SCM(playerid, -1, ""er"Invalid player!");
         if(PlayerInfo[player][KBMarked]) return SCM(playerid, -1, ""er"Can't ban this player!");
         
-		if(badsql(reason) != 0)
+		if(badsql(reason, true) != 0)
 		{
 		    return SCM(playerid, -1, ""er"You have specified invalid characters");
 		}
@@ -15351,7 +15347,7 @@ YCMD:label(playerid, params[], help)
 	    }
 	    else
 	    {
-			SCM(playerid, -1, ""er"You already got a label. Tpye /elabel to edit or /dlabel to detach it.");
+			SCM(playerid, -1, ""er"You already got a label. Type /elabel to edit or /dlabel to detach it.");
 		}
 	}
 	else
@@ -20496,7 +20492,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			 		ShowDialog(playerid, VEHICLE_PLATE_DIALOG);
 					return 1;
 				}
-				if(badsql(inputtext) != 0)
+				if(badsql(inputtext, true) != 0)
 				{
 				    ShowDialog(playerid, VEHICLE_PLATE_DIALOG);
 				    SCM(playerid, -1, ""er"You have specified invalid characters");
@@ -20521,7 +20517,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				 	ShowDialog(playerid, CUSTOM_PLATE_DIALOG);
 				 	return 1;
 				}
-				if(badsql(inputtext) != 0)
+				if(badsql(inputtext, true) != 0)
 				{
 					SCM(playerid, RED, ""er"You entered an invalid character!");
 				 	ShowDialog(playerid, CUSTOM_PLATE_DIALOG);
@@ -31273,9 +31269,12 @@ ResetPlayerModules(playerid)
 	PlayerInfo[playerid][DuelRequestRecv] = INVALID_PLAYER_ID;
 }
 
-badsql(const string[])
+badsql(const string[], bool:ban = false)
 {
-	if(strfind(string, " ", true) != -1) return 1;
+	if(!ban)
+	{
+		if(strfind(string, " ", true) != -1) return 1;
+	}
 	if(strfind(string, "-", true) != -1) return 1;
 	if(strfind(string, "|", true) != -1) return 1;
 	if(strfind(string, ",", true) != -1) return 1;
