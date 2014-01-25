@@ -4071,7 +4071,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 			if(rows > 0)
 			{
 			    PlayerInfo[extraid][AccountID] = cache_get_row_int(0, 0, g_SQL_handle);
-			    PlayerInfo[extraid][SavedColor] = cache_get_row_int(0, 2, g_SQL_handle) != 0 ? cache_get_row_int(0, 2, g_SQL_handle) & 0xFF : 0;
+			    PlayerInfo[extraid][SavedColor] = cache_get_row_int(0, 2, g_SQL_handle) != 0 ? cache_get_row_int(0, 2, g_SQL_handle) : 0;
 			    PlayerInfo[extraid][Level] = cache_get_row_int(0, 5, g_SQL_handle);
 			    PlayerInfo[extraid][Score] = cache_get_row_int(0, 6, g_SQL_handle);
 			    PlayerInfo[extraid][Money] = cache_get_row_int(0, 7, g_SQL_handle);
@@ -7571,6 +7571,11 @@ YCMD:party(playerid, params[], help)
 YCMD:aa(playerid, params[], help)
 {
     PortPlayerMapVeh(playerid, 386.0204, 2541.1179, 19.0953, 181.2326, 385.7370, 2513.5242, 16.6766, 89.6337, "Abandoned Airport", "aa");
+    return 1;
+}
+YCMD:rc(playerid, params[], help)
+{
+    PortPlayerMapVeh(playerid, 35.7414,-899.6901,1761.7263,178.9152,35.7414,-899.6901,1761.7263,178.9152, "Roller Coaster", "rc");
     return 1;
 }
 YCMD:a51(playerid, params[], help)
@@ -12877,8 +12882,7 @@ YCMD:giveweapon(playerid, params[], help)
 
 		if(sscanf(params, "rii", player, weaponID, ammo_a))
 		{
-		    SCM(playerid, NEF_GREEN, "Usage: /giveweapon <playerid> <weaponid> <ammo>");
-		    return 1;
+		    return SCM(playerid, NEF_GREEN, "Usage: /giveweapon <playerid> <weaponid> <ammo>");
 		}
 		
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
@@ -12887,7 +12891,7 @@ YCMD:giveweapon(playerid, params[], help)
 		if(IsPlayerAvail(player))
 		{
 	        if(gTeam[player] != FREEROAM) return SCM(playerid, -1, ""er"Player is in a minigame!");
-	        if(PlayerInfo[player][bGod]) return SCM(playerid, -1, ""er"You can't give players weapons who enabled GOD");
+	        if(PlayerInfo[player][bGod] && PlayerInfo[playerid][Level] != MAX_ADMIN_LEVEL) return SCM(playerid, -1, ""er"You can't give players weapons who enabled GOD");
 
 			if(ammo_a < 0 || ammo_a > 10000)
 			{
@@ -12896,8 +12900,8 @@ YCMD:giveweapon(playerid, params[], help)
 			    return 1;
 			}
 
-	        if(weaponID == 38 || weaponID == 36 || weaponID == 39 || weaponID == 44 || weaponID == 45|| weaponID == 40) return SCM(playerid, -1, ""er"Can't give restriced weapon");
-			if(weaponID == 35 && PlayerInfo[playerid][Level] != MAX_ADMIN_LEVEL) return SCM(playerid, -1, NO_PERM);
+	        if(weaponID == 35 || weaponID == 36 || weaponID == 39 || weaponID == 44 || weaponID == 45|| weaponID == 40) return SCM(playerid, -1, ""er"Can't give restriced weapon");
+			if(weaponID == 38 && PlayerInfo[playerid][Level] != MAX_ADMIN_LEVEL) return SCM(playerid, -1, NO_PERM);
 
 			if(weaponID <= 0 && weaponID >= 47)
 			{
@@ -19778,8 +19782,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					case 4: ShowPlayerDialog(playerid, STREAM_DIALOG+5, DIALOG_STYLE_LIST, ""nef" :: Streams > Rap", "POWERHITZ.COM - #1 FOR HITZ\nRADIOUP.COM - THE HITLIST", "Select", "Back");
 					case 5: ShowPlayerDialog(playerid, STREAM_DIALOG+6, DIALOG_STYLE_LIST, ""nef" :: Streams > Mainstream/Rock", "#MUSIK.MAIN - WWW.RAUTEMUSIK.FM - 24H\n181.FM - Kickin' Country", "Select", "Back");
 					case 6: ShowPlayerDialog(playerid, STREAM_DIALOG+7, DIALOG_STYLE_LIST, ""nef" :: Streams > Oldies", "181.FM - Good Time Oldies\n#MUSIK.GOLDIES - WWW.RAUTEMUSIK.FM", "Select", "Back");
-					case 7: ShowPlayerDialog(playerid, STREAM_DIALOG+7, DIALOG_STYLE_LIST, ""nef" :: Streams > Dubstep", "#MUSIK.DRUMSTEP - WWW.RAUTEMUSIK.FM\nSinister Souls Dubstep, Dub and Deep Bass", "Select", "Back");
-					case 8: ShowPlayerDialog(playerid, STREAM_DIALOG+8, DIALOG_STYLE_INPUT, ""nef" :: Streams > Your own stream", ""white"Please enter the audio stream you want to listen to", "Play", "Back");
+					case 7: ShowPlayerDialog(playerid, STREAM_DIALOG+8, DIALOG_STYLE_LIST, ""nef" :: Streams > Dubstep", "#MUSIK.DRUMSTEP - WWW.RAUTEMUSIK.FM\nSinister Souls Dubstep, Dub and Deep Bass", "Select", "Back");
+					case 8: ShowPlayerDialog(playerid, STREAM_DIALOG+9, DIALOG_STYLE_INPUT, ""nef" :: Streams > Your own stream", ""white"Please enter the audio stream you want to listen to", "Play", "Back");
 				}
 				return true;
 			}
@@ -19859,7 +19863,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 			    extract inputtext -> new string:link[144]; else
 			    {
-					return ShowPlayerDialog(playerid, STREAM_DIALOG+8, DIALOG_STYLE_INPUT, ""nef" :: Streams > Your own stream", ""white"Please enter the audio stream you want to listen to", "Play", "Back");
+					return ShowPlayerDialog(playerid, STREAM_DIALOG+9, DIALOG_STYLE_INPUT, ""nef" :: Streams > Your own stream", ""white"Please enter the audio stream you want to listen to", "Play", "Back");
 			    }
 				PlayAudioStreamForPlayer(playerid, link);
 				return true;
@@ -23037,7 +23041,7 @@ CreateTextdraws()
 	TextDrawSetProportional(TXTFooterBlack, 1);
 	TextDrawSetShadow(TXTFooterBlack, 1);
 	TextDrawUseBox(TXTFooterBlack, 1);
-	TextDrawBoxColor(TXTFooterBlack, 119);
+	TextDrawBoxColor(TXTFooterBlack, 0x00000055);
 	TextDrawTextSize(TXTFooterBlack, 0.000000, -710.000000);
 	TextDrawSetSelectable(TXTFooterBlack, 0);
 
@@ -23063,7 +23067,7 @@ CreateTextdraws()
 
 	NEFLOGO[1] = TextDrawCreate(89.000000, 432.000000, "-");
 	TextDrawAlignment(NEFLOGO[1], 2);
-	TextDrawBackgroundColor(NEFLOGO[2], 51);
+	TextDrawBackgroundColor(NEFLOGO[2], 255);
 	TextDrawFont(NEFLOGO[1], 1);
 	TextDrawLetterSize(NEFLOGO[1], 7.619995, 1.000000);
 	TextDrawColor(NEFLOGO[1], -1);
@@ -24040,6 +24044,7 @@ LoadVisualStaticMeshes()
 	AddTeleport(7, "San Fierro", "sf", -1990.6650, 136.9297, 27.3110);
 	AddTeleport(5, "Snow Market", "snow", -719.7679,1723.9852,7.0400);
 	AddTeleport(1, "Sherman Dam", "sd", -793.2972,2230.8733,45.0103);
+	AddTeleport(1, "Roller Coaster", "rc", 35.7414,-899.6901,1761.7263);
 	AddTeleport(7, "Quarry", "quarry",  833.0357,851.8098,12.0047);
 	AddTeleport(7, "Area 51", "a51", 307.2482,2050.7505,17.6406);
 	AddTeleport(2, "Base Jump", "bj", 294.3475,-1610.8379,494.6685);
@@ -26247,39 +26252,49 @@ function:OnQueueReceived()
 	}
 	return 1;
 }
-
-task LogoColUpdate[300]()
+/*
+task LogoColUpdate[333]()
 {
-	static phase_, red_, blue_, green_;
-	switch(phase_)
+	static LogoRed, LogoGreen, LogoBlue, LogoPhase;
+	
+	if(LogoPhase == 0)
 	{
-		case 0:
-		{
-		    red_ += 5;
-		    if(red_ >= 255) phase_ = 1;
-		}
-		case 1:
-		{
-		    red_ -= 5;
-		    blue_ += 5;
-		    if(blue_ >= 255) phase_ = 2;
-		}
-		case 2:
-		{
-		    green_ += 5;
-		    blue_ -= 5;
-		    if(green_ >= 255) phase_ = 3;
-		}
-		case 3:
-		{
-		    red_ += 5;
-		    green_ -= 5;
-		    if(red_ >= 255) phase_ = 1;
+		LogoRed += 5;
+		if(LogoRed >= 255) LogoPhase = 1;
+	}
+	else if(LogoPhase == 1)
+	{
+		LogoRed -= 5;
+		LogoBlue += 5;
+		if(LogoBlue >= 255) LogoBlue = 2;
+	}
+	else if(LogoPhase == 2)
+	{
+		LogoGreen += 5;
+		LogoBlue -= 5;
+		if(LogoGreen >= 255) LogoBlue = 3;
+	}
+	else if(LogoPhase == 3)
+	{
+	    LogoRed += 5;
+	    LogoGreen -= 5;
+	    if(LogoRed >= 255) LogoBlue = 1;
+	}
+	
+	TextDrawColor(NEFLOGO[1], RGBA2(LogoRed, LogoGreen, LogoBlue, 255));
+	TextDrawSetOutline(NEFLOGO[1], 1);
+	
+	for(new i = 0; i < MAX_PLAYERS; i++)
+	{
+	    if(PlayerInfo[i][bTDEnabled])
+	    {
+	        if(IsPlayerConnected(i)) TextDrawShowForPlayer(i, NEFLOGO[1]);
 		}
 	}
-	TextDrawColor(NEFLOGO[1], RGBA(red_, green_, blue_, 255));
+	
+	printf("%i, %i, %i, %i", LogoPhase, LogoRed, LogoGreen, LogoBlue);
 	return 1;
-}
+}*/
 
 task LogoSwitch[10000]()
 {
