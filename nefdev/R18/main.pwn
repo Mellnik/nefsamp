@@ -16,6 +16,10 @@
 #define IRC_CONNECT (true)
 #define WINTER_EDITION (false) // LOAD ferriswheelfair.amx
 
+/* R18 db change:
+UPDATE `accounts` SET `Color` = 0 WHERE `Color` != 0;
+*/
+
 // -
 // - Plugins
 // -
@@ -15288,14 +15292,19 @@ function:OnGTopReceived(playerid)
 	
 	if(rows > 0)
 	{
-	    new tmp[21], tmp2[5], finstring[1024], tmpstring[40];
+	    new tmp[21], tmp2[5], finstring[2048], tmpstring[128];
 	    strcat(finstring, ""white"");
 	    for(new i = 0; i < rows; i++)
 	    {
 	        cache_get_row(i, 0, tmp, g_SQL_handle, sizeof(tmp));
 	        cache_get_row(i, 1, tmp2, g_SQL_handle, sizeof(tmp2));
-	        format(tmpstring, sizeof(tmpstring), "{%06x}%i - [%s]%s [%i]\n", cache_get_row_int(i, 3, g_SQL_handle) >>> 8, i + 1, tmp2, tmp, cache_get_row_int(i, 2, g_SQL_handle));
-	        strcat(finstring, tmpstring);
+	        new col = cache_get_row_int(i, 3, g_SQL_handle);
+	        if(col != 0)
+	        {
+	        	format(tmpstring, sizeof(tmpstring), "{%06x}%i - [%s]%s [%i]\n", col >>> 8, i + 1, tmp2, tmp, cache_get_row_int(i, 2, g_SQL_handle));
+			}
+			else format(tmpstring, sizeof(tmpstring), ""white"%i - [%s]%s [%i]\n", i + 1, tmp2, tmp, cache_get_row_int(i, 2, g_SQL_handle));
+			strcat(finstring, tmpstring);
 	    }
 	    ShowPlayerDialog(playerid, TOP_GANGS_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" :: Top Gangs", finstring, "OK", "");
 	}
@@ -23067,7 +23076,7 @@ CreateTextdraws()
 
 	NEFLOGO[1] = TextDrawCreate(89.000000, 432.000000, "-");
 	TextDrawAlignment(NEFLOGO[1], 2);
-	TextDrawBackgroundColor(NEFLOGO[2], 255);
+	TextDrawBackgroundColor(NEFLOGO[2], 51);
 	TextDrawFont(NEFLOGO[1], 1);
 	TextDrawLetterSize(NEFLOGO[1], 7.619995, 1.000000);
 	TextDrawColor(NEFLOGO[1], -1);
