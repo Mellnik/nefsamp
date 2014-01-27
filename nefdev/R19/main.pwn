@@ -11,9 +11,9 @@
 
 #pragma dynamic 8192
 
-#define IS_RELEASE_BUILD (true)
+#define IS_RELEASE_BUILD (false)
 #define INC_ENVIORMENT (true)
-#define IRC_CONNECT (true)
+#define IRC_CONNECT (false)
 #define WINTER_EDITION (false) // LOAD ferriswheelfair.amx
 
 // -
@@ -2535,8 +2535,8 @@ public OnGameModeInit()
 	LoadHouses();
 	LoadProps();
 
-	//SetTimer("ProcessTick", 1000, true);
-    //SetTimer("QueueProcess", 60000, true);
+	SetTimer("ProcessTick", 1000, true);
+    SetTimer("QueueProcess", 60000, true);
 	tReactionTimer = SetTimer("xReactionTest", REAC_TIME, true);
 	g_tRaceOpenSelection = SetTimer("OpenNewRace", 40307, false);
 	SetTimer("Maths", 980000, true);
@@ -9643,6 +9643,10 @@ YCMD:duel(playerid, params[], help)
             SetCameraBehindPlayer(playerid);
             SetCameraBehindPlayer(PlayerInfo[playerid][DuelRequestRecv]);
             
+			// Closing open dialogs in order to avoid some exploits.
+			ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
+			ShowPlayerDialog(PlayerInfo[playerid][DuelRequestRecv], -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
+            
             gTeam[playerid] = gDUEL;
             gTeam[PlayerInfo[playerid][DuelRequestRecv]] = gDUEL;
             
@@ -12565,8 +12569,8 @@ YCMD:ipban(playerid, params[], help)
 				SCMToAll(YELLOW, gstr);
 				print(gstr);
 
-	    		format(gstr, sizeof(gstr), ""red"You have been banned!"white"\n\nAdmin:\t%s\nReason:\t%s\n\nIf you think that you have been banned wrongly,\nwrite a ban appeal on "SVRFORUM"", __GetName(playerid), reason);
-	    		ShowPlayerDialog(player, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Notice", gstr, "OK", "");
+	    		format(gstr2, sizeof(gstr2), ""red"You have been banned!"white"\n\nAdmin:\t%s\nReason:\t%s\n\nIf you think that you have been banned wrongly,\nwrite a ban appeal on "SVRFORUM"", __GetName(playerid), reason);
+	    		ShowPlayerDialog(player, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Notice", gstr2, "OK", "");
 
 				KickEx(player);
 			}
@@ -12679,8 +12683,8 @@ YCMD:tban(playerid, params[], help)
 				SCMToAll(YELLOW, gstr);
 				print(gstr);
 
-	    		format(gstr, sizeof(gstr), ""red"You have been time banned!"white"\n\nAdmin:\t%s\nReason:\t%s\nExpires:\t%s\n\nIf you think that you have been banned wrongly,\nwrite a ban appeal on "SVRFORUM"", __GetName(playerid), reason, UnixTimeToDate(gettime() + (mins * 60)));
-	    		ShowPlayerDialog(player, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Notice", gstr, "OK", "");
+	    		format(gstr2, sizeof(gstr2), ""red"You have been time banned!"white"\n\nAdmin:\t%s\nReason:\t%s\nExpires:\t%s\n\nIf you think that you have been banned wrongly,\nwrite a ban appeal on "SVRFORUM"", __GetName(playerid), reason, UnixTimeToDate(gettime() + (mins * 60)));
+	    		ShowPlayerDialog(player, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Notice", gstr2, "OK", "");
 
 	   			KickEx(player);
 			}
@@ -12742,8 +12746,8 @@ YCMD:ban(playerid, params[], help)
 				format(gstr, sizeof(gstr), "4Server: 2Admin %s(%i) has banned %s(%i) 1(Reason: %s)", __GetName(playerid), playerid, __GetName(player), player, reason);
 				IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 
-	    		format(gstr, sizeof(gstr), ""red"You have been banned!"white"\n\nAdmin:\t%s\nReason:\t%s\n\nIf you think that you have been banned wrongly,\nwrite a ban appeal on "SVRFORUM"", __GetName(playerid), reason);
-	    		ShowPlayerDialog(player, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Notice", gstr, "OK", "");
+	    		format(gstr2, sizeof(gstr2), ""red"You have been banned!"white"\n\nAdmin:\t%s\nReason:\t%s\n\nIf you think that you have been banned wrongly,\nwrite a ban appeal on "SVRFORUM"", __GetName(playerid), reason);
+	    		ShowPlayerDialog(player, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Notice", gstr2, "OK", "");
 
 				KickEx(player);
 			}
@@ -20106,6 +20110,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			}
 			case WEAPON_DIALOG+1:
 			{
+			    if(gTeam[playerid] == gDUEL) return SCM(playerid, -1, ""er"You tryin' to abuse? ;)");
 				switch(listitem)
 				{
 			    	case 0:{GivePlayerWeapon(playerid,30,99999);}
@@ -20117,6 +20122,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			}
 			case WEAPON_DIALOG+2:
 			{
+			    if(gTeam[playerid] == gDUEL) return SCM(playerid, -1, ""er"You tryin' to abuse? ;)");
 				switch(listitem)
 				{
 			    	case 0:{GivePlayerWeapon(playerid,29,99999);}
@@ -20127,6 +20133,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			}
 			case WEAPON_DIALOG+3:
 			{
+			    if(gTeam[playerid] == gDUEL) return SCM(playerid, -1, ""er"You tryin' to abuse? ;)");
 	  			switch(listitem)
 				{
 			    	case 0:{GivePlayerWeapon(playerid,25,99999);}
@@ -20137,6 +20144,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			}
 			case WEAPON_DIALOG+4:
 			{
+			    if(gTeam[playerid] == gDUEL) return SCM(playerid, -1, ""er"You tryin' to abuse? ;)");
 				switch(listitem)
 				{
 			    	case 0:{GivePlayerWeapon(playerid,22,99999);}
@@ -20147,6 +20155,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			}
 			case WEAPON_DIALOG+5:
 			{
+			    if(gTeam[playerid] == gDUEL) return SCM(playerid, -1, ""er"You tryin' to abuse? ;)");
 	  			switch(listitem)
 				{
 					case 0:{GivePlayerWeapon(playerid,2,1);}
@@ -20163,6 +20172,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			}
 			case WEAPON_DIALOG+6:
 			{
+                if(gTeam[playerid] == gDUEL) return SCM(playerid, -1, ""er"You tryin' to abuse? ;)");
 				switch(listitem)
 				{
 			    	case 0:{GivePlayerWeapon(playerid,17,99999);}
@@ -21770,6 +21780,8 @@ GetPlayingTimeFormat(playerid)
 
 CarSpawner(playerid, model, respawn_delay = -1, bool:spawnzone_check = true)
 {
+	if(gTeam[playerid] == gDUEL) return SCM(playerid, -1, ""er"You tryin' to abuse? ;)");
+	
 	if(model == 432 || model == 425 || model == 447 || model == 571 || model == 568 || model == 539 || model == 545 || model == 464)
 	{
 	    if(PlayerInfo[playerid][Level] != MAX_ADMIN_LEVEL)
@@ -25997,7 +26009,7 @@ function:DerbyFallOver()
 	}
 }
 
-task QueueProcess[60000]()
+function:QueueProcess()
 {
 	mysql_tquery(g_SQL_handle, "SELECT * FROM `queue` WHERE `ExecutionDate` < UNIX_TIMESTAMP();", "OnQueueReceived", "");
 	
@@ -26325,7 +26337,7 @@ task LogoSwitch[10000]()
 	return 1;
 }
 
-task ProcessTick[1000]()
+function:ProcessTick()
 {
 	static year, month, day, hour, minute, second;
 	getdate(year, month, day);
