@@ -26470,6 +26470,23 @@ function:ProcessTick()
 			    case FALLOUT:
 			    {
 			        T_FalloutPlayers++;
+			        
+			        if(g_FalloutStatus == e_Fallout_Running)
+			        {
+				        if(IsPlayerOnDesktop(i, 6000))
+				        {
+							format(gstr, sizeof(gstr), "%s(%i) went AFK for too long!", __GetName(i), i);
+							FalloutMSG(gstr);
+
+							PlayerInfo[i][FalloutLost] = true;
+							HidePlayerFalloutTextdraws(i);
+							CurrentFalloutPlayers--;
+							ResetPlayerWorld(i);
+							gTeam[i] = FREEROAM;
+							RandomSpawn(i, true);
+							RandomWeapons(i);
+				        }
+					}
 			    }
 			    case gBG_VOTING, gBG_TEAM1, gBG_TEAM2:
 			    {
@@ -27305,9 +27322,8 @@ function:Fallout_LoseGame()
 		{
 			GameTextForPlayer(i, "~p~You lost the Fallout!", 3000, 1);
 
-			new string[100];
-			format(string, sizeof(string), "%s(%i) fell over the glass bottom!", __GetName(i), i);
-			FalloutMSG(string);
+			format(gstr, sizeof(gstr), "%s(%i) fell over the glass bottom!", __GetName(i), i);
+			FalloutMSG(gstr);
 
 			PlayerInfo[i][FalloutLost] = true;
 			HidePlayerFalloutTextdraws(i);
