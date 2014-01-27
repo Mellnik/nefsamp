@@ -1516,7 +1516,7 @@ new const BLevelMatrix[21][e_prop_matrix] =
 	{20, 2000000, 30000}
 };
 
-new const PVMatrix[98][e_pv_matrix] =
+new const PVMatrix[99][e_pv_matrix] =
 {
 	{0, 536, 595000, "Blade"},
 	{0, 575, 390000, "Broadway"},
@@ -1563,6 +1563,7 @@ new const PVMatrix[98][e_pv_matrix] =
     {2, 560, 550000, "Sultan"},
     {2, 551, 400000, "Merit"},
     {2, 562, 500000, "Elegy"},
+    {2, 561, 100000, "Stratum"},
     {3, 581, 500000, "BF-400"},
     {3, 586, 200000, "Wayfarer"},
     {3, 461, 340000, "PCJ-600"},
