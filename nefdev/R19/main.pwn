@@ -16,6 +16,10 @@
 #define IRC_CONNECT (false)
 #define WINTER_EDITION (false) // LOAD ferriswheelfair.amx
 
+/* R19 db changes
+ADD `SavedSkin` to `accounts` small int default -1;
+*/
+
 // -
 // - Plugins
 // -
@@ -680,6 +684,7 @@ enum e_player_data
 	sName[25],
 	sIP[16],
 	SavedColor,
+	SavedSkin,
 	Float:fOldPos[4],
 	AdditionalPVSlots,
 	AdditionalToySlots,
@@ -2592,24 +2597,16 @@ public OnGameModeExit()
 	return 1;
 }
 
+function:ClassForceSpawn(playerid)
+{
+	SpawnPlayer(playerid);
+	return 1;
+}
+
 public OnPlayerRequestClass(playerid, classid)
 {
-	Streamer_UpdateEx(playerid, 1797.5835, -1305.0114, 121.2348, -1, -1);
-	SetPlayerPos(playerid, 1797.5835, -1305.0114, 121.2348);
-	SetPlayerFacingAngle(playerid, 359.9696);
-	SetPlayerCameraPos(playerid, 1797.3688, -1299.8156, 121.4657);
-	SetPlayerCameraLookAt(playerid, 1797.3661, -1300.8164, 121.4556);
-	
-	if(GlobalMain) return 0;
-
-	if(PlayerInfo[playerid][ExitType] == EXIT_FIRST_SPAWNED)
-	{
-		SCM(playerid, -1, ""er"You are bugged in class selection. Please reconnect.");
-		PlayerInfo[playerid][AllowSpawn] = false;
-		KickEx(playerid);
-	    return 0;
-	}
-
+    if(GlobalMain) return 0;
+    
     if(IsPlayerNPC(playerid))
 	{
 		if(!strcmp(__GetName(playerid), "["SVRSC"]TrainRider", true))
@@ -2623,14 +2620,21 @@ public OnPlayerRequestClass(playerid, classid)
 		return 1;
 	}
 
+	if(PlayerInfo[playerid][ExitType] == EXIT_FIRST_SPAWNED)
+	{
+		SCM(playerid, -1, ""er"You are bugged in class selection. Please reconnect.");
+		PlayerInfo[playerid][AllowSpawn] = false;
+		KickEx(playerid);
+	    return 0;
+	}
+		
+    PlayerInfo[playerid][bFirstSpawn] = true;
+
     new rand = random(4);
-    SetSpawnInfo(playerid, NO_TEAM, GetPlayerSkin(playerid), WorldSpawns[rand][0], WorldSpawns[rand][1], floatadd(WorldSpawns[rand][2], 3.0), WorldSpawns[rand][3], 0, 0, 0, 0, 0, 0);
+    SetSpawnInfo(playerid, NO_TEAM, PlayerInfo[playerid][SavedSkin] == -1 ? GetPlayerSkin(playerid) : PlayerInfo[playerid][SavedSkin], WorldSpawns[rand][0], WorldSpawns[rand][1], floatadd(WorldSpawns[rand][2], 3.0), WorldSpawns[rand][3], 0, 0, 0, 0, 0, 0);
 
 	TextDrawShowForPlayer(playerid, TXTTeleportInfo);
-
 	HidePlayerInfoTextdraws(playerid);
-	ShowPlayerWelcomeTextdraws(playerid);
-	
 	TextDrawShowForPlayer(playerid, TXTFooterBlack);
 	TextDrawShowForPlayer(playerid, TXTFooter);
 	TextDrawShowForPlayer(playerid, NEFLOGO[0]);
@@ -2642,22 +2646,36 @@ public OnPlayerRequestClass(playerid, classid)
 	TextDrawShowForPlayer(playerid, TXTWinterEdition);
 	#endif
 
-	PlayerInfo[playerid][bFirstSpawn] = true;
-
-	switch(random(2))
+	if(PlayerInfo[playerid][SavedSkin] == -1)
 	{
-	    case 0:
-	    {
-	        ApplyAnimation(playerid, "DANCING", "DNCE_M_A", 4.1, 1, 1, 1, 1, 1);
-		}
-		case 1:
-		{
-		    ApplyAnimation(playerid, "DANCING", "DNCE_M_B", 4.1, 1, 1, 1, 1, 1);
-		}
+	    SetTimerEx("ClassForceSpawn", 20, false, "i", playerid);
+	    return 0;
 	}
-	
-	SetPlayerAttachedObject(playerid, 0, 18693, 5, 1.983503, 1.558882, -0.129482, 86.705787, 308.978118, 268.198822, 1.500000, 1.500000, 1.500000); // Flame99 - handfire left
-	SetPlayerAttachedObject(playerid, 1, 18693, 6, 1.983503, 1.558882, -0.129482, 86.705787, 308.978118, 268.198822, 1.500000, 1.500000, 1.500000); // Flame99 - handfie right
+	else
+	{
+		Streamer_UpdateEx(playerid, 1797.5835, -1305.0114, 121.2348, -1, -1);
+		SetPlayerPos(playerid, 1797.5835, -1305.0114, 121.2348);
+		SetPlayerFacingAngle(playerid, 359.9696);
+		SetPlayerCameraPos(playerid, 1797.3688, -1299.8156, 121.4657);
+		SetPlayerCameraLookAt(playerid, 1797.3661, -1300.8164, 121.4556);
+
+		ShowPlayerWelcomeTextdraws(playerid);
+
+		switch(random(2))
+		{
+		    case 0:
+		    {
+		        ApplyAnimation(playerid, "DANCING", "DNCE_M_A", 4.1, 1, 1, 1, 1, 1);
+			}
+			case 1:
+			{
+			    ApplyAnimation(playerid, "DANCING", "DNCE_M_B", 4.1, 1, 1, 1, 1, 1);
+			}
+		}
+
+		SetPlayerAttachedObject(playerid, 0, 18693, 5, 1.983503, 1.558882, -0.129482, 86.705787, 308.978118, 268.198822, 1.500000, 1.500000, 1.500000); // Flame99 - handfire left
+		SetPlayerAttachedObject(playerid, 1, 18693, 6, 1.983503, 1.558882, -0.129482, 86.705787, 308.978118, 268.198822, 1.500000, 1.500000, 1.500000); // Flame99 - handfie right
+	}
 	return 1;
 }
 
@@ -4071,7 +4089,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 			if(rows > 0)
 			{
 			    PlayerInfo[extraid][AccountID] = cache_get_row_int(0, 0, g_SQL_handle);
-			    PlayerInfo[extraid][SavedColor] = cache_get_row_int(0, 2, g_SQL_handle) != 0 ? cache_get_row_int(0, 2, g_SQL_handle) : 0;
+			    PlayerInfo[extraid][SavedColor] = cache_get_row_int(0, 2, g_SQL_handle);
 			    PlayerInfo[extraid][Level] = cache_get_row_int(0, 5, g_SQL_handle);
 			    PlayerInfo[extraid][Score] = cache_get_row_int(0, 6, g_SQL_handle);
 			    PlayerInfo[extraid][Money] = cache_get_row_int(0, 7, g_SQL_handle);
@@ -4462,6 +4480,8 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				    PlayerPV[extraid][7][Mod16],
 				    PlayerPV[extraid][7][Mod17],
 				    PlayerPV[extraid][7][Plate]);
+
+				PlayerInfo[extraid][SavedSkin] = cache_get_row_int(0, 56, g_SQL_handle);
 
    				if(PlayerInfo[extraid][GangID] != 0)
 				{
@@ -5273,12 +5293,12 @@ public OnPlayerDeath(playerid, killerid, reason)
 	    {
             if(PlayerInfo[playerid][bHasSpawn])
             {
-                SetSpawnInfo(playerid, NO_TEAM, GetPlayerSkin(playerid), PlayerInfo[playerid][CSpawnX], PlayerInfo[playerid][CSpawnY], PlayerInfo[playerid][CSpawnZ], PlayerInfo[playerid][CSpawnA], 0, 0, 0, 0, 0, 0);
+                SetSpawnInfo(playerid, NO_TEAM, PlayerInfo[playerid][SavedSkin] == -1 ? GetPlayerSkin(playerid) : PlayerInfo[playerid][SavedSkin], PlayerInfo[playerid][CSpawnX], PlayerInfo[playerid][CSpawnY], PlayerInfo[playerid][CSpawnZ], PlayerInfo[playerid][CSpawnA], 0, 0, 0, 0, 0, 0);
             }
             else
             {
                 new rand = random(4);
-                SetSpawnInfo(playerid, NO_TEAM, GetPlayerSkin(playerid), WorldSpawns[rand][0], WorldSpawns[rand][1], floatadd(WorldSpawns[rand][2], 3.0), WorldSpawns[rand][3], 0, 0, 0, 0, 0, 0);
+                SetSpawnInfo(playerid, NO_TEAM, PlayerInfo[playerid][SavedSkin] == -1 ? GetPlayerSkin(playerid) : PlayerInfo[playerid][SavedSkin], WorldSpawns[rand][0], WorldSpawns[rand][1], floatadd(WorldSpawns[rand][2], 3.0), WorldSpawns[rand][3], 0, 0, 0, 0, 0, 0);
             }
 	    
 	        if(IsPlayerAvail(killerid) && (playerid != killerid) && gTeam[killerid] == FREEROAM)
@@ -16272,11 +16292,42 @@ YCMD:mellnik(playerid, params[], help)
 	return 1;
 }
 
+YCMD:saveskin(playerid, params[], help)
+{
+	if(!islogged(playerid)) return notlogged(playerid);
+
+	if(PlayerInfo[playerid][SavedSkin] == -1)
+	{
+	    SCM(playerid, COLOR_GREY, ""nef" "GREY2_E"Skin saved! Skipping class selection next login. Use /deleteskin to remove it");
+	}
+	else
+	{
+	    SCM(playerid, COLOR_GREY, ""nef" "GREY2_E"Saved skin overwritten! Skipping class selection next login. Use /deleteskin to remove it");
+	}
+    PlayerInfo[playerid][SavedSkin] = GetPlayerSkin(playerid);
+	return 1;
+}
+
+YCMD:deleteskin(playerid, params[], help)
+{
+	if(!islogged(playerid)) return notlogged(playerid);
+
+	if(PlayerInfo[playerid][SavedSkin] == -1)
+	{
+	    SCM(playerid, COLOR_GREY, ""nef" "GREY2_E"You have no saved skin yet!");
+	}
+	else
+	{
+	    SCM(playerid, COLOR_GREY, ""nef" "GREY2_E"Skin has been deleted!");
+	}
+    PlayerInfo[playerid][SavedSkin] = -1;
+	return 1;
+}
+
 YCMD:savecolor(playerid, params[], help)
 {
 	if(!islogged(playerid)) return notlogged(playerid);
-	
-	PlayerInfo[playerid][SavedColor] = GetPlayerColor(playerid);
+
 	if(PlayerInfo[playerid][SavedColor] == 0)
 	{
 	    SCM(playerid, COLOR_GREY, ""nef" "GREY2_E"Color saved! It will be loaded on next login. Use /deletecolor to remove it");
@@ -16285,6 +16336,7 @@ YCMD:savecolor(playerid, params[], help)
 	{
 	    SCM(playerid, COLOR_GREY, ""nef" "GREY2_E"Saved color overwritten! It will be loaded on next login. Use /deletecolor to remove it");
 	}
+    PlayerInfo[playerid][SavedColor] = GetPlayerColor(playerid);
 	return 1;
 }
 
@@ -19100,17 +19152,41 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					}
 					case 5:
 					{
-					    Command_ReProcess(playerid, "/changepass", false);
+					    if(PlayerInfo[playerid][SavedColor] == 0)
+					    {
+					        Command_ReProcess(playerid, "/savecolor", false);
+					    }
+					    else
+					    {
+					    	Command_ReProcess(playerid, "/deletecolor", false);
+						}
+						ShowDialog(playerid, SETTINGS_DIALOG);
 					}
 					case 6:
 					{
-					    Command_ReProcess(playerid, "/stats", false);
+					    if(PlayerInfo[playerid][SavedSkin] == -1)
+					    {
+					        Command_ReProcess(playerid, "/saveskin", false);
+					    }
+					    else
+					    {
+					    	Command_ReProcess(playerid, "/deleteskin", false);
+						}
+						ShowDialog(playerid, SETTINGS_DIALOG);
 					}
 					case 7:
 					{
-					    Command_ReProcess(playerid, "/help", false);
+					    Command_ReProcess(playerid, "/changepass", false);
 					}
 					case 8:
+					{
+					    Command_ReProcess(playerid, "/stats", false);
+					}
+					case 9:
+					{
+					    Command_ReProcess(playerid, "/help", false);
+					}
+					case 10:
 					{
 					    Command_ReProcess(playerid, "/mynetstats", false);
 					}
@@ -19253,6 +19329,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		                strcat(cstring, ""yellow"/stats "white"- stats of a player also /stats <playerid>\n");
 		                strcat(cstring, ""yellow"/savecolor "white"- save a color for you next visit\n");
 		                strcat(cstring, ""yellow"/deletecolor "white"- delete a saved color\n");
+		                strcat(cstring, ""yellow"/saveskin "white"- save a skin for you next visit\n");
+		                strcat(cstring, ""yellow"/deleteskin "white"- delete a saved skin\n");
 		                strcat(cstring, ""yellow"/ad "white"- place a global ad\n");
 		            }
 		            case 2: // Gang
@@ -22020,7 +22098,7 @@ MySQL_SavePlayer(playerid, bool:save_pv)
 		PlayerInfo[playerid][AdditionalHouseObjSlots],
 		PlayerInfo[playerid][DerbyWins]);
 
-    format(query2, sizeof(query2), ", `Color` = %i, `Credits` = %i, `Medkits` = %i, `Skin` = %i, `GungameWins` = %i, `RaceWins` = %i, `BGWins` = %i, `FalloutWins` = %i, `Wanteds` = %i, `VIP` = %i, `LastNameChange` = %i WHERE `Name` = '%s' LIMIT 1;",
+    format(query2, sizeof(query2), ", `Color` = %i, `Credits` = %i, `Medkits` = %i, `Skin` = %i, `GungameWins` = %i, `RaceWins` = %i, `BGWins` = %i, `FalloutWins` = %i, `Wanteds` = %i, `VIP` = %i, `LastNameChange` = %i, `SavedSkin` = %i WHERE `Name` = '%s' LIMIT 1;",
 		PlayerInfo[playerid][SavedColor],
 		GetCredits(playerid),
 		PlayerInfo[playerid][Medkits],
@@ -22032,6 +22110,7 @@ MySQL_SavePlayer(playerid, bool:save_pv)
 		PlayerInfo[playerid][Wanteds],
 		PlayerInfo[playerid][VIP],
 		PlayerInfo[playerid][LastNameChange],
+		PlayerInfo[playerid][SavedSkin],
 		__GetName(playerid));
 
 	strcat(query, query2);
@@ -29001,14 +29080,36 @@ GetPlayerSettings(playerid)
 	    format(tmpstring, sizeof(tmpstring), ""white"5)\tSpawn Place\t"vgreen"Custom\n");
 	    strcat(string, tmpstring);
 	}
+	
+	if(PlayerInfo[playerid][SavedColor] == 0)
+	{
+	    format(tmpstring, sizeof(tmpstring), ""white"6)\tSaved Color\tRandom\n");
+	    strcat(string, tmpstring);
+	}
+	else
+	{
+	    format(tmpstring, sizeof(tmpstring), ""white"6)\tSaved Color\t{%06x}COLOR\n", PlayerInfo[playerid][SavedColor]);
+	    strcat(string, tmpstring);
+	}
+	
+	if(PlayerInfo[playerid][SavedSkin] == -1)
+	{
+	    format(tmpstring, sizeof(tmpstring), ""white"7)\tSaved Skin\tRandom\n");
+	    strcat(string, tmpstring);
+	}
+	else
+	{
+	    format(tmpstring, sizeof(tmpstring), ""white"7)\tSaved Skin\tID: %i\n", PlayerInfo[playerid][SavedSkin]);
+	    strcat(string, tmpstring);
+	}
 
-    format(tmpstring, sizeof(tmpstring), ""grey"6)\tChange Pass\n");
+    format(tmpstring, sizeof(tmpstring), ""grey"8)\tChange Pass\n");
     strcat(string, tmpstring);
-    format(tmpstring, sizeof(tmpstring), ""grey"7)\tStats\n");
+    format(tmpstring, sizeof(tmpstring), ""grey"9)\tStats\n");
     strcat(string, tmpstring);
-    format(tmpstring, sizeof(tmpstring), ""grey"8)\tHelp\n");
+    format(tmpstring, sizeof(tmpstring), ""grey"10)\tHelp\n");
     strcat(string, tmpstring);
-    format(tmpstring, sizeof(tmpstring), ""grey"9)\tNetstats");
+    format(tmpstring, sizeof(tmpstring), ""grey"11)\tNetstats");
     strcat(string, tmpstring);
 	return string;
 }
@@ -31195,6 +31296,7 @@ ResetPlayerModules(playerid)
 	PlayerInfo[playerid][Boost] = 0;
 	PlayerInfo[playerid][BoostDeplete] = 0;
 	PlayerInfo[playerid][SavedColor] = 0;
+	PlayerInfo[playerid][SavedSkin] = -1;
 	PlayerInfo[playerid][AdditionalPVSlots] = 0;
 	PlayerInfo[playerid][AdditionalToySlots] = 0;
 	PlayerInfo[playerid][AdditionalHouseSlots] = 0;
