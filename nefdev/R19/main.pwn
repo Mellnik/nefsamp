@@ -453,7 +453,7 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define COOLDOWN_CMD_PSELL              (30000)
 #define COOLDOWN_CMD_CHANGEPASS         (60000)
 #define COOLDOWN_CMD_PM                 (3000)
-#define COOLDOWN_CMD_HITMAN             (60000)
+#define COOLDOWN_CMD_HITMAN             (30000)
 #define COOLDOWN_CMD_GINVITE            (60000)
 #define COOLDOWN_CMD_GKICK              (8000)
 #define COOLDOWN_CMD_GCREATE            (5000)
@@ -10121,7 +10121,10 @@ YCMD:hitman(playerid, params[], help)
     if(!islogged(playerid)) return notlogged(playerid);
     
 	new tick = GetTickCount() + 3600000;
-	if((PlayerInfo[playerid][tickLastHitman] + COOLDOWN_CMD_HITMAN) >= tick) return SCM(playerid, -1, ""er"You have to wait a bit before using it again!");
+	if(PlayerInfo[playerid][Level] != MAX_ADMIN_LEVEL)
+	{
+		if((PlayerInfo[playerid][tickLastHitman] + COOLDOWN_CMD_HITMAN) >= tick) return SCM(playerid, -1, ""er"You have to wait a bit before using it again!");
+	}
 	
 	new amount, player;
 	if(sscanf(params, "ri", player, amount))
@@ -10132,9 +10135,19 @@ YCMD:hitman(playerid, params[], help)
     if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 	if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 
-	if(amount < 5000 || amount > 100000)
+	if(PlayerInfo[playerid][Level] == MAX_ADMIN_LEVEL)
 	{
-	    return SCM(playerid, -1, ""er"$5,000 - $100,000!");
+		if(amount < 5000 || amount > 250000)
+		{
+		    return SCM(playerid, -1, ""er"$5,000 - $250,000!");
+		}
+	}
+	else
+	{
+	    if(amount < 5000 || amount > 1000000)
+	    {
+	        return SCM(playerid, -1, ""er"$5,000 - $1,000,000!");
+	    }
 	}
 
 	if(IsPlayerAvail(player) && player != playerid)
@@ -16680,9 +16693,9 @@ YCMD:givecash(playerid, params[], help)
 		{
 			return SCM(playerid, RED, "You don't have that much!");
 		}
-    	if(cash < 1000 || cash > 100000)
+    	if(cash < 100 || cash > 250000)
 		{
-			return SCM(playerid, YELLOW, "Info: $1,000 - $100,000");
+			return SCM(playerid, YELLOW, "Info: $100 - $250,000");
 		}
     	if(player == playerid)
 		{
