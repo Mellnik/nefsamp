@@ -4037,7 +4037,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				    format(string, sizeof(string), "DELETE FROM `bans` WHERE `PlayerName` = '%s' LIMIT 1;", __GetName(extraid)); // Delete time ban
 				    mysql_tquery(g_SQL_handle, string, "", "");
 				    
-				    SCM(extraid, -1, ""nef" Your time ban expired, you've benn unbanned!");
+				    SCM(extraid, -1, ""nef" Your time ban expired, you've been unbanned!");
 
 					format(string, sizeof(string), "SELECT * FROM `blacklist` WHERE `IP` = '%s' LIMIT 1;", __GetIP(extraid));
 					mysql_tquery(g_SQL_handle, string, "OnQueryFinish", "siii", string, THREAD_CHECK_IP, extraid, g_SQL_handle); // Continuing with progress
@@ -25212,7 +25212,7 @@ function:StartDerbyMap1()
 					GetVehicleVelocity(PlayerInfo[i][pDerbyCar], POS[0], POS[1], POS[2]);
 					SetVehicleVelocity(PlayerInfo[i][pDerbyCar], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
 					
-					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby ist starting!", 3000, 5);
+					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby is starting!", 3000, 5);
 					Derby_Map1Spawns[m1s][m1sUsed] = true;
 					break;
 				}
@@ -25307,7 +25307,7 @@ function:StartDerbyMap2()
 					GetVehicleVelocity(PlayerInfo[i][pDerbyCar], POS[0], POS[1], POS[2]);
 					SetVehicleVelocity(PlayerInfo[i][pDerbyCar], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
 					
-					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby ist starting!", 3000, 5);
+					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby is starting!", 3000, 5);
 					Derby_Map2Spawns[m2s][m2sUsed] = true;
 					break;
 				}
@@ -25402,7 +25402,7 @@ function:StartDerbyMap3()
 					GetVehicleVelocity(PlayerInfo[i][pDerbyCar], POS[0], POS[1], POS[2]);
 					SetVehicleVelocity(PlayerInfo[i][pDerbyCar], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
 					
-					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby ist starting!", 3000, 5);
+					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby is starting!", 3000, 5);
 					Derby_Map3Spawns[m3s][m3sUsed] = true;
 					break;
 				}
@@ -25497,7 +25497,7 @@ function:StartDerbyMap4()
 					GetVehicleVelocity(PlayerInfo[i][pDerbyCar], POS[0], POS[1], POS[2]);
 					SetVehicleVelocity(PlayerInfo[i][pDerbyCar], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
 					
-					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby ist starting!", 3000, 5);
+					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby is starting!", 3000, 5);
 					Derby_Map4Spawns[m4s][m4sUsed] = true;
 					break;
 				}
@@ -25592,7 +25592,7 @@ function:StartDerbyMap5()
 					GetVehicleVelocity(PlayerInfo[i][pDerbyCar], POS[0], POS[1], POS[2]);
 					SetVehicleVelocity(PlayerInfo[i][pDerbyCar], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
 					
-					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby ist starting!", 3000, 5);
+					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby is starting!", 3000, 5);
 					Derby_Map5Spawns[m5s][m5sUsed] = true;
 					break;
 				}
@@ -25677,7 +25677,7 @@ function:StartDerbyMap6()
 					GetVehicleVelocity(PlayerInfo[i][pDerbyCar], POS[0], POS[1], POS[2]);
 					SetVehicleVelocity(PlayerInfo[i][pDerbyCar], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
 					
-					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby ist starting!", 3000, 5);
+					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby is starting!", 3000, 5);
 					Derby_Map6Spawns[m6s][m6sUsed] = true;
 					break;
 				}
@@ -25762,7 +25762,7 @@ function:StartDerbyMap7()
 					GetVehicleVelocity(PlayerInfo[i][pDerbyCar], POS[0], POS[1], POS[2]);
 					SetVehicleVelocity(PlayerInfo[i][pDerbyCar], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
 					
-					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby ist starting!", 3000, 5);
+					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby is starting!", 3000, 5);
 					Derby_Map7Spawns[m7s][m7sUsed] = true;
 					break;
 				}
@@ -25847,7 +25847,7 @@ function:StartDerbyMap8()
 					GetVehicleVelocity(PlayerInfo[i][pDerbyCar], POS[0], POS[1], POS[2]);
 					SetVehicleVelocity(PlayerInfo[i][pDerbyCar], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
 					
-					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby ist starting!", 3000, 5);
+					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby is starting!", 3000, 5);
 					Derby_Map8Spawns[m8s][m8sUsed] = true;
 					break;
 				}
@@ -25932,7 +25932,7 @@ function:StartDerbyMap9()
 					GetVehicleVelocity(PlayerInfo[i][pDerbyCar], POS[0], POS[1], POS[2]);
 					SetVehicleVelocity(PlayerInfo[i][pDerbyCar], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
 					
-					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby ist starting!", 3000, 5);
+					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby is starting!", 3000, 5);
 					Derby_Map9Spawns[m9s][m9sUsed] = true;
 					break;
 				}
