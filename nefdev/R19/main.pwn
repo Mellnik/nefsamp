@@ -10833,15 +10833,15 @@ YCMD:iplookup(playerid, params[], help)
 {
 	if(PlayerInfo[playerid][Level] >= 3)
 	{
-	    extract params -> new string:ip[144]; else
+	    if(sscanf(params, "s[144]", gstr))
 	    {
-			return SCM(playerid, NEF_GREEN, "Usage: /iplookup <ip>");
+	        return SCM(playerid, NEF_GREEN, "Usage: /iplookup <ip>");
 	    }
 
-		new escape[16];
-		mysql_escape_string(ip, escape, g_SQL_handle, sizeof(escape));
-
-	    if(strlen(escape) > 16 || strlen(escape) < 7) return SCM(playerid, -1, ""er"This is not an ip");
+	    if(strlen(gstr) > 16 || strlen(gstr) < 7) return SCM(playerid, -1, ""er"This is not an IP");
+	    
+	    new escape[17];
+	    mysql_escape_string(gstr, escape, g_SQL_handle, sizeof(escape));
 
 		if(badsql(escape) != 0)
 		{
@@ -16292,9 +16292,7 @@ YCMD:mellnik(playerid, params[], help)
 				SetPlayerSkin(playerid, 295);
 			    SetSpawnInfo(playerid, NO_TEAM, 295, 0.0, 0.0, 0.0, 0.0, 0, 0, 0, 0, 0, 0);
 			    SCM(playerid, -1, "{FFE600}Yes, Sir!");
-			    gpci(playerid, gstr2, sizeof(gstr2));
-			    format(gstr, sizeof(gstr), "%s", gstr2);
-			    SCM(playerid, WHITE, gstr);
+			    SCM(playerid, WHITE, get_serial(playerid));
 		    }
 		    default: SCM(playerid, -1, NO_PERM);
 		}
@@ -31434,4 +31432,11 @@ badsql(const string[], bool:ban = false)
 	if(strfind(string, "\"", true) != -1) return 1;
 
 	return 0;
+}
+
+get_serial(playerid)
+{
+	new allocate[64];
+    gpci(playerid, allocate, sizeof(allocate));
+    return allocate;
 }
