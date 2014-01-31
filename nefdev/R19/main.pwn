@@ -23860,8 +23860,8 @@ LoadVisualStaticMeshes()
 	CreateDynamicCP(1400.9669,2685.9114,10.8203, 1.5, CNR_WORLD, -1, -1, 75.0); // Robbers Gate
 	CreateDynamicCP(1902.1838,-1404.4944,14.3474, 3.0, 0, -1, -1, 100.0); // Gold Credits
 	CreateDynamicCP(3360.8054,-1934.1283,43.3184, 3.5, 0, -1, -1, 50.0); // bmx bike spawn
-	CreateDynamicCP(249.9905, 3772.1204, 5.3780, 12.0, 0, -1, -1, 100.0); // skydive5 checkpoint
-	CreateDynamicCP(-1839.5253, -3856.7036, 6.9936, 12.0, 0, -1, -1, 100.0); // skydive6 checkpoint
+	CreateDynamicCP(249.9905, 3772.1204, 9.3780, 12.0, 0, -1, -1, 100.0); // skydive5 checkpoint
+	CreateDynamicCP(-1839.5253, -3856.7036, 10.9936, 12.0, 0, -1, -1, 100.0); // skydive6 checkpoint
 
 	//Stores
 	CreateDynamicMapIcon(2539.3477,2081.2295,10.8203, 6, 0, CNR_WORLD, -1, -1); //Ammunation 1
