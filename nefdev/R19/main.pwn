@@ -12571,6 +12571,11 @@ YCMD:unban(playerid, params[], help)
 	    new escape[25];
 	    mysql_escape_string(gstr, escape, g_SQL_handle, sizeof(escape));
 
+		if(badsql(escape) != 0)
+		{
+		    return SCM(playerid, -1, ""er"You have specified invalid characters");
+		}
+
 	    format(gstr, sizeof(gstr), "SELECT `ID` FROM `bans` WHERE `PlayerName` = '%s' LIMIT 1;", escape);
 	    mysql_tquery(g_SQL_handle, gstr, "OnUnbanAttempt", "is", playerid, escape);
 	}
@@ -12591,14 +12596,18 @@ YCMD:oban(playerid, params[], help)
 	        return SCM(playerid, NEF_GREEN, "Usage: /offlineban <name> <reason>");
 	    }
 
-		if(strlen(reason) > 128) return SCM(playerid, -1, ""er"Keep the reason below 128");
-	  	if(isnull(reason) || strlen(reason) < 2) return SCM(playerid, NEF_GREEN, "Usage: /offlineban <name> <reason>");
-	    if(strlen(player) > 24 || strlen(player) < 3) return SCM(playerid, -1, ""er"Name length 3 - 24");
+        if(strlen(reason) > 50 || isnull(reason) || strlen(reason) < 2) return SCM(playerid, -1, ""er"Ban reason length: 2-50");
+	    if(strlen(player) > 24 || strlen(player) < 3) return SCM(playerid, -1, ""er"Name length 3-24");
 	    if(__GetPlayerID(player) != INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Player seems to be online!");
 
 	    new escape[25], ereason[128];
 	    mysql_escape_string(player, escape, g_SQL_handle, sizeof(escape));
 	    mysql_escape_string(reason, ereason, g_SQL_handle, sizeof(ereason));
+
+		if(badsql(escape) != 0 || badsql(ereason, false) != 0)
+		{
+		    return SCM(playerid, -1, ""er"You have specified invalid characters");
+		}
 
 	    format(player, sizeof(player), "SELECT `AdminName` FROM `bans` WHERE `PlayerName` = '%s' LIMIT 1;", escape);
 	    mysql_tquery(g_SQL_handle, player, "OnOfflineBanAttempt", "iss", playerid, escape, ereason);
@@ -12623,14 +12632,13 @@ YCMD:ban(playerid, params[], help)
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 	    
-		if(strlen(reason) > 50) return SCM(playerid, -1, ""er"Ban reason length: 2-50");
+		if(strlen(reason) > 50 || isnull(reason) || strlen(reason) < 2) return SCM(playerid, -1, ""er"Ban reason length: 2-50");
 	    if(player == playerid) return SCM(playerid, -1, ""er"You can not ban yourself");
-	  	if(isnull(reason) || strlen(reason) < 2) return SCM(playerid, -1, ""er"Ban reason length: 2-50");
 	  	if(IsPlayerNPC(player)) return SCM(playerid, -1, ""er"You can not ban NPCs");
         if(PlayerInfo[player][KBMarked]) return SCM(playerid, -1, ""er"This player marked for disconnect");
         if(time != -1 && (time > 10080 || time < 5)) return SCM(playerid, -1, ""er"5-10080 minutes");
         
-		if(badsql(reason) != 0)
+		if(badsql(reason, false) != 0)
 		{
 		    return SCM(playerid, -1, ""er"You have specified invalid characters");
 		}
@@ -23513,6 +23521,7 @@ LoadServerStaticMeshes()
     Command_AddAltNamed("xmas", "christ");
 	#endif
     Command_AddAltNamed("time", "stime");
+    Command_AddAltNamed("oban", "offlineban");
     Command_AddAltNamed("concert", "gig");
     Command_AddAltNamed("radio", "streams");
     Command_AddAltNamed("stopradio", "stopstreams");
@@ -30546,6 +30555,9 @@ function:OnOfflineBanAttempt2(playerid, ban[], reason[])
 		MySQL_BanIP(ip);
 
 		SCM(playerid, -1, ""er"Player has been banned!");
+		
+		format(gstr, sizeof(gstr), "[ADMIN CHAT] "LG_E"Account and IP banned of %s [EXPIRES: NEVER, REASON: %s] by %s", ban, reason, __GetName(playerid));
+		AdminMSG(COLOR_RED, gstr);
 	}
 	else
 	{
