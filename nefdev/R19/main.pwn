@@ -3217,6 +3217,7 @@ public OnPlayerConnect(playerid)
     ToggleSpeedo(playerid, false);
 	SetPlayerScore_(playerid, 0);
 	SetPlayerTeam(playerid, NO_TEAM);
+	SetPlayerColor(playerid, PlayerColors[random(sizeof(PlayerColors))]);
 	PreparePlayerPV(playerid);
     PreparePlayerToy(playerid);
 
@@ -3949,13 +3950,13 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				{
 					format(string, sizeof(string),
 					""white"Gang name:\t"nef_yellow"%s\n"white"Gang tag:\t"nef_yellow"%s\n"white"Gang created:\t"nef_yellow"%s\n"white"Gang score:\t"nef_yellow"%i\n"white"Gang color:\t{%06x}COLOR\n"white"Gang car:\t"nef_yellow"%s\n"white"Users online:\t"nef_yellow"%i\n\n"white"Online:%s\n"white"[... too many online]",
-						gangname, gangtag, UnixTimeToDate(udate), score, color >>> 8, IsValidVehicleModel(gcar) ? VehicleNames[gcar - 400] : "not set", count, members);
+						gangname, gangtag, UTConvert(udate), score, color >>> 8, IsValidVehicleModel(gcar) ? VehicleNames[gcar - 400] : "not set", count, members);
 				}
 				else
 				{
 				    format(string, sizeof(string),
 					""white"Gang name:\t"nef_yellow"%s\n"white"Gang tag:\t"nef_yellow"%s\n"white"Gang created:\t"nef_yellow"%s\n"white"Gang score:\t"nef_yellow"%i\n"white"Gang color:\t{%06x}COLOR\n"white"Gang car:\t"nef_yellow"%s\n"white"Users online:\t"nef_yellow"%i\n\n"white"Online:%s",
-						gangname, gangtag, UnixTimeToDate(udate), score, color >>> 8, IsValidVehicleModel(gcar) ? VehicleNames[gcar - 400] : "not set", count, members);
+						gangname, gangtag, UTConvert(udate), score, color >>> 8, IsValidVehicleModel(gcar) ? VehicleNames[gcar - 400] : "not set", count, members);
 				}
 
 				ShowPlayerDialog(extraid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Gang Info", string, "OK", "");
@@ -3966,10 +3967,10 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
             new rows, fields;
             cache_get_data(rows, fields, g_SQL_handle);
 
-            if(rows == 0) // ip not banned
+            if(rows == 0) // IP not banned
             {
 				format(gstr, sizeof(gstr), "SELECT `ID` FROM `accounts` WHERE `Name` = '%s' LIMIT 1;", __GetName(extraid));
-				mysql_tquery(g_SQL_handle, gstr, "OnQueryFinish", "siii", gstr, THREAD_ACCOUNT_EXIST, extraid, g_SQL_handle); // cehcking if acc exists
+				mysql_tquery(g_SQL_handle, gstr, "OnQueryFinish", "siii", gstr, THREAD_ACCOUNT_EXIST, extraid, g_SQL_handle); // Check if account exist
 				
 				SendWelcomeMSG(extraid);
             }
@@ -4009,8 +4010,6 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		}
         case THREAD_IS_BANNED:
 		{
-		    SetPlayerColor(extraid, PlayerColors[random(sizeof(PlayerColors))]);
-		    
 		    new rows, fields;
 		    cache_get_data(rows, fields, g_SQL_handle);
 		    
@@ -4028,7 +4027,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 
 				if(lift == 0) // Perm ban
 				{
-			        format(string, sizeof(string), ""red"You have been banned!"white"\n\nAdmin:\t%s\nYour name:\t%s\nReason:\t%s\nDate:\t%s\n\nIf you think that you have been banned wrongly,\nwrite a ban appeal on "SVRFORUM"", adminname, __GetName(extraid), reason, UnixTimeToDate(udate));
+			        format(string, sizeof(string), ""red"You have been banned!"white"\n\nAdmin: %s\nYour name: %s\nReason: %s\nDate: %s\n\nIf you think that you have been banned wrongly,\nwrite a ban appeal on "SVRFORUM"", adminname, __GetName(extraid), reason, UTConvert(udate));
 					ShowPlayerDialog(extraid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Notice", string, "OK", "");
                     KickEx(extraid);
 				}
@@ -4040,11 +4039,11 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				    SCM(extraid, -1, ""nef" Your time ban expired, you've been unbanned!");
 
 					format(string, sizeof(string), "SELECT * FROM `blacklist` WHERE `IP` = '%s' LIMIT 1;", __GetIP(extraid));
-					mysql_tquery(g_SQL_handle, string, "OnQueryFinish", "siii", string, THREAD_CHECK_IP, extraid, g_SQL_handle); // Continuing with progress
+					mysql_tquery(g_SQL_handle, string, "OnQueryFinish", "siii", string, THREAD_CHECK_IP, extraid, g_SQL_handle); // Continuing with process
 				}
 				else
 				{
-				    format(string, sizeof(string), ""red"You have been time banned!"white"\n\nAdmin:\t%s\nYour name:\t%s\nReason:\t%s\nExpires:\t%s\n\nIf you think that you have been banned wrongly,\nwrite a ban appeal on "SVRFORUM"", adminname, __GetName(extraid), reason, UnixTimeToDate(lift));
+				    format(string, sizeof(string), ""red"You have been time banned!"white"\n\nAdmin: %s\nYour name: %s\nReason: %s\nExpires: %s\n\nIf you think that you have been banned wrongly,\nwrite a ban appeal on "SVRFORUM"", adminname, __GetName(extraid), reason, UTConvert(lift));
 					ShowPlayerDialog(extraid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Notice", string, "OK", "");
 					KickEx(extraid);
 				}
@@ -4505,7 +4504,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				{
 					format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"Successfully logged in. (Level: %s)", StaffLevels[PlayerInfo[extraid][Level]][e_rank]);
 					SCM(extraid, -1, gstr2);
-					format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"You were last online at %s and registered on %s", UnixTimeToDate(PlayerInfo[extraid][LastLogin]), UnixTimeToDate(PlayerInfo[extraid][RegDate]));
+					format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"You were last online at %s and registered on %s", UTConvert(PlayerInfo[extraid][LastLogin]), UTConvert(PlayerInfo[extraid][RegDate]));
   					SCM(extraid, -1, gstr2);
 					format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"You've been online for %s", GetPlayingTimeFormat(extraid));
 					SCM(extraid, -1, gstr2);
@@ -4513,7 +4512,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		   		else
 		   		{
 				   	SCM(extraid, -1, ""server_sign" "r_besch"Successfully logged in!");
-					format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"You were last online at %s and registered on %s", UnixTimeToDate(PlayerInfo[extraid][LastLogin]), UnixTimeToDate(PlayerInfo[extraid][RegDate]));
+					format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"You were last online at %s and registered on %s", UTConvert(PlayerInfo[extraid][LastLogin]), UTConvert(PlayerInfo[extraid][RegDate]));
   					SCM(extraid, -1, gstr2);
 					format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"You've been online for %s", GetPlayingTimeFormat(extraid));
 					SCM(extraid, -1, gstr2);
@@ -9917,7 +9916,7 @@ YCMD:adminhelp(playerid, params[], help)
 
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[2][e_rank]);
 		strcat(string, gstr);
-		strcat(string, "/tban /online /offline /onduty /offduty /akill /rv /day /night /dawn\n/move /ban /ipban /cuff /uncuff /jail /unjail /unfreeze\n\n");
+		strcat(string, "/online /offline /onduty /offduty /akill /rv /day /night /dawn\n/move /ban /cuff /uncuff /jail /unjail /unfreeze\n\n");
 		
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[3][e_rank]);
 		strcat(string, gstr);
@@ -11742,7 +11741,7 @@ YCMD:grename(playerid, params[], help)
 	{
 	    return SCM(playerid, -1, ""er"Invalid gangtag length");
 	}
-	if(badsql(buff) != 0)
+	if(badsql(buff, false) != 0)
 	{
 	    return SCM(playerid, -1, ""er"You have specified invalid characters");
 	}
@@ -11754,7 +11753,7 @@ YCMD:grename(playerid, params[], help)
 	new gangname[21];
 	mysql_escape_string(buff, gangname, g_SQL_handle, 21);
 
-	if(badsql(buff) != 0)
+	if(badsql(buff, false) != 0)
 	{
 	    return SCM(playerid, -1, ""er"You have specified invalid characters");
 	}
@@ -11933,7 +11932,7 @@ YCMD:gcreate(playerid, params[], help)
 	    return SCM(playerid, -1, ""er"Gang tag length: 2 - 4 characters");
 	}
 
-	if(badsql(ntmp) != 0)
+	if(badsql(ntmp, false) != 0)
 	{
 	    CancelGangCreation(playerid);
 	    return SCM(playerid, -1, ""er"You have specified invalid characters");
@@ -11945,7 +11944,7 @@ YCMD:gcreate(playerid, params[], help)
 	}
 	mysql_escape_string(ntmp, PlayerInfo[playerid][GangName], g_SQL_handle, 21);
 
-	if(badsql(ttmp) != 0)
+	if(badsql(ttmp, false) != 0)
 	{
 	    CancelGangCreation(playerid);
 	    return SCM(playerid, -1, ""er"You have specified invalid characters");
@@ -12557,76 +12556,6 @@ YCMD:gcar(playerid, params[], help)
 	return 1;
 }
 
-YCMD:ipban(playerid, params[], help)
-{
-	if(PlayerInfo[playerid][Level] >= 2)
-	{
-	    new player, reason[144];
-	    if(sscanf(params, "rs[144]", player, reason))
-	    {
-	        SCM(playerid, NEF_GREEN, "Usage: /ipban <playerid> <reason>");
-	        SCM(playerid, NEF_GREEN, "Bans the account (if registered) AND IP of the specified player");
-	        return 1;
-	    }
-	    
-	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
-		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
-	    
-		if(strlen(reason) > 50) return SCM(playerid, -1, ""er"Keep the reason below 50");
-	    if(player == playerid) return SCM(playerid, -1, ""er"Fail :p");
-	  	if(isnull(reason) || strlen(reason) < 2)
-  		{
-	        SCM(playerid, NEF_GREEN, "Usage: /ipban <playerid> <reason>");
-	        SCM(playerid, NEF_GREEN, "Bans the account (if registered) AND IP of the specified player");
-		  	return 1;
-		}
-	  	if(IsPlayerNPC(player)) return SCM(playerid, -1, ""er"Invalid player!");
-        if(PlayerInfo[player][KBMarked]) return SCM(playerid, -1, ""er"Can't ban this player!");
-        
-		if(badsql(reason, true) != 0)
-		{
-		    return SCM(playerid, -1, ""er"You have specified invalid characters");
-		}
-
-	  	if(PlayerInfo[player][Level] != MAX_ADMIN_LEVEL)
-	  	{
-		 	if(IsPlayerAvail(player) && player != playerid && PlayerInfo[player][Level] != MAX_ADMIN_LEVEL)
-			{
-				MySQL_BanIP(__GetIP(player));
-
-				if(islogged(player))
-				{
-	                MySQL_CreateBan(__GetName(player), __GetName(playerid), reason);
-				}
-                
-				format(gstr, sizeof(gstr), ""yellow"** "red"%s(%i) has been banned by Admin %s(%i) [Reason: %s]", __GetName(player), player, __GetName(playerid), playerid, reason);
-				SCMToAll(YELLOW, gstr);
-				print(gstr);
-
-	    		format(gstr2, sizeof(gstr2), ""red"You have been banned!"white"\n\nAdmin:\t%s\nReason:\t%s\n\nIf you think that you have been banned wrongly,\nwrite a ban appeal on "SVRFORUM"", __GetName(playerid), reason);
-	    		ShowPlayerDialog(player, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Notice", gstr2, "OK", "");
-
-				KickEx(player);
-			}
-			else
-			{
-				SCM(playerid, -1, ""er"Player is not connected or is yourself or is the highest level admin");
-			}
-		}
-		else
-		{
-		    format(gstr, sizeof(gstr), "OMGLOL: %s just tried to ban you with reason: %s", __GetName(playerid), reason);
-		    SCM(player, RED, gstr);
-		    SCM(playerid, RED, "I hope that was a joke");
-		}
-	}
-	else
-	{
-		SCM(playerid, -1, NO_PERM);
-	}
-	return 1;
-}
-
 YCMD:unban(playerid, params[], help)
 {
 	if(PlayerInfo[playerid][Level] >= 4)
@@ -12681,120 +12610,83 @@ YCMD:oban(playerid, params[], help)
 	return 1;
 }
 
-YCMD:tban(playerid, params[], help)
-{
-	if(PlayerInfo[playerid][Level] >= 2)
-	{
-	    new player, mins, reason[144];
-	    if(sscanf(params, "ris[144]", player, mins, reason))
-	    {
-	        return SCM(playerid, NEF_GREEN, "Usage: /tban <playerid> <minutes> <reason>");
-	    }
-
-	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
-		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
-
-		if(mins < 5 || mins > 10080) return SCM(playerid, -1, ""er"Min. ban time is 5 max is 10080");
-		if(strlen(reason) > 128) return SCM(playerid, -1, ""er"Keep the reason below 128");
-	    if(player == playerid) return SCM(playerid, -1, ""er"Fail :P");
-	  	if(isnull(reason) || strlen(reason) < 2) return SCM(playerid, NEF_GREEN, "Usage: /tban <playerid> <minutes> <reason>");
-	  	if(IsPlayerNPC(player)) return SCM(playerid, -1, ""er"Invalid player!");
-        if(PlayerInfo[player][KBMarked]) return SCM(playerid, -1, ""er"Can't ban this player!");
-		if(!islogged(player)) return SCM(playerid, -1, ""er"Cannot ban tmp accounts, use /ipban");
-
-		if(badsql(reason, true) != 0)
-		{
-		    return SCM(playerid, -1, ""er"You have specified invalid characters");
-		}
-
-	  	if(PlayerInfo[player][Level] != MAX_ADMIN_LEVEL)
-	  	{
-		 	if(IsPlayerAvail(player) && player != playerid && PlayerInfo[player][Level] != MAX_ADMIN_LEVEL)
-			{
-	   			MySQL_CreateBan(__GetName(player), __GetName(playerid), reason, gettime() + (mins * 60));
-
-				format(gstr, sizeof(gstr), ""yellow"** "red"%s(%i) has been time banned for %i minutes by Admin %s(%i) [Reason: %s]", __GetName(player), player, mins, __GetName(playerid), playerid, reason);
-				SCMToAll(YELLOW, gstr);
-				print(gstr);
-
-	    		format(gstr2, sizeof(gstr2), ""red"You have been time banned!"white"\n\nAdmin:\t%s\nReason:\t%s\nExpires:\t%s\n\nIf you think that you have been banned wrongly,\nwrite a ban appeal on "SVRFORUM"", __GetName(playerid), reason, UnixTimeToDate(gettime() + (mins * 60)));
-	    		ShowPlayerDialog(player, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Notice", gstr2, "OK", "");
-
-	   			KickEx(player);
-			}
-			else
-			{
-				SCM(playerid, -1, ""er"Player is not connected or is yourself or is the highest level admin");
-			}
-		}
-		else
-		{
-		    format(gstr, sizeof(gstr), "OMGLOL: %s just tried to ban you with reason: %s", __GetName(playerid), reason);
-		    SCM(player, RED, gstr);
-		    SCM(playerid, RED, "I hope that was a joke");
-		}
-	}
-	else
-	{
-		SCM(playerid, -1, NO_PERM);
-	}
-	return 1;
-}
-
 YCMD:ban(playerid, params[], help)
 {
 	if(PlayerInfo[playerid][Level] >= 2)
 	{
-	    new player, reason[144];
-	    if(sscanf(params, "rs[144]", player, reason))
+	    new player, reason[144], time;
+	    if(sscanf(params, "rs[144]I(-1)", player, reason, time))
 	    {
-	        return SCM(playerid, NEF_GREEN, "Usage: /ban <playerid> <reason>");
+	        return SCM(playerid, NEF_GREEN, "Usage: /ban <playerid> <reason> (optional: <time, minutes>)");
 	    }
 	    
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 	    
-		if(strlen(reason) > 50) return SCM(playerid, -1, ""er"Keep the reason below 50");
-	    if(player == playerid) return SCM(playerid, -1, ""er"Fail :P");
-	  	if(isnull(reason) || strlen(reason) < 2) return SCM(playerid, NEF_GREEN, "Usage: /ban <playerid> <reason>");
-	  	if(IsPlayerNPC(player)) return SCM(playerid, -1, ""er"Invalid player!");
-        if(PlayerInfo[player][KBMarked]) return SCM(playerid, -1, ""er"Can't ban this player!");
+		if(strlen(reason) > 50) return SCM(playerid, -1, ""er"Ban reason length: 2-50");
+	    if(player == playerid) return SCM(playerid, -1, ""er"You can not ban yourself");
+	  	if(isnull(reason) || strlen(reason) < 2) return SCM(playerid, -1, ""er"Ban reason length: 2-50");
+	  	if(IsPlayerNPC(player)) return SCM(playerid, -1, ""er"You can not ban NPCs");
+        if(PlayerInfo[player][KBMarked]) return SCM(playerid, -1, ""er"This player marked for disconnect");
+        if(time != -1 && (time > 10080 || time < 5)) return SCM(playerid, -1, ""er"5-10080 minutes");
         
-		if(badsql(reason, true) != 0)
+		if(badsql(reason) != 0)
 		{
 		    return SCM(playerid, -1, ""er"You have specified invalid characters");
 		}
 
 	  	if(PlayerInfo[player][Level] != MAX_ADMIN_LEVEL)
 	  	{
-		 	if(IsPlayerAvail(player) && player != playerid && PlayerInfo[player][Level] != MAX_ADMIN_LEVEL)
+		 	if(IsPlayerAvail(player))
 			{
-			    if(!islogged(player)) return SCM(playerid, -1, ""er"Use /ipban on not registered players!");
-			    
-	   			MySQL_CreateBan(__GetName(player), __GetName(playerid), reason);
+			    new amsg[144];
+			    if(islogged(player)) { // Ban registered player
+				    if(time == -1) {
+                    	MySQL_BanPlayer(__GetName(player), __GetName(playerid), reason);
+                        MySQL_BanIP(__GetIP(player));
+                        
+                        format(gstr, sizeof(gstr), ""yellow"** "red"%s(%i) has been banned by Admin %s(%i) [Reason: %s]", __GetName(player), player, __GetName(playerid), playerid, reason);
+                        format(amsg, sizeof(amsg), "[ADMIN CHAT] "LG_E"Account and IP banned of %s [EXPIRES: NEVER, REASON: %s]", __GetName(player), reason);
+					} else {
+					    MySQL_BanPlayer(__GetName(player), __GetName(playerid), reason, gettime() + (time * 60));
 
-				format(gstr, sizeof(gstr), ""yellow"** "red"%s(%i) has been banned by Admin %s(%i) [Reason: %s]", __GetName(player), player, __GetName(playerid), playerid, reason);
-				SCMToAll(YELLOW, gstr);
+						format(gstr, sizeof(gstr), ""yellow"** "red"%s(%i) has been banned by Admin %s(%i) [Reason: %s] [Time: %s]", __GetName(player), player, __GetName(playerid), playerid, reason, time);
+						format(amsg, sizeof(amsg), "[ADMIN CHAT] "LG_E"Account banned of %s [EXPIRES: %s, REASON: %s]", __GetName(player), UTConvert(gettime() + (time * 60)), reason);
+					}
+				} else {
+				    MySQL_BanIP(__GetIP(player));
+				    
+				    format(gstr, sizeof(gstr), ""yellow"** "red"%s(%i) has been banned by Admin %s(%i) [Reason: %s]", __GetName(player), player, __GetName(playerid), playerid, reason);
+				    format(amsg, sizeof(amsg), "[ADMIN CHAT] "LG_E"IP banned of %s [EXPIRES: NEVER, REASON: %s]", __GetName(player), reason);
+				}
+
+				SCMToAll(-1, gstr);
+                AdminMSG(COLOR_RED, amsg);
 				print(gstr);
+				print(amsg);
+
+	    		format(gstr2, sizeof(gstr2), ""red"You have been banned!"white"\n\nAdmin: %s\nReason: %s\nExpires: %s\n\nIf you think that you have been banned wrongly,\nwrite a ban appeal on "SVRFORUM"",
+					__GetName(playerid),
+					reason,
+					time == -1 ? ("Permanent") : UTConvert(gettime() + (time * 60)));
+					
+	    		ShowPlayerDialog(player, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Notice", gstr2, "OK", "");
 
 				format(gstr, sizeof(gstr), "4Server: 2Admin %s(%i) has banned %s(%i) 1(Reason: %s)", __GetName(playerid), playerid, __GetName(player), player, reason);
 				IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 
-	    		format(gstr2, sizeof(gstr2), ""red"You have been banned!"white"\n\nAdmin:\t%s\nReason:\t%s\n\nIf you think that you have been banned wrongly,\nwrite a ban appeal on "SVRFORUM"", __GetName(playerid), reason);
-	    		ShowPlayerDialog(player, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Notice", gstr2, "OK", "");
-
-				KickEx(player);
+                KickEx(player);
 			}
 			else
 			{
-				SCM(playerid, -1, ""er"Player is not connected or is yourself or is the highest level admin");
+				SCM(playerid, -1, ""er"Player is not available");
 			}
 		}
 		else
 		{
-		    format(gstr, sizeof(gstr), "OMGLOL: %s just tried to ban you with reason: %s", __GetName(playerid), reason);
-		    SCM(player, RED, gstr);
-		    SCM(playerid, RED, "I hope that was a joke");
+		    format(gstr, sizeof(gstr), ""server_sign" "r_besch"%s just tried to ban you with reason: %s", __GetName(playerid), reason);
+		    SCM(player, -1, gstr);
+            SCM(playerid, -1, ""server_sign" "r_besch"You may not ban this player.");
 		}
 	}
 	else
@@ -16027,18 +15919,18 @@ YCMD:stats(playerid, params[], help)
 			PlayerInfo[player1][Houses],
 			PlayerInfo[player1][Props],
 			PlayerInfo[player1][Wanteds],
-			UnixTimeToDate(PlayerInfo[player1][LastLogin]));
+			UTConvert(PlayerInfo[player1][LastLogin]));
 			
 		if(islogged(player1))
 		{
 			strcat(string3, "\n"white"Register Date: "LB_E"");
-			strcat(string3, UnixTimeToDate(PlayerInfo[player1][RegDate]));
+			strcat(string3, UTConvert(PlayerInfo[player1][RegDate]));
 		}
 			
 		if(PlayerInfo[player1][BoostDeplete] != 0)
 		{
 		    strcat(string3, "\n"white"Boost will end on: "LB_E"");
-		    strcat(string3, UnixTimeToDate(PlayerInfo[player1][BoostDeplete]));
+		    strcat(string3, UTConvert(PlayerInfo[player1][BoostDeplete]));
 		}
 			
 		strcat(finstring, string1);
@@ -17622,7 +17514,7 @@ function:OnPlayerNameChangeRequest(newname[], playerid)
 			
 			new nextnc = (PlayerInfo[playerid][LastNameChange] + ((PlayerInfo[playerid][VIP] == 1) ? (2592000) : (7776000)));
 			
-			format(query, sizeof(query), ""white"You have successfully changed your name.\n\nNew name: %s\nOld name: %s\nNext namechange available: %s", newname, oldname, UnixTimeToDate(nextnc));
+			format(query, sizeof(query), ""white"You have successfully changed your name.\n\nNew name: %s\nOld name: %s\nNext namechange available: %s", newname, oldname, UTConvert(nextnc));
 			ShowPlayerDialog(playerid, NAME_CHANGE_DIALOG + 5, DIALOG_STYLE_MSGBOX, ""nef" :: Namechange", query, "OK", "");
 			
 			format(query, sizeof(query), ""nef" %s(%i) has changed their name to %s", oldname, playerid, newname);
@@ -19835,11 +19727,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					return SkipLogin(playerid);
 				}
-				new query[255], escape[33];
+				new escape[33];
 				mysql_escape_string(password, escape, g_SQL_handle, 33);
 
-				format(query, sizeof(query), "SELECT `ID` FROM `accounts` WHERE `Name` = '%s' AND (`Hash` = MD5('%s') OR `Hash` = SHA1('%s')) LIMIT 1;", __GetName(playerid), escape, escape); // SHA1 because of Stunt Evolution server merge
-				mysql_tquery(g_SQL_handle, query, "OnQueryFinish", "siii", query, THREAD_CHECK_PLAYER_PASSWD, playerid, g_SQL_handle);
+				format(gstr2, sizeof(gstr2), "SELECT `ID` FROM `accounts` WHERE `Name` = '%s' AND (`Hash` = MD5('%s') OR `Hash` = SHA1('%s')) LIMIT 1;", __GetName(playerid), escape, escape); // SHA1 because of Stunt Evolution server merge
+				mysql_tquery(g_SQL_handle, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_CHECK_PLAYER_PASSWD, playerid, g_SQL_handle);
 			    return true;
 			}
 			case REGISTER_DIALOG2:
@@ -20592,7 +20484,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			 		ShowDialog(playerid, VEHICLE_PLATE_DIALOG);
 					return 1;
 				}
-				if(badsql(inputtext, true) != 0)
+				if(badsql(inputtext, false) != 0)
 				{
 				    ShowDialog(playerid, VEHICLE_PLATE_DIALOG);
 				    SCM(playerid, -1, ""er"You have specified invalid characters");
@@ -20617,7 +20509,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				 	ShowDialog(playerid, CUSTOM_PLATE_DIALOG);
 				 	return 1;
 				}
-				if(badsql(inputtext, true) != 0)
+				if(badsql(inputtext, false) != 0)
 				{
 					SCM(playerid, RED, ""er"You entered an invalid character!");
 				 	ShowDialog(playerid, CUSTOM_PLATE_DIALOG);
@@ -21752,21 +21644,21 @@ function:AutoLogin(playerid)
 
 function:RequestRegistration(playerid)
 {
-	new newtext1[1024], newtext2[128];
-    format(newtext2, sizeof(newtext2), ""nef" :: Registration - %s", __GetName(playerid));
-
-	format(newtext1, sizeof(newtext1), ""white"Welcome to "SVRLOGO""white"\n\nYour name: %s\n\nLet's create an account, enter a password below:", __GetName(playerid));
-	ShowPlayerDialog(playerid, REGISTER_DIALOG, DIALOG_STYLE_PASSWORD, newtext2, newtext1, "Register", "Skip");
+	new string[1024];
+	
+    format(gstr, sizeof(gstr), ""nef" :: Registration - %s", __GetName(playerid));
+	format(string, sizeof(string), ""white"Welcome to "SVRLOGO""white"\n\nYour name: %s\n\nLet's create an account, enter a password below:", __GetName(playerid));
+	ShowPlayerDialog(playerid, REGISTER_DIALOG, DIALOG_STYLE_PASSWORD, gstr, string, "Register", "Skip");
 	return 1;
 }
 
 function:RequestLogin(playerid)
 {
-	new newtext[1024], newtext2[128];
+	new string[1024];
 	
-    format(newtext2, sizeof(newtext2), ""nef_yellow"Login "white"- %s", __GetName(playerid));
-    format(newtext, sizeof(newtext), ""white"Welcome to "SVRLOGO""white"\nHow are you, %s?\n\nAccount: %s\n\nThe name that you are using is registered! Please enter the password:", __GetName(playerid), __GetName(playerid));
-	ShowPlayerDialog(playerid, LOGIN_DIALOG, DIALOG_STYLE_PASSWORD, newtext2, newtext, "Login", "Skip");
+    format(gstr, sizeof(gstr), ""nef_yellow"Login "white"- %s", __GetName(playerid));
+    format(string, sizeof(string), ""white"Welcome to "SVRLOGO""white"\nHow are you, %s?\n\nAccount: %s\n\nThe name that you are using is registered! Please enter the password:", __GetName(playerid), __GetName(playerid));
+	ShowPlayerDialog(playerid, LOGIN_DIALOG, DIALOG_STYLE_PASSWORD, gstr, string, "Login", "Skip");
     return 1;
 }
 
@@ -22418,7 +22310,7 @@ MySQL_UpdateAccount(playerid)
 	}
 }
 
-MySQL_CreateBan(PlayerName[], AdminName[], Reason[], lift = 0)
+MySQL_BanPlayer(PlayerName[], AdminName[], Reason[], lift = 0)
 {
 	new query[300], rescape[129], aescape[25], pescape[25];
 	mysql_escape_string(Reason, rescape, g_SQL_handle, 129);
@@ -28490,7 +28382,7 @@ function:ShowDialog(playerid, dialogid)
 	    {
 	        new string[650];
 	        format(string, sizeof(string), "%s since %s. During that time...\n\n... "yellow_e"%i "white"commands have been performed\n... "yellow_e"%i "white"chat messages have been sent\n... "yellow_e"%i "white"new players have registered\n... "yellow_e"%i "white"players have been murdered",
-				GetUptime(), UnixTimeToDate(StartTime), SrvStat[0], SrvStat[1], SrvStat[2], SrvStat[3]);
+				GetUptime(), UTConvert(StartTime), SrvStat[0], SrvStat[1], SrvStat[2], SrvStat[3]);
 				
 			format(gstr, sizeof(gstr), "\n\nStreamed client objects: %i", Streamer_CountVisibleItems(playerid, STREAMER_TYPE_OBJECT));
 	        strcat(string, gstr);
@@ -28519,8 +28411,8 @@ function:ShowDialog(playerid, dialogid)
 	            if((PlayerInfo[playerid][LastNameChange] + 2592000) > gettime())
 	            {
 	                format(string, sizeof(string), ""red"Namechange not possible"white"\n\nNamechange cooldown: 30 days "lb_e"(VIP)"white"\nLast Namechange: %s\nNext Namechange available: %s\nCurrent Name: %s",
-						UnixTimeToDate(PlayerInfo[playerid][LastNameChange]),
-						UnixTimeToDate(PlayerInfo[playerid][LastNameChange] + 2592000),
+						UTConvert(PlayerInfo[playerid][LastNameChange]),
+						UTConvert(PlayerInfo[playerid][LastNameChange] + 2592000),
 						__GetName(playerid));
 					return ShowPlayerDialog(playerid, NAME_CHANGE_DIALOG + 5, DIALOG_STYLE_MSGBOX, ""nef" :: Namechange", string, "OK", "");
 	            }
@@ -28529,14 +28421,14 @@ function:ShowDialog(playerid, dialogid)
 	                if(PlayerInfo[playerid][LastNameChange] == 0)
 	                {
 		                format(string, sizeof(string), ""green"Namechange possible"white"\n\nNamechange cooldown: 30 days "lb_e"(VIP)"white"\nLast Namechange: Never\nNext Namechange available: %s\nCurrent Name: %s\n\nEnter a new valid nickname below:",
-							UnixTimeToDate(PlayerInfo[playerid][RegDate]),
+							UTConvert(PlayerInfo[playerid][RegDate]),
 							__GetName(playerid));
 	                }
 	                else
 	                {
 		                format(string, sizeof(string), ""green"Namechange possible"white"\n\nNamechange cooldown: 30 days "lb_e"(VIP)"white"\nLast Namechange: %s\nNext Namechange available: %s\nCurrent Name: %s\n\nEnter a new valid nickname below:",
-							UnixTimeToDate(PlayerInfo[playerid][LastNameChange]),
-							UnixTimeToDate(PlayerInfo[playerid][LastNameChange] + 2592000),
+							UTConvert(PlayerInfo[playerid][LastNameChange]),
+							UTConvert(PlayerInfo[playerid][LastNameChange] + 2592000),
 							__GetName(playerid));
 	                }
 	                
@@ -28548,8 +28440,8 @@ function:ShowDialog(playerid, dialogid)
 	            if((PlayerInfo[playerid][LastNameChange] + 7776000) > gettime())
 	            {
 	                format(string, sizeof(string), ""red"Namechange not possible"white"\n\nNamechange cooldown: 90 days\nLast Namechange: %s\nNext Namechange available: %s\nCurrent Name: %s",
-						UnixTimeToDate(PlayerInfo[playerid][LastNameChange]),
-						UnixTimeToDate(PlayerInfo[playerid][LastNameChange] + 7776000),
+						UTConvert(PlayerInfo[playerid][LastNameChange]),
+						UTConvert(PlayerInfo[playerid][LastNameChange] + 7776000),
 						__GetName(playerid));
 					return ShowPlayerDialog(playerid, NAME_CHANGE_DIALOG + 5, DIALOG_STYLE_MSGBOX, ""nef" :: Namechange", string, "OK", "");
 	            }
@@ -28558,14 +28450,14 @@ function:ShowDialog(playerid, dialogid)
 	                if(PlayerInfo[playerid][LastNameChange] == 0)
 	                {
 		                format(string, sizeof(string), ""green"Namechange possible"white"\n\nNamechange cooldown: 90 days\nLast Namechange: Never\nNext Namechange available: %s\nCurrent Name: %s\n\nEnter a new valid nickname below:",
-							UnixTimeToDate(PlayerInfo[playerid][RegDate]),
+							UTConvert(PlayerInfo[playerid][RegDate]),
 							__GetName(playerid));
 	                }
 	                else
 	                {
 		                format(string, sizeof(string), ""green"Namechange possible"white"\n\nNamechange cooldown: 90 days\nLast Namechange: %s\nNext Namechange available: %s\nCurrent Name: %s\n\nEnter a new valid nickname below:",
-							UnixTimeToDate(PlayerInfo[playerid][LastNameChange]),
-							UnixTimeToDate(PlayerInfo[playerid][LastNameChange] + 7776000),
+							UTConvert(PlayerInfo[playerid][LastNameChange]),
+							UTConvert(PlayerInfo[playerid][LastNameChange] + 7776000),
 							__GetName(playerid));
 	                }
 
@@ -29126,7 +29018,7 @@ GetPlayerSettings(playerid)
 	return string;
 }
 
-UnixTimeToDate(unixtime)
+UTConvert(unixtime)
 {
 	new u_year,
 	    u_month,
@@ -29911,7 +29803,7 @@ function:OnNCReceive(playerid)
 	    {
 	        cache_get_row(i, 1, oldname, g_SQL_handle, sizeof(oldname));
 	        cache_get_row(i, 2, newname, g_SQL_handle, sizeof(newname));
-	        format(tmp, sizeof(tmp), "%i - %s changed their name to %s on %s\n", i + 1, oldname, newname, UnixTimeToDate(cache_get_row_int(i, 3, g_SQL_handle)));
+	        format(tmp, sizeof(tmp), "%i - %s changed their name to %s on %s\n", i + 1, oldname, newname, UTConvert(cache_get_row_int(i, 3, g_SQL_handle)));
 	        strcat(string, tmp);
 	    }
 
@@ -29934,7 +29826,7 @@ function:OnNCReceive2(playerid, name[])
 	    {
 	        cache_get_row(i, 1, oldname, g_SQL_handle, sizeof(oldname));
 	        cache_get_row(i, 2, newname, g_SQL_handle, sizeof(newname));
-	        format(tmp, sizeof(tmp), "%i - %s changed their name to %s on %s\n", i + 1, oldname, newname, UnixTimeToDate(cache_get_row_int(i, 3, g_SQL_handle)));
+	        format(tmp, sizeof(tmp), "%i - %s changed their name to %s on %s\n", i + 1, oldname, newname, UTConvert(cache_get_row_int(i, 3, g_SQL_handle)));
 	        strcat(string, tmp);
 	    }
 
@@ -30468,7 +30360,7 @@ function:OnBoostReceive(playerid)
 			{
 				PlayerInfo[playerid][BoostDeplete] = cache_get_row_int(i, 2, g_SQL_handle);
 				
-				format(gstr, sizeof(gstr), ""server_sign" "r_besch"Boost has been loaded! Runs out on: %s", UnixTimeToDate(PlayerInfo[playerid][BoostDeplete]));
+				format(gstr, sizeof(gstr), ""server_sign" "r_besch"Boost has been loaded! Runs out on: %s", UTConvert(PlayerInfo[playerid][BoostDeplete]));
 				SCM(playerid, -1, gstr);
 			}
 	    }
@@ -30650,7 +30542,7 @@ function:OnOfflineBanAttempt2(playerid, ban[], reason[])
 	    new ip[16];
 		cache_get_row(0, 1, ip, g_SQL_handle, sizeof(ip));
 
-		MySQL_CreateBan(ban, __GetName(playerid), reason);
+		MySQL_BanPlayer(ban, __GetName(playerid), reason);
 		MySQL_BanIP(ip);
 
 		SCM(playerid, -1, ""er"Player has been banned!");
@@ -31183,7 +31075,7 @@ function:OnNewsReceived(playerid)
 	    new news[512], ass[750];
 		cache_get_row(0, 2, gstr, g_SQL_handle, sizeof(gstr));
 		cache_get_row(0, 3, news, g_SQL_handle, sizeof(news));
-		format(ass, sizeof(ass), ""white"%s\n\n%s\n\nPosted on %s", gstr, news, UnixTimeToDate(cache_get_row_int(0, 4, g_SQL_handle)));
+		format(ass, sizeof(ass), ""white"%s\n\n%s\n\nPosted on %s", gstr, news, UTConvert(cache_get_row_int(0, 4, g_SQL_handle)));
 	    ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: News", ass, "OK", "");
 	}
 	return 1;
@@ -31411,15 +31303,15 @@ ResetPlayerModules(playerid)
 	PlayerInfo[playerid][DuelRequestRecv] = INVALID_PLAYER_ID;
 }
 
-badsql(const string[], bool:ban = false)
+badsql(const string[], bool:strict = true)
 {
-	if(!ban)
+	if(strict)
 	{
-		if(strfind(string, " ", true) != -1) return 1;
+	    if(strfind(string, " ", true) != -1) return 1;
+	    if(strfind(string, ",", true) != -1) return 1;
 	}
-	if(strfind(string, "-", true) != -1) return 1;
+
 	if(strfind(string, "|", true) != -1) return 1;
-	if(strfind(string, ",", true) != -1) return 1;
 	if(strfind(string, "@", true) != -1) return 1;
 	if(strfind(string, "*", true) != -1) return 1;
 	if(strfind(string, "'", true) != -1) return 1;
@@ -31430,7 +31322,6 @@ badsql(const string[], bool:ban = false)
 	if(strfind(string, "~", true) != -1) return 1;
 	if(strfind(string, "#", true) != -1) return 1;
 	if(strfind(string, "\"", true) != -1) return 1;
-
 	return 0;
 }
 
