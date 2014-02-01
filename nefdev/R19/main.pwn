@@ -2110,7 +2110,7 @@ new Float:BG_M6_T2_Spawns[4][4] =
 	{2034.2903, 4009.7451, 76.5134, 90.0},
 	{2056.8708, 3975.7813, 84.1782, 90.0}
 };
-new Float:DuelMaps[2][2][4] =
+new Float:DuelMaps[3][2][4] =
 {
 	{
 		{1144.1377, 1529.8433, 52.4003, 87.1090},
@@ -2119,6 +2119,10 @@ new Float:DuelMaps[2][2][4] =
 	{
 		{-2220.6504, 640.9958, 49.4492, 270.8222},
 		{-2176.0908, 641.5275, 49.4375, 89.4239}
+	},
+	{
+	    {15.5848, 1394.5194, 10.9798, 180.0},
+	    {-17.7188, 1356.9777, 11.0170, 0.0}
 	}
 };
 new Float:WorldSpawns[4][4] =
@@ -28306,7 +28310,7 @@ function:ShowDialog(playerid, dialogid)
 	{
 	    case DIALOG_DUEL + 1:
 	    {
-	        ShowPlayerDialog(playerid, DIALOG_DUEL + 1, DIALOG_STYLE_LIST, ""nef" :: Duel > Locations (Step 2/2)", "Stadium Top\nChinatown", "Send", "Back");
+	        ShowPlayerDialog(playerid, DIALOG_DUEL + 1, DIALOG_STYLE_LIST, ""nef" :: Duel > Locations (Step 2/2)", "Stadium Top\nChinatown\nCampsite", "Send", "Back");
 	    }
 	    case DIALOG_DUEL:
 	    {
