@@ -2647,7 +2647,7 @@ public OnPlayerRequestClass(playerid, classid)
 	TextDrawShowForPlayer(playerid, TXTWinterEdition);
 	#endif
 
-	if(PlayerInfo[playerid][SavedSkin] == -1)
+	if(PlayerInfo[playerid][SavedSkin] != -1)
 	{
 	    SetTimerEx("ClassForceSpawn", 20, false, "i", playerid);
 	    return 0;
@@ -2829,7 +2829,7 @@ public OnPlayerSpawn(playerid)
         {
 	    	SetPlayerPos(playerid, PlayerInfo[playerid][SpecX], PlayerInfo[playerid][SpecY], PlayerInfo[playerid][SpecZ]);
 			SetPlayerFacingAngle(playerid, PlayerInfo[playerid][SpecA]);
-			ResetPlayerWeapons(playerid);
+			RandomWeapons(playerid);
 			gTeam[playerid] = FREEROAM;
 			
 			ShowInfo(playerid, "No longer spectating", "");
