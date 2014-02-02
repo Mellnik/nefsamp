@@ -2627,7 +2627,7 @@ public OnPlayerRequestClass(playerid, classid)
 
 	if(PlayerInfo[playerid][ExitType] == EXIT_FIRST_SPAWNED)
 	{
-		SCM(playerid, -1, ""er"You are bugged in class selection. Please reconnect.");
+		SCM(playerid, -1, ""er"You are bugged in class selection. Please reconnect. "SERVER_IP"");
 		PlayerInfo[playerid][AllowSpawn] = false;
 		KickEx(playerid);
 	    return 0;
@@ -2653,7 +2653,7 @@ public OnPlayerRequestClass(playerid, classid)
 
 	if(PlayerInfo[playerid][SavedSkin] != -1)
 	{
-	    SetTimerEx("ClassForceSpawn", 20, false, "i", playerid);
+	    SetTimerEx("ClassForceSpawn", 10, false, "i", playerid);
 	    return 0;
 	}
 	else
@@ -4125,6 +4125,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
                 PlayerInfo[extraid][RegDate] = cache_get_row_int(0, 34, g_SQL_handle);
                 PlayerInfo[extraid][LastLogin] = cache_get_row_int(0, 35, g_SQL_handle);
                 PlayerInfo[extraid][LastNameChange] = cache_get_row_int(0, 36, g_SQL_handle);
+                PlayerInfo[extraid][SavedSkin] = cache_get_row_int(0, 57, g_SQL_handle);
                 
 				new buffer[255];
 				
@@ -4484,8 +4485,6 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				    PlayerPV[extraid][7][Mod16],
 				    PlayerPV[extraid][7][Mod17],
 				    PlayerPV[extraid][7][Plate]);
-
-				PlayerInfo[extraid][SavedSkin] = cache_get_row_int(0, 56, g_SQL_handle);
 
    				if(PlayerInfo[extraid][GangID] != 0)
 				{
@@ -23067,7 +23066,7 @@ CreateTextdraws()
 	TextDrawSetProportional(TXTFooter, 1);
 	TextDrawSetSelectable(TXTFooter, 0);
 	
-	NEFLOGO[0] = TextDrawCreate(88.000000, 426.000000, "~y~N~w~ew ~g~~h~~h~E~w~volution ~r~~h~~h~F~w~reeroam");
+	NEFLOGO[0] = TextDrawCreate(88.000000, 426.000000, "~y~N~w~ew ~g~~h~E~w~volution ~r~~h~F~w~reeroam");
 	TextDrawAlignment(NEFLOGO[0], 2);
 	TextDrawBackgroundColor(NEFLOGO[0], 51);
 	TextDrawFont(NEFLOGO[0], 3);
@@ -23081,8 +23080,8 @@ CreateTextdraws()
 	TextDrawAlignment(NEFLOGO[1], 2);
 	TextDrawBackgroundColor(NEFLOGO[2], 51);
 	TextDrawFont(NEFLOGO[1], 1);
-	TextDrawLetterSize(NEFLOGO[1], 7.619995, 1.000000);
-	TextDrawColor(NEFLOGO[1], -1);
+	TextDrawLetterSize(NEFLOGO[1], 8.039995, 1.000000);
+	TextDrawColor(NEFLOGO[1], 0xF97804FF);
 	TextDrawSetOutline(NEFLOGO[1], 1);
 	TextDrawSetProportional(NEFLOGO[1], 1);
 	TextDrawSetSelectable(NEFLOGO[1], 0);
@@ -23528,6 +23527,7 @@ LoadServerStaticMeshes()
     Command_AddAltNamed("oban", "offlineban");
     Command_AddAltNamed("concert", "gig");
     Command_AddAltNamed("radio", "streams");
+    Command_AddAltNamed("radio", "listenmusic");
     Command_AddAltNamed("stopradio", "stopstreams");
     Command_AddAltNamed("stopradio", "stopstream");
     Command_AddAltNamed("rocketdm", "rocket");
@@ -23668,10 +23668,13 @@ LoadServerStaticMeshes()
 	Command_AddAltNamed("achs", "erfolge");
 	Command_AddAltNamed("achs", "ach");
 	Command_AddAltNamed("cmds", "c");
+	Command_AddAltNamed("help", "ghelp");
+	Command_AddAltNamed("help", "chelp");
 	Command_AddAltNamed("help", "hilfe");
 	Command_AddAltNamed("cmds", "commands");
 	Command_AddAltNamed("cmds", "command");
 	Command_AddAltNamed("cmds", "cmd");
+	Command_AddAltNamed("hitman", "hit");
 	Command_AddAltNamed("serverstats", "uptime");
 	Command_AddAltNamed("w", "weps");
 	Command_AddAltNamed("w", "weapon");
@@ -23706,8 +23709,13 @@ LoadServerStaticMeshes()
 	Command_AddAltNamed("gotoxyza", "gotoxyz");
 	Command_AddAltNamed("toggletoys", "toggtoys");
 	Command_AddAltNamed("toggletoys", "togtoys");
+	Command_AddAltNamed("toggletoys", "ttoys");
+	Command_AddAltNamed("toggletoys", "holdoff");
+	Command_AddAltNamed("toggletoys", "holdon");
 	Command_AddAltNamed("new", "news");
 	Command_AddAltNamed("new", "updates");
+	Command_AddAltNamed("tops", "ranks");
+	Command_AddAltNamed("tops", "ranking");
     Command_AddAltNamed("score", "topscore");
     Command_AddAltNamed("richlist", "topcash");
     Command_AddAltNamed("richlist", "topmoney");
