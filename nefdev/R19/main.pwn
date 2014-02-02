@@ -1771,6 +1771,10 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
   	mc_dive,
   	mc_tp,
   	mc_weps,
+ 	beach_dive,
+  	beach_tp,
+  	beach_weps,
+  	beach_m,
 	bb_mcc,
   	houseid,
   	propid,
@@ -2933,11 +2937,6 @@ public OnPlayerSpawn(playerid)
 			SetPlayerVirtualWorld(playerid, ROCKETDM_WORLD);
 			GivePlayerWeapon(playerid, 35, 99999);
 			SetPlayerInterior(playerid, 0);
-
-            LoadMap(playerid);
-			new rand = random(8);
-			SetPlayerPosEx(playerid, RocketDM_Spawns[rand][0], RocketDM_Spawns[rand][1], floatadd(RocketDM_Spawns[rand][2], 2.5));
-			SetPlayerFacingAngle(playerid, RocketDM_Spawns[rand][3]);
 		}
 		case SNIPER:
 		{
@@ -2947,9 +2946,6 @@ public OnPlayerSpawn(playerid)
 			SetPlayerInterior(playerid, 0);
 
             LoadMap(playerid);
-			new rand = random(14);
-			SetPlayerPosEx(playerid, Sniper_Spawns[rand][0], Sniper_Spawns[rand][1], floatadd(Sniper_Spawns[rand][2], 3.5));
-			SetPlayerFacingAngle(playerid, Sniper_Spawns[rand][3]);
 		}
 		case MINIGUN:
 		{
@@ -5541,6 +5537,9 @@ public OnPlayerDeath(playerid, killerid, reason)
 				GivePlayerScore_(killerid, 2, true, true);
 				GivePlayerCash(killerid, 3000, true, true);
 		    }
+		    
+		    new rand = random(14);
+		    SetSpawnInfo(playerid, NO_TEAM, PlayerInfo[playerid][SavedSkin] == -1 ? GetPlayerSkin(playerid) : PlayerInfo[playerid][SavedSkin], Sniper_Spawns[rand][0], Sniper_Spawns[rand][1], floatadd(Sniper_Spawns[rand][2], 3.5), Sniper_Spawns[rand][3], 0, 0, 0, 0, 0, 0);
 		}
 		case ROCKETDM:
 		{
@@ -5549,6 +5548,9 @@ public OnPlayerDeath(playerid, killerid, reason)
 				GivePlayerScore_(killerid, 1, true, true);
 				GivePlayerCash(killerid, 2000, true, true);
 		    }
+		    
+			new rand = random(8);
+			SetSpawnInfo(playerid, NO_TEAM, PlayerInfo[playerid][SavedSkin] == -1 ? GetPlayerSkin(playerid) : PlayerInfo[playerid][SavedSkin],RocketDM_Spawns[rand][0], RocketDM_Spawns[rand][1], floatadd(RocketDM_Spawns[rand][2], 2.5), RocketDM_Spawns[rand][3], 0, 0, 0, 0, 0, 0);
 		}
 		case gBG_TEAM1:
 		{
@@ -6450,22 +6452,27 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 {
 	if(gTeam[playerid] == FREEROAM)
 	{
-	    if(pickupid == mc_tp)
+	    if(pickupid == mc_tp || pickupid == beach_tp)
 	    {
 	        Command_ReProcess(playerid, "/tele", false);
 	        return 1;
 	    }
-	    if(pickupid == mc_dive)
+	    if(pickupid == mc_dive || pickupid == beach_dive)
 	    {
 	        Command_ReProcess(playerid, "/dive", false);
 	        PlayerPlaySound(playerid, 1039, 0.0, 0.0, 0.0);
 	        return 1;
 	    }
-	    if(pickupid == mc_weps)
+	    if(pickupid == mc_weps || pickupid == beach_weps)
 	    {
             if(PlayerInfo[playerid][bGod]) ResetPlayerWeapons(playerid);
             
 	        Command_ReProcess(playerid, "/w", false);
+	        return 1;
+	    }
+	    if(pickupid == beach_m)
+	    {
+	        Command_ReProcess(playerid, "/m", false);
 	        return 1;
 	    }
 	    
@@ -7269,7 +7276,7 @@ public OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y,
 		}
 		else ShowInfo(playerid, "Couldn't find the house in that slot", "Report on forums", 5000);
     }
-	return 1;
+    return 1;
 }
 
 public OnPlayerEditAttachedObject(playerid, response, index, modelid, boneid, Float:fOffsetX, Float:fOffsetY, Float:fOffsetZ, Float:fRotX, Float:fRotY, Float:fRotZ, Float:fScaleX, Float:fScaleY, Float:fScaleZ)
@@ -16107,7 +16114,7 @@ YCMD:advsave(playerid, params[], help)
 	return 1;
 }
 
-YCMD:minigames(playerid, params[], help)
+YCMD:m(playerid, params[], help)
 {
 	new string[1024];
 	format(string, sizeof(string), "Derby (/derby) "green"[%i/20]\n"white"CNR (/cnr) "green"[%i]\n"white"Race (/race) "green"[%i/12]\n"white"Rocket DM (/rocket) "green"[%i]",
@@ -16677,9 +16684,9 @@ YCMD:pm(playerid, params[], help)
 	SetTimerEx("hideMsgTD", 3000, false, "i", player);
 	SetTimerEx("hideCheck", 3000, false, "i", playerid);
 	
-	format(gstr, sizeof(gstr), "***[PM] from %s(%i): %s", __GetName(playerid), playerid, msg);
+	format(gstr, sizeof(gstr), "{26FF00}***[PM] from %s(%i): %s", __GetName(playerid), playerid, msg);
     SCM(player, YELLOW, gstr);
-	format(gstr, sizeof(gstr), ">>>[PM] to %s(%i): %s", __GetName(player), player, msg);
+	format(gstr, sizeof(gstr), "{26FF00}>>>[PM] to %s(%i): %s", __GetName(player), player, msg);
 	SCM(playerid, YELLOW, gstr);
 	SetPVarInt(player, "LastID", playerid);
 
@@ -16732,9 +16739,9 @@ YCMD:r(playerid, params[], help)
 	    return SCM(playerid, -1, ""er"This player has blocked you from PMing him");
 	}
 	
-	format(gstr, sizeof(gstr), "***[PM] from %s(%i): %s", __GetName(playerid), playerid, msg);
+	format(gstr, sizeof(gstr), "{26FF00}***[PM] from %s(%i): %s", __GetName(playerid), playerid, msg);
     SCM(lID, YELLOW, gstr);
-	format(gstr, sizeof(gstr), ">>>[PM] to %s(%i): %s", __GetName(lID), lID, msg);
+	format(gstr, sizeof(gstr), "{26FF00}>>>[PM] to %s(%i): %s", __GetName(lID), lID, msg);
 	SCM(playerid, YELLOW, gstr);
 	SetPVarInt(lID, "LastID", playerid);
 
@@ -23653,8 +23660,8 @@ LoadServerStaticMeshes()
 	Command_AddAltNamed("hmenu", "houseupgrade");
 	Command_AddAltNamed("settings", "setting");
 	Command_AddAltNamed("settings", "cp");
-	Command_AddAltNamed("minigames", "m");
-	Command_AddAltNamed("minigames", "minigame");
+	Command_AddAltNamed("m", "minigames");
+	Command_AddAltNamed("m", "minigame");
 	Command_AddAltNamed("answer", "ans");
 	Command_AddAltNamed("pm", "pn");
 	Command_AddAltNamed("pm", "msg");
@@ -23780,7 +23787,13 @@ LoadVisualStaticMeshes()
     
 	MellnikGate = CreateDynamicObject(980, -205.68774, -2285.10693, 30.65776,   0.00000, 0.00000, 122.80286);
 	MellnikRamp = CreateDynamicObject(3115, -153.74190, -2210.68457, 27.16690,   0.00000, 0.00000, -145.55995);
-    
+
+	new mc_text = CreateDynamicObject(19479, -2331.787841, -1635.757690, 484.685546, 0.099999, -90.299964, 178.450790);
+	SetDynamicObjectMaterialText(mc_text, 0, ""nef_yellow"New "nef_green"Evolution "nef_red"Freeroam{F0F0F0}™\n"CURRENT_VERSION"\n"SVRURLWWW"", OBJECT_MATERIAL_SIZE_256x128, "Arial", 20, 1, -32256, 0, OBJECT_MATERIAL_TEXT_ALIGN_CENTER);
+
+	new beach_text = CreateDynamicObject(19479, 309.903930, -1934.953369, 12.736993, 0.000000, 0.000000, 39.940856);
+	SetDynamicObjectMaterialText(beach_text, 0, ""orange""SVRURLWWW"\n"red""CURRENT_VERSION"", OBJECT_MATERIAL_SIZE_256x128, "Arial", 30, 1, -32256, 0, OBJECT_MATERIAL_TEXT_ALIGN_CENTER);
+
     pick_chainsaw = CreateDynamicPickup(341, 23, 1219.1809,-924.6318,42.9045);
     pick_life[0] = CreateDynamicPickup(1240, 3, -1987.6259,274.7049,34.9564);
     pick_life[1] = CreateDynamicPickup(1240, 3, 2463.1362,-1683.0521,13.3142);
@@ -23803,6 +23816,16 @@ LoadVisualStaticMeshes()
 	CreateDynamic3DTextLabel("Teleports "red"(/t)", BLUE, -2330.7739,-1644.0229,485.6543+0.5, 30.0);
 	mc_weps = CreateDynamicPickup(1254, 2, -2340.0862,-1644.3979,485.6543);
 	CreateDynamic3DTextLabel("Weapons "green"(/w)", RED, -2340.0862,-1644.3979,485.6543+0.5, 30.0);
+
+    CreateDynamic3DTextLabel(""SVRLOGO"\n"r_besch"Beach Zone "grey"(/beach)\n"orange"www.nefserver.net\n"white"Are you a "orange"new "white"player? Explore our maps "orange"/t\n"white"Use "orange"/god "white"for freeroam mode!", -1, 323.8153,-1853.5037,8.2406+0.5, 35.0);
+	beach_dive = CreateDynamicPickup(371, 23, 327.5385,-1864.1561,8.2406);
+	CreateDynamic3DTextLabel("Dive", GREEN, 327.5385,-1864.1561,8.2406+0.5, 30.0);
+	beach_tp = CreateDynamicPickup(19130, 2, 336.6495,-1836.6848,8.2481);
+	CreateDynamic3DTextLabel("Teleports "red"(/t)", BLUE, 336.6495,-1836.6848,8.2481+0.5, 30.0);
+	beach_weps = CreateDynamicPickup(1254, 2, 327.7540,-1843.1305,8.2481);
+	CreateDynamic3DTextLabel("Weapons "green"(/w)", RED, 327.7540,-1843.1305,8.2481+0.5, 30.0);
+	beach_m = CreateDynamicPickup(1254, 2, 346.7035,-1867.6292,8.2481);
+	CreateDynamic3DTextLabel("Minigames "green"(/m)", RED, 346.7035,-1867.6292,8.2481+0.5, 30.0);
 
     AdminLC = CreateDynamicPickup(1559, 23, 1805.7494,-1302.6721,120.2656);
     AdminLC2 = CreateDynamicPickup(1559, 23, -794.806396,497.738037,1376.195312);
