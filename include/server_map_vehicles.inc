@@ -449,20 +449,19 @@ LoadServerVehicles()
 	// near /beach map da end
 
 	// /lsa
-	AddStaticVehicleEx(407, 1993.9724, -2440.9456, 14.9420, 90.0000, randomColors[random(23)], randomColors[random(23)], 100);
-	AddStaticVehicleEx(407, 2021.7626, -2465.6416, 14.9420, 179.1000, randomColors[random(23)], randomColors[random(23)], 100);
-	AddStaticVehicleEx(593, 2031.1289, -2466.3738, 15.4588, -182.6400, randomColors[random(23)], randomColors[random(23)], 100);
-	AddStaticVehicleEx(593, 2044.6322, -2466.6184, 15.4588, -182.6400, randomColors[random(23)], randomColors[random(23)], 100);
-	AddStaticVehicleEx(411, 1985.0796, -2466.6584, 14.6168, -182.7000, randomColors[random(23)], randomColors[random(23)], 100);
-	AddStaticVehicleEx(519, 1940.9961, -2542.8691, 16.9570, 0.0000, randomColors[random(23)], randomColors[random(23)], 100);
-	AddStaticVehicleEx(488, 1979.5079, -2448.7188, 15.0780, 91.8600, randomColors[random(23)], randomColors[random(23)], 100);
-	AddStaticVehicleEx(488, 1980.1112, -2461.9141, 15.0780, 91.8600, randomColors[random(23)], randomColors[random(23)], 100);
-	AddStaticVehicleEx(522, 1991.3574, -2473.3728, 15.3780, 147.4800, randomColors[random(23)], randomColors[random(23)], 100);
-	AddStaticVehicleEx(522, 1993.7209, -2473.4351, 15.3780, 147.4800, randomColors[random(23)], randomColors[random(23)], 100);
-	AddStaticVehicleEx(522, 1996.2783, -2473.4348, 15.3780, 147.4800, randomColors[random(23)], randomColors[random(23)], 100);
-	AddStaticVehicleEx(522, 1998.9141, -2473.5864, 15.3780, 147.4800, randomColors[random(23)], randomColors[random(23)], 100);
-	AddStaticVehicleEx(522, 2009.7009, -2473.9116, 15.3780, 147.4800, randomColors[random(23)], randomColors[random(23)], 100);
-	AddStaticVehicleEx(522, 2012.2480, -2474.0242, 15.3780, 147.4800, randomColors[random(23)], randomColors[random(23)], 100);
+	AddStaticVehicleEx(411, 2011.1121, -2407.1333, 13.4251, 179.0400, randomColors[random(23)], randomColors[random(23)], 100);
+	AddStaticVehicleEx(411, 2016.7783, -2407.1948, 13.4251, 179.0400, randomColors[random(23)], randomColors[random(23)], 100);
+	AddStaticVehicleEx(562, 2022.0791, -2406.9241, 13.1313, 178.5000, randomColors[random(23)], randomColors[random(23)], 100);
+	AddStaticVehicleEx(562, 2027.1914, -2406.6907, 13.1313, 178.5000, randomColors[random(23)], randomColors[random(23)], 100);
+	AddStaticVehicleEx(558, 2031.8901, -2406.9465, 13.1302, -180.3000, randomColors[random(23)], randomColors[random(23)], 100);
+	AddStaticVehicleEx(558, 2036.6921, -2407.0195, 13.1302, -180.3000, randomColors[random(23)], randomColors[random(23)], 100);
+	AddStaticVehicleEx(571, 2048.5579, -2418.6912, 13.0306, 120.3600, randomColors[random(23)], randomColors[random(23)], 100);
+	AddStaticVehicleEx(571, 2049.7603, -2420.9055, 13.0306, 120.3600, randomColors[random(23)], randomColors[random(23)], 100);
+	AddStaticVehicleEx(571, 2050.8149, -2422.8589, 13.0306, 120.3600, randomColors[random(23)], randomColors[random(23)], 100);
+	AddStaticVehicleEx(571, 2051.9424, -2424.6558, 13.0306, 120.3600, randomColors[random(23)], randomColors[random(23)], 100);
+	AddStaticVehicleEx(522, 2041.2472, -2407.2522, 13.2308, 180.1800, randomColors[random(23)], randomColors[random(23)], 100);
+	AddStaticVehicleEx(522, 2043.3196, -2407.3569, 13.2308, 180.1800, randomColors[random(23)], randomColors[random(23)], 100);
+	AddStaticVehicleEx(522, 2045.3838, -2407.4016, 13.2308, 180.1800, randomColors[random(23)], randomColors[random(23)], 100);
 	// /lsa end
 	
 	// /aa

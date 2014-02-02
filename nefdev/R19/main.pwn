@@ -2658,6 +2658,7 @@ public OnPlayerRequestClass(playerid, classid)
 	if(PlayerInfo[playerid][SavedSkin] != -1)
 	{
 	    SetTimerEx("ClassForceSpawn", 10, false, "i", playerid);
+	    SCM(playerid, -1, ""server_sign" "r_besch"Your saved skin has been set. (/deleteskin to remove)");
 	    return 0;
 	}
 	else
@@ -4534,7 +4535,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				if(PlayerInfo[extraid][SavedColor] != 0)
 				{
 				    SetPlayerColor(extraid, PlayerInfo[extraid][SavedColor]);
-				    SCM(extraid, -1, ""server_sign" "r_besch"Your saved color has been set.");
+				    SCM(extraid, -1, ""server_sign" "r_besch"Your saved color has been set. (/deletecolor to remove)");
 				}
 				
 				format(gstr2, sizeof(gstr2), "SELECT * FROM `queue` WHERE `Extra` = '%s';", __GetName(extraid));
@@ -10035,7 +10036,6 @@ YCMD:rocketdm(playerid, params[], help)
 	SetPlayerVirtualWorld(playerid, ROCKETDM_WORLD);
 	SetPlayerInterior(playerid, 0);
 	HidePlayerInfoTextdraws(playerid);
-    LoadMap(playerid);
 	new rand = random(8);
 	SetPlayerPosEx(playerid, RocketDM_Spawns[rand][0], RocketDM_Spawns[rand][1], RocketDM_Spawns[rand][2] + 4.5);
 	SetPlayerFacingAngle(playerid, RocketDM_Spawns[rand][3]);
@@ -25072,6 +25072,7 @@ function:StartDerbyMap1()
 
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
+	    DerbyWinner[i] = false;
 		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !IsPlayerNPC(i))
 		{
 		    ClearAnimations(i);
@@ -25083,7 +25084,6 @@ function:StartDerbyMap1()
 			    format(string, sizeof(string), "%s couldn't be put in vehicle!", __GetName(i));
 				DerbyMSG(string);
 				PlayerInfo[i][bDerbyAFK] = true;
-				DerbyWinner[i] = false;
 	        }
 			else pcount++;
 		}
@@ -25167,6 +25167,7 @@ function:StartDerbyMap2()
 
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
+	    DerbyWinner[i] = false;
 		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !IsPlayerNPC(i))
 		{
 		    ClearAnimations(i);
@@ -25178,7 +25179,6 @@ function:StartDerbyMap2()
 			    format(string, sizeof(string), "%s couldn't be put in vehicle!", __GetName(i));
 				DerbyMSG(string);
 				PlayerInfo[i][bDerbyAFK] = true;
-				DerbyWinner[i] = false;
 	        }
 			else pcount++;
 		}
@@ -25262,6 +25262,7 @@ function:StartDerbyMap3()
 
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
+	    DerbyWinner[i] = false;
 		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !IsPlayerNPC(i))
 		{
 		    ClearAnimations(i);
@@ -25273,7 +25274,6 @@ function:StartDerbyMap3()
 			    format(string, sizeof(string), "%s couldn't be put in vehicle!", __GetName(i));
 				DerbyMSG(string);
 				PlayerInfo[i][bDerbyAFK] = true;
-				DerbyWinner[i] = false;
 	        }
 			else pcount++;
 		}
@@ -25357,6 +25357,7 @@ function:StartDerbyMap4()
 
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
+	    DerbyWinner[i] = false;
 		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !IsPlayerNPC(i))
 		{
 		    ClearAnimations(i);
@@ -25368,7 +25369,6 @@ function:StartDerbyMap4()
 			    format(string, sizeof(string), "%s couldn't be put in vehicle!", __GetName(i));
 				DerbyMSG(string);
 				PlayerInfo[i][bDerbyAFK] = true;
-				DerbyWinner[i] = false;
 	        }
 			else pcount++;
 		}
@@ -25452,6 +25452,7 @@ function:StartDerbyMap5()
 
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
+	    DerbyWinner[i] = false;
 		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !IsPlayerNPC(i))
 		{
 		    ClearAnimations(i);
@@ -25463,7 +25464,6 @@ function:StartDerbyMap5()
 			    format(string, sizeof(string), "%s couldn't be put in vehicle!", __GetName(i));
 				DerbyMSG(string);
 				PlayerInfo[i][bDerbyAFK] = true;
-				DerbyWinner[i] = false;
 	        }
 			else pcount++;
 		}
@@ -25547,6 +25547,7 @@ function:StartDerbyMap6()
 
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
+	    DerbyWinner[i] = false;
 		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !IsPlayerNPC(i))
 		{
 		    ClearAnimations(i);
@@ -25558,7 +25559,6 @@ function:StartDerbyMap6()
 			    format(string, sizeof(string), "%s couldn't be put in vehicle!", __GetName(i));
 				DerbyMSG(string);
 				PlayerInfo[i][bDerbyAFK] = true;
-				DerbyWinner[i] = false;
 	        }
 			else pcount++;
 		}
@@ -25632,6 +25632,7 @@ function:StartDerbyMap7()
 
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
+	    DerbyWinner[i] = false;
 		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !IsPlayerNPC(i))
 		{
 		    ClearAnimations(i);
@@ -25643,7 +25644,6 @@ function:StartDerbyMap7()
 			    format(string, sizeof(string), "%s couldn't be put in vehicle!", __GetName(i));
 				DerbyMSG(string);
 				PlayerInfo[i][bDerbyAFK] = true;
-				DerbyWinner[i] = false;
 	        }
 			else pcount++;
 		}
@@ -25717,6 +25717,7 @@ function:StartDerbyMap8()
 
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
+	    DerbyWinner[i] = false;
 		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !IsPlayerNPC(i))
 		{
 		    ClearAnimations(i);
@@ -25728,7 +25729,6 @@ function:StartDerbyMap8()
 			    format(string, sizeof(string), "%s couldn't be put in vehicle!", __GetName(i));
 				DerbyMSG(string);
 				PlayerInfo[i][bDerbyAFK] = true;
-				DerbyWinner[i] = false;
 	        }
 			else pcount++;
 		}
@@ -25802,6 +25802,7 @@ function:StartDerbyMap9()
 
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
+	    DerbyWinner[i] = false;
 		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !IsPlayerNPC(i))
 		{
 		    ClearAnimations(i);
@@ -25813,7 +25814,6 @@ function:StartDerbyMap9()
 			    format(string, sizeof(string), "%s couldn't be put in vehicle!", __GetName(i));
 				DerbyMSG(string);
 				PlayerInfo[i][bDerbyAFK] = true;
-				DerbyWinner[i] = false;
 	        }
 			else pcount++;
 		}
