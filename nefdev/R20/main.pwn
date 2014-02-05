@@ -1,6 +1,6 @@
 /*======================================================================*\
 || #################################################################### ||
-|| # Project New Evolution Freeroam - Release 19         			  # ||
+|| # Project New Evolution Freeroam - Release 20         			  # ||
 || # ---------------------------------------------------------------- # ||
 || # Copyright ©2011-2014 New Evolution Freeroam	  				  # ||
 || # Created by Mellnik                                               # ||
@@ -11,14 +11,10 @@
 
 #pragma dynamic 8192
 
-#define IS_RELEASE_BUILD (true)
+#define IS_RELEASE_BUILD (false)
 #define INC_ENVIORMENT (true)
-#define IRC_CONNECT (true)
+#define IRC_CONNECT (false)
 #define WINTER_EDITION (false) // ferriswheelfair.amx
-
-/* R19 db changes
-ADD `SavedSkin` to `accounts` small int default -1;
-*/
 
 // -
 // - Plugins
@@ -81,24 +77,18 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 // -
 #define SVRNAME                      	"New Evolution Freeroam"
 #define SVRSC	                    	"NEF"
-//#define SVRLOGO                         "{646464}«(-|-|{CD0000}Stunt {005FFF}Evolution{F0F0F0}™{646464}|-|-)»"
-//#define SVRLOGO                         "{646464}«(-|-|{CD0000}New {005FFF}Evolution {FFE600}Freeroam{F0F0F0}™{646464}|-|-)»"
 #define SVRLOGO                         "{646464}«(-|-|"nef_yellow"New "nef_green"Evolution "nef_red"Freeroam{F0F0F0}™{646464}|-|-)»"
 #define SVRURL                          "nefserver.net"
 #define SVRURLWWW                       "www.nefserver.net"
 #define SVRFORUM                        "forum.nefserver.net"
 #define SERVER_IP                       "31.204.152.218:7777"
-//#define HOSTNAME 						"                  «(-|-| Stunt Evolution™ |-|-)»"
-//#define HOSTNAME 						"•NEF• :: New Evolution Freeroam 0.3x (R11)"
-//#define HOSTNAME                        "•••••••••• NEF :: Stunt/Race/Freeroam ••••••••••"
 #define HOSTNAME                        " 	        NEF » ×DM/Stunt/Race/Freeroam/Minigames×"
-//#define HOSTNAME 						"NEF 0.3x (R11)     «Stunt/Race/Freeroam/DM»"
 #if IS_RELEASE_BUILD == true
-#define CURRENT_VERSION                 "Release 19"
-#define CURRENT_VERISON_SHORT           "R19"
+#define CURRENT_VERSION                 "Release 20"
+#define CURRENT_VERISON_SHORT           "R20"
 #else
-#define CURRENT_VERSION                 "PTS:R19"
-#define CURRENT_VERSION_SHORT           "PTS:R19"
+#define CURRENT_VERSION                 "PTS:R20"
+#define CURRENT_VERSION_SHORT           "PTS:R20"
 #endif
 #define HOTFIX_REV                      "Hotfix #0"
 #define SAMP_VERSION                    "SA-MP 0.3x-R2"
@@ -16293,7 +16283,7 @@ YCMD:mellnik(playerid, params[], help)
 	}
 	return 1;
 }
-/*
+
 YCMD:saveskin(playerid, params[], help)
 {
 	if(!islogged(playerid)) return notlogged(playerid);
@@ -16314,8 +16304,8 @@ YCMD:saveskin(playerid, params[], help)
 	}
 	else SCM(playerid, -1, ""er"Invalid skin ID");
 	return 1;
-}*/
-/*
+}
+
 YCMD:deleteskin(playerid, params[], help)
 {
 	if(!islogged(playerid)) return notlogged(playerid);
@@ -16330,7 +16320,7 @@ YCMD:deleteskin(playerid, params[], help)
 	}
     PlayerInfo[playerid][SavedSkin] = -1;
 	return 1;
-}*/
+}
 
 YCMD:savecolor(playerid, params[], help)
 {
@@ -29122,7 +29112,7 @@ GetPlayerSettings(playerid)
 	}
 	else
 	{
-	    format(tmpstring, sizeof(tmpstring), ""white"6)\tSaved Color\t{%06x}COLOR\n", PlayerInfo[playerid][SavedColor] >>> 8);
+	    format(tmpstring, sizeof(tmpstring), ""white"6)\tSaved Color\t{%06x}Saved Color\n", PlayerInfo[playerid][SavedColor] >>> 8);
 	    strcat(string, tmpstring);
 	}
 	
@@ -31471,8 +31461,8 @@ SetPlayerSkin_(playerid, modelid)
 	PlayerInfo[playerid][SkinId] = modelid;
 	return SetPlayerSkin(playerid, modelid);
 }
-/*
+
 GetPlayerSkin_(playerid)
 {
 	return PlayerInfo[playerid][SkinId];
-}*/
+}
