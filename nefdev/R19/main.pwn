@@ -14,7 +14,7 @@
 #define IS_RELEASE_BUILD (true)
 #define INC_ENVIORMENT (true)
 #define IRC_CONNECT (true)
-#define WINTER_EDITION (false) // LOAD ferriswheelfair.amx
+#define WINTER_EDITION (false) // ferriswheelfair.amx
 
 /* R19 db changes
 ADD `SavedSkin` to `accounts` small int default -1;
@@ -12637,7 +12637,7 @@ YCMD:ban(playerid, params[], help)
 	    new player, reason[144], time;
 	    if(sscanf(params, "rs[144]I(-1)", player, reason, time))
 	    {
-	        return SCM(playerid, NEF_GREEN, "Usage: /ban <playerid> <reason> (optional: <time, minutes>)");
+	        return SCM(playerid, NEF_GREEN, "Usage: /ban <playerid> <reason> (optional: <time in minutes>)");
 	    }
 	    
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
@@ -12646,7 +12646,7 @@ YCMD:ban(playerid, params[], help)
 		if(strlen(reason) > 50 || isnull(reason) || strlen(reason) < 2) return SCM(playerid, -1, ""er"Ban reason length: 2-50");
 	    if(player == playerid) return SCM(playerid, -1, ""er"You can not ban yourself");
 	  	if(IsPlayerNPC(player)) return SCM(playerid, -1, ""er"You can not ban NPCs");
-        if(PlayerInfo[player][KBMarked]) return SCM(playerid, -1, ""er"This player marked for disconnect");
+        if(PlayerInfo[player][KBMarked]) return SCM(playerid, -1, ""er"This player is flagged for disconnect");
         if(time != -1 && (time > 10080 || time < 5)) return SCM(playerid, -1, ""er"5-10080 minutes");
         
 		if(badsql(reason, false) != 0)
