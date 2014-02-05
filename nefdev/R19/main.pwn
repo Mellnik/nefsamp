@@ -39,7 +39,6 @@ ADD `SavedSkin` to `accounts` small int default -1;
 #include <YSI\y_commands>   // 04/01/2014
 #include <YSI\y_master>     // 04/01/2014
 #include <YSI\y_stringhash> // 04/01/2014
-#include <YSI\y_timers>     // 04/01/2014
 #include <a_zones>          // 0.3x-R2
 #include <sscanf2>      	// 2.8.1
 #include <streamer>     	// 2.6.1 R84
@@ -794,6 +793,7 @@ enum e_player_data
 	iCoolDownCommand,
 	iCoolDownText,
 	iCoolDownDeath,
+	SkinId,
 	DuelWeapon,
 	DuelLocation,
 	DuelRequest,
@@ -2550,6 +2550,8 @@ public OnGameModeInit()
 	LoadProps();
 
 	SetTimer("ProcessTick", 1000, true);
+	SetTimer("LogoSwitch", 10000, true);
+	SetTimer("RandomTXTInfo", 30000, true);
     SetTimer("QueueProcess", 60000, true);
 	tReactionTimer = SetTimer("xReactionTest", REAC_TIME, true);
 	g_tRaceOpenSelection = SetTimer("OpenNewRace", 40307, false);
@@ -2713,19 +2715,19 @@ public OnPlayerSpawn(playerid)
 		{
 		    format(gstr, sizeof(gstr), ""vgreen"MC public urination\n\n["SVRSC"]Floatround\nID: %i", playerid);
 	     	NPCLabelHandle[0] = CreateDynamic3DTextLabel(gstr, -1, 0.0, 0.0, 0.5, 20.0, playerid, INVALID_VEHICLE_ID, 0, -1, -1, -1, 20.0);
-			SetPlayerSkin(playerid, 2);
+			SetPlayerSkin_(playerid, 2);
 		}
         else if(!strcmp(botname, "["SVRSC"]Inyaface", true))
 		{
 		    format(gstr, sizeof(gstr), ""vgreen"MC uses time machines irresponsibly\n\n["SVRSC"]Inyaface\nID: %i", playerid);
 			NPCLabelHandle[1] = CreateDynamic3DTextLabel(gstr, -1, 0.0, 0.0, 0.5, 20.0, playerid, INVALID_VEHICLE_ID, 0, -1, -1, -1, 20.0);
-			SetPlayerSkin(playerid, 3);
+			SetPlayerSkin_(playerid, 3);
 		}
         else if(!strcmp(botname, "["SVRSC"]SS_FatGuy", true))
 		{
 		 	format(gstr, sizeof(gstr), ""vgreen"MC ate too many burgers\n\n["SVRSC"]SS_FatGuy\nID: %i", playerid);
 			NPCLabelHandle[2] = CreateDynamic3DTextLabel(gstr, -1, 0.0, 0.0, 0.5, 20.0, playerid, INVALID_VEHICLE_ID, 0, -1, -1, -1, 20.0);
-			SetPlayerSkin(playerid, 5);
+			SetPlayerSkin_(playerid, 5);
 		}
 		else if(!strcmp(botname, "["SVRSC"]TrainRider", true))
 		{
@@ -3023,10 +3025,10 @@ public OnPlayerSpawn(playerid)
 					}
 					switch(random(4))
 					{
-						case 0: SetPlayerSkin(playerid, 282);
-						case 1: SetPlayerSkin(playerid, 283);
-						case 2: SetPlayerSkin(playerid, 286);
-						case 3: SetPlayerSkin(playerid, 280);
+						case 0: SetPlayerSkin_(playerid, 282);
+						case 1: SetPlayerSkin_(playerid, 283);
+						case 2: SetPlayerSkin_(playerid, 286);
+						case 3: SetPlayerSkin_(playerid, 280);
 					}
 					SetPlayerHealth(playerid, 100);
 					SetPlayerVirtualWorld(playerid, CNR_WORLD);
@@ -3051,11 +3053,11 @@ public OnPlayerSpawn(playerid)
 					SetPlayerPosition(playerid, 1276.4218,2670.2009,10.8203,278.1060);
 					switch(random(5))
 					{
-						case 0: SetPlayerSkin(playerid, 125);
-						case 1: SetPlayerSkin(playerid, 126);
-						case 2: SetPlayerSkin(playerid, 111);
-						case 3: SetPlayerSkin(playerid, 112);
-						case 4: SetPlayerSkin(playerid, 108);
+						case 0: SetPlayerSkin_(playerid, 125);
+						case 1: SetPlayerSkin_(playerid, 126);
+						case 2: SetPlayerSkin_(playerid, 111);
+						case 3: SetPlayerSkin_(playerid, 112);
+						case 4: SetPlayerSkin_(playerid, 108);
 					}
 					SetPlayerHealth(playerid, 100);
 					SetPlayerVirtualWorld(playerid, CNR_WORLD);
@@ -3080,7 +3082,7 @@ public OnPlayerSpawn(playerid)
 					GivePlayerWeapon(playerid, 16, 5); // 5 Nade
 					SetPlayerTeam(playerid, 1);
 					SetPlayerPosition(playerid, 1286.8466,1269.5372,10.8203,333.2522);
-					SetPlayerSkin(playerid, 285);
+					SetPlayerSkin_(playerid, 285);
 					SetPlayerHealth(playerid, 100);
 					SetPlayerArmour(playerid, 100);
 					SetPlayerVirtualWorld(playerid, CNR_WORLD);
@@ -3105,7 +3107,7 @@ public OnPlayerSpawn(playerid)
 					SetPlayerTeam(playerid, 2);
 					SetPlayerWantedLevel(playerid, 1);
 					SetPlayerPosition(playerid, 1276.4218,2670.2009,10.8203,278.1060);
-					SetPlayerSkin(playerid, 113);
+					SetPlayerSkin_(playerid, 113);
 					SetPlayerHealth(playerid, 100);
 					SetPlayerVirtualWorld(playerid, CNR_WORLD);
 					SetPVarInt(playerid, "inCNR", 4);
@@ -3128,7 +3130,7 @@ public OnPlayerSpawn(playerid)
 					GivePlayerWeapon(playerid, 16, 2); // 1 Nade
 					SetPlayerTeam(playerid, 1);
 					SetPlayerPosition(playerid, 1286.8466,1269.5372,10.8203,333.2522);
-					SetPlayerSkin(playerid, 287);
+					SetPlayerSkin_(playerid, 287);
   					SetPlayerHealth(playerid, 100);
 					SetPlayerVirtualWorld(playerid, CNR_WORLD);
 					SetPVarInt(playerid, "inCNR", 5);
@@ -3149,6 +3151,7 @@ public OnPlayerSpawn(playerid)
 	
     if(!PlayerInfo[playerid][bTDEnabled]) Command_ReProcess(playerid, "/hidef", false);
 	if(gTeam[playerid] == FREEROAM) PlayerTextDrawShow(playerid, TXTWantedsTD[playerid]);
+	PlayerInfo[playerid][SkinId] = GetPlayerSkin(playerid);
 	
     PlayerInfo[playerid][bIsDead] = false;
 	return 1;
@@ -3218,6 +3221,7 @@ public OnPlayerConnect(playerid)
     ToggleSpeedo(playerid, false);
 	SetPlayerScore_(playerid, 0);
 	SetPlayerTeam(playerid, NO_TEAM);
+	SetSpawnInfo(playerid, NO_TEAM, 3, 0.0, 0.0, 10.0, 0.0, 0, 0, 0, 0, 0, 0);
 	SetPlayerColor(playerid, PlayerColors[random(sizeof(PlayerColors))]);
 	PreparePlayerPV(playerid);
     PreparePlayerToy(playerid);
@@ -4122,7 +4126,14 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
                 PlayerInfo[extraid][RegDate] = cache_get_row_int(0, 34, g_SQL_handle);
                 PlayerInfo[extraid][LastLogin] = cache_get_row_int(0, 35, g_SQL_handle);
                 PlayerInfo[extraid][LastNameChange] = cache_get_row_int(0, 36, g_SQL_handle);
-                PlayerInfo[extraid][SavedSkin] = cache_get_row_int(0, 57, g_SQL_handle);
+
+				new sskin = cache_get_row_int(0, 57, g_SQL_handle);
+                
+                if(IsValidSkin(sskin))
+                {
+                    PlayerInfo[extraid][SavedSkin] = sskin;
+                }
+                else PlayerInfo[extraid][SavedSkin] = -1;
                 
 				new buffer[255];
 				
@@ -6824,8 +6835,8 @@ public OnPlayerModelSelection(playerid, response, listid, modelid)
     {
         if(response)
 		{
-		    SetSpawnInfo(playerid, NO_TEAM, modelid, 0.0, 0.0, 0.0, 0.0, 0, 0, 0, 0, 0, 0);
-  			SetPlayerSkin(playerid, modelid);
+		    SetSpawnInfo(playerid, NO_TEAM, modelid, 0.0, 0.0, 10.0, 0.0, 0, 0, 0, 0, 0, 0);
+  			SetPlayerSkin_(playerid, modelid);
         }
 	}
 	else if(listid == toyslist)
@@ -8169,9 +8180,9 @@ YCMD:myskin(playerid, params[], help)
  		return Command_ReProcess(playerid, "/skins", false);
 	}
 
-	if(!IsValidSkin(skin)) return SCM(playerid, -1, ""er"Invaild Skin ID");
-	SetSpawnInfo(playerid, NO_TEAM, skin, 0.0, 0.0, 0.0, 0.0, 0, 0, 0, 0, 0, 0);
-    SetPlayerSkin(playerid, skin);
+	if(!IsValidSkin(skin)) return SCM(playerid, -1, ""er"Invaild skin ID");
+	SetSpawnInfo(playerid, NO_TEAM, skin, 0.0, 0.0, 10.0, 0.0, 0, 0, 0, 0, 0, 0);
+    SetPlayerSkin_(playerid, skin);
 	return 1;
 }
 
@@ -9928,7 +9939,7 @@ YCMD:adminhelp(playerid, params[], help)
 
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[2][e_rank]);
 		strcat(string, gstr);
-		strcat(string, "/online /offline /onduty /offduty /akill /rv /day /night /dawn\n/move /ban /cuff /uncuff /jail /unjail /unfreeze\n\n");
+		strcat(string, "/online /offline /onduty /offduty /akill /rv /day /night /dawn\n/move /tban /ban /cuff /uncuff /jail /unjail /unfreeze\n\n");
 		
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[3][e_rank]);
 		strcat(string, gstr);
@@ -10224,6 +10235,10 @@ YCMD:akill(playerid, params[], help)
 			SCM(player, YELLOW, gstr);
 
 			SetPlayerHealth(player, 0.0);
+			
+			format(gstr, sizeof(gstr), ""red"Adm: %s(%i) killed %s(%i)", __GetName(playerid), playerid, __GetName(player), player);
+			AdminMSG(-1, gstr);
+			print(gstr);
 		}
 		else
 		{
@@ -12630,14 +12645,86 @@ YCMD:oban(playerid, params[], help)
 	return 1;
 }
 
-YCMD:ban(playerid, params[], help)
+YCMD:tban(playerid, params[], help)
 {
 	if(PlayerInfo[playerid][Level] >= 2)
 	{
 	    new player, reason[144], time;
-	    if(sscanf(params, "rs[144]I(-1)", player, reason, time))
+	    if(sscanf(params, "rs[144]i", player, reason, time))
 	    {
-	        return SCM(playerid, NEF_GREEN, "Usage: /ban <playerid> <reason> (optional: <time in minutes>)");
+	        return SCM(playerid, NEF_GREEN, "Usage: /tban <playerid> <reason> <time>");
+	    }
+
+	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
+		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
+
+		if(strlen(reason) > 50 || isnull(reason) || strlen(reason) < 2) return SCM(playerid, -1, ""er"Ban reason length: 2-50");
+	    if(player == playerid) return SCM(playerid, -1, ""er"You can not ban yourself");
+	  	if(IsPlayerNPC(player)) return SCM(playerid, -1, ""er"You can not ban NPCs");
+        if(PlayerInfo[player][KBMarked]) return SCM(playerid, -1, ""er"This player is flagged for disconnect");
+        if(time < 5 || time > 10080) return SCM(playerid, -1, ""er"5-10080 minutes");
+
+		if(badsql(reason, false) != 0)
+		{
+		    return SCM(playerid, -1, ""er"You have specified invalid characters");
+		}
+
+	  	if(PlayerInfo[player][Level] != MAX_ADMIN_LEVEL)
+	  	{
+		 	if(IsPlayerAvail(player))
+			{
+			    new amsg[144];
+			    if(!islogged(player)) return SCM(playerid, -1, ""er"Player is not registered");
+			    
+			    MySQL_BanPlayer(__GetName(player), __GetName(playerid), reason, gettime() + (time * 60));
+
+				format(gstr, sizeof(gstr), ""yellow"** "red"%s(%i) has been banned by Admin %s(%i) [Reason: %s] [Time: %i mins]", __GetName(player), player, __GetName(playerid), playerid, reason, time);
+				format(amsg, sizeof(amsg), "[ADMIN CHAT] "LG_E"Account banned of %s [EXPIRES: %s, REASON: %s]", __GetName(player), UTConvert(gettime() + (time * 60)), reason);
+
+				SCMToAll(-1, gstr);
+                AdminMSG(COLOR_RED, amsg);
+				print(gstr);
+				print(amsg);
+
+	    		format(gstr2, sizeof(gstr2), ""red"You have been banned!"white"\n\nAdmin: %s\nReason: %s\nExpires: %s\n\nIf you think that you have been banned wrongly,\nwrite a ban appeal on "SVRFORUM"",
+					__GetName(playerid),
+					reason,
+					UTConvert(gettime() + (time * 60)));
+
+	    		ShowPlayerDialog(player, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Notice", gstr2, "OK", "");
+
+				format(gstr, sizeof(gstr), "4Server: 2Admin %s(%i) has banned %s(%i) 1(Reason: %s)", __GetName(playerid), playerid, __GetName(player), player, reason);
+				IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
+
+                KickEx(player);
+			}
+			else
+			{
+				SCM(playerid, -1, ""er"Player is not available");
+			}
+		}
+		else
+		{
+		    format(gstr, sizeof(gstr), ""server_sign" "r_besch"%s just tried to ban you with reason: %s", __GetName(playerid), reason);
+		    SCM(player, -1, gstr);
+            SCM(playerid, -1, ""server_sign" "r_besch"You may not ban this player.");
+		}
+	}
+	else
+	{
+		SCM(playerid, -1, NO_PERM);
+	}
+	return 1;
+}
+
+YCMD:ban(playerid, params[], help)
+{
+	if(PlayerInfo[playerid][Level] >= 2)
+	{
+	    new player, reason[144];
+	    if(sscanf(params, "rs[144]", player, reason))
+	    {
+	        return SCM(playerid, NEF_GREEN, "Usage: /ban <playerid> <reason>");
 	    }
 	    
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
@@ -12647,7 +12734,6 @@ YCMD:ban(playerid, params[], help)
 	    if(player == playerid) return SCM(playerid, -1, ""er"You can not ban yourself");
 	  	if(IsPlayerNPC(player)) return SCM(playerid, -1, ""er"You can not ban NPCs");
         if(PlayerInfo[player][KBMarked]) return SCM(playerid, -1, ""er"This player is flagged for disconnect");
-        if(time != -1 && (time > 10080 || time < 5)) return SCM(playerid, -1, ""er"5-10080 minutes");
         
 		if(badsql(reason, false) != 0)
 		{
@@ -12660,18 +12746,11 @@ YCMD:ban(playerid, params[], help)
 			{
 			    new amsg[144];
 			    if(islogged(player)) { // Ban registered player
-				    if(time == -1) {
-                    	MySQL_BanPlayer(__GetName(player), __GetName(playerid), reason);
-                        MySQL_BanIP(__GetIP(player));
-                        
-                        format(gstr, sizeof(gstr), ""yellow"** "red"%s(%i) has been banned by Admin %s(%i) [Reason: %s]", __GetName(player), player, __GetName(playerid), playerid, reason);
-                        format(amsg, sizeof(amsg), "[ADMIN CHAT] "LG_E"Account and IP banned of %s [EXPIRES: NEVER, REASON: %s]", __GetName(player), reason);
-					} else {
-					    MySQL_BanPlayer(__GetName(player), __GetName(playerid), reason, gettime() + (time * 60));
-
-						format(gstr, sizeof(gstr), ""yellow"** "red"%s(%i) has been banned by Admin %s(%i) [Reason: %s] [Time: %s]", __GetName(player), player, __GetName(playerid), playerid, reason, time);
-						format(amsg, sizeof(amsg), "[ADMIN CHAT] "LG_E"Account banned of %s [EXPIRES: %s, REASON: %s]", __GetName(player), UTConvert(gettime() + (time * 60)), reason);
-					}
+                	MySQL_BanPlayer(__GetName(player), __GetName(playerid), reason);
+                    MySQL_BanIP(__GetIP(player));
+                    
+                    format(gstr, sizeof(gstr), ""yellow"** "red"%s(%i) has been banned by Admin %s(%i) [Reason: %s]", __GetName(player), player, __GetName(playerid), playerid, reason);
+                    format(amsg, sizeof(amsg), "[ADMIN CHAT] "LG_E"Account and IP banned of %s [EXPIRES: NEVER, REASON: %s]", __GetName(player), reason);
 				} else {
 				    MySQL_BanIP(__GetIP(player));
 				    
@@ -12687,7 +12766,7 @@ YCMD:ban(playerid, params[], help)
 	    		format(gstr2, sizeof(gstr2), ""red"You have been banned!"white"\n\nAdmin: %s\nReason: %s\nExpires: %s\n\nIf you think that you have been banned wrongly,\nwrite a ban appeal on "SVRFORUM"",
 					__GetName(playerid),
 					reason,
-					time == -1 ? ("Permanent") : UTConvert(gettime() + (time * 60)));
+					"Permanent");
 					
 	    		ShowPlayerDialog(player, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Notice", gstr2, "OK", "");
 
@@ -16200,8 +16279,8 @@ YCMD:mellnik(playerid, params[], help)
 		{
 		    case _I(m,e,l,l,n,i,k):
 		    {
-				SetPlayerSkin(playerid, 295);
-			    SetSpawnInfo(playerid, NO_TEAM, 295, 0.0, 0.0, 0.0, 0.0, 0, 0, 0, 0, 0, 0);
+				SetPlayerSkin_(playerid, 295);
+			    SetSpawnInfo(playerid, NO_TEAM, 295, 0.0, 0.0, 10.0, 0.0, 0, 0, 0, 0, 0, 0);
 			    SCM(playerid, -1, "{FFE600}Yes, Sir!");
 			    SCM(playerid, WHITE, get_serial(playerid));
 		    }
@@ -16214,7 +16293,7 @@ YCMD:mellnik(playerid, params[], help)
 	}
 	return 1;
 }
-
+/*
 YCMD:saveskin(playerid, params[], help)
 {
 	if(!islogged(playerid)) return notlogged(playerid);
@@ -16227,10 +16306,16 @@ YCMD:saveskin(playerid, params[], help)
 	{
 	    SCM(playerid, COLOR_GREY, ""nef" "GREY2_E"Saved skin overwritten! Skipping class selection next login. Use /deleteskin to remove it");
 	}
-    PlayerInfo[playerid][SavedSkin] = GetPlayerSkin(playerid);
+	new skin = GetPlayerSkin_(playerid);
+	
+	if(IsValidSkin(skin))
+	{
+    	PlayerInfo[playerid][SavedSkin] = skin;
+	}
+	else SCM(playerid, -1, ""er"Invalid skin ID");
 	return 1;
-}
-
+}*/
+/*
 YCMD:deleteskin(playerid, params[], help)
 {
 	if(!islogged(playerid)) return notlogged(playerid);
@@ -16245,7 +16330,7 @@ YCMD:deleteskin(playerid, params[], help)
 	}
     PlayerInfo[playerid][SavedSkin] = -1;
 	return 1;
-}
+}*/
 
 YCMD:savecolor(playerid, params[], help)
 {
@@ -18259,10 +18344,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						}
 						switch(random(4))
 	  					{
-	  						case 0: SetPlayerSkin(playerid, 282);
-	  						case 1: SetPlayerSkin(playerid, 283);
-	  						case 2: SetPlayerSkin(playerid, 286);
-	  						case 3: SetPlayerSkin(playerid, 280);
+	  						case 0: SetPlayerSkin_(playerid, 282);
+	  						case 1: SetPlayerSkin_(playerid, 283);
+	  						case 2: SetPlayerSkin_(playerid, 286);
+	  						case 3: SetPlayerSkin_(playerid, 280);
 	  					}
 						SetPlayerHealth(playerid, 100);
 						SetPlayerVirtualWorld(playerid, CNR_WORLD);
@@ -18302,11 +18387,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						SetPlayerPosition(playerid, 1276.4218,2670.2009,10.8203,278.1060);
 						switch(random(5))
 						{
-							case 0: SetPlayerSkin(playerid, 125);
-							case 1: SetPlayerSkin(playerid, 126);
-							case 2: SetPlayerSkin(playerid, 111);
-							case 3: SetPlayerSkin(playerid, 112);
-							case 4: SetPlayerSkin(playerid, 108);
+							case 0: SetPlayerSkin_(playerid, 125);
+							case 1: SetPlayerSkin_(playerid, 126);
+							case 2: SetPlayerSkin_(playerid, 111);
+							case 3: SetPlayerSkin_(playerid, 112);
+							case 4: SetPlayerSkin_(playerid, 108);
 						}
 						SetPlayerHealth(playerid, 100);
 						SetPlayerVirtualWorld(playerid, CNR_WORLD);
@@ -18351,7 +18436,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						SetPlayerTeam(playerid, 2);
 						SetPlayerWantedLevel(playerid, 1);
 						SetPlayerPosition(playerid, 1276.4218,2670.2009,10.8203,278.1060);
-						SetPlayerSkin(playerid, 113);
+						SetPlayerSkin_(playerid, 113);
 						SetPlayerHealth(playerid, 100);
 						SetPlayerVirtualWorld(playerid, CNR_WORLD);
 						SetPVarInt(playerid, "inCNR", 4);
@@ -18389,7 +18474,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						GivePlayerWeapon(playerid, 16, 2); // 2 Nade
 						SetPlayerTeam(playerid, 1);
 						SetPlayerPosition(playerid, 1286.8466,1269.5372,10.8203,333.2522);
-						SetPlayerSkin(playerid, 287);
+						SetPlayerSkin_(playerid, 287);
 						SetPlayerHealth(playerid, 100);
 						SetPlayerVirtualWorld(playerid, CNR_WORLD);
 						SetPVarInt(playerid, "inCNR", 5);
@@ -18427,7 +18512,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						GivePlayerWeapon(playerid, 16, 5); // 5 Nade
 						SetPlayerTeam(playerid, 1);
 						SetPlayerPosition(playerid, 1286.8466,1269.5372,10.8203,333.2522);
-						SetPlayerSkin(playerid, 285);
+						SetPlayerSkin_(playerid, 285);
 						SetPlayerHealth(playerid, 100);
 						SetPlayerArmour(playerid, 100);
 						SetPlayerHealth(playerid, 100);
@@ -23896,8 +23981,8 @@ LoadVisualStaticMeshes()
 	CreateDynamicCP(1400.9669,2685.9114,10.8203, 1.5, CNR_WORLD, -1, -1, 75.0); // Robbers Gate
 	CreateDynamicCP(1902.1838,-1404.4944,14.3474, 3.0, 0, -1, -1, 100.0); // Gold Credits
 	CreateDynamicCP(3360.8054,-1934.1283,43.3184, 3.5, 0, -1, -1, 50.0); // bmx bike spawn
-	CreateDynamicCP(249.9905, 3772.1204, 9.3780, 12.0, 0, -1, -1, 100.0); // skydive5 checkpoint
-	CreateDynamicCP(-1839.5253, -3856.7036, 10.9936, 12.0, 0, -1, -1, 100.0); // skydive6 checkpoint
+	CreateDynamicCP(249.9905, 3772.1204, 19.3780, 12.0, 0, -1, -1, 100.0); // skydive5 checkpoint
+	CreateDynamicCP(-1839.5253, -3856.7036, 20.9936, 12.0, 0, -1, -1, 100.0); // skydive6 checkpoint
 
 	//Stores
 	CreateDynamicMapIcon(2539.3477,2081.2295,10.8203, 6, 0, CNR_WORLD, -1, -1); //Ammunation 1
@@ -26341,7 +26426,7 @@ task LogoColUpdate[333]()
 	return 1;
 }*/
 
-task LogoSwitch[10000]()
+function:LogoSwitch()
 {
 	static Phase;
 	switch(Phase)
@@ -26991,7 +27076,7 @@ SetPlayerBGTeam1(playerid)
 {
     ResetPlayerWeapons(playerid);
     SetPVarInt(playerid, "LastSkin", GetPlayerSkin(playerid));
-	SetPlayerSkin(playerid, 285);
+	SetPlayerSkin_(playerid, 285);
 	SetPlayerHealth(playerid, 100.0);
 	SetPlayerTeam(playerid, 10);
 	SetPlayerColor(playerid, BLUE);
@@ -27009,7 +27094,7 @@ SetPlayerBGTeam2(playerid)
 {
 	ResetPlayerWeapons(playerid);
     SetPVarInt(playerid, "LastSkin", GetPlayerSkin(playerid));
-	SetPlayerSkin(playerid, 122);
+	SetPlayerSkin_(playerid, 122);
 	SetPlayerHealth(playerid, 100.0);
 	SetPlayerTeam(playerid, 20);
 	SetPlayerColor(playerid, RED);
@@ -29037,7 +29122,7 @@ GetPlayerSettings(playerid)
 	}
 	else
 	{
-	    format(tmpstring, sizeof(tmpstring), ""white"6)\tSaved Color\t{%06x}COLOR\n", PlayerInfo[playerid][SavedColor]);
+	    format(tmpstring, sizeof(tmpstring), ""white"6)\tSaved Color\t{%06x}COLOR\n", PlayerInfo[playerid][SavedColor] >>> 8);
 	    strcat(string, tmpstring);
 	}
 	
@@ -29958,7 +30043,7 @@ ExitPlayer(playerid)
 			SetPVarInt(playerid, "Cop", 0);
 
 			SetPlayerColor(playerid, GetPVarInt(playerid, "oldColor"));
-			SetPlayerSkin(playerid, GetPVarInt(playerid, "dSkin"));
+			SetPlayerSkin_(playerid, GetPVarInt(playerid, "dSkin"));
 
             Streamer_ToggleItemUpdate(playerid, STREAMER_TYPE_OBJECT, 1);
             Streamer_ToggleItemUpdate(playerid, STREAMER_TYPE_PICKUP, 1);
@@ -30068,7 +30153,7 @@ ExitPlayer(playerid)
 			RandomWeapons(playerid);
 			ResetPlayerWorld(playerid);
 			SetPlayerHealth(playerid, 100.0);
-			SetPlayerSkin(playerid, GetPVarInt(playerid, "LastSkin"));
+			SetPlayerSkin_(playerid, GetPVarInt(playerid, "LastSkin"));
 
 			if(GetPVarInt(playerid, "HadGod") == 1) Command_ReProcess(playerid, "/god silent", false);
 			SetPVarInt(playerid, "doingStunt", 0);
@@ -30086,7 +30171,7 @@ ExitPlayer(playerid)
 			RandomWeapons(playerid);
 			ResetPlayerWorld(playerid);
 			SetPlayerHealth(playerid, 100.0);
-			SetPlayerSkin(playerid, GetPVarInt(playerid, "LastSkin"));
+			SetPlayerSkin_(playerid, GetPVarInt(playerid, "LastSkin"));
 
 			if(GetPVarInt(playerid, "HadGod") == 1) Command_ReProcess(playerid, "/god silent", false);
 			SetPVarInt(playerid, "doingStunt", 0);
@@ -30104,7 +30189,7 @@ ExitPlayer(playerid)
 			RandomWeapons(playerid);
 			ResetPlayerWorld(playerid);
 			SetPlayerHealth(playerid, 100.0);
-			SetPlayerSkin(playerid, GetPVarInt(playerid, "LastSkin"));
+			SetPlayerSkin_(playerid, GetPVarInt(playerid, "LastSkin"));
 
 			if(GetPVarInt(playerid, "HadGod") == 1) Command_ReProcess(playerid, "/god silent", false);
 			SetPVarInt(playerid, "doingStunt", 0);
@@ -30503,7 +30588,7 @@ GetCNRRobbers()
 
 LoadPos(playerid)
 {
-	SetPlayerPos(playerid, PlayerInfo[playerid][fOldPos][0], PlayerInfo[playerid][fOldPos][1], PlayerInfo[playerid][fOldPos][2] + 1.0);
+	SetPlayerPos(playerid, PlayerInfo[playerid][fOldPos][0], PlayerInfo[playerid][fOldPos][1], PlayerInfo[playerid][fOldPos][2] + 1.5);
 	SetPlayerFacingAngle(playerid, PlayerInfo[playerid][fOldPos][3]);
 	SetCameraBehindPlayer(playerid);
 }
@@ -30524,7 +30609,7 @@ islogged(playerid)
 	return 0;
 }
 
-task RandomTXTInfo[30000]()
+function:RandomTXTInfo()
 {
 	TextDrawSetString(TXTRandomInfo, szRandomInfoTXTs[random(sizeof(szRandomInfoTXTs))]);
 	return 1;
@@ -31345,6 +31430,7 @@ ResetPlayerModules(playerid)
 	PlayerInfo[playerid][iCoolDownCommand] = 0;
 	PlayerInfo[playerid][iCoolDownText] = 0;
 	PlayerInfo[playerid][iCoolDownDeath] = 0;
+	PlayerInfo[playerid][SkinId] = 0;
 	PlayerInfo[playerid][DuelWeapon] = 0;
 	PlayerInfo[playerid][DuelLocation] = 0;
 	PlayerInfo[playerid][DuelRequest] = INVALID_PLAYER_ID;
@@ -31379,3 +31465,14 @@ get_serial(playerid)
     gpci(playerid, allocate, sizeof(allocate));
     return allocate;
 }
+
+SetPlayerSkin_(playerid, modelid)
+{
+	PlayerInfo[playerid][SkinId] = modelid;
+	return SetPlayerSkin(playerid, modelid);
+}
+/*
+GetPlayerSkin_(playerid)
+{
+	return PlayerInfo[playerid][SkinId];
+}*/
