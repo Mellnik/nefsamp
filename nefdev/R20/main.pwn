@@ -2113,8 +2113,8 @@ new Float:DuelMaps[3][2][4] =
 		{-2176.0908, 641.5275, 49.4375, 89.4239}
 	},
 	{
-	    {15.5848, 1394.5194, 10.9798, 180.0},
-	    {-17.7188, 1356.9777, 11.0170, 0.0}
+	    {-22.3681, 1353.8052, 11.7029, 180.0},
+	    {29.7761, 1375.0975, 10.6471, 0.0}
 	}
 };
 new Float:WorldSpawns[4][4] =
@@ -8003,7 +8003,7 @@ YCMD:skydive5(playerid, params[], help)
 }
 YCMD:skydive6(playerid, params[], help)
 {
-    if(PortPlayerMap(playerid, -1866.3245, -3814.7351, 1162.8438, 180, "Skydive 6", "skydive6"))
+    if(PortPlayerMap(playerid, -1854.9218,-3813.2405,1160.8369,270.6376, "Skydive 6", "skydive6"))
     {
         LoadMap(playerid);
         CheckPlayerGod(playerid);
@@ -23997,7 +23997,7 @@ LoadVisualStaticMeshes()
 	AddTeleport(2, "Skydive 3", "skydive3", 2875,-3233,3268);
 	AddTeleport(2, "Skydive 4", "skydive4", 118.210845,3658.245859,836.183776);
 	AddTeleport(2, "Skydive 5", "skydive5", 239.3282, 3754.8267, 888.9833);
-	AddTeleport(2, "Skydive 6", "skydive6", -1866.3245, -3814.7351, 1162.8438);
+	AddTeleport(2, "Skydive 6", "skydive6", -1854.9218,-3813.2405,1160.8369);
 	AddTeleport(0, "BMX Parkour", "bmx", 3362.586, -1939.724, 43.027);
 	AddTeleport(0, "Quad Parkour", "qp", -2904.806, 880.312, 5.354);
 	AddTeleport(0, "Quad Parkour 2", "qp2", 2121.9146,2397.7786,51.2586);
