@@ -30,7 +30,7 @@
 // -
 #include <a_samp>   		// 0.3x-R2
 #undef MAX_PLAYERS
-#define MAX_PLAYERS (405)
+#define MAX_PLAYERS (400)
 #include <YSI\y_iterate>	// 04/01/2014
 #include <YSI\y_commands>   // 04/01/2014
 #include <YSI\y_master>     // 04/01/2014
@@ -4794,11 +4794,17 @@ public OnPlayerExitVehicle(playerid, vehicleid)
 {
 	if(gTeam[playerid] == DERBY || gTeam[playerid] == gRACE)
 	{
-	    Command_ReProcess(playerid, "/exit", false);/*
-	    new Float:POS[3];
-	    GetPlayerPos(playerid, POS[0], POS[1], POS[2]);
-		SetPlayerPos(playerid, POS[0], POS[1], POS[2]);
-		PutPlayerInVehicle(playerid, vehicleid, 0);*/
+	    if(ExitPlayer(playerid) == 0)
+	    {
+	        ShowInfo(playerid, "REMOVED", "Do not exit vehicles in derby/race");
+	    }
+	    else
+	    {
+		    new Float:POS[3];
+		    GetPlayerPos(playerid, POS[0], POS[1], POS[2]);
+			SetPlayerPos(playerid, POS[0], POS[1], POS[2]);
+			PutPlayerInVehicle(playerid, vehicleid, 0);
+		}
 	}
 	return 1;
 }
@@ -4816,9 +4822,8 @@ public OnPlayerText(playerid, text[])
 	}
 	else if(PlayerInfo[playerid][iCoolDownText] >= 15 && PlayerInfo[playerid][Level] < 2)
 	{
-	    new string[100];
-		format(string, sizeof(string), "Chat-Spam detected! %s(%i) has been kicked!", __GetName(playerid), playerid);
-		AdminMSG(RED, string);
+		format(gstr, sizeof(gstr), "Chat-Spam detected! %s(%i) has been kicked!", __GetName(playerid), playerid);
+		AdminMSG(RED, gstr);
 		PlayerInfo[playerid][iCoolDownText] = 0;
 		Kick(playerid);
 		return 0;
@@ -5393,10 +5398,8 @@ public OnPlayerDeath(playerid, killerid, reason)
 
 		    if(IsDerbyRunning && DerbyWinner[playerid])
 		    {
-			    new string[64];
-
-		    	format(string, sizeof(string), "%s's vehicle has been destroyed!", __GetName(playerid));
-				DerbyMSG(string);
+		    	format(gstr, sizeof(gstr), "%s's vehicle has been destroyed!", __GetName(playerid));
+				DerbyMSG(gstr);
 
 		    	DerbyPlayers--;
 		    	DerbyWinner[playerid] = false;
@@ -5421,10 +5424,8 @@ public OnPlayerDeath(playerid, killerid, reason)
 		}
 		case FALLOUT:
 		{
-			new string[50];
-
-			format(string, sizeof(string), "%s(%i) died!", __GetName(playerid), playerid);
-			FalloutMSG(string);
+			format(gstr, sizeof(gstr), "%s(%i) died!", __GetName(playerid), playerid);
+			FalloutMSG(gstr);
 
 		    TogglePlayerControllable(playerid, true);
 		    HidePlayerFalloutTextdraws(playerid);
@@ -5671,13 +5672,12 @@ public OnPlayerDeath(playerid, killerid, reason)
 
 					if(GunGame_Player[killerid][level] == 13)
 					{
-						new string[64];
-						format(string, sizeof string, "%s reached the last level!", __GetName(killerid));
+						format(gstr, sizeof gstr, "%s reached the last level!", __GetName(killerid));
      				    for(new i = 0; i < MAX_PLAYERS; i++)
 					    {
 							if(IsPlayerAvail(i) && gTeam[i] == GUNGAME)
 							{
-		                		GameTextForPlayer(i, string, 2500, 3);
+		                		GameTextForPlayer(i, gstr, 2500, 3);
 							}
 						}
 					}
@@ -9990,9 +9990,8 @@ YCMD:bounties(playerid, params[], help)
 	{
 		if(IsPlayerAvail(i) && PlayerInfo[i][HitmanHit] > 0)
 		{
-			new string[100];
-			format(string, sizeof(string), "- Hit on %s(%i) for $%s", __GetName(i), i, number_format(PlayerInfo[i][HitmanHit]));
-			SCM(playerid, GREY, string);
+			format(gstr, sizeof(gstr), "- Hit on %s(%i) for $%s", __GetName(i), i, number_format(PlayerInfo[i][HitmanHit]));
+			SCM(playerid, GREY, gstr);
 			count++;
 		}
 	}
@@ -15950,9 +15949,9 @@ YCMD:healall(playerid, params[], help)
 				SetPlayerHealth(i, 100.0);
 			}
 		}
-		new string[64];
-		format(string, sizeof(string), "Admin %s(%i) healed all players", __GetName(playerid), playerid);
-		SCMToAll(BLUE, string);
+
+		format(gstr, sizeof(gstr), "Admin %s(%i) healed all players", __GetName(playerid), playerid);
+		SCMToAll(BLUE, gstr);
 		GameTextForAll("Health for all!", 3000, 3);
 		SetPlayerHealth(playerid, 100.0);
 	}
@@ -15975,9 +15974,9 @@ YCMD:armourall(playerid, params[], help)
 				SetPlayerArmour(i, 100.0);
 			}
 		}
-		new string[64];
-		format(string, sizeof(string), "Admin %s(%i) restored all players armour", __GetName(playerid), playerid);
-		SCMToAll(BLUE, string);
+
+		format(gstr, sizeof(gstr), "Admin %s(%i) restored all players armour", __GetName(playerid), playerid);
+		SCMToAll(BLUE, gstr);
 		GameTextForAll("Armour for all!", 3000, 3);
 		SetPlayerArmour(playerid, 100.0);
 	}
@@ -16347,9 +16346,8 @@ YCMD:weather(playerid, params[], help)
 
 	SetPlayerWeather(playerid, weather);
 
-	new string[64];
-	format(string, sizeof(string), "You've set your weather to '%i'", weather);
-	SCM(playerid, BLUE, string);
+	format(gstr, sizeof(gstr), "You've set your weather to '%i'", weather);
+	SCM(playerid, BLUE, gstr);
     SCM(playerid, NEF_GREEN, "-> "PINK_E"Time set! Use /rtime to reset your time!");
 	return 1;
 }
@@ -16396,7 +16394,6 @@ YCMD:scorefall(playerid, params[], help)
 
 		if(score > 100 || score < 1) return SCM(playerid, -1, ""er"Score: 1 - 100");
 
-		new string[100];
 		for(new i = 0; i < MAX_PLAYERS; i++)
 		{
 			if(IsPlayerAvail(i))
@@ -16405,11 +16402,11 @@ YCMD:scorefall(playerid, params[], help)
 				GivePlayerScore_(i, score, true, true);
 			}
 		}
-		format(string, sizeof(string), "~g~~h~%i Score ~w~for all!", score);
-		GameTextForAll(string, 5000, 0);
-		format(string, sizeof(string), "Admin %s(%i) has given all players %i Score", __GetName(playerid), playerid, score);
-		SCMToAll(YELLOW, string);
-		print(string);
+		format(gstr, sizeof(gstr), "~g~~h~%i Score ~w~for all!", score);
+		GameTextForAll(gstr, 5000, 0);
+		format(gstr, sizeof(gstr), "Admin %s(%i) has given all players %i Score", __GetName(playerid), playerid, score);
+		SCMToAll(YELLOW, gstr);
+		print(gstr);
 	}
 	else
 	{
@@ -16515,9 +16512,8 @@ YCMD:tpm(playerid, params[], help)
 	
 	if(IsAd(params))
 	{
-		new string[255];
-	  	format(string, sizeof(string), ""yellow"** "red"Suspicion advertising | Player: %s(%i) Advertised IP: %s - PlayerIP: %s", __GetName(playerid), playerid, params, __GetIP(playerid));
-		AdminMSG(RED, string);
+	  	format(gstr, sizeof(gstr), ""yellow"** "red"Suspicion advertising | Player: %s(%i) Advertised IP: %s - PlayerIP: %s", __GetName(playerid), playerid, params, __GetIP(playerid));
+		AdminMSG(RED, gstr);
 
         SCM(playerid, RED, "Advertising is not allowed!");
         return 1;
@@ -18461,14 +18457,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        }
 	        case HOUSE_MENU_DIALOG:
 	        {
-				new string[128];
-				format(string, sizeof(string), ""nef" :: House Menu > Slot: %i", listitem + 1);
+				format(gstr, sizeof(gstr), ""nef" :: House Menu > Slot: %i", listitem + 1);
 				
 	            PlayerInfo[playerid][HouseSlotSelected] = listitem;
 	            
 		        if(listitem > PlayerInfo[playerid][AdditionalHouseSlots])
 		        {
-		            ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, string, ""nef_green"This house slot is locked.\n\n"white"You may unlock it by purchasing an extra slot at Gold Credits (/gc)", "OK", "");
+		            ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, gstr, ""nef_green"This house slot is locked.\n\n"white"You may unlock it by purchasing an extra slot at Gold Credits (/gc)", "OK", "");
 		        }
 		        else
 				{
@@ -18478,7 +18473,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				    }
 				    else
 				    {
-				        ShowPlayerDialog(playerid, HOUSE_MENU_DIALOG + 1, DIALOG_STYLE_LIST, string, "Goto This House\nUpgrade Interior\nManage House Items", "Select", "Cancel");
+				        ShowPlayerDialog(playerid, HOUSE_MENU_DIALOG + 1, DIALOG_STYLE_LIST, gstr, "Goto This House\nUpgrade Interior\nManage House Items", "Select", "Cancel");
 				    }
 				}
 	            return true;
@@ -18560,12 +18555,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        {
 	            if(gTeam[playerid] != HOUSE) return SCM(playerid, -1, ""er"You need to be in your house!");
 
-				new string[128];
-				format(string, sizeof(string), ""nef" :: House Menu > Slot: %i > Item Slot %i", PlayerInfo[playerid][HouseSlotSelected] + 1, listitem + 1);
+				format(gstr, sizeof(gstr), ""nef" :: House Menu > Slot: %i > Item Slot %i", PlayerInfo[playerid][HouseSlotSelected] + 1, listitem + 1);
 
 				if(listitem > PlayerInfo[playerid][AdditionalHouseObjSlots] + 2)
 				{
-				    ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, string, ""nef_green"This house item slot is locked.\n\n"white"You may unlock it by purchasing an extra slot at Gold Credits (/gc)", "OK", "");
+				    ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, gstr, ""nef_green"This house item slot is locked.\n\n"white"You may unlock it by purchasing an extra slot at Gold Credits (/gc)", "OK", "");
 				}
 				else
 				{
@@ -18583,7 +18577,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	                    }
 	                    else
 	                    {
-	                        ShowPlayerDialog(playerid, HOUSE_MENU_DIALOG + 3, DIALOG_STYLE_LIST, string, "Edit House Item Position\n"grey"Remove House Item", "Select", "Cancel");
+	                        ShowPlayerDialog(playerid, HOUSE_MENU_DIALOG + 3, DIALOG_STYLE_LIST, gstr, "Edit House Item Position\n"grey"Remove House Item", "Select", "Cancel");
 	                    }
 					}
 					else ShowInfo(playerid, "Couldn't find the house in that slot", "Report on forums", 5000);
@@ -18853,10 +18847,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				
 				PlayerInfo[playerid][RankSelected] = listitem;
 				
-				new string[128];
-				format(string, sizeof(string), ""white"Now enter the name of the player who should get the rank:\n\nSelected Rank: %s", GangPositions[listitem][E_gang_pos_name]);
+				format(gstr, sizeof(gstr), ""white"Now enter the name of the player who should get the rank:\n\nSelected Rank: %s", GangPositions[listitem][E_gang_pos_name]);
 				
-				ShowPlayerDialog(playerid, GANG_SET_RANK_DIALOG + 1, DIALOG_STYLE_INPUT, ""nef" :: Gang Rank Menu", string, "Next", "Cancel");
+				ShowPlayerDialog(playerid, GANG_SET_RANK_DIALOG + 1, DIALOG_STYLE_INPUT, ""nef" :: Gang Rank Menu", gstr, "Next", "Cancel");
 	            return true;
 	        }
 	        case GANG_SET_RANK_DIALOG + 1:
@@ -19328,9 +19321,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        case HOUSE_UPGRADE_DIALOG:
 	        {
 				PlayerInfo[playerid][HouseIntSelected] = listitem;
-				new string[255];
-				format(string, sizeof(string), ""white"House Upgrade\n\n- Interior: %s\n- Price: $%s\n\nClick \"Upgrade\" in order to apply the new interior.\n"green"* "white"All House Items will be removed in this slot!", HouseIntTypes[listitem][intname], number_format(HouseIntTypes[listitem][price]));
-				ShowPlayerDialog(playerid, HOUSE_UPGRADE_DIALOG + 1, DIALOG_STYLE_MSGBOX, ""nef" :: House Upgrade", string, "Upgrade", "Cancel");
+
+				format(gstr2, sizeof(gstr2), ""white"House Upgrade\n\n- Interior: %s\n- Price: $%s\n\nClick \"Upgrade\" in order to apply the new interior.\n"green"* "white"All House Items will be removed in this slot!", HouseIntTypes[listitem][intname], number_format(HouseIntTypes[listitem][price]));
+				ShowPlayerDialog(playerid, HOUSE_UPGRADE_DIALOG + 1, DIALOG_STYLE_MSGBOX, ""nef" :: House Upgrade", gstr2, "Upgrade", "Cancel");
 				return true;
 	        }
 	        case HOUSE_UPGRADE_DIALOG + 1:
@@ -19552,63 +19545,61 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				    
 				    Iter_Add(DerbyVoters, playerid);
 				
-				    new string[100];
-
 				    switch(listitem)
 				    {
 						case 0:
 						{
-						    format(string, sizeof(string), "%s(%i) has voted for Map 'SilverGround'", __GetName(playerid), playerid);
+						    format(gstr, sizeof(gstr), "%s(%i) has voted for Map 'SilverGround'", __GetName(playerid), playerid);
 							DerbyMapVotes[6]++;
-							DerbyMSG(string);
+							DerbyMSG(gstr);
 						}
 						case 1:
 						{
-						    format(string, sizeof(string), "%s(%i) has voted for Map 'Anubis'", __GetName(playerid), playerid);
+						    format(gstr, sizeof(gstr), "%s(%i) has voted for Map 'Anubis'", __GetName(playerid), playerid);
 							DerbyMapVotes[7]++;
-							DerbyMSG(string);
+							DerbyMSG(gstr);
 						}
 						case 2:
 						{
-						    format(string, sizeof(string), "%s(%i) has voted for Map 'Confusing'", __GetName(playerid), playerid);
+						    format(gstr, sizeof(gstr), "%s(%i) has voted for Map 'Confusing'", __GetName(playerid), playerid);
 							DerbyMapVotes[8]++;
-							DerbyMSG(string);
+							DerbyMSG(gstr);
 						}
 				        case 3:
 						{
-						    format(string, sizeof(string), "%s(%i) has voted for Map 'Lighthouse'", __GetName(playerid), playerid);
+						    format(gstr, sizeof(gstr), "%s(%i) has voted for Map 'Lighthouse'", __GetName(playerid), playerid);
 							DerbyMapVotes[0]++;
-							DerbyMSG(string);
+							DerbyMSG(gstr);
 						}
 						case 4:
 						{
-						    format(string, sizeof(string), "%s(%i) has voted for Map 'Truncat'", __GetName(playerid), playerid);
+						    format(gstr, sizeof(gstr), "%s(%i) has voted for Map 'Truncat'", __GetName(playerid), playerid);
 							DerbyMapVotes[1]++;
-							DerbyMSG(string);
+							DerbyMSG(gstr);
 						}
 						case 5:
 						{
-						    format(string, sizeof(string), "%s(%i) has voted for Map 'Sky Skiing'", __GetName(playerid), playerid);
+						    format(gstr, sizeof(gstr), "%s(%i) has voted for Map 'Sky Skiing'", __GetName(playerid), playerid);
 							DerbyMapVotes[2]++;
-							DerbyMSG(string);
+							DerbyMSG(gstr);
 						}
 						case 6:
 						{
-						    format(string, sizeof(string), "%s(%i) has voted for Map 'Townhall'", __GetName(playerid), playerid);
+						    format(gstr, sizeof(gstr), "%s(%i) has voted for Map 'Townhall'", __GetName(playerid), playerid);
 							DerbyMapVotes[3]++;
-							DerbyMSG(string);
+							DerbyMSG(gstr);
 						}
 						case 7:
 						{
-						    format(string, sizeof(string), "%s(%i) has voted for Map 'Glazz'", __GetName(playerid), playerid);
+						    format(gstr, sizeof(gstr), "%s(%i) has voted for Map 'Glazz'", __GetName(playerid), playerid);
 							DerbyMapVotes[4]++;
-							DerbyMSG(string);
+							DerbyMSG(gstr);
 						}
 						case 8:
 						{
-						    format(string, sizeof(string), "%s(%i) has voted for Map 'Rambo'", __GetName(playerid), playerid);
+						    format(gstr, sizeof(gstr), "%s(%i) has voted for Map 'Rambo'", __GetName(playerid), playerid);
 							DerbyMapVotes[5]++;
-							DerbyMSG(string);
+							DerbyMSG(gstr);
 						}
 					}
 				}
@@ -19620,31 +19611,28 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			}
 			case BANK_DIALOG:
 			{
-			    new string[130];
 			    switch(listitem)
 			    {
 				    case 0: // Deposit
 				    {
-				        format(string, sizeof(string), ""white"» You got "yellow"$%s"white" in your bank account.\n\nType in the amount you want to deposit below:", number_format(PlayerInfo[playerid][Bank]));
-				        ShowPlayerDialog(playerid, BANK_DIALOG+1, DIALOG_STYLE_INPUT, ""nef" :: Bank > Deposit", string, "Deposit", "Cancel");
+				        format(gstr, sizeof(gstr), ""white"» You got "yellow"$%s"white" in your bank account.\n\nType in the amount you want to deposit below:", number_format(PlayerInfo[playerid][Bank]));
+				        ShowPlayerDialog(playerid, BANK_DIALOG+1, DIALOG_STYLE_INPUT, ""nef" :: Bank > Deposit", gstr, "Deposit", "Cancel");
 				    }
 				    case 1: // Withdraw
 				    {
-				        format(string, sizeof(string), ""white"» You got "yellow"$%s"white" in your bank account.\n\nType in the amount you want to withdraw below:", number_format(PlayerInfo[playerid][Bank]));
-				        ShowPlayerDialog(playerid, BANK_DIALOG+2, DIALOG_STYLE_INPUT, ""nef" :: Bank > Withdraw", string, "Withdraw", "Cancel");
+				        format(gstr, sizeof(gstr), ""white"» You got "yellow"$%s"white" in your bank account.\n\nType in the amount you want to withdraw below:", number_format(PlayerInfo[playerid][Bank]));
+				        ShowPlayerDialog(playerid, BANK_DIALOG+2, DIALOG_STYLE_INPUT, ""nef" :: Bank > Withdraw", gstr, "Withdraw", "Cancel");
 				    }
 				    case 2: // Show Credit
 				    {
-				        format(string, sizeof(string), ""white"» You got "yellow"$%s"white" in your bank account.", number_format(PlayerInfo[playerid][Bank]));
-				        ShowPlayerDialog(playerid, 11231, DIALOG_STYLE_MSGBOX, ""nef" :: Bank > Balance", string, "OK", "");
+				        format(gstr, sizeof(gstr), ""white"» You got "yellow"$%s"white" in your bank account.", number_format(PlayerInfo[playerid][Bank]));
+				        ShowPlayerDialog(playerid, 11231, DIALOG_STYLE_MSGBOX, ""nef" :: Bank > Balance", gstr, "OK", "");
 				    }
 			    }
 			    return true;
 			}
 			case BANK_DIALOG + 1:
 			{
-			    new string[100];
-
 				extract inputtext -> new inamount; else
 				{
 				    return SCM(playerid, WHITE, ""er"Invalid amount");
@@ -19662,15 +19650,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					GivePlayerCash(playerid, -inamount);
 					PlayerInfo[playerid][Bank] += inamount;
-					format(string, sizeof(string), "» You have deposited {FF7800}$%s"white" into your bank account", number_format(inamount));
-					SCM(playerid, WHITE, string);
+					format(gstr, sizeof(gstr), "» You have deposited {FF7800}$%s"white" into your bank account", number_format(inamount));
+					SCM(playerid, WHITE, gstr);
 				}
 				return true;
 			}
 			case BANK_DIALOG+2:
 			{
-			    new string[100];
-
 				extract inputtext -> new outamount; else
 				{
 				    return SCM(playerid, WHITE, ""er"Invalid amount");
@@ -19688,8 +19674,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					GivePlayerCash(playerid, outamount);
 					PlayerInfo[playerid][Bank] -= outamount;
-					format(string, sizeof(string), "» You have withdrawn {FF7800}$%s"white" from your bank account", number_format(outamount));
-					SCM(playerid, WHITE, string);
+					format(gstr, sizeof(gstr), "» You have withdrawn {FF7800}$%s"white" from your bank account", number_format(outamount));
+					SCM(playerid, WHITE, gstr);
 				}
 				return true;
 			}
@@ -20546,43 +20532,42 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
    				if(CurrentBGMap == BG_VOTING)
 				{
-				    new string[100];
 	 				switch(listitem)
 					{
 						case 0:
 						{
-						   	format(string, sizeof(string), "%s(%i) voted for map 'Forest'", __GetName(playerid), playerid);
-							BGMSG(string);
+						   	format(gstr, sizeof(gstr), "%s(%i) voted for map 'Forest'", __GetName(playerid), playerid);
+							BGMSG(gstr);
 							BGMapVotes[0]++;
 						}
 						case 1:
 						{
-						   	format(string, sizeof(string), "%s(%i) voted for map 'Quarters'", __GetName(playerid), playerid);
-							BGMSG(string);
+						   	format(gstr, sizeof(gstr), "%s(%i) voted for map 'Quarters'", __GetName(playerid), playerid);
+							BGMSG(gstr);
 						   	BGMapVotes[1]++;
 						}
 						case 2:
 						{
-						   	format(string, sizeof(string), "%s(%i) voted for map 'Rust'", __GetName(playerid), playerid);
-							BGMSG(string);
+						   	format(gstr, sizeof(gstr), "%s(%i) voted for map 'Rust'", __GetName(playerid), playerid);
+							BGMSG(gstr);
 						   	BGMapVotes[2]++;
 						}
 						case 3:
 						{
-						   	format(string, sizeof(string), "%s(%i) voted for map 'Italy'", __GetName(playerid), playerid);
-							BGMSG(string);
+						   	format(gstr, sizeof(gstr), "%s(%i) voted for map 'Italy'", __GetName(playerid), playerid);
+							BGMSG(gstr);
 						   	BGMapVotes[3]++;
 						}
 						case 4:
 						{
-						   	format(string, sizeof(string), "%s(%i) voted for map 'Medieval'", __GetName(playerid), playerid);
-							BGMSG(string);
+						   	format(gstr, sizeof(gstr), "%s(%i) voted for map 'Medieval'", __GetName(playerid), playerid);
+							BGMSG(gstr);
 						   	BGMapVotes[4]++;
 						}
 						case 5:
 						{
-						   	format(string, sizeof(string), "%s(%i) voted for map 'Hangar War'", __GetName(playerid), playerid);
-							BGMSG(string);
+						   	format(gstr, sizeof(gstr), "%s(%i) voted for map 'Hangar War'", __GetName(playerid), playerid);
+							BGMSG(gstr);
 						   	BGMapVotes[5]++;
 						}
 					}
@@ -25050,9 +25035,8 @@ function:StartDerbyMap1()
 
 	        if(IsPlayerOnDesktop(i, 1500))
 			{
-			    new string[100];
-			    format(string, sizeof(string), "%s couldn't be put in vehicle!", __GetName(i));
-				DerbyMSG(string);
+			    format(gstr, sizeof(gstr), "%s couldn't be put in vehicle!", __GetName(i));
+				DerbyMSG(gstr);
 				PlayerInfo[i][bDerbyAFK] = true;
 	        }
 			else pcount++;
@@ -25139,15 +25123,14 @@ function:StartDerbyMap2()
 	{
 	    DerbyWinner[i] = false;
 		if(gTeam[i] == DERBY && IsPlayerConnected(i))
-  {
+  		{
 		    ClearAnimations(i);
 		    SetPlayerSpecialAction(i, SPECIAL_ACTION_NONE);
 
 	        if(IsPlayerOnDesktop(i, 1500))
 			{
-			    new string[100];
-			    format(string, sizeof(string), "%s couldn't be put in vehicle!", __GetName(i));
-				DerbyMSG(string);
+			    format(gstr, sizeof(gstr), "%s couldn't be put in vehicle!", __GetName(i));
+				DerbyMSG(gstr);
 				PlayerInfo[i][bDerbyAFK] = true;
 	        }
 			else pcount++;
@@ -25240,9 +25223,8 @@ function:StartDerbyMap3()
 
 	        if(IsPlayerOnDesktop(i, 1500))
 			{
-			    new string[100];
-			    format(string, sizeof(string), "%s couldn't be put in vehicle!", __GetName(i));
-				DerbyMSG(string);
+			    format(gstr, sizeof(gstr), "%s couldn't be put in vehicle!", __GetName(i));
+				DerbyMSG(gstr);
 				PlayerInfo[i][bDerbyAFK] = true;
 	        }
 			else pcount++;
@@ -25335,9 +25317,8 @@ function:StartDerbyMap4()
 
 	        if(IsPlayerOnDesktop(i, 1500))
 			{
-			    new string[100];
-			    format(string, sizeof(string), "%s couldn't be put in vehicle!", __GetName(i));
-				DerbyMSG(string);
+			    format(gstr, sizeof(gstr), "%s couldn't be put in vehicle!", __GetName(i));
+				DerbyMSG(gstr);
 				PlayerInfo[i][bDerbyAFK] = true;
 	        }
 			else pcount++;
@@ -25430,9 +25411,8 @@ function:StartDerbyMap5()
 
 	        if(IsPlayerOnDesktop(i, 1500))
 			{
-			    new string[100];
-			    format(string, sizeof(string), "%s couldn't be put in vehicle!", __GetName(i));
-				DerbyMSG(string);
+			    format(gstr, sizeof(gstr), "%s couldn't be put in vehicle!", __GetName(i));
+				DerbyMSG(gstr);
 				PlayerInfo[i][bDerbyAFK] = true;
 	        }
 			else pcount++;
@@ -25525,9 +25505,8 @@ function:StartDerbyMap6()
 
 	        if(IsPlayerOnDesktop(i, 1500))
 			{
-			    new string[100];
-			    format(string, sizeof(string), "%s couldn't be put in vehicle!", __GetName(i));
-				DerbyMSG(string);
+			    format(gstr, sizeof(gstr), "%s couldn't be put in vehicle!", __GetName(i));
+				DerbyMSG(gstr);
 				PlayerInfo[i][bDerbyAFK] = true;
 	        }
 			else pcount++;
@@ -25610,9 +25589,8 @@ function:StartDerbyMap7()
 
 	        if(IsPlayerOnDesktop(i, 1500))
 			{
-			    new string[100];
-			    format(string, sizeof(string), "%s couldn't be put in vehicle!", __GetName(i));
-				DerbyMSG(string);
+			    format(gstr, sizeof(gstr), "%s couldn't be put in vehicle!", __GetName(i));
+				DerbyMSG(gstr);
 				PlayerInfo[i][bDerbyAFK] = true;
 	        }
 			else pcount++;
@@ -25695,9 +25673,8 @@ function:StartDerbyMap8()
 
 	        if(IsPlayerOnDesktop(i, 1500))
 			{
-			    new string[100];
-			    format(string, sizeof(string), "%s couldn't be put in vehicle!", __GetName(i));
-				DerbyMSG(string);
+			    format(gstr, sizeof(gstr), "%s couldn't be put in vehicle!", __GetName(i));
+				DerbyMSG(gstr);
 				PlayerInfo[i][bDerbyAFK] = true;
 	        }
 			else pcount++;
@@ -25780,9 +25757,8 @@ function:StartDerbyMap9()
 
 	        if(IsPlayerOnDesktop(i, 1500))
 			{
-			    new string[100];
-			    format(string, sizeof(string), "%s couldn't be put in vehicle!", __GetName(i));
-				DerbyMSG(string);
+			    format(gstr, sizeof(gstr), "%s couldn't be put in vehicle!", __GetName(i));
+				DerbyMSG(gstr);
 				PlayerInfo[i][bDerbyAFK] = true;
 	        }
 			else pcount++;
@@ -27445,8 +27421,7 @@ function:DecideFalloutWinners()
 {
 	g_FalloutStatus = e_Fallout_Inactive;
 
-	new string[128],
-		winners,
+	new winners,
 		money;
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
@@ -27461,8 +27436,8 @@ function:DecideFalloutWinners()
 			{
 				winners++;
 
-				format(string, sizeof(string), ""fallout_sign" Winner(s): %i. %s", winners, __GetName(i));
-				SCMToAll(YELLOW, string);
+				format(gstr, sizeof(gstr), ""fallout_sign" Winner(s): %i. %s", winners, __GetName(i));
+				SCMToAll(YELLOW, gstr);
 
 				money = (2500 * CurrentFalloutPlayers);
                 GivePlayerCash(i, money, true, true);
