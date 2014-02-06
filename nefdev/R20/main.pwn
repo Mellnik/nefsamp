@@ -1212,21 +1212,21 @@ new const szRandomInfoTXTs[14][] =
 
 new const ServerMSGS[15][] =
 {
-	""yellow_e"- ServerNPC - "LB2_E"Visit our site: "SVRURLWWW"",
-	""yellow_e"- ServerNPC - "LB2_E"Join Minigames for money and score - /help",
-	""yellow_e"- ServerNPC - "LB2_E"Player Control: /settings",
-	""yellow_e"- ServerNPC - "LB2_E"Get VIP (/vip) today! "SVRURLWWW"/vip",
-	""yellow_e"- ServerNPC - "LB2_E"Get VIP (/vip) today! "SVRURLWWW"/vip",
-	""yellow_e"- ServerNPC - "LB2_E"Get "SVRSC" Credits (/credits) today! "SVRURLWWW"/gc/",
-	""yellow_e"- ServerNPC - "LB2_E"Get "SVRSC" Credits (/credits) today! "SVRURLWWW"/gc/",
-	""yellow_e"- ServerNPC - "LB2_E"Join Minigames to earn money and score - /help",
-	""yellow_e"- ServerNPC - "LB2_E"Got suggestions? Post them on our forums! ("SVRFORUM")",
-	""yellow_e"- ServerNPC - "LB2_E"Use /report to report a player to the admins",
-	""yellow_e"- ServerNPC - "LB2_E"Get "SVRSC" Credits (/credits) today! "SVRURLWWW"/gc/",
-	""yellow_e"- ServerNPC - "LB2_E"Add "SVRSC" to your favlist! samp."SVRURL":7777",
-	""yellow_e"- ServerNPC - "LB2_E"Get VIP (/vip) today! "SVRURLWWW"/vip/",
-	""yellow_e"- ServerNPC - "LB2_E"Get a private vehicle which you can tune! (/vs)",
-	""yellow_e"- ServerNPC - "LB2_E"Get a private vehicle which you can tune! (/vs)"
+	""yellow_e"- Server - "LB2_E"Visit our site: "SVRURLWWW"",
+	""yellow_e"- Server - "LB2_E"Join Minigames for money and score - /help",
+	""yellow_e"- Server - "LB2_E"Player Control: /settings",
+	""yellow_e"- Server - "LB2_E"Get VIP (/vip) today! "SVRURLWWW"/vip",
+	""yellow_e"- Server - "LB2_E"Get VIP (/vip) today! "SVRURLWWW"/vip",
+	""yellow_e"- Server - "LB2_E"Get "SVRSC" Credits (/credits) today! "SVRURLWWW"/gc/",
+	""yellow_e"- Server - "LB2_E"Get "SVRSC" Credits (/credits) today! "SVRURLWWW"/gc/",
+	""yellow_e"- Server - "LB2_E"Join Minigames to earn money and score - /help",
+	""yellow_e"- Server - "LB2_E"Got suggestions? Post them on our forums! ("SVRFORUM")",
+	""yellow_e"- Server - "LB2_E"Use /report to report a player to the admins",
+	""yellow_e"- Server - "LB2_E"Get "SVRSC" Credits (/credits) today! "SVRURLWWW"/gc/",
+	""yellow_e"- Server - "LB2_E"Add "SVRSC" to your favlist! samp."SVRURL":7777",
+	""yellow_e"- Server - "LB2_E"Get VIP (/vip) today! "SVRURLWWW"/vip/",
+	""yellow_e"- Server - "LB2_E"Get a private vehicle which you can tune! (/vs)",
+	""yellow_e"- Server - "LB2_E"Get a private vehicle which you can tune! (/vs)"
 };
 
 new Derby_Map1Spawns[MAX_DERBY_PLAYERS][e_derby_map1_data] =
@@ -1693,7 +1693,6 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
 	Teleport_Index[MAX_TELE_CATEGORYS],
 	TeleportDialogString[MAX_TELE_CATEGORYS][2048],
 	wangotto[4],
-	Text3D:NPCLabelHandle[5],
 	SrvStat[4],
 	sPVCategory[512],
 	pAch[MAX_PLAYERS][e_player_ach_data],
@@ -2518,11 +2517,6 @@ public OnGameModeInit()
     BuildServerMap3();
     BuildServerMap4();
     #endif
-    
-	//For teh npcs
-	AddStaticVehicle(537, 1462.0745, 2630.8787, 10.8203, 0.0, -1, -1);
-	AddStaticVehicle(538, -2006.5000, 144.8758, 28.8756, 180.0000, -1, -1);
-	//npcs end
 
 	ResetElevatorQueue();
 	Elevator_Initialize();
@@ -2550,12 +2544,6 @@ public OnGameModeInit()
 	SetTimer("DoLotto", 100000, false);
 
     SollIchDirMaEtWatSagen();
-
-	ConnectNPC("["SVRSC"]Floatround", "bot0");
-	ConnectNPC("["SVRSC"]Inyaface", "bot1");
-	ConnectNPC("["SVRSC"]SS_FatGuy", "bot2");
-	ConnectNPC("["SVRSC"]TrainRider", "train_lv");
-	ConnectNPC("["SVRSC"]CrazyLilMan", "at400_ls");
 
     LoadServerVehicles();
 
@@ -2607,19 +2595,6 @@ function:ClassForceSpawn(playerid)
 public OnPlayerRequestClass(playerid, classid)
 {
     if(GlobalMain) return 0;
-    
-    if(IsPlayerNPC(playerid))
-	{
-		if(!strcmp(__GetName(playerid), "["SVRSC"]TrainRider", true))
- 		{
-	        SetSpawnInfo(playerid, NO_TEAM, 255, 1462.0745, 2630.8787, 10.8203, 0.0, -1, -1, -1, -1, -1, -1);
-		}
- 	 	else if(!strcmp(__GetName(playerid), "["SVRSC"]CrazyLilMan", true))
- 		{
-	        SetSpawnInfo(playerid, NO_TEAM, 4, -2006.5000, 144.8758, 28.8756, 180.0000, -1, -1, -1, -1, -1, -1);
-		}
-		return 1;
-	}
 
 	if(PlayerInfo[playerid][ExitType] == EXIT_FIRST_SPAWNED)
 	{
@@ -2695,44 +2670,7 @@ public OnPlayerRequestSpawn(playerid)
 
 public OnPlayerSpawn(playerid)
 {
-    if(IsPlayerNPC(playerid))
-    {
-        new botname[MAX_PLAYER_NAME+1];
-        GetPlayerName(playerid, botname, sizeof(botname));
-        SetPlayerColor(playerid, PlayerColors[random(sizeof(PlayerColors))]);
-
-        if(!strcmp(botname, "["SVRSC"]Floatround", true))
-		{
-		    format(gstr, sizeof(gstr), ""vgreen"MC public urination\n\n["SVRSC"]Floatround\nID: %i", playerid);
-	     	NPCLabelHandle[0] = CreateDynamic3DTextLabel(gstr, -1, 0.0, 0.0, 0.5, 20.0, playerid, INVALID_VEHICLE_ID, 0, -1, -1, -1, 20.0);
-			SetPlayerSkin_(playerid, 2);
-		}
-        else if(!strcmp(botname, "["SVRSC"]Inyaface", true))
-		{
-		    format(gstr, sizeof(gstr), ""vgreen"MC uses time machines irresponsibly\n\n["SVRSC"]Inyaface\nID: %i", playerid);
-			NPCLabelHandle[1] = CreateDynamic3DTextLabel(gstr, -1, 0.0, 0.0, 0.5, 20.0, playerid, INVALID_VEHICLE_ID, 0, -1, -1, -1, 20.0);
-			SetPlayerSkin_(playerid, 3);
-		}
-        else if(!strcmp(botname, "["SVRSC"]SS_FatGuy", true))
-		{
-		 	format(gstr, sizeof(gstr), ""vgreen"MC ate too many burgers\n\n["SVRSC"]SS_FatGuy\nID: %i", playerid);
-			NPCLabelHandle[2] = CreateDynamic3DTextLabel(gstr, -1, 0.0, 0.0, 0.5, 20.0, playerid, INVALID_VEHICLE_ID, 0, -1, -1, -1, 20.0);
-			SetPlayerSkin_(playerid, 5);
-		}
-		else if(!strcmp(botname, "["SVRSC"]TrainRider", true))
-		{
-		    format(gstr, sizeof(gstr), ""vgreen"MC no MC\n\n["SVRSC"]TrainRider\nID: %i", playerid);
-			NPCLabelHandle[3] = CreateDynamic3DTextLabel(gstr, -1, 0.0, 0.0, 0.5, 20.0, playerid, INVALID_VEHICLE_ID, 0, -1, -1, -1, 20.0);
-	        PutPlayerInVehicle(playerid, 1, 0);
-	 	}
-  		else if(!strcmp(botname, "["SVRSC"]CrazyLilMan", true))
-		{
-		    format(gstr, sizeof(gstr), ""vgreen"MC whose father is a traindriver\n\n["SVRSC"]CrazyLilMan\nID: %i", playerid);
-			NPCLabelHandle[4] = CreateDynamic3DTextLabel(gstr, -1, 0.0, 0.0, 0.5, 20.0, playerid, INVALID_VEHICLE_ID, 0, -1, -1, -1, 20.0);
-	        PutPlayerInVehicle(playerid, 2, 0);
-	 	}
-		return 1;
-    }
+    if(IsPlayerNPC(playerid)) return 1;
 
     if(PlayerInfo[playerid][bShowToys] && !PlayerInfo[playerid][bFirstSpawn]) AttachPlayerToys(playerid);
     
@@ -13000,49 +12938,12 @@ YCMD:connectbots(playerid, params[], help)
 {
 	if(PlayerInfo[playerid][Level] >= 3)
 	{
-	    new count = 0;
-	    for(new i = 0; i < MAX_PLAYERS; i++)
-	    {
-	        if(IsPlayerNPC(i))
-	        {
-	            count++;
-	        }
-	    }
-	    
-	    if(count != 5)
-	    {
-            for(new i = 0; i < 5; i++)
-            {
-				if(NPCLabelHandle[i] == Text3D:-1)
-				{
-				    DestroyDynamic3DTextLabel(NPCLabelHandle[i]);
-				    NPCLabelHandle[i] = Text3D:-1;
-				}
-            }
-	        if(count != 0)
-	        {
-		        for(new i = 0; i < MAX_PLAYERS; i++)
-		        {
-					if(IsPlayerNPC(i))
-					{
-					    Kick(i);
-					}
-				}
-	        }
-	        
-			ConnectNPC("["SVRSC"]Floatround", "bot0");
-			ConnectNPC("["SVRSC"]Inyaface", "bot1");
-			ConnectNPC("["SVRSC"]SS_FatGuy", "bot2");
-			ConnectNPC("["SVRSC"]TrainRider", "train_lv");
-			ConnectNPC("["SVRSC"]CrazyLilMan", "at400_ls");
-	    }
-	    
 	    #if IRC_CONNECT == true
 		IRC_QuitBots();
 		IRC_SetUp(true);
 	    #endif
 		
-		SCM(playerid, -1, ""er"All IRC bots and Server NPCs have been checked and if needed reconnected");
+		SCM(playerid, -1, ""er"All IRC bots have been checked and if needed reconnected");
 	}
 	else
 	{
@@ -23567,11 +23468,6 @@ LoadServerStaticMeshes()
 		Adverts[i] = "<none>";
 	}
 	
-	for(new i = 0; i < 5; i++)
-	{
-		NPCLabelHandle[i] = Text3D:-1;
-	}
-	
     g_SpawnAreas[0] = CreateDynamicSphere(341.8535, -1852.6327, 6.8569, 25.0); // <- beach sphere
     g_SpawnAreas[1] = CreateDynamicSphere(385.4325, 2541.2456, 14.5953, 13.5); // <- AA sphere
     g_SpawnAreas[2] = CreateDynamicSphere(-1203.3666, -27.8846, 15.8403, 15.0); // <- SFA 1 sphere
@@ -25149,7 +25045,7 @@ function:StartDerbyMap1()
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    DerbyWinner[i] = false;
-		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !IsPlayerNPC(i))
+		if(gTeam[i] == DERBY && IsPlayerConnected(i))
 		{
 		    ClearAnimations(i);
 		    SetPlayerSpecialAction(i, SPECIAL_ACTION_NONE);
@@ -25182,7 +25078,7 @@ function:StartDerbyMap1()
 
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !IsPlayerNPC(i) && !PlayerInfo[i][bDerbyAFK])
+		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !PlayerInfo[i][bDerbyAFK])
 		{
 			DerbyWinner[i] = true;
 			DerbyPlayers++;
@@ -25244,8 +25140,8 @@ function:StartDerbyMap2()
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    DerbyWinner[i] = false;
-		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !IsPlayerNPC(i))
-		{
+		if(gTeam[i] == DERBY && IsPlayerConnected(i))
+  {
 		    ClearAnimations(i);
 		    SetPlayerSpecialAction(i, SPECIAL_ACTION_NONE);
 
@@ -25277,7 +25173,7 @@ function:StartDerbyMap2()
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-  		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !IsPlayerNPC(i) && !PlayerInfo[i][bDerbyAFK])
+  		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !PlayerInfo[i][bDerbyAFK])
 		{
 			DerbyWinner[i] = true;
 			DerbyPlayers++;
@@ -25339,7 +25235,7 @@ function:StartDerbyMap3()
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    DerbyWinner[i] = false;
-		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !IsPlayerNPC(i))
+		if(gTeam[i] == DERBY && IsPlayerConnected(i))
 		{
 		    ClearAnimations(i);
 		    SetPlayerSpecialAction(i, SPECIAL_ACTION_NONE);
@@ -25372,7 +25268,7 @@ function:StartDerbyMap3()
 
     for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !IsPlayerNPC(i) && !PlayerInfo[i][bDerbyAFK])
+		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !PlayerInfo[i][bDerbyAFK])
 		{
 			DerbyWinner[i] = true;
 			DerbyPlayers++;
@@ -25434,7 +25330,7 @@ function:StartDerbyMap4()
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    DerbyWinner[i] = false;
-		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !IsPlayerNPC(i))
+		if(gTeam[i] == DERBY && IsPlayerConnected(i))
 		{
 		    ClearAnimations(i);
 		    SetPlayerSpecialAction(i, SPECIAL_ACTION_NONE);
@@ -25467,8 +25363,8 @@ function:StartDerbyMap4()
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !IsPlayerNPC(i) && !PlayerInfo[i][bDerbyAFK])
-		{
+		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !PlayerInfo[i][bDerbyAFK])
+  		{
 			DerbyWinner[i] = true;
 			DerbyPlayers++;
 			for(new m4s = 0; m4s < sizeof(Derby_Map4Spawns); m4s++)
@@ -25529,7 +25425,7 @@ function:StartDerbyMap5()
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    DerbyWinner[i] = false;
-		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !IsPlayerNPC(i))
+		if(gTeam[i] == DERBY && IsPlayerConnected(i))
 		{
 		    ClearAnimations(i);
 		    SetPlayerSpecialAction(i, SPECIAL_ACTION_NONE);
@@ -25562,7 +25458,7 @@ function:StartDerbyMap5()
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !IsPlayerNPC(i) && !PlayerInfo[i][bDerbyAFK])
+		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !PlayerInfo[i][bDerbyAFK])
 		{
 			DerbyWinner[i] = true;
 			DerbyPlayers++;
@@ -25624,7 +25520,7 @@ function:StartDerbyMap6()
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    DerbyWinner[i] = false;
-		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !IsPlayerNPC(i))
+		if(gTeam[i] == DERBY && IsPlayerConnected(i))
 		{
 		    ClearAnimations(i);
 		    SetPlayerSpecialAction(i, SPECIAL_ACTION_NONE);
@@ -25657,7 +25553,7 @@ function:StartDerbyMap6()
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !IsPlayerNPC(i) && !PlayerInfo[i][bDerbyAFK])
+		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !PlayerInfo[i][bDerbyAFK])
 		{
 			DerbyWinner[i] = true;
 			DerbyPlayers++;
@@ -25709,7 +25605,7 @@ function:StartDerbyMap7()
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    DerbyWinner[i] = false;
-		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !IsPlayerNPC(i))
+		if(gTeam[i] == DERBY && IsPlayerConnected(i))
 		{
 		    ClearAnimations(i);
 		    SetPlayerSpecialAction(i, SPECIAL_ACTION_NONE);
@@ -25742,7 +25638,7 @@ function:StartDerbyMap7()
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !IsPlayerNPC(i) && !PlayerInfo[i][bDerbyAFK])
+		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !PlayerInfo[i][bDerbyAFK])
 		{
 			DerbyWinner[i] = true;
 			DerbyPlayers++;
@@ -25794,7 +25690,7 @@ function:StartDerbyMap8()
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    DerbyWinner[i] = false;
-		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !IsPlayerNPC(i))
+		if(gTeam[i] == DERBY && IsPlayerConnected(i))
 		{
 		    ClearAnimations(i);
 		    SetPlayerSpecialAction(i, SPECIAL_ACTION_NONE);
@@ -25827,7 +25723,7 @@ function:StartDerbyMap8()
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !IsPlayerNPC(i) && !PlayerInfo[i][bDerbyAFK])
+		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !PlayerInfo[i][bDerbyAFK])
 		{
 			DerbyWinner[i] = true;
 			DerbyPlayers++;
@@ -25879,7 +25775,7 @@ function:StartDerbyMap9()
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    DerbyWinner[i] = false;
-		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !IsPlayerNPC(i))
+		if(gTeam[i] == DERBY && IsPlayerConnected(i))
 		{
 		    ClearAnimations(i);
 		    SetPlayerSpecialAction(i, SPECIAL_ACTION_NONE);
@@ -25912,7 +25808,7 @@ function:StartDerbyMap9()
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !IsPlayerNPC(i) && !PlayerInfo[i][bDerbyAFK])
+		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !PlayerInfo[i][bDerbyAFK])
 		{
 			DerbyWinner[i] = true;
 			DerbyPlayers++;
@@ -26469,7 +26365,7 @@ function:ProcessTick()
 	
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-	    if(IsPlayerConnected(i) && !IsPlayerNPC(i))
+	    if(IsPlayerConnected(i))
 	    {
 			++T_ServerPlayers;
 			switch(gTeam[i])
@@ -27912,7 +27808,7 @@ function:IsPlayerAvail(playerid)
 {
 	if(playerid == INVALID_PLAYER_ID) return 0;
 	
-	if(IsPlayerConnected(playerid) && PlayerInfo[playerid][ExitType] == EXIT_FIRST_SPAWNED && !IsPlayerNPC(playerid))
+	if(IsPlayerConnected(playerid) && PlayerInfo[playerid][ExitType] == EXIT_FIRST_SPAWNED)
 	{
 	    return 1;
 	}
@@ -28109,7 +28005,7 @@ __GetPlayerID(const PlayerName[])
 {
 	for(new i = 0; i < MAX_PLAYERS; i++)
     {
-    	if(IsPlayerConnected(i) && !IsPlayerNPC(i))
+    	if(IsPlayerConnected(i))
       	{
         	if(!strcmp(PlayerName, __GetName(i), true))
         	{
@@ -30896,7 +30792,7 @@ function:CountTillRace()
 			format(gstr, sizeof(gstr), "~y~RACE STARTING IN~n~~p~- %i -~n~~y~SECONDS", g_RaceCountDown);
 			for(new i = 0; i < MAX_PLAYERS; i++)
 			{
-			    if(!IsPlayerConnected(i) || IsPlayerNPC(i)) continue;
+			    if(!IsPlayerConnected(i)) continue;
 			    if(gTeam[i] == gRACE)
 			    {
 			    	GameTextForPlayer(i, gstr, 999, 3);
@@ -30920,7 +30816,7 @@ StartRace()
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-	    if(!IsPlayerConnected(i) || IsPlayerNPC(i)) continue;
+	    if(!IsPlayerConnected(i)) continue;
 	    if(gTeam[i] == gRACE)
 	    {
 	        TogglePlayerControllable(i, true);
@@ -30966,7 +30862,7 @@ function:StopRace()
     
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-	    if(!IsPlayerConnected(i) || IsPlayerNPC(i)) continue;
+	    if(!IsPlayerConnected(i)) continue;
 	    if(gTeam[i] == gRACE)
 	    {
 			TogglePlayerControllable(i, true);
@@ -31098,7 +30994,7 @@ Race_CalculatePosition()
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-	    if(IsPlayerConnected(i) && !IsPlayerNPC(i))
+	    if(IsPlayerConnected(i))
 		{
 	        if(gTeam[i] == gRACE)
 			{
