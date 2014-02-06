@@ -29,6 +29,7 @@
 // - Includes
 // -
 #include <a_samp>   		// 0.3x-R2
+#include <a_http>           // 0.3x-R2
 #undef MAX_PLAYERS
 #define MAX_PLAYERS (400)
 #include <YSI\y_iterate>	// 04/01/2014
@@ -16254,7 +16255,7 @@ YCMD:deletecolor(playerid, params[], help)
 
 YCMD:new(playerid, params[], help)
 {
-	mysql_tquery(g_SQL_handle, "SELECT * FROM `news` ORDER BY `date` DESC LIMIT 1;", "OnNewsReceived", "i", playerid);
+	HTTP(playerid, HTTP_GET, "http://www.nefserver.net/gateway/api.php?a=news", "", "OnNewsReceived");
 	return 1;
 }
 
@@ -31054,19 +31055,13 @@ function:DestroyPlayerVehicles(playerid)
 	return 1;
 }
 
-function:OnNewsReceived(playerid)
+function:OnNewsReceived(playerid, response_code, data[])
 {
-	new rows, fields;
-	cache_get_data(rows, fields, g_SQL_handle);
-
-	if(rows > 0)
+	if(response_code == 200)
 	{
-	    new news[512], ass[750];
-		cache_get_row(0, 2, gstr, g_SQL_handle, sizeof(gstr));
-		cache_get_row(0, 3, news, g_SQL_handle, sizeof(news));
-		format(ass, sizeof(ass), ""white"%s\n\n%s\n\nPosted on %s", gstr, news, UTConvert(cache_get_row_int(0, 4, g_SQL_handle)));
-	    ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: News", ass, "OK", "");
+	    ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: News", data, "OK", "");
 	}
+	else ShowInfo(playerid, "ERROR", "Fetching data");
 	return 1;
 }
 
