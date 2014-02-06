@@ -2605,7 +2605,7 @@ public OnPlayerRequestClass(playerid, classid)
     PlayerInfo[playerid][bFirstSpawn] = true;
 
     new rand = random(4);
-    SetSpawnInfo(playerid, NO_TEAM, PlayerInfo[playerid][SavedSkin] == -1 ? GetPlayerSkin(playerid) : PlayerInfo[playerid][SavedSkin], WorldSpawns[rand][0], WorldSpawns[rand][1], floatadd(WorldSpawns[rand][2], 3.0), WorldSpawns[rand][3], 0, 0, 0, 0, 0, 0);
+    SetSpawnInfoEx(playerid, NO_TEAM, PlayerInfo[playerid][SavedSkin] != -1 ? PlayerInfo[playerid][SavedSkin] : GetPlayerSkin_(playerid), WorldSpawns[rand][0], WorldSpawns[rand][1], WorldSpawns[rand][2] + 3.0, WorldSpawns[rand][3]);
 
 	TextDrawShowForPlayer(playerid, TXTTeleportInfo);
 	HidePlayerInfoTextdraws(playerid);
@@ -3077,7 +3077,7 @@ public OnPlayerSpawn(playerid)
 	
     if(!PlayerInfo[playerid][bTDEnabled]) Command_ReProcess(playerid, "/hidef", false);
 	if(gTeam[playerid] == FREEROAM) PlayerTextDrawShow(playerid, TXTWantedsTD[playerid]);
-	PlayerInfo[playerid][SkinId] = GetPlayerSkin(playerid);
+	PlayerInfo[playerid][SkinId] = GetPlayerSkin_(playerid);
 	
     PlayerInfo[playerid][bIsDead] = false;
 	return 1;
@@ -3147,7 +3147,7 @@ public OnPlayerConnect(playerid)
     ToggleSpeedo(playerid, false);
 	SetPlayerScore_(playerid, 0);
 	SetPlayerTeam(playerid, NO_TEAM);
-	SetSpawnInfo(playerid, NO_TEAM, 3, 0.0, 0.0, 10.0, 0.0, 0, 0, 0, 0, 0, 0);
+	SetSpawnInfoEx(playerid, NO_TEAM, 0, 0.0, 0.0, 10.0, 0.0);
 	SetPlayerColor(playerid, PlayerColors[random(sizeof(PlayerColors))]);
 	PreparePlayerPV(playerid);
     PreparePlayerToy(playerid);
@@ -5236,12 +5236,12 @@ public OnPlayerDeath(playerid, killerid, reason)
 	    {
             if(PlayerInfo[playerid][bHasSpawn])
             {
-                SetSpawnInfo(playerid, NO_TEAM, PlayerInfo[playerid][SavedSkin] == -1 ? GetPlayerSkin(playerid) : PlayerInfo[playerid][SavedSkin], PlayerInfo[playerid][CSpawnX], PlayerInfo[playerid][CSpawnY], PlayerInfo[playerid][CSpawnZ], PlayerInfo[playerid][CSpawnA], 0, 0, 0, 0, 0, 0);
+                SetSpawnInfoEx(playerid, NO_TEAM, PlayerInfo[playerid][SavedSkin] != -1 ? PlayerInfo[playerid][SavedSkin] : GetPlayerSkin_(playerid), PlayerInfo[playerid][CSpawnX], PlayerInfo[playerid][CSpawnY], PlayerInfo[playerid][CSpawnZ], PlayerInfo[playerid][CSpawnA]);
             }
             else
             {
                 new rand = random(4);
-                SetSpawnInfo(playerid, NO_TEAM, PlayerInfo[playerid][SavedSkin] == -1 ? GetPlayerSkin(playerid) : PlayerInfo[playerid][SavedSkin], WorldSpawns[rand][0], WorldSpawns[rand][1], floatadd(WorldSpawns[rand][2], 3.0), WorldSpawns[rand][3], 0, 0, 0, 0, 0, 0);
+                SetSpawnInfoEx(playerid, NO_TEAM, PlayerInfo[playerid][SavedSkin] == -1 ? PlayerInfo[playerid][SavedSkin] : GetPlayerSkin_(playerid), WorldSpawns[rand][0], WorldSpawns[rand][1], WorldSpawns[rand][2] + 3.0, WorldSpawns[rand][3]);
             }
 	    
 	        if(IsPlayerAvail(killerid) && (playerid != killerid) && gTeam[killerid] == FREEROAM)
@@ -5479,7 +5479,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 		    }
 		    
 		    new rand = random(14);
-		    SetSpawnInfo(playerid, NO_TEAM, PlayerInfo[playerid][SavedSkin] == -1 ? GetPlayerSkin(playerid) : PlayerInfo[playerid][SavedSkin], Sniper_Spawns[rand][0], Sniper_Spawns[rand][1], floatadd(Sniper_Spawns[rand][2], 3.5), Sniper_Spawns[rand][3], 0, 0, 0, 0, 0, 0);
+		    SetSpawnInfoEx(playerid, NO_TEAM, PlayerInfo[playerid][SavedSkin] != -1 ? PlayerInfo[playerid][SavedSkin] : GetPlayerSkin_(playerid), Sniper_Spawns[rand][0], Sniper_Spawns[rand][1], Sniper_Spawns[rand][2] + 3.5, Sniper_Spawns[rand][3]);
 		}
 		case ROCKETDM:
 		{
@@ -5490,7 +5490,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 		    }
 		    
 			new rand = random(8);
-			SetSpawnInfo(playerid, NO_TEAM, PlayerInfo[playerid][SavedSkin] == -1 ? GetPlayerSkin(playerid) : PlayerInfo[playerid][SavedSkin],RocketDM_Spawns[rand][0], RocketDM_Spawns[rand][1], floatadd(RocketDM_Spawns[rand][2], 2.5), RocketDM_Spawns[rand][3], 0, 0, 0, 0, 0, 0);
+			SetSpawnInfoEx(playerid, NO_TEAM, PlayerInfo[playerid][SavedSkin] != -1 ? PlayerInfo[playerid][SavedSkin] : GetPlayerSkin_(playerid), RocketDM_Spawns[rand][0], RocketDM_Spawns[rand][1], RocketDM_Spawns[rand][2] + 2.5, RocketDM_Spawns[rand][3]);
 		}
 		case gBG_TEAM1:
 		{
@@ -6761,7 +6761,7 @@ public OnPlayerModelSelection(playerid, response, listid, modelid)
     {
         if(response)
 		{
-		    SetSpawnInfo(playerid, NO_TEAM, modelid, 0.0, 0.0, 10.0, 0.0, 0, 0, 0, 0, 0, 0);
+		    SetSpawnInfoEx(playerid, NO_TEAM, modelid, 0.0, 0.0, 10.0, 0.0);
   			SetPlayerSkin_(playerid, modelid);
         }
 	}
@@ -8107,7 +8107,7 @@ YCMD:myskin(playerid, params[], help)
 	}
 
 	if(!IsValidSkin(skin)) return SCM(playerid, -1, ""er"Invaild skin ID");
-	SetSpawnInfo(playerid, NO_TEAM, skin, 0.0, 0.0, 10.0, 0.0, 0, 0, 0, 0, 0, 0);
+	SetSpawnInfoEx(playerid, NO_TEAM, skin, 0.0, 0.0, 10.0, 0.0);
     SetPlayerSkin_(playerid, skin);
 	return 1;
 }
@@ -16168,7 +16168,7 @@ YCMD:mellnik(playerid, params[], help)
 		    case _I(m,e,l,l,n,i,k):
 		    {
 				SetPlayerSkin_(playerid, 295);
-			    SetSpawnInfo(playerid, NO_TEAM, 295, 0.0, 0.0, 10.0, 0.0, 0, 0, 0, 0, 0, 0);
+			    SetSpawnInfoEx(playerid, NO_TEAM, 295, 0.0, 0.0, 10.0, 0.0);
 			    SCM(playerid, -1, "{FFE600}Yes, Sir!");
 			    SCM(playerid, WHITE, get_serial(playerid));
 		    }
@@ -18194,7 +18194,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        case CNR_DIALOG:
 	        {
 	            SavePos(playerid);
-	            SetPVarInt(playerid, "dSkin", GetPlayerSkin(playerid));
+	            SetPVarInt(playerid, "dSkin", GetPlayerSkin_(playerid));
 	            new string[255];
 	            SetPVarInt(playerid, "oldColor", GetColor__(playerid));
 				switch(listitem)
@@ -21984,7 +21984,7 @@ MySQL_SavePlayer(playerid, bool:save_pv)
 		PlayerInfo[playerid][SavedColor],
 		GetCredits(playerid),
 		PlayerInfo[playerid][Medkits],
-		GetPlayerSkin(playerid),
+		GetPlayerSkin_(playerid),
 		PlayerInfo[playerid][GungameWins],
 		PlayerInfo[playerid][RaceWins],
 		PlayerInfo[playerid][BGWins],
@@ -26935,7 +26935,7 @@ function:DeleteDerbyText(playerid)
 SetPlayerBGTeam1(playerid)
 {
     ResetPlayerWeapons(playerid);
-    SetPVarInt(playerid, "LastSkin", GetPlayerSkin(playerid));
+    SetPVarInt(playerid, "LastSkin", GetPlayerSkin_(playerid));
 	SetPlayerSkin_(playerid, 285);
 	SetPlayerHealth(playerid, 100.0);
 	SetPlayerTeam(playerid, 10);
@@ -26953,7 +26953,7 @@ SetPlayerBGTeam1(playerid)
 SetPlayerBGTeam2(playerid)
 {
 	ResetPlayerWeapons(playerid);
-    SetPVarInt(playerid, "LastSkin", GetPlayerSkin(playerid));
+    SetPVarInt(playerid, "LastSkin", GetPlayerSkin_(playerid));
 	SetPlayerSkin_(playerid, 122);
 	SetPlayerHealth(playerid, 100.0);
 	SetPlayerTeam(playerid, 20);
@@ -31331,4 +31331,10 @@ SetPlayerSkin_(playerid, modelid)
 GetPlayerSkin_(playerid)
 {
 	return PlayerInfo[playerid][SkinId];
+}
+
+SetSpawnInfoEx(playerid, team, skin, Float:x, Float:y, Float:z, Float:Angle)
+{
+	if(!IsValidSkin(skin)) skin = 0;
+	return SetSpawnInfo(playerid, team, skin, x, y, z, Angle, 0, 0, 0, 0, 0, 0);
 }
