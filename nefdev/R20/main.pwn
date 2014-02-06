@@ -1,6 +1,6 @@
 /*======================================================================*\
 || #################################################################### ||
-|| # Project New Evolution Freeroam - Release 20         			  # ||
+|| # Project New Evolution Freeroam - Build 20 	        			  # ||
 || # ---------------------------------------------------------------- # ||
 || # Copyright ©2011-2014 New Evolution Freeroam	  				  # ||
 || # Created by Mellnik                                               # ||
@@ -84,11 +84,9 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define SERVER_IP                       "31.204.152.218:7777"
 #define HOSTNAME                        " 	        NEF » ×DM/Stunt/Race/Freeroam/Minigames×"
 #if IS_RELEASE_BUILD == true
-#define CURRENT_VERSION                 "Release 20"
-#define CURRENT_VERISON_SHORT           "R20"
+#define CURRENT_VERSION                 "Build 20"
 #else
-#define CURRENT_VERSION                 "PTS:R20"
-#define CURRENT_VERSION_SHORT           "PTS:R20"
+#define CURRENT_VERSION                 "PTS:Build20"
 #endif
 #define HOTFIX_REV                      "Hotfix #0"
 #define SAMP_VERSION                    "SA-MP 0.3x-R2"
@@ -29332,11 +29330,10 @@ function:hideJailTD(playerid)
 
 function:Maths()
 {
-	new str[255];
 	if(mathsAnswered == 0)
 	{
-		format(str, sizeof(str), ""RED_E"[MATHS] "white"Previous question(%s) wasn't answered "GREEN_E"(right answer was %i)", mathsCurrent, mathsAnswer);
-		SCMToAll(NEF_GREEN, str);
+		format(gstr2, sizeof(gstr2), ""RED_E"[MATHS] "white"Previous question(%s) wasn't answered "GREEN_E"(right answer was %i)", mathsCurrent, mathsAnswer);
+		SCMToAll(NEF_GREEN, gstr2);
 	}
 	
     new NR1 = random(100),
@@ -29437,8 +29434,8 @@ function:Maths()
 		}
 	}
 	format(mathsCurrent, sizeof(mathsCurrent), "%i%s%i%s%i", NR1, FOP1, NR2, FOP2, NR3);
-	format(str, sizeof(str), ""RED_E"[MATHS] "white"Calculate %s and write /answer <answer> "YELLOW_E"(Score: 4 | Money: $%s)", mathsCurrent, number_format(mathsAward));
-	SCMToAll(-1, str);
+	format(gstr2, sizeof(gstr2), ""RED_E"[MATHS] "white"Calculate %s and write /answer <answer> "YELLOW_E"(Score: 4 | Money: $%s)", mathsCurrent, number_format(mathsAward));
+	SCMToAll(-1, gstr2);
 	return 1;
 }
 
@@ -29603,8 +29600,7 @@ function:LottoDraw()
 {
     lotto_active = false;
 
-	new string[255];
-	format(string, sizeof(string), "~g~~h~~<~ Lottery Information ~>~~n~~w~Numbers have been drawn. Current jackpot is: $%s - Drawn number: %i~n~~b~~h~~h~", number_format(lotto_jackpot), lotto_number);
+	format(gstr2, sizeof(gstr2), "~g~~h~~<~ Lottery Information ~>~~n~~w~Numbers have been drawn. Current jackpot is: $%s - Drawn number: %i~n~~b~~h~~h~", number_format(lotto_jackpot), lotto_number);
 	
 	new bool:found = false;
 	for(new i = 0; i < MAX_PLAYERS; i++)
@@ -29612,25 +29608,24 @@ function:LottoDraw()
 	    if(!IsPlayerAvail(i)) continue;
 	    if(PlayerInfo[i][DrawnNumber] == lotto_number)
 	    {
-			new str[128];
-			format(str, sizeof(str), "We have a winner! %s(%i) has lotto %i and won the jackpot!", __GetName(i), i, lotto_number, number_format(lotto_jackpot));
-	        strcat(string, str);
+			format(gstr, sizeof(gstr), "We have a winner! %s(%i) has lotto %i and won the jackpot!", __GetName(i), i, lotto_number, number_format(lotto_jackpot));
+	        strcat(gstr2, gstr);
 	        GivePlayerCash(i, lotto_jackpot, true, true);
 	        PlayerPlaySound(i, 5448, 0, 0, 0);
 	        ShowInfo(i, "~g~~h~~h~You won the lotto jackpot!", "", 4000);
-	 		format(str, sizeof(str), "5%s(%i)3 won the lottery! Prize: $%s", __GetName(i), i, number_format(lotto_jackpot));
-	        IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, str);
+	 		format(gstr, sizeof(gstr), "5%s(%i)3 won the lottery! Prize: $%s", __GetName(i), i, number_format(lotto_jackpot));
+	        IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 	        found = true;
 	        break;
 	    }
 	}
 	
-	if(!found) strcat(string, "No winner this round!");
+	if(!found) strcat(gstr2, "No winner this round!");
 	
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(!IsPlayerAvail(i)) continue;
-		InfoTD_MSG(i, 15000, string);
+		InfoTD_MSG(i, 15000, gstr2);
 	}
 	
 	for(new i = 0; i < MAX_PLAYERS; i++)
