@@ -3076,8 +3076,8 @@ public OnPlayerSpawn(playerid)
 		SetPlayerHealth(playerid, 99999.0);
 	}
 	
-    if(!PlayerInfo[playerid][bTDEnabled]) Command_ReProcess(playerid, "/hidef", false);
 	if(gTeam[playerid] == FREEROAM) PlayerTextDrawShow(playerid, TXTWantedsTD[playerid]);
+    if(!PlayerInfo[playerid][bTDEnabled]) Command_ReProcess(playerid, "/hidef", false);
 	PlayerInfo[playerid][SkinId] = GetPlayerSkin_(playerid);
 	
     PlayerInfo[playerid][bIsDead] = false;
@@ -3153,9 +3153,9 @@ public OnPlayerConnect(playerid)
 	PreparePlayerPV(playerid);
     PreparePlayerToy(playerid);
 
-	for(new ii = 0; e_player_ach_data:ii < e_player_ach_data; ii++)
+	for(new i = 0; e_player_ach_data:i < e_player_ach_data; i++)
 	{
-	    pAch[playerid][e_player_ach_data:ii] = 0;
+	    pAch[playerid][e_player_ach_data:i] = 0;
 	}
 
     Iter_Clear(PlayerIgnore[playerid]);
@@ -7336,7 +7336,7 @@ YCMD:sfa(playerid, params[], help)
 }
 YCMD:lsa(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid, 2003.1035,-2455.4905,15.8403,125.4882,2000.9854,-2493.9919,13.3126,89.7651, "Los Santos Airport", "lsa");
+    PortPlayerMapVeh(playerid, 2012.4763,-2448.1399,14.6396,133.3216,2000.9854,-2493.9919,13.3126,89.7651, "Los Santos Airport", "lsa");
     return 1;
 }
 YCMD:ls(playerid, params[], help)
@@ -7948,7 +7948,7 @@ YCMD:deathjump(playerid, params[], help)
 }
 YCMD:skydive(playerid, params[], help)
 {
-    if(PortPlayerMap(playerid,3887.5874,3891.2942,2018.7869,91.8075, "Skydive 1", "skydive"))
+    if(PortPlayerMap(playerid,3887.5874,3891.2942,2017.7869,91.8075, "Skydive 1", "skydive"))
     {
         LoadMap(playerid);
         CheckPlayerGod(playerid);
@@ -13616,7 +13616,7 @@ YCMD:god(playerid, params[], help)
 	        {
 				if(((PlayerInfo[playerid][tickLastShot] + 5000) > (GetTickCount() + 3600000)))
 				{
-				    return GameTextForPlayer(playerid, "~b~~h~~h~You were shot in the last 5 seconds!", 2000, 3);
+				    return ShowInfo(playerid, "You were shot", "in the last 5 seconds");
 				}
 			}
 			
@@ -23992,7 +23992,7 @@ LoadVisualStaticMeshes()
 	AddTeleport(3, "Bike Jump", "bikejump", 641.9279,2222.7144,940.5793);
 	AddTeleport(3, "Globe", "globe", 1954.7849,1915.3772,144.7200);
 	AddTeleport(3, "Quarry Jump", "qjump", 868.278,245.432,587.522);
-	AddTeleport(2, "Skydive", "skydive", 3887.5874,3891.2942,2018.7869);
+	AddTeleport(2, "Skydive", "skydive", 3887.5874,3891.2942,2017.7869);
 	AddTeleport(2, "Skydive 2", "skydive2", -1288.0760,-44.0085,4216.4507);
 	AddTeleport(2, "Skydive 3", "skydive3", 2875,-3233,3268);
 	AddTeleport(2, "Skydive 4", "skydive4", 118.210845,3658.245859,836.183776);
@@ -24005,7 +24005,7 @@ LoadVisualStaticMeshes()
 	AddTeleport(4, "Mount Chilliad", "mc", -2330.8264,-1636.1765,485.6543);
 	AddTeleport(7, "Bayside", "bayside", -2227.2446,2326.8723,7.5469);
 	AddTeleport(7, "San Fierro Airport", "sfa", -1196.3280, -17.4523, 15.8281);
-	AddTeleport(7, "Los Santos Airport", "lsa",  2003.1035,-2455.4905,15.8403);
+	AddTeleport(7, "Los Santos Airport", "lsa", 2012.4763,-2448.1399,14.6396);
 	AddTeleport(7, "Los Santos", "ls", 2494.7476, -1666.6097, 13.3438);
 	AddTeleport(7, "Los Santos Police Department", "lspd", 1542.5554, -1674.7850, 13.5547);
 	AddTeleport(7, "Las Venturas Police Department", "lvpd", 2290.5759,2421.3708, 10.8203);
