@@ -12914,16 +12914,18 @@ YCMD:rplayers(playerid, params[], help)
 {
 	if(PlayerInfo[playerid][Level] >= 1)
 	{
-		new string[512], tmp[50];
+		new string[512], tmp[50], count = 0;
 		for(new i = 0; i < MAX_PLAYERS; i++)
 		{
 		    if(IsPlayerAvail(i) && gTeam[i] == gRACE)
 		    {
 				format(tmp, sizeof(tmp), "{%06x}(%i)%s\n", GetColor__(i) >>> 8, i, __GetName(i));
 				strcat(string, tmp);
-		    }
+				count++;
+			}
 		}
-		ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Race Players", string, "OK", "");
+		gstr = ""white"No players in race.";
+		ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Race Players", count != 0 ? (string) : (gstr), "OK", "");
 	}
 	else
 	{
@@ -13466,8 +13468,8 @@ YCMD:p(playerid, params[], help)
         return 1;
 	}
 
-	format(gstr2, sizeof(gstr2), ""white"["lb_e"VIP CHAT"white"] {%06x}%s"lb_e"(%i): %s", GetColor__(playerid) >>> 8, __GetName(playerid), playerid, gstr);
-	VIPMSG(-1, gstr2);
+	format(gstr, sizeof(gstr), ""white"["lb_e"VIP CHAT"white"] {%06x}%s"lb_e"(%i): %s", GetColor__(playerid) >>> 8, __GetName(playerid), playerid, gstr);
+	VIPMSG(-1, gstr);
 	return 1;
 }
 
@@ -14042,19 +14044,22 @@ YCMD:report(playerid, params[], help)
 		if(strlen(reason) < 4) return SCM(playerid, -1, ""er"Please write a proper reason");
 
 		new time[3];
-
 		gettime(time[0], time[1], time[2]);
 
-		format(gstr, sizeof(gstr), ""YELLOW_E"Report(%02i:%02i:%02i) "RED_E"%s(%i) -> %s(%i) -> %s", time[0], time[1], time[2], __GetName(playerid), playerid, __GetName(player), player, reason);
+		format(gstr, sizeof(gstr), "[ADMIN CHAT] "YELLOW_E"Report(%02i:%02i:%02i) "RED_E"%s(%i) -> %s(%i) -> %s", time[0], time[1], time[2], __GetName(playerid), playerid, __GetName(player), player, reason);
 		for(new i = 1; i < MAX_REPORTS - 1; i++)
 		{
 			Reports[i] = Reports[i + 1];
 		}
 		Reports[MAX_REPORTS - 1] = gstr;
 
-        AdminMSG(-1, gstr, true);
+        if(AdminMSG(COLOR_RED, gstr, true) == 0)
+        {
+			format(gstr, sizeof(gstr), ""white"["lb_e"VIP CHAT"white"] "YELLOW_E"Report(%02i:%02i:%02i) "RED_E"%s(%i) -> %s(%i) -> %s", time[0], time[1], time[2], __GetName(playerid), playerid, __GetName(player), player, reason);
+			VIPMSG(-1, gstr);
+        }
 
-		SCM(playerid, YELLOW, "Your report has been sent to online Admins");
+		SCM(playerid, YELLOW, "Your report has been sent to online Administrators");
 		PlayerInfo[playerid][tickLastReport] = tick;
 	}
 	else
@@ -21891,14 +21896,17 @@ GangMSG(gGangID, const string[])
 
 AdminMSG(color, const string[], bool:beep = false)
 {
+	new internal_c = 0;
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if((IsPlayerAvail(i)) && (PlayerInfo[i][Level] >= 1))
 		{
 			SCM(i, color, string);
 			if(beep) PlayerPlaySound(i, 1057, 0.0, 0.0, 0.0);
+			internal_c++;
 		}
 	}
+	return internal_c;
 }
 
 VIPMSG(color, const msg[])
