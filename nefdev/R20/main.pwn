@@ -1197,7 +1197,7 @@ new const szRandomInfoTXTs[14][] =
 	"~w~Don't wanna get killed? Type ~g~~h~~h~/god",
 	"~w~Want access to ~y~bonus commands~w~? Check out ~r~~h~/premium~w~!",
 	"~w~Edit your server preferences and features using ~r~~h~/settings~w~!",
-	"~w~Flip your vehicle with key ~g~~h~~h~'2'",
+	"~w~Flip your vehicle with the key ~g~~h~~h~'2'",
 	"~w~Join our ~r~~h~forums~w~! Register at ~b~~h~~h~"SVRURLWWW"~w~!",
 	"~w~Get some ~y~Gold Credits ~w~at "SVRURLWWW"/gc/",
 	"~w~Try our ~y~Cops and Robbers ~w~Minigame! ~y~/cnr",
@@ -3497,7 +3497,7 @@ public OnPlayerCommandReceived(playerid, cmdtext[])
 	{
 	    switch(YHash(cmdtext[1], false))
 	    {
-	        case _I(p,m), _I(r): { }
+	        case _I(p,m), _I(r), _I(s,t,a,t,s): { }
 	        default:
 			{
 			    SCM(playerid, -1, ""er"You can only use /pm and /r while being frozen!");
@@ -3511,6 +3511,7 @@ public OnPlayerCommandReceived(playerid, cmdtext[])
 		{
 		    case _I(b,i,k,e,c), _I(b,m,x): { }
 			case _I(s,k,y,d,i,v,e), _I(s,k,y,d,i,v,e,2), _I(s,k,y,d,i,v,e,3), _I(s,k,y,d,i,v,e,4), _I(s,k,y,d,i,v,e,5), _I(s,k,y,d,i,v,e,6): { }
+			case _I(p,m), _I(r), _I(s,t,a,t,s): { }
 			default:
 			{
 				SetPVarInt(playerid, "doingStunt", 0);
@@ -5414,7 +5415,6 @@ public OnPlayerDeath(playerid, killerid, reason)
 			    	DeletePlayer3DTextLabel(playerid, PlayerInfo[playerid][DerbyVehLabel]);
 			    	PlayerInfo[playerid][DerbyVehLabel] = PlayerText3D:-1;
 			    }
-                SetPlayerDerbyStaticMeshes(playerid);
 
 		    	if(DerbyPlayers == 1) Derby();
 			}
@@ -5958,9 +5958,9 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 				format(str, sizeof(str), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /bmx.", GetColor__(playerid) >>> 8, __GetName(playerid), playerid);
 				SCMToAll(COLOR_WHITE, str);
 				GivePlayerScore_(playerid, 8, true, true);
-				GivePlayerCash(playerid, 8000, true, true);
+				GivePlayerCash(playerid, 10000, true, true);
 				PlayerInfo[playerid][tickJoin_bmx] = 0;
-				InfoTD_MSG(playerid, 5000, "~r~~h~~h~Congratulations!~n~~w~You finished the BMX Parkour~n~~r~~h~~h~8 score and $8,000!");
+				InfoTD_MSG(playerid, 5000, "~r~~h~~h~Congratulations!~n~~w~You finished the BMX Parkour~n~~r~~h~~h~8 score and $10,000!");
 				if(pAch[playerid][E_ach_bmxmaster] == 0)
 				{
 					pAch[playerid][E_ach_bmxmaster] = 1;
@@ -8150,8 +8150,6 @@ YCMD:fallout(playerid, params[], help)
     if(gTeam[playerid] == FALLOUT) return SCM(playerid, -1, ""er"You are already in this minigame!");
     if(gTeam[playerid] != FREEROAM) return ShowInfo(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
-    SavePos(playerid);
-
 	if(g_FalloutStatus == e_Fallout_Inactive)
 	{
 	    CheckPlayerGod(playerid);
@@ -8200,7 +8198,6 @@ YCMD:derby(playerid, params[], help)
 	
 	if(CurrentDerbyPlayers == MAX_DERBY_PLAYERS) return SCM(playerid, -1, ""er"Derby reached it's max Players!");
 
-    SavePos(playerid);
     CheckPlayerGod(playerid);
     Command_ReProcess(playerid, "/stopanims", false);
     ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
@@ -8246,7 +8243,6 @@ YCMD:war(playerid, params[], help)
     if(gTeam[playerid] == WAR) return SCM(playerid, -1, ""er"You are already in this minigame!");
     if(gTeam[playerid] != FREEROAM) return ShowInfo(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
-    SavePos(playerid);
     CheckPlayerGod(playerid);
 	
 	ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
@@ -8296,7 +8292,6 @@ YCMD:dm(playerid, params[], help)
     if(gTeam[playerid] == DM && gLastMap[playerid] == DM_1) return SCM(playerid, -1, ""er"You are already in this minigame!");
     if(gTeam[playerid] != FREEROAM) return ShowInfo(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
-    SavePos(playerid);
     CheckPlayerGod(playerid);
     Command_ReProcess(playerid, "/stopanims", false);
     ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
@@ -8331,7 +8326,6 @@ YCMD:dm2(playerid, params[], help)
     if(gTeam[playerid] == DM && gLastMap[playerid] == DM_1) return SCM(playerid, -1, ""er"You are already in this minigame!");
     if(gTeam[playerid] != FREEROAM) return ShowInfo(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
-    SavePos(playerid);
     CheckPlayerGod(playerid);
 	Command_ReProcess(playerid, "/stopanims", false);
     ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
@@ -8367,7 +8361,6 @@ YCMD:dm3(playerid, params[], help)
     if(gTeam[playerid] == DM && gLastMap[playerid] == DM_1) return SCM(playerid, -1, ""er"You are already in this minigame!");
     if(gTeam[playerid] != FREEROAM) return ShowInfo(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
-    SavePos(playerid);
     CheckPlayerGod(playerid);
     Command_ReProcess(playerid, "/stopanims", false);
     ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
@@ -8402,7 +8395,6 @@ YCMD:dm4(playerid, params[], help)
     if(gTeam[playerid] == DM && gLastMap[playerid] == DM_1) return SCM(playerid, -1, ""er"You are already in this minigame!");
     if(gTeam[playerid] != FREEROAM) return ShowInfo(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
-    SavePos(playerid);
     CheckPlayerGod(playerid);
     Command_ReProcess(playerid, "/stopanims", false);
     ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
@@ -9492,7 +9484,6 @@ YCMD:gungame(playerid, params[], help)
     if(gTeam[playerid] == GUNGAME) return SCM(playerid, -1, ""er"You are already in this minigame!");
     if(gTeam[playerid] != FREEROAM) return ShowInfo(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
-    SavePos(playerid);
     CheckPlayerGod(playerid);
     Command_ReProcess(playerid, "/stopanims", false);
 	GunGamePlayers++;
@@ -9588,9 +9579,6 @@ YCMD:duel(playerid, params[], help)
 		        	PlayerInfo[i][DuelRequestRecv] = INVALID_PLAYER_ID;
 			    }
 			}
-
-			SavePos(playerid);
-			SavePos(PlayerInfo[playerid][DuelRequestRecv]);
 			
 			CheckPlayerGod(playerid);
 			CheckPlayerGod(PlayerInfo[playerid][DuelRequestRecv]);
@@ -9659,7 +9647,6 @@ YCMD:tdm(playerid, params[], help)
     if(gTeam[playerid] == gBG_VOTING || gTeam[playerid] == gBG_TEAM1 || gTeam[playerid] == gBG_TEAM2) return SCM(playerid, -1, ""er"You are already in this minigame!");
     if(gTeam[playerid] != FREEROAM) return ShowInfo(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 	
-    SavePos(playerid);
     CheckPlayerGod(playerid);
     Command_ReProcess(playerid, "/stopanims", false);
 	SetPlayerVirtualWorld(playerid, BG_WORLD);
@@ -9895,7 +9882,6 @@ YCMD:minigun(playerid, params[], help)
     if(gTeam[playerid] == MINIGUN) return SCM(playerid, -1, ""er"You are already in this minigame!");
     if(gTeam[playerid] != FREEROAM) return ShowInfo(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
-    SavePos(playerid);
     CheckPlayerGod(playerid);
     Command_ReProcess(playerid, "/stopanims", false);
 	gTeam[playerid] = MINIGUN;
@@ -9918,7 +9904,6 @@ YCMD:minigun2(playerid, params[], help)
     if(gTeam[playerid] == MINIGUN2) return SCM(playerid, -1, ""er"You are already in this minigame!");
     if(gTeam[playerid] != FREEROAM) return ShowInfo(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
-    SavePos(playerid);
     CheckPlayerGod(playerid);
     Command_ReProcess(playerid, "/stopanims", false);
 	gTeam[playerid] = MINIGUN2;
@@ -9942,7 +9927,6 @@ YCMD:sniper(playerid, params[], help)
     if(gTeam[playerid] == MINIGUN) return SCM(playerid, -1, ""er"You are already in this minigame!");
     if(gTeam[playerid] != FREEROAM) return ShowInfo(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
-    SavePos(playerid);
     CheckPlayerGod(playerid);
     Command_ReProcess(playerid, "/stopanims", false);
 	gTeam[playerid] = SNIPER;
@@ -9966,7 +9950,6 @@ YCMD:rocketdm(playerid, params[], help)
     if(gTeam[playerid] == ROCKETDM) return SCM(playerid, -1, ""er"You are already in this minigame!");
     if(gTeam[playerid] != FREEROAM) return ShowInfo(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
-    SavePos(playerid);
     CheckPlayerGod(playerid);
     Command_ReProcess(playerid, "/stopanims", false);
 	gTeam[playerid] = ROCKETDM;
@@ -14106,9 +14089,7 @@ YCMD:race(playerid, params[], help)
 
     if(gTeam[playerid] == gRACE) return SCM(playerid, -1, ""er"You are already in this minigame!");
     if(gTeam[playerid] != FREEROAM) return ShowInfo(playerid, "~w~Type ~y~/exit ~w~to leave", "");
-    
-    SavePos(playerid);
-    
+
     switch(g_RaceStatus)
     {
         case RaceStatus_StandBy:
@@ -15459,7 +15440,6 @@ YCMD:spec(playerid, params[], help)
 
 			if(gTeam[playerid] != SPEC)
 			{
-				SavePos(playerid);
 				CheckPlayerGod(playerid);
 			}
 			
@@ -18207,7 +18187,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        }
 	        case CNR_DIALOG:
 	        {
-	            SavePos(playerid);
 	            SetPVarInt(playerid, "dSkin", GetPlayerSkin_(playerid));
 	            new string[255];
 	            SetPVarInt(playerid, "oldColor", GetColor__(playerid));
@@ -26714,7 +26693,7 @@ function:ProcessTick()
 
 						format(gstr, sizeof(gstr), ""orange"Gang %s captured zone '%s' and gained their reward", GetGangNameByID(GZoneInfo[i][AttackingGang]), GZoneInfo[i][sZoneName]);
 						SCMToAll(-1, gstr);
-						SCMToAll(-1, ""orange"This zone is now locked for 2 hours and cannot be attacked in that time!");
+						SCMToAll(-1, ""orange"This zone is now locked for 2 hours and cannot be attacked during that time!");
 
 						MySQL_UpdateGangScore(GZoneInfo[i][AttackingGang], 5);
 						
@@ -26728,7 +26707,7 @@ function:ProcessTick()
 
 						format(gstr, sizeof(gstr), ""orange"Gang %s captured zone '%s' which was territory of %s", GetGangNameByID(GZoneInfo[i][AttackingGang]), GZoneInfo[i][sZoneName], GetGangNameByID(GZoneInfo[i][DefendingGang]));
 						SCMToAll(-1, gstr);
-						SCMToAll(-1, ""orange"This zone is now locked for 2 hours and cannot be attacked in that time!");
+						SCMToAll(-1, ""orange"This zone is now locked for 2 hours and cannot be attacked during that time!");
 
 						MySQL_UpdateGangScore(GZoneInfo[i][AttackingGang], 10);
 						
