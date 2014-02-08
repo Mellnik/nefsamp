@@ -16367,7 +16367,11 @@ YCMD:cashfall(playerid, params[], help)
 			return SCM(playerid, NEF_GREEN, "Usage: /cashfall <cash>");
 		}
 
-		if(money > 25000 || money < 1) return SCM(playerid, -1, ""er"Cash: $1 - $25,000");
+		if(PlayerInfo[playerid][Level] == MAX_ADMIN_LEVEL) {
+			if(money > 25000 || money < 1) return SCM(playerid, -1, ""er"Cash: $1 - $25,000");
+		} else {
+		    if(money > 10000 || money < 1) return SCM(playerid, -1, ""er"Cash: $1 - $10,000");
+		}
 
 		for(new i = 0; i < MAX_PLAYERS; i++)
 		{
@@ -16398,7 +16402,11 @@ YCMD:scorefall(playerid, params[], help)
 			return SCM(playerid, NEF_GREEN, "Usage: /scorefall <score>");
 		}
 
-		if(score > 100 || score < 1) return SCM(playerid, -1, ""er"Score: 1 - 100");
+		if(PlayerInfo[playerid][Level] == MAX_ADMIN_LEVEL) {
+			if(score > 100 || score < 1) return SCM(playerid, -1, ""er"Score: 1 - 100");
+		} else {
+		    if(score > 100 || score < 1) return SCM(playerid, -1, ""er"Score: 1 - 25");
+		}
 
 		for(new i = 0; i < MAX_PLAYERS; i++)
 		{
@@ -19884,7 +19892,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							
 						format(string, sizeof(string), ""nef" :: Player Toys > Slot %i > Change Bone", PlayerInfo[playerid][toy_selected] + 1);
 
-					    strcat(finstring, "Spine\nHead\nLeft upper arm\nRight upper arm\nLeft hand\nRight hand\nLeft thigh\nRight tigh\nLeft foot\nRight foot");
+					    strcat(finstring, "Spine\nHead\nLeft upper arm\nRight upper arm\nLeft hand\nRight hand\nLeft thigh\nRight thigh\nLeft foot\nRight foot");
 					    strcat(finstring, "\nRight calf\nLeft calf\nLeft forearm\nRight forearm\nLeft clavicle\nRight clavicle\nNeck\nJaw");
 
 					    ShowPlayerDialog(playerid, TOY_DIALOG + 2, DIALOG_STYLE_LIST, string, finstring, "Select", "Cancel");
