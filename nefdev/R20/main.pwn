@@ -1196,7 +1196,7 @@ new const szRandomInfoTXTs[14][] =
     "~w~Need a ~b~~h~vehicle~w~? Spawn one using ~r~~h~/v~w~!",
 	"~w~Don't wanna get killed? Type ~g~~h~~h~/god",
 	"~w~Want access to ~y~bonus commands~w~? Check out ~r~~h~/premium~w~!",
-	"~w~Edit your server prefrences and features using ~r~~h~/settings~w~!",
+	"~w~Edit your server preferences and features using ~r~~h~/settings~w~!",
 	"~w~Flip your vehicle with key ~g~~h~~h~'2'",
 	"~w~Join our ~r~~h~forums~w~! Register at ~b~~h~~h~"SVRURLWWW"~w~!",
 	"~w~Get some ~y~Gold Credits ~w~at "SVRURLWWW"/gc/",
@@ -11965,7 +11965,7 @@ YCMD:gcapture(playerid, params[], help)
 		    format(gstr, sizeof(gstr), ""gang_sign" "r_besch" Your gang failed to capture '%s'. %s(%i) re-captured it!", GZoneInfo[i][sZoneName], __GetName(playerid), playerid);
 			GangMSG(GZoneInfo[i][AttackingGang], gstr);
 
-			format(gstr, sizeof(gstr), ""orange"Gang %s failed to capture '%s'. The zone remains %s gang territory and was locked for 30 minutes!", GetGangNameByID(GZoneInfo[i][AttackingGang]), GZoneInfo[i][sZoneName], GetGangNameByID(GZoneInfo[i][DefendingGang]));
+			format(gstr, sizeof(gstr), ""orange"Gang %s failed to capture '%s'. Zone remains %s territory and will be locked for 30 minutes!", GetGangNameByID(GZoneInfo[i][AttackingGang]), GZoneInfo[i][sZoneName], GetGangNameByID(GZoneInfo[i][DefendingGang]));
 			SCMToAll(-1, gstr);
 
 			for(new ii = 0; ii < MAX_PLAYERS; ii++)
@@ -19131,7 +19131,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	                {
 						new cstring[512];
 
-						strcat(cstring, ""red"» "nef_yellow"LMB (Left Mice Button)\n");
+						strcat(cstring, ""red"» "nef_yellow"LMB (Left Mouse Button)\n");
 						strcat(cstring, ""white"Speedboost for vehicles\n\n");
 
 						strcat(cstring, ""red"» "nef_yellow"2\n");
@@ -24806,13 +24806,15 @@ PortPlayerMap(playerid, Float:X, Float:Y, Float:Z, Float:Angle, const mapname[],
 	SetPlayerFacingAngle(playerid, Angle);
 
     PlayerPlaySound(playerid, 1039, 0.0, 0.0, 0.0);
-	new rcmd[32];
-	rcmd[0] = '/';
-	strcat(rcmd, cmd, sizeof(rcmd));
-	ShowInfo(playerid, mapname, rcmd);
     SetCameraBehindPlayer(playerid);
+    
     if(populate)
 	{
+		new rcmd[32];
+		rcmd[0] = '/';
+		strcat(rcmd, cmd, sizeof(rcmd));
+		ShowInfo(playerid, mapname, rcmd);
+	
         NewMapEvent(playerid, cmd);
 	} 
 	return 1;
@@ -24846,13 +24848,15 @@ PortPlayerMapVeh(playerid, Float:X, Float:Y, Float:Z, Float:Angle, Float:XVeh, F
 	}
 	
 	PlayerPlaySound(playerid, 1039, 0.0, 0.0, 0.0);
-	new rcmd[32];
-	rcmd[0] = '/';
-	strcat(rcmd, cmd, sizeof(rcmd));
-    ShowInfo(playerid, mapname, rcmd);
     SetCameraBehindPlayer(playerid);
+    
     if(populate)
 	{
+	 	new rcmd[32];
+		rcmd[0] = '/';
+		strcat(rcmd, cmd, sizeof(rcmd));
+	    ShowInfo(playerid, mapname, rcmd);
+	    
         NewMapEvent(playerid, cmd);
 	} 
 	return 1;
