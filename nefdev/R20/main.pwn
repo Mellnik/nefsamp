@@ -10823,7 +10823,7 @@ YCMD:locate(playerid, params[], help)
 
 	if(IsPlayerAvail(player))
 	{
-        if(gTeam[player] != FREEROAM) return SCM(playerid, -1, ""er"Player is a minigame!");
+        if(gTeam[player] != FREEROAM) return SCM(playerid, -1, ""er"Player is in a minigame!");
 
 		new zone[MAX_ZONE_NAME];
 	    GetPlayer2DZone(player, zone, sizeof(zone));
