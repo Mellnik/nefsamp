@@ -9045,11 +9045,11 @@ YCMD:buyvip(playerid, params[], help)
 	    SCM(PlayerInfo[playerid][VIPPlayer], -1, gstr);
 		print(gstr);
 		
-	    format(gstr, sizeof(gstr), ""orange"[NEF] %s(%i) has sold his VIP stauts to %s(%i) for $%s", __GetName(PlayerInfo[playerid][VIPPlayer]), PlayerInfo[playerid][VIPPlayer], __GetName(playerid), playerid, number_format(PlayerInfo[playerid][VIPOffer]));
+	    format(gstr, sizeof(gstr), ""orange"[NEF] %s(%i) has sold his VIP status to %s(%i) for $%s", __GetName(PlayerInfo[playerid][VIPPlayer]), PlayerInfo[playerid][VIPPlayer], __GetName(playerid), playerid, number_format(PlayerInfo[playerid][VIPOffer]));
 	    SCMToAll(-1, gstr);
 	    print(gstr);
 	    
-  		format(gstr, sizeof(gstr), "3,1GC:4 %s(%i) has sold his VIP stauts to %s(%i) for $%s", __GetName(PlayerInfo[playerid][VIPPlayer]), PlayerInfo[playerid][VIPPlayer], __GetName(playerid), playerid, number_format(PlayerInfo[playerid][VIPOffer]));
+  		format(gstr, sizeof(gstr), "3,1GC:4 %s(%i) has sold his VIP status to %s(%i) for $%s", __GetName(PlayerInfo[playerid][VIPPlayer]), PlayerInfo[playerid][VIPPlayer], __GetName(playerid), playerid, number_format(PlayerInfo[playerid][VIPOffer]));
 		IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 	    
 	    PlayerInfo[playerid][VIPPlayer] = INVALID_PLAYER_ID;
@@ -9058,7 +9058,7 @@ YCMD:buyvip(playerid, params[], help)
 	}
 	else
 	{
-		SCM(playerid, -1, ""er"This player has either gone offline or does not own VIP stauts.");
+		SCM(playerid, -1, ""er"This player has either gone offline or does not own VIP status.");
 	}
 	return 1;
 }
@@ -13609,7 +13609,7 @@ YCMD:god(playerid, params[], help)
 	        GetPlayerHealth(playerid, HP);
 			if(HP < 40 && !silent) return GameTextForPlayer(playerid, "~b~~h~~h~Your health may not be below 40!", 2000, 3);
 	        SetPVarInt(playerid, "HadGod", 1);
-		    SCM(playerid, COLOR_RED, ""nef" "GREY_E"You have enabled god-mode. You will now have infinith health in stunt zones.");
+		    SCM(playerid, COLOR_RED, ""nef" "GREY_E"You have enabled god-mode. You will now have infinite health in stunt zones.");
 			SCM(playerid, COLOR_RED, "> "YELLOW_E"You will not be able to use weapons with godmode enabled, type /god again to disable.");
 	        TextDrawShowForPlayer(playerid, TXTGodTD);
 	        ResetPlayerWeapons(playerid);
@@ -17561,12 +17561,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        {
 	            PlayerInfo[playerid][DuelLocation] = listitem + 1;
 	            
-	            if(!IsPlayerAvail(PlayerInfo[playerid][DuelRequest])) return SCM(playerid, -1, ""er"Player is not available");
-	            if(gTeam[PlayerInfo[playerid][DuelRequest]] != FREEROAM) return SCM(playerid, -1, ""er"Player is not in normal world");
-	            if(gTeam[playerid] != FREEROAM) return ShowInfo(playerid, "You must be in Freeroam", "");
-	            if(IsPlayerOnDesktop(PlayerInfo[playerid][DuelRequest])) return SCM(playerid, -1, ""er"Player is on desktop");
-	            if(playerid == PlayerInfo[playerid][DuelRequest]) return SCM(playerid, -1, ""er"You can't duel yourself");
-	            if(!islogged(PlayerInfo[playerid][DuelRequest])) return SCM(playerid, -1, ""er"Player does not have an account");
+	            if(!IsPlayerAvail(PlayerInfo[playerid][DuelRequest])) return PlayerInfo[playerid][DuelRequest] = INVALID_PLAYER_ID, SCM(playerid, -1, ""er"Player is not available");
+	            if(gTeam[PlayerInfo[playerid][DuelRequest]] != FREEROAM) return PlayerInfo[playerid][DuelRequest] = INVALID_PLAYER_ID, SCM(playerid, -1, ""er"Player is not in freeroam mode");
+	            if(gTeam[playerid] != FREEROAM) return PlayerInfo[playerid][DuelRequest] = INVALID_PLAYER_ID, ShowInfo(playerid, "You must be in Freeroam", "");
+	            if(IsPlayerOnDesktop(PlayerInfo[playerid][DuelRequest])) return PlayerInfo[playerid][DuelRequest] = INVALID_PLAYER_ID, SCM(playerid, -1, ""er"Player is on desktop");
+	            if(playerid == PlayerInfo[playerid][DuelRequest]) return PlayerInfo[playerid][DuelRequest] = INVALID_PLAYER_ID, SCM(playerid, -1, ""er"You can't duel yourself");
+	            if(!islogged(PlayerInfo[playerid][DuelRequest])) return PlayerInfo[playerid][DuelRequest] = INVALID_PLAYER_ID, SCM(playerid, -1, ""er"Player does not have an account");
 	            
 	            PlayerInfo[PlayerInfo[playerid][DuelRequest]][DuelRequestRecv] = playerid;
 	            
