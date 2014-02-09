@@ -6341,7 +6341,7 @@ public OnPlayerEnterRaceCheckpoint(playerid)
 			    if(islogged(playerid))
 			    {
 				    format(gstr, sizeof(gstr), "INSERT INTO `race_records` VALUES (NULL, %i, '%s', %i);", g_NextRace, __GetName(playerid), TotalRaceTime);
-				    mysql_function_query(g_SQL_handle, gstr, false, "OnQueryFinish", "siii", gstr, THREAD_RACE_FINISH, g_rPosition, g_SQL_handle);
+				    mysql_tquery(g_SQL_handle, gstr, "OnQueryFinish", "siii", gstr, THREAD_RACE_FINISH, g_rPosition, g_SQL_handle);
 				}
 			}
 			else if(TotalRaceTime < 40000) // Do not save cheaters time
@@ -14100,11 +14100,11 @@ YCMD:race(playerid, params[], help)
         }
         case RaceStatus_Inactive:
         {
-            SCM(playerid, -1, ""er"No Race active!");
+            ShowInfo(playerid, "NO RACE ACTIVE", "");
         }
         case RaceStatus_Active:
         {
-            SCM(playerid, -1, ""er"Sorry, race already started");
+            ShowInfo(playerid, "Race already started", "");
         }
     }
     
@@ -23846,8 +23846,8 @@ LoadVisualStaticMeshes()
 	CreateDynamicCP(1400.9669,2685.9114,10.8203, 1.5, CNR_WORLD, -1, -1, 75.0); // Robbers Gate
 	CreateDynamicCP(1902.1838,-1404.4944,14.3474, 3.0, 0, -1, -1, 100.0); // Gold Credits
 	CreateDynamicCP(3360.8054,-1934.1283,43.3184, 3.5, 0, -1, -1, 50.0); // bmx bike spawn
-	CreateDynamicCP(249.9905, 3772.1204, 19.3780, 12.0, 0, -1, -1, 100.0); // skydive5 checkpoint
-	CreateDynamicCP(-1839.5253, -3856.7036, 20.9936, 12.0, 0, -1, -1, 100.0); // skydive6 checkpoint
+	CreateDynamicCP(249.9905, 3772.1204, 18.3780, 12.0, 0, -1, -1, 100.0); // skydive5 checkpoint
+	CreateDynamicCP(-1839.5253, -3856.7036, 16.9936, 12.0, 0, -1, -1, 100.0); // skydive6 checkpoint
 
 	//Stores
 	CreateDynamicMapIcon(2539.3477,2081.2295,10.8203, 6, 0, CNR_WORLD, -1, -1); //Ammunation 1
