@@ -620,10 +620,10 @@ enum E_staff_levels
 	e_color[10]
 };
 
-enum (<<= 1)
+enum BOOST:(<<= 1)
 {
-	BOOST_MONEY_x2,
-	BOOST_MONEY_x3 = 1,
+	BOOST_MONEY_x2 = 1,
+	BOOST_MONEY_x3,
 	BOOST_SCORE_x2,
 	BOOST_SCORE_x3,
 	BOOST_MASTER
@@ -667,7 +667,7 @@ enum e_player_data
 	RobberyCount,
 	tRobbery,
 	tLoadMap,
-	Boost,
+	BOOST:Boost,
 	BoostDeplete,
 	sName[25],
 	sIP[16],
@@ -27846,7 +27846,7 @@ GivePlayerCash(playerid, amount, bool:populate = true, bool:boost = false)
 			else
 			{
 		    	PlayerInfo[playerid][Money] += amount;
-		    	format(gstr, sizeof(gstr), "~g~~h~~h~+$%s (No Boost)", number_format(amount));
+		    	format(gstr, sizeof(gstr), "~g~~h~~h~+$%s", number_format(amount));
 			}
 		}
 		else
@@ -27898,7 +27898,7 @@ GivePlayerScore_(playerid, amount, bool:populate = true, bool:boost = false)
 			else
 			{
 			    PlayerInfo[playerid][Score] += amount;
-			    format(gstr, sizeof(gstr), "~y~~h~+%s Score (No Boost)", number_format(amount));
+			    format(gstr, sizeof(gstr), "~y~~h~+%s Score", number_format(amount));
 			}
 		}
 		else
@@ -31180,7 +31180,7 @@ ResetPlayerModules(playerid)
 	PlayerInfo[playerid][RobberyCount] = 0;
 	PlayerInfo[playerid][tRobbery] = -1;
 	PlayerInfo[playerid][tLoadMap] = -1;
-	PlayerInfo[playerid][Boost] = 0;
+	PlayerInfo[playerid][Boost] = BOOST:0;
 	PlayerInfo[playerid][BoostDeplete] = 0;
 	PlayerInfo[playerid][SavedColor] = 0;
 	PlayerInfo[playerid][SavedSkin] = -1;
