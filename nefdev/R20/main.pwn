@@ -1755,7 +1755,7 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
   	vehiclebuy,
  	aussenrein,
  	innenraus,
-  	g_SQL_handle,
+  	pSQL,
   	mc_dive,
   	mc_tp,
   	mc_weps,
@@ -2564,7 +2564,7 @@ public OnGameModeExit()
 
     MySQL_CleanUp();
     
-	mysql_stat(gstr2, g_SQL_handle);
+	mysql_stat(gstr2, pSQL);
 	print(gstr2);
 
     IRC_QuitBots();
@@ -2579,7 +2579,7 @@ public OnGameModeExit()
 	DestroyAllDynamic3DTextLabels();
 	DestroyAllDynamicPickups();
 
- 	mysql_close(g_SQL_handle, true);
+ 	mysql_close(pSQL, true);
  	
 	print("...GameMode unloaded!");
 	return 1;
@@ -3141,7 +3141,7 @@ public OnPlayerConnect(playerid)
 	}
 
 	format(gstr, sizeof(gstr), "DELETE FROM `online` WHERE `name` = '%s';", __GetName(playerid));
-	mysql_tquery(g_SQL_handle, gstr, "", "");
+	mysql_tquery(pSQL, gstr, "", "");
 
 	ResetPlayerModules(playerid);
 
@@ -3209,7 +3209,7 @@ public OnPlayerConnect(playerid)
 		PlayAudioStreamForPlayer(playerid, "http://www.nefserver.net/s/NEFLogin.mp3");
 
 		format(gstr, sizeof(gstr), "SELECT * FROM `bans` WHERE `PlayerName` = '%s' LIMIT 1;", __GetName(playerid));
-		mysql_tquery(g_SQL_handle, gstr, "OnQueryFinish", "siii", gstr, THREAD_IS_BANNED, playerid, g_SQL_handle);
+		mysql_tquery(pSQL, gstr, "OnQueryFinish", "siii", gstr, THREAD_IS_BANNED, playerid, pSQL);
  	}
  	return 1;
 }
@@ -3217,7 +3217,7 @@ public OnPlayerConnect(playerid)
 public OnPlayerDisconnect(playerid, reason)
 {
 	format(gstr, sizeof(gstr), "DELETE FROM `online` WHERE `name` = '%s';", __GetName(playerid));
-	mysql_tquery(g_SQL_handle, gstr, "", "");
+	mysql_tquery(pSQL, gstr, "", "");
 	
     if(IsPlayerNPC(playerid)) return 1;
     
@@ -3645,15 +3645,15 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 	{
 		case THREAD_RACE_FINISH:
 		{
-			new maxid = cache_insert_id(g_SQL_handle);
+			new maxid = cache_insert_id(pSQL);
 
 			format(gstr2, sizeof(gstr2), "SELECT `id`, `name`, `time` FROM `race_records` WHERE `track` = %i ORDER BY `time` ASC LIMIT 6;", g_NextRace); // 6 , da vllt Platz 5 belegt und somit 6 verdrängt // versteh ich nicht // ah warte jetzt hab ichs kapiert
-			mysql_tquery(g_SQL_handle, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_RACE_LATEST, maxid, extraid);
+			mysql_tquery(pSQL, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_RACE_LATEST, maxid, extraid);
 		}
 		case THREAD_RACE_LATEST:
 		{
 			new rows, fields;
-			cache_get_data(rows, fields, g_SQL_handle);
+			cache_get_data(rows, fields, pSQL);
 			
 			if(rows > 0)
 			{
@@ -3663,9 +3663,9 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				for(new i = 0; i < rows; i++)
 				{
 				    name[0] = '\0';
-					id = cache_get_row_int(i, 0, g_SQL_handle);
-					time = cache_get_row_int(i, 2, g_SQL_handle);
-					cache_get_row(i, 1, name, g_SQL_handle, sizeof(name));
+					id = cache_get_row_int(i, 0, pSQL);
+					time = cache_get_row_int(i, 2, pSQL);
+					cache_get_row(i, 1, name, pSQL, sizeof(name));
 					
 					if(extraid == id)
 					{
@@ -3690,8 +3690,8 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 						        oldtime;
 
 							name[0] = '\0';
-							cache_get_row(i + 1, 1, name, g_SQL_handle, sizeof(name));
-							oldtime = cache_get_row_int(i + 1, 2, g_SQL_handle);
+							cache_get_row(i + 1, 1, name, pSQL, sizeof(name));
+							oldtime = cache_get_row_int(i + 1, 2, pSQL);
 
 					 	    ConvertTime(var1, oldtime, minute, sec, msec);
 					 	    oldtime -= time;
@@ -3708,7 +3708,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		case THREAD_RACE_TOPLIST:
 		{
 		    new rows, fields;
-		    cache_get_data(rows, fields, g_SQL_handle);
+		    cache_get_data(rows, fields, pSQL);
 
 		    if(rows > 0)
 		    {
@@ -3720,8 +3720,8 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 
 				for(new i = 0; i < rows; i++)
 				{
-					cache_get_row(i, 0, name, g_SQL_handle, sizeof(name));
-					time = cache_get_row_int(i, 1, g_SQL_handle);
+					cache_get_row(i, 0, name, pSQL, sizeof(name));
+					time = cache_get_row_int(i, 1, pSQL);
 					ConvertTime(var, time, minute, sec, msec);
 					format(gstr, sizeof(gstr), ""nef_yellow"%i. "green"%s "nef_yellow"- "white"%02i:%02i.%03i", i + 1, name, minute, sec, msec);
 					SCM(extraid, -1, gstr);
@@ -3735,19 +3735,19 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 	    case THREAD_GANG_DESTROY:
 	    {
      		new rows, fields;
-	        cache_get_data(rows, fields, g_SQL_handle);
+	        cache_get_data(rows, fields, pSQL);
 	        
 	        if(rows == 1)
 	        {
 	            new gangname[21], gangid;
-	            cache_get_row(0, 1, gangname, g_SQL_handle, sizeof(gangname));
-	            gangid = cache_get_row_int(0, 0, g_SQL_handle);
+	            cache_get_row(0, 1, gangname, pSQL, sizeof(gangname));
+	            gangid = cache_get_row_int(0, 0, pSQL);
 	            
 				if(Iter_Contains(iterGangWar, gangid)) return SCM(extraid, -1, ""er"You can't close this gang as they are involved in a Gang War.");
 	            
 	            new string[255];
 				format(string, sizeof(string), "UPDATE `accounts` SET `GangPosition` = 0, `GangID` = 0 WHERE `GangID` = %i;", gangid);
-				mysql_tquery(g_SQL_handle, string, "", "");
+				mysql_tquery(pSQL, string, "", "");
 
 				for(new i = 0; i < gzoneid; i++)
 				{
@@ -3792,7 +3792,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				}
 
 				format(string, sizeof(string), "DELETE FROM `gangs` WHERE `ID` = %i LIMIT 1;", gangid);
-				mysql_tquery(g_SQL_handle, string, "", "");
+				mysql_tquery(pSQL, string, "", "");
 
 				format(string, sizeof(string), ""server_sign" "r_besch"Admin %s(%i) has destroyed gang %s", __GetName(extraid), extraid, gangname);
 				SCMToAll(-1, string);
@@ -3802,7 +3802,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 	    case THREAD_CHECK_AUTO_LOGIN:
 	    {
 	        new rows, fields;
-	        cache_get_data(rows, fields, g_SQL_handle);
+	        cache_get_data(rows, fields, pSQL);
 	        
 	        if(rows > 0) // accname with ip found
 	        {
@@ -3818,7 +3818,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
         case THREAD_FETCH_GANG_MEMBER_NAMES:
         {
             new rows, fields;
-            cache_get_data(rows, fields, g_SQL_handle);
+            cache_get_data(rows, fields, pSQL);
 
 			if(rows > 0)
 			{
@@ -3832,8 +3832,8 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 					    tmp[MAX_PLAYER_NAME+1 + 25],
 					    rank = 1;
 
-					cache_get_row(i, 0, result, g_SQL_handle, sizeof(result));
-					rank = cache_get_row_int(i, 1, g_SQL_handle);
+					cache_get_row(i, 0, result, pSQL, sizeof(result));
+					rank = cache_get_row_int(i, 1, pSQL);
 
 					format(tmp, sizeof(tmp), "\n%i. %s (%s)", count + 1, result, GangPositions[rank][E_gang_pos_name]);
 					strcat(tmpstring, tmp);
@@ -3850,7 +3850,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		case THREAD_FETCH_GANG_INFO:
 		{
 		    new rows, fields;
-		    cache_get_data(rows, fields, g_SQL_handle);
+		    cache_get_data(rows, fields, pSQL);
 
 		    if(rows > 0)
 			{
@@ -3864,12 +3864,12 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 					members[1536],
 					string[2048];
 
-				cache_get_row(0, 1, gangname, g_SQL_handle, sizeof(gangname));
-				cache_get_row(0, 2, gangtag, g_SQL_handle, sizeof(gangtag));
-				score = cache_get_row_int(0, 3, g_SQL_handle);
-				udate = cache_get_row_int(0, 4, g_SQL_handle);
-				color = cache_get_row_int(0, 5, g_SQL_handle);
-				gcar = cache_get_row_int(0, 6, g_SQL_handle);
+				cache_get_row(0, 1, gangname, pSQL, sizeof(gangname));
+				cache_get_row(0, 2, gangtag, pSQL, sizeof(gangtag));
+				score = cache_get_row_int(0, 3, pSQL);
+				udate = cache_get_row_int(0, 4, pSQL);
+				color = cache_get_row_int(0, 5, pSQL);
+				gcar = cache_get_row_int(0, 6, pSQL);
 
 				for(new i = 0; i < MAX_PLAYERS; i++)
 				{
@@ -3904,12 +3904,12 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
         case THREAD_CHECK_IP:
         {
             new rows, fields;
-            cache_get_data(rows, fields, g_SQL_handle);
+            cache_get_data(rows, fields, pSQL);
 
             if(rows == 0) // IP not banned
             {
 				format(gstr, sizeof(gstr), "SELECT `ID` FROM `accounts` WHERE `Name` = '%s' LIMIT 1;", __GetName(extraid));
-				mysql_tquery(g_SQL_handle, gstr, "OnQueryFinish", "siii", gstr, THREAD_ACCOUNT_EXIST, extraid, g_SQL_handle); // Check if account exist
+				mysql_tquery(pSQL, gstr, "OnQueryFinish", "siii", gstr, THREAD_ACCOUNT_EXIST, extraid, pSQL); // Check if account exist
 				
 				SendWelcomeMSG(extraid);
             }
@@ -3924,7 +3924,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		case THREAD_CREATE_GANG:
 		{
 			PlayerInfo[extraid][GangPosition] = GANG_POS_MAIN_LEADER;
-			PlayerInfo[extraid][GangID] = cache_insert_id(g_SQL_handle);
+			PlayerInfo[extraid][GangID] = cache_insert_id(pSQL);
 
             GivePlayerCash(extraid, -500000);
 
@@ -3950,7 +3950,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
         case THREAD_IS_BANNED:
 		{
 		    new rows, fields;
-		    cache_get_data(rows, fields, g_SQL_handle);
+		    cache_get_data(rows, fields, pSQL);
 		    
 		    if(rows > 0) // Playername is banned
 		    {
@@ -3959,10 +3959,10 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		            reason[128],
 		            udate, lift;
 
-				cache_get_row(0, 2, adminname, g_SQL_handle, sizeof(adminname));
-				cache_get_row(0, 3, reason, g_SQL_handle, sizeof(reason));
-				lift = cache_get_row_int(0, 4, g_SQL_handle);
-				udate = cache_get_row_int(0, 5, g_SQL_handle);
+				cache_get_row(0, 2, adminname, pSQL, sizeof(adminname));
+				cache_get_row(0, 3, reason, pSQL, sizeof(reason));
+				lift = cache_get_row_int(0, 4, pSQL);
+				udate = cache_get_row_int(0, 5, pSQL);
 
 				if(lift == 0) // Perm ban
 				{
@@ -3973,12 +3973,12 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				else if(lift < gettime())
 				{
 				    format(string, sizeof(string), "DELETE FROM `bans` WHERE `PlayerName` = '%s' LIMIT 1;", __GetName(extraid)); // Delete time ban
-				    mysql_tquery(g_SQL_handle, string, "", "");
+				    mysql_tquery(pSQL, string, "", "");
 				    
 				    SCM(extraid, -1, ""nef" Your time ban expired, you've been unbanned!");
 
 					format(string, sizeof(string), "SELECT * FROM `blacklist` WHERE `IP` = '%s' LIMIT 1;", __GetIP(extraid));
-					mysql_tquery(g_SQL_handle, string, "OnQueryFinish", "siii", string, THREAD_CHECK_IP, extraid, g_SQL_handle); // Continuing with process
+					mysql_tquery(pSQL, string, "OnQueryFinish", "siii", string, THREAD_CHECK_IP, extraid, pSQL); // Continuing with process
 				}
 				else
 				{
@@ -3990,13 +3990,13 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		    else
 		    {
 				format(gstr, sizeof(gstr), "SELECT * FROM `blacklist` WHERE `IP` = '%s' LIMIT 1;", __GetIP(extraid));
-				mysql_tquery(g_SQL_handle, gstr, "OnQueryFinish", "siii", gstr, THREAD_CHECK_IP, extraid, g_SQL_handle);
+				mysql_tquery(pSQL, gstr, "OnQueryFinish", "siii", gstr, THREAD_CHECK_IP, extraid, pSQL);
 		    }
 		}
 	 	case THREAD_ACCOUNT_EXIST:
 		{
 		    new rows, fields;
-		    cache_get_data(rows, fields, g_SQL_handle);
+		    cache_get_data(rows, fields, pSQL);
 
 			TextDrawHideForPlayer(extraid, TXTOnJoin[0]);
 			TextDrawHideForPlayer(extraid, TXTOnJoin[1]);
@@ -4008,12 +4008,12 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 			SetPlayerCameraLookAt(extraid, 1797.3661, -1300.8164, 121.4556);
 
 			format(gstr, sizeof(gstr), "INSERT INTO `online` VALUES (NULL, '%s', '%s', UNIX_TIMESTAMP());", __GetName(extraid), __GetIP(extraid));
-			mysql_tquery(g_SQL_handle, gstr, "", "");
+			mysql_tquery(pSQL, gstr, "", "");
 
 		    if(rows != 0) // acc exists
 		    {
 				format(gstr, sizeof(gstr), "SELECT `ID` FROM `accounts` WHERE `Name` = '%s' AND `IP` = '%s' LIMIT 1;", __GetName(extraid), __GetIP(extraid));
-				mysql_tquery(g_SQL_handle, gstr, "OnQueryFinish", "siii", gstr, THREAD_CHECK_AUTO_LOGIN, extraid, g_SQL_handle); // check auto login
+				mysql_tquery(pSQL, gstr, "OnQueryFinish", "siii", gstr, THREAD_CHECK_AUTO_LOGIN, extraid, pSQL); // check auto login
 		    }
 		    else
 		    {
@@ -4023,45 +4023,45 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		case THREAD_LOAD_PLAYER:
 		{
 		    new rows, fields;
-			cache_get_data(rows, fields, g_SQL_handle);
+			cache_get_data(rows, fields, pSQL);
 			
 			if(rows > 0)
 			{
-			    PlayerInfo[extraid][AccountID] = cache_get_row_int(0, 0, g_SQL_handle);
-			    PlayerInfo[extraid][SavedColor] = cache_get_row_int(0, 2, g_SQL_handle);
-			    PlayerInfo[extraid][Level] = cache_get_row_int(0, 5, g_SQL_handle);
-			    PlayerInfo[extraid][Score] = cache_get_row_int(0, 6, g_SQL_handle);
-			    PlayerInfo[extraid][Money] = cache_get_row_int(0, 7, g_SQL_handle);
-			    PlayerInfo[extraid][Bank] = cache_get_row_int(0, 8, g_SQL_handle);
-			    PlayerInfo[extraid][Kills] = cache_get_row_int(0, 9, g_SQL_handle);
-			    PlayerInfo[extraid][Deaths] = cache_get_row_int(0, 10, g_SQL_handle);
-			    PlayerInfo[extraid][TotalTime] = cache_get_row_int(0, 11, g_SQL_handle);
-                PlayerInfo[extraid][Reaction] = cache_get_row_int(0, 12, g_SQL_handle);
-                PlayerInfo[extraid][PayDay] = cache_get_row_int(0, 13, g_SQL_handle);
-                PlayerInfo[extraid][Houses] = cache_get_row_int(0, 14, g_SQL_handle);
-                PlayerInfo[extraid][Props] = cache_get_row_int(0, 15, g_SQL_handle);
-                PlayerInfo[extraid][GangPosition] = cache_get_row_int(0, 16, g_SQL_handle);
-                PlayerInfo[extraid][GangID] = cache_get_row_int(0, 17, g_SQL_handle);
-                PlayerInfo[extraid][AdditionalPVSlots] = cache_get_row_int(0, 18, g_SQL_handle);
-                PlayerInfo[extraid][AdditionalToySlots] = cache_get_row_int(0, 19, g_SQL_handle);
-                PlayerInfo[extraid][AdditionalHouseSlots] = cache_get_row_int(0, 20, g_SQL_handle);
-                PlayerInfo[extraid][AdditionalPropSlots] = cache_get_row_int(0, 21, g_SQL_handle);
-                PlayerInfo[extraid][AdditionalHouseObjSlots] = cache_get_row_int(0, 22, g_SQL_handle);
-                PlayerInfo[extraid][DerbyWins] = cache_get_row_int(0, 24, g_SQL_handle);
-                PlayerInfo[extraid][RaceWins] = cache_get_row_int(0, 25, g_SQL_handle);
-                PlayerInfo[extraid][BGWins] = cache_get_row_int(0, 26, g_SQL_handle);
-                PlayerInfo[extraid][FalloutWins] = cache_get_row_int(0, 27, g_SQL_handle);
-                PlayerInfo[extraid][GungameWins] = cache_get_row_int(0, 28, g_SQL_handle);
-                PlayerInfo[extraid][EventWins] = cache_get_row_int(0, 29, g_SQL_handle);
-                PlayerInfo[extraid][Wanteds] = cache_get_row_int(0, 30, g_SQL_handle);
-                PlayerInfo[extraid][VIP] = cache_get_row_int(0, 31, g_SQL_handle);
-                PlayerInfo[extraid][Credits] = cache_get_row_int(0, 32, g_SQL_handle);
-                PlayerInfo[extraid][Medkits] = cache_get_row_int(0, 33, g_SQL_handle);
-                PlayerInfo[extraid][RegDate] = cache_get_row_int(0, 34, g_SQL_handle);
-                PlayerInfo[extraid][LastLogin] = cache_get_row_int(0, 35, g_SQL_handle);
-                PlayerInfo[extraid][LastNameChange] = cache_get_row_int(0, 36, g_SQL_handle);
+			    PlayerInfo[extraid][AccountID] = cache_get_row_int(0, 0, pSQL);
+			    PlayerInfo[extraid][SavedColor] = cache_get_row_int(0, 2, pSQL);
+			    PlayerInfo[extraid][Level] = cache_get_row_int(0, 5, pSQL);
+			    PlayerInfo[extraid][Score] = cache_get_row_int(0, 6, pSQL);
+			    PlayerInfo[extraid][Money] = cache_get_row_int(0, 7, pSQL);
+			    PlayerInfo[extraid][Bank] = cache_get_row_int(0, 8, pSQL);
+			    PlayerInfo[extraid][Kills] = cache_get_row_int(0, 9, pSQL);
+			    PlayerInfo[extraid][Deaths] = cache_get_row_int(0, 10, pSQL);
+			    PlayerInfo[extraid][TotalTime] = cache_get_row_int(0, 11, pSQL);
+                PlayerInfo[extraid][Reaction] = cache_get_row_int(0, 12, pSQL);
+                PlayerInfo[extraid][PayDay] = cache_get_row_int(0, 13, pSQL);
+                PlayerInfo[extraid][Houses] = cache_get_row_int(0, 14, pSQL);
+                PlayerInfo[extraid][Props] = cache_get_row_int(0, 15, pSQL);
+                PlayerInfo[extraid][GangPosition] = cache_get_row_int(0, 16, pSQL);
+                PlayerInfo[extraid][GangID] = cache_get_row_int(0, 17, pSQL);
+                PlayerInfo[extraid][AdditionalPVSlots] = cache_get_row_int(0, 18, pSQL);
+                PlayerInfo[extraid][AdditionalToySlots] = cache_get_row_int(0, 19, pSQL);
+                PlayerInfo[extraid][AdditionalHouseSlots] = cache_get_row_int(0, 20, pSQL);
+                PlayerInfo[extraid][AdditionalPropSlots] = cache_get_row_int(0, 21, pSQL);
+                PlayerInfo[extraid][AdditionalHouseObjSlots] = cache_get_row_int(0, 22, pSQL);
+                PlayerInfo[extraid][DerbyWins] = cache_get_row_int(0, 24, pSQL);
+                PlayerInfo[extraid][RaceWins] = cache_get_row_int(0, 25, pSQL);
+                PlayerInfo[extraid][BGWins] = cache_get_row_int(0, 26, pSQL);
+                PlayerInfo[extraid][FalloutWins] = cache_get_row_int(0, 27, pSQL);
+                PlayerInfo[extraid][GungameWins] = cache_get_row_int(0, 28, pSQL);
+                PlayerInfo[extraid][EventWins] = cache_get_row_int(0, 29, pSQL);
+                PlayerInfo[extraid][Wanteds] = cache_get_row_int(0, 30, pSQL);
+                PlayerInfo[extraid][VIP] = cache_get_row_int(0, 31, pSQL);
+                PlayerInfo[extraid][Credits] = cache_get_row_int(0, 32, pSQL);
+                PlayerInfo[extraid][Medkits] = cache_get_row_int(0, 33, pSQL);
+                PlayerInfo[extraid][RegDate] = cache_get_row_int(0, 34, pSQL);
+                PlayerInfo[extraid][LastLogin] = cache_get_row_int(0, 35, pSQL);
+                PlayerInfo[extraid][LastNameChange] = cache_get_row_int(0, 36, pSQL);
 
-				new sskin = cache_get_row_int(0, 57, g_SQL_handle);
+				new sskin = cache_get_row_int(0, 57, pSQL);
                 
                 if(IsValidSkin(sskin))
                 {
@@ -4071,7 +4071,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
                 
 				new buffer[255];
 				
-				cache_get_row(0, 37, buffer, g_SQL_handle, sizeof(buffer));
+				cache_get_row(0, 37, buffer, pSQL, sizeof(buffer));
 				sscanf(buffer, "p<,>iiiiiiiiiiiiii",
 	                pAch[extraid][E_ach_styler],
 	                pAch[extraid][E_ach_grimreaper],
@@ -4088,7 +4088,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 	                pAch[extraid][E_ach_biker],
 					pAch[extraid][E_ach_bmxmaster]);
 					
-                cache_get_row(0, 38, buffer, g_SQL_handle, sizeof(buffer)); // Slot 0
+                cache_get_row(0, 38, buffer, pSQL, sizeof(buffer)); // Slot 0
 				sscanf(buffer, "p<,>iifffffffff",
 					PlayerToys[extraid][0][toy_model],
 				    PlayerToys[extraid][0][toy_bone],
@@ -4102,7 +4102,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				    PlayerToys[extraid][0][toy_sy],
 				    PlayerToys[extraid][0][toy_sz]);
 				    
-                cache_get_row(0, 39, buffer, g_SQL_handle, sizeof(buffer)); // Slot 1
+                cache_get_row(0, 39, buffer, pSQL, sizeof(buffer)); // Slot 1
 				sscanf(buffer, "p<,>iifffffffff",
 					PlayerToys[extraid][1][toy_model],
 				    PlayerToys[extraid][1][toy_bone],
@@ -4116,7 +4116,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				    PlayerToys[extraid][1][toy_sy],
 				    PlayerToys[extraid][1][toy_sz]);
 
-                cache_get_row(0, 40, buffer, g_SQL_handle, sizeof(buffer)); // Slot 2
+                cache_get_row(0, 40, buffer, pSQL, sizeof(buffer)); // Slot 2
 				sscanf(buffer, "p<,>iifffffffff",
 					PlayerToys[extraid][2][toy_model],
 				    PlayerToys[extraid][2][toy_bone],
@@ -4130,7 +4130,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				    PlayerToys[extraid][2][toy_sy],
 				    PlayerToys[extraid][2][toy_sz]);
 				    
-                cache_get_row(0, 41, buffer, g_SQL_handle, sizeof(buffer)); // Slot 3
+                cache_get_row(0, 41, buffer, pSQL, sizeof(buffer)); // Slot 3
 				sscanf(buffer, "p<,>iifffffffff",
 					PlayerToys[extraid][3][toy_model],
 				    PlayerToys[extraid][3][toy_bone],
@@ -4144,7 +4144,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				    PlayerToys[extraid][3][toy_sy],
 				    PlayerToys[extraid][3][toy_sz]);
 				    
-                cache_get_row(0, 42, buffer, g_SQL_handle, sizeof(buffer)); // Slot 4
+                cache_get_row(0, 42, buffer, pSQL, sizeof(buffer)); // Slot 4
 				sscanf(buffer, "p<,>iifffffffff",
 					PlayerToys[extraid][4][toy_model],
 				    PlayerToys[extraid][4][toy_bone],
@@ -4158,7 +4158,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				    PlayerToys[extraid][4][toy_sy],
 				    PlayerToys[extraid][4][toy_sz]);
 				    
-                cache_get_row(0, 43, buffer, g_SQL_handle, sizeof(buffer)); // Slot 5
+                cache_get_row(0, 43, buffer, pSQL, sizeof(buffer)); // Slot 5
 				sscanf(buffer, "p<,>iifffffffff",
 					PlayerToys[extraid][5][toy_model],
 				    PlayerToys[extraid][5][toy_bone],
@@ -4172,7 +4172,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				    PlayerToys[extraid][5][toy_sy],
 				    PlayerToys[extraid][5][toy_sz]);
 				    
-                cache_get_row(0, 44, buffer, g_SQL_handle, sizeof(buffer)); // Slot 6
+                cache_get_row(0, 44, buffer, pSQL, sizeof(buffer)); // Slot 6
 				sscanf(buffer, "p<,>iifffffffff",
 					PlayerToys[extraid][6][toy_model],
 				    PlayerToys[extraid][6][toy_bone],
@@ -4186,7 +4186,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				    PlayerToys[extraid][6][toy_sy],
 				    PlayerToys[extraid][6][toy_sz]);
 				    
-                cache_get_row(0, 45, buffer, g_SQL_handle, sizeof(buffer)); // Slot 7
+                cache_get_row(0, 45, buffer, pSQL, sizeof(buffer)); // Slot 7
 				sscanf(buffer, "p<,>iifffffffff",
 					PlayerToys[extraid][7][toy_model],
 				    PlayerToys[extraid][7][toy_bone],
@@ -4200,7 +4200,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				    PlayerToys[extraid][7][toy_sy],
 				    PlayerToys[extraid][7][toy_sz]);
 				    
-                cache_get_row(0, 46, buffer, g_SQL_handle, sizeof(buffer)); // Slot 8
+                cache_get_row(0, 46, buffer, pSQL, sizeof(buffer)); // Slot 8
 				sscanf(buffer, "p<,>iifffffffff",
 					PlayerToys[extraid][8][toy_model],
 				    PlayerToys[extraid][8][toy_bone],
@@ -4214,7 +4214,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				    PlayerToys[extraid][8][toy_sy],
 				    PlayerToys[extraid][8][toy_sz]);
 				    
-                cache_get_row(0, 47, buffer, g_SQL_handle, sizeof(buffer)); // Slot 9
+                cache_get_row(0, 47, buffer, pSQL, sizeof(buffer)); // Slot 9
 				sscanf(buffer, "p<,>iifffffffff",
 					PlayerToys[extraid][9][toy_model],
 				    PlayerToys[extraid][9][toy_bone],
@@ -4228,7 +4228,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				    PlayerToys[extraid][9][toy_sy],
 				    PlayerToys[extraid][9][toy_sz]);
 				    
-                cache_get_row(0, 48, buffer, g_SQL_handle, sizeof(buffer)); // PV_Slot 0
+                cache_get_row(0, 48, buffer, pSQL, sizeof(buffer)); // PV_Slot 0
 				sscanf(buffer, "p<,>iiiiiiiiiiiiiiiiiiiiis[13]",
 				    PlayerPV[extraid][0][Model],
 				    PlayerPV[extraid][0][PaintJob],
@@ -4253,7 +4253,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				    PlayerPV[extraid][0][Mod17],
 				    PlayerPV[extraid][0][Plate]);
 				    
-                cache_get_row(0, 49, buffer, g_SQL_handle, sizeof(buffer)); // PV_Slot 1
+                cache_get_row(0, 49, buffer, pSQL, sizeof(buffer)); // PV_Slot 1
 				sscanf(buffer, "p<,>iiiiiiiiiiiiiiiiiiiiis[13]",
 				    PlayerPV[extraid][1][Model],
 				    PlayerPV[extraid][1][PaintJob],
@@ -4278,7 +4278,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				    PlayerPV[extraid][1][Mod17],
 				    PlayerPV[extraid][1][Plate]);
 				    
-                cache_get_row(0, 50, buffer, g_SQL_handle, sizeof(buffer)); // PV_Slot 2
+                cache_get_row(0, 50, buffer, pSQL, sizeof(buffer)); // PV_Slot 2
 				sscanf(buffer, "p<,>iiiiiiiiiiiiiiiiiiiiis[13]",
 				    PlayerPV[extraid][2][Model],
 				    PlayerPV[extraid][2][PaintJob],
@@ -4303,7 +4303,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				    PlayerPV[extraid][2][Mod17],
 				    PlayerPV[extraid][2][Plate]);
 
-                cache_get_row(0, 51, buffer, g_SQL_handle, sizeof(buffer)); // PV_Slot 3
+                cache_get_row(0, 51, buffer, pSQL, sizeof(buffer)); // PV_Slot 3
 				sscanf(buffer, "p<,>iiiiiiiiiiiiiiiiiiiiis[13]",
 				    PlayerPV[extraid][3][Model],
 				    PlayerPV[extraid][3][PaintJob],
@@ -4328,7 +4328,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				    PlayerPV[extraid][3][Mod17],
 				    PlayerPV[extraid][3][Plate]);
 				    
-                cache_get_row(0, 52, buffer, g_SQL_handle, sizeof(buffer)); // PV_Slot 4
+                cache_get_row(0, 52, buffer, pSQL, sizeof(buffer)); // PV_Slot 4
 				sscanf(buffer, "p<,>iiiiiiiiiiiiiiiiiiiiis[13]",
 				    PlayerPV[extraid][4][Model],
 				    PlayerPV[extraid][4][PaintJob],
@@ -4353,7 +4353,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				    PlayerPV[extraid][4][Mod17],
 				    PlayerPV[extraid][4][Plate]);
 				    
-                cache_get_row(0, 53, buffer, g_SQL_handle, sizeof(buffer)); // PV_Slot 5
+                cache_get_row(0, 53, buffer, pSQL, sizeof(buffer)); // PV_Slot 5
 				sscanf(buffer, "p<,>iiiiiiiiiiiiiiiiiiiiis[13]",
 				    PlayerPV[extraid][5][Model],
 				    PlayerPV[extraid][5][PaintJob],
@@ -4378,7 +4378,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				    PlayerPV[extraid][5][Mod17],
 				    PlayerPV[extraid][5][Plate]);
 				    
-                cache_get_row(0, 54, buffer, g_SQL_handle, sizeof(buffer)); // PV_Slot 6
+                cache_get_row(0, 54, buffer, pSQL, sizeof(buffer)); // PV_Slot 6
 				sscanf(buffer, "p<,>iiiiiiiiiiiiiiiiiiiiis[13]",
 				    PlayerPV[extraid][6][Model],
 				    PlayerPV[extraid][6][PaintJob],
@@ -4403,7 +4403,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				    PlayerPV[extraid][6][Mod17],
 				    PlayerPV[extraid][6][Plate]);
 				    
-                cache_get_row(0, 55, buffer, g_SQL_handle, sizeof(buffer)); // PV_Slot 7
+                cache_get_row(0, 55, buffer, pSQL, sizeof(buffer)); // PV_Slot 7
 				sscanf(buffer, "p<,>iiiiiiiiiiiiiiiiiiiiis[13]",
 				    PlayerPV[extraid][7][Model],
 				    PlayerPV[extraid][7][PaintJob],
@@ -4443,7 +4443,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				PlayerTextDrawSetString(extraid, TXTWantedsTD[extraid], gstr);
                 
 			    format(gstr2, sizeof(gstr2), "INSERT INTO `login_log` VALUES (NULL, %i, '%s', UNIX_TIMESTAMP(), 0);", PlayerInfo[extraid][AccountID], __GetIP(extraid));
-			    mysql_tquery(g_SQL_handle, gstr2, "", "");
+			    mysql_tquery(pSQL, gstr2, "", "");
                 
 				if(PlayerInfo[extraid][Level] > 0)
 				{
@@ -4484,21 +4484,21 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				}
 				
 				format(gstr2, sizeof(gstr2), "SELECT * FROM `queue` WHERE `Extra` = '%s';", __GetName(extraid));
-				mysql_tquery(g_SQL_handle, gstr2, "OnBoostReceive", "i", extraid);
+				mysql_tquery(pSQL, gstr2, "OnBoostReceive", "i", extraid);
 			}
 		}
 		case THREAD_LOAD_PLAYER_GANG:
 		{
 		    new rows, fields;
-		    cache_get_data(rows, fields, g_SQL_handle);
+		    cache_get_data(rows, fields, pSQL);
 
 		    if(rows > 0)
 		    {
 		        new buffer[25];
 
-		        cache_get_row(0, 0, buffer, g_SQL_handle, sizeof(buffer));
+		        cache_get_row(0, 0, buffer, pSQL, sizeof(buffer));
 		        strmid(PlayerInfo[extraid][GangName], buffer, 0, 25, 25);
-				cache_get_row(0, 1, buffer, g_SQL_handle, sizeof(buffer));
+				cache_get_row(0, 1, buffer, pSQL, sizeof(buffer));
 				strmid(PlayerInfo[extraid][GangTag], buffer, 0, 5, 5);
 
 				if(PlayerInfo[extraid][GangLabel] != Text3D:-1)
@@ -4517,11 +4517,11 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		case THREAD_ASSIGN_RANK:
 		{
 		    new rows, fields;
-		    cache_get_data(rows, fields, g_SQL_handle);
+		    cache_get_data(rows, fields, pSQL);
 
 	  		if(rows > 0)
 		    {
-				rows = cache_get_row_int(0, 0, g_SQL_handle);
+				rows = cache_get_row_int(0, 0, pSQL);
 				
 				if(PlayerInfo[extraid][GangPosition] == GANG_POS_LEADER || PlayerInfo[extraid][GangPosition] == GANG_POS_MAIN_LEADER)
 				{
@@ -4563,11 +4563,11 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		case THREAD_KICK_FROM_GANG:
 		{
 		    new rows, fields;
-		    cache_get_data(rows, fields, g_SQL_handle);
+		    cache_get_data(rows, fields, pSQL);
 
 	  		if(rows > 0)
 		    {
-				if(cache_get_row_int(0, 0, g_SQL_handle) == GANG_POS_MAIN_LEADER)
+				if(cache_get_row_int(0, 0, pSQL) == GANG_POS_MAIN_LEADER)
 				{
 				    SCM(extraid, -1, ""er"You cannot kick other the Founder!");
 				}
@@ -4592,7 +4592,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		case THREAD_CHECK_PLAYER_PASSWD:
 		{
 		    new rows, fields;
-		    cache_get_data(rows, fields, g_SQL_handle);
+		    cache_get_data(rows, fields, pSQL);
 
 	  		if(rows > 0) // correct password
 		    {
@@ -4610,12 +4610,12 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		}
 		case THREAD_CREATE_ACCOUNT2:
 		{
-		    PlayerInfo[extraid][AccountID] = cache_insert_id(g_SQL_handle);
+		    PlayerInfo[extraid][AccountID] = cache_insert_id(pSQL);
 		    PlayerInfo[extraid][bLogged] = true;
 		    
-			format(gstr, sizeof gstr, "["SVRSC"] %s(%i) "GREEN_E"has registered, making the server have a total of "LB2_E"%i "GREEN_E"players registered.", __GetName(extraid), extraid, cache_insert_id(g_SQL_handle));
+			format(gstr, sizeof gstr, "["SVRSC"] %s(%i) "GREEN_E"has registered, making the server have a total of "LB2_E"%i "GREEN_E"players registered.", __GetName(extraid), extraid, cache_insert_id(pSQL));
 			SCMToAll(COLOR_PINK, gstr);
-			format(gstr, sizeof(gstr), "5,9- RegServ -3,0 %s(%i) has registered making the server have a total of %i players registered.", __GetName(extraid), extraid, cache_insert_id(g_SQL_handle));
+			format(gstr, sizeof(gstr), "5,9- RegServ -3,0 %s(%i) has registered making the server have a total of %i players registered.", __GetName(extraid), extraid, cache_insert_id(pSQL));
 			IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 			format(gstr, sizeof(gstr), "~b~~h~~h~Welcome to "SVRSC", ~r~~h~~h~%s~b~~h~~h~!~n~~b~~h~~h~You have successfully registered and logged in!", __GetName(extraid));
 			InfoTD_MSG(extraid, 5000, gstr);
@@ -4629,7 +4629,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		}
 		case THREAD_CREATE_ACCOUNT:
 		{
-		    PlayerInfo[extraid][AccountID] = cache_insert_id(g_SQL_handle);
+		    PlayerInfo[extraid][AccountID] = cache_insert_id(pSQL);
 		    PlayerInfo[extraid][RegDate] = gettime();
 			PlayerInfo[extraid][ExitType] = EXIT_LOGGED;
 			PlayerInfo[extraid][PayDay] = 60;
@@ -4638,9 +4638,9 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		    PlayerInfo[extraid][Wanteds] = 0;
 		    PlayerInfo[extraid][bLogged] = true;
 		    
-			format(gstr, sizeof gstr, "["SVRSC"] %s(%i) "GREEN_E"has registered, making the server have a total of "LB2_E"%i "GREEN_E"players registered.", __GetName(extraid), extraid, cache_insert_id(g_SQL_handle));
+			format(gstr, sizeof gstr, "["SVRSC"] %s(%i) "GREEN_E"has registered, making the server have a total of "LB2_E"%i "GREEN_E"players registered.", __GetName(extraid), extraid, cache_insert_id(pSQL));
 			SCMToAll(COLOR_PINK, gstr);
-			format(gstr, sizeof(gstr), "5,9- RegServ -3,0 %s(%i) has registered making the server have a total of %i players registered.", __GetName(extraid), extraid, cache_insert_id(g_SQL_handle));
+			format(gstr, sizeof(gstr), "5,9- RegServ -3,0 %s(%i) has registered making the server have a total of %i players registered.", __GetName(extraid), extraid, cache_insert_id(pSQL));
 			IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 			format(gstr, sizeof(gstr), "~b~~h~~h~Welcome to "SVRSC", ~r~~h~~h~%s~b~~h~~h~!~n~~b~~h~~h~You have successfully registered and logged in!", __GetName(extraid));
 			InfoTD_MSG(extraid, 5000, gstr);
@@ -4663,7 +4663,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 	 	case THREAD_GANG_EXIST:
 	 	{
 		    new rows, fields;
-		    cache_get_data(rows, fields, g_SQL_handle);
+		    cache_get_data(rows, fields, pSQL);
 
 			if(rows == 0)
 	 		{
@@ -6334,7 +6334,7 @@ public OnPlayerEnterRaceCheckpoint(playerid)
 			}
 			
 			format(gstr, sizeof(gstr), "UPDATE `accounts` SET `RacePoints` = `RacePoints` + %i WHERE `Name` = '%s' LIMIT 1;", points, __GetName(playerid));
-			mysql_tquery(g_SQL_handle, gstr, "", "");
+			mysql_tquery(pSQL, gstr, "", "");
 			
 			format(gstr, sizeof(gstr), "» %s(%i) has finished the race %i. in %02i:%02i.%03i", __GetName(playerid), playerid, g_rPosition, rTime[0], rTime[1], rTime[2]);
 			SCMToAll(YELLOW, gstr);
@@ -6347,7 +6347,7 @@ public OnPlayerEnterRaceCheckpoint(playerid)
 			    if(islogged(playerid))
 			    {
 				    format(gstr, sizeof(gstr), "INSERT INTO `race_records` VALUES (NULL, %i, '%s', %i);", g_NextRace, __GetName(playerid), TotalRaceTime);
-				    mysql_tquery(g_SQL_handle, gstr, "OnQueryFinish", "siii", gstr, THREAD_RACE_FINISH, g_rPosition, g_SQL_handle);
+				    mysql_tquery(pSQL, gstr, "OnQueryFinish", "siii", gstr, THREAD_RACE_FINISH, g_rPosition, pSQL);
 				}
 			}
 			else if(TotalRaceTime < 40000) // Do not save cheaters time
@@ -8796,7 +8796,7 @@ YCMD:enter(playerid, params[], help)
 
 YCMD:charts(playerid, params[], help)
 {
-	mysql_tquery(g_SQL_handle, "SELECT `quantity`, `price` FROM `sells` WHERE `item` = 2;", "OnChartRecv", "i", playerid);
+	mysql_tquery(pSQL, "SELECT `quantity`, `price` FROM `sells` WHERE `item` = 2;", "OnChartRecv", "i", playerid);
 	return 1;
 }
 
@@ -8805,8 +8805,8 @@ function:OnChartRecv(playerid)
 	new items, pric3;
 	for(new i = 0; i < cache_get_row_count(); i++)
 	{
-		items += cache_get_row_int(i, 0, g_SQL_handle);
-		pric3 += cache_get_row_int(i, 1, g_SQL_handle);
+		items += cache_get_row_int(i, 0, pSQL);
+		pric3 += cache_get_row_int(i, 1, pSQL);
 	}
 	format(gstr, sizeof(gstr), "Average price for 1000GC is $%s, based on %i transactions.", number_format((pric3 / items) * 1000), cache_get_row_count());
 	SCM(playerid, -1, gstr);
@@ -8890,7 +8890,7 @@ YCMD:buygc(playerid, params[], help)
 		MySQL_SavePlayer(PlayerInfo[playerid][GCPlayer], false);
 
 	    format(gstr2, sizeof(gstr2), "INSERT INTO `sells` VALUES (NULL, 2, %i, %i, %i, %i);", PlayerInfo[playerid][GCOffer], PlayerInfo[playerid][GCPrice], PlayerInfo[PlayerInfo[playerid][GCPlayer]][AccountID], PlayerInfo[playerid][AccountID]);
-	    mysql_tquery(g_SQL_handle, gstr2, "", "");
+	    mysql_tquery(pSQL, gstr2, "", "");
 
 	    format(gstr, sizeof(gstr), ""blue"You have accepted %s's offer and bough %sGC for $%s", __GetName(PlayerInfo[playerid][GCPlayer]), number_format(PlayerInfo[playerid][GCOffer]), number_format(PlayerInfo[playerid][GCPrice]));
 	    SCM(playerid, -1, gstr);
@@ -9043,7 +9043,7 @@ YCMD:buyvip(playerid, params[], help)
 		MySQL_SavePlayer(PlayerInfo[playerid][VIPPlayer], false);
 
 	    format(gstr2, sizeof(gstr2), "INSERT INTO `sells` VALUES (NULL, 1, 1, %i, %i, %i);", PlayerInfo[playerid][VIPOffer], PlayerInfo[PlayerInfo[playerid][VIPPlayer]][AccountID], PlayerInfo[playerid][AccountID]);
-	    mysql_tquery(g_SQL_handle, gstr2, "", "");
+	    mysql_tquery(pSQL, gstr2, "", "");
 
 	    format(gstr, sizeof(gstr), ""blue"You have accepted %s's offer and bough VIP for $%s", __GetName(PlayerInfo[playerid][VIPPlayer]), number_format(PlayerInfo[playerid][VIPOffer]));
 	    SCM(playerid, -1, gstr);
@@ -9863,11 +9863,11 @@ YCMD:adminhelp(playerid, params[], help)
 		
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[3][e_rank]);
 		strcat(string, gstr);
-		strcat(string, "/freeze /eject /go /burn /getip /mkick /clearchat /iplookup\n/giveweapon /announce /connectbots /raceforcemap /deleterecord\n\n");
+		strcat(string, "/freeze /eject /go /burn /getip /get /mkick /clearchat /iplookup\n/giveweapon /announce /connectbots /raceforcemap /deleterecord\n\n");
 		
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[4][e_rank]);
 		strcat(string, gstr);
-		strcat(string, "/unban /oban /sethealth /get /healall /armorall /cashfall\n/scorefall /announce2\n\n");
+		strcat(string, "/unban /oban /sethealth /healall /armorall /cashfall\n/scorefall /announce2\n\n");
 		
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[5][e_rank]);
 		strcat(string, gstr);
@@ -10315,14 +10315,14 @@ YCMD:onlinefix(playerid, params[], help)
 {
 	if(PlayerInfo[playerid][Level] >= MAX_ADMIN_LEVEL)
 	{
-	    mysql_query(g_SQL_handle, "TRUNCATE TABLE `online`;", false);
+	    mysql_query(pSQL, "TRUNCATE TABLE `online`;", false);
 	    
 	    for(new i = 0; i < MAX_PLAYERS; i++)
 	    {
 	        if(IsPlayerConnected(i) && !IsPlayerNPC(i))
 	        {
 				format(gstr, sizeof(gstr), "INSERT INTO `online` VALUES (NULL, '%s', '%s', UNIX_TIMESTAMP());", __GetName(i), __GetIP(i));
-				mysql_tquery(g_SQL_handle, gstr, "", "");
+				mysql_tquery(pSQL, gstr, "", "");
 	        }
 	    }
 	    
@@ -10781,7 +10781,7 @@ YCMD:iplookup(playerid, params[], help)
 	    if(strlen(gstr) > 16 || strlen(gstr) < 7) return SCM(playerid, -1, ""er"This is not an IP");
 	    
 	    new escape[17];
-	    mysql_escape_string(gstr, escape, g_SQL_handle, sizeof(escape));
+	    mysql_escape_string(gstr, escape, pSQL, sizeof(escape));
 
 		if(badsql(escape) != 0)
 		{
@@ -10789,7 +10789,7 @@ YCMD:iplookup(playerid, params[], help)
 		}
 
 	    format(gstr, sizeof(gstr), "SELECT `Name` FROM `accounts` WHERE `IP` = '%s' AND `Level` != 5;", escape);
-	    mysql_tquery(g_SQL_handle, gstr, "OnIpLookUp", "is", playerid, escape);
+	    mysql_tquery(pSQL, gstr, "OnIpLookUp", "is", playerid, escape);
 	}
 	else
 	{
@@ -11244,13 +11244,13 @@ YCMD:ncrecords(playerid, params[], help)
 	new name[25];
 	if(sscanf(params, "s[24]", name))
 	{
-		mysql_tquery(g_SQL_handle, "SELECT * FROM `ncrecords` ORDER BY `ID` DESC LIMIT 10;", "OnNCReceive", "i", playerid);
+		mysql_tquery(pSQL, "SELECT * FROM `ncrecords` ORDER BY `ID` DESC LIMIT 10;", "OnNCReceive", "i", playerid);
 	}
 	else
 	{
 		new query[255];
 		format(query, sizeof(query), "SELECT * FROM `ncrecords` WHERE `OldName` = '%s' OR `NewName` = '%s';", name, name);
-		mysql_tquery(g_SQL_handle, query, "OnNCReceive2", "is", playerid, name);
+		mysql_tquery(pSQL, query, "OnNCReceive2", "is", playerid, name);
 	}
 	return 1;
 }
@@ -11692,7 +11692,7 @@ YCMD:grename(playerid, params[], help)
 	}
 	
 	new gangname[21];
-	mysql_escape_string(buff, gangname, g_SQL_handle, 21);
+	mysql_escape_string(buff, gangname, pSQL, 21);
 
 	if(badsql(buff, false) != 0)
 	{
@@ -11708,7 +11708,7 @@ YCMD:grename(playerid, params[], help)
 	}
 
 	new gangtag[5];
-	mysql_escape_string(buff2, gangtag, g_SQL_handle, 5);
+	mysql_escape_string(buff2, gangtag, pSQL, 5);
 
 	MySQL_GangRename(playerid, gangname, gangtag);
 	return 1;
@@ -11732,7 +11732,7 @@ YCMD:gzonecreate(playerid, params[], help)
 		    return SCM(playerid, NEF_GREEN, "Usage: /gzonecreate <zone name>");
 		}
 		new zonename[40];
-		mysql_escape_string(tmp, zonename, g_SQL_handle, sizeof(zonename));
+		mysql_escape_string(tmp, zonename, pSQL, sizeof(zonename));
 		
         strmid(GZoneInfo[gzoneid][sZoneName], zonename, 0, 40, 40);
 
@@ -11755,8 +11755,8 @@ YCMD:gzonecreate(playerid, params[], help)
 			GZoneInfo[gzoneid][localGang],
 			GZoneInfo[gzoneid][iLocked]);
 			
-		mysql_tquery(g_SQL_handle, gstr2, "", "");
-	    mysql_tquery(g_SQL_handle, "SELECT * FROM `gzones` ORDER BY `id` DESC LIMIT 1;", "OnGangZoneLoadEx", "i", gzoneid);
+		mysql_tquery(pSQL, gstr2, "", "");
+	    mysql_tquery(pSQL, "SELECT * FROM `gzones` ORDER BY `id` DESC LIMIT 1;", "OnGangZoneLoadEx", "i", gzoneid);
 	    
 	    gzoneid++;
 	}
@@ -11824,7 +11824,7 @@ YCMD:gdestroy(playerid, params[], help)
 		    return SCM(playerid, NEF_GREEN, "Usage: /gdestroy <exact gang name>");
 		}
 		new escape[21];
-		mysql_escape_string(to_destroy, escape, g_SQL_handle, 21);
+		mysql_escape_string(to_destroy, escape, pSQL, 21);
 		MySQL_DestroyGang(playerid, escape);
 	}
 	else
@@ -11883,7 +11883,7 @@ YCMD:gcreate(playerid, params[], help)
 	    CancelGangCreation(playerid);
 		return SCM(playerid, -1, ""er"Not possible");
 	}
-	mysql_escape_string(ntmp, PlayerInfo[playerid][GangName], g_SQL_handle, 21);
+	mysql_escape_string(ntmp, PlayerInfo[playerid][GangName], pSQL, 21);
 
 	if(badsql(ttmp, false) != 0)
 	{
@@ -11900,7 +11900,7 @@ YCMD:gcreate(playerid, params[], help)
 	 	CancelGangCreation(playerid);
 		return SCM(playerid, -1, ""er"Do not add [ or ]");
 	}
-	mysql_escape_string(ttmp, PlayerInfo[playerid][GangTag], g_SQL_handle, 5);
+	mysql_escape_string(ttmp, PlayerInfo[playerid][GangTag], pSQL, 5);
 
     PlayerInfo[playerid][tickLastGCreate] = tick;
     MySQL_ExistGang(playerid);
@@ -12407,7 +12407,7 @@ YCMD:gcolor(playerid, params[], help)
 		new col = RGBA(r, g, b, 255);
 
 		format(gstr, sizeof(gstr), "UPDATE `gangs` SET `Color` = %i WHERE `ID` = %i;", col, PlayerInfo[playerid][GangID]);
-		mysql_tquery(g_SQL_handle, gstr, "", "");
+		mysql_tquery(pSQL, gstr, "", "");
 
 	    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s set the gang color to {%06x}NEW COLOR", __GetName(playerid), col >>> 8);
 		GangMSG(PlayerInfo[playerid][GangID], gstr);
@@ -12430,13 +12430,13 @@ YCMD:gcar(playerid, params[], help)
 	        if(IsPlayerInRangeOfPoint(playerid, 65.0, 1797.3141, -1302.0978, 120.2659) && PlayerInfo[playerid][Level] < 1) return SCM(playerid, -1, ""er"Can't spawn vehicle at this place!");
 	        
 	        format(gstr, sizeof(gstr), "SELECT `Vehicle` FROM `gangs` WHERE `ID` = %i LIMIT 1;", PlayerInfo[playerid][GangID]);
-			new Cache:res = mysql_query(g_SQL_handle, gstr);
+			new Cache:res = mysql_query(pSQL, gstr);
 			
-			if(cache_get_row_count(g_SQL_handle) != 0)
+			if(cache_get_row_count(pSQL) != 0)
 			{
-			    if(IsValidVehicleModel(cache_get_row_int(0, 0, g_SQL_handle)))
+			    if(IsValidVehicleModel(cache_get_row_int(0, 0, pSQL)))
 				{
-					CarSpawner(playerid, cache_get_row_int(0, 0, g_SQL_handle), 120);
+					CarSpawner(playerid, cache_get_row_int(0, 0, pSQL), 120);
 				}
 				else
 				{
@@ -12483,7 +12483,7 @@ YCMD:gcar(playerid, params[], help)
 			if(gcar != -1)
 			{
 				format(gstr, sizeof(gstr), "UPDATE `gangs` SET `Vehicle` = %i WHERE `ID` = %i;", gcar, PlayerInfo[playerid][GangID]);
-				mysql_tquery(g_SQL_handle, gstr, "", "");
+				mysql_tquery(pSQL, gstr, "", "");
 
 			    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s set the gang vehicle to %s", __GetName(playerid), VehicleNames[gcar - 400]);
 				GangMSG(PlayerInfo[playerid][GangID], gstr);
@@ -12510,7 +12510,7 @@ YCMD:unban(playerid, params[], help)
 	    if(__GetPlayerID(gstr) != INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Player seems to be online!");
 
 	    new escape[25];
-	    mysql_escape_string(gstr, escape, g_SQL_handle, sizeof(escape));
+	    mysql_escape_string(gstr, escape, pSQL, sizeof(escape));
 
 		if(badsql(escape) != 0)
 		{
@@ -12518,7 +12518,7 @@ YCMD:unban(playerid, params[], help)
 		}
 
 	    format(gstr, sizeof(gstr), "SELECT `ID` FROM `bans` WHERE `PlayerName` = '%s' LIMIT 1;", escape);
-	    mysql_tquery(g_SQL_handle, gstr, "OnUnbanAttempt", "is", playerid, escape);
+	    mysql_tquery(pSQL, gstr, "OnUnbanAttempt", "is", playerid, escape);
 	}
 	else
 	{
@@ -12542,8 +12542,8 @@ YCMD:oban(playerid, params[], help)
 	    if(__GetPlayerID(player) != INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Player seems to be online!");
 
 	    new escape[25], ereason[128];
-	    mysql_escape_string(player, escape, g_SQL_handle, sizeof(escape));
-	    mysql_escape_string(reason, ereason, g_SQL_handle, sizeof(ereason));
+	    mysql_escape_string(player, escape, pSQL, sizeof(escape));
+	    mysql_escape_string(reason, ereason, pSQL, sizeof(ereason));
 
 		if(badsql(escape) != 0 || badsql(ereason, false) != 0)
 		{
@@ -12551,7 +12551,7 @@ YCMD:oban(playerid, params[], help)
 		}
 
 	    format(player, sizeof(player), "SELECT `AdminName` FROM `bans` WHERE `PlayerName` = '%s' LIMIT 1;", escape);
-	    mysql_tquery(g_SQL_handle, player, "OnOfflineBanAttempt", "iss", playerid, escape, ereason);
+	    mysql_tquery(pSQL, player, "OnOfflineBanAttempt", "iss", playerid, escape, ereason);
 	}
 	else
 	{
@@ -12715,7 +12715,7 @@ YCMD:resetrc(playerid, params[], help)
 	{
 	    if(!strcmp(params, "all", true))
 	    {
-			mysql_tquery(g_SQL_handle, "TRUNCATE TABLE `race_records`;", "", "");
+			mysql_tquery(pSQL, "TRUNCATE TABLE `race_records`;", "", "");
 			SCM(playerid, -1, ""er"All race records have been deleted!");
 	    }
 		else
@@ -12733,7 +12733,7 @@ YCMD:resetrc(playerid, params[], help)
 			}
 
 			format(gstr, sizeof(gstr), "DELETE FROM `race_records` WHERE `track` = %i;", map);
-			mysql_tquery(g_SQL_handle, gstr, "", "");
+			mysql_tquery(pSQL, gstr, "", "");
 			SCM(playerid, -1, ""er"Race records of the specific race have been deleted!");
 		}
 	}
@@ -12761,7 +12761,7 @@ YCMD:deleterecord(playerid, params[], help)
 		}
 		
 		format(gstr, sizeof(gstr), "SELECT `id` FROM `race_records` WHERE `track` = %i ORDER BY `time` ASC LIMIT 1;", map);
-		mysql_tquery(g_SQL_handle, gstr, "OnRaceRecordPurged", "ii", playerid, map);
+		mysql_tquery(pSQL, gstr, "OnRaceRecordPurged", "ii", playerid, map);
 	}
 	else
 	{
@@ -14149,19 +14149,19 @@ YCMD:sethouseowner(playerid, params[], help)
 
 	if(strlen(owner) > 21 || strlen(owner) < 3) return SCM(playerid, -1, ""er"Invalid name");
 	
-	mysql_escape_string(owner, owner, g_SQL_handle, sizeof(owner));
+	mysql_escape_string(owner, owner, pSQL, sizeof(owner));
 	format(gstr, sizeof(gstr), "SELECT `Houses`, `AdditionalHouseSlots` FROM `accounts` WHERE `Name` = '%s'", owner);
-	mysql_query(g_SQL_handle, gstr, false);
+	mysql_query(pSQL, gstr, false);
 
 	new houses = 0, addslots = 0;
-	if(cache_get_row_count(g_SQL_handle) == 0)
+	if(cache_get_row_count(pSQL) == 0)
 	{
 		return SCM(playerid, -1, ""er"Player does not exist");
 	}
 	else
 	{
-	    houses = cache_get_row_int(0, 0, g_SQL_handle);
-	    slots = cache_get_row_int(0, 1, g_SQL_handle);
+	    houses = cache_get_row_int(0, 0, pSQL);
+	    slots = cache_get_row_int(0, 1, pSQL);
 	}
 	
 	if(houses
@@ -14264,7 +14264,7 @@ YCMD:resethouse(playerid, params[], help)
 		else
 		{
 			format(gstr, sizeof(gstr), "UPDATE `accounts` SET `Houses` = `Houses` - 1 WHERE `Name` = '%s' LIMIT 1;", HouseInfo[i][Owner]);
-			mysql_tquery(g_SQL_handle, gstr, "", "");
+			mysql_tquery(pSQL, gstr, "", "");
 		}
 		
 	    strmid(HouseInfo[i][Owner], "ForSale", 0, 25, 25);
@@ -14363,7 +14363,7 @@ YCMD:resetbizz(playerid, params[], help)
 		if(!pfound)
 		{
 			format(gstr, sizeof(gstr), "UPDATE `accounts` SET `Props` = `Props` - 1 WHERE `Name` = '%s' LIMIT 1;", PropInfo[i][Owner]);
-			mysql_tquery(g_SQL_handle, gstr, "", "");
+			mysql_tquery(pSQL, gstr, "", "");
 		}
 	    strmid(PropInfo[i][Owner], "ForSale", 0, 25, 25);
 	    PropInfo[i][sold] = 0;
@@ -14443,8 +14443,8 @@ YCMD:createbizz(playerid, params[], help)
 	 	PropInfo[propid][E_y],
 		PropInfo[propid][E_z]);
 
-    mysql_tquery(g_SQL_handle, query, "", "");
-    mysql_tquery(g_SQL_handle, "SELECT * FROM `props` ORDER BY `ID` DESC LIMIT 1;", "OnPropLoadEx", "i", propid);
+    mysql_tquery(pSQL, query, "", "");
+    mysql_tquery(pSQL, "SELECT * FROM `props` ORDER BY `ID` DESC LIMIT 1;", "OnPropLoadEx", "i", propid);
 
     propid++;
     return 1;
@@ -14496,8 +14496,8 @@ YCMD:createhouse(playerid, params[], help)
 	    HouseInfo[houseid][locked],
 		HouseInfo[houseid][date]);
 
-    mysql_tquery(g_SQL_handle, query, "", "");
-    mysql_tquery(g_SQL_handle, "SELECT * FROM `houses` ORDER BY `ID` DESC LIMIT 1;", "OnHouseLoadEx", "i", houseid);
+    mysql_tquery(pSQL, query, "", "");
+    mysql_tquery(pSQL, "SELECT * FROM `houses` ORDER BY `ID` DESC LIMIT 1;", "OnHouseLoadEx", "i", houseid);
 
     houseid++;
     return 1;
@@ -15187,14 +15187,14 @@ YCMD:gangs(playerid, params[], help)
 
 YCMD:gtop(playerid, params[], help)
 {
-	mysql_tquery(g_SQL_handle, "SELECT `GangName`, `GangTag`, `GangScore`, `Color` FROM `gangs` ORDER BY `GangScore` DESC LIMIT 30;", "OnGTopReceived", "i", playerid);
+	mysql_tquery(pSQL, "SELECT `GangName`, `GangTag`, `GangScore`, `Color` FROM `gangs` ORDER BY `GangScore` DESC LIMIT 30;", "OnGTopReceived", "i", playerid);
 	return 1;
 }
 
 function:OnGTopReceived(playerid)
 {
 	new rows, fields;
-	cache_get_data(rows, fields, g_SQL_handle);
+	cache_get_data(rows, fields, pSQL);
 	
 	if(rows > 0)
 	{
@@ -15202,14 +15202,14 @@ function:OnGTopReceived(playerid)
 	    strcat(finstring, ""white"");
 	    for(new i = 0; i < rows; i++)
 	    {
-	        cache_get_row(i, 0, tmp, g_SQL_handle, sizeof(tmp));
-	        cache_get_row(i, 1, tmp2, g_SQL_handle, sizeof(tmp2));
-	        new col = cache_get_row_int(i, 3, g_SQL_handle);
+	        cache_get_row(i, 0, tmp, pSQL, sizeof(tmp));
+	        cache_get_row(i, 1, tmp2, pSQL, sizeof(tmp2));
+	        new col = cache_get_row_int(i, 3, pSQL);
 	        if(col != 0)
 	        {
-	        	format(tmpstring, sizeof(tmpstring), "{%06x}%i - [%s]%s [%i]\n", col >>> 8, i + 1, tmp2, tmp, cache_get_row_int(i, 2, g_SQL_handle));
+	        	format(tmpstring, sizeof(tmpstring), "{%06x}%i - [%s]%s [%i]\n", col >>> 8, i + 1, tmp2, tmp, cache_get_row_int(i, 2, pSQL));
 			}
-			else format(tmpstring, sizeof(tmpstring), ""white"%i - [%s]%s [%i]\n", i + 1, tmp2, tmp, cache_get_row_int(i, 2, g_SQL_handle));
+			else format(tmpstring, sizeof(tmpstring), ""white"%i - [%s]%s [%i]\n", i + 1, tmp2, tmp, cache_get_row_int(i, 2, pSQL));
 			strcat(finstring, tmpstring);
 	    }
 	    ShowPlayerDialog(playerid, TOP_GANGS_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" :: Top Gangs", finstring, "OK", "");
@@ -15732,7 +15732,7 @@ YCMD:changename(playerid, params[], help)
     if(!islogged(playerid)) return notlogged(playerid);
 
 	format(gstr, sizeof(gstr), "SELECT `ip` FROM `sessions` WHERE `user_name` = '%s';", __GetName(playerid));
-	mysql_tquery(g_SQL_handle, gstr, "OnSessionCheck", "i", playerid);
+	mysql_tquery(pSQL, gstr, "OnSessionCheck", "i", playerid);
 	return 1;
 }
 
@@ -16266,6 +16266,7 @@ YCMD:lotto(playerid, params[], help)
 	    return SCM(playerid, NEF_GREEN, "Usage: /lotto <1-75>");
 	}
 	
+	if(lotto < 1 || lotto > 75) return SCM(playerid, -1, ""er"Invalid lotto number");
 	if(Iter_Contains(LottoNumbersUsed, lotto)) return SCM(playerid, -1, ""er"This lotto number is already in use!");
 	
 	PlayerInfo[playerid][DrawnNumber] = lotto;
@@ -17431,7 +17432,7 @@ public OnVehicleSpawn(vehicleid)
 function:OnPlayerNameChangeRequest(newname[], playerid)
 {
 	new rows, fields;
-	cache_get_data(rows, fields, g_SQL_handle);
+	cache_get_data(rows, fields, pSQL);
 	
 	if(rows > 0)
 	{
@@ -17478,25 +17479,25 @@ function:OnPlayerNameChangeRequest(newname[], playerid)
             }
             
             format(query, sizeof(query), "UPDATE `accounts` SET `Name` = '%s' WHERE `Name` = '%s' LIMIT 1;", newname, oldname);
-            mysql_tquery(g_SQL_handle, query, "", "");
+            mysql_tquery(pSQL, query, "", "");
             
             format(query, sizeof(query), "UPDATE `race_records` SET `name` = '%s' WHERE `name` = '%s';", newname, oldname);
-            mysql_tquery(g_SQL_handle, query, "", "");
+            mysql_tquery(pSQL, query, "", "");
             
             format(query, sizeof(query), "INSERT INTO `ncrecords` VALUES (NULL, '%s', '%s', %i);", oldname, newname, gettime());
-            mysql_tquery(g_SQL_handle, query, "", "");
+            mysql_tquery(pSQL, query, "", "");
             
             format(query, sizeof(query), "UPDATE `queue` SET `Extra` = '%s' WHERE `Extra` = '%s';", newname, oldname);
-            mysql_tquery(g_SQL_handle, query, "", "");
+            mysql_tquery(pSQL, query, "", "");
 
             format(query, sizeof(query), "UPDATE `online` SET `name` = '%s' WHERE `name` = '%s';", newname, oldname);
-            mysql_tquery(g_SQL_handle, query, "", "");
+            mysql_tquery(pSQL, query, "", "");
             
             format(query, sizeof(query), "UPDATE `creditsorder` SET `receiver` = '%s' WHERE `receiver` = '%s';", newname, oldname);
-            mysql_tquery(g_SQL_handle, query, "", "");
+            mysql_tquery(pSQL, query, "", "");
 
             format(query, sizeof(query), "UPDATE `viporder` SET `receiver` = '%s' WHERE `receiver` = '%s';", newname, oldname);
-            mysql_tquery(g_SQL_handle, query, "", "");
+            mysql_tquery(pSQL, query, "", "");
 
 			PlayerInfo[playerid][LastNameChange] = gettime();
 			
@@ -18000,7 +18001,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				ShowInfo(playerid, "Item purchased", gstr, 5000);
                 
                 format(gstr, sizeof(gstr), "INSERT INTO `queue` VALUES (NULL, 2, UNIX_TIMESTAMP() + 86400, '%s');", __GetName(playerid));
-                mysql_tquery(g_SQL_handle, gstr, "", "");
+                mysql_tquery(pSQL, gstr, "", "");
                 
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[8][E_item_credits]);
 
@@ -18030,7 +18031,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				ShowInfo(playerid, "Item purchased", gstr, 5000);
 				
                 format(gstr, sizeof(gstr), "INSERT INTO `queue` VALUES (NULL, 3, UNIX_TIMESTAMP() + 86400, '%s');", __GetName(playerid));
-                mysql_tquery(g_SQL_handle, gstr, "", "");
+                mysql_tquery(pSQL, gstr, "", "");
                 
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[9][E_item_credits]);
 
@@ -18060,7 +18061,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				ShowInfo(playerid, "Item purchased", gstr, 5000);
                 
                 format(gstr, sizeof(gstr), "INSERT INTO `queue` VALUES (NULL, 4, UNIX_TIMESTAMP() + 86400, '%s');", __GetName(playerid));
-                mysql_tquery(g_SQL_handle, gstr, "", "");
+                mysql_tquery(pSQL, gstr, "", "");
                 
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[10][E_item_credits]);
 
@@ -18090,7 +18091,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				ShowInfo(playerid, "Item purchased", gstr, 5000);
                 
                 format(gstr, sizeof(gstr), "INSERT INTO `queue` VALUES (NULL, 5, UNIX_TIMESTAMP() + 86400, '%s');", __GetName(playerid));
-                mysql_tquery(g_SQL_handle, gstr, "", "");
+                mysql_tquery(pSQL, gstr, "", "");
                 
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[11][E_item_credits]);
 
@@ -18120,7 +18121,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				ShowInfo(playerid, "Item purchased", gstr, 5000);
                 
                 format(gstr2, sizeof(gstr2), "INSERT INTO `queue` VALUES (NULL, 6, UNIX_TIMESTAMP() + 86400, '%s');", __GetName(playerid));
-                mysql_tquery(g_SQL_handle, gstr2, "", "");
+                mysql_tquery(pSQL, gstr2, "", "");
                 
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[12][E_item_credits]);
 
@@ -18816,10 +18817,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	            if(!strcmp(inputtext, __GetName(playerid), true)) return SCM(playerid, -1, ""er"The name only differs in case. Just relog with that.");
 
 				new newname[MAX_PLAYER_NAME+1], query[255];
-				mysql_escape_string(inputtext, newname, g_SQL_handle, MAX_PLAYER_NAME+1);
+				mysql_escape_string(inputtext, newname, pSQL, MAX_PLAYER_NAME+1);
 				
                 format(query, sizeof(query), "SELECT `ID` FROM `accounts` WHERE `Name` = '%s';", newname);
-                mysql_tquery(g_SQL_handle, query, "OnPlayerNameChangeRequest", "si", newname, playerid);
+                mysql_tquery(pSQL, query, "OnPlayerNameChangeRequest", "si", newname, playerid);
 	            return true;
 	        }
 	        case HAREFILL_DIALOG:
@@ -18861,7 +18862,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			    
 	            if(strlen(inputtext) > MAX_PLAYER_NAME+1 || strlen(inputtext) < 3) return SCM(playerid, -1, ""er"Player doesn't exist");
 	            if(sscanf(inputtext, "s[26]", PlayerInfo[playerid][GangAssignRank])) return SCM(playerid, -1, ""er"Player doesn't exist");
-	            mysql_escape_string(PlayerInfo[playerid][GangAssignRank], PlayerInfo[playerid][GangAssignRank], g_SQL_handle, MAX_PLAYER_NAME+1);
+	            mysql_escape_string(PlayerInfo[playerid][GangAssignRank], PlayerInfo[playerid][GangAssignRank], pSQL, MAX_PLAYER_NAME+1);
 
 				new ID = __GetPlayerID(PlayerInfo[playerid][GangAssignRank]);
 				
@@ -18891,7 +18892,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        {
 	            new query[255];
 				format(query, sizeof(query), "UPDATE `accounts` SET `GangPosition` = 0, `GangID` = 0 WHERE `GangID` = %i;", PlayerInfo[playerid][GangID]);
-				mysql_tquery(g_SQL_handle, query, "", "");
+				mysql_tquery(pSQL, query, "", "");
 
 				GangMSG(PlayerInfo[playerid][GangID], ""gang_sign" "r_besch"The gang has been closed by it's Leader");
 
@@ -18938,7 +18939,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 
 				format(query, sizeof(query), "DELETE FROM `gangs` WHERE `ID` = %i LIMIT 1;", PlayerInfo[playerid][GangID]);
-				mysql_tquery(g_SQL_handle, query, "", "");
+				mysql_tquery(pSQL, query, "", "");
 
 			    PlayerInfo[playerid][gInvite] = false;
 			    PlayerInfo[playerid][GangID] = 0;
@@ -18967,7 +18968,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        
 	            if(strlen(inputtext) > MAX_PLAYER_NAME+1 || strlen(inputtext) < 3) return SCM(playerid, -1, ""er"Player doesn't exist");
 	            if(sscanf(inputtext, "s[26]", PlayerInfo[playerid][GangKickMem])) return SCM(playerid, -1, ""er"Player doesn't exist");
-	            mysql_escape_string(PlayerInfo[playerid][GangKickMem], PlayerInfo[playerid][GangKickMem], g_SQL_handle, MAX_PLAYER_NAME+1);
+	            mysql_escape_string(PlayerInfo[playerid][GangKickMem], PlayerInfo[playerid][GangKickMem], pSQL, MAX_PLAYER_NAME+1);
 
 		  		new ID = __GetPlayerID(PlayerInfo[playerid][GangKickMem]);
 
@@ -19707,10 +19708,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return SkipLogin(playerid);
 				}
 				new escape[33];
-				mysql_escape_string(password, escape, g_SQL_handle, 33);
+				mysql_escape_string(password, escape, pSQL, 33);
 
 				format(gstr2, sizeof(gstr2), "SELECT `ID` FROM `accounts` WHERE `Name` = '%s' AND (`Hash` = MD5('%s') OR `Hash` = SHA1('%s')) LIMIT 1;", __GetName(playerid), escape, escape); // SHA1 because of Stunt Evolution server merge
-				mysql_tquery(g_SQL_handle, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_CHECK_PLAYER_PASSWD, playerid, g_SQL_handle);
+				mysql_tquery(pSQL, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_CHECK_PLAYER_PASSWD, playerid, pSQL);
 			    return true;
 			}
 			case REGISTER_DIALOG2:
@@ -20475,7 +20476,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			 		ShowDialog(playerid, VEHICLE_PLATE_DIALOG);
 					return 1;
 				}
-				mysql_escape_string(PlayerPVTMPPlate[playerid], PlayerPVTMPPlate[playerid], g_SQL_handle, 13);
+				mysql_escape_string(PlayerPVTMPPlate[playerid], PlayerPVTMPPlate[playerid], pSQL, 13);
 				
 				PVSlotSelect(playerid);
 				return true;
@@ -20501,7 +20502,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				 	return 1;
 				}
 
-                mysql_escape_string(PlayerPV[playerid][PVVMenuSel[playerid]][Plate], PlayerPV[playerid][PVVMenuSel[playerid]][Plate], g_SQL_handle, 13);
+                mysql_escape_string(PlayerPV[playerid][PVVMenuSel[playerid]][Plate], PlayerPV[playerid][PVVMenuSel[playerid]][Plate], pSQL, 13);
 
 				DestroyPlayerVehicles(playerid);
 				
@@ -20810,24 +20811,24 @@ function:CancelGangCreation(playerid)
 function:OnHouseLoadEx(index)
 {
 	new rows, fields;
-	cache_get_data(rows, fields, g_SQL_handle);
+	cache_get_data(rows, fields, pSQL);
 	
 	if(rows > 0)
 	{
 		new	line[144], buffer[100];
 
-	    HouseInfo[index][iID] = cache_get_row_int(0, 0, g_SQL_handle);
-		cache_get_row(0, 1, buffer, g_SQL_handle, sizeof(buffer));
+	    HouseInfo[index][iID] = cache_get_row_int(0, 0, pSQL);
+		cache_get_row(0, 1, buffer, pSQL, sizeof(buffer));
 		strmid(HouseInfo[index][Owner], buffer, 0, 25, 25);
 
-        HouseInfo[index][E_x] = cache_get_row_float(0, 2, g_SQL_handle);
-        HouseInfo[index][E_y] = cache_get_row_float(0, 3, g_SQL_handle);
-        HouseInfo[index][E_z] = cache_get_row_float(0, 4, g_SQL_handle);
-		HouseInfo[index][interior] = cache_get_row_int(0, 5, g_SQL_handle);
-		HouseInfo[index][price] = cache_get_row_int(0, 6, g_SQL_handle);
-		HouseInfo[index][E_score] = cache_get_row_int(0, 7, g_SQL_handle);
-		HouseInfo[index][sold] = cache_get_row_int(0, 8, g_SQL_handle);
-		HouseInfo[index][locked] = cache_get_row_int(0, 9, g_SQL_handle);
+        HouseInfo[index][E_x] = cache_get_row_float(0, 2, pSQL);
+        HouseInfo[index][E_y] = cache_get_row_float(0, 3, pSQL);
+        HouseInfo[index][E_z] = cache_get_row_float(0, 4, pSQL);
+		HouseInfo[index][interior] = cache_get_row_int(0, 5, pSQL);
+		HouseInfo[index][price] = cache_get_row_int(0, 6, pSQL);
+		HouseInfo[index][E_score] = cache_get_row_int(0, 7, pSQL);
+		HouseInfo[index][sold] = cache_get_row_int(0, 8, pSQL);
+		HouseInfo[index][locked] = cache_get_row_int(0, 9, pSQL);
 
 		format(line, sizeof(line), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseInfo[index][iID], number_format(HouseInfo[index][price]), HouseInfo[index][E_score], HouseIntTypes[HouseInfo[index][interior]][intname]);
 
@@ -20843,7 +20844,7 @@ function:OnHouseLoadEx(index)
 function:OnHouseLoad()
 {
 	new rows, fields;
-	cache_get_data(rows, fields, g_SQL_handle);
+	cache_get_data(rows, fields, pSQL);
 
 	if(rows > 0)
 	{
@@ -20851,18 +20852,18 @@ function:OnHouseLoad()
 
 		for(new i = 0; i < rows; i++)
 		{
-		    HouseInfo[houseid][iID] = cache_get_row_int(i, 0, g_SQL_handle);
-			cache_get_row(i, 1, buffer, g_SQL_handle, sizeof(buffer));
+		    HouseInfo[houseid][iID] = cache_get_row_int(i, 0, pSQL);
+			cache_get_row(i, 1, buffer, pSQL, sizeof(buffer));
 			strmid(HouseInfo[houseid][Owner], buffer, 0, 25, 25);
 
-	        HouseInfo[houseid][E_x] = cache_get_row_float(i, 2, g_SQL_handle);
-	        HouseInfo[houseid][E_y] = cache_get_row_float(i, 3, g_SQL_handle);
-	        HouseInfo[houseid][E_z] = cache_get_row_float(i, 4, g_SQL_handle);
-			HouseInfo[houseid][interior] = cache_get_row_int(i, 5, g_SQL_handle);
-			HouseInfo[houseid][price] = cache_get_row_int(i, 6, g_SQL_handle);
-			HouseInfo[houseid][E_score] = cache_get_row_int(i, 7, g_SQL_handle);
-			HouseInfo[houseid][sold] = cache_get_row_int(i, 8, g_SQL_handle);
-			HouseInfo[houseid][locked] = cache_get_row_int(i, 9, g_SQL_handle);
+	        HouseInfo[houseid][E_x] = cache_get_row_float(i, 2, pSQL);
+	        HouseInfo[houseid][E_y] = cache_get_row_float(i, 3, pSQL);
+	        HouseInfo[houseid][E_z] = cache_get_row_float(i, 4, pSQL);
+			HouseInfo[houseid][interior] = cache_get_row_int(i, 5, pSQL);
+			HouseInfo[houseid][price] = cache_get_row_int(i, 6, pSQL);
+			HouseInfo[houseid][E_score] = cache_get_row_int(i, 7, pSQL);
+			HouseInfo[houseid][sold] = cache_get_row_int(i, 8, pSQL);
+			HouseInfo[houseid][locked] = cache_get_row_int(i, 9, pSQL);
 
 			if(!HouseInfo[houseid][sold])
 			{
@@ -20874,7 +20875,7 @@ function:OnHouseLoad()
 
 				for(new ii = 0; ii < MAX_HOUSE_OBJECTS; ii++)
 				{
-				    cache_get_row(i, ii + 10, buffer, g_SQL_handle, sizeof(buffer));
+				    cache_get_row(i, ii + 10, buffer, pSQL, sizeof(buffer));
 				    sscanf(buffer, "p<,>iffffff", HouseInfo[houseid][E_Obj_Model][ii], postal[0], postal[1], postal[2], postal[3], postal[4], postal[5]);
 					if(HouseInfo[houseid][E_Obj_Model][ii] != 0)
 					{
@@ -20885,7 +20886,7 @@ function:OnHouseLoad()
 				}
 			}
 
-            HouseInfo[houseid][date] = cache_get_row_int(i, 20, g_SQL_handle);
+            HouseInfo[houseid][date] = cache_get_row_int(i, 20, pSQL);
 
 			HouseInfo[houseid][label] = CreateDynamic3DTextLabel(line, (HouseInfo[houseid][sold]) ? (0xFF0000FF) : (0x00FF00FF), HouseInfo[houseid][E_x], HouseInfo[houseid][E_y], floatadd(HouseInfo[houseid][E_z], 0.3), 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 30.0);
 			HouseInfo[houseid][pickid] = CreateDynamicPickup((HouseInfo[houseid][sold]) ? (1272) : (1273), 1, HouseInfo[houseid][E_x], HouseInfo[houseid][E_y], HouseInfo[houseid][E_z], -1, -1, -1, 30.0);
@@ -20901,22 +20902,22 @@ function:OnHouseLoad()
 function:OnPropLoadEx(pindex)
 {
 	new rows, fields;
-	cache_get_data(rows, fields, g_SQL_handle);
+	cache_get_data(rows, fields, pSQL);
 
 	if(rows > 0)
 	{
 	    new name[25], string[255];
 
-	    PropInfo[pindex][iID] = cache_get_row_int(0, 0, g_SQL_handle);
-	    cache_get_row(0, 1, name, g_SQL_handle, sizeof(name));
+	    PropInfo[pindex][iID] = cache_get_row_int(0, 0, pSQL);
+	    cache_get_row(0, 1, name, pSQL, sizeof(name));
 	    strmid(PropInfo[pindex][Owner], name, 0, 25, 25);
 	    
-		PropInfo[pindex][E_x] = cache_get_row_float(0, 2, g_SQL_handle);
-		PropInfo[pindex][E_y] = cache_get_row_float(0, 3, g_SQL_handle);
-		PropInfo[pindex][E_z] = cache_get_row_float(0, 4, g_SQL_handle);
-		PropInfo[pindex][E_Level] = cache_get_row_int(0, 5, g_SQL_handle);
-		PropInfo[pindex][sold] = cache_get_row_int(0, 6, g_SQL_handle);
-		PropInfo[pindex][date] = cache_get_row_int(0, 7, g_SQL_handle);
+		PropInfo[pindex][E_x] = cache_get_row_float(0, 2, pSQL);
+		PropInfo[pindex][E_y] = cache_get_row_float(0, 3, pSQL);
+		PropInfo[pindex][E_z] = cache_get_row_float(0, 4, pSQL);
+		PropInfo[pindex][E_Level] = cache_get_row_int(0, 5, pSQL);
+		PropInfo[pindex][sold] = cache_get_row_int(0, 6, pSQL);
+		PropInfo[pindex][date] = cache_get_row_int(0, 7, pSQL);
 		
 		format(string, sizeof(string), ""business_mark"\nOwner: ---\nID: %i\nLevel: %i", PropInfo[pindex][iID], PropInfo[pindex][E_Level]);
 
@@ -20932,7 +20933,7 @@ function:OnPropLoadEx(pindex)
 function:OnPropLoad()
 {
 	new rows, fields;
-	cache_get_data(rows, fields, g_SQL_handle);
+	cache_get_data(rows, fields, pSQL);
 
 	if(rows > 0)
 	{
@@ -20940,16 +20941,16 @@ function:OnPropLoad()
 
 		for(new i = 0; i < rows; i++)
 		{
-		    PropInfo[propid][iID] = cache_get_row_int(i, 0, g_SQL_handle);
-		    cache_get_row(i, 1, name, g_SQL_handle, sizeof(name));
+		    PropInfo[propid][iID] = cache_get_row_int(i, 0, pSQL);
+		    cache_get_row(i, 1, name, pSQL, sizeof(name));
 		    strmid(PropInfo[propid][Owner], name, 0, 25, 25);
 
-			PropInfo[propid][E_x] = cache_get_row_float(i, 2, g_SQL_handle);
-			PropInfo[propid][E_y] = cache_get_row_float(i, 3, g_SQL_handle);
-			PropInfo[propid][E_z] = cache_get_row_float(i, 4, g_SQL_handle);
-			PropInfo[propid][E_Level] = cache_get_row_int(i, 5, g_SQL_handle);
-			PropInfo[propid][sold] = cache_get_row_int(i, 6, g_SQL_handle);
-			PropInfo[propid][date] = cache_get_row_int(i, 7, g_SQL_handle);
+			PropInfo[propid][E_x] = cache_get_row_float(i, 2, pSQL);
+			PropInfo[propid][E_y] = cache_get_row_float(i, 3, pSQL);
+			PropInfo[propid][E_z] = cache_get_row_float(i, 4, pSQL);
+			PropInfo[propid][E_Level] = cache_get_row_int(i, 5, pSQL);
+			PropInfo[propid][sold] = cache_get_row_int(i, 6, pSQL);
+			PropInfo[propid][date] = cache_get_row_int(i, 7, pSQL);
 
 			if(!PropInfo[propid][sold])
 			{
@@ -20974,11 +20975,11 @@ function:OnPropLoad()
 function:OnGangZoneLoadEx(gindex)
 {
 	new rows, fields;
-	cache_get_data(rows, fields, g_SQL_handle);
+	cache_get_data(rows, fields, pSQL);
 
 	if(rows > 0)
 	{
-	    GZoneInfo[gindex][iID] = cache_get_row_int(0, 0, g_SQL_handle);
+	    GZoneInfo[gindex][iID] = cache_get_row_int(0, 0, pSQL);
 
         format(gstr, sizeof(gstr), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: ---\n"orange"Type /gwar to start an attack!", GZoneInfo[gindex][iID], GZoneInfo[gindex][sZoneName]);
 
@@ -20998,27 +20999,27 @@ function:OnGangZoneLoadEx(gindex)
 function:OnGangZoneLoad()
 {
 	new rows, fields;
-	cache_get_data(rows, fields, g_SQL_handle);
+	cache_get_data(rows, fields, pSQL);
 	
 	if(rows > 0)
 	{
-	    new Cache:Data = cache_save(g_SQL_handle);
+	    new Cache:Data = cache_save(pSQL);
 	    
 	    for(new i = 0; i < rows; i++)
 	    {
-	        cache_set_active(Data, g_SQL_handle);
+	        cache_set_active(Data, pSQL);
 	        
-	        GZoneInfo[gzoneid][iID] = cache_get_row_int(i, 0, g_SQL_handle);
-	        cache_get_row(i, 1, GZoneInfo[gzoneid][sZoneName], g_SQL_handle, 40);
+	        GZoneInfo[gzoneid][iID] = cache_get_row_int(i, 0, pSQL);
+	        cache_get_row(i, 1, GZoneInfo[gzoneid][sZoneName], pSQL, 40);
 	        
-	        GZoneInfo[gzoneid][E_x] = cache_get_row_float(i, 2, g_SQL_handle);
-	        GZoneInfo[gzoneid][E_y] = cache_get_row_float(i, 3, g_SQL_handle);
-	        GZoneInfo[gzoneid][E_z] = cache_get_row_float(i, 4, g_SQL_handle);
+	        GZoneInfo[gzoneid][E_x] = cache_get_row_float(i, 2, pSQL);
+	        GZoneInfo[gzoneid][E_y] = cache_get_row_float(i, 3, pSQL);
+	        GZoneInfo[gzoneid][E_z] = cache_get_row_float(i, 4, pSQL);
 	        
-	        GZoneInfo[gzoneid][localGang] = cache_get_row_int(i, 5, g_SQL_handle);
-	        GZoneInfo[gzoneid][iLocked] = cache_get_row_int(i, 6, g_SQL_handle);
+	        GZoneInfo[gzoneid][localGang] = cache_get_row_int(i, 5, pSQL);
+	        GZoneInfo[gzoneid][iLocked] = cache_get_row_int(i, 6, pSQL);
 	        
-	        cache_set_active(Cache:0, g_SQL_handle);
+	        cache_set_active(Cache:0, pSQL);
 	        
 	        if(GZoneInfo[gzoneid][localGang] != 0)
 	        {
@@ -21070,10 +21071,10 @@ SyncGangZones(playerid)
 GetGangNameByID(id)
 {
 	format(gstr, sizeof(gstr), "SELECT `GangName` FROM `gangs` WHERE `ID` = %i LIMIT 1;", id);
-	new Cache:res = mysql_query(g_SQL_handle, gstr), name[21];
-	if(cache_get_row_count(g_SQL_handle) != 0)
+	new Cache:res = mysql_query(pSQL, gstr), name[21];
+	if(cache_get_row_count(pSQL) != 0)
 	{
-		cache_get_row(0, 0, name, g_SQL_handle, sizeof(name));
+		cache_get_row(0, 0, name, pSQL, sizeof(name));
   	}
   	else
   	{
@@ -21098,19 +21099,19 @@ GetGZonesByGang(id)
 
 function:LoadHouses()
 {
-	mysql_tquery(g_SQL_handle, "SELECT * FROM `houses`;", "OnHouseLoad", "");
+	mysql_tquery(pSQL, "SELECT * FROM `houses`;", "OnHouseLoad", "");
 	return 1;
 }
 
 function:LoadProps()
 {
-	mysql_tquery(g_SQL_handle, "SELECT * FROM `props`;", "OnPropLoad", "");
+	mysql_tquery(pSQL, "SELECT * FROM `props`;", "OnPropLoad", "");
 	return 1;
 }
 
 function:LoadGZones()
 {
-	mysql_tquery(g_SQL_handle, "SELECT * FROM `gzones`;", "OnGangZoneLoad", "");
+	mysql_tquery(pSQL, "SELECT * FROM `gzones`;", "OnGangZoneLoad", "");
 	return 1;
 }
 
@@ -21708,7 +21709,7 @@ function:SkipLogin(playerid)
 		SrvStat[2]++;
 
         format(gstr, sizeof(gstr), "UPDATE `online` SET `name` = '%s' WHERE `name` = '%s';", newname, oldname);
-        mysql_tquery(g_SQL_handle, gstr, "", "");
+        mysql_tquery(pSQL, gstr, "", "");
 
 	    GameTextForPlayer(playerid, "Welcome", 3000, 4);
   		GivePlayerCash(playerid, 20000, false);
@@ -21917,37 +21918,37 @@ VIPMSG(color, const msg[])
 MySQL_FetchGangInfo(playerid, gGangID)
 {
 	format(gstr, sizeof(gstr), "SELECT * FROM `gangs` WHERE `ID` = %i LIMIT 1;", gGangID);
-	mysql_tquery(g_SQL_handle, gstr, "OnQueryFinish", "siii", gstr, THREAD_FETCH_GANG_INFO, playerid, g_SQL_handle);
+	mysql_tquery(pSQL, gstr, "OnQueryFinish", "siii", gstr, THREAD_FETCH_GANG_INFO, playerid, pSQL);
 }
 
 MySQL_UpdateGangScore(gGangID, value)
 {
 	format(gstr2, sizeof(gstr2), "UPDATE `gangs` SET `GangScore` = `GangScore` + %i WHERE `ID` = %i LIMIT 1;", value, gGangID);
-	mysql_tquery(g_SQL_handle, gstr2, "", "");
+	mysql_tquery(pSQL, gstr2, "", "");
 }
 
 MySQL_LoadPlayer(playerid)
 {
 	format(gstr2, sizeof(gstr2), "SELECT * FROM `accounts` WHERE `Name` = '%s' LIMIT 1;", __GetName(playerid));
-	mysql_tquery(g_SQL_handle, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_LOAD_PLAYER, playerid, g_SQL_handle);
+	mysql_tquery(pSQL, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_LOAD_PLAYER, playerid, pSQL);
 }
 
 MySQL_LoadPlayerGang(playerid)
 {
 	format(gstr2, sizeof(gstr2), "SELECT `GangName`, `GangTag` FROM `gangs` WHERE `ID` = %i LIMIT 1;", PlayerInfo[playerid][GangID]);
-	mysql_tquery(g_SQL_handle, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_LOAD_PLAYER_GANG, playerid, g_SQL_handle);
+	mysql_tquery(pSQL, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_LOAD_PLAYER_GANG, playerid, pSQL);
 }
 
 MySQL_AssignRankIfExist(playerid)
 {
   	format(gstr2, sizeof(gstr2), "SELECT `GangPosition` FROM `accounts` WHERE `GangID` = %i AND `Name` = '%s';", PlayerInfo[playerid][GangID], PlayerInfo[playerid][GangAssignRank]);
-  	mysql_tquery(g_SQL_handle, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_ASSIGN_RANK, playerid, g_SQL_handle);
+  	mysql_tquery(pSQL, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_ASSIGN_RANK, playerid, pSQL);
 }
 
 MySQL_KickFromGangIfExist(playerid)
 {
   	format(gstr2, sizeof(gstr2), "SELECT `GangPosition` FROM `accounts` WHERE `GangID` = %i AND `Name` = '%s';", PlayerInfo[playerid][GangID], PlayerInfo[playerid][GangKickMem]);
-  	mysql_tquery(g_SQL_handle, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_KICK_FROM_GANG, playerid, g_SQL_handle);
+  	mysql_tquery(pSQL, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_KICK_FROM_GANG, playerid, pSQL);
 }
 
 MySQL_SavePlayer(playerid, bool:save_pv)
@@ -21999,7 +22000,7 @@ MySQL_SavePlayer(playerid, bool:save_pv)
 		__GetName(playerid));
 
 	strcat(query, query2);
-	mysql_tquery(g_SQL_handle, query, "", "");
+	mysql_tquery(pSQL, query, "", "");
 
 	format(query, sizeof(query), "UPDATE `accounts` SET `Achievements` = '%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i' WHERE `Name` = '%s' LIMIT 1;",
 	    pAch[playerid][E_ach_styler],
@@ -22017,7 +22018,7 @@ MySQL_SavePlayer(playerid, bool:save_pv)
 		pAch[playerid][E_ach_biker],
 		pAch[playerid][E_ach_bmxmaster],
 		__GetName(playerid));
-    mysql_tquery(g_SQL_handle, query, "", "");
+    mysql_tquery(pSQL, query, "", "");
 
 	if(save_pv)
 	{
@@ -22067,7 +22068,7 @@ MySQL_SavePlayer(playerid, bool:save_pv)
 			PlayerPV[playerid][1][Mod17],
 			PlayerPV[playerid][1][Plate],
 			__GetName(playerid));
-	    mysql_tquery(g_SQL_handle, query, "", "");
+	    mysql_tquery(pSQL, query, "", "");
 
 		format(query, sizeof(query), "UPDATE `accounts` SET `PV_Slot2` = '%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%s', `PV_Slot3` = '%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%s' WHERE `Name` = '%s' LIMIT 1;",
 			PlayerPV[playerid][2][Model],
@@ -22115,7 +22116,7 @@ MySQL_SavePlayer(playerid, bool:save_pv)
 			PlayerPV[playerid][3][Mod17],
 			PlayerPV[playerid][3][Plate],
 			__GetName(playerid));
-	    mysql_tquery(g_SQL_handle, query, "", "");
+	    mysql_tquery(pSQL, query, "", "");
 
 		format(query, sizeof(query), "UPDATE `accounts` SET `PV_Slot4` = '%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%s', `PV_Slot5` = '%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%s' WHERE `Name` = '%s' LIMIT 1;",
 			PlayerPV[playerid][4][Model],
@@ -22163,7 +22164,7 @@ MySQL_SavePlayer(playerid, bool:save_pv)
 			PlayerPV[playerid][5][Mod17],
 			PlayerPV[playerid][5][Plate],
 			__GetName(playerid));
-	    mysql_tquery(g_SQL_handle, query, "", "");
+	    mysql_tquery(pSQL, query, "", "");
 
 		format(query, sizeof(query), "UPDATE `accounts` SET `PV_Slot6` = '%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%s', `PV_Slot7` = '%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%s' WHERE `Name` = '%s' LIMIT 1;",
 			PlayerPV[playerid][6][Model],
@@ -22211,7 +22212,7 @@ MySQL_SavePlayer(playerid, bool:save_pv)
 			PlayerPV[playerid][7][Mod17],
 			PlayerPV[playerid][7][Plate],
 			__GetName(playerid));
-	    mysql_tquery(g_SQL_handle, query, "", "");
+	    mysql_tquery(pSQL, query, "", "");
 	}
     return 1;
 }
@@ -22219,45 +22220,45 @@ MySQL_SavePlayer(playerid, bool:save_pv)
 MySQL_UpdatePlayerPass(playerid, hash[])
 {
 	new escape[33];
-	mysql_escape_string(hash, escape, g_SQL_handle, 33);
+	mysql_escape_string(hash, escape, pSQL, 33);
 	format(gstr2, sizeof(gstr2), "UPDATE `accounts` SET `Hash` = MD5('%s') WHERE `Name` = '%s' LIMIT 1;", escape, __GetName(playerid));
- 	mysql_tquery(g_SQL_handle, gstr2, "", "");
+ 	mysql_tquery(pSQL, gstr2, "", "");
 }
 
 MySQL_FetchGangMemberNames(playerid, gGangID)
 {
 	format(gstr, sizeof(gstr), "SELECT `Name`, `GangPosition` FROM `accounts` WHERE `GangID` = %i ORDER BY `GangPosition` DESC;", gGangID);
-	mysql_tquery(g_SQL_handle, gstr, "OnQueryFinish", "siii", gstr, THREAD_FETCH_GANG_MEMBER_NAMES, playerid, g_SQL_handle);
+	mysql_tquery(pSQL, gstr, "OnQueryFinish", "siii", gstr, THREAD_FETCH_GANG_MEMBER_NAMES, playerid, pSQL);
 }
 
 MySQL_BanIP(const ip[])
 {
  	format(gstr, sizeof(gstr), "INSERT INTO `blacklist` VALUES (NULL, '%s');", ip);
- 	mysql_tquery(g_SQL_handle, gstr, "", "");
+ 	mysql_tquery(pSQL, gstr, "", "");
 }
 
 MySQL_ExistGang(playerid)
 {
 	format(gstr, sizeof(gstr), "SELECT `ID` FROM `gangs` WHERE `GangName` = '%s' LIMIT 1;", PlayerInfo[playerid][GangName]);
-	mysql_tquery(g_SQL_handle, gstr, "OnQueryFinish", "siii", gstr, THREAD_GANG_EXIST, playerid, g_SQL_handle);
+	mysql_tquery(pSQL, gstr, "OnQueryFinish", "siii", gstr, THREAD_GANG_EXIST, playerid, pSQL);
 }
 
 MySQL_CreateGang(playerid)
 {
     format(gstr2, sizeof(gstr2), "INSERT INTO `gangs` VALUES (NULL, '%s', '%s', 0, %i, -84215197, 0);", PlayerInfo[playerid][GangName], PlayerInfo[playerid][GangTag], gettime());
-    mysql_tquery(g_SQL_handle, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_CREATE_GANG, playerid, g_SQL_handle);
+    mysql_tquery(pSQL, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_CREATE_GANG, playerid, pSQL);
 }
 
 MySQL_DestroyGang(playerid, gangname[])
 {
 	format(gstr2, sizeof(gstr2), "SELECT `ID`, `GangName` FROM `gangs` WHERE `GangName` = '%s';", gangname);
-	mysql_tquery(g_SQL_handle, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_GANG_DESTROY, playerid, g_SQL_handle);
+	mysql_tquery(pSQL, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_GANG_DESTROY, playerid, pSQL);
 }
 
 MySQL_GangRename(playerid, newgangname[], newgangtag[])
 {
 	format(gstr2, sizeof(gstr2), "SELECT `ID` FROM `gangs` WHERE `GangName` = '%s';", newgangname);
-	mysql_tquery(g_SQL_handle, gstr2, "OnGangRenameAttempt", "iss", playerid, newgangname, newgangtag);
+	mysql_tquery(pSQL, gstr2, "OnGangRenameAttempt", "iss", playerid, newgangname, newgangtag);
 }
 
 MySQL_CreateAccount(playerid, password[])
@@ -22266,9 +22267,9 @@ MySQL_CreateAccount(playerid, password[])
 	PlayerInfo[playerid][LastNameChange] = 0;
 	
     new query[350], escape[33];
-	mysql_escape_string(password, escape, g_SQL_handle, 33);
+	mysql_escape_string(password, escape, pSQL, 33);
     format(query, sizeof(query), "INSERT INTO `accounts` (`Name`, `Color`, `Hash`, `IP`, `GangPosition`, `GangID`, `RegDate`, `LastLogin`) VALUES ('%s', 0, MD5('%s'), '%s', 0, 0, %i, %i);", __GetName(playerid), escape, __GetIP(playerid), gettime(), PlayerInfo[playerid][LastLogin]);
-	mysql_tquery(g_SQL_handle, query, "OnQueryFinish", "siii", query, THREAD_CREATE_ACCOUNT, playerid, g_SQL_handle);
+	mysql_tquery(pSQL, query, "OnQueryFinish", "siii", query, THREAD_CREATE_ACCOUNT, playerid, pSQL);
 }
 
 MySQL_CreateAccount2(playerid, password[])
@@ -22277,9 +22278,9 @@ MySQL_CreateAccount2(playerid, password[])
 	PlayerInfo[playerid][LastNameChange] = 0;
 
     new query[350], escape[33];
-	mysql_escape_string(password, escape, g_SQL_handle, 33);
+	mysql_escape_string(password, escape, pSQL, 33);
     format(query, sizeof(query), "INSERT INTO `accounts` (`Name`, `Color`, `Hash`, `IP`, `GangPosition`, `GangID`, `RegDate`, `LastLogin`) VALUES ('%s', 0, MD5('%s'), '%s', 0, 0, %i, %i);", __GetName(playerid), escape, __GetIP(playerid), gettime(), PlayerInfo[playerid][LastLogin]);
-	mysql_tquery(g_SQL_handle, query, "OnQueryFinish", "siii", query, THREAD_CREATE_ACCOUNT2, playerid, g_SQL_handle);
+	mysql_tquery(pSQL, query, "OnQueryFinish", "siii", query, THREAD_CREATE_ACCOUNT2, playerid, pSQL);
 }
 
 MySQL_UpdateAccount(playerid)
@@ -22287,24 +22288,24 @@ MySQL_UpdateAccount(playerid)
     if(PlayerInfo[playerid][bLogged])
     {
 	    format(gstr2, sizeof(gstr2), "UPDATE `accounts` SET `IP` = '%s', `LastLogin` = %i WHERE `Name` = '%s' LIMIT 1;", __GetIP(playerid), gettime(), __GetName(playerid));
-	    mysql_tquery(g_SQL_handle, gstr2, "", "");
+	    mysql_tquery(pSQL, gstr2, "", "");
 	}
 }
 
 MySQL_BanPlayer(PlayerName[], AdminName[], Reason[], lift = 0)
 {
 	new query[300], rescape[129], aescape[25], pescape[25];
-	mysql_escape_string(Reason, rescape, g_SQL_handle, 129);
-	mysql_escape_string(AdminName, aescape, g_SQL_handle, 25);
-	mysql_escape_string(PlayerName, pescape, g_SQL_handle, 25);
+	mysql_escape_string(Reason, rescape, pSQL, 129);
+	mysql_escape_string(AdminName, aescape, pSQL, 25);
+	mysql_escape_string(PlayerName, pescape, pSQL, 25);
     format(query, sizeof(query), "INSERT INTO `bans` VALUES (NULL, '%s', '%s', '%s', %i, %i);", pescape, aescape, rescape, lift, gettime());
-    mysql_tquery(g_SQL_handle, query, "", "");
+    mysql_tquery(pSQL, query, "", "");
 }
 
 MySQL_SaveGangZone(id)
 {
 	format(gstr, sizeof(gstr), "UPDATE `gzones` SET `localgang` = %i, `locked` = %i WHERE `id` = %i;", GZoneInfo[id][localGang], GZoneInfo[id][iLocked], GZoneInfo[id][iID]);
-	mysql_tquery(g_SQL_handle, gstr, "", "");
+	mysql_tquery(pSQL, gstr, "", "");
 }
 
 MySQL_SaveHouse(house, bool:save_items = false)
@@ -22323,7 +22324,7 @@ MySQL_SaveHouse(house, bool:save_items = false)
 		HouseInfo[house][locked],
 		HouseInfo[house][date],
 		HouseInfo[house][iID]);
-    mysql_tquery(g_SQL_handle, query, "", "");
+    mysql_tquery(pSQL, query, "", "");
 		
 	if(save_items)
 	{
@@ -22350,7 +22351,7 @@ MySQL_SaveHouse(house, bool:save_items = false)
 			{
 			    format(query, sizeof(query), "UPDATE `houses` SET `ObjSlot%i` = '0,0.0,0.0,0.0,0.0,0.0,0.0' WHERE `ID` = %i LIMIT 1;", i, HouseInfo[house][iID]);
 			}
-			mysql_tquery(g_SQL_handle, query, "", "");
+			mysql_tquery(pSQL, query, "", "");
 		}
 	}
 }
@@ -22368,40 +22369,40 @@ MySQL_SaveProp(propertyid)
 		PropInfo[propertyid][date],
 		PropInfo[propertyid][iID]);
 
-	mysql_tquery(g_SQL_handle, query, "", "");
+	mysql_tquery(pSQL, query, "", "");
 }
 
 MySQL_FinalGangKick(playerid)
 {
 	format(gstr2, sizeof(gstr2), "UPDATE `accounts` SET `GangID` = 0, `GangPosition` = 0 WHERE `Name` = '%s' LIMIT 1;", PlayerInfo[playerid][GangKickMem]);
-	mysql_tquery(g_SQL_handle, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_KICK_FROM_GANG_2, playerid, g_SQL_handle);
+	mysql_tquery(pSQL, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_KICK_FROM_GANG_2, playerid, pSQL);
 }
 
 MySQL_FinalRankAssign(playerid)
 {
 	format(gstr2, sizeof(gstr2), "UPDATE `accounts` SET `GangPosition` = %i WHERE `Name` = '%s' LIMIT 1;", PlayerInfo[playerid][RankSelected], PlayerInfo[playerid][GangAssignRank]);
-	mysql_tquery(g_SQL_handle, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_ASSIGN_RANK_2, playerid, g_SQL_handle);
+	mysql_tquery(pSQL, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_ASSIGN_RANK_2, playerid, pSQL);
 }
 
 MySQL_CleanUp()
 {
-	mysql_tquery(g_SQL_handle, "TRUNCATE TABLE `online`;", "", "");
+	mysql_tquery(pSQL, "TRUNCATE TABLE `online`;", "", "");
 }
 
 MySQL_Connect()
 {
-    g_SQL_handle = mysql_connect(SQL_HOST, SQL_USER, SQL_DATA, SQL_PASS, SQL_PORT, true);
+    pSQL = mysql_connect(SQL_HOST, SQL_USER, SQL_DATA, SQL_PASS, SQL_PORT, true);
 
-    if(!mysql_errno(g_SQL_handle))
+    if(!mysql_errno(pSQL))
     {
         printf("#Successfully connected to MySQL Server @ %s:%i", SQL_HOST, SQL_PORT);
     }
     else
     {
-        printf("#Failed to connect, %i. Second try...", mysql_errno(g_SQL_handle));
-        g_SQL_handle = mysql_connect(SQL_HOST, SQL_USER, SQL_DATA, SQL_PASS, SQL_PORT, true);
+        printf("#Failed to connect, %i. Second try...", mysql_errno(pSQL));
+        pSQL = mysql_connect(SQL_HOST, SQL_USER, SQL_DATA, SQL_PASS, SQL_PORT, true);
         
-        if(!mysql_errno(g_SQL_handle))
+        if(!mysql_errno(pSQL))
         {
             printf("#Successfully connected to MySQL Server with second try @ %s:%i", SQL_HOST, SQL_PORT);
         }
@@ -25991,7 +25992,7 @@ function:DerbyFallOver()
 
 function:QueueProcess()
 {
-	mysql_tquery(g_SQL_handle, "SELECT * FROM `queue` WHERE `ExecutionDate` < UNIX_TIMESTAMP();", "OnQueueReceived", "");
+	mysql_tquery(pSQL, "SELECT * FROM `queue` WHERE `ExecutionDate` < UNIX_TIMESTAMP();", "OnQueueReceived", "");
 	
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -26063,22 +26064,22 @@ function:QueueProcess()
 function:OnQueueReceived()
 {
 	new rows, fields;
-	cache_get_data(rows, fields, g_SQL_handle);
+	cache_get_data(rows, fields, pSQL);
 	
 	if(rows > 0)
 	{
-	    new Cache:Data = cache_save(g_SQL_handle);
-	    cache_set_active(Data, g_SQL_handle);
+	    new Cache:Data = cache_save(pSQL);
+	    cache_set_active(Data, pSQL);
 	
 		for(new i = 0; i < rows; i++)
 		{
-		    new action = cache_get_row_int(i, 1, g_SQL_handle);
+		    new action = cache_get_row_int(i, 1, pSQL);
 		    switch(action)
 			{
 		        case 1: // give a player credits
 		        {
 		            new name[26], credits, payment[21];
-		            cache_get_row(i, 3, gstr2, g_SQL_handle, sizeof(gstr2));
+		            cache_get_row(i, 3, gstr2, pSQL, sizeof(gstr2));
 		            
 		            sscanf(gstr2, "p<,>s[25]is[20]",
 		                name,
@@ -26099,10 +26100,10 @@ function:OnQueueReceived()
 		            }
 		            else
 		            {
-		                mysql_format(g_SQL_handle, gstr2, sizeof(gstr2), "UPDATE `accounts` SET `Credits` = `Credits` + %i WHERE `Name` = '%e' LIMIT 1;", credits, name);
-		                mysql_tquery(g_SQL_handle, gstr2, "", "");
-						mysql_format(g_SQL_handle, gstr2, sizeof(gstr2), "INSERT INTO `creditslog` VALUES (NULL, '%e', %i, %i);", name, credits, gettime());
-						mysql_tquery(g_SQL_handle, gstr2, "", "");
+		                mysql_format(pSQL, gstr2, sizeof(gstr2), "UPDATE `accounts` SET `Credits` = `Credits` + %i WHERE `Name` = '%e' LIMIT 1;", credits, name);
+		                mysql_tquery(pSQL, gstr2, "", "");
+						mysql_format(pSQL, gstr2, sizeof(gstr2), "INSERT INTO `creditslog` VALUES (NULL, '%e', %i, %i);", name, credits, gettime());
+						mysql_tquery(pSQL, gstr2, "", "");
 		            }
 		            
 					format(gstr, sizeof(gstr), "~p~%s received %s credits for donating %s!", name, number_format(credits), payment);
@@ -26113,7 +26114,7 @@ function:OnQueueReceived()
 		        case 2..6: // alter boost
 		        {
 		            new name[25];
-		            cache_get_row(i, 3, name, g_SQL_handle, sizeof(name));
+		            cache_get_row(i, 3, name, pSQL, sizeof(name));
 		            
 		            new playerid = __GetPlayerID(name);
 		            if(playerid != INVALID_PLAYER_ID)
@@ -26156,7 +26157,7 @@ function:OnQueueReceived()
 		        case 7: // give a player vip
 		        {
 		            new name[26], payment[21];
-                    cache_get_row(i, 3, gstr2, g_SQL_handle, sizeof(gstr2));
+                    cache_get_row(i, 3, gstr2, pSQL, sizeof(gstr2));
                     
 				    sscanf(gstr2, "p<,>s[25]s[20]",
 		                name,
@@ -26192,16 +26193,16 @@ function:OnQueueReceived()
 		            }
 		            else
 		            {
-						cache_set_active(Cache:0, g_SQL_handle);
+						cache_set_active(Cache:0, pSQL);
 		                
-						mysql_format(g_SQL_handle, gstr, sizeof(gstr), "SELECT `AdditionalPVSlots`, `AdditionalHouseSlots`, `AdditionalPropSlots` FROM `accounts` WHERE `Name` = '%e';", name);
-						new Cache:res = mysql_query(g_SQL_handle, gstr);
+						mysql_format(pSQL, gstr, sizeof(gstr), "SELECT `AdditionalPVSlots`, `AdditionalHouseSlots`, `AdditionalPropSlots` FROM `accounts` WHERE `Name` = '%e';", name);
+						new Cache:res = mysql_query(pSQL, gstr);
 						
-						if(cache_get_row_count(g_SQL_handle) > 0)
+						if(cache_get_row_count(pSQL) > 0)
 						{
-							new pvslot = cache_get_row_int(0, 0, g_SQL_handle),
-							    houseslot = cache_get_row_int(0, 1, g_SQL_handle),
-							    propslot = cache_get_row_int(0, 2, g_SQL_handle);
+							new pvslot = cache_get_row_int(0, 0, pSQL),
+							    houseslot = cache_get_row_int(0, 1, pSQL),
+							    propslot = cache_get_row_int(0, 2, pSQL);
 
 			                if(pvslot < 7)
 			                {
@@ -26220,18 +26221,18 @@ function:OnQueueReceived()
 			                    propslot++;
 			                }
 
-			                mysql_format(g_SQL_handle, gstr2, sizeof(gstr2), "UPDATE `accounts` SET `VIP` = 1, `Bank` = `Bank` + 1000000, `AdditionalPVSlots` = %i, `AdditionalHouseSlots` = %i, `AdditionalPropSlots` = %i WHERE `Name` = '%e' LIMIT 1;",
+			                mysql_format(pSQL, gstr2, sizeof(gstr2), "UPDATE `accounts` SET `VIP` = 1, `Bank` = `Bank` + 1000000, `AdditionalPVSlots` = %i, `AdditionalHouseSlots` = %i, `AdditionalPropSlots` = %i WHERE `Name` = '%e' LIMIT 1;",
 								pvslot,
 								houseslot,
 								propslot,
 								name);
 
-			                mysql_tquery(g_SQL_handle, gstr2, "", "");
+			                mysql_tquery(pSQL, gstr2, "", "");
 						}
 						
 						cache_delete(res);
 						
-						cache_set_active(Data, g_SQL_handle);
+						cache_set_active(Data, pSQL);
 		            }
 		            
 					format(gstr, sizeof(gstr), "~p~%s received VIP for donating $%s!", name, payment);
@@ -26241,11 +26242,11 @@ function:OnQueueReceived()
 		        }
 		        default: continue;
 		    }
-			format(gstr2, sizeof(gstr2), "DELETE FROM `queue` WHERE `ID` = %i LIMIT 1;", cache_get_row_int(i, 0, g_SQL_handle));
-			mysql_tquery(g_SQL_handle, gstr2, "", "");
+			format(gstr2, sizeof(gstr2), "DELETE FROM `queue` WHERE `ID` = %i LIMIT 1;", cache_get_row_int(i, 0, pSQL));
+			mysql_tquery(pSQL, gstr2, "", "");
 		}
 		
-		cache_delete(Data, g_SQL_handle);
+		cache_delete(Data, pSQL);
 	}
 	return 1;
 }
@@ -28179,7 +28180,7 @@ MySQL_SavePlayerToys(playerid)
 		    PlayerToys[playerid][1][toy_sy],
 		    PlayerToys[playerid][1][toy_sz],
 		    __GetName(playerid));
-	    mysql_tquery(g_SQL_handle, query, "", "");
+	    mysql_tquery(pSQL, query, "", "");
 
 		format(query, sizeof(query), "UPDATE `accounts` SET `Toy_Slot2` = '%i,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f', `Toy_Slot3` = '%i,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f' WHERE `Name` = '%s' LIMIT 1;",
 			PlayerToys[playerid][2][toy_model],
@@ -28205,7 +28206,7 @@ MySQL_SavePlayerToys(playerid)
 		    PlayerToys[playerid][3][toy_sy],
 		    PlayerToys[playerid][3][toy_sz],
 		    __GetName(playerid));
-	    mysql_tquery(g_SQL_handle, query, "", "");
+	    mysql_tquery(pSQL, query, "", "");
 
 		format(query, sizeof(query), "UPDATE `accounts` SET `Toy_Slot4` = '%i,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f', `Toy_Slot5` = '%i,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f' WHERE `Name` = '%s' LIMIT 1;",
 			PlayerToys[playerid][4][toy_model],
@@ -28231,7 +28232,7 @@ MySQL_SavePlayerToys(playerid)
 		    PlayerToys[playerid][5][toy_sy],
 		    PlayerToys[playerid][5][toy_sz],
 		    __GetName(playerid));
-	    mysql_tquery(g_SQL_handle, query, "", "");
+	    mysql_tquery(pSQL, query, "", "");
 
 		format(query, sizeof(query), "UPDATE `accounts` SET `Toy_Slot6` = '%i,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f', `Toy_Slot7` = '%i,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f' WHERE `Name` = '%s' LIMIT 1;",
 			PlayerToys[playerid][6][toy_model],
@@ -28257,7 +28258,7 @@ MySQL_SavePlayerToys(playerid)
 		    PlayerToys[playerid][7][toy_sy],
 		    PlayerToys[playerid][7][toy_sz],
 		    __GetName(playerid));
-	    mysql_tquery(g_SQL_handle, query, "", "");
+	    mysql_tquery(pSQL, query, "", "");
 
 		format(query, sizeof(query), "UPDATE `accounts` SET `Toy_Slot8` = '%i,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f', `Toy_Slot9` = '%i,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f' WHERE `Name` = '%s' LIMIT 1;",
 			PlayerToys[playerid][8][toy_model],
@@ -28283,7 +28284,7 @@ MySQL_SavePlayerToys(playerid)
 		    PlayerToys[playerid][9][toy_sy],
 		    PlayerToys[playerid][9][toy_sz],
 		    __GetName(playerid));
-	    mysql_tquery(g_SQL_handle, query, "", "");
+	    mysql_tquery(pSQL, query, "", "");
 	}
 }
 
@@ -28916,7 +28917,7 @@ ShowInfo(playerid, const top[], const desc[], time = 3000, type = 3)
 function:KickEx(playerid)
 {
 	PlayerInfo[playerid][KBMarked] = true;
-	SetTimerEx("Kick_Delay", 3000, false, "ii", playerid, YHash(__GetName(playerid), false));
+	SetTimerEx("Kick_Delay", 3200, false, "ii", playerid, YHash(__GetName(playerid), false));
 	return 1;
 }
 
@@ -29744,7 +29745,7 @@ GetPVPriceByModelId(modelid)
 function:AlterPlayerCredits(playerid, amount)
 {
 	format(gstr, sizeof(gstr), "INSERT INTO `creditslog` VALUES (NULL, '%s', %i, %i);", __GetName(playerid), amount, gettime());
-	mysql_tquery(g_SQL_handle, gstr, "", "");
+	mysql_tquery(pSQL, gstr, "", "");
 	PlayerInfo[playerid][Credits] += amount;
 	PlayerPlaySound(playerid, 1058, 0.0, 0.0, 0.0);
 	return 1;
@@ -29786,7 +29787,7 @@ IsAd(const text[])
 function:OnNCReceive(playerid)
 {
 	new rows, fields;
-	cache_get_data(rows, fields, g_SQL_handle);
+	cache_get_data(rows, fields, pSQL);
 
 	if(rows > 0)
 	{
@@ -29794,9 +29795,9 @@ function:OnNCReceive(playerid)
 	    strcat(string, ""white"Displaying last 10 Name Change Records:\n\n");
 	    for(new i = 0; i < rows; i++)
 	    {
-	        cache_get_row(i, 1, oldname, g_SQL_handle, sizeof(oldname));
-	        cache_get_row(i, 2, newname, g_SQL_handle, sizeof(newname));
-	        format(tmp, sizeof(tmp), "%i - %s changed their name to %s on %s\n", i + 1, oldname, newname, UTConvert(cache_get_row_int(i, 3, g_SQL_handle)));
+	        cache_get_row(i, 1, oldname, pSQL, sizeof(oldname));
+	        cache_get_row(i, 2, newname, pSQL, sizeof(newname));
+	        format(tmp, sizeof(tmp), "%i - %s changed their name to %s on %s\n", i + 1, oldname, newname, UTConvert(cache_get_row_int(i, 3, pSQL)));
 	        strcat(string, tmp);
 	    }
 
@@ -29808,7 +29809,7 @@ function:OnNCReceive(playerid)
 function:OnNCReceive2(playerid, name[])
 {
 	new rows, fields;
-	cache_get_data(rows, fields, g_SQL_handle);
+	cache_get_data(rows, fields, pSQL);
 
 	if(rows > 0)
 	{
@@ -29817,9 +29818,9 @@ function:OnNCReceive2(playerid, name[])
 	    strcat(string, tmp);
 	    for(new i = 0; i < rows; i++)
 	    {
-	        cache_get_row(i, 1, oldname, g_SQL_handle, sizeof(oldname));
-	        cache_get_row(i, 2, newname, g_SQL_handle, sizeof(newname));
-	        format(tmp, sizeof(tmp), "%i - %s changed their name to %s on %s\n", i + 1, oldname, newname, UTConvert(cache_get_row_int(i, 3, g_SQL_handle)));
+	        cache_get_row(i, 1, oldname, pSQL, sizeof(oldname));
+	        cache_get_row(i, 2, newname, pSQL, sizeof(newname));
+	        format(tmp, sizeof(tmp), "%i - %s changed their name to %s on %s\n", i + 1, oldname, newname, UTConvert(cache_get_row_int(i, 3, pSQL)));
 	        strcat(string, tmp);
 	    }
 
@@ -30301,7 +30302,7 @@ GetCredits(playerid)
 function:OnGangRenameAttempt(playerid, newgangname[], newgangtag[])
 {
 	new rows, fields;
-	cache_get_data(rows, fields, g_SQL_handle);
+	cache_get_data(rows, fields, pSQL);
 
 	if(rows > 0)
 	{
@@ -30318,7 +30319,7 @@ function:OnGangRenameAttempt(playerid, newgangname[], newgangtag[])
 	        }
 	    }
 	    format(gstr2, sizeof(gstr2), "UPDATE `gangs` SET `GangName` = '%s', `GangTag` = '%s' WHERE `ID` = %i LIMIT 1;", newgangname, newgangtag, PlayerInfo[playerid][GangID]);
-	    mysql_tquery(g_SQL_handle, gstr2, "", "");
+	    mysql_tquery(pSQL, gstr2, "", "");
 	    
 	    format(gstr2, sizeof(gstr2), ""gang_sign" "r_besch"Gang Founder %s(%i) changed the gang's name to [%s]%s", __GetName(playerid), playerid, newgangtag, newgangname);
 		GangMSG(PlayerInfo[playerid][GangID], gstr2);
@@ -30331,7 +30332,7 @@ function:OnGangRenameAttempt(playerid, newgangname[], newgangtag[])
 function:OnBoostReceive(playerid)
 {
 	new rows, fields;
-	cache_get_data(rows, fields, g_SQL_handle);
+	cache_get_data(rows, fields, pSQL);
 	
 	if(rows > 0)
 	{
@@ -30339,7 +30340,7 @@ function:OnBoostReceive(playerid)
 	    {
 	        new bool:set = true;
 	        
-			switch(cache_get_row_int(i, 1, g_SQL_handle))
+			switch(cache_get_row_int(i, 1, pSQL))
 			{
 			    case 2: PlayerInfo[playerid][Boost] |= BOOST_MONEY_x2;
 			    case 3: PlayerInfo[playerid][Boost] |= BOOST_MONEY_x3;
@@ -30351,7 +30352,7 @@ function:OnBoostReceive(playerid)
 			
 			if(set)
 			{
-				PlayerInfo[playerid][BoostDeplete] = cache_get_row_int(i, 2, g_SQL_handle);
+				PlayerInfo[playerid][BoostDeplete] = cache_get_row_int(i, 2, pSQL);
 				
 				format(gstr, sizeof(gstr), ""server_sign" "r_besch"Boost has been loaded! Runs out on: %s", UTConvert(PlayerInfo[playerid][BoostDeplete]));
 				SCM(playerid, -1, gstr);
@@ -30481,14 +30482,14 @@ function:RandomTXTInfo()
 function:OnUnbanAttempt(playerid, unban[])
 {
 	new rows, fields;
-	cache_get_data(rows, fields, g_SQL_handle);
+	cache_get_data(rows, fields, pSQL);
 
 	if(rows > 0)
 	{
 	    new query[128];
 	    format(query, sizeof(query), "DELETE FROM `bans` WHERE `PlayerName` = '%s' LIMIT 1;", unban);
 
-	    mysql_tquery(g_SQL_handle, query, "", "");
+	    mysql_tquery(pSQL, query, "", "");
 
 	    SCM(playerid, -1, ""er"Player has been unbanned!");
 	}
@@ -30502,12 +30503,12 @@ function:OnUnbanAttempt(playerid, unban[])
 function:OnOfflineBanAttempt(playerid, ban[], reason[])
 {
 	new rows, fields;
-	cache_get_data(rows, fields, g_SQL_handle);
+	cache_get_data(rows, fields, pSQL);
 
 	if(rows > 0)
 	{
 		new buffer[30];
-		cache_get_row(0, 0, buffer, g_SQL_handle, sizeof(buffer));
+		cache_get_row(0, 0, buffer, pSQL, sizeof(buffer));
 		
 		format(gstr, sizeof(gstr), ""er"%s has already been banned by %s", ban, buffer);
 	    SCM(playerid, -1, gstr);
@@ -30515,7 +30516,7 @@ function:OnOfflineBanAttempt(playerid, ban[], reason[])
 	else
 	{
 	    format(gstr, sizeof(gstr), "SELECT `Level`, `IP` FROM `accounts` WHERE `Name` = '%s' LIMIT 1;", ban);
-	    mysql_tquery(g_SQL_handle, gstr, "OnOfflineBanAttempt2", "iss", playerid, ban, reason);
+	    mysql_tquery(pSQL, gstr, "OnOfflineBanAttempt2", "iss", playerid, ban, reason);
 	}
 	return 1;
 }
@@ -30523,17 +30524,17 @@ function:OnOfflineBanAttempt(playerid, ban[], reason[])
 function:OnOfflineBanAttempt2(playerid, ban[], reason[])
 {
 	new rows, fields;
-	cache_get_data(rows, fields, g_SQL_handle);
+	cache_get_data(rows, fields, pSQL);
 
 	if(rows > 0)
 	{
-	    if(cache_get_row_int(0, 0, g_SQL_handle) != 0)
+	    if(cache_get_row_int(0, 0, pSQL) != 0)
 	    {
 	        return SCM(playerid, -1, ""er"You may not ban admins");
 	    }
 
 	    new ip[16];
-		cache_get_row(0, 1, ip, g_SQL_handle, sizeof(ip));
+		cache_get_row(0, 1, ip, pSQL, sizeof(ip));
 
 		MySQL_BanPlayer(ban, __GetName(playerid), reason);
 		MySQL_BanIP(ip);
@@ -30569,14 +30570,14 @@ function:HideScoreTD(playerid, namehash)
 function:OnIpLookUp(playerid, ip[])
 {
 	new rows, fields;
-	cache_get_data(rows, fields, g_SQL_handle);
+	cache_get_data(rows, fields, pSQL);
 
 	if(rows > 0)
 	{
 	    for(new i = 0; i < rows; i++)
 	    {
 			new buffer[MAX_PLAYER_NAME+1];
-			cache_get_row(i, 0, buffer, g_SQL_handle, sizeof(buffer));
+			cache_get_row(i, 0, buffer, pSQL, sizeof(buffer));
 
 			format(gstr, sizeof(gstr), "%i) %s used %s", i, buffer, ip);
 			SCM(playerid, BLUE, gstr);
@@ -30592,7 +30593,7 @@ function:OnIpLookUp(playerid, ip[])
 function:OnSessionCheck(playerid)
 {
 	new rows, fields;
-	cache_get_data(rows, fields, g_SQL_handle);
+	cache_get_data(rows, fields, pSQL);
 
 	if(rows == 0)
 	{
@@ -30631,7 +30632,7 @@ function:OpenNewRace()
 	SCMToAll(-1, gstr);
 
 	format(gstr, sizeof(gstr), "SELECT `name`, `time` FROM `race_records` WHERE `track` = %i ORDER BY `time` ASC LIMIT 1;", g_NextRace);
-	mysql_tquery(g_SQL_handle, gstr, "OnRaceDataLoaded", "");
+	mysql_tquery(pSQL, gstr, "OnRaceDataLoaded", "");
 	return 1;
 }
 
@@ -30683,7 +30684,7 @@ PrepareRace()
 function:OnRaceDataLoaded()
 {
 	new rows, fields;
-	cache_get_data(rows, fields, g_SQL_handle);
+	cache_get_data(rows, fields, pSQL);
 
 	if(rows > 0)
 	{
@@ -30695,8 +30696,8 @@ function:OnRaceDataLoaded()
 		format(gstr, sizeof(gstr), " -> Vehicle: %s | Checkpoints: %i", VehicleNames[g_RaceArray[E_vModel] - 400], g_RaceArray[E_rCPs]);
 		SCMToAll(YELLOW, gstr);
 
-		cache_get_row(0, 0, name, g_SQL_handle, sizeof(name));
-		ConvertTime(var, cache_get_row_int(0, 1, g_SQL_handle), minute, sec, msec);
+		cache_get_row(0, 0, name, pSQL, sizeof(name));
+		ConvertTime(var, cache_get_row_int(0, 1, pSQL), minute, sec, msec);
 
 		format(gstr, sizeof(gstr), " -> #1 %s | %02i:%02i.%03i", name, minute, sec, msec);
 		SCMToAll(YELLOW, gstr);
@@ -30749,7 +30750,7 @@ SetupRaceForPlayer(playerid)
     g_CPProgress[playerid] = 0;
 
     format(gstr2, sizeof(gstr2), "SELECT `name`, `time` FROM `race_records` WHERE `track` = %i ORDER BY `time` ASC LIMIT 5;", g_NextRace);
-    mysql_tquery(g_SQL_handle, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_RACE_TOPLIST, playerid, g_SQL_handle);
+    mysql_tquery(pSQL, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_RACE_TOPLIST, playerid, pSQL);
 
 	++g_RacePlayerCount;
 	++g_RaceSpawnCount;
@@ -31073,10 +31074,10 @@ function:OnNewsReceived(playerid, response_code, data[])
 
 function:OnRaceRecordPurged(playerid, map)
 {
-	if(cache_get_row_count(g_SQL_handle) == 1)
+	if(cache_get_row_count(pSQL) == 1)
 	{
-		format(gstr, sizeof(gstr), "DELETE FROM `race_records` WHERE `id` = %i;", cache_get_row_int(0, 0, g_SQL_handle));
-		mysql_tquery(g_SQL_handle, gstr, "", "");
+		format(gstr, sizeof(gstr), "DELETE FROM `race_records` WHERE `id` = %i;", cache_get_row_int(0, 0, pSQL));
+		mysql_tquery(pSQL, gstr, "", "");
 
 		format(gstr, sizeof(gstr), ""red"Adm: %s(%i) deleted the first record in race %i", __GetName(playerid), playerid, map);
 		AdminMSG(-1, gstr);
