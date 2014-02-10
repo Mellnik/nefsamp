@@ -637,7 +637,7 @@ enum e_player_data
 	bool:bShowToys,
 	bool:Frozen,
 	bool:AllowSpawn,
- 	bool:onduty,
+ 	bool:bDuty,
 	bool:Muted,
  	bool:SpeedBoost,
  	bool:SuperJump,
@@ -3071,7 +3071,7 @@ public OnPlayerSpawn(playerid)
         }
     }
     
-	if(PlayerInfo[playerid][onduty])
+	if(PlayerInfo[playerid][bDuty])
 	{
 		SetPlayerHealth(playerid, 99999.0);
 	}
@@ -3516,7 +3516,8 @@ public OnPlayerCommandReceived(playerid, cmdtext[])
 			{
 			    if(GetPVarInt(playerid, "doingStunt") != 0)
 			    {
-			        SCM(playerid, -1, ""er"Removed from challenge because of using restricted commands");
+			        format(gstr, sizeof(gstr), ""er"You can no longer win this challenge because of using %s", cmdtext);
+			        SCM(playerid, -1, gstr);
 			        
 					SetPVarInt(playerid, "doingStunt", 0);
 					PlayerInfo[playerid][tickJoin_bmx] = 0;
@@ -4926,7 +4927,7 @@ public OnPlayerText(playerid, text[])
 
     SrvStat[1]++;
 
-	if(PlayerInfo[playerid][Level] >= 1 && PlayerInfo[playerid][onduty] && text[0] == '#')
+	if(PlayerInfo[playerid][Level] >= 1 && PlayerInfo[playerid][bDuty] && text[0] == '#')
 	{
 	    format(gstr, sizeof(gstr), "[ADMIN CHAT] "LG_E"%s(%i): "LB_E"%s", __GetName(playerid), playerid, text[1]);
 		AdminMSG(COLOR_RED, gstr);
@@ -10579,9 +10580,9 @@ YCMD:onduty(playerid, params[], help)
 	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 	if(PlayerInfo[playerid][Level] >= 2)
 	{
-		if(!PlayerInfo[playerid][onduty])
+		if(!PlayerInfo[playerid][bDuty])
 		{
-			PlayerInfo[playerid][onduty] = true;
+			PlayerInfo[playerid][bDuty] = true;
 			PlayerInfo[playerid][AdminDutyLabel] = CreateDynamic3DTextLabel("Admin On Duty", ADMIN, 0.0, 0.0, 0.35, 20.0, playerid, INVALID_VEHICLE_ID, 0, -1, -1, -1, 20.0);
 
 	        format(gstr, sizeof(gstr), ""yellow"** "red"Admin %s(%i) is now onduty!", __GetName(playerid), playerid);
@@ -10604,9 +10605,9 @@ YCMD:offduty(playerid, params[], help)
 {
 	if(PlayerInfo[playerid][Level] >= 2)
 	{
-    	if(PlayerInfo[playerid][onduty])
+    	if(PlayerInfo[playerid][bDuty])
 		{
-		    PlayerInfo[playerid][onduty] = false;
+		    PlayerInfo[playerid][bDuty] = false;
 
         	format(gstr, sizeof(gstr), ""yellow"** "red"Admin %s(%i) is now offduty!", __GetName(playerid), playerid);
         	SCMToAll(-1, gstr);
@@ -13578,6 +13579,7 @@ YCMD:hydra(playerid, params[], help)
 YCMD:god(playerid, params[], help)
 {
 	if(PlayerInfo[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
+	if(PlayerInfo[playerid][bDuty]) return SCM(playerid, -1, ""er"You can't use god command while being on duty");
 	
 	new mode[30], bool:silent = false;
 	if(!sscanf(params, "s[30]", mode))
@@ -31155,7 +31157,7 @@ ResetPlayerModules(playerid)
 	PlayerInfo[playerid][bShowToys] = true;
 	PlayerInfo[playerid][Frozen] = false;
 	PlayerInfo[playerid][AllowSpawn] = false;
- 	PlayerInfo[playerid][onduty] = false;
+ 	PlayerInfo[playerid][bDuty] = false;
 	PlayerInfo[playerid][Muted] = false;
  	PlayerInfo[playerid][SpeedBoost] = true;
  	PlayerInfo[playerid][SuperJump] = false;
