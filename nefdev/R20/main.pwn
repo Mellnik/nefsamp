@@ -8921,6 +8921,7 @@ YCMD:ad(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
     if(GetPlayerCash(playerid) < 10000) return SCM(playerid, -1, ""er"You need $10,000 to make an advertisment");
+	if(PlayerInfo[playerid][Muted]) return SCM(playerid, RED, "You are muted! Please wait until the time is over!");
     
 	new ad[144];
 	if(sscanf(params, "s[140]", ad))
@@ -13224,7 +13225,12 @@ YCMD:getin(playerid, params[], help)
 		{
 			if(player == playerid || gTeam[player] != FREEROAM)
 			{
-			    return SCM(playerid, -1, ""er"Cannot get in that player");
+			    return SCM(playerid, -1, ""er"Cannot get in that players vehicle");
+			}
+
+			if(seat < 0 || seat > 3)
+			{
+				return SCM(playerid, NEF_GREEN, "Usage: /getin <playerid> <seat id 1-3>");
 			}
 
 			if(!IsPlayerInAnyVehicle(player))
@@ -13233,21 +13239,18 @@ YCMD:getin(playerid, params[], help)
 				SCM(playerid, -1, gstr);
 				return 1;
 			}
-
-			if(GetVehicleModelSeats(GetVehicleModel(GetPlayerVehicleID(player))) == 1)
+			
+            new vID = GetPlayerVehicleID(player), vM = GetVehicleModel(vID), count = 0;
+            
+			if(GetVehicleModelSeats(vM) == 1)
 			{
 				format(gstr, sizeof(gstr), ""er"%s(%i) is currently driving a one seat vehicle!", __GetName(player), player);
 				SCM(playerid, -1, gstr);
 				return 1;
 			}
 
-			if(seat < 0 || seat > 3)
-			{
-				return SCM(playerid, NEF_GREEN, "Usage: /getin <playerid> <seat id 1-3>");
-			}
-
-			new vID = GetPlayerVehicleID(player), vM = GetVehicleModel(vID), count = 0;
-
+            if(vM == 537 || vM == 538) return SCM(playerid, -1, ""er"You can't get into trains");
+            
 			for(new i = 0; i < MAX_PLAYERS; i++)
 			{
 			    if(!IsPlayerInVehicle(i, vID)) continue;
@@ -13259,11 +13262,8 @@ YCMD:getin(playerid, params[], help)
 					return 1;
 				}
 			}
-			
-			if(count >= GetVehicleModelSeats(GetVehicleModel(GetPlayerVehicleID(player))))
-			{
-			    return SCM(playerid, -1, ""er"All vehicles seats occupied!");
-			}
+
+			if(count >= GetVehicleModelSeats(vM)) return SCM(playerid, -1, ""er"All vehicles seats occupied!");
 
 			SetPlayerInterior(playerid, GetPlayerInterior(player));
 			SetPlayerVirtualWorld(playerid, GetPlayerVirtualWorld(player));
@@ -13455,6 +13455,11 @@ YCMD:p(playerid, params[], help)
 
         SCM(playerid, RED, "Advertising is not allowed!");
         return 1;
+	}
+
+	if(!PlayerInfo[playerid][bCaps])
+	{
+	    UpperToLower(gstr);
 	}
 
 	format(gstr, sizeof(gstr), ""white"["lb_e"VIP CHAT"white"] {%06x}%s"lb_e"(%i): %s", GetColor__(playerid) >>> 8, __GetName(playerid), playerid, gstr);
@@ -16657,6 +16662,11 @@ YCMD:pm(playerid, params[], help)
 	SetTimerEx("hideMsgTD", 3000, false, "i", player);
 	SetTimerEx("hideCheck", 3000, false, "i", playerid);
 	
+	if(!PlayerInfo[playerid][bCaps])
+	{
+	    UpperToLower(msg);
+	}
+	
 	format(gstr, sizeof(gstr), "{26FF00}***[PM] from %s(%i): %s", __GetName(playerid), playerid, msg);
     SCM(player, YELLOW, gstr);
 	format(gstr, sizeof(gstr), "{26FF00}>>>[PM] to %s(%i): %s", __GetName(player), player, msg);
@@ -16710,6 +16720,11 @@ YCMD:r(playerid, params[], help)
 	if(Iter_Contains(PlayerIgnore[lID], playerid))
 	{
 	    return SCM(playerid, -1, ""er"This player has blocked you from PMing him");
+	}
+	
+	if(!PlayerInfo[playerid][bCaps])
+	{
+	    UpperToLower(msg);
 	}
 	
 	format(gstr, sizeof(gstr), "{26FF00}***[PM] from %s(%i): %s", __GetName(playerid), playerid, msg);
