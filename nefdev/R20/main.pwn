@@ -43,7 +43,7 @@
 #include <mSelection>       // 1.1 R3
 #include <a_mysql_R34>  	// R34
 #include <dini>         	// 1.6
-#include <irc>          	// 1.4.3
+#include <irc>          	// 1.4.4
 #include <md-sort>      	// 04/01/2014
 #include <unixtimetodate> 	// 2.0
 #include <dns>              // v2.4
