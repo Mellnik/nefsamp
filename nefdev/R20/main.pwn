@@ -3500,7 +3500,7 @@ public OnPlayerCommandReceived(playerid, cmdtext[])
 	        case _I(p,m), _I(r), _I(s,t,a,t,s): { }
 	        default:
 			{
-			    SCM(playerid, -1, ""er"You can only use /pm and /r while being frozen!");
+			    SCM(playerid, -1, ""er"You can't use this command while being frozen!");
 				return 0;
    			}
 	    }
@@ -3514,8 +3514,13 @@ public OnPlayerCommandReceived(playerid, cmdtext[])
 			case _I(p,m), _I(r), _I(s,t,a,t,s): { }
 			default:
 			{
-				SetPVarInt(playerid, "doingStunt", 0);
-				PlayerInfo[playerid][tickJoin_bmx] = 0;
+			    if(GetPVarInt(playerid, "doingStunt") != 0)
+			    {
+			        SCM(playerid, -1, ""er"Removed from challenge because of using restricted commands");
+			        
+					SetPVarInt(playerid, "doingStunt", 0);
+					PlayerInfo[playerid][tickJoin_bmx] = 0;
+				}
 			}
 		}
 	}
