@@ -19950,7 +19950,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					case 11: ShowPlayerDialog(playerid, VEHICLE_DIALOG+11, DIALOG_STYLE_LIST, ""nef" :: Vehicles > Station Wagons", "Moonbeam\nPerenniel\nRegina\nSolair\nStratum", "Select", "Back");
 					case 12: ShowPlayerDialog(playerid, VEHICLE_DIALOG+12, DIALOG_STYLE_LIST, ""nef" :: Vehicles > Boats", "Coastguard\nDinghy\nJetmax\nLaunch\nMarquis\nPredator\nReefer\nSpeeder\nSquallo\nTropic", "Select", "Back");
 					case 13: ShowPlayerDialog(playerid, VEHICLE_DIALOG+13, DIALOG_STYLE_LIST, ""nef" :: Vehicles > Trailers", "Article Trailer\nArticle Trailer 2\nArticle Trailer 3\nBaggage Trailer A\nBaggage Trailer B\nFarm Trailer\nPetrol Trailer\nStairs Trailer\nUtility Trailer", "Select", "Back");
-					case 14: ShowPlayerDialog(playerid, VEHICLE_DIALOG+14, DIALOG_STYLE_LIST, ""nef" :: Vehicles > Unique Vehicles", "Baggage\nBrownstreak (Train)\nCaddy\nCamper\nCamper A\nCombine Harvester\nDozer\nDumper\nForklift\nFreight (Train)\nHotknife\nHotdog\nMower\nMr Whoopee\nRomero\nSecuricar\nStretch\nSweeper\nTram\nTowtruck\nTug", "Select", "Back");
+					case 14: ShowPlayerDialog(playerid, VEHICLE_DIALOG+14, DIALOG_STYLE_LIST, ""nef" :: Vehicles > Unique Vehicles", "Baggage\nCaddy\nCamper A\nCamper B\nCombine Harvester\nDozer\nDumper\nForklift\nFreight (Train)\nHotknife\nHotdog\nMower\nMr Whoopee\nRomero\nSecuricar\nStretch\nSweeper\nTram\nTowtruck\nTug", "Select", "Back");
 					case 15: ShowPlayerDialog(playerid, VEHICLE_DIALOG+15, DIALOG_STYLE_LIST, ""nef" :: Vehicles > RC Vehicles", "RC Bandit\nRC Raider\nRC Goblin\nRC Tiger\nRC Cam", "Select", "Back");
 				}
 				return true;
@@ -20035,7 +20035,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			}
 			case VEHICLE_DIALOG+14:
 			{
-		        new model_array[] = {485, 537, 457, 483, 508, 532, 486, 406, 530, 538, 434, 588, 572, 423, 442, 428, 409, 574, 449, 525, 583};
+		        new model_array[] = {485, 457, 483, 508, 532, 486, 406, 530, 434, 588, 572, 423, 442, 428, 409, 574, 449, 525, 583};
 	            CarSpawner(playerid, model_array[listitem], 120);
 				return true;
 			}
@@ -26007,13 +26007,18 @@ function:QueueProcess()
 		{
 		    PlayerInfo[i][PayDay] = 60;
 		    
+		    if((PlayerInfo[i][Bank] + PlayerInfo[i][Money]) > 100000000)
+		    {
+		        continue;
+		    }
+		    
 		    new string0[100],
 				string1[100],
 				string2[100],
 				string3[100],
 				string4[100],
 				string5[100],
-				interest = floatround(floatmul(floatdiv(PlayerInfo[i][Bank], 2150.0), 7.0), floatround_round),
+				interest = floatround(floatmul(floatdiv(PlayerInfo[i][Bank], 2300.0), 7.0), floatround_round),
 				vipinterest = floatround(interest / 2.5),
 				b_vipearnings = 0;
 
