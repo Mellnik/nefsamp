@@ -12076,7 +12076,7 @@ YCMD:gwar(playerid, params[], help)
 
         if(GZoneInfo[i][iLocked] > gettime())
         {
-            format(gstr, sizeof(gstr), ""white"This zone is currently locked!\n\nIt will become available for GWar in\n%i minutes.", floatround((GZoneInfo[i][iLocked] - gettime()) / 60.0));
+            format(gstr, sizeof(gstr), ""white"This zone is currently locked!\n\nIt will become available for Gang War in %i minutes.", floatround((GZoneInfo[i][iLocked] - gettime()) / 60.0));
             ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" Gang War", gstr, "OK", "");
             return 1;
 		}
