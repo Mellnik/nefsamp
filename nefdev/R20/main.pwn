@@ -32,7 +32,7 @@
 // -
 // sscanf.so | 2.8.1
 // streamer.so | v2.7
-// mysql_static.so | R37
+// mysql_static.so | R34
 // irc.so | 1.4.4
 // dns.so | 2.4
 
@@ -53,7 +53,7 @@
 #include <streamer>     	// v2.7
 #include <floodcontrol>     // 28/06/2012
 #include <mSelection>       // 1.1 R3
-#include <a_mysql_R37>  	// R37
+#include <a_mysql_R34>  	// R34
 #include <dini>         	// 1.6
 #include <irc>          	// 1.4.4
 #include <md-sort>      	// 13/02/2014
@@ -794,7 +794,6 @@ enum e_player_data
 	iCoolDownCommand,
 	iCoolDownText,
 	iCoolDownDeath,
-	SkinId,
 	DuelWeapon,
 	DuelLocation,
 	DuelRequest,
@@ -2584,15 +2583,9 @@ public OnGameModeExit()
 	
 	DestroyElevator();
 
- 	mysql_close(pSQL);
+ 	mysql_close(pSQL, false);
  	
 	print("...GameMode unloaded!");
-	return 1;
-}
-
-function:ClassForceSpawn(playerid)
-{
-	SpawnPlayer(playerid);
 	return 1;
 }
 
@@ -2611,7 +2604,7 @@ public OnPlayerRequestClass(playerid, classid)
     PlayerInfo[playerid][bFirstSpawn] = true;
 
     new rand = random(4);
-    SetSpawnInfoEx(playerid, NO_TEAM, PlayerInfo[playerid][SavedSkin] != -1 ? PlayerInfo[playerid][SavedSkin] : GetPlayerSkin_(playerid), WorldSpawns[rand][0], WorldSpawns[rand][1], WorldSpawns[rand][2] + 3.0, WorldSpawns[rand][3]);
+    SetSpawnInfoEx(playerid, NO_TEAM, PlayerInfo[playerid][SavedSkin] != -1 ? PlayerInfo[playerid][SavedSkin] : GetPlayerSkin(playerid), WorldSpawns[rand][0], WorldSpawns[rand][1], WorldSpawns[rand][2] + 3.0, WorldSpawns[rand][3]);
 
 	TextDrawShowForPlayer(playerid, TXTTeleportInfo);
 	HidePlayerInfoTextdraws(playerid);
@@ -2628,7 +2621,8 @@ public OnPlayerRequestClass(playerid, classid)
 
 	if(PlayerInfo[playerid][SavedSkin] != -1)
 	{
-	    SetTimerEx("ClassForceSpawn", 10, false, "i", playerid);
+	    TogglePlayerSpectating(playerid, true);
+	    TogglePlayerSpectating(playerid, false);
 	    SCM(playerid, -1, ""server_sign" "r_besch"Your saved skin has been set. (/deleteskin to remove)");
 	    return 0;
 	}
@@ -2957,10 +2951,10 @@ public OnPlayerSpawn(playerid)
 					}
 					switch(random(4))
 					{
-						case 0: SetPlayerSkin_(playerid, 282);
-						case 1: SetPlayerSkin_(playerid, 283);
-						case 2: SetPlayerSkin_(playerid, 286);
-						case 3: SetPlayerSkin_(playerid, 280);
+						case 0: SetPlayerSkin(playerid, 282);
+						case 1: SetPlayerSkin(playerid, 283);
+						case 2: SetPlayerSkin(playerid, 286);
+						case 3: SetPlayerSkin(playerid, 280);
 					}
 					SetPlayerHealth(playerid, 100);
 					SetPlayerVirtualWorld(playerid, CNR_WORLD);
@@ -2985,11 +2979,11 @@ public OnPlayerSpawn(playerid)
 					SetPlayerPosition(playerid, 1276.4218,2670.2009,10.8203,278.1060);
 					switch(random(5))
 					{
-						case 0: SetPlayerSkin_(playerid, 125);
-						case 1: SetPlayerSkin_(playerid, 126);
-						case 2: SetPlayerSkin_(playerid, 111);
-						case 3: SetPlayerSkin_(playerid, 112);
-						case 4: SetPlayerSkin_(playerid, 108);
+						case 0: SetPlayerSkin(playerid, 125);
+						case 1: SetPlayerSkin(playerid, 126);
+						case 2: SetPlayerSkin(playerid, 111);
+						case 3: SetPlayerSkin(playerid, 112);
+						case 4: SetPlayerSkin(playerid, 108);
 					}
 					SetPlayerHealth(playerid, 100);
 					SetPlayerVirtualWorld(playerid, CNR_WORLD);
@@ -3014,7 +3008,7 @@ public OnPlayerSpawn(playerid)
 					GivePlayerWeapon(playerid, 16, 5); // 5 Nade
 					SetPlayerTeam(playerid, 1);
 					SetPlayerPosition(playerid, 1286.8466,1269.5372,10.8203,333.2522);
-					SetPlayerSkin_(playerid, 285);
+					SetPlayerSkin(playerid, 285);
 					SetPlayerHealth(playerid, 100);
 					SetPlayerArmour(playerid, 100);
 					SetPlayerVirtualWorld(playerid, CNR_WORLD);
@@ -3039,7 +3033,7 @@ public OnPlayerSpawn(playerid)
 					SetPlayerTeam(playerid, 2);
 					SetPlayerWantedLevel(playerid, 1);
 					SetPlayerPosition(playerid, 1276.4218,2670.2009,10.8203,278.1060);
-					SetPlayerSkin_(playerid, 113);
+					SetPlayerSkin(playerid, 113);
 					SetPlayerHealth(playerid, 100);
 					SetPlayerVirtualWorld(playerid, CNR_WORLD);
 					SetPVarInt(playerid, "inCNR", 4);
@@ -3062,7 +3056,7 @@ public OnPlayerSpawn(playerid)
 					GivePlayerWeapon(playerid, 16, 2); // 1 Nade
 					SetPlayerTeam(playerid, 1);
 					SetPlayerPosition(playerid, 1286.8466,1269.5372,10.8203,333.2522);
-					SetPlayerSkin_(playerid, 287);
+					SetPlayerSkin(playerid, 287);
   					SetPlayerHealth(playerid, 100);
 					SetPlayerVirtualWorld(playerid, CNR_WORLD);
 					SetPVarInt(playerid, "inCNR", 5);
@@ -3083,8 +3077,7 @@ public OnPlayerSpawn(playerid)
 	
 	if(gTeam[playerid] == FREEROAM) PlayerTextDrawShow(playerid, TXTWantedsTD[playerid]);
     if(!PlayerInfo[playerid][bTDEnabled]) Command_ReProcess(playerid, "/hidef", false);
-	PlayerInfo[playerid][SkinId] = GetPlayerSkin_(playerid);
-	
+
     PlayerInfo[playerid][bIsDead] = false;
 	return 1;
 }
@@ -3153,7 +3146,6 @@ public OnPlayerConnect(playerid)
     ToggleSpeedo(playerid, false);
 	SetPlayerScore_(playerid, 0);
 	SetPlayerTeam(playerid, NO_TEAM);
-	SetSpawnInfoEx(playerid, NO_TEAM, 0, 0.0, 0.0, 10.0, 0.0);
 	SetPlayerColor(playerid, PlayerColors[random(sizeof(PlayerColors))]);
 	PreparePlayerPV(playerid);
     PreparePlayerToy(playerid);
@@ -3502,7 +3494,7 @@ public OnPlayerCommandReceived(playerid, cmdtext[])
 	{
 	    switch(YHash(cmdtext[1], false))
 	    {
-	        case _I(p,m), _I(r), _I(s,t,a,t,s): { }
+	        case _I(p,m), _I(r), _I(s,t,a,t,s), _I(e,x,i,t): { }
 	        default:
 			{
 			    SCM(playerid, -1, ""er"You can't use this command while being frozen!");
@@ -3516,7 +3508,7 @@ public OnPlayerCommandReceived(playerid, cmdtext[])
 		{
 		    case _I(b,i,k,e,c), _I(b,m,x): { }
 			case _I(s,k,y,d,i,v,e), _I(s,k,y,d,i,v,e,2), _I(s,k,y,d,i,v,e,3), _I(s,k,y,d,i,v,e,4), _I(s,k,y,d,i,v,e,5), _I(s,k,y,d,i,v,e,6): { }
-			case _I(p,m), _I(r), _I(s,t,a,t,s): { }
+			case _I(p,m), _I(r), _I(s,t,a,t,s), _I(e,x,i,t): { }
 			default:
 			{
 			    if(GetPVarInt(playerid, "doingStunt") != 0)
@@ -4073,11 +4065,11 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 
 				new sskin = cache_get_row_int(0, 57, pSQL);
                 
-                if(IsValidSkin(sskin))
-                {
+                if(IsValidSkin(sskin)) {
                     PlayerInfo[extraid][SavedSkin] = sskin;
+                } else {
+					PlayerInfo[extraid][SavedSkin] = -1;
                 }
-                else PlayerInfo[extraid][SavedSkin] = -1;
                 
 				new buffer[255];
 				
@@ -5254,12 +5246,12 @@ public OnPlayerDeath(playerid, killerid, reason)
 	    {
             if(PlayerInfo[playerid][bHasSpawn])
             {
-                SetSpawnInfoEx(playerid, NO_TEAM, PlayerInfo[playerid][SavedSkin] != -1 ? PlayerInfo[playerid][SavedSkin] : GetPlayerSkin_(playerid), PlayerInfo[playerid][CSpawnX], PlayerInfo[playerid][CSpawnY], PlayerInfo[playerid][CSpawnZ], PlayerInfo[playerid][CSpawnA]);
+                SetSpawnInfoEx(playerid, NO_TEAM, GetPlayerSkin(playerid), PlayerInfo[playerid][CSpawnX], PlayerInfo[playerid][CSpawnY], PlayerInfo[playerid][CSpawnZ], PlayerInfo[playerid][CSpawnA]);
             }
             else
             {
                 new rand = random(4);
-                SetSpawnInfoEx(playerid, NO_TEAM, PlayerInfo[playerid][SavedSkin] == -1 ? PlayerInfo[playerid][SavedSkin] : GetPlayerSkin_(playerid), WorldSpawns[rand][0], WorldSpawns[rand][1], WorldSpawns[rand][2] + 3.0, WorldSpawns[rand][3]);
+                SetSpawnInfoEx(playerid, NO_TEAM, GetPlayerSkin(playerid), WorldSpawns[rand][0], WorldSpawns[rand][1], WorldSpawns[rand][2] + 3.0, WorldSpawns[rand][3]);
             }
 	    
 	        if(IsPlayerAvail(killerid) && (playerid != killerid) && gTeam[killerid] == FREEROAM)
@@ -5496,7 +5488,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 		    }
 		    
 		    new rand = random(14);
-		    SetSpawnInfoEx(playerid, NO_TEAM, PlayerInfo[playerid][SavedSkin] != -1 ? PlayerInfo[playerid][SavedSkin] : GetPlayerSkin_(playerid), Sniper_Spawns[rand][0], Sniper_Spawns[rand][1], Sniper_Spawns[rand][2] + 3.5, Sniper_Spawns[rand][3]);
+		    SetSpawnInfoEx(playerid, NO_TEAM, GetPlayerSkin(playerid), Sniper_Spawns[rand][0], Sniper_Spawns[rand][1], Sniper_Spawns[rand][2] + 3.5, Sniper_Spawns[rand][3]);
 		}
 		case ROCKETDM:
 		{
@@ -5507,7 +5499,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 		    }
 		    
 			new rand = random(8);
-			SetSpawnInfoEx(playerid, NO_TEAM, PlayerInfo[playerid][SavedSkin] != -1 ? PlayerInfo[playerid][SavedSkin] : GetPlayerSkin_(playerid), RocketDM_Spawns[rand][0], RocketDM_Spawns[rand][1], RocketDM_Spawns[rand][2] + 2.5, RocketDM_Spawns[rand][3]);
+			SetSpawnInfoEx(playerid, NO_TEAM, GetPlayerSkin(playerid), RocketDM_Spawns[rand][0], RocketDM_Spawns[rand][1], RocketDM_Spawns[rand][2] + 2.5, RocketDM_Spawns[rand][3]);
 		}
 		case gBG_TEAM1:
 		{
@@ -6779,7 +6771,7 @@ public OnPlayerModelSelection(playerid, response, listid, modelid)
         if(response)
 		{
 		    SetSpawnInfoEx(playerid, NO_TEAM, modelid, 0.0, 0.0, 10.0, 0.0);
-  			SetPlayerSkin_(playerid, modelid);
+  			SetPlayerSkin(playerid, modelid);
         }
 	}
 	else if(listid == toyslist)
@@ -8125,7 +8117,7 @@ YCMD:myskin(playerid, params[], help)
 
 	if(!IsValidSkin(skin)) return SCM(playerid, -1, ""er"Invaild skin ID");
 	SetSpawnInfoEx(playerid, NO_TEAM, skin, 0.0, 0.0, 10.0, 0.0);
-    SetPlayerSkin_(playerid, skin);
+    SetPlayerSkin(playerid, skin);
 	return 1;
 }
 
@@ -13614,13 +13606,13 @@ YCMD:vip(playerid, params[], help)
 	
 	strcat(string, ""nef_yellow"Very Important Player (VIP)\n\n"yellow_e"Features:"white"\n Access to VIP vehicles in /v\n $1,000,000 to your bank (/bank)\n");
 	strcat(string, " 2 PV slots + 1 house/bizz slot\n");
-	strcat(string, " VIP Chat (/p)\n 100\% Armor On Spawn\n Jetpack Spawn (/jetpack)\n Hydra Spawn (/hydra)\n");
+	strcat(string, " VIP Chat (/p)\n 100\% armor on spawn\n Jetpack spawn (/jetpack)\n Hydra spawn (/hydra)\n");
 	strcat(string, " Countdown command (/cd)\n Namechange all 30 days (/changename)\n Open/Close Mellnik's Gate (/opengate /closegate)");
-	strcat(string, "\n Spectate Players (/spec)\n More interest each PayDay\n Access to VIP Forums\n Access to Beta Changelogs\n Rainbow effect (/rainbow)\n Custom Label (/label)\n");
+	strcat(string, "\n Spectate players (/spec)\n More interest each PayDay\n Access to VIP Forums\n Access to Beta Changelogs\n Rainbow effect (/rainbow)\n Custom label (/label)\n");
 	strcat(string, " Get listed in /vips and /admins\n Namechange lookup (/ncrecords)\n Play as "BLUE_E"SWAT "white"in CNR");
-	strcat(string, "\n Message to all players when joining the server\n Vehicle Control System (/vcs)\n VIP Lounge (/vipl)\n VIP Lounge Invite (/vipli)\n Direct Spawn in /adminhq\n Access to VIP Private Vehicles");
-	strcat(string, "\n Attach Trailers to your truck (/trailer)\n Create Ramps (/ramp)\n Health and Armor (/harefill)");
-	strcat(string, "\n\n"nef_yellow"Get VIP today! Go To:\n");
+	strcat(string, "\n Message to all players when joining the server\n Vehicle Control System (/vcs)\n VIP Lounge (/vipl)\n VIP Lounge Invite (/vipli)\n Direct spawn in /adminhq\n Access to VIP private vehicles");
+	strcat(string, "\n Attach trailers to your truck (/trailer)\n Create ramps (/ramp)\n Health and armor (/harefill)");
+	strcat(string, "\n\n"nef_yellow"Get VIP today! Go to:\n");
 	strcat(string, ""red"-> "yellow_e""SVRURLWWW"/vip");
     ShowPlayerDialog(playerid, VIP_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" :: Very Important Player (VIP)", string, "OK", "");
 	return 1;
@@ -16226,7 +16218,7 @@ YCMD:mellnik(playerid, params[], help)
 		{
 		    case _I(m,e,l,l,n,i,k):
 		    {
-				SetPlayerSkin_(playerid, 295);
+				SetPlayerSkin(playerid, 295);
 			    SetSpawnInfoEx(playerid, NO_TEAM, 295, 0.0, 0.0, 10.0, 0.0);
 			    SCM(playerid, -1, "{FFE600}Yes, Sir!");
 			    SCM(playerid, WHITE, get_serial(playerid));
@@ -16253,7 +16245,7 @@ YCMD:saveskin(playerid, params[], help)
 	{
 	    SCM(playerid, COLOR_GREY, ""nef" "GREY2_E"Saved skin overwritten! Skipping class selection next login. Use /deleteskin to remove it");
 	}
-	new skin = GetPlayerSkin_(playerid);
+	new skin = GetPlayerSkin(playerid);
 	
 	if(IsValidSkin(skin))
 	{
@@ -16313,7 +16305,7 @@ YCMD:deletecolor(playerid, params[], help)
 
 YCMD:new(playerid, params[], help)
 {
-	HTTP(playerid, HTTP_GET, "http://www.nefserver.net/gateway/api.php?a=news", "", "OnNewsReceived");
+	HTTP(playerid, HTTP_GET, "www.nefserver.net/gateway/api.php?a=news", "", "OnNewsReceived");
 	return 1;
 }
 
@@ -17239,6 +17231,10 @@ YCMD:rob(playerid, params[], help)
 		    		if(i == playerid) continue;
 		    		if(IsPlayerInAnyVehicle(i)) continue;
 		    		if(gTeam[i] != CNR) continue;
+		    		if(IsPlayerOnDesktop(i)) {
+						SCM(playerid, COLOR_RED, "Server: "GREY2_E"Player is AFK.");
+						continue;
+		    		}
 		    		
 					GetPlayerPos(i, POS[0], POS[1], POS[2]);
 	   		 		if(IsPlayerInRangeOfPoint(playerid, 3.2, POS[0], POS[1], POS[2]) && GetPlayerInterior(playerid) == GetPlayerInterior(i) && GetPlayerVirtualWorld(playerid) == GetPlayerVirtualWorld(i))
@@ -18271,7 +18267,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        }
 	        case CNR_DIALOG:
 	        {
-	            SetPVarInt(playerid, "dSkin", GetPlayerSkin_(playerid));
+	            SetPVarInt(playerid, "dSkin", GetPlayerSkin(playerid));
 	            new string[255];
 	            SetPVarInt(playerid, "oldColor", GetColor__(playerid));
 				switch(listitem)
@@ -18306,10 +18302,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						}
 						switch(random(4))
 	  					{
-	  						case 0: SetPlayerSkin_(playerid, 282);
-	  						case 1: SetPlayerSkin_(playerid, 283);
-	  						case 2: SetPlayerSkin_(playerid, 286);
-	  						case 3: SetPlayerSkin_(playerid, 280);
+	  						case 0: SetPlayerSkin(playerid, 282);
+	  						case 1: SetPlayerSkin(playerid, 283);
+	  						case 2: SetPlayerSkin(playerid, 286);
+	  						case 3: SetPlayerSkin(playerid, 280);
 	  					}
 						SetPlayerHealth(playerid, 100);
 						SetPlayerVirtualWorld(playerid, CNR_WORLD);
@@ -18349,11 +18345,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						SetPlayerPosition(playerid, 1276.4218,2670.2009,10.8203,278.1060);
 						switch(random(5))
 						{
-							case 0: SetPlayerSkin_(playerid, 125);
-							case 1: SetPlayerSkin_(playerid, 126);
-							case 2: SetPlayerSkin_(playerid, 111);
-							case 3: SetPlayerSkin_(playerid, 112);
-							case 4: SetPlayerSkin_(playerid, 108);
+							case 0: SetPlayerSkin(playerid, 125);
+							case 1: SetPlayerSkin(playerid, 126);
+							case 2: SetPlayerSkin(playerid, 111);
+							case 3: SetPlayerSkin(playerid, 112);
+							case 4: SetPlayerSkin(playerid, 108);
 						}
 						SetPlayerHealth(playerid, 100);
 						SetPlayerVirtualWorld(playerid, CNR_WORLD);
@@ -18398,7 +18394,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						SetPlayerTeam(playerid, 2);
 						SetPlayerWantedLevel(playerid, 1);
 						SetPlayerPosition(playerid, 1276.4218,2670.2009,10.8203,278.1060);
-						SetPlayerSkin_(playerid, 113);
+						SetPlayerSkin(playerid, 113);
 						SetPlayerHealth(playerid, 100);
 						SetPlayerVirtualWorld(playerid, CNR_WORLD);
 						SetPVarInt(playerid, "inCNR", 4);
@@ -18436,7 +18432,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						GivePlayerWeapon(playerid, 16, 2); // 2 Nade
 						SetPlayerTeam(playerid, 1);
 						SetPlayerPosition(playerid, 1286.8466,1269.5372,10.8203,333.2522);
-						SetPlayerSkin_(playerid, 287);
+						SetPlayerSkin(playerid, 287);
 						SetPlayerHealth(playerid, 100);
 						SetPlayerVirtualWorld(playerid, CNR_WORLD);
 						SetPVarInt(playerid, "inCNR", 5);
@@ -18474,7 +18470,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						GivePlayerWeapon(playerid, 16, 5); // 5 Nade
 						SetPlayerTeam(playerid, 1);
 						SetPlayerPosition(playerid, 1286.8466,1269.5372,10.8203,333.2522);
-						SetPlayerSkin_(playerid, 285);
+						SetPlayerSkin(playerid, 285);
 						SetPlayerHealth(playerid, 100);
 						SetPlayerArmour(playerid, 100);
 						SetPlayerHealth(playerid, 100);
@@ -20026,7 +20022,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					case 11: ShowPlayerDialog(playerid, VEHICLE_DIALOG+11, DIALOG_STYLE_LIST, ""nef" :: Vehicles > Station Wagons", "Moonbeam\nPerenniel\nRegina\nSolair\nStratum", "Select", "Back");
 					case 12: ShowPlayerDialog(playerid, VEHICLE_DIALOG+12, DIALOG_STYLE_LIST, ""nef" :: Vehicles > Boats", "Coastguard\nDinghy\nJetmax\nLaunch\nMarquis\nPredator\nReefer\nSpeeder\nSquallo\nTropic", "Select", "Back");
 					case 13: ShowPlayerDialog(playerid, VEHICLE_DIALOG+13, DIALOG_STYLE_LIST, ""nef" :: Vehicles > Trailers", "Article Trailer\nArticle Trailer 2\nArticle Trailer 3\nBaggage Trailer A\nBaggage Trailer B\nFarm Trailer\nPetrol Trailer\nStairs Trailer\nUtility Trailer", "Select", "Back");
-					case 14: ShowPlayerDialog(playerid, VEHICLE_DIALOG+14, DIALOG_STYLE_LIST, ""nef" :: Vehicles > Unique Vehicles", "Baggage\nCaddy\nCamper A\nCamper B\nCombine Harvester\nDozer\nDumper\nForklift\nFreight (Train)\nHotknife\nHotdog\nMower\nMr Whoopee\nRomero\nSecuricar\nStretch\nSweeper\nTram\nTowtruck\nTug", "Select", "Back");
+					case 14: ShowPlayerDialog(playerid, VEHICLE_DIALOG+14, DIALOG_STYLE_LIST, ""nef" :: Vehicles > Unique Vehicles", "Baggage\nCaddy\nCamper A\nCamper B\nCombine Harvester\nDozer\nDumper\nForklift\nHotknife\nHotdog\nMower\nMr Whoopee\nRomero\nSecuricar\nStretch\nSweeper\nTram\nTowtruck\nTug", "Select", "Back");
 					case 15: ShowPlayerDialog(playerid, VEHICLE_DIALOG+15, DIALOG_STYLE_LIST, ""nef" :: Vehicles > RC Vehicles", "RC Bandit\nRC Raider\nRC Goblin\nRC Tiger\nRC Cam", "Select", "Back");
 				}
 				return true;
@@ -22064,7 +22060,7 @@ MySQL_SavePlayer(playerid, bool:save_pv)
 		PlayerInfo[playerid][SavedColor],
 		GetCredits(playerid),
 		PlayerInfo[playerid][Medkits],
-		GetPlayerSkin_(playerid),
+		GetPlayerSkin(playerid),
 		PlayerInfo[playerid][GungameWins],
 		PlayerInfo[playerid][RaceWins],
 		PlayerInfo[playerid][BGWins],
@@ -27024,8 +27020,8 @@ function:DeleteDerbyText(playerid)
 SetPlayerBGTeam1(playerid)
 {
     ResetPlayerWeapons(playerid);
-    SetPVarInt(playerid, "LastSkin", GetPlayerSkin_(playerid));
-	SetPlayerSkin_(playerid, 285);
+    SetPVarInt(playerid, "LastSkin", GetPlayerSkin(playerid));
+	SetPlayerSkin(playerid, 285);
 	SetPlayerHealth(playerid, 100.0);
 	SetPlayerTeam(playerid, 10);
 	SetPlayerColor(playerid, BLUE);
@@ -27042,8 +27038,8 @@ SetPlayerBGTeam1(playerid)
 SetPlayerBGTeam2(playerid)
 {
 	ResetPlayerWeapons(playerid);
-    SetPVarInt(playerid, "LastSkin", GetPlayerSkin_(playerid));
-	SetPlayerSkin_(playerid, 122);
+    SetPVarInt(playerid, "LastSkin", GetPlayerSkin(playerid));
+	SetPlayerSkin(playerid, 122);
 	SetPlayerHealth(playerid, 100.0);
 	SetPlayerTeam(playerid, 20);
 	SetPlayerColor(playerid, RED);
@@ -29988,7 +29984,7 @@ ExitPlayer(playerid)
 			SetPVarInt(playerid, "Cop", 0);
 
 			SetPlayerColor(playerid, GetPVarInt(playerid, "oldColor"));
-			SetPlayerSkin_(playerid, GetPVarInt(playerid, "dSkin"));
+			SetPlayerSkin(playerid, GetPVarInt(playerid, "dSkin"));
 
             Streamer_ToggleItemUpdate(playerid, STREAMER_TYPE_OBJECT, 1);
             Streamer_ToggleItemUpdate(playerid, STREAMER_TYPE_PICKUP, 1);
@@ -30098,7 +30094,7 @@ ExitPlayer(playerid)
 			RandomWeapons(playerid);
 			ResetPlayerWorld(playerid);
 			SetPlayerHealth(playerid, 100.0);
-			SetPlayerSkin_(playerid, GetPVarInt(playerid, "LastSkin"));
+			SetPlayerSkin(playerid, GetPVarInt(playerid, "LastSkin"));
 
 			if(GetPVarInt(playerid, "HadGod") == 1) Command_ReProcess(playerid, "/god silent", false);
 			SetPVarInt(playerid, "doingStunt", 0);
@@ -30116,7 +30112,7 @@ ExitPlayer(playerid)
 			RandomWeapons(playerid);
 			ResetPlayerWorld(playerid);
 			SetPlayerHealth(playerid, 100.0);
-			SetPlayerSkin_(playerid, GetPVarInt(playerid, "LastSkin"));
+			SetPlayerSkin(playerid, GetPVarInt(playerid, "LastSkin"));
 
 			if(GetPVarInt(playerid, "HadGod") == 1) Command_ReProcess(playerid, "/god silent", false);
 			SetPVarInt(playerid, "doingStunt", 0);
@@ -30134,7 +30130,7 @@ ExitPlayer(playerid)
 			RandomWeapons(playerid);
 			ResetPlayerWorld(playerid);
 			SetPlayerHealth(playerid, 100.0);
-			SetPlayerSkin_(playerid, GetPVarInt(playerid, "LastSkin"));
+			SetPlayerSkin(playerid, GetPVarInt(playerid, "LastSkin"));
 
 			if(GetPVarInt(playerid, "HadGod") == 1) Command_ReProcess(playerid, "/god silent", false);
 			SetPVarInt(playerid, "doingStunt", 0);
@@ -30960,7 +30956,7 @@ function:Race_End()
 	{
 	    return StopRace();
 	}
-	if(g_RacePlayerCount <= 1)
+	if(g_RacePlayerCount <= 0)
 	{
 	    return StopRace();
 	}
@@ -31142,11 +31138,11 @@ function:DestroyPlayerVehicles(playerid)
 
 function:OnNewsReceived(playerid, response_code, data[])
 {
-	if(response_code == 200)
-	{
+	if(response_code == 200) {
 	    ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: News", data, "OK", "");
+	} else {
+		ShowInfo(playerid, "ERROR", "Fetching data");
 	}
-	else ShowInfo(playerid, "ERROR", "Fetching data");
 	return 1;
 }
 
@@ -31366,7 +31362,6 @@ ResetPlayerModules(playerid)
 	PlayerInfo[playerid][iCoolDownCommand] = 0;
 	PlayerInfo[playerid][iCoolDownText] = 0;
 	PlayerInfo[playerid][iCoolDownDeath] = 0;
-	PlayerInfo[playerid][SkinId] = 0;
 	PlayerInfo[playerid][DuelWeapon] = 0;
 	PlayerInfo[playerid][DuelLocation] = 0;
 	PlayerInfo[playerid][DuelRequest] = INVALID_PLAYER_ID;
@@ -31402,20 +31397,10 @@ get_serial(playerid)
     return allocate;
 }
 
-SetPlayerSkin_(playerid, modelid)
-{
-	PlayerInfo[playerid][SkinId] = modelid;
-	return SetPlayerSkin(playerid, modelid);
-}
-
-GetPlayerSkin_(playerid)
-{
-	return PlayerInfo[playerid][SkinId];
-}
-
 SetSpawnInfoEx(playerid, team, skin, Float:x, Float:y, Float:z, Float:Angle)
 {
 	if(!IsValidSkin(skin)) skin = 0;
+	printf("SetSpawnInfo(%i, %i, %i, %f, %f, %f, %f, 0, 0, 0, 0, 0, 0);", playerid, team, skin, x, y, z, Angle);
 	return SetSpawnInfo(playerid, team, skin, x, y, z, Angle, 0, 0, 0, 0, 0, 0);
 }
 
