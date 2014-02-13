@@ -8538,7 +8538,7 @@ YCMD:l(playerid, params[], help)
 	return 1;
 }
 
-YCMD:tele(playerid, params[], help)
+YCMD:t(playerid, params[], help)
 {
 	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
  	ShowDialog(playerid, TELE_DIALOG);
@@ -10794,7 +10794,7 @@ YCMD:nstats(playerid, params[], help)
         if(IsPlayerAvail(player))
 		{
 			new string[512], ip_port[22];
-			format(string, sizeof(string), ""white"Network Statistics\n\n%s(%i)\n\nConnect Time: %i\nMsgs Recv: %i\nBytes Recv: %i\nMsgs Sent: %i\nBytes Sent: %i\nMsgs Recv per second: %i\nPacketloss: %.2f\%\nConnect Stauts: %i\n",
+			format(string, sizeof(string), ""white"Network Statistics\n\n%s(%i)\n\nConnect Time: %i\nMsgs Recv: %i\nBytes Recv: %i\nMsgs Sent: %i\nBytes Sent: %i\nMsgs Recv per second: %i\nPacketloss: %.2f percent\nConnect Stauts: %i\n",
 			    __GetName(playerid),
 			    playerid,
 			    NetStats_GetConnectedTime(playerid),
@@ -16934,7 +16934,7 @@ YCMD:achs(playerid, params[], help)
 	return 1;
 }
 
-YCMD:cmds(playerid, params[], help)
+YCMD:c(playerid, params[], help)
 {
     ShowDialog(playerid, CMDS_DIALOG);
 	return 1;
@@ -19578,9 +19578,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		            }
 		            case 2:
 		            {
-						new cstring[600];
+						new cstring[900];
 						
-						strcat(cstring, ""yellow"/gcreate "white"- create a gang\n");
 						strcat(cstring, ""yellow"/gmenu "white"- gang menu\n");
 						strcat(cstring, ""yellow"/gcolor "white"- set the gang color\n");
 						strcat(cstring, ""yellow"/gcar "white"- set the gang vehicle\n");
@@ -19592,6 +19591,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						strcat(cstring, ""yellow"/gclose "white"- destroy your gang\n");
 						strcat(cstring, ""yellow"/gdeny "white"- deny an invitation\n");
 						strcat(cstring, ""yellow"/gangs "white"- online gangs\n");
+						strcat(cstring, ""yellow"/gzones "white"- view your zones\n");
+						strcat(cstring, ""yellow"/gcapture "white"- recapture a zone while it is begin attacked\n");
+						strcat(cstring, ""yellow"/gwar "white"- start a war against another gang\n");
+						strcat(cstring, ""yellow"/gwars "white"- view ongoing gwars\n");
 		            
 		                ShowPlayerDialog(playerid, GMENU_DIALOG + 1, DIALOG_STYLE_MSGBOX, ""nef" :: Gang commands", cstring, "OK", "Back");
 		            }
@@ -23624,11 +23627,11 @@ LoadServerStaticMeshes()
 	Command_AddAltNamed("l", "lpos");
 	Command_AddAltNamed("l", "load");
 	Command_AddAltNamed("l", "lp");
-	Command_AddAltNamed("tele", "maps");
-	Command_AddAltNamed("tele", "map");
-	Command_AddAltNamed("tele", "teles");
-	Command_AddAltNamed("tele", "t");
-	Command_AddAltNamed("tele", "teleport");
+	Command_AddAltNamed("t", "maps");
+	Command_AddAltNamed("t", "map");
+	Command_AddAltNamed("t", "teles");
+	Command_AddAltNamed("t", "tele");
+	Command_AddAltNamed("t", "teleport");
 	Command_AddAltNamed("parch", "para");
 	Command_AddAltNamed("parch", "pc");
 	Command_AddAltNamed("colors", "color");
@@ -23705,13 +23708,13 @@ LoadServerStaticMeshes()
 	Command_AddAltNamed("achs", "achievements");
 	Command_AddAltNamed("achs", "erfolge");
 	Command_AddAltNamed("achs", "ach");
-	Command_AddAltNamed("cmds", "c");
+	Command_AddAltNamed("c", "cmds");
 	Command_AddAltNamed("help", "ghelp");
 	Command_AddAltNamed("help", "chelp");
 	Command_AddAltNamed("help", "hilfe");
-	Command_AddAltNamed("cmds", "commands");
-	Command_AddAltNamed("cmds", "command");
-	Command_AddAltNamed("cmds", "cmd");
+	Command_AddAltNamed("c", "commands");
+	Command_AddAltNamed("c", "command");
+	Command_AddAltNamed("c", "cmd");
 	Command_AddAltNamed("hitman", "hit");
 	Command_AddAltNamed("serverstats", "uptime");
 	Command_AddAltNamed("w", "weps");
