@@ -15,36 +15,37 @@
 #define INC_ENVIORMENT (true)
 #define IRC_CONNECT (false)
 #define WINTER_EDITION (false) // ferriswheelfair.amx
+#define YSI_IS_SERVER
 
 // -
 // - Plugins
 // -
 // sscanf.so | 2.8.1
-// streamer.so | R84
+// streamer.so | v2.7
 // mysql_static.so | R34
-// irc.so | 1.4.3
+// irc.so | 1.4.4
 // dns.so | 2.4
 
 // -
 // - Includes
 // -
-#include <a_samp>   		// 0.3x-R2
-#include <a_http>           // 0.3x-R2
+#include <a_samp>   		// 0.3z
+#include <a_http>           // 0.3z
 #undef MAX_PLAYERS
 #define MAX_PLAYERS (400)
-#include <YSI\y_iterate>	// 04/01/2014
-#include <YSI\y_commands>   // 04/01/2014
-#include <YSI\y_master>     // 04/01/2014
-#include <YSI\y_stringhash> // 04/01/2014
-#include <a_zones>          // 0.3x-R2
+#include <YSI\y_iterate>	// 13/02/2014
+#include <YSI\y_commands>   // 13/02/2014
+#include <YSI\y_master>     // 13/02/2014
+#include <YSI\y_stringhash> // 13/02/2014
+#include <a_zones>          // 0.3z
 #include <sscanf2>      	// 2.8.1
-#include <streamer>     	// 2.6.1 R84
+#include <streamer>     	// v2.7
 #include <floodcontrol>     // 28/06/2012
 #include <mSelection>       // 1.1 R3
 #include <a_mysql_R34>  	// R34
 #include <dini>         	// 1.6
 #include <irc>          	// 1.4.4
-#include <md-sort>      	// 04/01/2014
+#include <md-sort>      	// 13/02/2014
 #include <unixtimetodate> 	// 2.0
 #include <dns>              // v2.4
 #if INC_ENVIORMENT == true
@@ -87,10 +88,10 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #if IS_RELEASE_BUILD == true
 #define CURRENT_VERSION                 "Build 20"
 #else
-#define CURRENT_VERSION                 "PTS:Build20"
+#define CURRENT_VERSION                 "PTS:Build 20"
 #endif
 #define HOTFIX_REV                      "Hotfix #0"
-#define SAMP_VERSION                    "SA-MP 0.3x-R2"
+#define SAMP_VERSION                    "SA-MP 0.3z"
 #define MAX_REPORTS 					(7)
 #define MAX_ADS                         (10)
 #define MAX_GANG_NAME					(20)
@@ -2571,13 +2572,6 @@ public OnGameModeExit()
     IRC_DestroyGroup(IRC_GroupID);
 	
 	DestroyElevator();
-    
-	DestroyAllDynamicObjects();
-	DestroyAllDynamicCPs();
-	DestroyAllDynamicRaceCPs();
-	DestroyAllDynamicMapIcons();
-	DestroyAllDynamic3DTextLabels();
-	DestroyAllDynamicPickups();
 
  	mysql_close(pSQL, true);
  	
@@ -3621,7 +3615,12 @@ public OnVehicleRespray(playerid, vehicleid, color1, color2)
 	return 1;
 }
 
-public OnPlayerGiveDamage(playerid, damagedid, Float:amount, weaponid)
+public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY, Float:fZ)
+{
+	return 1;
+}
+
+public OnPlayerGiveDamage(playerid, damagedid, Float:amount, weaponid, bodypart)
 {
 	if(damagedid == INVALID_PLAYER_ID || playerid == INVALID_PLAYER_ID) return 1;
 	
@@ -9854,7 +9853,7 @@ YCMD:adminhelp(playerid, params[], help)
 	{
 	    new string[1500];
 
-		format(gstr, sizeof(gstr), "%s\n", StaffLevels[1][e_rank]);
+		format(gstr, sizeof(gstr), ""white"%s\n", StaffLevels[1][e_rank]);
 		strcat(string, gstr);
 		strcat(string, "/rplayers /dplayers /asay /warn /slap /reports /spec /specoff /disarm\n/pweaps /getin /gotoxyza /spectators /caps\n/kick /mute /unmute /adminhq /ncrecords\n\n");
 
@@ -9864,7 +9863,7 @@ YCMD:adminhelp(playerid, params[], help)
 		
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[3][e_rank]);
 		strcat(string, gstr);
-		strcat(string, "/freeze /eject /go /burn /getip /get /mkick /clearchat /iplookup\n/giveweapon /announce /connectbots /raceforcemap /deleterecord\n\n");
+		strcat(string, "/freeze /eject /go /burn /getip /get /mkick /clearchat /iplookup\n/giveweapon /announce /connectbots /raceforcemap /deleterecord /nstats\n\n");
 		
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[4][e_rank]);
 		strcat(string, gstr);
@@ -10757,6 +10756,57 @@ YCMD:getip(playerid, params[], help)
 			SCM(playerid, BLUE, gstr);
 			
 			rdns(__GetIP(player), playerid);
+	    }
+		else
+		{
+			SCM(playerid, -1, ""er"Player is not connected");
+		}
+	}
+	else
+	{
+		SCM(playerid, -1, NO_PERM);
+	}
+	return 1;
+}
+
+YCMD:nstats(playerid, params[], help)
+{
+	if(PlayerInfo[playerid][Level] >= 3)
+	{
+	    new player;
+	 	if(sscanf(params, "r", player))
+		{
+			return SCM(playerid, NEF_GREEN, "Usage: /nstats <playerid>");
+	  	}
+
+		if(CSGSOFT[playerid]) return SCM(playerid, -1, ""er"Player not available!");
+	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
+		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
+
+		if(PlayerInfo[player][Level] >= PlayerInfo[playerid][Level] && PlayerInfo[playerid][Level] != MAX_ADMIN_LEVEL)
+		{
+			return SCM(playerid, -1, ""er"You cannot use this command on this admin");
+		}
+
+        if(IsPlayerAvail(player))
+		{
+			new string[512], ip_port[22];
+			format(string, sizeof(string), ""white"Network Statistics\n\n%s(%i)\n\nConnect Time: %i\nMsgs Recv: %i\nBytes Recv: %i\nMsgs Sent: %i\nBytes Sent: %i\nMsgs Recv per second: %i\nPacketloss: %.2f\%\nConnect Stauts: %i\n",
+			    __GetName(playerid),
+			    playerid,
+			    NetStats_GetConnectedTime(playerid),
+			    NetStats_MessagesReceived(playerid),
+			    NetStats_BytesReceived(playerid),
+			    NetStats_MessagesSent(playerid),
+			    NetStats_BytesSent(playerid),
+			    NetStats_MessagesRecvPerSecond(playerid),
+			    NetStats_PacketLossPercent(playerid),
+			    NetStats_ConnectionStatus(playerid));
+			    
+			NetStats_GetIpPort(playerid, ip_port, sizeof(ip_port));
+			strcat(string, ip_port);
+			
+			ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Network Stats", string, "OK", "");
 	    }
 		else
 		{
@@ -30974,6 +31024,11 @@ SetCP(playerid, PrevCP, NextCP, MaxCP, Type)
 	}
 }
 
+Float:GetDistance3D(Float:x1, Float:y1, Float:z1, Float:x2, Float:y2, Float:z2)
+{
+	return VectorSize(x1 - x2, y1 - y2, z1 - z2);
+}
+
 Race_CalculatePosition()
 {
 	new cp,
@@ -31022,14 +31077,6 @@ Race_CalculatePosition()
 		}
 	}
 	return 1;
-}
-
-GetDistance3D(Float:xPos, Float:yPos, Float:zPos, Float:xPos2, Float:yPos2, Float:zPos2)
-{
-	xPos -= xPos2;
-	yPos -= yPos2;
-	zPos -= zPos2;
-	return floatround(floatpower((xPos * xPos) + (yPos * yPos) + (zPos * zPos), 0.5)); // Float:VectorSize(xPos, yPos, zPos); for 0.3z
 }
 
 function:DestroyPlayerVehicles(playerid)
@@ -31360,3 +31407,19 @@ SetSpawnInfoEx(playerid, team, skin, Float:x, Float:y, Float:z, Float:Angle)
 	if(!IsValidSkin(skin)) skin = 0;
 	return SetSpawnInfo(playerid, team, skin, x, y, z, Angle, 0, 0, 0, 0, 0, 0);
 }
+
+/*
+HOOK_CreateDynamicObject(modelid, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz, worldid = -1, interiorid = -1, playerid = -1, Float:streamdistance = 200.0)
+{
+    new obj = CreateDynamicObject(modelid, x, y, z, rx, ry, rz, worldid, interiorid, playerid, streamdistance);
+    Streamer_SetFloatData(STREAMER_TYPE_OBJECT, obj, E_STREAMER_DRAW_DISTANCE, 300.0);
+    return obj;
+}
+
+#if defined _ALS_CreateDynamicObject
+    #undef CreateDynamicObject
+#else
+    #define _ALS_CreateDynamicObject
+#endif
+#define CreateDynamicObject HOOK_CreateDynamicObject
+*/
