@@ -3534,7 +3534,7 @@ public OnPlayerCommandReceived(playerid, cmdtext[])
 
 public OnPlayerCommandPerformed(playerid, cmdtext[], success)
 {
-    new File:lFile = fopen("/Logs/cmdlog.txt", io_append),
+    new File:lFile = fopen("/Log/cmdlog.txt", io_append),
         time[3];
 
     gettime(time[0], time[1], time[2]);
@@ -4866,7 +4866,7 @@ public OnPlayerText(playerid, text[])
   		return 0;
   	}
 
-    new File:lFile = fopen("/Logs/chatlog.txt", io_append),
+    new File:lFile = fopen("/Log/chatlog.txt", io_append),
         time[3];
 
     gettime(time[0], time[1], time[2]);
