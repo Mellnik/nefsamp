@@ -18,6 +18,8 @@
 #define YSI_IS_SERVER
 
 /* Build 20 todo:
+- Add taxi to /vs
+
 - Remove profiler
 - Remove crashdetect
 - Add samp.ban
@@ -1725,7 +1727,7 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
     PlayerToys[MAX_PLAYERS][MAX_PLAYER_ATTACHED_OBJECTS][e_toy_data],
 	StartTime,
 	hVIPVehObj[MAX_PLAYERS][13],
-  	Info[e_fallout_data],
+  	FalloutInfo[e_fallout_data],
   	g_FalloutStatus,
   	PlayerPVTMP[MAX_PLAYERS][2],
   	PlayerPVTMPPlate[MAX_PLAYERS][13],
@@ -3340,7 +3342,7 @@ public OnPlayerDisconnect(playerid, reason)
 
 				if(count < 2)
 				{
-				    KillTimer(Info[I_iTimer][1]);
+				    KillTimer(FalloutInfo[I_iTimer][1]);
 
 					for(new i = 0; i < MAX_PLAYERS; i++)
 					{
@@ -5453,7 +5455,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 
 			if(count < 2)
 			{
-			    KillTimer(Info[I_iTimer][1]);
+			    KillTimer(FalloutInfo[I_iTimer][1]);
 
 				for(new i = 0; i < MAX_PLAYERS; i++)
 				{
@@ -27208,115 +27210,115 @@ Fallout_BuildMap()
 {
 	for(new i = 0; i < 101; i++)
 	{
-		DestroyDynamicObject(Info[I_iObject][i]);
-		Info[I_iNumberout][i] = -1;
-		KillTimer(Info[I_iShaketimer][i]);
-		KillTimer(Info[I_iTimer][0]);
-		Info[I_iShake][i] = 0;
+		DestroyDynamicObject(FalloutInfo[I_iObject][i]);
+		FalloutInfo[I_iNumberout][i] = -1;
+		KillTimer(FalloutInfo[I_iShaketimer][i]);
+		KillTimer(FalloutInfo[I_iTimer][0]);
+		FalloutInfo[I_iShake][i] = 0;
 	}
 
 	new j;
-	Info[I_iCount] = 15;
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
-	Info[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iCount] = 15;
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
 	return 1;
 }
 
@@ -27331,7 +27333,7 @@ Fallout_StartGame()
 	    }
 	}
 
-	Info[I_iTimer][1] = SetTimer("FalloutCountDown", 1000, true);
+	FalloutInfo[I_iTimer][1] = SetTimer("FalloutCountDown", 1000, true);
 
 	SCMToAll(-1, ""yellow_e"A new fallout game has started!");
 	return 1;
@@ -27355,13 +27357,13 @@ Fallout_Cancel()
 	g_FalloutStatus = e_Fallout_Inactive;
 	for(new i = 0; i < 101; i++)
 	{
-		DestroyDynamicObject(Info[I_iObject][i]);
-		Info[I_iNumberout][i] = -1;
-		KillTimer(Info[I_iShaketimer][i]);
-		Info[I_iShake][i] = 0;
+		DestroyDynamicObject(FalloutInfo[I_iObject][i]);
+		FalloutInfo[I_iNumberout][i] = -1;
+		KillTimer(FalloutInfo[I_iShaketimer][i]);
+		FalloutInfo[I_iShake][i] = 0;
 	}
-	KillTimer(Info[I_iTimer][0]);
-	KillTimer(Info[I_tLoseGame]);
+	KillTimer(FalloutInfo[I_iTimer][0]);
+	KillTimer(FalloutInfo[I_tLoseGame]);
 	return 1;
 }
 
@@ -27408,30 +27410,28 @@ function:Fallout_LoseGame()
 
 function:FalloutCountDown()
 {
-	new player, string[100];
+	new player;
 
-	Info[I_iCount]--;
-
-	if(Info[I_iCount] == 0)
+	if(--FalloutInfo[I_iCount] == 0)
 	{
-		format(string, sizeof(string), "~b~Start!");
+		format(gstr, sizeof(gstr), "~b~Start!");
 	}
 	else
 	{
-		format(string, sizeof(string), "~y~FALLOUT STARTING IN~n~~p~- %i -~n~~y~SECONDS", Info[I_iCount]);
+		format(gstr, sizeof(gstr), "~y~FALLOUT STARTING IN~n~~p~- %i -~n~~y~SECONDS", FalloutInfo[I_iCount]);
 	}
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(gTeam[i] == FALLOUT)
 		{
-			GameTextForPlayer(i, string, 999, 3);
+			GameTextForPlayer(i, gstr, 999, 3);
 	    }
 	}
 
-	if(Info[I_iCount] <= 0)
+	if(FalloutInfo[I_iCount] <= 0)
 	{
-		KillTimer(Info[I_iTimer][1]);
+		KillTimer(FalloutInfo[I_iTimer][1]);
 		for(new i = 0; i < MAX_PLAYERS; i++)
 		{
 		    if(gTeam[i] == FALLOUT)
@@ -27472,7 +27472,7 @@ function:FalloutCountDown()
 function:SolarFall()
 {
 	new objectid, go;
-	for(new i = 0; i < 101; i++) if(Info[I_iNumberout][i] == -1) go++;
+	for(new i = 0; i < 101; i++) if(FalloutInfo[I_iNumberout][i] == -1) go++;
 
 	if(go == 3)
 	{
@@ -27481,25 +27481,25 @@ function:SolarFall()
 			g_FalloutStatus = e_Fallout_Finish;
 			SetTimer("DecideFalloutWinners", 200, false);
 		}
-		KillTimer(Info[I_iTimer][0]);
+		KillTimer(FalloutInfo[I_iTimer][0]);
 		return 1;
 	}
 
 	start:
 	objectid = random(101);
 
-	if(Info[I_iNumberout][objectid] != -1) goto start;
+	if(FalloutInfo[I_iNumberout][objectid] != -1) goto start;
 
-	Info[I_iNumberout][objectid] = 0;
+	FalloutInfo[I_iNumberout][objectid] = 0;
 
-	Info[I_iShaketimer][objectid] = SetTimerEx("SquareShake", 100, true, "i", objectid);
+	FalloutInfo[I_iShaketimer][objectid] = SetTimerEx("SquareShake", 100, true, "i", objectid);
 	return 1;
 }
 
 function:StartFalling()
 {
-	Info[I_iTimer][0] = SetTimer("SolarFall", 500, true);
-	Info[I_tLoseGame] = SetTimer("Fallout_LoseGame", 500, true);
+	FalloutInfo[I_iTimer][0] = SetTimer("SolarFall", 500, true);
+	FalloutInfo[I_tLoseGame] = SetTimer("Fallout_LoseGame", 500, true);
 	return 1;
 }
 
@@ -27518,6 +27518,7 @@ function:DecideFalloutWinners()
 		    HidePlayerFalloutTextdraws(i);
 		    ResetPlayerWorld(i);
 		    RandomWeapons(i);
+		    
 			if(!PlayerInfo[i][FalloutLost])
 			{
 				winners++;
@@ -27541,6 +27542,8 @@ function:DecideFalloutWinners()
 				SpawnPlayer(i);
 			}
 		}
+		
+		PlayerInfo[i][FalloutLost] = true;
 	}
 	Fallout_Cancel();
 
@@ -27552,50 +27555,50 @@ function:SquareShake(objectid)
 {
 	if(objectid == 0)
 	{
-		return KillTimer(Info[I_iShaketimer][objectid]);
+		return KillTimer(FalloutInfo[I_iShaketimer][objectid]);
 	}
 
-	switch(Info[I_iShake][objectid])
+	switch(FalloutInfo[I_iShake][objectid])
 	{
 		case 0, 5:
 		{
-			SetDynamicObjectRot(Info[I_iObject][objectid], 31.8, 2, 0);
+			SetDynamicObjectRot(FalloutInfo[I_iObject][objectid], 31.8, 2, 0);
 		}
 		case 1, 6:
 		{
-			SetDynamicObjectRot(Info[I_iObject][objectid], 33.8, 0, 0);
+			SetDynamicObjectRot(FalloutInfo[I_iObject][objectid], 33.8, 0, 0);
 		}
 		case 2, 7:
 		{
-			SetDynamicObjectRot(Info[I_iObject][objectid], 31.8, -2, 0);
+			SetDynamicObjectRot(FalloutInfo[I_iObject][objectid], 31.8, -2, 0);
 		}
 		case 3, 8:
 		{
-			SetDynamicObjectRot(Info[I_iObject][objectid], 29.8, 0, 0);
+			SetDynamicObjectRot(FalloutInfo[I_iObject][objectid], 29.8, 0, 0);
 		}
 		case 4, 9:
 		{
-			SetDynamicObjectRot(Info[I_iObject][objectid], 31.8, 0, 0);
+			SetDynamicObjectRot(FalloutInfo[I_iObject][objectid], 31.8, 0, 0);
 		}
 		case 10:
 		{
 			new Float:patPOS[3];
-			GetDynamicObjectPos(Info[I_iObject][objectid], patPOS[0], patPOS[1], patPOS[2]);
-			MoveDynamicObject(Info[I_iObject][objectid], patPOS[0], patPOS[1], floatsub(patPOS[2], 100.0), 4);
+			GetDynamicObjectPos(FalloutInfo[I_iObject][objectid], patPOS[0], patPOS[1], patPOS[2]);
+			MoveDynamicObject(FalloutInfo[I_iObject][objectid], patPOS[0], patPOS[1], floatsub(patPOS[2], 100.0), 4);
 		}
 		case 11..99:
 		{
-  			SetDynamicObjectPos(Info[I_iObject][objectid], floatsub(31.8, floatsub((Info[I_iShake][objectid] * 2), 20)), 0, 0);
+  			SetDynamicObjectPos(FalloutInfo[I_iObject][objectid], floatsub(31.8, floatsub((FalloutInfo[I_iShake][objectid] * 2), 20)), 0, 0);
 		}
 		case 100:
 		{
-			DestroyDynamicObject(Info[I_iObject][objectid]);
+			DestroyDynamicObject(FalloutInfo[I_iObject][objectid]);
 
-			KillTimer(Info[I_iShaketimer][objectid]);
+			KillTimer(FalloutInfo[I_iShaketimer][objectid]);
 		}
 	}
 
-	Info[I_iShake][objectid]++;
+	FalloutInfo[I_iShake][objectid]++;
 	return 1;
 }
 
@@ -30266,7 +30269,7 @@ ExitPlayer(playerid)
 
 			if(count < 2)
 			{
-			    KillTimer(Info[I_iTimer][1]);
+			    KillTimer(FalloutInfo[I_iTimer][1]);
 
 				for(new i = 0; i < MAX_PLAYERS; i++)
 				{
