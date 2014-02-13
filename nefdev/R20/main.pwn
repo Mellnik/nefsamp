@@ -3454,7 +3454,7 @@ public OnPlayerDisconnect(playerid, reason)
         }
 	}
 	
-    DestroyPlayerVehicles(playerid);
+    DestroyPlayerVehicles(playerid, true);
 
     ResetPlayerModules(playerid);
 
@@ -9547,7 +9547,7 @@ YCMD:cnrhelp(playerid, params[], help)
  	}
  	else if(GetPVarInt(playerid, "Robber") == 1)
 	{
-		strcat(line3, ""ORANGE_E"You have joined the Las Venturas Mafia!\n\n"BLUE_E"Criminal Help:\n"WHITE_E"Your job is to cause mayam in the streets of Las Venturas\nYou must do your best to evade any cops whila your at it.\nThe cops are marked as "LB_E"blue"WHITE_E" on your map radar.\nThe elite Swat team is marked as "BLUE_E"darkblue on your map radar.\n");
+		strcat(line3, ""ORANGE_E"You have joined the Las Venturas Mafia!\n\n"BLUE_E"Criminal Help:\n"WHITE_E"Your job is to cause mayham in the streets of Las Venturas\nYou must do your best to evade any cops while you're at it.\nThe cops are marked as "LB_E"blue"WHITE_E" on your map radar.\nThe elite Swat team is marked as "BLUE_E"darkblue on your map radar.\n");
 		strcat(line3, "\nYou can enter some shops and "RED_E"/rob "WHITE_E"the store for cash.\nType "PINK_E"/tpm "WHITE_E"to teamchat with your team members.\n\nType /cnrhelp to open this box up at anytime, Good luck boys!");
 		ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""RED_E"Criminal Help", line3, "OK", "");
 	}
@@ -19578,7 +19578,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		            }
 		            case 2:
 		            {
-						new cstring[512];
+						new cstring[600];
 						
 						strcat(cstring, ""yellow"/gcreate "white"- create a gang\n");
 						strcat(cstring, ""yellow"/gmenu "white"- gang menu\n");
@@ -25914,18 +25914,21 @@ function:Derby()
 	ResetDerbyGameTime();
 	ExecDerbyVotingTimer();
 
+	for(new i = 0; i < MAX_PLAYERS; i++)
+	{
+	    if(PlayerInfo[i][pDerbyCar] != -1)
+	    {
+	    	DestroyVehicle_(PlayerInfo[i][pDerbyCar]);
+	    	PlayerInfo[i][pDerbyCar] = -1;
+		}
+	}
+
 	if(DerbyPlayers > 1)
 	{
     	for(new i = 0; i < MAX_PLAYERS; i++)
     	{
   			if(gTeam[i] == DERBY)
 			{
-			    RemovePlayerFromVehicle(i);
-			    if(PlayerInfo[i][pDerbyCar] != -1)
-			    {
-			    	DestroyVehicle_(PlayerInfo[i][pDerbyCar]);
-			    	PlayerInfo[i][pDerbyCar] = -1;
-				}
        			SetPlayerVirtualWorld(i, DERBY_WORLD);
        			SetPlayerDerbyStaticMeshes(i);
 				ShowDialog(i, DERBY_VOTING_DIALOG);
@@ -25961,11 +25964,6 @@ function:Derby()
 			    	format(string, sizeof(string), "%s won the Derby and earned "nef_yellow"$%s", __GetName(i), number_format(money));
 					DerbyMSG(string);
 	   			}
-			    if(PlayerInfo[i][pDerbyCar] != -1)
-			    {
-			    	DestroyVehicle_(PlayerInfo[i][pDerbyCar]);
-			    	PlayerInfo[i][pDerbyCar] = -1;
-				}
 				SetPlayerDerbyStaticMeshes(i);
 	      		ShowDialog(i, DERBY_VOTING_DIALOG);
 			}
@@ -31086,7 +31084,7 @@ Race_CalculatePosition()
 	return 1;
 }
 
-function:DestroyPlayerVehicles(playerid)
+DestroyPlayerVehicles(playerid, bool:minigames = false)
 {
 	for(new obj = 0; obj < 13; obj++)
 	{
@@ -31132,6 +31130,21 @@ function:DestroyPlayerVehicles(playerid)
 	{
 		DestroyVehicle_(PlayerInfo[playerid][TrailerVid]);
 		PlayerInfo[playerid][TrailerVid] = -1;
+	}
+	
+	if(minigames)
+	{
+		if(g_RaceVehicle[playerid] != -1)
+		{
+			DestroyVehicle_(g_RaceVehicle[playerid]);
+			g_RaceVehicle[playerid] = -1;
+		}
+		
+	    if(PlayerInfo[playerid][pDerbyCar] != -1)
+	    {
+	    	DestroyVehicle_(PlayerInfo[playerid][pDerbyCar]);
+	    	PlayerInfo[playerid][pDerbyCar] = -1;
+		}
 	}
 	return 1;
 }
@@ -31403,19 +31416,3 @@ SetSpawnInfoEx(playerid, team, skin, Float:x, Float:y, Float:z, Float:Angle)
 	printf("SetSpawnInfo(%i, %i, %i, %f, %f, %f, %f, 0, 0, 0, 0, 0, 0);", playerid, team, skin, x, y, z, Angle);
 	return SetSpawnInfo(playerid, team, skin, x, y, z, Angle, 0, 0, 0, 0, 0, 0);
 }
-
-/*
-HOOK_CreateDynamicObject(modelid, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz, worldid = -1, interiorid = -1, playerid = -1, Float:streamdistance = 200.0)
-{
-    new obj = CreateDynamicObject(modelid, x, y, z, rx, ry, rz, worldid, interiorid, playerid, streamdistance);
-    Streamer_SetFloatData(STREAMER_TYPE_OBJECT, obj, E_STREAMER_DRAW_DISTANCE, 300.0);
-    return obj;
-}
-
-#if defined _ALS_CreateDynamicObject
-    #undef CreateDynamicObject
-#else
-    #define _ALS_CreateDynamicObject
-#endif
-#define CreateDynamicObject HOOK_CreateDynamicObject
-*/
