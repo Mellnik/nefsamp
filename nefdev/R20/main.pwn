@@ -17,12 +17,22 @@
 #define WINTER_EDITION (false) // ferriswheelfair.amx
 #define YSI_IS_SERVER
 
+/* Build 20 todo:
+- Remove profiler
+- Remove crashdetect
+- Add samp.ban
+- Compile with -O1 -d0
+- yum update
+- Restart server
+- Compile MySQL R37
+*/
+
 // -
 // - Plugins
 // -
 // sscanf.so | 2.8.1
 // streamer.so | v2.7
-// mysql_static.so | R34
+// mysql_static.so | R37
 // irc.so | 1.4.4
 // dns.so | 2.4
 
@@ -37,12 +47,13 @@
 #include <YSI\y_commands>   // 13/02/2014
 #include <YSI\y_master>     // 13/02/2014
 #include <YSI\y_stringhash> // 13/02/2014
+#include <crashdetect>
 #include <a_zones>          // 0.3z
 #include <sscanf2>      	// 2.8.1
 #include <streamer>     	// v2.7
 #include <floodcontrol>     // 28/06/2012
 #include <mSelection>       // 1.1 R3
-#include <a_mysql_R34>  	// R34
+#include <a_mysql_R37>  	// R37
 #include <dini>         	// 1.6
 #include <irc>          	// 1.4.4
 #include <md-sort>      	// 13/02/2014
@@ -2573,7 +2584,7 @@ public OnGameModeExit()
 	
 	DestroyElevator();
 
- 	mysql_close(pSQL, true);
+ 	mysql_close(pSQL);
  	
 	print("...GameMode unloaded!");
 	return 1;
