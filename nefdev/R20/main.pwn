@@ -23975,6 +23975,7 @@ LoadVisualStaticMeshes()
 	// CNR END
     
 	// anti vehile drop
+	CreateObject(8040, 660.65997, -1361.88000, 2548.94995,   0.00000, 0.00000, -179.78000); // /speed
 	CreateObject(4726, 338.60001, -1853.16003, 5.92000,   0.00000, 0.00000, 270.00000); // LS beach
 	CreateObject(9241, -1182.88000, -12.16000, 14.00000,   0.00000, 0.00000, -135.00000); //SFA 1
 	CreateObject(9241, -1200.43005, -29.73000, 14.00000,   0.00000, 0.00000, -135.00000); //SFA 2
@@ -24064,7 +24065,7 @@ LoadVisualStaticMeshes()
 	AddTeleport(3, "Infernus Paradise", "ip", -5051.7461, -2237.2556, 10.9);
 	AddTeleport(3, "Infernus Paradise 2", "ip2", -297.6044, 3682.8264, 24.0);
 	AddTeleport(3, "Infernus Paradise 3", "ip3", 4546.4175,655.6476,13.4803);
-	AddTeleport(3, "Speed", "speed", 680.2595, -1361.8927, 2551.2214);
+	AddTeleport(3, "Speed", "speed", 680.2595, -1361.8927, 2550.2214);
 	AddTeleport(3, "Disney", "disney", 400.2232,636.9904,16.8194);
 	AddTeleport(4, "Mellnik's Island", "mi", -3801.8572, 498.8828, 16.5183);
 	AddTeleport(4, "Mellnik's House", "mh", -182.9842,-2245.7412,31.1492);
@@ -28480,7 +28481,7 @@ function:ShowDialog(playerid, dialogid)
 	        format(string, sizeof(string), "%s since %s. During that time...\n\n... "yellow_e"%i "white"commands have been performed\n... "yellow_e"%i "white"chat messages have been sent\n... "yellow_e"%i "white"new players have registered\n... "yellow_e"%i "white"players have been murdered",
 				GetUptime(), UTConvert(StartTime), SrvStat[0], SrvStat[1], SrvStat[2], SrvStat[3]);
 				
-			format(gstr, sizeof(gstr), "\n\nStreamed client objects: %i", Streamer_CountVisibleItems(playerid, STREAMER_TYPE_OBJECT));
+			format(gstr, sizeof(gstr), "\n\nStreamed client objects: %i\nServer FPS: %i", Streamer_CountVisibleItems(playerid, STREAMER_TYPE_OBJECT), GetServerTickRate());
 	        strcat(string, gstr);
 	        strcat(string, "\n\nServer version: "SVRNAME" "CURRENT_VERSION", "HOTFIX_REV" on "SAMP_VERSION"");
 	        
