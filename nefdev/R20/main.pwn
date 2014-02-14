@@ -1760,7 +1760,6 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
 	BGTeam1Kills = 0,
   	BGTeam2Kills = 0,
   	CurrentBGMap,
-  	GunGamePlayers = 0,
   	dm1pickup,
   	dm2pickup,
   	VIPLpickup,
@@ -2925,8 +2924,8 @@ public OnPlayerSpawn(playerid)
 			GunGame_Player[playerid][dead] = false;
 			GunGame_Player[playerid][pw] = true;
 			
-			if(GunGamePlayers >= 16) SetPlayerHealth(playerid, 100.0);
-			else SetPlayerHealth(playerid, (25 + 5 * GunGamePlayers));
+			if(GunGamePlayers() >= 16) SetPlayerHealth(playerid, 100.0);
+			else SetPlayerHealth(playerid, (25 + 5 * GunGamePlayers()));
 		}
         case CNR:
         {
@@ -3400,10 +3399,6 @@ public OnPlayerDisconnect(playerid, reason)
 			    Streamer_ToggleItemUpdate(playerid, STREAMER_TYPE_MAP_ICON, 1);
 			    Streamer_ToggleItemUpdate(playerid, STREAMER_TYPE_CP, 1);
 			    Streamer_Update(playerid);
-			}
-			case GUNGAME:
-			{
-			    GunGamePlayers--;
 			}
 		}
 	}
@@ -5688,8 +5683,8 @@ public OnPlayerDeath(playerid, killerid, reason)
 
 							if(i != playerid)
 							{
-								if(GunGamePlayers >= 16) SetPlayerHealth(i, 100.0);
-								else SetPlayerHealth(i, ((25) + (5 * GunGamePlayers)));
+								if(GunGamePlayers() >= 16) SetPlayerHealth(i, 100.0);
+								else SetPlayerHealth(i, ((25) + (5 * GunGamePlayers())));
 								GivePlayerWeapon(i, 4, 1);
 								GivePlayerWeapon(i, GunGame_Weapons[GunGame_Player[i][level]], 65535);
 								GunGame_Player[i][pw] = true;
@@ -9521,7 +9516,6 @@ YCMD:gungame(playerid, params[], help)
 
     CheckPlayerGod(playerid);
     Command_ReProcess(playerid, "/stopanims", false);
-	GunGamePlayers++;
 	SetPlayerInterior(playerid, 0);
 	SetPlayerVirtualWorld(playerid, 1338);
 
@@ -9544,8 +9538,8 @@ YCMD:gungame(playerid, params[], help)
 	GunGame_Player[playerid][dead] = false;
 	GunGame_Player[playerid][pw] = true;
 
-	if(GunGamePlayers >= 16) SetPlayerHealth(playerid, 100.0);
-	else SetPlayerHealth(playerid, ((20) + (5 * GunGamePlayers)));
+	if(GunGamePlayers() >= 16) SetPlayerHealth(playerid, 100.0);
+	else SetPlayerHealth(playerid, ((20) + (5 * GunGamePlayers())));
 
 	ShowPlayerGunGameTextdraws(playerid);
 
@@ -26547,7 +26541,7 @@ function:ProcessTick()
 						pweapon = GetPlayerWeapon(i);
 
 				    GetWeaponName(pweapon, wp, sizeof(wp));
-				    format(gstr2, sizeof(gstr2), "Players: ~b~~h~~h~%i~n~~w~Level: ~r~~h~~h~%i of 14~n~~w~Weapon: ~g~~h~~h~%s", GunGamePlayers, GunGame_Player[i][level], wp);
+				    format(gstr2, sizeof(gstr2), "Players: ~b~~h~~h~%i~n~~w~Level: ~r~~h~~h~%i of 14~n~~w~Weapon: ~g~~h~~h~%s", GunGamePlayers(), GunGame_Player[i][level], wp);
 				    PlayerTextDrawSetString(i, TXTGunGameInfo[i], gstr2);
 
 				    T_GunGamePlayers++;
@@ -30324,7 +30318,6 @@ ExitPlayer(playerid)
 	    	RandomSpawn(playerid, true);
 	    	RandomWeapons(playerid);
 	    	SetCameraBehindPlayer(playerid);
-	    	GunGamePlayers--;
 	    	HidePlayerGunGameTextdraws(playerid);
 
 	    	if(GetPVarInt(playerid, "HadGod") == 1) Command_ReProcess(playerid, "/god silent", false);
@@ -31445,4 +31438,15 @@ SetSpawnInfoEx(playerid, team, skin, Float:x, Float:y, Float:z, Float:Angle)
 	if(!IsValidSkin(skin)) skin = 0;
 	printf("SetSpawnInfo(%i, %i, %i, %f, %f, %f, %f, 0, 0, 0, 0, 0, 0);", playerid, team, skin, x, y, z, Angle);
 	return SetSpawnInfo(playerid, team, skin, x, y, z, Angle, 0, 0, 0, 0, 0, 0);
+}
+
+GunGamePlayers()
+{
+	new count = 0;
+	for(new i = 0; i < MAX_PLAYERS; i++) {
+	    if(gTeam[i] == GUNGAME) {
+	        ++count;
+		}
+	}
+	return count;
 }
