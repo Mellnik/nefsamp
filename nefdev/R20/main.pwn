@@ -3651,7 +3651,7 @@ public OnPlayerGiveDamage(playerid, damagedid, Float:amount, weaponid, bodypart)
 {
 	if(damagedid == INVALID_PLAYER_ID || playerid == INVALID_PLAYER_ID) return 1;
 	
-	PlayerInfo[damagedid][tickLastShot] = GetTickCount() + 3600000;
+	PlayerInfo[damagedid][tickLastShot] = GetTickCount_();
 	
 	if(PlayerInfo[damagedid][bGod])
 	{
@@ -4766,7 +4766,7 @@ public OnRconLoginAttempt(ip[], password[], success)
 
 public OnPlayerUpdate(playerid)
 {
-    PlayerInfo[playerid][tickPlayerUpdate] = GetTickCount() + 3600000;
+    PlayerInfo[playerid][tickPlayerUpdate] = GetTickCount_();
 
 	switch(gTeam[playerid])
 	{
@@ -4917,10 +4917,10 @@ public OnPlayerText(playerid, text[])
 		{
             ReactionOn = false;
 
-		    new rtime = (GetTickCount() + 3600000) - tickReactionStart,
+		    new rtime = GetTickCount_() - tickReactionStart,
 		        second = rtime / 1000;
 
-			rtime = rtime - second * 1100;
+			rtime = rtime - second * 1000;
 
 			format(gstr, sizeof(gstr), "["vlila"REACTION"white"]: {%06x}%s(%i) "white"has won the reaction test in %2i.%03i seconds!", GetColor__(playerid) >>> 8, __GetName(playerid), playerid, second, rtime);
 		    SCMToAll(WHITE, gstr);
@@ -4973,7 +4973,7 @@ public OnPlayerText(playerid, text[])
 		return 0;
 	}
 
-    new tick = GetTickCount() + 3600000;
+    new tick = GetTickCount_();
 
 	if((PlayerInfo[playerid][ChatWrote] >= 2) && ((PlayerInfo[playerid][tickLastChat] + COOLDOWN_CHAT) >= tick))
 	{
@@ -5842,7 +5842,7 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 	  		{
 	  		    if(GetVehicleModel(GetPlayerVehicleID(playerid)) != 522) return 1;
 
-     			new tick = GetTickCount() + 3600000;
+     			new tick = GetTickCount_();
 				if((PlayerInfo[playerid][tickLastBIKEC] + COOLDOWN_BIKEC) >= tick)
 				{
 				    return GameTextForPlayer(playerid, "~r~~h~Please wait before doing this stunt again", 6000, 5);
@@ -5975,7 +5975,7 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 	 	}
  		case 6: //bmx Prize
 		{
-			if(GetPVarInt(playerid, "doingStunt") == 3 && GetPlayerState(playerid) == PLAYER_STATE_DRIVER && ((PlayerInfo[playerid][tickJoin_bmx] + 60000) < GetTickCount() + 3600000))
+			if(GetPVarInt(playerid, "doingStunt") == 3 && GetPlayerState(playerid) == PLAYER_STATE_DRIVER && ((PlayerInfo[playerid][tickJoin_bmx] + 60000) < GetTickCount_()))
 	  		{
 	  		    if(GetVehicleModel(GetPlayerVehicleID(playerid)) != 481) return 1;
 
@@ -6291,7 +6291,7 @@ public OnPlayerEnterRaceCheckpoint(playerid)
 				Prize[2],
 				points = 0;
 
-			TimeStamp = GetTickCount() + 3600000;
+			TimeStamp = GetTickCount_();
 			TotalRaceTime = TimeStamp - g_RaceTick;
 			ConvertTime(var, TotalRaceTime, rTime[0], rTime[1], rTime[2]);
 
@@ -6937,11 +6937,11 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 	
 	if(newstate == PLAYER_STATE_DRIVER)
 	{
-	    PlayerInfo[playerid][tickVehicleEnterTime] = GetTickCount() + 3600000;
+	    PlayerInfo[playerid][tickVehicleEnterTime] = GetTickCount_();
 	}
 	else if(oldstate == PLAYER_STATE_DRIVER)
 	{
-	    if(((GetTickCount() + 3600000) - PlayerInfo[playerid][tickVehicleEnterTime]) < COOLDOWN_VEHICLE)
+	    if((GetTickCount_() - PlayerInfo[playerid][tickVehicleEnterTime]) < COOLDOWN_VEHICLE)
 	    {
 			if((++PlayerInfo[playerid][VehicleSpamViolation]) >= 3 && !PlayerInfo[playerid][KBMarked])
 			{
@@ -7688,7 +7688,7 @@ YCMD:bmx(playerid, params[], help)
         
 		DestroyPlayerVehicles(playerid);
 		
-		PlayerInfo[playerid][tickJoin_bmx] = GetTickCount() + 3600000;
+		PlayerInfo[playerid][tickJoin_bmx] = GetTickCount_();
 		
 		SetPVarInt(playerid, "doingStunt", 3);
     }
@@ -9078,11 +9078,11 @@ YCMD:buyvip(playerid, params[], help)
 	    SCM(PlayerInfo[playerid][VIPPlayer], -1, gstr);
 		print(gstr);
 		
-	    format(gstr, sizeof(gstr), ""orange"[NEF] %s(%i) has sold his VIP status to %s(%i) for $%s", __GetName(PlayerInfo[playerid][VIPPlayer]), PlayerInfo[playerid][VIPPlayer], __GetName(playerid), playerid, number_format(PlayerInfo[playerid][VIPOffer]));
+	    format(gstr, sizeof(gstr), ""orange"[NEF] %s(%i) sold their VIP status to %s(%i) for $%s", __GetName(PlayerInfo[playerid][VIPPlayer]), PlayerInfo[playerid][VIPPlayer], __GetName(playerid), playerid, number_format(PlayerInfo[playerid][VIPOffer]));
 	    SCMToAll(-1, gstr);
 	    print(gstr);
 	    
-  		format(gstr, sizeof(gstr), "3,1GC:4 %s(%i) has sold his VIP status to %s(%i) for $%s", __GetName(PlayerInfo[playerid][VIPPlayer]), PlayerInfo[playerid][VIPPlayer], __GetName(playerid), playerid, number_format(PlayerInfo[playerid][VIPOffer]));
+  		format(gstr, sizeof(gstr), "3,1GC:4 %s(%i) sold their VIP status to %s(%i) for $%s", __GetName(PlayerInfo[playerid][VIPPlayer]), PlayerInfo[playerid][VIPPlayer], __GetName(playerid), playerid, number_format(PlayerInfo[playerid][VIPOffer]));
 		IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 	    
 	    PlayerInfo[playerid][VIPPlayer] = INVALID_PLAYER_ID;
@@ -9101,7 +9101,7 @@ YCMD:bbuy(playerid, params[], help)
 	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
     if(!islogged(playerid)) return notlogged(playerid);
 
-	new tick = GetTickCount() + 3600000;
+	new tick = GetTickCount_();
 	if(PlayerInfo[playerid][Level] != MAX_ADMIN_LEVEL)
 	{
 		if((PlayerInfo[playerid][tickLastPBuy] + COOLDOWN_CMD_PBUY) >= tick)
@@ -9165,7 +9165,7 @@ YCMD:buy(playerid, params[], help)
 	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
     if(!islogged(playerid)) return notlogged(playerid);
     
-	new tick = GetTickCount() + 3600000;
+	new tick = GetTickCount_();
 	if(PlayerInfo[playerid][Level] != MAX_ADMIN_LEVEL)
 	{
 		if((PlayerInfo[playerid][tickLastBuy] + COOLDOWN_CMD_BUY) >= tick)
@@ -9232,7 +9232,7 @@ YCMD:bsell(playerid, params[], help)
 	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
     if(!islogged(playerid)) return notlogged(playerid);
     
-	new tick = GetTickCount() + 3600000;
+	new tick = GetTickCount_();
 	if(PlayerInfo[playerid][Level] != MAX_ADMIN_LEVEL)
 	{
 		if((PlayerInfo[playerid][tickLastPSell] + COOLDOWN_CMD_PSELL) >= tick)
@@ -9285,7 +9285,7 @@ YCMD:sell(playerid, params[], help)
 	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
     if(!islogged(playerid)) return notlogged(playerid);
     
-	new tick = GetTickCount() + 3600000;
+	new tick = GetTickCount_();
 	if(PlayerInfo[playerid][Level] != MAX_ADMIN_LEVEL)
 	{
 		if((PlayerInfo[playerid][tickLastSell] + COOLDOWN_CMD_SELL) >= tick)
@@ -9447,7 +9447,7 @@ YCMD:lock(playerid, params[], help)
 
 	if(gTeam[playerid] == FREEROAM || gTeam[playerid] == HOUSE)
 	{
-		new tick = GetTickCount() + 3600000;
+		new tick = GetTickCount_();
 
 		if((PlayerInfo[playerid][tickLastLocked] + COOLDOWN_CMD_LOCK) >= tick)
 		{
@@ -10082,7 +10082,7 @@ YCMD:hitman(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
     
-	new tick = GetTickCount() + 3600000;
+	new tick = GetTickCount_();
 	if(PlayerInfo[playerid][Level] != MAX_ADMIN_LEVEL)
 	{
 		if((PlayerInfo[playerid][tickLastHitman] + COOLDOWN_CMD_HITMAN) >= tick) return SCM(playerid, -1, ""er"You have to wait a bit before using it again!");
@@ -10099,17 +10099,17 @@ YCMD:hitman(playerid, params[], help)
 
 	if(PlayerInfo[playerid][Level] == MAX_ADMIN_LEVEL)
 	{
-		if(amount < 5000 || amount > 250000)
-		{
-		    return SCM(playerid, -1, ""er"$5,000 - $250,000!");
-		}
-	}
-	else
-	{
 	    if(amount < 5000 || amount > 1000000)
 	    {
 	        return SCM(playerid, -1, ""er"$5,000 - $1,000,000!");
 	    }
+	}
+	else
+	{
+		if(amount < 5000 || amount > 250000)
+		{
+		    return SCM(playerid, -1, ""er"$5,000 - $250,000!");
+		}
 	}
 
 	if(IsPlayerAvail(player) && player != playerid)
@@ -10118,6 +10118,7 @@ YCMD:hitman(playerid, params[], help)
 		{
 			new zone[MAX_ZONE_NAME];
 		    GetPlayer2DZone(player, zone, sizeof(zone));
+		    
 		    if(PlayerInfo[player][HitmanHit] == 0)
 		    {
 		        PlayerInfo[player][HitmanHit] += amount;
@@ -10140,6 +10141,7 @@ YCMD:hitman(playerid, params[], help)
 				format(gstr, sizeof(gstr), "You've placed a bounty on %s(%i) for $%s", __GetName(player), player, number_format(amount));
 				SCM(playerid, YELLOW, gstr);
 		    }
+		    
 			PlayerInfo[playerid][tickLastHitman] = tick;
 			GivePlayerCash(playerid, -amount);
 		}
@@ -11917,7 +11919,7 @@ YCMD:gcreate(playerid, params[], help)
     
 	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 
-	new tick = GetTickCount() + 3600000;
+	new tick = GetTickCount_();
 	if((PlayerInfo[playerid][tickLastGCreate] + COOLDOWN_CMD_GCREATE) >= tick)
 	{
 		return SCM(playerid, -1, ""er"Please wait a bit before using this command again!");
@@ -12284,7 +12286,7 @@ YCMD:ginvite(playerid, params[], help)
     
     if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 
-	new tick = GetTickCount() + 3600000;
+	new tick = GetTickCount_();
 	if(PlayerInfo[playerid][Level] != MAX_ADMIN_LEVEL)
 	{
 		if((PlayerInfo[playerid][tickLastGInvite] + COOLDOWN_CMD_GINVITE) >= tick) return SCM(playerid, -1, ""er"Please wait a bit before inviting again!");
@@ -12449,7 +12451,7 @@ YCMD:gkick(playerid, params[], help)
 
     if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 
-	new tick = GetTickCount() + 3600000;
+	new tick = GetTickCount_();
 	if((PlayerInfo[playerid][tickLastGKick] + COOLDOWN_CMD_GKICK) >= tick) return SCM(playerid, -1, ""er"Please wait a bit before kicking again!");
 
     if(PlayerInfo[playerid][GangID] == 0) return SCM(playerid, -1, ""er"You aren't in any gang");
@@ -13547,7 +13549,7 @@ YCMD:vipli(playerid, params[], help)
 {
 	if(PlayerInfo[playerid][VIP] == 1)
 	{
-		new tick = GetTickCount() + 3600000;
+		new tick = GetTickCount_();
 	 	if(PlayerInfo[playerid][Level] != MAX_ADMIN_LEVEL)
 		{
 			if((PlayerInfo[playerid][tickLastVIPLInv] + COOLDOWN_CMD_VIPLI) >= tick)
@@ -13687,7 +13689,7 @@ YCMD:god(playerid, params[], help)
 	    {
 	        if(!silent)
 	        {
-				if(((PlayerInfo[playerid][tickLastShot] + 5000) > (GetTickCount() + 3600000)))
+				if(((PlayerInfo[playerid][tickLastShot] + 5000) > GetTickCount_()))
 				{
 				    return ShowInfo(playerid, "You were shot", "in the last 5 seconds");
 				}
@@ -13938,7 +13940,7 @@ YCMD:cd(playerid, params[], help)
 {
     if(PlayerInfo[playerid][VIP] == 0) return Command_ReProcess(playerid, "/vip", false);
     
-   	new tick = GetTickCount() + 3600000;
+   	new tick = GetTickCount_();
 	if((PlayerInfo[playerid][tickLastCD] + COOLDOWN_CMD_CD) >= tick)
 	{
 	    return SCM(playerid, -1, ""nef" Please wait before sending a message again");
@@ -14095,7 +14097,7 @@ YCMD:setadminlevel(playerid, params[], help)
 
 YCMD:report(playerid, params[], help)
 {
-	new tick = GetTickCount() + 3600000;
+	new tick = GetTickCount_();
 	if((PlayerInfo[playerid][tickLastReport] + COOLDOWN_CMD_REPORT) >= tick)
 	{
     	return SCM(playerid, -1, ""er"Please wait a bit before using this cmd again!");
@@ -15821,7 +15823,7 @@ YCMD:changepass(playerid, params[], help)
 {
 	if(!islogged(playerid)) return notlogged(playerid);
 	
-    new tick = GetTickCount() + 3600000;
+    new tick = GetTickCount_();
 	if((PlayerInfo[playerid][tickLastPW] + COOLDOWN_CMD_CHANGEPASS) >= tick)
 	{
     	return SCM(playerid, -1, ""er"Please wait a bit before using this cmd again!");
@@ -15854,7 +15856,7 @@ YCMD:serverstats(playerid, params[], help)
 
 YCMD:mk(playerid, params[], help)
 {
-	new tick = GetTickCount() + 3600000;
+	new tick = GetTickCount_();
 	if((PlayerInfo[playerid][tickLastMedkit] + COOLDOWN_CMD_MEDKIT) >= tick)
 	{
     	return SCM(playerid, -1, ""er"Please wait a bit before using this cmd again!");
@@ -16629,7 +16631,7 @@ YCMD:tpm(playerid, params[], help)
 
 YCMD:givecash(playerid, params[], help)
 {
-	new tick = GetTickCount() + 3600000;
+	new tick = GetTickCount_();
 	if(PlayerInfo[playerid][Level] != MAX_ADMIN_LEVEL)
 	{
 		if((PlayerInfo[playerid][tickLastGiveCash] + COOLDOWN_CMD_GIVECASH) >= tick)
@@ -16704,7 +16706,7 @@ YCMD:pm(playerid, params[], help)
     if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 	if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 	
-	new tick = GetTickCount() + 3600000;
+	new tick = GetTickCount_();
 	if((PlayerInfo[playerid][tickLastPM] + COOLDOWN_CMD_PM) >= tick)
 	{
 	    return SCM(playerid, -1, ""nef" Please wait before sending a message again");
@@ -17199,7 +17201,7 @@ YCMD:rob(playerid, params[], help)
 {
 	if(gTeam[playerid] == CNR)
 	{
-		new tick = GetTickCount() + 3600000;
+		new tick = GetTickCount_();
 		if(PlayerInfo[playerid][Level] != MAX_ADMIN_LEVEL)
 		{
 			if((PlayerInfo[playerid][tickLastRob] + COOLDOWN_CMD_ROB) >= tick)
@@ -17299,7 +17301,7 @@ YCMD:rob(playerid, params[], help)
 
 YCMD:ar(playerid, params[], help)
 {
-	new tick = GetTickCount() + 3600000;
+	new tick = GetTickCount_();
 	if(PlayerInfo[playerid][Level] != MAX_ADMIN_LEVEL)
 	{
 		if((PlayerInfo[playerid][tickLastAr] + COOLDOWN_CMD_AR) >= tick)
@@ -18934,7 +18936,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					ShowInfo(playerid, "Armor refilled", "");
 	    			GivePlayerCash(playerid, -2500);
 	            }
-				PlayerInfo[playerid][tickLastRefill] = GetTickCount() + 3600000;
+				PlayerInfo[playerid][tickLastRefill] = GetTickCount_();
 	            return 1;
 	        }
 	        case GANG_SET_RANK_DIALOG:
@@ -21215,7 +21217,7 @@ function:LoadGZones()
 
 IsPlayerOnDesktop(playerid, afktimems = 5000)
 {
-	if((PlayerInfo[playerid][tickPlayerUpdate] + afktimems) < (GetTickCount() + 3600000)) return 1;
+	if((PlayerInfo[playerid][tickPlayerUpdate] + afktimems) < GetTickCount_()) return 1;
 	return 0;
 }
 
@@ -22516,7 +22518,7 @@ MySQL_Connect()
 LoadStores()
 {
 	new file[50],
-		count = GetTickCount() + 3600000;
+		count = GetTickCount_();
 
 	for(new b = 0; b < MAX_BANKS; b++)
 	{
@@ -22591,7 +22593,7 @@ LoadStores()
 	  		CreateDynamic3DTextLabel(gstr, YELLOW, dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ") + 0.7, 25.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 25.0);
 		}
 	}
- 	printf("#Stores loaded in %i ms", (GetTickCount() + 3600000) - count);
+ 	printf("#Stores loaded in %i ms", GetTickCount_() - count);
  	return 1;
 }
 
@@ -23041,7 +23043,7 @@ RandomWeapons(playerid)
 
 CreateTextdraws()
 {
-    new count = GetTickCount() + 3600000;
+    new count = GetTickCount_();
 	
 	#if WINTER_EDITION == true
 	TXTWinterEdition = TextDrawCreate(545.000000, 405.000000, "Winter Edition");
@@ -23441,7 +23443,7 @@ CreateTextdraws()
 	TextDrawBoxColor(TXTLoading, 170);
 	TextDrawTextSize(TXTLoading, -9.000000, -152.000000);
 	
-	printf("#TextDraws loaded in %i ms", (GetTickCount() + 3600000) - count);
+	printf("#TextDraws loaded in %i ms", GetTickCount_() - count);
 	return 1;
 }
 
@@ -23476,7 +23478,7 @@ function:xReactionTest()
 	}
 	format(gstr, sizeof(gstr), "["vlila"REACTION"white"]: The first who types '"vlila"%s"white"' wins $%s + %i score", xChars, number_format(xCash), xScore);
 	SCMToAll(WHITE, gstr);
-	tickReactionStart = GetTickCount() + 3600000;
+	tickReactionStart = GetTickCount_();
 	KillTimer(tReactionTimer);
 	xTestBusy = true;
 	SetTimer("xReactionProgress", 70000, false);
@@ -23516,7 +23518,7 @@ function:mainmode()
 
 LoadServerStaticMeshes()
 {
-	new string[128], count = GetTickCount() + 3600000;
+	new string[128], count = GetTickCount_();
 	format(string, sizeof(string), "hostname %s", HOSTNAME);
 
 	SendRconCommand(string);
@@ -23824,7 +23826,7 @@ LoadServerStaticMeshes()
 	AddPlayerClass(285, 1958.3783, 1343.1572, 15.3746, 270.1425, 0, 0, 0, 0, 0, 0);
 	AddPlayerClass(283, 1958.3783, 1343.1572, 15.3746, 270.1425, 0, 0, 0, 0, 0, 0);
 
-	printf("#Server Meshes loaded in %i ms", (GetTickCount() + 3600000) - count);
+	printf("#Server Meshes loaded in %i ms", GetTickCount_() - count);
 	return 1;
 }
 
@@ -23833,7 +23835,7 @@ LoadVisualStaticMeshes()
 	// 3374 heuballen
 	// 2898 grünes rasen ding
 	
-    new count = GetTickCount() + 3600000;
+    new count = GetTickCount_();
     
 	bb_mcc = CreateDynamicObject(8323, -2322.76880, -1704.56067, 499.98999,   0.00000, 0.00000, 69.30000);
 	SetDynamicObjectMaterialText(bb_mcc, 0, "Welcome to New Evolution Freeroam!\nServer Realtime: \n"green"Players online: ", OBJECT_MATERIAL_SIZE_256x128, "Calibri", 0, 0, -32256, -16777216, OBJECT_MATERIAL_TEXT_ALIGN_LEFT);
@@ -24783,7 +24785,7 @@ LoadVisualStaticMeshes()
 	CreateDynamicObject(19056, 1066.84094, -1760.02844, 12.77734,   0.00000, 0.00000, 0.00000);
 	#endif
 
-	printf("#Visual Meshes loaded in %i ms", (GetTickCount() + 3600000) - count);
+	printf("#Visual Meshes loaded in %i ms", GetTickCount_() - count);
 	return 1;
 }
 
@@ -28602,7 +28604,7 @@ function:ShowDialog(playerid, dialogid)
 		}
 		case HAREFILL_DIALOG:
 		{
-		 	new tick = GetTickCount() + 3600000;
+		 	new tick = GetTickCount_();
 			if((PlayerInfo[playerid][tickLastRefill] + COOLDOWN_CMD_HAREFILL) >= tick)
 			{
 				return SCM(playerid, -1, ""er"Please wait a bit before using this command again!");
@@ -30927,7 +30929,7 @@ function:CountTillRace()
 StartRace()
 {
     g_RaceStatus = RaceStatus_Active;
-    g_RaceTick = GetTickCount() + 3600000;
+    g_RaceTick = GetTickCount_();
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -31488,4 +31490,9 @@ GunGamePlayers()
 		}
 	}
 	return count;
+}
+
+GetTickCount_()
+{
+	return (GetTickCount() + 3600000);
 }
