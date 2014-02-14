@@ -26,7 +26,7 @@
 - Compile with -O1 -d0
 - yum update
 - Restart server
-- Compile MySQL R37
+- Compile MySQL R34
 */
 
 // -
