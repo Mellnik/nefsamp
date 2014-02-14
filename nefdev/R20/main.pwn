@@ -204,6 +204,8 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define DERBY_VOTING_TIME     			(15000)
 #define DEFAULT_DERBY_TIME              (120)
 #define DERBY_FALLOVER_CHECK_TIME   	(500)
+#define DERBY_FREEZE_TIME 				(1750)
+#define DERBY_FREEZE_INTERVAL 			(70)
 
 // -
 // - Firework
@@ -1669,6 +1671,7 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
 	Float:g_RaceVehCoords[RACE_MAX_PLAYERS][4],
 	Float:g_RaceCPs[RACE_MAX_CHECKPOINTS][3],
 	bool:CSGSOFT[MAX_PLAYERS] = {false, ...},
+	g_DerbyFreezePool = DERBY_FREEZE_TIME / DERBY_FREEZE_INTERVAL,
 	g_SpawnAreas[5],
 	g_RaceForceMap = 0,
 	g_BuildRace = INVALID_PLAYER_ID,
@@ -25212,6 +25215,7 @@ function:StartDerbyMap1()
 		}
  	}
  	ExecDerbyTimer();
+    Derby_EnableFreezePool();
  	tDerbyFallOver = SetTimer("DerbyFallOver", DERBY_FALLOVER_CHECK_TIME, true);
 	return 1;
 }
@@ -25306,6 +25310,7 @@ function:StartDerbyMap2()
 		}
 	}
 	ExecDerbyTimer();
+	Derby_EnableFreezePool();
 	tDerbyFallOver = SetTimer("DerbyFallOver", DERBY_FALLOVER_CHECK_TIME, true);
 	return 1;
 }
@@ -25400,6 +25405,7 @@ function:StartDerbyMap3()
 		}
 	}
     ExecDerbyTimer();
+    Derby_EnableFreezePool();
 	tDerbyFallOver = SetTimer("DerbyFallOver", DERBY_FALLOVER_CHECK_TIME, true);
 	return 1;
 }
@@ -25494,6 +25500,7 @@ function:StartDerbyMap4()
 		}
 	}
     ExecDerbyTimer();
+    Derby_EnableFreezePool();
 	tDerbyFallOver = SetTimer("DerbyFallOver", DERBY_FALLOVER_CHECK_TIME, true);
 	return 1;
 }
@@ -25588,6 +25595,7 @@ function:StartDerbyMap5()
 		}
 	}
     ExecDerbyTimer();
+    Derby_EnableFreezePool();
 	tDerbyFallOver = SetTimer("DerbyFallOver", DERBY_FALLOVER_CHECK_TIME, true);
 	return 1;
 }
@@ -25672,6 +25680,7 @@ function:StartDerbyMap6()
 		}
 	}
     ExecDerbyTimer();
+    Derby_EnableFreezePool();
 	tDerbyFallOver = SetTimer("DerbyFallOver", DERBY_FALLOVER_CHECK_TIME, true);
 	return 1;
 }
@@ -25756,6 +25765,7 @@ function:StartDerbyMap7()
 		}
 	}
     ExecDerbyTimer();
+    Derby_EnableFreezePool();
 	tDerbyFallOver = SetTimer("DerbyFallOver", DERBY_FALLOVER_CHECK_TIME, true);
 	return 1;
 }
@@ -25840,6 +25850,7 @@ function:StartDerbyMap8()
 		}
 	}
     ExecDerbyTimer();
+    Derby_EnableFreezePool();
 	tDerbyFallOver = SetTimer("DerbyFallOver", DERBY_FALLOVER_CHECK_TIME, true);
 	return 1;
 }
@@ -25924,6 +25935,7 @@ function:StartDerbyMap9()
 		}
 	}
     ExecDerbyTimer();
+    Derby_EnableFreezePool();
 	tDerbyFallOver = SetTimer("DerbyFallOver", DERBY_FALLOVER_CHECK_TIME, true);
 	return 1;
 }
@@ -26901,6 +26913,32 @@ function:ExecDerbyTimer()
 	KillTimer(tDerbyTimer);
     tDerbyTimer = SetTimer("Derby", DERBY_TIME, false);
     return 1;
+}
+
+Derby_EnableFreezePool()
+{
+    g_DerbyFreezePool = DERBY_FREEZE_TIME / DERBY_FREEZE_INTERVAL;
+	SetTimer("Derby_FreezeVehicles", DERBY_FREEZE_INTERVAL, 0);
+}
+
+function:Derby_FreezeVehicles()
+{
+	for(new i = 0; i < MAX_PLAYERS; i++)
+	{
+	    if(gTeam[i] == DERBY)
+	    {
+	        if(IsPlayerInAnyVehicle(i))
+	        {
+	            SetVehicleVelocity(GetPlayerVehicleID(i), 0.0, 0.0, 0.0);
+	        }
+	    }
+	}
+
+	if(--g_DerbyFreezePool > 0 && IsDerbyRunning)
+	{
+	    SetTimer("Derby_FreezeVehicles", DERBY_FREEZE_INTERVAL, 0);
+	}
+	return 1;
 }
 
 function:ClearDerbySpawns()
