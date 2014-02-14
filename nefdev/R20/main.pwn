@@ -67,6 +67,7 @@
 #include <server_maps_3>
 #include <server_maps_4>
 #endif
+#include <server_map_patches>
 #include <server_map_vehicles>
 
 native IsValidVehicle(vehicleid); // undefined in a_samp.inc
@@ -1518,7 +1519,7 @@ new const BLevelMatrix[21][e_prop_matrix] =
 	{20, 2000000, 30000}
 };
 
-new const PVMatrix[99][e_pv_matrix] =
+new const PVMatrix[100][e_pv_matrix] =
 {
 	{0, 536, 595000, "Blade"},
 	{0, 575, 390000, "Broadway"},
@@ -1607,6 +1608,7 @@ new const PVMatrix[99][e_pv_matrix] =
     {8, 572, 1, "Mower"},
     {8, 434, 1, "Hotknife"},
     {8, 601, 1, "S.W.A.T."},
+    {9, 438, 250000, "Cabbie"},
     {9, 497, 450000, "Police Maverick"},
     {9, 596, 300000, "Police Car (LSPD)"},
     {9, 597, 300000, "Police Car (SFPD)"},
@@ -2529,6 +2531,7 @@ public OnGameModeInit()
     BuildServerMap3();
     BuildServerMap4();
     #endif
+    Server_MapPatches();
 
 	ResetElevatorQueue();
 	Elevator_Initialize();
@@ -2777,7 +2780,7 @@ public OnPlayerSpawn(playerid)
         }
 		case DERBY:
 		{
-		    SetPlayerDerbyStaticMeshes(playerid);
+		    SetTimerEx("SetPlayerDerbyStaticMeshes", 10, 0, "i", playerid);
 		}
 		case WAR:
 		{
@@ -3622,6 +3625,27 @@ public OnVehicleRespray(playerid, vehicleid, color1, color2)
 
 public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY, Float:fZ)
 {
+	if(gTeam[playerid] == gBG_TEAM1 || gTeam[playerid] == gBG_TEAM2)
+	{
+		if(weaponid == 35)
+		{
+		    new p_Weapons[13][2];
+		    
+			for(new i = 0; i < 13; i++)
+			{
+			    GetPlayerWeaponData(playerid, i, p_Weapons[i][0], p_Weapons[i][1]);
+			}
+			
+			p_Weapons[7][0] = 0; // RPG
+			
+			ResetPlayerWeapons(playerid);
+			
+			for(new i = 0; i < 13; i++)
+			{
+			    GivePlayerWeapon(playerid, p_Weapons[i][0], p_Weapons[i][1]);
+			}
+		}
+	}
 	return 1;
 }
 
@@ -9864,11 +9888,11 @@ YCMD:adminhelp(playerid, params[], help)
 
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[2][e_rank]);
 		strcat(string, gstr);
-		strcat(string, "/online /offline /onduty /offduty /akill /rv /day /night /dawn\n/move /tban /ban /cuff /uncuff /jail /unjail /unfreeze\n\n");
+		strcat(string, "/online /offline /onduty /offduty /akill /rv /day /night /dawn\n/burn /move /tban /ban /cuff /uncuff /jail /unjail /unfreeze\n\n");
 		
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[3][e_rank]);
 		strcat(string, gstr);
-		strcat(string, "/freeze /eject /go /burn /getip /get /mkick /clearchat /iplookup\n/giveweapon /announce /connectbots /raceforcemap /deleterecord /nstats\n\n");
+		strcat(string, "/freeze /eject /go /getip /get /mkick /clearchat /iplookup\n/giveweapon /announce /connectbots /raceforcemap /deleterecord /nstats\n\n");
 		
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[4][e_rank]);
 		strcat(string, gstr);
