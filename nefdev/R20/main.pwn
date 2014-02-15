@@ -2628,8 +2628,7 @@ public OnPlayerRequestClass(playerid, classid)
 
 	if(PlayerInfo[playerid][SavedSkin] != -1)
 	{
-	    TogglePlayerSpectating(playerid, true);
-	    TogglePlayerSpectating(playerid, false);
+	    SetTimerEx("ForceClassSpawn", 10, 0, "i", playerid);
 	    SCM(playerid, -1, ""server_sign" "r_besch"Your saved skin has been set. (/deleteskin to remove)");
 	    return 0;
 	}
@@ -3549,8 +3548,6 @@ public OnPlayerCommandPerformed(playerid, cmdtext[], success)
     fwrite(lFile, gstr2);
     fclose(lFile);
 
-    SrvStat[0]++;
-
 	PlayerInfo[playerid][iCoolDownCommand]++;
 	SetTimerEx("CoolDownCommand", COOLDOWN_CMD, false, "i", playerid);
 	if(PlayerInfo[playerid][iCoolDownCommand] == 8)
@@ -3565,9 +3562,10 @@ public OnPlayerCommandPerformed(playerid, cmdtext[], success)
 		return Kick(playerid);
 	}
 
-	if(!success)
-	{
+	if(!success) {
 	    ShowInfo(playerid, "Unknown Command", "Type ~y~/c ~w~for all commands");
+	} else {
+	    SrvStat[0]++;
 	}
 	return 1;
 }
@@ -10820,16 +10818,16 @@ YCMD:nstats(playerid, params[], help)
 		{
 			new string[512], ip_port[22];
 			format(string, sizeof(string), ""white"Network Statistics\n\n%s(%i)\n\nConnect Time: %i\nMsgs Recv: %i\nBytes Recv: %i\nMsgs Sent: %i\nBytes Sent: %i\nMsgs Recv per second: %i\nPacketloss: %.2f percent\nConnect Stauts: %i\n",
-			    __GetName(playerid),
-			    playerid,
-			    NetStats_GetConnectedTime(playerid),
-			    NetStats_MessagesReceived(playerid),
-			    NetStats_BytesReceived(playerid),
-			    NetStats_MessagesSent(playerid),
-			    NetStats_BytesSent(playerid),
-			    NetStats_MessagesRecvPerSecond(playerid),
-			    NetStats_PacketLossPercent(playerid),
-			    NetStats_ConnectionStatus(playerid));
+			    __GetName(player),
+			    player,
+			    NetStats_GetConnectedTime(player),
+			    NetStats_MessagesReceived(player),
+			    NetStats_BytesReceived(player),
+			    NetStats_MessagesSent(player),
+			    NetStats_BytesSent(player),
+			    NetStats_MessagesRecvPerSecond(player),
+			    NetStats_PacketLossPercent(player),
+			    NetStats_ConnectionStatus(player));
 			    
 			NetStats_GetIpPort(playerid, ip_port, sizeof(ip_port));
 			strcat(string, ip_port);
@@ -11795,54 +11793,52 @@ YCMD:grename(playerid, params[], help)
 
 YCMD:gzonecreate(playerid, params[], help)
 {
-	if(PlayerInfo[playerid][Level] == MAX_ADMIN_LEVEL)
+    if(!IsPlayerAdmin(playerid) || PlayerInfo[playerid][Level] != MAX_ADMIN_LEVEL)
 	{
-	    new c = 0;
-    	for(new i = 0; i < gzoneid; i++)
-		{
-			c++;
-		}
-		
-		if(c >= MAX_GZONES) return SCM(playerid, -1, ""er"Max. GZones reached.");
-
-		new tmp[41];
-		if(sscanf(params, "s[40]", tmp))
-		{
-		    return SCM(playerid, NEF_GREEN, "Usage: /gzonecreate <zone name>");
-		}
-		new zonename[40];
-		mysql_escape_string(tmp, zonename, pSQL, sizeof(zonename));
-		
-        strmid(GZoneInfo[gzoneid][sZoneName], zonename, 0, 40, 40);
-
-	    new Float:POS[3];
-	    GetPlayerPos(playerid, POS[0], POS[1], POS[2]);
-
-        GZoneInfo[gzoneid][E_x] = POS[0];
-        GZoneInfo[gzoneid][E_y] = POS[1];
-        GZoneInfo[gzoneid][E_z] = POS[2];
-
-		GZoneInfo[gzoneid][localGang] = 0;
-  		GZoneInfo[gzoneid][iLocked] = gettime();
-        GZoneInfo[gzoneid][bUnderAttack] = false;
-
-		format(gstr2, sizeof(gstr2), "INSERT INTO `gzones` VALUES (NULL, '%s', %f, %f, %f, %i, %i);",
-			GZoneInfo[gzoneid][sZoneName],
-			GZoneInfo[gzoneid][E_x],
-			GZoneInfo[gzoneid][E_y],
-			GZoneInfo[gzoneid][E_z],
-			GZoneInfo[gzoneid][localGang],
-			GZoneInfo[gzoneid][iLocked]);
-			
-		mysql_tquery(pSQL, gstr2, "", "");
-	    mysql_tquery(pSQL, "SELECT * FROM `gzones` ORDER BY `id` DESC LIMIT 1;", "OnGangZoneLoadEx", "i", gzoneid);
-	    
-	    gzoneid++;
+		return SCM(playerid, -1, NO_PERM);
 	}
-	else
+
+    new c = 0;
+	for(new i = 0; i < gzoneid; i++)
 	{
-		SCM(playerid, -1, NO_PERM);
+		c++;
 	}
+	
+	if(c >= MAX_GZONES) return SCM(playerid, -1, ""er"Max. GZones reached.");
+
+	new tmp[41];
+	if(sscanf(params, "s[40]", tmp))
+	{
+	    return SCM(playerid, NEF_GREEN, "Usage: /gzonecreate <zone name>");
+	}
+	new zonename[40];
+	mysql_escape_string(tmp, zonename, pSQL, sizeof(zonename));
+	
+    strmid(GZoneInfo[gzoneid][sZoneName], zonename, 0, 40, 40);
+
+    new Float:POS[3];
+    GetPlayerPos(playerid, POS[0], POS[1], POS[2]);
+
+    GZoneInfo[gzoneid][E_x] = POS[0];
+    GZoneInfo[gzoneid][E_y] = POS[1];
+    GZoneInfo[gzoneid][E_z] = POS[2];
+
+	GZoneInfo[gzoneid][localGang] = 0;
+	GZoneInfo[gzoneid][iLocked] = gettime();
+    GZoneInfo[gzoneid][bUnderAttack] = false;
+
+	format(gstr2, sizeof(gstr2), "INSERT INTO `gzones` VALUES (NULL, '%s', %f, %f, %f, %i, %i);",
+		GZoneInfo[gzoneid][sZoneName],
+		GZoneInfo[gzoneid][E_x],
+		GZoneInfo[gzoneid][E_y],
+		GZoneInfo[gzoneid][E_z],
+		GZoneInfo[gzoneid][localGang],
+		GZoneInfo[gzoneid][iLocked]);
+		
+	mysql_tquery(pSQL, gstr2, "", "");
+    mysql_tquery(pSQL, "SELECT * FROM `gzones` ORDER BY `id` DESC LIMIT 1;", "OnGangZoneLoadEx", "i", gzoneid);
+    
+    gzoneid++;
 	return 1;
 }
 
@@ -23397,7 +23393,7 @@ CreateTextdraws()
 	TextDrawSetProportional(TXTTdmSign, 1);
 	TextDrawSetSelectable(TXTTdmSign, 0);
 
-    TXTTdmInfo = TextDrawCreate(513.000000, 344.000000, "Timelft: ~r~~h~~h~--:--~n~~w~Players: ~b~~h~~h~--~n~~w~Map: ~g~~h~~h~Voting~n~~w~Ranger Kills: ~g~~h~~h~---~n~~w~Spetsnaz Kills: ~g~~h~~h~---");
+    TXTTdmInfo = TextDrawCreate(513.000000, 344.000000, "Timeleft: ~r~~h~~h~--:--~n~~w~Players: ~b~~h~~h~--~n~~w~Map: ~g~~h~~h~Voting~n~~w~Ranger Kills: ~g~~h~~h~---~n~~w~Spetsnaz Kills: ~g~~h~~h~---");
 	TextDrawBackgroundColor(TXTTdmInfo, 168430202);
 	TextDrawFont(TXTTdmInfo, 1);
 	TextDrawLetterSize(TXTTdmInfo, 0.270000, 1.099997);
@@ -23575,7 +23571,7 @@ LoadServerStaticMeshes()
 	{
 		GZoneInfo[i][bUnderAttack] = false;
 		
-		GZoneInfo[i][E_Txt] = TextDrawCreate(503.000000, 298.000000, "Gang War: %s~n~Defend the Gang Zone!~n~~n~~n~Timelft: --:--");
+		GZoneInfo[i][E_Txt] = TextDrawCreate(503.000000, 298.000000, "Gang War: %s~n~Defend the Gang Zone!~n~~n~~n~Timeleft: --:--");
 		TextDrawBackgroundColor(GZoneInfo[i][E_Txt], 255);
 		TextDrawFont(GZoneInfo[i][E_Txt], 1);
 		TextDrawLetterSize(GZoneInfo[i][E_Txt], 0.240000, 1.100000);
@@ -26681,18 +26677,18 @@ function:ProcessTick()
 		new bg_players = BGTeam1Players + BGTeam2Players;
 		switch(CurrentBGMap)
 		{                                     
-		    case BG_MAP1: format(gstr2, sizeof(gstr2), "Timelft: ~r~~h~~h~%s~n~~w~Players: ~b~~h~~h~%i~n~~w~Map: ~g~~h~~h~Forest~n~~w~Ranger Kills: ~g~~h~~h~%i~n~~w~Spetsnaz Kills: ~g~~h~~h~%i", GameTimeConvert(BGGameTime), bg_players, BGTeam1Kills, BGTeam2Kills);
-		    case BG_MAP2: format(gstr2, sizeof(gstr2), "Timelft: ~r~~h~~h~%s~n~~w~Players: ~b~~h~~h~%i~n~~w~Map: ~g~~h~~h~Quaters~n~~w~Ranger Kills: ~g~~h~~h~%i~n~~w~Spetsnaz Kills: ~g~~h~~h~%i", GameTimeConvert(BGGameTime), bg_players, BGTeam1Kills, BGTeam2Kills);
-            case BG_MAP3: format(gstr2, sizeof(gstr2), "Timelft: ~r~~h~~h~%s~n~~w~Players: ~b~~h~~h~%i~n~~w~Map: ~g~~h~~h~Rust~n~~w~Ranger Kills: ~g~~h~~h~%i~n~~w~Spetsnaz Kills: ~g~~h~~h~%i", GameTimeConvert(BGGameTime), bg_players, BGTeam1Kills, BGTeam2Kills);
-            case BG_MAP4: format(gstr2, sizeof(gstr2), "Timelft: ~r~~h~~h~%s~n~~w~Players: ~b~~h~~h~%i~n~~w~Map: ~g~~h~~h~Italy~n~~w~Ranger Kills: ~g~~h~~h~%i~n~~w~Spetsnaz Kills: ~g~~h~~h~%i", GameTimeConvert(BGGameTime), bg_players, BGTeam1Kills, BGTeam2Kills);
-            case BG_MAP5: format(gstr2, sizeof(gstr2), "Timelft: ~r~~h~~h~%s~n~~w~Players: ~b~~h~~h~%i~n~~w~Map: ~g~~h~~h~Medieval~n~~w~Ranger Kills: ~g~~h~~h~%i~n~~w~Spetsnaz Kills: ~g~~h~~h~%i", GameTimeConvert(BGGameTime), bg_players, BGTeam1Kills, BGTeam2Kills);
-            case BG_MAP6: format(gstr2, sizeof(gstr2), "Timelft: ~r~~h~~h~%s~n~~w~Players: ~b~~h~~h~%i~n~~w~Map: ~g~~h~~h~Hangar War~n~~w~Ranger Kills: ~g~~h~~h~%i~n~~w~Spetsnaz Kills: ~g~~h~~h~%i", GameTimeConvert(BGGameTime), bg_players, BGTeam1Kills, BGTeam2Kills);
+		    case BG_MAP1: format(gstr2, sizeof(gstr2), "Timeleft: ~r~~h~~h~%s~n~~w~Players: ~b~~h~~h~%i~n~~w~Map: ~g~~h~~h~Forest~n~~w~Ranger Kills: ~g~~h~~h~%i~n~~w~Spetsnaz Kills: ~g~~h~~h~%i", GameTimeConvert(BGGameTime), bg_players, BGTeam1Kills, BGTeam2Kills);
+		    case BG_MAP2: format(gstr2, sizeof(gstr2), "Timeleft: ~r~~h~~h~%s~n~~w~Players: ~b~~h~~h~%i~n~~w~Map: ~g~~h~~h~Quaters~n~~w~Ranger Kills: ~g~~h~~h~%i~n~~w~Spetsnaz Kills: ~g~~h~~h~%i", GameTimeConvert(BGGameTime), bg_players, BGTeam1Kills, BGTeam2Kills);
+            case BG_MAP3: format(gstr2, sizeof(gstr2), "Timeleft: ~r~~h~~h~%s~n~~w~Players: ~b~~h~~h~%i~n~~w~Map: ~g~~h~~h~Rust~n~~w~Ranger Kills: ~g~~h~~h~%i~n~~w~Spetsnaz Kills: ~g~~h~~h~%i", GameTimeConvert(BGGameTime), bg_players, BGTeam1Kills, BGTeam2Kills);
+            case BG_MAP4: format(gstr2, sizeof(gstr2), "Timeleft: ~r~~h~~h~%s~n~~w~Players: ~b~~h~~h~%i~n~~w~Map: ~g~~h~~h~Italy~n~~w~Ranger Kills: ~g~~h~~h~%i~n~~w~Spetsnaz Kills: ~g~~h~~h~%i", GameTimeConvert(BGGameTime), bg_players, BGTeam1Kills, BGTeam2Kills);
+            case BG_MAP5: format(gstr2, sizeof(gstr2), "Timeleft: ~r~~h~~h~%s~n~~w~Players: ~b~~h~~h~%i~n~~w~Map: ~g~~h~~h~Medieval~n~~w~Ranger Kills: ~g~~h~~h~%i~n~~w~Spetsnaz Kills: ~g~~h~~h~%i", GameTimeConvert(BGGameTime), bg_players, BGTeam1Kills, BGTeam2Kills);
+            case BG_MAP6: format(gstr2, sizeof(gstr2), "Timeleft: ~r~~h~~h~%s~n~~w~Players: ~b~~h~~h~%i~n~~w~Map: ~g~~h~~h~Hangar War~n~~w~Ranger Kills: ~g~~h~~h~%i~n~~w~Spetsnaz Kills: ~g~~h~~h~%i", GameTimeConvert(BGGameTime), bg_players, BGTeam1Kills, BGTeam2Kills);
 		}
 		TextDrawSetString(TXTTdmInfo, gstr2);
 	}
 	else
 	{
-		TextDrawSetString(TXTTdmInfo, "Timelft: ~r~~h~~h~--:--~n~~w~Players: ~b~~h~~h~--~n~~w~Map: ~g~~h~~h~Voting~n~~w~Ranger Kills: ~g~~h~~h~---~n~~w~Spetsnaz Kills: ~g~~h~~h~---");
+		TextDrawSetString(TXTTdmInfo, "Timeleft: ~r~~h~~h~--:--~n~~w~Players: ~b~~h~~h~--~n~~w~Map: ~g~~h~~h~Voting~n~~w~Ranger Kills: ~g~~h~~h~---~n~~w~Spetsnaz Kills: ~g~~h~~h~---");
 	}
 
 	if(IsDerbyRunning)
@@ -31495,4 +31491,10 @@ GunGamePlayers()
 GetTickCount_()
 {
 	return (GetTickCount() + 3600000);
+}
+
+function:ForceClassSpawn(playerid)
+{
+	SpawnPlayer(playerid);
+	return 1;
 }
