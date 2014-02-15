@@ -5266,7 +5266,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 		}
 	    case FREEROAM:
 	    {
-            if(PlayerInfo[playerid][bHasSpawn])
+            if(PlayerInfo[playerid][bHasSpawn] && !PlayerInfo[playerid][bGWarMode])
             {
                 SetSpawnInfoEx(playerid, NO_TEAM, GetPlayerSkin(playerid), PlayerInfo[playerid][CSpawnX], PlayerInfo[playerid][CSpawnY], PlayerInfo[playerid][CSpawnZ], PlayerInfo[playerid][CSpawnA]);
             }
@@ -11070,6 +11070,22 @@ YCMD:jetpack(playerid, params[], help)
 	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
     if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't use this command now");
 
+	if(PlayerInfo[playerid][Level] != MAX_ADMIN_LEVEL && PlayerInfo[playerid][bGWarMode])
+	{
+	    new Float:POS[3];
+	    GetPlayerPos(playerid, POS[0], POS[1], POS[2]);
+
+		for(new i = 0; i < gzoneid; i++)
+		{
+		    if(!GZoneInfo[i][bUnderAttack]) continue;
+
+		    if(IsPointInDynamicArea(GZoneInfo[i][zsphere], POS[0], POS[1], POS[2]))
+		    {
+		        return ShowInfo(playerid, "Failed to spawn jetpack", "Not allowed in the gang zone");
+		    }
+		}
+	}
+
 	ShowInfo(playerid, "Jetpack spawned", "");
 	SetPlayerSpecialAction(playerid, SPECIAL_ACTION_USEJETPACK);
 	return 1;
@@ -12190,7 +12206,7 @@ YCMD:gwar(playerid, params[], help)
 		    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s(%i) is capturing the zone: '%s' %i members have been tied!", __GetName(playerid), playerid, GZoneInfo[i][sZoneName], count);
 			GangMSG(PlayerInfo[playerid][GangID], gstr);
 			
-			format(gstr, sizeof(gstr), ""orange"%s(%i) has started capturing the zone '%s' with %i gang members!", __GetName(playerid), playerid, GZoneInfo[i][sZoneName], count);
+			format(gstr, sizeof(gstr), ""orange"%s(%i) has started capturing the zone '%s' with %i gang member(s)!", __GetName(playerid), playerid, GZoneInfo[i][sZoneName], count);
 			SCMToAll(-1, gstr);
 			
 			Iter_Add(iterGangWar, PlayerInfo[playerid][GangID]);
@@ -12231,7 +12247,7 @@ YCMD:gwar(playerid, params[], help)
 		    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"Gang %s started a war against your gang at %s!", GetGangNameByID(PlayerInfo[playerid][GangID]), GZoneInfo[i][sZoneName]);
 			GangMSG(GZoneInfo[i][localGang], gstr);
 
-			format(gstr, sizeof(gstr), ""orange"%s(%i) has started capturing the zone '%s' with %i gang members!", __GetName(playerid), playerid, GZoneInfo[i][sZoneName], count);
+			format(gstr, sizeof(gstr), ""orange"%s(%i) has started capturing the zone '%s' with %i gang member(s)!", __GetName(playerid), playerid, GZoneInfo[i][sZoneName], count);
 			SCMToAll(-1, gstr);
 		    
 		    Iter_Add(iterGangWar, PlayerInfo[playerid][GangID]);
@@ -21860,7 +21876,7 @@ CarSpawner(playerid, model, respawn_delay = -1, bool:spawnzone_check = true)
 		    
 		    if(IsPointInDynamicArea(GZoneInfo[i][zsphere], POS[0], POS[1], POS[2]))
 		    {
-		        return ShowInfo(playerid, "Failed to spawn hydra", "Not allowed during gang war");
+		        return ShowInfo(playerid, "Failed to spawn hydra", "Not allowed in the gang zone");
 		    }
 		}
 	}
@@ -28732,11 +28748,11 @@ function:ShowDialog(playerid, dialogid)
 			    }
 			    case GANG_POS_LEADER:
 			    {
-			        ShowPlayerDialog(playerid, GMENU_DIALOG, DIALOG_STYLE_LIST, gstr, "Gang Info\nShow All Gang Members\nView All Gang Commands\nView gang zones\nSet Player Rank", "Select", "Cancel");
+			        ShowPlayerDialog(playerid, GMENU_DIALOG, DIALOG_STYLE_LIST, gstr, "Gang Info\nShow all gang members\nView All gang commands\nView gang zones\nSet Player Rank", "Select", "Cancel");
 			    }
 			    case GANG_POS_MAIN_LEADER:
 			    {
-			    	ShowPlayerDialog(playerid, GMENU_DIALOG, DIALOG_STYLE_LIST, gstr, "Gang Info\nShow All Gang Members\nView All Gang Commands\nView gang zones\nSet Player Rank\nKick Player From Gang", "Select", "Cancel");
+			    	ShowPlayerDialog(playerid, GMENU_DIALOG, DIALOG_STYLE_LIST, gstr, "Gang Info\nShow all gang members\nView All gang commands\nView gang zones\nSet Player Rank\nKick Player From Gang", "Select", "Cancel");
 			    }
 			}
 		}
