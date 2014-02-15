@@ -2522,6 +2522,7 @@ main()
 public OnGameModeInit()
 {
 	print("====================="SVRNAME" "CURRENT_VERSION"=====================");
+	print("Copyright ©2011 - 2014 New Evolution Freeroam");
 
 	mysql_log(LOG_ERROR | LOG_WARNING, LOG_TYPE_TEXT);
     MySQL_Connect();
@@ -26820,7 +26821,7 @@ function:ProcessTick()
 				{
 				    if(GZoneInfo[i][DefendingGang] == 0)
 				    {
-					    format(gstr, sizeof(gstr), ""gang_sign" "r_besch" Your gang successfully captured '%s' with %i alive players!", GZoneInfo[i][sZoneName], Iter_Count(Players));
+					    format(gstr, sizeof(gstr), ""gang_sign" "r_besch" Your gang successfully captured '%s' with %i alive player(s)!", GZoneInfo[i][sZoneName], Iter_Count(Players));
 						GangMSG(GZoneInfo[i][AttackingGang], gstr);
 						GangMSG(GZoneInfo[i][AttackingGang], ""gang_sign" "r_besch" The gang gained 5 gang score and each member $20,000 who were tied.");
 
@@ -26834,7 +26835,7 @@ function:ProcessTick()
 					}
 					else
 					{
-					    format(gstr, sizeof(gstr), ""gang_sign" "r_besch" Your gang successfully captured '%s' with %i alive players!", GZoneInfo[i][sZoneName], Iter_Count(Players));
+					    format(gstr, sizeof(gstr), ""gang_sign" "r_besch" Your gang successfully captured '%s' with %i alive player(s)!", GZoneInfo[i][sZoneName], Iter_Count(Players));
 						GangMSG(GZoneInfo[i][AttackingGang], gstr);
 						GangMSG(GZoneInfo[i][AttackingGang], ""gang_sign" "r_besch" The gang gained 10 gang score and each member $20,000 who were tied.");
 
@@ -31489,7 +31490,7 @@ get_serial(playerid)
 SetSpawnInfoEx(playerid, team, skin, Float:x, Float:y, Float:z, Float:Angle)
 {
 	if(!IsValidSkin(skin)) skin = 0;
-	printf("SetSpawnInfo(%i, %i, %i, %f, %f, %f, %f, 0, 0, 0, 0, 0, 0);", playerid, team, skin, x, y, z, Angle);
+	//printf("SetSpawnInfo(%i, %i, %i, %f, %f, %f, %f, 0, 0, 0, 0, 0, 0);", playerid, team, skin, x, y, z, Angle);
 	return SetSpawnInfo(playerid, team, skin, x, y, z, Angle, 0, 0, 0, 0, 0, 0);
 }
 
