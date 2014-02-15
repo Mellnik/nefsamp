@@ -18,8 +18,6 @@
 #define YSI_IS_SERVER
 
 /* Build 20 todo:
-- Add taxi to /vs
-
 - Remove profiler
 - Remove crashdetect
 - Add samp.ban
@@ -2591,7 +2589,7 @@ public OnGameModeExit()
 	
 	DestroyElevator();
 
- 	mysql_close(pSQL, false);
+ 	mysql_close(pSQL, true);
  	
 	print("...GameMode unloaded!");
 	return 1;
@@ -2602,11 +2600,14 @@ public OnPlayerRequestClass(playerid, classid)
     if(GlobalMain) return 0;
 
 	if(PlayerInfo[playerid][ExitType] == EXIT_FIRST_SPAWNED)
-	{
+	{/*
 		SCM(playerid, -1, ""er"You are bugged in class selection. Please reconnect. "SERVER_IP"");
 		PlayerInfo[playerid][AllowSpawn] = false;
-		KickEx(playerid);
-	    return 0;
+		KickEx(playerid);*/
+	    new rand = random(4);
+	    SetSpawnInfoEx(playerid, NO_TEAM, PlayerInfo[playerid][SavedSkin] != -1 ? PlayerInfo[playerid][SavedSkin] : GetPlayerSkin(playerid), WorldSpawns[rand][0], WorldSpawns[rand][1], WorldSpawns[rand][2] + 3.0, WorldSpawns[rand][3]);
+        SetTimerEx("ForceClassSpawn", 10, 0, "i", playerid);
+		return 0;
 	}
 		
     PlayerInfo[playerid][bFirstSpawn] = true;
@@ -6999,6 +7000,11 @@ Float:GetDoorsZCoordForFloor(floorid)
 	return (GROUND_Z_COORD + FloorZOffsets[floorid]);
 }
 
+Float:GetDistance3D(Float:x1, Float:y1, Float:z1, Float:x2, Float:y2, Float:z2)
+{
+	return VectorSize(x1 - x2, y1 - y2, z1 - z2);
+}
+
 public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 {
 	if(Key(KEY_SPRINT) && IsPlayerInRangeOfPoint(playerid, 2.2, 2311.63, -3.89, 26.74) && gTeam[playerid] == STORE)
@@ -8543,6 +8549,17 @@ YCMD:l(playerid, params[], help)
 		return 1;
 	}
 	
+	for(new i = 0; i < gzoneid; i++)
+	{
+	    if(GZoneInfo[i][bUnderAttack] && (GZoneInfo[i][localGang] == PlayerInfo[playerid][GangID] || GZoneInfo[i][AttackingGang] == PlayerInfo[playerid][GangID]))
+	    {
+	        if(GZONE_SIZE + 100.0 > GetDistance3D(PlayerInfo[playerid][sX], PlayerInfo[playerid][sY], PlayerInfo[playerid][sZ], GZoneInfo[i][E_x], GZoneInfo[i][E_y], GZoneInfo[i][E_z]))
+	        {
+	            return SCM(playerid, -1, ""er"Point is next to a Gang Zone which is under attack");
+	        }
+		}
+	}
+	
 	SetPlayerInterior(playerid, 0);
 	
 	if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
@@ -8588,7 +8605,7 @@ YCMD:colors(playerid, params[], help)
 	{
 		SCM(playerid, -1, ""nef" You can also set your own color using RGB values. /color <0-255> <0-255> <0-255>");
 		SCM(playerid, -1, ""nef" Quick color change: /blue /orange /red /yellow /grey /pink /green - /random for a random color");
-		ShowPlayerDialog(playerid, COLOR_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Colors", ""RED_E"Red\n"BLUE_E"Blue\n"WHITE_E"White\n{FFFF82}Ivory\n"PINK_E"Pink\n"YELLOW_E"Yellow\n"GREEN_E"Green\n"LB_E"Lightblue\n"GREY_E"Grey\n"ORANGE_E"Orange\n"purple"Purple\n"LG_E"Light Green\n{B0C4DE}Steelblue", "Select", "Exit");
+		ShowPlayerDialog(playerid, COLOR_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Colors", ""RED_E"Red\n"BLUE_E"Blue\n"WHITE_E"White\n{FFFF82}Ivory\n"PINK_E"Pink\n"YELLOW_E"Yellow\n"GREEN_E"Green\n{00EBFF}Lightblue\n"GREY_E"Grey\n"ORANGE_E"Orange\n"purple"Purple\n"LG_E"Light Green\n{B0C4DE}Steelblue", "Select", "Exit");
 	}
 	else
 	{
@@ -18782,8 +18799,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					}
 					case 7:
 	    	    	{
-	    	    		SetPlayerColor(playerid, COLOR_LIGHTBLUE);
-	    	    		SCM(playerid, COLOR_LIGHTBLUE, ">> Your nick color has been changed to LIGHTBLUE.");
+	    	    		SetPlayerColor(playerid, 0x00EBFFFF);
+	    	    		SCM(playerid, 0x00EBFFFF, ">> Your nick color has been changed to LIGHTBLUE.");
 					}
 					case 8:
 	    	    	{
@@ -31105,11 +31122,6 @@ SetCP(playerid, PrevCP, NextCP, MaxCP, Type)
 			SetPlayerRaceCheckpoint(playerid, 3, g_RaceCPs[PrevCP][0], g_RaceCPs[PrevCP][1], g_RaceCPs[PrevCP][2], g_RaceCPs[NextCP][0], g_RaceCPs[NextCP][1], g_RaceCPs[NextCP][2], RACE_CHECKPOINT_SIZE);
 		}
 	}
-}
-
-Float:GetDistance3D(Float:x1, Float:y1, Float:z1, Float:x2, Float:y2, Float:z2)
-{
-	return VectorSize(x1 - x2, y1 - y2, z1 - z2);
 }
 
 Race_CalculatePosition()
