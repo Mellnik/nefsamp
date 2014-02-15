@@ -1221,7 +1221,7 @@ new const szRandomInfoTXTs[14][] =
 	"~w~Go to ~g~~h~~h~/vs ~w~and get a private vehicle which you can tune!",
     "~w~Join minigames to earn money and score! ~g~~h~~h~/m",
 	"~w~Spawn vehicles using ~r~~h~/v ~w~or ~r~~h~/car",
-	"~w~Edit your server prefrences and features using ~r~/settings~w~!",
+	"~w~Edit your server preferences and features using ~r~/settings~w~!",
 	"~w~Challenge your friends in ~r~~h~~h~/duel"
 };
 
@@ -2712,6 +2712,7 @@ public OnPlayerSpawn(playerid)
         case FREEROAM:
         {
             ResetPlayerWorld(playerid);
+            
             /*if(PlayerInfo[playerid][bHasSpawn]) Moved to OPD system
             {
         		SetPlayerPos(playerid, PlayerInfo[playerid][CSpawnX], PlayerInfo[playerid][CSpawnY], PlayerInfo[playerid][CSpawnZ]);
