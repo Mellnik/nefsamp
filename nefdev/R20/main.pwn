@@ -7810,7 +7810,7 @@ YCMD:sfdrift(playerid, params[], help)
 }
 YCMD:driftcity(playerid, params[], help)
 {
-	PortPlayerMapVeh(playerid, 3431.8403,485.7794,1788.2438,359.8336,3431.8403,485.7794,1788.2438,359.8336, "Drift City", "driftcity");
+	PortPlayerMapVeh(playerid, 3431.8403,485.7794,1788.2438,359.8336,3431.8403,485.7794,1788.0438,359.8336, "Drift City", "driftcity");
 	return 1;
 }
 YCMD:driftisland(playerid, params[], help)
