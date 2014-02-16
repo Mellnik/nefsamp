@@ -9582,7 +9582,7 @@ YCMD:cnrhelp(playerid, params[], help)
 	if(GetPVarInt(playerid, "Cop") != 0)
 	{
 		strcat(line3, ""LB2_E"You have joined the Las Venturas Police Department!\n\n"BLUE_E"Cop Help:\n"WHITE_E"Your mission is to protect the streets of Las Venturas by eliminating any crime.\nSuspects are shown as "ORANGE_E"orange"WHITE_E" on your map radar. The most wanted suspects are shown in darker orange.");
-		strcat(line3, "\nType "RED_E"/ar "WHITE_E"to arrest any criminal nearby, you and the suspect must be on foot.\nYou get more score and money by arresting rather than takedowns.\nType "PINK_E"/tpm "WHITE_E"to teamchat with your team members.\n\nType /cnrhelp to open this box up at anytime, Good luck soilders!");
+		strcat(line3, "\nType "RED_E"/ar "WHITE_E"to arrest any criminal nearby, you and the suspect must be on foot.\nYou get more score and money by arresting rather than takedowns.\nType "PINK_E"/tpm "WHITE_E"to teamchat with your team members.\n\nType /cnrhelp to open this box up at anytime, Good luck soldiers!");
 		ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""BLUE_E"Cop Help", line3, "OK", "");
  	}
  	else if(GetPVarInt(playerid, "Robber") == 1)
@@ -18340,7 +18340,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
   	    				format(string, sizeof(string), ""cnr_sign" "ORANGE_E"%s(%i) has joined the "LB_E"Cops "ORANGE_E"in the /CNR minigame.", __GetName(playerid), playerid);
   	    				SCMToAll(-1, string);
 			    		SCM(playerid, -1, ""nef" You have joined the LVPD!");
-			    		SCM(playerid, -1, ""nef" Your mission is to arrests any robbers and keep the steets of LV clean!");
+			    		SCM(playerid, -1, ""nef" Your mission is to arrests any robbers and keep the streets of LV clean!");
 						GameTextForPlayer(playerid, "~w~You have joined the ~b~cops team~w~!", 4000, 4);
 						SetPlayerColor(playerid, COLOR_CNR_COP);
 						ResetPlayerWeapons(playerid);
@@ -18475,7 +18475,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						format(string, sizeof(string), ""cnr_sign" "ORANGE_E"%s(%i) has joined the "PURPLE_E"Army "ORANGE_E"in the /CNR minigame.", __GetName(playerid), playerid);
   	    				SCMToAll(-1, string);
 			    		SCM(playerid, -1, ""nef" You have joined the Army Task Force!");
-			    		SCM(playerid, -1, ""nef" Your mission is to arrests any robbers and keep the steets of LV clean!");
+			    		SCM(playerid, -1, ""nef" Your mission is to arrests any robbers and keep the streets of LV clean!");
 						GameTextForPlayer(playerid, "~w~You have joined the ~p~army team~w~!", 4000, 4);
 						SetPlayerColor(playerid, COLOR_PURPLE);
 						ResetPlayerWeapons(playerid);
