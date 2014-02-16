@@ -11,9 +11,9 @@
 
 #pragma dynamic 8192
 
-#define IS_RELEASE_BUILD (false)
+#define IS_RELEASE_BUILD (true)
 #define INC_ENVIORMENT (true)
-#define IRC_CONNECT (false)
+#define IRC_CONNECT (true)
 #define WINTER_EDITION (false) // ferriswheelfair.amx
 #define YSI_IS_SERVER
 
@@ -25,6 +25,7 @@
 - yum update
 - Restart server
 - Compile MySQL R34
+- swap to nef03z
 */
 
 // -
@@ -47,7 +48,6 @@
 #include <YSI\y_commands>   // 13/02/2014
 #include <YSI\y_master>     // 13/02/2014
 #include <YSI\y_stringhash> // 13/02/2014
-#include <crashdetect>
 #include <a_zones>          // 0.3z
 #include <sscanf2>      	// 2.8.1
 #include <streamer>     	// v2.7
