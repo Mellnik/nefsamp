@@ -13803,7 +13803,7 @@ YCMD:v71(playerid, params[], help)// Infernus
 	AttachDynamicObjectToVehicle(hVIPVehObj[playerid][5], vID, -0.000000,2.175000,0.075000,70.200004,-0.000001,-0.000001);
 
 	ChangeVehicleColor(vID, 0, 0);
-	SCM(playerid, -1, ""nef" "LB2_E"You have spawned a custom Infurnes!");
+	SCM(playerid, -1, ""nef" "LB2_E"You have spawned a custom Infernus!");
 	return 1;
 }
 
@@ -15280,7 +15280,7 @@ YCMD:gangs(playerid, params[], help)
 	    {
 	        if(count <= 40)
 	        {
-	        	format(tmpstring, sizeof(tmpstring), "\n%i - [%s] %s", count + 1, PlayerInfo[i][GangTag], PlayerInfo[i][GangName]);
+	        	format(tmpstring, sizeof(tmpstring), "\n- [%s] %s", PlayerInfo[i][GangTag], PlayerInfo[i][GangName]);
 	        	strcat(finstring, tmpstring);
 			}
 			else
@@ -20066,7 +20066,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						{
 							return SCM(playerid, -1, ""er"You need to be VIP to access this section");
 						}
-						ShowPlayerDialog(playerid, VEHICLE_DIALOG+16, DIALOG_STYLE_LIST, ""nef" :: Vehicles > VIP Vehicles", ""RED_E"Custom Cheetah\n"LB_E"Police Infurnes\n"YELLOW_E"Custom NRG\n"GREEN_E"Custom Bullet\n"WHITE_E"Custom Huntley", "Select", "Back");
+						ShowPlayerDialog(playerid, VEHICLE_DIALOG+16, DIALOG_STYLE_LIST, ""nef" :: Vehicles > VIP Vehicles", ""RED_E"Custom Cheetah\n"LB_E"Police Infernus\n"YELLOW_E"Custom NRG\n"GREEN_E"Custom Bullet\n"WHITE_E"Custom Huntley", "Select", "Back");
 					}
 					case 1: ShowPlayerDialog(playerid, VEHICLE_DIALOG+1, DIALOG_STYLE_LIST, ""nef" :: Vehicles > Airplanes", "Andromada\nAT-400\nBeagle\nCropduster\nDodo\nNevada\nRustler\nShamal\nSkimmer\nStuntplane", "Select", "Back");
 					case 2: ShowPlayerDialog(playerid, VEHICLE_DIALOG+2, DIALOG_STYLE_LIST, ""nef" :: Vehicles > Helicopters", "Cargobob\nLeviathan\nMaverick\nNews Maverick\nPolice Maverick\nRaindance\nSeasparrow\nSparrow", "Select", "Back");
