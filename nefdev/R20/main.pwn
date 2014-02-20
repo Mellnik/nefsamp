@@ -17933,8 +17933,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				ShowInfo(playerid, "Item purchased", gstr, 5000);
 				
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[0][E_item_credits]);
-
-				MySQL_SavePlayer(playerid, false);
 				return true;
 	        }
 	        case CM_DIALOG + 3: // pv slot
@@ -17959,8 +17957,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				ShowInfo(playerid, "Item purchased", gstr, 5000);
                 
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[1][E_item_credits]);
-
-				MySQL_SavePlayer(playerid, false);
 	            return true;
 	        }
 	        case CM_DIALOG + 4: // house slot
@@ -17985,8 +17981,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				ShowInfo(playerid, "Item purchased", gstr, 5000);
                 
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[2][E_item_credits]);
-
-				MySQL_SavePlayer(playerid, false);
 	            return true;
 	        }
 	        case CM_DIALOG + 5: // house obj slot
@@ -18011,8 +18005,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				ShowInfo(playerid, "Item purchased", gstr, 5000);
                 
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[3][E_item_credits]);
-
-				MySQL_SavePlayer(playerid, false);
 	            return true;
 	        }
 	        case CM_DIALOG + 6: // business slot
@@ -18037,8 +18029,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				ShowInfo(playerid, "Item purchased", gstr, 5000);
                 
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[4][E_item_credits]);
-
-				MySQL_SavePlayer(playerid, false);
 	            return true;
 	        }
 	        case CM_DIALOG + 7: // instant nc
@@ -18064,8 +18054,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				ShowInfo(playerid, "Item purchased", gstr, 5000);
 
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[5][E_item_credits]);
-
-				MySQL_SavePlayer(playerid, false);
 	            return true;
 	        }
 	        case CM_DIALOG + 8: // 20 medkit
@@ -18083,8 +18071,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				ShowInfo(playerid, "Item purchased", gstr, 5000);
                 
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[6][E_item_credits]);
-
-				MySQL_SavePlayer(playerid, false);
 	            return true;
 	        }
 	        case CM_DIALOG + 9: // 100 medkits
@@ -18102,8 +18088,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				ShowInfo(playerid, "Item purchased", gstr, 5000);
                 
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[7][E_item_credits]);
-
-				MySQL_SavePlayer(playerid, false);
 	            return true;
 	        }
 	        case CM_DIALOG + 10: // mb x2
@@ -18132,8 +18116,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 mysql_tquery(pSQL, gstr, "", "");
                 
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[8][E_item_credits]);
-
-				MySQL_SavePlayer(playerid, false);
 	            return true;
 	        }
 	        case CM_DIALOG + 11: // mb x3
@@ -18162,8 +18144,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 mysql_tquery(pSQL, gstr, "", "");
                 
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[9][E_item_credits]);
-
-				MySQL_SavePlayer(playerid, false);
 	            return true;
 	        }
 	        case CM_DIALOG + 12: // sb x2
@@ -18192,8 +18172,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 mysql_tquery(pSQL, gstr, "", "");
                 
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[10][E_item_credits]);
-
-				MySQL_SavePlayer(playerid, false);
 	            return true;
 	        }
 	        case CM_DIALOG + 13: // sb x3
@@ -18222,8 +18200,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 mysql_tquery(pSQL, gstr, "", "");
                 
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[11][E_item_credits]);
-
-				MySQL_SavePlayer(playerid, false);
 	            return true;
 	        }
 	        case CM_DIALOG + 14: // masterb
@@ -18252,8 +18228,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 mysql_tquery(pSQL, gstr2, "", "");
                 
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[12][E_item_credits]);
-
-				MySQL_SavePlayer(playerid, false);
 	            return true;
 	        }
 	        case CM_DIALOG + 15: // kills/deaths reset
@@ -18273,8 +18247,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				SCM(playerid, NEF_YELLOW, "Your K/D has been reset!");
 				
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[13][E_item_credits]);
-
-				MySQL_SavePlayer(playerid, false);
 	            return true;
 	        }
 	        case COPS_REFILL:
@@ -22115,9 +22087,8 @@ MySQL_SavePlayer(playerid, bool:save_pv)
 		PlayerInfo[playerid][AdditionalHouseObjSlots],
 		PlayerInfo[playerid][DerbyWins]);
 
-    format(query2, sizeof(query2), ", `Color` = %i, `Credits` = %i, `Medkits` = %i, `Skin` = %i, `GungameWins` = %i, `RaceWins` = %i, `BGWins` = %i, `FalloutWins` = %i, `Wanteds` = %i, `VIP` = %i, `LastNameChange` = %i, `SavedSkin` = %i WHERE `Name` = '%s' LIMIT 1;",
+    format(query2, sizeof(query2), ", `Color` = %i, `Medkits` = %i, `Skin` = %i, `GungameWins` = %i, `RaceWins` = %i, `BGWins` = %i, `FalloutWins` = %i, `Wanteds` = %i, `VIP` = %i, `LastNameChange` = %i, `SavedSkin` = %i WHERE `Name` = '%s' LIMIT 1;",
 		PlayerInfo[playerid][SavedColor],
-		GetCredits(playerid),
 		PlayerInfo[playerid][Medkits],
 		GetPlayerSkin(playerid),
 		PlayerInfo[playerid][GungameWins],
@@ -26218,6 +26189,7 @@ function:OnQueueReceived()
 		for(new i = 0; i < rows; i++)
 		{
 		    new action = cache_get_row_int(i, 1, pSQL);
+		    
 		    switch(action)
 			{
 		        case 1: // give a player credits
@@ -26250,9 +26222,9 @@ function:OnQueueReceived()
 						mysql_tquery(pSQL, gstr2, "", "");
 		            }
 		            
-					format(gstr, sizeof(gstr), "~p~%s received %s credits for donating %s!", name, number_format(credits), payment);
+					format(gstr, sizeof(gstr), "~p~%s received %s credits for donating!", name, number_format(credits));
                     GameTextForAll(gstr, 10000, 3);
-                    format(gstr, sizeof(gstr), "%s received %s credits for donating %s!", name, number_format(credits), payment);
+                    format(gstr, sizeof(gstr), "%s received %s credits for donating!", name, number_format(credits));
                     SCMToAll(ORANGE, gstr);
 		        }
 		        case 2..6: // alter boost
@@ -29918,6 +29890,8 @@ function:AlterPlayerCredits(playerid, amount)
 	format(gstr, sizeof(gstr), "INSERT INTO `creditslog` VALUES (NULL, '%s', %i, %i);", __GetName(playerid), amount, gettime());
 	mysql_tquery(pSQL, gstr, "", "");
 	PlayerInfo[playerid][Credits] += amount;
+	format(gstr, sizeof(gstr), "UPDATE `accounts` SET `Credits` = %i WHERE `Name` = '%s' LIMIT 1;", PlayerInfo[playerid][Credits], __GetName(playerid));
+	mysql_tquery(pSQL, gstr, "", "");
 	PlayerPlaySound(playerid, 1058, 0.0, 0.0, 0.0);
 	return 1;
 }
