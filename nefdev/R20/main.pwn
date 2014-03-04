@@ -18,8 +18,6 @@
 #define YSI_IS_SERVER
 
 /* Build 20 todo:
-- Remove profiler
-- Remove crashdetect
 - Add samp.ban
 - Compile with -O1 -d0
 - yum update
@@ -17026,7 +17024,7 @@ YCMD:handsup(playerid, params[], help)
 {
     if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
-    ShowInfo(playerid, "Type ~y~/stopanim ~w~to quit", "");
+    ShowInfo(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
     
     SetPlayerSpecialAction(playerid, SPECIAL_ACTION_HANDSUP);
 	return 1;
@@ -17036,7 +17034,7 @@ YCMD:cigar(playerid, params[], help)
 {
     if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
-    ShowInfo(playerid, "Type ~y~/stopanim ~w~to quit", "");
+    ShowInfo(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
     
     SetPlayerSpecialAction(playerid, SPECIAL_ACTION_SMOKE_CIGGY);
 	return 1;
@@ -17046,7 +17044,7 @@ YCMD:carry(playerid, params[], help)
 {
     if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
-    ShowInfo(playerid, "Type ~y~/stopanim ~w~to quit", "");
+    ShowInfo(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
     
     SetPlayerSpecialAction(playerid, SPECIAL_ACTION_CARRY);
 	return 1;
@@ -17056,7 +17054,7 @@ YCMD:piss(playerid, params[], help)
 {
     if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
-    ShowInfo(playerid, "Type ~y~/stopanim ~w~to quit", "");
+    ShowInfo(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
     
     ApplyAnimation(playerid, "PAULNMAC", "Piss_loop", 4.1, 1, 0, 0, 0, 0);
     SetPlayerSpecialAction(playerid, 68);
@@ -17067,7 +17065,7 @@ YCMD:wank(playerid, params[], help)
 {
     if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
-    ShowInfo(playerid, "Type ~y~/stopanim ~w~to quit", "");
+    ShowInfo(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
     
     ApplyAnimation(playerid, "PAULNMAC", "wank_loop", 4.1, 1, 0, 0, 0, 0);
 	return 1;
@@ -17083,7 +17081,7 @@ YCMD:crossarms(playerid, params[], help)
 	}
 
     Command_ReProcess(playerid, "/stopanims", false);
-    ShowInfo(playerid, "Type ~y~/stopanim ~w~to quit", "");
+    ShowInfo(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
 
 	switch(crossarms)
 	{
@@ -17104,7 +17102,7 @@ YCMD:sit(playerid, params[], help)
     }
 
     Command_ReProcess(playerid, "/stopanims", false);
-    ShowInfo(playerid, "Type ~y~/stopanim ~w~to quit", "");
+    ShowInfo(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
 
 	switch(sit)
 	{
@@ -17129,7 +17127,7 @@ YCMD:dance(playerid, params[], help)
     }
 
     Command_ReProcess(playerid, "/stopanims", false);
-    ShowInfo(playerid, "Type ~y~/stopanim ~w~to quit", "");
+    ShowInfo(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
     
   	if(dance == 1)
   	{
@@ -17162,7 +17160,7 @@ YCMD:vomit(playerid, params[], help)
 {
     if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
-    ShowInfo(playerid, "Type ~y~/stopanim ~w~to quit", "");
+    ShowInfo(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
     
     ApplyAnimation(playerid, "FOOD", "EAT_Vomit_P", 4.1, 1, 0, 0, 0, 0);
 	return 1;
@@ -17172,7 +17170,7 @@ YCMD:drunk(playerid, params[], help)
 {
     if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
-    ShowInfo(playerid, "Type ~y~/stopanim ~w~to quit", "");
+    ShowInfo(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
 
     ApplyAnimation(playerid, "PED", "WALK_DRUNK", 4.1, 1, 0, 0, 0, 0);
 	return 1;
@@ -17182,7 +17180,7 @@ YCMD:wave(playerid, params[], help)
 {
     if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
-    ShowInfo(playerid, "Type ~y~/stopanim ~w~to quit", "");
+    ShowInfo(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
     
     ApplyAnimation(playerid, "ON_LOOKERS", "wave_loop", 4.1, 1, 0, 0, 0, 0);
 	return 1;
@@ -17192,7 +17190,7 @@ YCMD:lay(playerid, params[], help)
 {
     if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
-    ShowInfo(playerid, "Type ~y~/stopanim ~w~to quit", "");
+    ShowInfo(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
     
     ApplyAnimation(playerid, "BEACH", "Lay_Bac_Loop", 4.1, 1, 0, 0, 0, 0);
 	return 1;
@@ -17202,7 +17200,7 @@ YCMD:smoke(playerid, params[], help)
 {
     if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
-    ShowInfo(playerid, "Type ~y~/stopanim ~w~to quit", "");
+    ShowInfo(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
     
     ApplyAnimation(playerid, "SHOP", "Smoke_RYD", 4.1, 1, 0, 0, 0, 0);
 	return 1;
@@ -17212,7 +17210,7 @@ YCMD:laugh(playerid, params[], help)
 {
     if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
-    ShowInfo(playerid, "Type ~y~/stopanim ~w~to quit", "");
+    ShowInfo(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
 
     ApplyAnimation(playerid, "RAPPING", "Laugh_01", 4.1, 1, 0, 0, 0, 0);
 	return 1;
@@ -17222,7 +17220,7 @@ YCMD:fucku(playerid, params[], help)
 {
     if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
-    ShowInfo(playerid, "Type ~y~/stopanim ~w~to quit", "");
+    ShowInfo(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
 
     ApplyAnimation(playerid, "PED", "fucku", 4.1, 1, 0, 0, 0, 0);
 	return 1;
@@ -17323,7 +17321,7 @@ YCMD:rob(playerid, params[], help)
 	{
 	    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
 		Command_ReProcess(playerid, "/stopanims", false);
-		ShowInfo(playerid, "Type ~y~/stopanim ~w~to quit", "");
+		ShowInfo(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
 	    
 	    ApplyAnimation(playerid, "SHOP", "ROB_Loop", 4.1, 1, 0, 0, 0, 0);
 	}
@@ -26351,9 +26349,9 @@ function:OnQueueReceived()
 						cache_set_active(Data, pSQL);
 		            }
 		            
-					format(gstr, sizeof(gstr), "~p~%s received VIP for donating $%s!", name, payment);
+					format(gstr, sizeof(gstr), "~p~%s received VIP for donating!", name);
                     GameTextForAll(gstr, 10000, 3);
-                    format(gstr, sizeof(gstr), "%s received VIP for donating $%s!", name, payment);
+                    format(gstr, sizeof(gstr), "%s received VIP for donating!", name);
                     SCMToAll(ORANGE, gstr);
 		        }
 		        default: continue;
