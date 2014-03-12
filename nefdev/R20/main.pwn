@@ -19,10 +19,7 @@
 
 /* Build 20 todo:
 - Add samp.ban
-- Compile with -O1 -d0
-- yum update
 - Restart server
-- Compile MySQL R34
 - swap to nef03z
 */
 
@@ -46,13 +43,13 @@
 #include <YSI\y_commands>   // 13/02/2014
 #include <YSI\y_master>     // 13/02/2014
 #include <YSI\y_stringhash> // 13/02/2014
-#include <a_zones>          // 0.3z
+#include <a_zones>          // V2.0
 #include <sscanf2>      	// 2.8.1
 #include <streamer>     	// v2.7
 #include <floodcontrol>     // 28/06/2012
 #include <mSelection>       // 1.1 R3
 #include <a_mysql_R34>  	// R34
-#include <dini>         	// 1.6
+#include <Dini>         	// 1.6
 #include <irc>          	// 1.4.4
 #include <md-sort>      	// 13/02/2014
 #include <unixtimetodate> 	// 2.0
