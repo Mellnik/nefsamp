@@ -17,12 +17,6 @@
 #define WINTER_EDITION (false) // ferriswheelfair.amx
 #define YSI_IS_SERVER
 
-/* Build 20 todo:
-- Add samp.ban
-- Restart server
-- swap to nef03z
-*/
-
 // -
 // - Plugins
 // -
