@@ -42,7 +42,7 @@
 #include <streamer>     	// v2.7
 #include <floodcontrol>     // 28/06/2012
 #include <mSelection>       // 1.1 R3
-#include <a_mysql_R34>  	// R34
+#include <a_mysql_R38>  	// R38
 #include <Dini>         	// 1.6
 #include <irc>          	// 1.4.4
 #include <md-sort>      	// 13/02/2014
@@ -799,7 +799,7 @@ enum e_player_ach_data
 	E_ach_eliteracer, // win 10 races
 	E_ach_toofast, // win 10 reaction tests
 	E_ach_scorewhore, // get 2000 score
-	E_ach_destroyer, // win 10 derbys
+	E_ach_destroyer, // win 20 derbys
 	E_ach_restinpeace, // die 50 times
 	E_ach_silentkiller, // kill someone with a knife
     E_ach_oneshot2kills, // win 10 gungames
@@ -2578,7 +2578,7 @@ public OnGameModeExit()
 	
 	DestroyElevator();
 
- 	mysql_close(pSQL, true);
+ 	mysql_close(pSQL);
  	
 	print("...GameMode unloaded!");
 	return 1;
@@ -20987,7 +20987,7 @@ function:OnHouseLoad()
 			houseid++;
 		}
 	}
-	printf(">> Loaded %i House(s)", houseid);
+	printf(">> Loaded %i House(s) in %i microseconds", houseid, cache_get_query_exec_time(UNIT_MICROSECONDS));
 	return 1;
 }
 
@@ -21060,7 +21060,7 @@ function:OnPropLoad()
 		}
 	}
 
-	printf(">> Loaded %i Business(s)", propid);
+	printf(">> Loaded %i Businesse(s) in %i microseconds", propid, cache_get_query_exec_time(UNIT_MICROSECONDS));
 	return 1;
 }
 
@@ -21134,7 +21134,7 @@ function:OnGangZoneLoad()
 	    cache_delete(Data);
 	}
 
-	printf(">> Loaded %i Gang Zone(s)", gzoneid);
+	printf(">> Loaded %i Gang Zone(s) in %i microseconds", gzoneid, cache_get_query_exec_time(UNIT_MICROSECONDS));
 	return 1;
 }
 
@@ -25975,7 +25975,7 @@ function:Derby()
 			    {
 			    	PlayerInfo[i][DerbyWins]++;
 
-					if(PlayerInfo[i][DerbyWins] >= 10 && pAch[i][E_ach_destroyer] == 0)
+					if(PlayerInfo[i][DerbyWins] >= 20 && pAch[i][E_ach_destroyer] == 0)
 					{
 					    GivePlayerAchievement(i, "Destroyer", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
 					    pAch[i][E_ach_destroyer] = 1;
