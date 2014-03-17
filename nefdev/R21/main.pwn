@@ -1,6 +1,6 @@
 /*======================================================================*\
 || #################################################################### ||
-|| # Project New Evolution Freeroam - Build 20 	        			  # ||
+|| # Project New Evolution Freeroam - Build 21 	        			  # ||
 || # ---------------------------------------------------------------- # ||
 || # Copyright ©2011-2014 New Evolution Freeroam	  				  # ||
 || # Created by Mellnik                                               # ||
@@ -87,9 +87,9 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define SERVER_IP                       "31.204.152.218:7777"
 #define HOSTNAME                        " 	        NEF » ×DM/Stunt/Race/Freeroam/Minigames×"
 #if IS_RELEASE_BUILD == true
-#define CURRENT_VERSION                 "Build 20"
+#define CURRENT_VERSION                 "Build 21"
 #else
-#define CURRENT_VERSION                 "PTS:Build 20"
+#define CURRENT_VERSION                 "PTS:Build 21"
 #endif
 #define HOTFIX_REV                      "Hotfix #0"
 #define SAMP_VERSION                    "SA-MP 0.3z"
