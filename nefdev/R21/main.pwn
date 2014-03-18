@@ -22,7 +22,7 @@
 // -
 // sscanf.so | 2.8.1
 // streamer.so | v2.7
-// mysql_static.so | R34
+// mysql_static.so | R38
 // irc.so | 1.4.4
 // dns.so | 2.4
 
@@ -550,9 +550,6 @@ enum (+= 56)
 // -
 enum
 {
-	THREAD_ACCOUNT_EXIST,
-  	THREAD_IS_BANNED,
-  	THREAD_CHECK_IP,
   	THREAD_CREATE_ACCOUNT,
   	THREAD_CREATE_ACCOUNT2,
   	THREAD_LOAD_PLAYER,
@@ -566,11 +563,18 @@ enum
   	THREAD_KICK_FROM_GANG_2,
  	THREAD_ASSIGN_RANK,
 	THREAD_ASSIGN_RANK_2,
-  	THREAD_CHECK_AUTO_LOGIN,
   	THREAD_GANG_DESTROY,
   	THREAD_RACE_TOPLIST,
   	THREAD_RACE_FINISH,
   	THREAD_RACE_LATEST
+};
+
+enum (+= 10)
+{
+	ACCOUNT_REQUEST_BANNED,
+	ACCOUNT_REQUEST_IP_BANNED,
+	ACCOUNT_REQUEST_EXIST,
+	ACCOUNT_REQUEST_AUTO_LOGIN
 };
 
 // -
@@ -3139,14 +3143,14 @@ public OnPlayerConnect(playerid)
 	format(gstr, sizeof(gstr), "DELETE FROM `online` WHERE `name` = '%s';", __GetName(playerid));
 	mysql_tquery(pSQL, gstr, "", "");
 
-	ResetPlayerModules(playerid);
+	ResetPlayerVars(playerid);
 
-    ToggleSpeedo(playerid, false);
 	SetPlayerScore_(playerid, 0);
 	SetPlayerTeam(playerid, NO_TEAM);
 	SetPlayerColor(playerid, PlayerColors[random(sizeof(PlayerColors))]);
 	PreparePlayerPV(playerid);
     PreparePlayerToy(playerid);
+    ToggleSpeedo(playerid, false);
 
 	for(new i = 0; e_player_ach_data:i < e_player_ach_data; i++)
 	{
@@ -3203,8 +3207,8 @@ public OnPlayerConnect(playerid)
         //PlayerPlaySound(playerid, 1183, 0, 0, 0);
 		PlayAudioStreamForPlayer(playerid, "http://www.nefserver.net/s/NEFLogin.mp3");
 
-		format(gstr, sizeof(gstr), "SELECT * FROM `bans` WHERE `PlayerName` = '%s' LIMIT 1;", __GetName(playerid));
-		mysql_tquery(pSQL, gstr, "OnQueryFinish", "siii", gstr, THREAD_IS_BANNED, playerid, pSQL);
+		mysql_format(pSQL, gstr, sizeof(gstr), "SELECT * FROM `bans` WHERE `PlayerName` = '%e' LIMIT 1;", __GetName(playerid));
+		mysql_pquery(pSQL, gstr, "OnPlayerAccountRequest", "isi", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_BANNED);
  	}
  	return 1;
 }
@@ -3450,7 +3454,7 @@ public OnPlayerDisconnect(playerid, reason)
 	
     DestroyPlayerVehicles(playerid, true);
 
-    ResetPlayerModules(playerid);
+    ResetPlayerVars(playerid);
 
 	PreparePlayerPV(playerid);
  	PreparePlayerToy(playerid);
@@ -3815,22 +3819,6 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 	        }
 			else SCM(extraid, -1, ""er"This gang does not exist");
 	    }
-	    case THREAD_CHECK_AUTO_LOGIN:
-	    {
-	        new rows, fields;
-	        cache_get_data(rows, fields, pSQL);
-	        
-	        if(rows > 0) // accname with ip found
-	        {
-	            // Auto Login
-				AutoLogin(extraid);
-	        }
-	        else // ip on account is not the same as current connection
-	        {
-	            // Login Dialog
-	            RequestLogin(extraid);
-	        }
-	    }
         case THREAD_FETCH_GANG_MEMBER_NAMES:
         {
             new rows, fields;
@@ -3917,26 +3905,6 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				ShowPlayerDialog(extraid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Gang Info", string, "OK", "");
 		    }
 		}
-        case THREAD_CHECK_IP:
-        {
-            new rows, fields;
-            cache_get_data(rows, fields, pSQL);
-
-            if(rows == 0) // IP not banned
-            {
-				format(gstr, sizeof(gstr), "SELECT `ID` FROM `accounts` WHERE `Name` = '%s' LIMIT 1;", __GetName(extraid));
-				mysql_tquery(pSQL, gstr, "OnQueryFinish", "siii", gstr, THREAD_ACCOUNT_EXIST, extraid, pSQL); // Check if account exist
-				
-				SendWelcomeMSG(extraid);
-            }
-            else
-			{
-	 		   	SCM(extraid, -1, ""server_sign" You have been banned.");
-	 		   	TextDrawHideForPlayer(extraid, TXTOnJoin[0]);
-	 		   	TextDrawHideForPlayer(extraid, TXTOnJoin[1]);
-       			KickEx(extraid);
-			}
-		}
 		case THREAD_CREATE_GANG:
 		{
 			PlayerInfo[extraid][GangPosition] = GANG_POS_MAIN_LEADER;
@@ -3962,79 +3930,6 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 
 			SyncGangZones(extraid);
 			PlayerInfo[extraid][GangLabel] = CreateDynamic3DTextLabel(gstr, -1, 0.0, 0.0, 0.5, 20.0, extraid, INVALID_VEHICLE_ID, 1, -1, -1, -1, 20.0);
-		}
-        case THREAD_IS_BANNED:
-		{
-		    new rows, fields;
-		    cache_get_data(rows, fields, pSQL);
-		    
-		    if(rows > 0) // Playername is banned
-		    {
-		        new string[512],
-		            adminname[MAX_PLAYER_NAME + 1],
-		            reason[128],
-		            udate, lift;
-
-				cache_get_row(0, 2, adminname, pSQL, sizeof(adminname));
-				cache_get_row(0, 3, reason, pSQL, sizeof(reason));
-				lift = cache_get_row_int(0, 4, pSQL);
-				udate = cache_get_row_int(0, 5, pSQL);
-
-				if(lift == 0) // Perm ban
-				{
-			        format(string, sizeof(string), ""red"You have been banned!"white"\n\nAdmin: %s\nYour name: %s\nReason: %s\nDate: %s\n\nIf you think that you have been banned wrongly,\nwrite a ban appeal on "SVRFORUM"", adminname, __GetName(extraid), reason, UTConvert(udate));
-					ShowPlayerDialog(extraid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Notice", string, "OK", "");
-                    KickEx(extraid);
-				}
-				else if(lift < gettime())
-				{
-				    format(string, sizeof(string), "DELETE FROM `bans` WHERE `PlayerName` = '%s' LIMIT 1;", __GetName(extraid)); // Delete time ban
-				    mysql_tquery(pSQL, string, "", "");
-				    
-				    SCM(extraid, -1, ""nef" Your time ban expired, you've been unbanned!");
-
-					format(string, sizeof(string), "SELECT * FROM `blacklist` WHERE `IP` = '%s' LIMIT 1;", __GetIP(extraid));
-					mysql_tquery(pSQL, string, "OnQueryFinish", "siii", string, THREAD_CHECK_IP, extraid, pSQL); // Continuing with process
-				}
-				else
-				{
-				    format(string, sizeof(string), ""red"You have been time banned!"white"\n\nAdmin: %s\nYour name: %s\nReason: %s\nExpires: %s\n\nIf you think that you have been banned wrongly,\nwrite a ban appeal on "SVRFORUM"", adminname, __GetName(extraid), reason, UTConvert(lift));
-					ShowPlayerDialog(extraid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Notice", string, "OK", "");
-					KickEx(extraid);
-				}
-		    }
-		    else
-		    {
-				format(gstr, sizeof(gstr), "SELECT * FROM `blacklist` WHERE `IP` = '%s' LIMIT 1;", __GetIP(extraid));
-				mysql_tquery(pSQL, gstr, "OnQueryFinish", "siii", gstr, THREAD_CHECK_IP, extraid, pSQL);
-		    }
-		}
-	 	case THREAD_ACCOUNT_EXIST:
-		{
-		    new rows, fields;
-		    cache_get_data(rows, fields, pSQL);
-
-			TextDrawHideForPlayer(extraid, TXTOnJoin[0]);
-			TextDrawHideForPlayer(extraid, TXTOnJoin[1]);
-
-			Streamer_UpdateEx(extraid, 1797.5835, -1305.0114, 121.2348, -1, -1);
-			SetPlayerPos(extraid, 1797.5835, -1305.0114, 121.2348);
-			SetPlayerFacingAngle(extraid, 359.9696);
-			SetPlayerCameraPos(extraid, 1797.3688, -1299.8156, 121.4657);
-			SetPlayerCameraLookAt(extraid, 1797.3661, -1300.8164, 121.4556);
-
-			format(gstr, sizeof(gstr), "INSERT INTO `online` VALUES (NULL, '%s', '%s', UNIX_TIMESTAMP());", __GetName(extraid), __GetIP(extraid));
-			mysql_tquery(pSQL, gstr, "", "");
-
-		    if(rows != 0) // acc exists
-		    {
-				format(gstr, sizeof(gstr), "SELECT `ID` FROM `accounts` WHERE `Name` = '%s' AND `IP` = '%s' LIMIT 1;", __GetName(extraid), __GetIP(extraid));
-				mysql_tquery(pSQL, gstr, "OnQueryFinish", "siii", gstr, THREAD_CHECK_AUTO_LOGIN, extraid, pSQL); // check auto login
-		    }
-		    else
-		    {
-		        RequestRegistration(extraid);
-		    }
 		}
 		case THREAD_LOAD_PLAYER:
 		{
@@ -22020,7 +21915,7 @@ MySQL_UpdateGangScore(gGangID, value)
 MySQL_LoadPlayer(playerid)
 {
 	format(gstr2, sizeof(gstr2), "SELECT * FROM `accounts` WHERE `Name` = '%s' LIMIT 1;", __GetName(playerid));
-	mysql_tquery(pSQL, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_LOAD_PLAYER, playerid, pSQL);
+	mysql_pquery(pSQL, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_LOAD_PLAYER, playerid, pSQL);
 }
 
 MySQL_LoadPlayerGang(playerid)
@@ -31270,7 +31165,7 @@ ToggleSpeedo(playerid, bool:toggle)
 	}
 }
 
-ResetPlayerModules(playerid)
+ResetPlayerVars(playerid)
 {
 	gTeam[playerid] = FREEROAM;
 	DerbyWinner[playerid] = false;
@@ -31488,4 +31383,115 @@ function:ForceClassSpawn(playerid)
 {
 	SpawnPlayer(playerid);
 	return 1;
+}
+
+function:OnPlayerAccountRequest(playerid, namehash, request)
+{
+	if(YHash(__GetName(playerid)) != namehash) {
+	    Kick(playerid);
+		return 0;
+	}
+
+	switch(request)
+	{
+	    case ACCOUNT_REQUEST_BANNED:
+	    {
+	        if(cache_get_row_count() != 0)
+	        {
+	            new szAdmin[MAX_PLAYER_NAME + 1],
+	                szReason[128],
+	                u_iBanDate,
+	                iLift;
+
+	            cache_get_row(0, 2, szAdmin);
+	            cache_get_row(0, 3, szReason);
+				iLift = cache_get_row_int(0, 4, pSQL);
+				u_iBanDate = cache_get_row_int(0, 5, pSQL);
+
+				if(iLift == 0) // Player has a permanent ban
+				{
+				    format(gstr2, sizeof(gstr2), ""red"You have been banned!"white"\n\nAdmin: %s\nYour name: %s\nReason: %s\nDate: %s\n\nIf you think that you have been banned wrongly,\nwrite a ban appeal on "SVRFORUM"", szAdmin, __GetName(playerid), szReason, UTConvert(u_iBanDate));
+					ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Notice", gstr2, "OK", "");
+					KickEx(playerid);
+					return 1;
+				}
+				else if(iLift < gettime()) // Player is time banned, checking if ban ran out
+				{
+				    mysql_format(pSQL, gstr2, sizeof(gstr2), "DELETE FROM `bans` WHERE `PlayerName` = '%e' LIMIT 1;", __GetName(playerid)); // Delete time ban
+				    mysql_pquery(pSQL, gstr2);
+
+				    SCM(playerid, -1, ""nef" Your time ban expired, you've been unbanned!");
+				}
+				else
+				{
+				    format(gstr2, sizeof(gstr2), ""red"You have been time banned!"white"\n\nAdmin: %s\nYour name: %s\nReason: %s\nExpires: %s\n\nIf you think that you have been banned wrongly,\nwrite a ban appeal on "SVRFORUM"", szAdmin, __GetName(playerid), szReason, UTConvert(iLift));
+					ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Notice", gstr2, "OK", "");
+					KickEx(playerid);
+					return 1;
+				}
+	        }
+
+	        mysql_format(pSQL, gstr2, sizeof(gstr2), "SELECT * FROM `blacklist` WHERE `IP` = '%e' LIMIT 1;", __GetIP(playerid));
+	        mysql_pquery(pSQL, gstr2, "OnPlayerAccountRequest", "isi", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_IP_BANNED);
+	        return 1;
+	    }
+	    case ACCOUNT_REQUEST_IP_BANNED:
+	    {
+            if(cache_get_row_count() == 0) // IP Address is not blacklisted
+            {
+				mysql_format(pSQL, gstr, sizeof(gstr), "SELECT `ID` FROM `accounts` WHERE `Name` = '%e' LIMIT 1;", __GetName(playerid));
+				mysql_pquery(pSQL, gstr, "OnPlayerAccountRequest", "isi", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_EXIST); // Check if the account already exist
+
+				SendWelcomeMSG(playerid);
+            }
+            else
+			{
+	 		   	SCM(playerid, -1, ""server_sign" You have been banned.");
+	 		   	TextDrawHideForPlayer(playerid, TXTOnJoin[0]);
+	 		   	TextDrawHideForPlayer(playerid, TXTOnJoin[1]);
+       			KickEx(playerid);
+			}
+	        return 1;
+	    }
+	    case ACCOUNT_REQUEST_EXIST:
+	    {
+			TextDrawHideForPlayer(playerid, TXTOnJoin[0]);
+			TextDrawHideForPlayer(playerid, TXTOnJoin[1]);
+
+			Streamer_UpdateEx(playerid, 1797.5835, -1305.0114, 121.2348, -1, -1);
+			SetPlayerPos(playerid, 1797.5835, -1305.0114, 121.2348);
+			SetPlayerFacingAngle(playerid, 359.9696);
+			SetPlayerCameraPos(playerid, 1797.3688, -1299.8156, 121.4657);
+			SetPlayerCameraLookAt(playerid, 1797.3661, -1300.8164, 121.4556);
+
+			mysql_format(pSQL, gstr2, sizeof(gstr2), "INSERT INTO `online` VALUES (NULL, '%e', '%s', UNIX_TIMESTAMP());", __GetName(playerid), __GetIP(playerid));
+			mysql_pquery(pSQL, gstr2);
+
+		    if(cache_get_row_count() != 0) // acc exists
+		    {
+				mysql_format(pSQL, gstr2, sizeof(gstr2), "SELECT `ID` FROM `accounts` WHERE `Name` = '%e' AND `IP` = '%s' LIMIT 1;", __GetName(playerid), __GetIP(playerid));
+				mysql_pquery(pSQL, gstr2, "OnPlayerAccountRequest", "isi", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_AUTO_LOGIN); // Check auto login
+		    }
+		    else
+		    {
+		        RequestRegistration(playerid);
+		    }
+	        return 1;
+	    }
+	    case ACCOUNT_REQUEST_AUTO_LOGIN:
+	    {
+	        if(cache_get_row_count() > 0) // Account with IP found
+	        {
+	            // Auto Login
+				AutoLogin(playerid);
+	        }
+	        else // ip on account is not the same as current connection
+	        {
+	            // Login Dialog
+	            RequestLogin(playerid);
+	        }
+	        return 1;
+	    }
+	}
+	return 0;
 }
