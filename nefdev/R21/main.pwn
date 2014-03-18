@@ -8825,12 +8825,12 @@ YCMD:enter(playerid, params[], help)
 	}
 	return 1;
 }
-
+/*
 YCMD:charts(playerid, params[], help)
 {
 	mysql_tquery(pSQL, "SELECT `quantity`, `price` FROM `sells` WHERE `item` = 2;", "OnChartRecv", "i", playerid);
 	return 1;
-}
+}*/
 
 function:OnChartRecv(playerid)
 {
@@ -8853,21 +8853,20 @@ YCMD:sellgc(playerid, params[], help)
 	new player, gc, money;
 	if(sscanf(params, "rii", player, gc, money))
 	{
-	    SCM(playerid, NEF_GREEN, "Usage: /sellgc <playerid> <gc amount> <money>");
-		return SCM(playerid, NEF_GREEN, "Info: Type /charts to see the average price for 1000GC!");
+	    return SCM(playerid, NEF_GREEN, "Usage: /sellgc <playerid> <gc amount> <money>");
 	}
 
     if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 	if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 
-	if(money < 1 || money > 1000000000)
+	if(money < 100000 || money > 100000000)
 	{
-	    return SCM(playerid, -1, ""er"$1 - $1,000,000,000!");
+	    return SCM(playerid, -1, ""er"$100,000 - $100,000,000!");
 	}
 	
-	if(gc < 1 || gc > 10000000)
+	if(gc < 10 || gc > 1000000)
 	{
-	    return SCM(playerid, -1, ""er"$1 - $10,000,000!");
+	    return SCM(playerid, -1, ""er"GC: 10 - $1,000,000!");
 	}
 	
 	if(gc > PlayerInfo[playerid][Credits]) return SCM(playerid, -1, ""er"You don't have that much GC.");
@@ -8886,8 +8885,7 @@ YCMD:sellgc(playerid, params[], help)
 	    SCM(playerid, -1, gstr);
 	    format(gstr, sizeof(gstr), ""blue"%s(%i) is offering you their %sGC for $%s, type /buygc to accept", __GetName(playerid), playerid, number_format(gc), number_format(money));
 	    SCM(player, -1, gstr);
-	    SCM(player, NEF_GREEN, "Info: Type /charts to see the average price for 1000GC!");
-
+	    
 		PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
 		PlayerPlaySound(player, 1057, 0.0, 0.0, 0.0);
 	}
@@ -9005,7 +9003,7 @@ YCMD:ads(playerid, params[], help)
 	else ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_LIST, "Last Adverts (/ad <text>)", ass, "Close", "");
 	return 1;
 }
-
+/*
 YCMD:sellvip(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
@@ -9100,7 +9098,7 @@ YCMD:buyvip(playerid, params[], help)
 		SCM(playerid, -1, ""er"This player has either gone offline or does not own VIP status.");
 	}
 	return 1;
-}
+}*/
 
 YCMD:bbuy(playerid, params[], help)
 {
