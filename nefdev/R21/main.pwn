@@ -12,7 +12,7 @@
 #pragma dynamic 8192
 
 #define IS_RELEASE_BUILD (true)
-#define INC_ENVIORMENT (false)
+#define INC_ENVIORMENT (true)
 #define IRC_CONNECT (true)
 #define WINTER_EDITION (false) // ferriswheelfair.amx
 #define YSI_IS_SERVER
@@ -20306,13 +20306,13 @@ function:OnHouseLoad()
 
 	if(rows > 0)
 	{
-		new	line[144], buffer[100], Float:postal[6];
+		new	Float:postal[6];
 
 		for(new i = 0; i < rows; i++)
 		{
 		    HouseInfo[houseid][iID] = cache_get_row_int(i, 0, pSQL);
-			cache_get_row(i, 1, buffer, pSQL, sizeof(buffer));
-			strmid(HouseInfo[houseid][Owner], buffer, 0, 25, 25);
+			cache_get_row(i, 1, gstr, pSQL, sizeof(gstr));
+			strmid(HouseInfo[houseid][Owner], gstr, 0, 25, 25);
 
 	        HouseInfo[houseid][E_x] = cache_get_row_float(i, 2, pSQL);
 	        HouseInfo[houseid][E_y] = cache_get_row_float(i, 3, pSQL);
@@ -20325,29 +20325,29 @@ function:OnHouseLoad()
 
 			if(!HouseInfo[houseid][sold])
 			{
-			    format(line, sizeof(line), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseInfo[houseid][iID], number_format(HouseInfo[houseid][price]), HouseInfo[houseid][E_score], HouseIntTypes[HouseInfo[houseid][interior]][intname]);
+			    format(gstr2, sizeof(gstr2), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseInfo[houseid][iID], number_format(HouseInfo[houseid][price]), HouseInfo[houseid][E_score], HouseIntTypes[HouseInfo[houseid][interior]][intname]);
 			}
 			else
 			{
-			    format(line, sizeof(line), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseInfo[houseid][Owner], HouseInfo[houseid][iID], number_format(HouseInfo[houseid][price]), HouseInfo[houseid][E_score], HouseIntTypes[HouseInfo[houseid][interior]][intname]);
+			    format(gstr2, sizeof(gstr2), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseInfo[houseid][Owner], HouseInfo[houseid][iID], number_format(HouseInfo[houseid][price]), HouseInfo[houseid][E_score], HouseIntTypes[HouseInfo[houseid][interior]][intname]);
 
 				for(new ii = 0; ii < MAX_HOUSE_OBJECTS; ii++)
 				{
-				    cache_get_row(i, ii + 10, buffer, pSQL, sizeof(buffer));
-				    sscanf(buffer, "p<,>iffffff", HouseInfo[houseid][E_Obj_Model][ii], postal[0], postal[1], postal[2], postal[3], postal[4], postal[5]);
+				    cache_get_row(i, ii + 10, gstr, pSQL, sizeof(gstr));
+				    sscanf(gstr, "p<,>iffffff", HouseInfo[houseid][E_Obj_Model][ii], postal[0], postal[1], postal[2], postal[3], postal[4], postal[5]);
 					if(HouseInfo[houseid][E_Obj_Model][ii] != 0)
 					{
-					    format(buffer, sizeof(buffer), "/hmenu to edit\nSlot ID: %i - Item ID: %i", ii + 1, HouseInfo[houseid][E_Obj_Model][ii]);
+					    format(gstr, sizeof(gstr), "/hmenu to edit\nSlot ID: %i - Item ID: %i", ii + 1, HouseInfo[houseid][E_Obj_Model][ii]);
 						HouseInfo[houseid][E_Obj_ObjectID][ii] = CreateDynamicObject(HouseInfo[houseid][E_Obj_Model][ii], postal[0], postal[1], postal[2], postal[3], postal[4], postal[5], HouseInfo[houseid][iID] + 1000, -1, -1);
-                        HouseInfo[houseid][E_Obj_Label][ii] = CreateDynamic3DTextLabel(buffer, LIGHT_YELLOW, postal[0], postal[1], postal[2]+0.5, 3.5, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, HouseInfo[houseid][iID] + 1000);
+                        HouseInfo[houseid][E_Obj_Label][ii] = CreateDynamic3DTextLabel(gstr, LIGHT_YELLOW, postal[0], postal[1], postal[2]+0.5, 3.5, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, HouseInfo[houseid][iID] + 1000);
 					}
 				}
 			}
 
             HouseInfo[houseid][date] = cache_get_row_int(i, 20, pSQL);
 
-			HouseInfo[houseid][label] = CreateDynamic3DTextLabel(line, (HouseInfo[houseid][sold]) ? (0xFF0000FF) : (0x00FF00FF), HouseInfo[houseid][E_x], HouseInfo[houseid][E_y], floatadd(HouseInfo[houseid][E_z], 0.3), 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 30.0);
-			HouseInfo[houseid][pickid] = CreateDynamicPickup((HouseInfo[houseid][sold]) ? (1272) : (1273), 1, HouseInfo[houseid][E_x], HouseInfo[houseid][E_y], HouseInfo[houseid][E_z], -1, -1, -1, 30.0);
+			HouseInfo[houseid][label] = CreateDynamic3DTextLabel(gstr2, HouseInfo[houseid][sold] ? 0xFF0000FF : 0x00FF00FF, HouseInfo[houseid][E_x], HouseInfo[houseid][E_y], floatadd(HouseInfo[houseid][E_z], 0.3), 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 30.0);
+			HouseInfo[houseid][pickid] = CreateDynamicPickup(HouseInfo[houseid][sold] ? 1272 : 1273, 1, HouseInfo[houseid][E_x], HouseInfo[houseid][E_y], HouseInfo[houseid][E_z], -1, -1, -1, 30.0);
 			if(!HouseInfo[houseid][sold]) HouseInfo[houseid][iconid] = CreateDynamicMapIcon(HouseInfo[houseid][E_x], HouseInfo[houseid][E_y], HouseInfo[houseid][E_z], 31, 1, 0, -1, -1, 150.0);
 			
 			houseid++;
@@ -20364,7 +20364,7 @@ function:OnPropLoadEx(pindex)
 
 	if(rows > 0)
 	{
-	    new name[25], string[255];
+	    new name[25];
 
 	    PropInfo[pindex][iID] = cache_get_row_int(0, 0, pSQL);
 	    cache_get_row(0, 1, name, pSQL, sizeof(name));
@@ -20377,9 +20377,9 @@ function:OnPropLoadEx(pindex)
 		PropInfo[pindex][sold] = cache_get_row_int(0, 6, pSQL);
 		PropInfo[pindex][date] = cache_get_row_int(0, 7, pSQL);
 		
-		format(string, sizeof(string), ""business_mark"\nOwner: ---\nID: %i\nLevel: %i", PropInfo[pindex][iID], PropInfo[pindex][E_Level]);
+		format(gstr2, sizeof(gstr2), ""business_mark"\nOwner: ---\nID: %i\nLevel: %i", PropInfo[pindex][iID], PropInfo[pindex][E_Level]);
 
-		PropInfo[pindex][label] = CreateDynamic3DTextLabel(string, -1, PropInfo[pindex][E_x], PropInfo[pindex][E_y], floatadd(PropInfo[pindex][E_z], 0.3), 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 30.0);
+		PropInfo[pindex][label] = CreateDynamic3DTextLabel(gstr2, -1, PropInfo[pindex][E_x], PropInfo[pindex][E_y], floatadd(PropInfo[pindex][E_z], 0.3), 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 30.0);
 		PropInfo[pindex][pickid] = CreateDynamicPickup(1274, 1, PropInfo[pindex][E_x], PropInfo[pindex][E_y], PropInfo[pindex][E_z], -1, -1, -1, 30.0);
 		PropInfo[pindex][iconid] = CreateDynamicMapIcon(PropInfo[pindex][E_x], PropInfo[pindex][E_y], PropInfo[pindex][E_z], 52, 1, 0, -1, -1, 150.0);
 		
@@ -20395,7 +20395,7 @@ function:OnPropLoad()
 
 	if(rows > 0)
 	{
-	    new name[25], string[255];
+	    new name[25];
 
 		for(new i = 0; i < rows; i++)
 		{
@@ -20410,15 +20410,12 @@ function:OnPropLoad()
 			PropInfo[propid][sold] = cache_get_row_int(i, 6, pSQL);
 			PropInfo[propid][date] = cache_get_row_int(i, 7, pSQL);
 
-			if(!PropInfo[propid][sold])
-			{
-				format(string, sizeof(string), ""business_mark"\nOwner: ---\n"white"ID: %i\nLevel: %i", PropInfo[propid][iID], PropInfo[propid][E_Level]);
+			if(!PropInfo[propid][sold]) {
+				format(gstr2, sizeof(gstr2), ""business_mark"\nOwner: ---\n"white"ID: %i\nLevel: %i", PropInfo[propid][iID], PropInfo[propid][E_Level]);
+			} else {
+				format(gstr2, sizeof(gstr2), ""business_mark"\nOwner: %s\n"white"ID: %i\nLevel: %i", PropInfo[propid][Owner], PropInfo[propid][iID], PropInfo[propid][E_Level]);
 			}
-	        else
-			{
-				format(string, sizeof(string), ""business_mark"\nOwner: %s\n"white"ID: %i\nLevel: %i", PropInfo[propid][Owner], PropInfo[propid][iID], PropInfo[propid][E_Level]);
-			}
-			PropInfo[propid][label] = CreateDynamic3DTextLabel(string, WHITE, PropInfo[propid][E_x], PropInfo[propid][E_y], floatadd(PropInfo[propid][E_z], 0.3), 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 30.0);
+			PropInfo[propid][label] = CreateDynamic3DTextLabel(gstr2, WHITE, PropInfo[propid][E_x], PropInfo[propid][E_y], floatadd(PropInfo[propid][E_z], 0.3), 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 30.0);
 			PropInfo[propid][pickid] = CreateDynamicPickup(1274, 1, PropInfo[propid][E_x], PropInfo[propid][E_y], PropInfo[propid][E_z], -1, -1, -1, 30.0);
 			if(!PropInfo[propid][sold]) PropInfo[propid][iconid] = CreateDynamicMapIcon(PropInfo[propid][E_x], PropInfo[propid][E_y], PropInfo[propid][E_z], 52, 1, 0, -1, -1, 150.0);
 			
@@ -21113,8 +21110,7 @@ function:SkipRegistration(playerid)
 	format(gstr, sizeof(gstr), "~y~[] ~w~%i", PlayerInfo[playerid][Wanteds]);
 	PlayerTextDrawSetString(playerid, TXTWantedsTD[playerid], gstr);
 	
-	ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef"", ""white"You have chosen not to register.\n\n"red"Please note:\n"white"Your statistics won't be saved.\nYou will be limited to some features.\n\
-	You can register at any time using /register.\n\nEnjoy playing here at "nef"!", "OK", "");
+	ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef"", ""white"You have chosen not to register.\n\n"red"Please note:\n"white"Your statistics won't be saved.\nYou will be limited to some features.\nYou can register at any time using /register.\n\nEnjoy playing here at "nef"!", "OK", "");
 	
     GameTextForPlayer(playerid, "Welcome", 3000, 4);
 	GivePlayerCash(playerid, 20000, false);
@@ -21275,56 +21271,52 @@ CarSpawner(playerid, model, respawn_delay = -1, bool:spawnzone_check = true)
 
 FalloutMSG(const string[])
 {
-	new finstring[200];
-	format(finstring, sizeof(finstring), ""fallout_sign" %s", string);
+	format(gstr, sizeof(gstr), ""fallout_sign" %s", string);
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if((IsPlayerAvail(i)) && (gTeam[i] == FALLOUT))
+		if(IsPlayerAvail(i) && gTeam[i] == FALLOUT)
 		{
-			SCM(i, GREY, finstring);
+			SCM(i, GREY, gstr);
 		}
 	}
 }
 
 DerbyMSG(const string[])
 {
-	new finstring[200];
-	format(finstring, sizeof(finstring), ""derby_sign" %s", string);
+	format(gstr, sizeof(gstr), ""derby_sign" %s", string);
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if((IsPlayerAvail(i)) && (gTeam[i] == DERBY))
+		if(IsPlayerAvail(i) && (gTeam[i] == DERBY))
 		{
-			SCM(i, -1, finstring);
+			SCM(i, -1, gstr);
 		}
 	}
 }
 
 BGMSG(const string[])
 {
-	new finstring[200];
-	format(finstring, sizeof(finstring), ""tdm_sign" %s", string);
+	format(gstr, sizeof(gstr), ""tdm_sign" %s", string);
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if(IsPlayerAvail(i) && (gTeam[i] == gBG_TEAM1 || gTeam[i] == gBG_VOTING || gTeam[i] == gBG_TEAM2))
 		{
-  			SCM(i, -1, finstring);
+  			SCM(i, -1, gstr);
 		}
 	}
 }
 
 RaceMSG(const string[])
 {
-	new finstring[200];
-	format(finstring, sizeof(finstring), ""race_sign" %s", string);
+	format(gstr, sizeof(gstr), ""race_sign" %s", string);
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if((IsPlayerAvail(i)) && (gTeam[i] == gRACE))
+		if(IsPlayerAvail(i) && gTeam[i] == gRACE)
 		{
-			SCM(i, -1, finstring);
+			SCM(i, -1, gstr);
 		}
 	}
 }
@@ -21345,24 +21337,24 @@ GangMSG(gGangID, const string[])
 
 AdminMSG(color, const string[], bool:beep = false)
 {
-	new internal_c = 0;
+	new count = 0;
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if((IsPlayerAvail(i)) && (PlayerInfo[i][Level] >= 1))
+		if(IsPlayerAvail(i) && PlayerInfo[i][Level] >= 1)
 		{
 			SCM(i, color, string);
 			if(beep) PlayerPlaySound(i, 1057, 0.0, 0.0, 0.0);
-			internal_c++;
+			count++;
 		}
 	}
-	return internal_c;
+	return count;
 }
 
 VIPMSG(color, const msg[])
 {
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if((IsPlayerAvail(i)) && (PlayerInfo[i][VIP] == 1 || PlayerInfo[i][Level] > 0))
+		if(IsPlayerAvail(i) && (PlayerInfo[i][VIP] == 1 || PlayerInfo[i][Level] > 0))
 		{
 			SCM(i, color, msg);
 		}
