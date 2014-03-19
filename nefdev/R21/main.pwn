@@ -12,7 +12,7 @@
 #pragma dynamic 8192
 
 #define IS_RELEASE_BUILD (true)
-#define INC_ENVIORMENT (true)
+#define INC_ENVIORMENT (false)
 #define IRC_CONNECT (true)
 #define WINTER_EDITION (false) // ferriswheelfair.amx
 #define YSI_IS_SERVER
@@ -550,10 +550,7 @@ enum (+= 56)
 // -
 enum
 {
-  	THREAD_CREATE_ACCOUNT,
   	THREAD_CREATE_ACCOUNT2,
-  	THREAD_LOAD_PLAYER,
-  	THREAD_LOAD_PLAYER_GANG,
   	THREAD_CHECK_PLAYER_PASSWD,
   	THREAD_GANG_EXIST,
   	THREAD_CREATE_GANG,
@@ -574,7 +571,10 @@ enum (+= 10)
 	ACCOUNT_REQUEST_BANNED,
 	ACCOUNT_REQUEST_IP_BANNED,
 	ACCOUNT_REQUEST_EXIST,
-	ACCOUNT_REQUEST_AUTO_LOGIN
+	ACCOUNT_REQUEST_AUTO_LOGIN,
+	ACCOUNT_REQUEST_CREATE,
+	ACCOUNT_REQUEST_LOAD,
+	ACCOUNT_REQUEST_GANG_LOAD
 };
 
 // -
@@ -3140,8 +3140,8 @@ public OnPlayerConnect(playerid)
 		return 1;
 	}
 
-	format(gstr, sizeof(gstr), "DELETE FROM `online` WHERE `name` = '%s';", __GetName(playerid));
-	mysql_tquery(pSQL, gstr, "", "");
+	mysql_format(pSQL, gstr, sizeof(gstr), "DELETE FROM `online` WHERE `name` = '%e';", __GetName(playerid));
+	mysql_pquery(pSQL, gstr);
 
 	ResetPlayerVars(playerid);
 
@@ -3208,15 +3208,15 @@ public OnPlayerConnect(playerid)
 		PlayAudioStreamForPlayer(playerid, "http://www.nefserver.net/s/NEFLogin.mp3");
 
 		mysql_format(pSQL, gstr, sizeof(gstr), "SELECT * FROM `bans` WHERE `PlayerName` = '%e' LIMIT 1;", __GetName(playerid));
-		mysql_pquery(pSQL, gstr, "OnPlayerAccountRequest", "isi", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_BANNED);
+		mysql_pquery(pSQL, gstr, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_BANNED);
  	}
  	return 1;
 }
 
 public OnPlayerDisconnect(playerid, reason)
 {
-	format(gstr, sizeof(gstr), "DELETE FROM `online` WHERE `name` = '%s';", __GetName(playerid));
-	mysql_tquery(pSQL, gstr, "", "");
+	mysql_format(pSQL, gstr, sizeof(gstr), "DELETE FROM `online` WHERE `name` = '%e';", __GetName(playerid));
+	mysql_pquery(pSQL, gstr);
 	
     if(IsPlayerNPC(playerid)) return 1;
     
@@ -3931,500 +3931,6 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 			SyncGangZones(extraid);
 			PlayerInfo[extraid][GangLabel] = CreateDynamic3DTextLabel(gstr, -1, 0.0, 0.0, 0.5, 20.0, extraid, INVALID_VEHICLE_ID, 1, -1, -1, -1, 20.0);
 		}
-		case THREAD_LOAD_PLAYER:
-		{
-		    new rows, fields;
-			cache_get_data(rows, fields, pSQL);
-			
-			if(rows > 0)
-			{
-			    PlayerInfo[extraid][AccountID] = cache_get_row_int(0, 0, pSQL);
-			    PlayerInfo[extraid][SavedColor] = cache_get_row_int(0, 2, pSQL);
-			    PlayerInfo[extraid][Level] = cache_get_row_int(0, 5, pSQL);
-			    PlayerInfo[extraid][Score] = cache_get_row_int(0, 6, pSQL);
-			    PlayerInfo[extraid][Money] = cache_get_row_int(0, 7, pSQL);
-			    PlayerInfo[extraid][Bank] = cache_get_row_int(0, 8, pSQL);
-			    PlayerInfo[extraid][Kills] = cache_get_row_int(0, 9, pSQL);
-			    PlayerInfo[extraid][Deaths] = cache_get_row_int(0, 10, pSQL);
-			    PlayerInfo[extraid][TotalTime] = cache_get_row_int(0, 11, pSQL);
-                PlayerInfo[extraid][Reaction] = cache_get_row_int(0, 12, pSQL);
-                PlayerInfo[extraid][PayDay] = cache_get_row_int(0, 13, pSQL);
-                PlayerInfo[extraid][Houses] = cache_get_row_int(0, 14, pSQL);
-                PlayerInfo[extraid][Props] = cache_get_row_int(0, 15, pSQL);
-                PlayerInfo[extraid][GangPosition] = cache_get_row_int(0, 16, pSQL);
-                PlayerInfo[extraid][GangID] = cache_get_row_int(0, 17, pSQL);
-                PlayerInfo[extraid][AdditionalPVSlots] = cache_get_row_int(0, 18, pSQL);
-                PlayerInfo[extraid][AdditionalToySlots] = cache_get_row_int(0, 19, pSQL);
-                PlayerInfo[extraid][AdditionalHouseSlots] = cache_get_row_int(0, 20, pSQL);
-                PlayerInfo[extraid][AdditionalPropSlots] = cache_get_row_int(0, 21, pSQL);
-                PlayerInfo[extraid][AdditionalHouseObjSlots] = cache_get_row_int(0, 22, pSQL);
-                PlayerInfo[extraid][DerbyWins] = cache_get_row_int(0, 24, pSQL);
-                PlayerInfo[extraid][RaceWins] = cache_get_row_int(0, 25, pSQL);
-                PlayerInfo[extraid][BGWins] = cache_get_row_int(0, 26, pSQL);
-                PlayerInfo[extraid][FalloutWins] = cache_get_row_int(0, 27, pSQL);
-                PlayerInfo[extraid][GungameWins] = cache_get_row_int(0, 28, pSQL);
-                PlayerInfo[extraid][EventWins] = cache_get_row_int(0, 29, pSQL);
-                PlayerInfo[extraid][Wanteds] = cache_get_row_int(0, 30, pSQL);
-                PlayerInfo[extraid][VIP] = cache_get_row_int(0, 31, pSQL);
-                PlayerInfo[extraid][Credits] = cache_get_row_int(0, 32, pSQL);
-                PlayerInfo[extraid][Medkits] = cache_get_row_int(0, 33, pSQL);
-                PlayerInfo[extraid][RegDate] = cache_get_row_int(0, 34, pSQL);
-                PlayerInfo[extraid][LastLogin] = cache_get_row_int(0, 35, pSQL);
-                PlayerInfo[extraid][LastNameChange] = cache_get_row_int(0, 36, pSQL);
-
-				new sskin = cache_get_row_int(0, 57, pSQL);
-                
-                if(IsValidSkin(sskin)) {
-                    PlayerInfo[extraid][SavedSkin] = sskin;
-                } else {
-					PlayerInfo[extraid][SavedSkin] = -1;
-                }
-                
-				new buffer[255];
-				
-				cache_get_row(0, 37, buffer, pSQL, sizeof(buffer));
-				sscanf(buffer, "p<,>iiiiiiiiiiiiii",
-	                pAch[extraid][E_ach_styler],
-	                pAch[extraid][E_ach_grimreaper],
-	                pAch[extraid][E_ach_masskiller],
-	                pAch[extraid][E_ach_eliteracer],
-	                pAch[extraid][E_ach_toofast],
-	                pAch[extraid][E_ach_scorewhore],
-	                pAch[extraid][E_ach_destroyer],
-	                pAch[extraid][E_ach_restinpeace],
-	                pAch[extraid][E_ach_silentkiller],
-	                pAch[extraid][E_ach_oneshot2kills],
-	                pAch[extraid][E_ach_deepimpact],
-	                pAch[extraid][E_ach_skydiver],
-	                pAch[extraid][E_ach_biker],
-					pAch[extraid][E_ach_bmxmaster]);
-					
-                cache_get_row(0, 38, buffer, pSQL, sizeof(buffer)); // Slot 0
-				sscanf(buffer, "p<,>iifffffffff",
-					PlayerToys[extraid][0][toy_model],
-				    PlayerToys[extraid][0][toy_bone],
-				    PlayerToys[extraid][0][toy_x],
-				    PlayerToys[extraid][0][toy_y],
-				    PlayerToys[extraid][0][toy_z],
-				    PlayerToys[extraid][0][toy_rx],
-				    PlayerToys[extraid][0][toy_ry],
-				    PlayerToys[extraid][0][toy_rz],
-				    PlayerToys[extraid][0][toy_sx],
-				    PlayerToys[extraid][0][toy_sy],
-				    PlayerToys[extraid][0][toy_sz]);
-				    
-                cache_get_row(0, 39, buffer, pSQL, sizeof(buffer)); // Slot 1
-				sscanf(buffer, "p<,>iifffffffff",
-					PlayerToys[extraid][1][toy_model],
-				    PlayerToys[extraid][1][toy_bone],
-				    PlayerToys[extraid][1][toy_x],
-				    PlayerToys[extraid][1][toy_y],
-				    PlayerToys[extraid][1][toy_z],
-				    PlayerToys[extraid][1][toy_rx],
-				    PlayerToys[extraid][1][toy_ry],
-				    PlayerToys[extraid][1][toy_rz],
-				    PlayerToys[extraid][1][toy_sx],
-				    PlayerToys[extraid][1][toy_sy],
-				    PlayerToys[extraid][1][toy_sz]);
-
-                cache_get_row(0, 40, buffer, pSQL, sizeof(buffer)); // Slot 2
-				sscanf(buffer, "p<,>iifffffffff",
-					PlayerToys[extraid][2][toy_model],
-				    PlayerToys[extraid][2][toy_bone],
-				    PlayerToys[extraid][2][toy_x],
-				    PlayerToys[extraid][2][toy_y],
-				    PlayerToys[extraid][2][toy_z],
-				    PlayerToys[extraid][2][toy_rx],
-				    PlayerToys[extraid][2][toy_ry],
-				    PlayerToys[extraid][2][toy_rz],
-				    PlayerToys[extraid][2][toy_sx],
-				    PlayerToys[extraid][2][toy_sy],
-				    PlayerToys[extraid][2][toy_sz]);
-				    
-                cache_get_row(0, 41, buffer, pSQL, sizeof(buffer)); // Slot 3
-				sscanf(buffer, "p<,>iifffffffff",
-					PlayerToys[extraid][3][toy_model],
-				    PlayerToys[extraid][3][toy_bone],
-				    PlayerToys[extraid][3][toy_x],
-				    PlayerToys[extraid][3][toy_y],
-				    PlayerToys[extraid][3][toy_z],
-				    PlayerToys[extraid][3][toy_rx],
-				    PlayerToys[extraid][3][toy_ry],
-				    PlayerToys[extraid][3][toy_rz],
-				    PlayerToys[extraid][3][toy_sx],
-				    PlayerToys[extraid][3][toy_sy],
-				    PlayerToys[extraid][3][toy_sz]);
-				    
-                cache_get_row(0, 42, buffer, pSQL, sizeof(buffer)); // Slot 4
-				sscanf(buffer, "p<,>iifffffffff",
-					PlayerToys[extraid][4][toy_model],
-				    PlayerToys[extraid][4][toy_bone],
-				    PlayerToys[extraid][4][toy_x],
-				    PlayerToys[extraid][4][toy_y],
-				    PlayerToys[extraid][4][toy_z],
-				    PlayerToys[extraid][4][toy_rx],
-				    PlayerToys[extraid][4][toy_ry],
-				    PlayerToys[extraid][4][toy_rz],
-				    PlayerToys[extraid][4][toy_sx],
-				    PlayerToys[extraid][4][toy_sy],
-				    PlayerToys[extraid][4][toy_sz]);
-				    
-                cache_get_row(0, 43, buffer, pSQL, sizeof(buffer)); // Slot 5
-				sscanf(buffer, "p<,>iifffffffff",
-					PlayerToys[extraid][5][toy_model],
-				    PlayerToys[extraid][5][toy_bone],
-				    PlayerToys[extraid][5][toy_x],
-				    PlayerToys[extraid][5][toy_y],
-				    PlayerToys[extraid][5][toy_z],
-				    PlayerToys[extraid][5][toy_rx],
-				    PlayerToys[extraid][5][toy_ry],
-				    PlayerToys[extraid][5][toy_rz],
-				    PlayerToys[extraid][5][toy_sx],
-				    PlayerToys[extraid][5][toy_sy],
-				    PlayerToys[extraid][5][toy_sz]);
-				    
-                cache_get_row(0, 44, buffer, pSQL, sizeof(buffer)); // Slot 6
-				sscanf(buffer, "p<,>iifffffffff",
-					PlayerToys[extraid][6][toy_model],
-				    PlayerToys[extraid][6][toy_bone],
-				    PlayerToys[extraid][6][toy_x],
-				    PlayerToys[extraid][6][toy_y],
-				    PlayerToys[extraid][6][toy_z],
-				    PlayerToys[extraid][6][toy_rx],
-				    PlayerToys[extraid][6][toy_ry],
-				    PlayerToys[extraid][6][toy_rz],
-				    PlayerToys[extraid][6][toy_sx],
-				    PlayerToys[extraid][6][toy_sy],
-				    PlayerToys[extraid][6][toy_sz]);
-				    
-                cache_get_row(0, 45, buffer, pSQL, sizeof(buffer)); // Slot 7
-				sscanf(buffer, "p<,>iifffffffff",
-					PlayerToys[extraid][7][toy_model],
-				    PlayerToys[extraid][7][toy_bone],
-				    PlayerToys[extraid][7][toy_x],
-				    PlayerToys[extraid][7][toy_y],
-				    PlayerToys[extraid][7][toy_z],
-				    PlayerToys[extraid][7][toy_rx],
-				    PlayerToys[extraid][7][toy_ry],
-				    PlayerToys[extraid][7][toy_rz],
-				    PlayerToys[extraid][7][toy_sx],
-				    PlayerToys[extraid][7][toy_sy],
-				    PlayerToys[extraid][7][toy_sz]);
-				    
-                cache_get_row(0, 46, buffer, pSQL, sizeof(buffer)); // Slot 8
-				sscanf(buffer, "p<,>iifffffffff",
-					PlayerToys[extraid][8][toy_model],
-				    PlayerToys[extraid][8][toy_bone],
-				    PlayerToys[extraid][8][toy_x],
-				    PlayerToys[extraid][8][toy_y],
-				    PlayerToys[extraid][8][toy_z],
-				    PlayerToys[extraid][8][toy_rx],
-				    PlayerToys[extraid][8][toy_ry],
-				    PlayerToys[extraid][8][toy_rz],
-				    PlayerToys[extraid][8][toy_sx],
-				    PlayerToys[extraid][8][toy_sy],
-				    PlayerToys[extraid][8][toy_sz]);
-				    
-                cache_get_row(0, 47, buffer, pSQL, sizeof(buffer)); // Slot 9
-				sscanf(buffer, "p<,>iifffffffff",
-					PlayerToys[extraid][9][toy_model],
-				    PlayerToys[extraid][9][toy_bone],
-				    PlayerToys[extraid][9][toy_x],
-				    PlayerToys[extraid][9][toy_y],
-				    PlayerToys[extraid][9][toy_z],
-				    PlayerToys[extraid][9][toy_rx],
-				    PlayerToys[extraid][9][toy_ry],
-				    PlayerToys[extraid][9][toy_rz],
-				    PlayerToys[extraid][9][toy_sx],
-				    PlayerToys[extraid][9][toy_sy],
-				    PlayerToys[extraid][9][toy_sz]);
-				    
-                cache_get_row(0, 48, buffer, pSQL, sizeof(buffer)); // PV_Slot 0
-				sscanf(buffer, "p<,>iiiiiiiiiiiiiiiiiiiiis[13]",
-				    PlayerPV[extraid][0][Model],
-				    PlayerPV[extraid][0][PaintJob],
-				    PlayerPV[extraid][0][Color1],
-				    PlayerPV[extraid][0][Color2],
-				    PlayerPV[extraid][0][Mod1],
-				    PlayerPV[extraid][0][Mod2],
-				    PlayerPV[extraid][0][Mod3],
-				    PlayerPV[extraid][0][Mod4],
-				    PlayerPV[extraid][0][Mod5],
-				    PlayerPV[extraid][0][Mod6],
-				    PlayerPV[extraid][0][Mod7],
-				    PlayerPV[extraid][0][Mod8],
-				    PlayerPV[extraid][0][Mod9],
-				    PlayerPV[extraid][0][Mod10],
-				    PlayerPV[extraid][0][Mod11],
-				    PlayerPV[extraid][0][Mod12],
-				    PlayerPV[extraid][0][Mod13],
-				    PlayerPV[extraid][0][Mod14],
-				    PlayerPV[extraid][0][Mod15],
-				    PlayerPV[extraid][0][Mod16],
-				    PlayerPV[extraid][0][Mod17],
-				    PlayerPV[extraid][0][Plate]);
-				    
-                cache_get_row(0, 49, buffer, pSQL, sizeof(buffer)); // PV_Slot 1
-				sscanf(buffer, "p<,>iiiiiiiiiiiiiiiiiiiiis[13]",
-				    PlayerPV[extraid][1][Model],
-				    PlayerPV[extraid][1][PaintJob],
-				    PlayerPV[extraid][1][Color1],
-				    PlayerPV[extraid][1][Color2],
-				    PlayerPV[extraid][1][Mod1],
-				    PlayerPV[extraid][1][Mod2],
-				    PlayerPV[extraid][1][Mod3],
-				    PlayerPV[extraid][1][Mod4],
-				    PlayerPV[extraid][1][Mod5],
-				    PlayerPV[extraid][1][Mod6],
-				    PlayerPV[extraid][1][Mod7],
-				    PlayerPV[extraid][1][Mod8],
-				    PlayerPV[extraid][1][Mod9],
-				    PlayerPV[extraid][1][Mod10],
-				    PlayerPV[extraid][1][Mod11],
-				    PlayerPV[extraid][1][Mod12],
-				    PlayerPV[extraid][1][Mod13],
-				    PlayerPV[extraid][1][Mod14],
-				    PlayerPV[extraid][1][Mod15],
-				    PlayerPV[extraid][1][Mod16],
-				    PlayerPV[extraid][1][Mod17],
-				    PlayerPV[extraid][1][Plate]);
-				    
-                cache_get_row(0, 50, buffer, pSQL, sizeof(buffer)); // PV_Slot 2
-				sscanf(buffer, "p<,>iiiiiiiiiiiiiiiiiiiiis[13]",
-				    PlayerPV[extraid][2][Model],
-				    PlayerPV[extraid][2][PaintJob],
-				    PlayerPV[extraid][2][Color1],
-				    PlayerPV[extraid][2][Color2],
-				    PlayerPV[extraid][2][Mod1],
-				    PlayerPV[extraid][2][Mod2],
-				    PlayerPV[extraid][2][Mod3],
-				    PlayerPV[extraid][2][Mod4],
-				    PlayerPV[extraid][2][Mod5],
-				    PlayerPV[extraid][2][Mod6],
-				    PlayerPV[extraid][2][Mod7],
-				    PlayerPV[extraid][2][Mod8],
-				    PlayerPV[extraid][2][Mod9],
-				    PlayerPV[extraid][2][Mod10],
-				    PlayerPV[extraid][2][Mod11],
-				    PlayerPV[extraid][2][Mod12],
-				    PlayerPV[extraid][2][Mod13],
-				    PlayerPV[extraid][2][Mod14],
-				    PlayerPV[extraid][2][Mod15],
-				    PlayerPV[extraid][2][Mod16],
-				    PlayerPV[extraid][2][Mod17],
-				    PlayerPV[extraid][2][Plate]);
-
-                cache_get_row(0, 51, buffer, pSQL, sizeof(buffer)); // PV_Slot 3
-				sscanf(buffer, "p<,>iiiiiiiiiiiiiiiiiiiiis[13]",
-				    PlayerPV[extraid][3][Model],
-				    PlayerPV[extraid][3][PaintJob],
-				    PlayerPV[extraid][3][Color1],
-				    PlayerPV[extraid][3][Color2],
-				    PlayerPV[extraid][3][Mod1],
-				    PlayerPV[extraid][3][Mod2],
-				    PlayerPV[extraid][3][Mod3],
-				    PlayerPV[extraid][3][Mod4],
-				    PlayerPV[extraid][3][Mod5],
-				    PlayerPV[extraid][3][Mod6],
-				    PlayerPV[extraid][3][Mod7],
-				    PlayerPV[extraid][3][Mod8],
-				    PlayerPV[extraid][3][Mod9],
-				    PlayerPV[extraid][3][Mod10],
-				    PlayerPV[extraid][3][Mod11],
-				    PlayerPV[extraid][3][Mod12],
-				    PlayerPV[extraid][3][Mod13],
-				    PlayerPV[extraid][3][Mod14],
-				    PlayerPV[extraid][3][Mod15],
-				    PlayerPV[extraid][3][Mod16],
-				    PlayerPV[extraid][3][Mod17],
-				    PlayerPV[extraid][3][Plate]);
-				    
-                cache_get_row(0, 52, buffer, pSQL, sizeof(buffer)); // PV_Slot 4
-				sscanf(buffer, "p<,>iiiiiiiiiiiiiiiiiiiiis[13]",
-				    PlayerPV[extraid][4][Model],
-				    PlayerPV[extraid][4][PaintJob],
-				    PlayerPV[extraid][4][Color1],
-				    PlayerPV[extraid][4][Color2],
-				    PlayerPV[extraid][4][Mod1],
-				    PlayerPV[extraid][4][Mod2],
-				    PlayerPV[extraid][4][Mod3],
-				    PlayerPV[extraid][4][Mod4],
-				    PlayerPV[extraid][4][Mod5],
-				    PlayerPV[extraid][4][Mod6],
-				    PlayerPV[extraid][4][Mod7],
-				    PlayerPV[extraid][4][Mod8],
-				    PlayerPV[extraid][4][Mod9],
-				    PlayerPV[extraid][4][Mod10],
-				    PlayerPV[extraid][4][Mod11],
-				    PlayerPV[extraid][4][Mod12],
-				    PlayerPV[extraid][4][Mod13],
-				    PlayerPV[extraid][4][Mod14],
-				    PlayerPV[extraid][4][Mod15],
-				    PlayerPV[extraid][4][Mod16],
-				    PlayerPV[extraid][4][Mod17],
-				    PlayerPV[extraid][4][Plate]);
-				    
-                cache_get_row(0, 53, buffer, pSQL, sizeof(buffer)); // PV_Slot 5
-				sscanf(buffer, "p<,>iiiiiiiiiiiiiiiiiiiiis[13]",
-				    PlayerPV[extraid][5][Model],
-				    PlayerPV[extraid][5][PaintJob],
-				    PlayerPV[extraid][5][Color1],
-				    PlayerPV[extraid][5][Color2],
-				    PlayerPV[extraid][5][Mod1],
-				    PlayerPV[extraid][5][Mod2],
-				    PlayerPV[extraid][5][Mod3],
-				    PlayerPV[extraid][5][Mod4],
-				    PlayerPV[extraid][5][Mod5],
-				    PlayerPV[extraid][5][Mod6],
-				    PlayerPV[extraid][5][Mod7],
-				    PlayerPV[extraid][5][Mod8],
-				    PlayerPV[extraid][5][Mod9],
-				    PlayerPV[extraid][5][Mod10],
-				    PlayerPV[extraid][5][Mod11],
-				    PlayerPV[extraid][5][Mod12],
-				    PlayerPV[extraid][5][Mod13],
-				    PlayerPV[extraid][5][Mod14],
-				    PlayerPV[extraid][5][Mod15],
-				    PlayerPV[extraid][5][Mod16],
-				    PlayerPV[extraid][5][Mod17],
-				    PlayerPV[extraid][5][Plate]);
-				    
-                cache_get_row(0, 54, buffer, pSQL, sizeof(buffer)); // PV_Slot 6
-				sscanf(buffer, "p<,>iiiiiiiiiiiiiiiiiiiiis[13]",
-				    PlayerPV[extraid][6][Model],
-				    PlayerPV[extraid][6][PaintJob],
-				    PlayerPV[extraid][6][Color1],
-				    PlayerPV[extraid][6][Color2],
-				    PlayerPV[extraid][6][Mod1],
-				    PlayerPV[extraid][6][Mod2],
-				    PlayerPV[extraid][6][Mod3],
-				    PlayerPV[extraid][6][Mod4],
-				    PlayerPV[extraid][6][Mod5],
-				    PlayerPV[extraid][6][Mod6],
-				    PlayerPV[extraid][6][Mod7],
-				    PlayerPV[extraid][6][Mod8],
-				    PlayerPV[extraid][6][Mod9],
-				    PlayerPV[extraid][6][Mod10],
-				    PlayerPV[extraid][6][Mod11],
-				    PlayerPV[extraid][6][Mod12],
-				    PlayerPV[extraid][6][Mod13],
-				    PlayerPV[extraid][6][Mod14],
-				    PlayerPV[extraid][6][Mod15],
-				    PlayerPV[extraid][6][Mod16],
-				    PlayerPV[extraid][6][Mod17],
-				    PlayerPV[extraid][6][Plate]);
-				    
-                cache_get_row(0, 55, buffer, pSQL, sizeof(buffer)); // PV_Slot 7
-				sscanf(buffer, "p<,>iiiiiiiiiiiiiiiiiiiiis[13]",
-				    PlayerPV[extraid][7][Model],
-				    PlayerPV[extraid][7][PaintJob],
-				    PlayerPV[extraid][7][Color1],
-				    PlayerPV[extraid][7][Color2],
-				    PlayerPV[extraid][7][Mod1],
-				    PlayerPV[extraid][7][Mod2],
-				    PlayerPV[extraid][7][Mod3],
-				    PlayerPV[extraid][7][Mod4],
-				    PlayerPV[extraid][7][Mod5],
-				    PlayerPV[extraid][7][Mod6],
-				    PlayerPV[extraid][7][Mod7],
-				    PlayerPV[extraid][7][Mod8],
-				    PlayerPV[extraid][7][Mod9],
-				    PlayerPV[extraid][7][Mod10],
-				    PlayerPV[extraid][7][Mod11],
-				    PlayerPV[extraid][7][Mod12],
-				    PlayerPV[extraid][7][Mod13],
-				    PlayerPV[extraid][7][Mod14],
-				    PlayerPV[extraid][7][Mod15],
-				    PlayerPV[extraid][7][Mod16],
-				    PlayerPV[extraid][7][Mod17],
-				    PlayerPV[extraid][7][Plate]);
-
-   				if(PlayerInfo[extraid][GangID] != 0)
-				{
-				    MySQL_LoadPlayerGang(extraid);
-				}
-				
-  			 	SetPlayerScore_(extraid, PlayerInfo[extraid][Score]);
-			 	SetPlayerCash(extraid, PlayerInfo[extraid][Money]);
-			 	PlayerInfo[extraid][ConnectTime] = gettime();
-
-				//SendWelcomeMSG(extraid);
-
-				format(gstr, sizeof(gstr), "~y~[] ~w~%i", PlayerInfo[extraid][Wanteds]);
-				PlayerTextDrawSetString(extraid, TXTWantedsTD[extraid], gstr);
-                
-			    format(gstr2, sizeof(gstr2), "INSERT INTO `login_log` VALUES (NULL, %i, '%s', UNIX_TIMESTAMP(), 0);", PlayerInfo[extraid][AccountID], __GetIP(extraid));
-			    mysql_tquery(pSQL, gstr2, "", "");
-                
-				if(PlayerInfo[extraid][Level] > 0)
-				{
-					format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"Successfully logged in. (Level: %s)", StaffLevels[PlayerInfo[extraid][Level]][e_rank]);
-					SCM(extraid, -1, gstr2);
-					format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"You were last online at %s and registered on %s", UTConvert(PlayerInfo[extraid][LastLogin]), UTConvert(PlayerInfo[extraid][RegDate]));
-  					SCM(extraid, -1, gstr2);
-					format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"You've been online for %s", GetPlayingTimeFormat(extraid));
-					SCM(extraid, -1, gstr2);
-		   		}
-		   		else
-		   		{
-				   	SCM(extraid, -1, ""server_sign" "r_besch"Successfully logged in!");
-					format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"You were last online at %s and registered on %s", UTConvert(PlayerInfo[extraid][LastLogin]), UTConvert(PlayerInfo[extraid][RegDate]));
-  					SCM(extraid, -1, gstr2);
-					format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"You've been online for %s", GetPlayingTimeFormat(extraid));
-					SCM(extraid, -1, gstr2);
-				}
-				
-				if(PlayerInfo[extraid][VIP] == 1)
-				{
-                    format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"VIP %s(%i) logged in!", __GetName(extraid), extraid);
-                    SCMToAll(-1, gstr2);
-
-					format(gstr2, sizeof(gstr2), "02[%i] 03*** VIP %s has joined the server.", extraid, __GetName(extraid));
-					IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr2);
-				}
-				else
-				{
-					format(gstr2, sizeof(gstr2), "02[%i] 03*** %s has joined the server.", extraid, __GetName(extraid));
-					IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr2);
-				}
-				
-				if(PlayerInfo[extraid][SavedColor] != 0)
-				{
-				    SetPlayerColor(extraid, PlayerInfo[extraid][SavedColor]);
-				    SCM(extraid, -1, ""server_sign" "r_besch"Your saved color has been set. (/deletecolor to remove)");
-				}
-				
-				format(gstr2, sizeof(gstr2), "SELECT * FROM `queue` WHERE `Extra` = '%s';", __GetName(extraid));
-				mysql_tquery(pSQL, gstr2, "OnBoostReceive", "i", extraid);
-			}
-		}
-		case THREAD_LOAD_PLAYER_GANG:
-		{
-		    new rows, fields;
-		    cache_get_data(rows, fields, pSQL);
-
-		    if(rows > 0)
-		    {
-		        new buffer[25];
-
-		        cache_get_row(0, 0, buffer, pSQL, sizeof(buffer));
-		        strmid(PlayerInfo[extraid][GangName], buffer, 0, 25, 25);
-				cache_get_row(0, 1, buffer, pSQL, sizeof(buffer));
-				strmid(PlayerInfo[extraid][GangTag], buffer, 0, 5, 5);
-
-				if(PlayerInfo[extraid][GangLabel] != Text3D:-1)
-				{
-				    DestroyDynamic3DTextLabel(PlayerInfo[extraid][GangLabel]);
-		 			PlayerInfo[extraid][GangLabel] = Text3D:-1;
-				}
-				
- 			    format(gstr, sizeof(gstr), ""nef_yellow"Gang:"white" %s", PlayerInfo[extraid][GangName]);
-				PlayerInfo[extraid][GangLabel] = CreateDynamic3DTextLabel(gstr, -1, 0.0, 0.0, 0.5, 20.0, extraid, INVALID_VEHICLE_ID, 1, -1, -1, -1, 20.0);
-
-			    format(gstr, sizeof(gstr), ""gang_sign" "grey"%s %s(%i) logged in!", GangPositions[PlayerInfo[extraid][GangPosition]][E_gang_pos_name], __GetName(extraid), extraid);
-				GangMSG(PlayerInfo[extraid][GangID], gstr);
-			}
-		}
 		case THREAD_ASSIGN_RANK:
 		{
 		    new rows, fields;
@@ -4535,39 +4041,6 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 
 			SrvStat[2]++;
 
-			MySQL_SavePlayer(extraid, true);
-			MySQL_UpdateAccount(extraid);
-		}
-		case THREAD_CREATE_ACCOUNT:
-		{
-		    PlayerInfo[extraid][AccountID] = cache_insert_id(pSQL);
-		    PlayerInfo[extraid][RegDate] = gettime();
-			PlayerInfo[extraid][ExitType] = EXIT_LOGGED;
-			PlayerInfo[extraid][PayDay] = 60;
-			PlayerInfo[extraid][ConnectTime] = gettime();
-		    PlayerInfo[extraid][AllowSpawn] = true;
-		    PlayerInfo[extraid][Wanteds] = 0;
-		    PlayerInfo[extraid][bLogged] = true;
-		    
-			format(gstr, sizeof gstr, "["SVRSC"] %s(%i) "GREEN_E"has registered, making the server have a total of "LB2_E"%i "GREEN_E"players registered.", __GetName(extraid), extraid, cache_insert_id(pSQL));
-			SCMToAll(COLOR_PINK, gstr);
-			format(gstr, sizeof(gstr), "5,9- RegServ -3,0 %s(%i) has registered making the server have a total of %i players registered.", __GetName(extraid), extraid, cache_insert_id(pSQL));
-			IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
-			format(gstr, sizeof(gstr), "~b~~h~~h~Welcome to "SVRSC", ~r~~h~~h~%s~b~~h~~h~!~n~~b~~h~~h~You have successfully registered and logged in!", __GetName(extraid));
-			InfoTD_MSG(extraid, 5000, gstr);
-		    
-			format(gstr, sizeof(gstr), "~y~[] ~w~%i", PlayerInfo[extraid][Wanteds]);
-			PlayerTextDrawSetString(extraid, TXTWantedsTD[extraid], gstr);
-
-			SrvStat[2]++;
-
-		    GameTextForPlayer(extraid, "Welcome", 3000, 4);
-	  		GivePlayerCash(extraid, 200000, false);
-	    	GameTextForPlayer(extraid, "~n~+$20,000~n~Startcash", 3000, 1);
-			SCM(extraid, -1, ""server_sign" "r_besch"You are now registered, and have been logged in!");
-
-			PlayerPlaySound(extraid, 1057, 0.0, 0.0, 0.0);
-			
 			MySQL_SavePlayer(extraid, true);
 			MySQL_UpdateAccount(extraid);
 		}
@@ -21647,8 +21120,6 @@ function:SkipRegistration(playerid)
 	GivePlayerCash(playerid, 20000, false);
 	GameTextForPlayer(playerid, "~n~+$20,000~n~Startcash", 3000, 1);
 	PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
-	
-	//SendWelcomeMSG(playerid);
 	return 1;
 }
 
@@ -21679,8 +21150,6 @@ function:SkipLogin(playerid)
 		format(string, sizeof(string), ""white"Your name has been changed to %s because you failed to log in.\n\n"nef_yellow"Please restart the game if this is incorrect.", newname);
 		ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef"", string, "OK", "");
 		
-		//SendWelcomeMSG(playerid);
-		
 	    PlayerInfo[playerid][RegDate] = gettime();
 		PlayerInfo[playerid][PayDay] = 60;
 		PlayerInfo[playerid][ConnectTime] = gettime();
@@ -21693,8 +21162,8 @@ function:SkipLogin(playerid)
 
 		SrvStat[2]++;
 
-        format(gstr, sizeof(gstr), "UPDATE `online` SET `name` = '%s' WHERE `name` = '%s';", newname, oldname);
-        mysql_tquery(pSQL, gstr, "", "");
+        mysql_format(pSQL, gstr, sizeof(gstr), "UPDATE `online` SET `name` = '%e' WHERE `name` = '%e';", newname, oldname);
+        mysql_pquery(pSQL, gstr);
 
 	    GameTextForPlayer(playerid, "Welcome", 3000, 4);
   		GivePlayerCash(playerid, 20000, false);
@@ -21914,14 +21383,14 @@ MySQL_UpdateGangScore(gGangID, value)
 
 MySQL_LoadPlayer(playerid)
 {
-	format(gstr2, sizeof(gstr2), "SELECT * FROM `accounts` WHERE `Name` = '%s' LIMIT 1;", __GetName(playerid));
-	mysql_pquery(pSQL, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_LOAD_PLAYER, playerid, pSQL);
+	mysql_format(pSQL, gstr2, sizeof(gstr2), "SELECT * FROM `accounts` WHERE `Name` = '%e' LIMIT 1;", __GetName(playerid));
+	mysql_pquery(pSQL, gstr2, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_LOAD);
 }
 
 MySQL_LoadPlayerGang(playerid)
 {
 	format(gstr2, sizeof(gstr2), "SELECT `GangName`, `GangTag` FROM `gangs` WHERE `ID` = %i LIMIT 1;", PlayerInfo[playerid][GangID]);
-	mysql_tquery(pSQL, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_LOAD_PLAYER_GANG, playerid, pSQL);
+	mysql_pquery(pSQL, gstr2, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_GANG_LOAD);
 }
 
 MySQL_AssignRankIfExist(playerid)
@@ -21984,7 +21453,7 @@ MySQL_SavePlayer(playerid, bool:save_pv)
 		__GetName(playerid));
 
 	strcat(query, query2);
-	mysql_tquery(pSQL, query, "", "");
+	mysql_pquery(pSQL, query, "", "");
 
 	format(query, sizeof(query), "UPDATE `accounts` SET `Achievements` = '%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i' WHERE `Name` = '%s' LIMIT 1;",
 	    pAch[playerid][E_ach_styler],
@@ -22002,7 +21471,7 @@ MySQL_SavePlayer(playerid, bool:save_pv)
 		pAch[playerid][E_ach_biker],
 		pAch[playerid][E_ach_bmxmaster],
 		__GetName(playerid));
-    mysql_tquery(pSQL, query, "", "");
+    mysql_pquery(pSQL, query, "", "");
 
 	if(save_pv)
 	{
@@ -22249,11 +21718,9 @@ MySQL_CreateAccount(playerid, password[])
 {
 	PlayerInfo[playerid][LastLogin] = gettime();
 	PlayerInfo[playerid][LastNameChange] = 0;
-	
-    new query[350], escape[33];
-	mysql_escape_string(password, escape, pSQL, 33);
-    format(query, sizeof(query), "INSERT INTO `accounts` (`Name`, `Color`, `Hash`, `IP`, `GangPosition`, `GangID`, `RegDate`, `LastLogin`) VALUES ('%s', 0, MD5('%s'), '%s', 0, 0, %i, %i);", __GetName(playerid), escape, __GetIP(playerid), gettime(), PlayerInfo[playerid][LastLogin]);
-	mysql_tquery(pSQL, query, "OnQueryFinish", "siii", query, THREAD_CREATE_ACCOUNT, playerid, pSQL);
+
+	mysql_format(pSQL, gstr2, sizeof(gstr2), "INSERT INTO `accounts` (`Name`, `Color`, `Hash`, `IP`, `GangPosition`, `GangID`, `RegDate`, `LastLogin`) VALUES ('%e', 0, MD5('%e'), '%e', 0, 0, %i, %i);", __GetName(playerid), password, __GetIP(playerid), gettime(), PlayerInfo[playerid][LastLogin]);
+	mysql_pquery(pSQL, gstr2, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_CREATE);
 }
 
 MySQL_CreateAccount2(playerid, password[])
@@ -22271,8 +21738,8 @@ MySQL_UpdateAccount(playerid)
 {
     if(PlayerInfo[playerid][bLogged])
     {
-	    format(gstr2, sizeof(gstr2), "UPDATE `accounts` SET `IP` = '%s', `LastLogin` = %i WHERE `Name` = '%s' LIMIT 1;", __GetIP(playerid), gettime(), __GetName(playerid));
-	    mysql_tquery(pSQL, gstr2, "", "");
+	    mysql_format(pSQL, gstr2, sizeof(gstr2), "UPDATE `accounts` SET `IP` = '%e', `LastLogin` = %i WHERE `Name` = '%e' LIMIT 1;", __GetIP(playerid), gettime(), __GetName(playerid));
+	    mysql_pquery(pSQL, gstr2);
 	}
 }
 
@@ -22370,7 +21837,7 @@ MySQL_FinalRankAssign(playerid)
 
 MySQL_CleanUp()
 {
-	mysql_tquery(pSQL, "TRUNCATE TABLE `online`;", "", "");
+	mysql_pquery(pSQL, "TRUNCATE TABLE `online`;");
 }
 
 MySQL_Connect()
@@ -31432,7 +30899,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 	        }
 
 	        mysql_format(pSQL, gstr2, sizeof(gstr2), "SELECT * FROM `blacklist` WHERE `IP` = '%e' LIMIT 1;", __GetIP(playerid));
-	        mysql_pquery(pSQL, gstr2, "OnPlayerAccountRequest", "isi", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_IP_BANNED);
+	        mysql_pquery(pSQL, gstr2, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_IP_BANNED);
 	        return 1;
 	    }
 	    case ACCOUNT_REQUEST_IP_BANNED:
@@ -31440,7 +30907,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
             if(cache_get_row_count() == 0) // IP Address is not blacklisted
             {
 				mysql_format(pSQL, gstr, sizeof(gstr), "SELECT `ID` FROM `accounts` WHERE `Name` = '%e' LIMIT 1;", __GetName(playerid));
-				mysql_pquery(pSQL, gstr, "OnPlayerAccountRequest", "isi", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_EXIST); // Check if the account already exist
+				mysql_pquery(pSQL, gstr, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_EXIST); // Check if the account already exist
 
 				SendWelcomeMSG(playerid);
             }
@@ -31470,7 +30937,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 		    if(cache_get_row_count() != 0) // acc exists
 		    {
 				mysql_format(pSQL, gstr2, sizeof(gstr2), "SELECT `ID` FROM `accounts` WHERE `Name` = '%e' AND `IP` = '%s' LIMIT 1;", __GetName(playerid), __GetIP(playerid));
-				mysql_pquery(pSQL, gstr2, "OnPlayerAccountRequest", "isi", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_AUTO_LOGIN); // Check auto login
+				mysql_pquery(pSQL, gstr2, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_AUTO_LOGIN); // Check auto login
 		    }
 		    else
 		    {
@@ -31490,6 +30957,530 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 	            // Login Dialog
 	            RequestLogin(playerid);
 	        }
+	        return 1;
+	    }
+	    case ACCOUNT_REQUEST_CREATE:
+	    {
+		    PlayerInfo[playerid][AccountID] = cache_insert_id();
+		    PlayerInfo[playerid][RegDate] = gettime();
+			PlayerInfo[playerid][ExitType] = EXIT_LOGGED;
+			PlayerInfo[playerid][PayDay] = 60;
+			PlayerInfo[playerid][ConnectTime] = gettime();
+		    PlayerInfo[playerid][AllowSpawn] = true;
+		    PlayerInfo[playerid][Wanteds] = 0;
+		    PlayerInfo[playerid][bLogged] = true;
+
+			format(gstr, sizeof gstr, "["SVRSC"] %s(%i) "GREEN_E"has registered, making the server have a total of "LB2_E"%i "GREEN_E"players registered.", __GetName(playerid), playerid, cache_insert_id());
+			SCMToAll(COLOR_PINK, gstr);
+			
+			format(gstr, sizeof(gstr), "5,9- RegServ -3,0 %s(%i) has registered making the server have a total of %i players registered.", __GetName(playerid), playerid, cache_insert_id());
+			IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
+			
+			format(gstr, sizeof(gstr), "~b~~h~~h~Welcome to "SVRSC", ~r~~h~~h~%s~b~~h~~h~!~n~~b~~h~~h~You have successfully registered and logged in!", __GetName(playerid));
+			InfoTD_MSG(playerid, 5000, gstr);
+
+			format(gstr, sizeof(gstr), "~y~[] ~w~%i", PlayerInfo[playerid][Wanteds]);
+			PlayerTextDrawSetString(playerid, TXTWantedsTD[playerid], gstr);
+
+			SrvStat[2]++;
+
+		    GameTextForPlayer(playerid, "Welcome", 3000, 4);
+	  		GivePlayerCash(playerid, 200000, false);
+	    	GameTextForPlayer(playerid, "~n~+$20,000~n~Startcash", 3000, 1);
+			SCM(playerid, -1, ""server_sign" "r_besch"You are now registered, and have been logged in!");
+
+			PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
+
+			MySQL_SavePlayer(playerid, true);
+			MySQL_UpdateAccount(playerid);
+	        return 1;
+	    }
+	    case ACCOUNT_REQUEST_LOAD:
+	    {
+			if(cache_get_row_count() > 0)
+			{
+			    PlayerInfo[playerid][AccountID] = cache_get_row_int(0, 0, pSQL);
+			    PlayerInfo[playerid][SavedColor] = cache_get_row_int(0, 2, pSQL);
+			    PlayerInfo[playerid][Level] = cache_get_row_int(0, 5, pSQL);
+			    PlayerInfo[playerid][Score] = cache_get_row_int(0, 6, pSQL);
+			    PlayerInfo[playerid][Money] = cache_get_row_int(0, 7, pSQL);
+			    PlayerInfo[playerid][Bank] = cache_get_row_int(0, 8, pSQL);
+			    PlayerInfo[playerid][Kills] = cache_get_row_int(0, 9, pSQL);
+			    PlayerInfo[playerid][Deaths] = cache_get_row_int(0, 10, pSQL);
+			    PlayerInfo[playerid][TotalTime] = cache_get_row_int(0, 11, pSQL);
+                PlayerInfo[playerid][Reaction] = cache_get_row_int(0, 12, pSQL);
+                PlayerInfo[playerid][PayDay] = cache_get_row_int(0, 13, pSQL);
+                PlayerInfo[playerid][Houses] = cache_get_row_int(0, 14, pSQL);
+                PlayerInfo[playerid][Props] = cache_get_row_int(0, 15, pSQL);
+                PlayerInfo[playerid][GangPosition] = cache_get_row_int(0, 16, pSQL);
+                PlayerInfo[playerid][GangID] = cache_get_row_int(0, 17, pSQL);
+                PlayerInfo[playerid][AdditionalPVSlots] = cache_get_row_int(0, 18, pSQL);
+                PlayerInfo[playerid][AdditionalToySlots] = cache_get_row_int(0, 19, pSQL);
+                PlayerInfo[playerid][AdditionalHouseSlots] = cache_get_row_int(0, 20, pSQL);
+                PlayerInfo[playerid][AdditionalPropSlots] = cache_get_row_int(0, 21, pSQL);
+                PlayerInfo[playerid][AdditionalHouseObjSlots] = cache_get_row_int(0, 22, pSQL);
+                PlayerInfo[playerid][DerbyWins] = cache_get_row_int(0, 24, pSQL);
+                PlayerInfo[playerid][RaceWins] = cache_get_row_int(0, 25, pSQL);
+                PlayerInfo[playerid][BGWins] = cache_get_row_int(0, 26, pSQL);
+                PlayerInfo[playerid][FalloutWins] = cache_get_row_int(0, 27, pSQL);
+                PlayerInfo[playerid][GungameWins] = cache_get_row_int(0, 28, pSQL);
+                PlayerInfo[playerid][EventWins] = cache_get_row_int(0, 29, pSQL);
+                PlayerInfo[playerid][Wanteds] = cache_get_row_int(0, 30, pSQL);
+                PlayerInfo[playerid][VIP] = cache_get_row_int(0, 31, pSQL);
+                PlayerInfo[playerid][Credits] = cache_get_row_int(0, 32, pSQL);
+                PlayerInfo[playerid][Medkits] = cache_get_row_int(0, 33, pSQL);
+                PlayerInfo[playerid][RegDate] = cache_get_row_int(0, 34, pSQL);
+                PlayerInfo[playerid][LastLogin] = cache_get_row_int(0, 35, pSQL);
+                PlayerInfo[playerid][LastNameChange] = cache_get_row_int(0, 36, pSQL);
+
+				new sskin = cache_get_row_int(0, 57, pSQL);
+
+                if(IsValidSkin(sskin)) {
+                    PlayerInfo[playerid][SavedSkin] = sskin;
+                } else {
+					PlayerInfo[playerid][SavedSkin] = -1;
+                }
+
+				new buffer[255];
+
+				cache_get_row(0, 37, buffer, pSQL, sizeof(buffer));
+				sscanf(buffer, "p<,>iiiiiiiiiiiiii",
+	                pAch[playerid][E_ach_styler],
+	                pAch[playerid][E_ach_grimreaper],
+	                pAch[playerid][E_ach_masskiller],
+	                pAch[playerid][E_ach_eliteracer],
+	                pAch[playerid][E_ach_toofast],
+	                pAch[playerid][E_ach_scorewhore],
+	                pAch[playerid][E_ach_destroyer],
+	                pAch[playerid][E_ach_restinpeace],
+	                pAch[playerid][E_ach_silentkiller],
+	                pAch[playerid][E_ach_oneshot2kills],
+	                pAch[playerid][E_ach_deepimpact],
+	                pAch[playerid][E_ach_skydiver],
+	                pAch[playerid][E_ach_biker],
+					pAch[playerid][E_ach_bmxmaster]);
+
+                cache_get_row(0, 38, buffer, pSQL, sizeof(buffer)); // Slot 0
+				sscanf(buffer, "p<,>iifffffffff",
+					PlayerToys[playerid][0][toy_model],
+				    PlayerToys[playerid][0][toy_bone],
+				    PlayerToys[playerid][0][toy_x],
+				    PlayerToys[playerid][0][toy_y],
+				    PlayerToys[playerid][0][toy_z],
+				    PlayerToys[playerid][0][toy_rx],
+				    PlayerToys[playerid][0][toy_ry],
+				    PlayerToys[playerid][0][toy_rz],
+				    PlayerToys[playerid][0][toy_sx],
+				    PlayerToys[playerid][0][toy_sy],
+				    PlayerToys[playerid][0][toy_sz]);
+
+                cache_get_row(0, 39, buffer, pSQL, sizeof(buffer)); // Slot 1
+				sscanf(buffer, "p<,>iifffffffff",
+					PlayerToys[playerid][1][toy_model],
+				    PlayerToys[playerid][1][toy_bone],
+				    PlayerToys[playerid][1][toy_x],
+				    PlayerToys[playerid][1][toy_y],
+				    PlayerToys[playerid][1][toy_z],
+				    PlayerToys[playerid][1][toy_rx],
+				    PlayerToys[playerid][1][toy_ry],
+				    PlayerToys[playerid][1][toy_rz],
+				    PlayerToys[playerid][1][toy_sx],
+				    PlayerToys[playerid][1][toy_sy],
+				    PlayerToys[playerid][1][toy_sz]);
+
+                cache_get_row(0, 40, buffer, pSQL, sizeof(buffer)); // Slot 2
+				sscanf(buffer, "p<,>iifffffffff",
+					PlayerToys[playerid][2][toy_model],
+				    PlayerToys[playerid][2][toy_bone],
+				    PlayerToys[playerid][2][toy_x],
+				    PlayerToys[playerid][2][toy_y],
+				    PlayerToys[playerid][2][toy_z],
+				    PlayerToys[playerid][2][toy_rx],
+				    PlayerToys[playerid][2][toy_ry],
+				    PlayerToys[playerid][2][toy_rz],
+				    PlayerToys[playerid][2][toy_sx],
+				    PlayerToys[playerid][2][toy_sy],
+				    PlayerToys[playerid][2][toy_sz]);
+
+                cache_get_row(0, 41, buffer, pSQL, sizeof(buffer)); // Slot 3
+				sscanf(buffer, "p<,>iifffffffff",
+					PlayerToys[playerid][3][toy_model],
+				    PlayerToys[playerid][3][toy_bone],
+				    PlayerToys[playerid][3][toy_x],
+				    PlayerToys[playerid][3][toy_y],
+				    PlayerToys[playerid][3][toy_z],
+				    PlayerToys[playerid][3][toy_rx],
+				    PlayerToys[playerid][3][toy_ry],
+				    PlayerToys[playerid][3][toy_rz],
+				    PlayerToys[playerid][3][toy_sx],
+				    PlayerToys[playerid][3][toy_sy],
+				    PlayerToys[playerid][3][toy_sz]);
+
+                cache_get_row(0, 42, buffer, pSQL, sizeof(buffer)); // Slot 4
+				sscanf(buffer, "p<,>iifffffffff",
+					PlayerToys[playerid][4][toy_model],
+				    PlayerToys[playerid][4][toy_bone],
+				    PlayerToys[playerid][4][toy_x],
+				    PlayerToys[playerid][4][toy_y],
+				    PlayerToys[playerid][4][toy_z],
+				    PlayerToys[playerid][4][toy_rx],
+				    PlayerToys[playerid][4][toy_ry],
+				    PlayerToys[playerid][4][toy_rz],
+				    PlayerToys[playerid][4][toy_sx],
+				    PlayerToys[playerid][4][toy_sy],
+				    PlayerToys[playerid][4][toy_sz]);
+
+                cache_get_row(0, 43, buffer, pSQL, sizeof(buffer)); // Slot 5
+				sscanf(buffer, "p<,>iifffffffff",
+					PlayerToys[playerid][5][toy_model],
+				    PlayerToys[playerid][5][toy_bone],
+				    PlayerToys[playerid][5][toy_x],
+				    PlayerToys[playerid][5][toy_y],
+				    PlayerToys[playerid][5][toy_z],
+				    PlayerToys[playerid][5][toy_rx],
+				    PlayerToys[playerid][5][toy_ry],
+				    PlayerToys[playerid][5][toy_rz],
+				    PlayerToys[playerid][5][toy_sx],
+				    PlayerToys[playerid][5][toy_sy],
+				    PlayerToys[playerid][5][toy_sz]);
+
+                cache_get_row(0, 44, buffer, pSQL, sizeof(buffer)); // Slot 6
+				sscanf(buffer, "p<,>iifffffffff",
+					PlayerToys[playerid][6][toy_model],
+				    PlayerToys[playerid][6][toy_bone],
+				    PlayerToys[playerid][6][toy_x],
+				    PlayerToys[playerid][6][toy_y],
+				    PlayerToys[playerid][6][toy_z],
+				    PlayerToys[playerid][6][toy_rx],
+				    PlayerToys[playerid][6][toy_ry],
+				    PlayerToys[playerid][6][toy_rz],
+				    PlayerToys[playerid][6][toy_sx],
+				    PlayerToys[playerid][6][toy_sy],
+				    PlayerToys[playerid][6][toy_sz]);
+
+                cache_get_row(0, 45, buffer, pSQL, sizeof(buffer)); // Slot 7
+				sscanf(buffer, "p<,>iifffffffff",
+					PlayerToys[playerid][7][toy_model],
+				    PlayerToys[playerid][7][toy_bone],
+				    PlayerToys[playerid][7][toy_x],
+				    PlayerToys[playerid][7][toy_y],
+				    PlayerToys[playerid][7][toy_z],
+				    PlayerToys[playerid][7][toy_rx],
+				    PlayerToys[playerid][7][toy_ry],
+				    PlayerToys[playerid][7][toy_rz],
+				    PlayerToys[playerid][7][toy_sx],
+				    PlayerToys[playerid][7][toy_sy],
+				    PlayerToys[playerid][7][toy_sz]);
+
+                cache_get_row(0, 46, buffer, pSQL, sizeof(buffer)); // Slot 8
+				sscanf(buffer, "p<,>iifffffffff",
+					PlayerToys[playerid][8][toy_model],
+				    PlayerToys[playerid][8][toy_bone],
+				    PlayerToys[playerid][8][toy_x],
+				    PlayerToys[playerid][8][toy_y],
+				    PlayerToys[playerid][8][toy_z],
+				    PlayerToys[playerid][8][toy_rx],
+				    PlayerToys[playerid][8][toy_ry],
+				    PlayerToys[playerid][8][toy_rz],
+				    PlayerToys[playerid][8][toy_sx],
+				    PlayerToys[playerid][8][toy_sy],
+				    PlayerToys[playerid][8][toy_sz]);
+
+                cache_get_row(0, 47, buffer, pSQL, sizeof(buffer)); // Slot 9
+				sscanf(buffer, "p<,>iifffffffff",
+					PlayerToys[playerid][9][toy_model],
+				    PlayerToys[playerid][9][toy_bone],
+				    PlayerToys[playerid][9][toy_x],
+				    PlayerToys[playerid][9][toy_y],
+				    PlayerToys[playerid][9][toy_z],
+				    PlayerToys[playerid][9][toy_rx],
+				    PlayerToys[playerid][9][toy_ry],
+				    PlayerToys[playerid][9][toy_rz],
+				    PlayerToys[playerid][9][toy_sx],
+				    PlayerToys[playerid][9][toy_sy],
+				    PlayerToys[playerid][9][toy_sz]);
+
+                cache_get_row(0, 48, buffer, pSQL, sizeof(buffer)); // PV_Slot 0
+				sscanf(buffer, "p<,>iiiiiiiiiiiiiiiiiiiiis[13]",
+				    PlayerPV[playerid][0][Model],
+				    PlayerPV[playerid][0][PaintJob],
+				    PlayerPV[playerid][0][Color1],
+				    PlayerPV[playerid][0][Color2],
+				    PlayerPV[playerid][0][Mod1],
+				    PlayerPV[playerid][0][Mod2],
+				    PlayerPV[playerid][0][Mod3],
+				    PlayerPV[playerid][0][Mod4],
+				    PlayerPV[playerid][0][Mod5],
+				    PlayerPV[playerid][0][Mod6],
+				    PlayerPV[playerid][0][Mod7],
+				    PlayerPV[playerid][0][Mod8],
+				    PlayerPV[playerid][0][Mod9],
+				    PlayerPV[playerid][0][Mod10],
+				    PlayerPV[playerid][0][Mod11],
+				    PlayerPV[playerid][0][Mod12],
+				    PlayerPV[playerid][0][Mod13],
+				    PlayerPV[playerid][0][Mod14],
+				    PlayerPV[playerid][0][Mod15],
+				    PlayerPV[playerid][0][Mod16],
+				    PlayerPV[playerid][0][Mod17],
+				    PlayerPV[playerid][0][Plate]);
+
+                cache_get_row(0, 49, buffer, pSQL, sizeof(buffer)); // PV_Slot 1
+				sscanf(buffer, "p<,>iiiiiiiiiiiiiiiiiiiiis[13]",
+				    PlayerPV[playerid][1][Model],
+				    PlayerPV[playerid][1][PaintJob],
+				    PlayerPV[playerid][1][Color1],
+				    PlayerPV[playerid][1][Color2],
+				    PlayerPV[playerid][1][Mod1],
+				    PlayerPV[playerid][1][Mod2],
+				    PlayerPV[playerid][1][Mod3],
+				    PlayerPV[playerid][1][Mod4],
+				    PlayerPV[playerid][1][Mod5],
+				    PlayerPV[playerid][1][Mod6],
+				    PlayerPV[playerid][1][Mod7],
+				    PlayerPV[playerid][1][Mod8],
+				    PlayerPV[playerid][1][Mod9],
+				    PlayerPV[playerid][1][Mod10],
+				    PlayerPV[playerid][1][Mod11],
+				    PlayerPV[playerid][1][Mod12],
+				    PlayerPV[playerid][1][Mod13],
+				    PlayerPV[playerid][1][Mod14],
+				    PlayerPV[playerid][1][Mod15],
+				    PlayerPV[playerid][1][Mod16],
+				    PlayerPV[playerid][1][Mod17],
+				    PlayerPV[playerid][1][Plate]);
+
+                cache_get_row(0, 50, buffer, pSQL, sizeof(buffer)); // PV_Slot 2
+				sscanf(buffer, "p<,>iiiiiiiiiiiiiiiiiiiiis[13]",
+				    PlayerPV[playerid][2][Model],
+				    PlayerPV[playerid][2][PaintJob],
+				    PlayerPV[playerid][2][Color1],
+				    PlayerPV[playerid][2][Color2],
+				    PlayerPV[playerid][2][Mod1],
+				    PlayerPV[playerid][2][Mod2],
+				    PlayerPV[playerid][2][Mod3],
+				    PlayerPV[playerid][2][Mod4],
+				    PlayerPV[playerid][2][Mod5],
+				    PlayerPV[playerid][2][Mod6],
+				    PlayerPV[playerid][2][Mod7],
+				    PlayerPV[playerid][2][Mod8],
+				    PlayerPV[playerid][2][Mod9],
+				    PlayerPV[playerid][2][Mod10],
+				    PlayerPV[playerid][2][Mod11],
+				    PlayerPV[playerid][2][Mod12],
+				    PlayerPV[playerid][2][Mod13],
+				    PlayerPV[playerid][2][Mod14],
+				    PlayerPV[playerid][2][Mod15],
+				    PlayerPV[playerid][2][Mod16],
+				    PlayerPV[playerid][2][Mod17],
+				    PlayerPV[playerid][2][Plate]);
+
+                cache_get_row(0, 51, buffer, pSQL, sizeof(buffer)); // PV_Slot 3
+				sscanf(buffer, "p<,>iiiiiiiiiiiiiiiiiiiiis[13]",
+				    PlayerPV[playerid][3][Model],
+				    PlayerPV[playerid][3][PaintJob],
+				    PlayerPV[playerid][3][Color1],
+				    PlayerPV[playerid][3][Color2],
+				    PlayerPV[playerid][3][Mod1],
+				    PlayerPV[playerid][3][Mod2],
+				    PlayerPV[playerid][3][Mod3],
+				    PlayerPV[playerid][3][Mod4],
+				    PlayerPV[playerid][3][Mod5],
+				    PlayerPV[playerid][3][Mod6],
+				    PlayerPV[playerid][3][Mod7],
+				    PlayerPV[playerid][3][Mod8],
+				    PlayerPV[playerid][3][Mod9],
+				    PlayerPV[playerid][3][Mod10],
+				    PlayerPV[playerid][3][Mod11],
+				    PlayerPV[playerid][3][Mod12],
+				    PlayerPV[playerid][3][Mod13],
+				    PlayerPV[playerid][3][Mod14],
+				    PlayerPV[playerid][3][Mod15],
+				    PlayerPV[playerid][3][Mod16],
+				    PlayerPV[playerid][3][Mod17],
+				    PlayerPV[playerid][3][Plate]);
+
+                cache_get_row(0, 52, buffer, pSQL, sizeof(buffer)); // PV_Slot 4
+				sscanf(buffer, "p<,>iiiiiiiiiiiiiiiiiiiiis[13]",
+				    PlayerPV[playerid][4][Model],
+				    PlayerPV[playerid][4][PaintJob],
+				    PlayerPV[playerid][4][Color1],
+				    PlayerPV[playerid][4][Color2],
+				    PlayerPV[playerid][4][Mod1],
+				    PlayerPV[playerid][4][Mod2],
+				    PlayerPV[playerid][4][Mod3],
+				    PlayerPV[playerid][4][Mod4],
+				    PlayerPV[playerid][4][Mod5],
+				    PlayerPV[playerid][4][Mod6],
+				    PlayerPV[playerid][4][Mod7],
+				    PlayerPV[playerid][4][Mod8],
+				    PlayerPV[playerid][4][Mod9],
+				    PlayerPV[playerid][4][Mod10],
+				    PlayerPV[playerid][4][Mod11],
+				    PlayerPV[playerid][4][Mod12],
+				    PlayerPV[playerid][4][Mod13],
+				    PlayerPV[playerid][4][Mod14],
+				    PlayerPV[playerid][4][Mod15],
+				    PlayerPV[playerid][4][Mod16],
+				    PlayerPV[playerid][4][Mod17],
+				    PlayerPV[playerid][4][Plate]);
+
+                cache_get_row(0, 53, buffer, pSQL, sizeof(buffer)); // PV_Slot 5
+				sscanf(buffer, "p<,>iiiiiiiiiiiiiiiiiiiiis[13]",
+				    PlayerPV[playerid][5][Model],
+				    PlayerPV[playerid][5][PaintJob],
+				    PlayerPV[playerid][5][Color1],
+				    PlayerPV[playerid][5][Color2],
+				    PlayerPV[playerid][5][Mod1],
+				    PlayerPV[playerid][5][Mod2],
+				    PlayerPV[playerid][5][Mod3],
+				    PlayerPV[playerid][5][Mod4],
+				    PlayerPV[playerid][5][Mod5],
+				    PlayerPV[playerid][5][Mod6],
+				    PlayerPV[playerid][5][Mod7],
+				    PlayerPV[playerid][5][Mod8],
+				    PlayerPV[playerid][5][Mod9],
+				    PlayerPV[playerid][5][Mod10],
+				    PlayerPV[playerid][5][Mod11],
+				    PlayerPV[playerid][5][Mod12],
+				    PlayerPV[playerid][5][Mod13],
+				    PlayerPV[playerid][5][Mod14],
+				    PlayerPV[playerid][5][Mod15],
+				    PlayerPV[playerid][5][Mod16],
+				    PlayerPV[playerid][5][Mod17],
+				    PlayerPV[playerid][5][Plate]);
+
+                cache_get_row(0, 54, buffer, pSQL, sizeof(buffer)); // PV_Slot 6
+				sscanf(buffer, "p<,>iiiiiiiiiiiiiiiiiiiiis[13]",
+				    PlayerPV[playerid][6][Model],
+				    PlayerPV[playerid][6][PaintJob],
+				    PlayerPV[playerid][6][Color1],
+				    PlayerPV[playerid][6][Color2],
+				    PlayerPV[playerid][6][Mod1],
+				    PlayerPV[playerid][6][Mod2],
+				    PlayerPV[playerid][6][Mod3],
+				    PlayerPV[playerid][6][Mod4],
+				    PlayerPV[playerid][6][Mod5],
+				    PlayerPV[playerid][6][Mod6],
+				    PlayerPV[playerid][6][Mod7],
+				    PlayerPV[playerid][6][Mod8],
+				    PlayerPV[playerid][6][Mod9],
+				    PlayerPV[playerid][6][Mod10],
+				    PlayerPV[playerid][6][Mod11],
+				    PlayerPV[playerid][6][Mod12],
+				    PlayerPV[playerid][6][Mod13],
+				    PlayerPV[playerid][6][Mod14],
+				    PlayerPV[playerid][6][Mod15],
+				    PlayerPV[playerid][6][Mod16],
+				    PlayerPV[playerid][6][Mod17],
+				    PlayerPV[playerid][6][Plate]);
+
+                cache_get_row(0, 55, buffer, pSQL, sizeof(buffer)); // PV_Slot 7
+				sscanf(buffer, "p<,>iiiiiiiiiiiiiiiiiiiiis[13]",
+				    PlayerPV[playerid][7][Model],
+				    PlayerPV[playerid][7][PaintJob],
+				    PlayerPV[playerid][7][Color1],
+				    PlayerPV[playerid][7][Color2],
+				    PlayerPV[playerid][7][Mod1],
+				    PlayerPV[playerid][7][Mod2],
+				    PlayerPV[playerid][7][Mod3],
+				    PlayerPV[playerid][7][Mod4],
+				    PlayerPV[playerid][7][Mod5],
+				    PlayerPV[playerid][7][Mod6],
+				    PlayerPV[playerid][7][Mod7],
+				    PlayerPV[playerid][7][Mod8],
+				    PlayerPV[playerid][7][Mod9],
+				    PlayerPV[playerid][7][Mod10],
+				    PlayerPV[playerid][7][Mod11],
+				    PlayerPV[playerid][7][Mod12],
+				    PlayerPV[playerid][7][Mod13],
+				    PlayerPV[playerid][7][Mod14],
+				    PlayerPV[playerid][7][Mod15],
+				    PlayerPV[playerid][7][Mod16],
+				    PlayerPV[playerid][7][Mod17],
+				    PlayerPV[playerid][7][Plate]);
+
+   				if(PlayerInfo[playerid][GangID] != 0)
+				{
+				    MySQL_LoadPlayerGang(playerid);
+				}
+
+  			 	SetPlayerScore_(playerid, PlayerInfo[playerid][Score]);
+			 	SetPlayerCash(playerid, PlayerInfo[playerid][Money]);
+			 	PlayerInfo[playerid][ConnectTime] = gettime();
+
+				format(gstr, sizeof(gstr), "~y~[] ~w~%i", PlayerInfo[playerid][Wanteds]);
+				PlayerTextDrawSetString(playerid, TXTWantedsTD[playerid], gstr);
+
+			    format(gstr2, sizeof(gstr2), "INSERT INTO `login_log` VALUES (NULL, %i, '%s', UNIX_TIMESTAMP(), 0);", PlayerInfo[playerid][AccountID], __GetIP(playerid));
+			    mysql_tquery(pSQL, gstr2, "", "");
+
+				if(PlayerInfo[playerid][Level] > 0)
+				{
+					format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"Successfully logged in. (Level: %s)", StaffLevels[PlayerInfo[playerid][Level]][e_rank]);
+					SCM(playerid, -1, gstr2);
+					format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"You were last online at %s and registered on %s", UTConvert(PlayerInfo[playerid][LastLogin]), UTConvert(PlayerInfo[playerid][RegDate]));
+  					SCM(playerid, -1, gstr2);
+					format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"You've been online for %s", GetPlayingTimeFormat(playerid));
+					SCM(playerid, -1, gstr2);
+		   		}
+		   		else
+		   		{
+				   	SCM(playerid, -1, ""server_sign" "r_besch"Successfully logged in!");
+					format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"You were last online at %s and registered on %s", UTConvert(PlayerInfo[playerid][LastLogin]), UTConvert(PlayerInfo[playerid][RegDate]));
+  					SCM(playerid, -1, gstr2);
+					format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"You've been online for %s", GetPlayingTimeFormat(playerid));
+					SCM(playerid, -1, gstr2);
+				}
+
+				if(PlayerInfo[playerid][VIP] == 1)
+				{
+                    format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"VIP %s(%i) logged in!", __GetName(playerid), playerid);
+                    SCMToAll(-1, gstr2);
+
+					format(gstr2, sizeof(gstr2), "02[%i] 03*** VIP %s has joined the server.", playerid, __GetName(playerid));
+					IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr2);
+				}
+				else
+				{
+					format(gstr2, sizeof(gstr2), "02[%i] 03*** %s has joined the server.", playerid, __GetName(playerid));
+					IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr2);
+				}
+
+				if(PlayerInfo[playerid][SavedColor] != 0)
+				{
+				    SetPlayerColor(playerid, PlayerInfo[playerid][SavedColor]);
+				    SCM(playerid, -1, ""server_sign" "r_besch"Your saved color has been set. (/deletecolor to remove)");
+				}
+
+				format(gstr2, sizeof(gstr2), "SELECT * FROM `queue` WHERE `Extra` = '%s';", __GetName(playerid));
+				mysql_tquery(pSQL, gstr2, "OnBoostReceive", "i", playerid);
+			}
+	        return 1;
+	    }
+	    case ACCOUNT_REQUEST_GANG_LOAD:
+	    {
+		    if(cache_get_row_count() > 0)
+		    {
+		        new buffer[25];
+
+		        cache_get_row(0, 0, buffer, pSQL, sizeof(buffer));
+		        strmid(PlayerInfo[playerid][GangName], buffer, 0, 25, 25);
+				cache_get_row(0, 1, buffer, pSQL, sizeof(buffer));
+				strmid(PlayerInfo[playerid][GangTag], buffer, 0, 5, 5);
+
+				if(PlayerInfo[playerid][GangLabel] != Text3D:-1)
+				{
+				    DestroyDynamic3DTextLabel(PlayerInfo[playerid][GangLabel]);
+		 			PlayerInfo[playerid][GangLabel] = Text3D:-1;
+				}
+
+ 			    format(gstr, sizeof(gstr), ""nef_yellow"Gang:"white" %s", PlayerInfo[playerid][GangName]);
+				PlayerInfo[playerid][GangLabel] = CreateDynamic3DTextLabel(gstr, -1, 0.0, 0.0, 0.5, 20.0, playerid, INVALID_VEHICLE_ID, 1, -1, -1, -1, 20.0);
+
+			    format(gstr, sizeof(gstr), ""gang_sign" "grey"%s %s(%i) logged in!", GangPositions[PlayerInfo[playerid][GangPosition]][E_gang_pos_name], __GetName(playerid), playerid);
+				GangMSG(PlayerInfo[playerid][GangID], gstr);
+			}
 	        return 1;
 	    }
 	}
