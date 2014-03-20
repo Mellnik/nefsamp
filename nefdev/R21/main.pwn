@@ -551,7 +551,6 @@ enum (+= 56)
 enum
 {
   	THREAD_CREATE_ACCOUNT2,
-  	THREAD_CHECK_PLAYER_PASSWD,
   	THREAD_GANG_EXIST,
   	THREAD_CREATE_GANG,
   	THREAD_FETCH_GANG_MEMBER_NAMES,
@@ -574,7 +573,8 @@ enum (+= 10)
 	ACCOUNT_REQUEST_AUTO_LOGIN,
 	ACCOUNT_REQUEST_CREATE,
 	ACCOUNT_REQUEST_LOAD,
-	ACCOUNT_REQUEST_GANG_LOAD
+	ACCOUNT_REQUEST_GANG_LOAD,
+    ACCOUNT_REQUEST_LOGIN
 };
 
 // -
@@ -3665,7 +3665,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 	{
 		case THREAD_RACE_FINISH:
 		{
-			new maxid = cache_insert_id(pSQL);
+			new maxid = cache_insert_id();
 
 			format(gstr2, sizeof(gstr2), "SELECT `id`, `name`, `time` FROM `race_records` WHERE `track` = %i ORDER BY `time` ASC LIMIT 6;", g_NextRace); // 6 , da vllt Platz 5 belegt und somit 6 verdrängt // versteh ich nicht // ah warte jetzt hab ichs kapiert
 			mysql_tquery(pSQL, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_RACE_LATEST, maxid, extraid);
@@ -3908,7 +3908,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		case THREAD_CREATE_GANG:
 		{
 			PlayerInfo[extraid][GangPosition] = GANG_POS_MAIN_LEADER;
-			PlayerInfo[extraid][GangID] = cache_insert_id(pSQL);
+			PlayerInfo[extraid][GangID] = cache_insert_id();
 
             GivePlayerCash(extraid, -500000);
 
@@ -4006,33 +4006,14 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 
             PlayerInfo[extraid][GangKickMem][0] = '\0';
 		}
-		case THREAD_CHECK_PLAYER_PASSWD:
-		{
-		    new rows, fields;
-		    cache_get_data(rows, fields, pSQL);
-
-	  		if(rows > 0) // correct password
-		    {
-		        PlayerInfo[extraid][AllowSpawn] = true;
-				PlayerInfo[extraid][bLogged] = true;
-                PlayerInfo[extraid][ExitType] = EXIT_LOGGED;
-                
-		        MySQL_LoadPlayer(extraid);
-		        MySQL_UpdateAccount(extraid);
-			}
-			else
-			{
-			    SkipLogin(extraid);
-			}
-		}
 		case THREAD_CREATE_ACCOUNT2:
 		{
-		    PlayerInfo[extraid][AccountID] = cache_insert_id(pSQL);
+		    PlayerInfo[extraid][AccountID] = cache_insert_id();
 		    PlayerInfo[extraid][bLogged] = true;
 		    
-			format(gstr, sizeof gstr, "["SVRSC"] %s(%i) "GREEN_E"has registered, making the server have a total of "LB2_E"%i "GREEN_E"players registered.", __GetName(extraid), extraid, cache_insert_id(pSQL));
+			format(gstr, sizeof gstr, "["SVRSC"] %s(%i) "GREEN_E"has registered, making the server have a total of "LB2_E"%i "GREEN_E"players registered.", __GetName(extraid), extraid, cache_insert_id());
 			SCMToAll(COLOR_PINK, gstr);
-			format(gstr, sizeof(gstr), "5,9- RegServ -3,0 %s(%i) has registered making the server have a total of %i players registered.", __GetName(extraid), extraid, cache_insert_id(pSQL));
+			format(gstr, sizeof(gstr), "5,9- RegServ -3,0 %s(%i) has registered making the server have a total of %i players registered.", __GetName(extraid), extraid, cache_insert_id());
 			IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 			format(gstr, sizeof(gstr), "~b~~h~~h~Welcome to "SVRSC", ~r~~h~~h~%s~b~~h~~h~!~n~~b~~h~~h~You have successfully registered and logged in!", __GetName(extraid));
 			InfoTD_MSG(extraid, 5000, gstr);
@@ -15405,17 +15386,17 @@ YCMD:healall(playerid, params[], help)
 	{
 	   	for(new i = 0; i < MAX_PLAYERS; i++)
  		{
-			if((IsPlayerAvail(i)) && (i != playerid) && (i != MAX_ADMIN_LEVEL) && (gTeam[i] == FREEROAM))
+			if(IsPlayerAvail(i) && i != MAX_ADMIN_LEVEL && gTeam[i] == FREEROAM)
 			{
 				PlayerPlaySound(i, 1057, 0.0, 0.0, 0.0);
 				SetPlayerHealth(i, 100.0);
+				
+				ShowInfo(i, "Health for all!", "");
 			}
 		}
 
 		format(gstr, sizeof(gstr), "Admin %s(%i) healed all players", __GetName(playerid), playerid);
 		SCMToAll(BLUE, gstr);
-		GameTextForAll("Health for all!", 3000, 3);
-		SetPlayerHealth(playerid, 100.0);
 	}
 	else
 	{
@@ -15430,17 +15411,17 @@ YCMD:armourall(playerid, params[], help)
 	{
 	   	for(new i = 0; i < MAX_PLAYERS; i++)
  		{
-			if((IsPlayerAvail(i)) && (i != playerid) && (i != MAX_ADMIN_LEVEL) && (gTeam[i] == FREEROAM))
+			if(IsPlayerAvail(i) && i != MAX_ADMIN_LEVEL && gTeam[i] == FREEROAM)
 			{
 				PlayerPlaySound(i, 1057, 0.0, 0.0, 0.0);
 				SetPlayerArmour(i, 100.0);
+				
+				ShowInfo(i, "Armor for all!", "");
 			}
 		}
 
 		format(gstr, sizeof(gstr), "Admin %s(%i) restored all players armour", __GetName(playerid), playerid);
 		SCMToAll(BLUE, gstr);
-		GameTextForAll("Armour for all!", 3000, 3);
-		SetPlayerArmour(playerid, 100.0);
 	}
 	else
 	{
@@ -15716,7 +15697,7 @@ YCMD:deletecolor(playerid, params[], help)
 
 YCMD:new(playerid, params[], help)
 {
-	HTTP(playerid, HTTP_GET, "www.nefserver.net/gateway/api.php?a=news", "", "OnNewsReceived");
+	HTTP(playerid, HTTP_GET, "www.nefserver.net/gateway/api.php?a=news", "", "OnNewsReceive");
 	return 1;
 }
 
@@ -19165,11 +19146,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					return SkipLogin(playerid);
 				}
-				new escape[33];
-				mysql_escape_string(password, escape, pSQL, 33);
-
-				format(gstr2, sizeof(gstr2), "SELECT `ID` FROM `accounts` WHERE `Name` = '%s' AND (`Hash` = MD5('%s') OR `Hash` = SHA1('%s')) LIMIT 1;", __GetName(playerid), escape, escape); // SHA1 because of Stunt Evolution server merge
-				mysql_tquery(pSQL, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_CHECK_PLAYER_PASSWD, playerid, pSQL);
+				
+				mysql_format(pSQL, gstr2, sizeof(gstr2), "SELECT `ID` FROM `accounts` WHERE `Name` = '%e' AND (`Hash` = MD5('%e') OR `Hash` = SHA1('%e')) LIMIT 1;", __GetName(playerid), password, password);
+				mysql_pquery(pSQL, gstr2, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_LOGIN);
 			    return true;
 			}
 			case REGISTER_DIALOG2:
@@ -21664,10 +21643,8 @@ MySQL_SavePlayer(playerid, bool:save_pv)
 
 MySQL_UpdatePlayerPass(playerid, hash[])
 {
-	new escape[33];
-	mysql_escape_string(hash, escape, pSQL, 33);
-	format(gstr2, sizeof(gstr2), "UPDATE `accounts` SET `Hash` = MD5('%s') WHERE `Name` = '%s' LIMIT 1;", escape, __GetName(playerid));
- 	mysql_tquery(pSQL, gstr2, "", "");
+	format(gstr2, sizeof(gstr2), "UPDATE `accounts` SET `Hash` = SHA1('%e') WHERE `Name` = '%e' LIMIT 1;", hash, __GetName(playerid));
+ 	mysql_pquery(pSQL, gstr2);
 }
 
 MySQL_FetchGangMemberNames(playerid, gGangID)
@@ -21711,7 +21688,7 @@ MySQL_CreateAccount(playerid, password[])
 	PlayerInfo[playerid][LastLogin] = gettime();
 	PlayerInfo[playerid][LastNameChange] = 0;
 
-	mysql_format(pSQL, gstr2, sizeof(gstr2), "INSERT INTO `accounts` (`Name`, `Color`, `Hash`, `IP`, `GangPosition`, `GangID`, `RegDate`, `LastLogin`) VALUES ('%e', 0, MD5('%e'), '%e', 0, 0, %i, %i);", __GetName(playerid), password, __GetIP(playerid), gettime(), PlayerInfo[playerid][LastLogin]);
+	mysql_format(pSQL, gstr2, sizeof(gstr2), "INSERT INTO `accounts` (`Name`, `Color`, `Hash`, `IP`, `GangPosition`, `GangID`, `RegDate`, `LastLogin`) VALUES ('%e', 0, SHA1('%e'), '%e', 0, 0, %i, %i);", __GetName(playerid), password, __GetIP(playerid), gettime(), PlayerInfo[playerid][LastLogin]);
 	mysql_pquery(pSQL, gstr2, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_CREATE);
 }
 
@@ -21722,7 +21699,7 @@ MySQL_CreateAccount2(playerid, password[])
 
     new query[350], escape[33];
 	mysql_escape_string(password, escape, pSQL, 33);
-    format(query, sizeof(query), "INSERT INTO `accounts` (`Name`, `Color`, `Hash`, `IP`, `GangPosition`, `GangID`, `RegDate`, `LastLogin`) VALUES ('%s', 0, MD5('%s'), '%s', 0, 0, %i, %i);", __GetName(playerid), escape, __GetIP(playerid), gettime(), PlayerInfo[playerid][LastLogin]);
+    format(query, sizeof(query), "INSERT INTO `accounts` (`Name`, `Color`, `Hash`, `IP`, `GangPosition`, `GangID`, `RegDate`, `LastLogin`) VALUES ('%s', 0, SHA1('%s'), '%s', 0, 0, %i, %i);", __GetName(playerid), escape, __GetIP(playerid), gettime(), PlayerInfo[playerid][LastLogin]);
 	mysql_tquery(pSQL, query, "OnQueryFinish", "siii", query, THREAD_CREATE_ACCOUNT2, playerid, pSQL);
 }
 
@@ -30554,7 +30531,7 @@ DestroyPlayerVehicles(playerid, bool:minigames = false)
 	return 1;
 }
 
-function:OnNewsReceived(playerid, response_code, data[])
+function:OnNewsReceive(playerid, response_code, data[])
 {
 	if(response_code == 200) {
 	    ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: News", data, "OK", "");
@@ -31472,6 +31449,23 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 
 			    format(gstr, sizeof(gstr), ""gang_sign" "grey"%s %s(%i) logged in!", GangPositions[PlayerInfo[playerid][GangPosition]][E_gang_pos_name], __GetName(playerid), playerid);
 				GangMSG(PlayerInfo[playerid][GangID], gstr);
+			}
+	        return 1;
+	    }
+	    case ACCOUNT_REQUEST_LOGIN:
+	    {
+	  		if(cache_get_row_count() != 0) // Correct password
+		    {
+		        PlayerInfo[playerid][AllowSpawn] = true;
+				PlayerInfo[playerid][bLogged] = true;
+                PlayerInfo[playerid][ExitType] = EXIT_LOGGED;
+
+		        MySQL_LoadPlayer(playerid);
+		        MySQL_UpdateAccount(playerid);
+			}
+			else
+			{
+			    SkipLogin(playerid);
 			}
 	        return 1;
 	    }
