@@ -22923,12 +22923,12 @@ LoadServerStaticMeshes()
 	SendRconCommand(string);
 	SendRconCommand("weburl "SVRURLWWW"");
 	#if IS_RELEASE_BUILD == true
-	SendRconCommand("mapname DerbyTdmRaceCNRFunStuntFreeroam");
 	SetGameModeText("TdmDerbyRaceCNRFunStuntFreeroam");
 	#else
-	SendRconCommand("mapname "SVRSC" "CURRENT_VERSION"");
 	SetGameModeText(""SVRSC" "CURRENT_VERSION"");
 	#endif
+
+	SendRconCommand("mapname "SVRSC" "CURRENT_VERSION"");
 	
 	EnableVehicleFriendlyFire();
 	ShowPlayerMarkers(1);
