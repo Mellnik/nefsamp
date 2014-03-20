@@ -483,7 +483,6 @@ enum (+= 56)
     DIALOG_RACE_RACEVW,
     DIALOG_RACE_RACETYPE,
     REGISTER_DIALOG,
-    REGISTER_DIALOG2,
     LOGIN_DIALOG,
     TELE_DIALOG,
     WEAPON_DIALOG,
@@ -550,8 +549,7 @@ enum (+= 56)
 // -
 enum
 {
-  	THREAD_CREATE_ACCOUNT2,
-  	THREAD_GANG_EXIST,
+   	THREAD_GANG_EXIST,
   	THREAD_CREATE_GANG,
   	THREAD_FETCH_GANG_MEMBER_NAMES,
   	THREAD_FETCH_GANG_INFO,
@@ -571,7 +569,7 @@ enum (+= 10)
 	ACCOUNT_REQUEST_IP_BANNED,
 	ACCOUNT_REQUEST_EXIST,
 	ACCOUNT_REQUEST_AUTO_LOGIN,
-	ACCOUNT_REQUEST_CREATE,
+	ACCOUNT_REQUEST_REGISTER,
 	ACCOUNT_REQUEST_LOAD,
 	ACCOUNT_REQUEST_GANG_LOAD,
     ACCOUNT_REQUEST_LOGIN
@@ -4005,25 +4003,6 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 			GangMSG(PlayerInfo[extraid][GangID], gstr);
 
             PlayerInfo[extraid][GangKickMem][0] = '\0';
-		}
-		case THREAD_CREATE_ACCOUNT2:
-		{
-		    PlayerInfo[extraid][AccountID] = cache_insert_id();
-		    PlayerInfo[extraid][bLogged] = true;
-		    
-			format(gstr, sizeof gstr, "["SVRSC"] %s(%i) "GREEN_E"has registered, making the server have a total of "LB2_E"%i "GREEN_E"players registered.", __GetName(extraid), extraid, cache_insert_id());
-			SCMToAll(COLOR_PINK, gstr);
-			format(gstr, sizeof(gstr), "5,9- RegServ -3,0 %s(%i) has registered making the server have a total of %i players registered.", __GetName(extraid), extraid, cache_insert_id());
-			IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
-			format(gstr, sizeof(gstr), "~b~~h~~h~Welcome to "SVRSC", ~r~~h~~h~%s~b~~h~~h~!~n~~b~~h~~h~You have successfully registered and logged in!", __GetName(extraid));
-			InfoTD_MSG(extraid, 5000, gstr);
-
-			//ShowPlayerDialog(extraid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Account", ""white"Thank you for registering at New Evo
-
-			SrvStat[2]++;
-
-			MySQL_SavePlayer(extraid, true);
-			MySQL_UpdateAccount(extraid);
 		}
 	 	case THREAD_GANG_EXIST:
 	 	{
@@ -11103,7 +11082,7 @@ YCMD:register(playerid, params[], help)
     format(newtext2, sizeof(newtext2), ""nef" :: Registration - %s", __GetName(playerid));
 
 	format(newtext1, sizeof(newtext1), ""white"Welcome to "SVRLOGO""white"\n\nDesired name: %s\n\nIt seems that you don't have an account, please enter a password below:", __GetName(playerid));
-	ShowPlayerDialog(playerid, REGISTER_DIALOG2, DIALOG_STYLE_PASSWORD, newtext2, newtext1, "Register", "Cancel");
+	ShowPlayerDialog(playerid, REGISTER_DIALOG + 1, DIALOG_STYLE_PASSWORD, newtext2, newtext1, "Register", "Cancel");
 	return 1;
 }
 
@@ -19151,20 +19130,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				mysql_pquery(pSQL, gstr2, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_LOGIN);
 			    return true;
 			}
-			case REGISTER_DIALOG2:
-			{
-			    if(strlen(inputtext) < 4 || strlen(inputtext) > 32)
-				{
-				    return SCM(playerid, -1, ""er"Wrong input");
-				}
-				if(isnull(inputtext)) return SCM(playerid, -1, ""er"Wrong input");
-				extract inputtext -> new string:password[33]; else
-				{
-					return SCM(playerid, -1, ""er"Wrong input");
-				}
-			    MySQL_CreateAccount2(playerid, password);
-			    return true;
-			}
 			case REGISTER_DIALOG:
 			{
 			    if(strlen(inputtext) < 4 || strlen(inputtext) > 32)
@@ -19176,7 +19141,21 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					return SkipRegistration(playerid);
 				}
-			    MySQL_CreateAccount(playerid, password);
+			    MySQL_RegisterAccount(playerid, password);
+			    return true;
+			}
+			case REGISTER_DIALOG + 1:
+			{
+			    if(strlen(inputtext) < 4 || strlen(inputtext) > 32)
+				{
+				    return SCM(playerid, -1, ""er"Wrong input");
+				}
+				if(isnull(inputtext)) return SCM(playerid, -1, ""er"Wrong input");
+				extract inputtext -> new string:password[33]; else
+				{
+					return SCM(playerid, -1, ""er"Wrong input");
+				}
+			    MySQL_RegisterAccount2(playerid, password);
 			    return true;
 			}
 			case STREAM_DIALOG:
@@ -21683,24 +21662,22 @@ MySQL_GangRename(playerid, newgangname[], newgangtag[])
 	mysql_tquery(pSQL, gstr2, "OnGangRenameAttempt", "iss", playerid, newgangname, newgangtag);
 }
 
-MySQL_CreateAccount(playerid, password[])
+MySQL_RegisterAccount(playerid, password[])
 {
 	PlayerInfo[playerid][LastLogin] = gettime();
 	PlayerInfo[playerid][LastNameChange] = 0;
 
 	mysql_format(pSQL, gstr2, sizeof(gstr2), "INSERT INTO `accounts` (`Name`, `Color`, `Hash`, `IP`, `GangPosition`, `GangID`, `RegDate`, `LastLogin`) VALUES ('%e', 0, SHA1('%e'), '%e', 0, 0, %i, %i);", __GetName(playerid), password, __GetIP(playerid), gettime(), PlayerInfo[playerid][LastLogin]);
-	mysql_pquery(pSQL, gstr2, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_CREATE);
+	mysql_pquery(pSQL, gstr2, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_REGISTER);
 }
 
-MySQL_CreateAccount2(playerid, password[])
+MySQL_RegisterAccount2(playerid, password[])
 {
 	PlayerInfo[playerid][LastLogin] = gettime();
 	PlayerInfo[playerid][LastNameChange] = 0;
 
-    new query[350], escape[33];
-	mysql_escape_string(password, escape, pSQL, 33);
-    format(query, sizeof(query), "INSERT INTO `accounts` (`Name`, `Color`, `Hash`, `IP`, `GangPosition`, `GangID`, `RegDate`, `LastLogin`) VALUES ('%s', 0, SHA1('%s'), '%s', 0, 0, %i, %i);", __GetName(playerid), escape, __GetIP(playerid), gettime(), PlayerInfo[playerid][LastLogin]);
-	mysql_tquery(pSQL, query, "OnQueryFinish", "siii", query, THREAD_CREATE_ACCOUNT2, playerid, pSQL);
+	mysql_format(pSQL, gstr2, sizeof(gstr2), "INSERT INTO `accounts` (`Name`, `Color`, `Hash`, `IP`, `GangPosition`, `GangID`, `RegDate`, `LastLogin`) VALUES ('%e', 0, SHA1('%e'), '%e', 0, 0, %i, %i);", __GetName(playerid), password, __GetIP(playerid), gettime(), PlayerInfo[playerid][LastLogin]);
+	mysql_pquery(pSQL, gstr2, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_REGISTER + 1);
 }
 
 MySQL_UpdateAccount(playerid)
@@ -30928,7 +30905,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 	        }
 	        return 1;
 	    }
-	    case ACCOUNT_REQUEST_CREATE:
+	    case ACCOUNT_REQUEST_REGISTER:
 	    {
 		    PlayerInfo[playerid][AccountID] = cache_insert_id();
 		    PlayerInfo[playerid][RegDate] = gettime();
@@ -30963,6 +30940,24 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 			MySQL_SavePlayer(playerid, true);
 			MySQL_UpdateAccount(playerid);
 	        return 1;
+	    }
+	    case ACCOUNT_REQUEST_REGISTER + 1:
+	    {
+		    PlayerInfo[playerid][AccountID] = cache_insert_id();
+		    PlayerInfo[playerid][bLogged] = true;
+
+			format(gstr, sizeof gstr, "["SVRSC"] %s(%i) "GREEN_E"has registered, making the server have a total of "LB2_E"%i "GREEN_E"players registered.", __GetName(playerid), playerid, cache_insert_id());
+			SCMToAll(COLOR_PINK, gstr);
+			format(gstr, sizeof(gstr), "5,9- RegServ -3,0 %s(%i) has registered making the server have a total of %i players registered.", __GetName(playerid), playerid, cache_insert_id());
+			IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
+			format(gstr, sizeof(gstr), "~b~~h~~h~Welcome to "SVRSC", ~r~~h~~h~%s~b~~h~~h~!~n~~b~~h~~h~You have successfully registered and logged in!", __GetName(playerid));
+			InfoTD_MSG(playerid, 5000, gstr);
+
+			SrvStat[2]++;
+
+			MySQL_SavePlayer(playerid, true);
+			MySQL_UpdateAccount(playerid);
+			return 1;
 	    }
 	    case ACCOUNT_REQUEST_LOAD:
 	    {
