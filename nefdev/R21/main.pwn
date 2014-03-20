@@ -26,6 +26,10 @@
 // irc.so | 1.4.4
 // dns.so | 2.4
 
+/* Build 21
+- Set rcon 0 in server.cfg
+*/
+
 // -
 // - Includes
 // -
@@ -3613,26 +3617,58 @@ public OnVehicleRespray(playerid, vehicleid, color1, color2)
 	return 1;
 }
 
+/* AUTHORITATIVE SERVER */
 public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY, Float:fZ)
 {
-	if(gTeam[playerid] == gBG_TEAM1 || gTeam[playerid] == gBG_TEAM2)
-	{
-		if(weaponid == 35)
-		{
+	/* PLAYER QUEUED FOR KICK */
+	if(hittype != BULLET_HIT_TYPE_NONE) {
+	    if(PlayerInfo[hitid][KBMarked]) {
+	        return 0;
+	    }
+	}
+	
+	/* GOD CONTROL */
+	if(hittype == BULLET_HIT_TYPE_PLAYER) {
+	    if(hitid != INVALID_PLAYER_ID) {
+	        if(PlayerInfo[hitid][bGod]) {
+			    GameTextForPlayer(playerid, "~g~~h~~h~Player has GOD enabled", 2000, 3);
+			    return 0;
+	        }
+	    }
+	}
+	
+	/* HITSOUND */
+	if(hittype == BULLET_HIT_TYPE_PLAYER) {
+	    if(gTeam[playerid] == DM || gTeam[playerid] == SNIPER || gTeam[playerid] == gDUEL) {
+	        PlayerPlaySound(playerid, 17802, 0.0, 0.0, 0.0);
+	    }
+	}
+
+	/* TDM RPG ABUSE */
+	if(gTeam[playerid] == gBG_TEAM1 || gTeam[playerid] == gBG_TEAM2) {
+		if(weaponid == 35) {
+		    GivePlayerWeapon(playerid, 37, 1);
+		    GivePlayerWeapon(playerid, 35, 0);
+		
 		    new p_Weapons[13][2];
-		    
-			for(new i = 0; i < 13; i++)
-			{
+			for(new i = 0; i < 13; i++) {
 			    GetPlayerWeaponData(playerid, i, p_Weapons[i][0], p_Weapons[i][1]);
 			}
-			
 			p_Weapons[7][0] = 0; // RPG
 			
 			ResetPlayerWeapons(playerid);
 			
-			for(new i = 0; i < 13; i++)
-			{
+			for(new i = 0; i < 13; i++) {
 			    GivePlayerWeapon(playerid, p_Weapons[i][0], p_Weapons[i][1]);
+			}
+		}
+	}
+	
+	/* LAST HIT */
+	if(hittype == BULLET_HIT_TYPE_PLAYER) {
+	    if(hitid != INVALID_PLAYER_ID) {
+	        if(gTeam[hitid] == FREEROAM) {
+	        	PlayerInfo[hitid][tickLastShot] = GetTickCount_();
 			}
 		}
 	}
@@ -3641,19 +3677,6 @@ public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY
 
 public OnPlayerGiveDamage(playerid, damagedid, Float:amount, weaponid, bodypart)
 {
-	if(damagedid == INVALID_PLAYER_ID || playerid == INVALID_PLAYER_ID) return 1;
-	
-	PlayerInfo[damagedid][tickLastShot] = GetTickCount_();
-	
-	if(PlayerInfo[damagedid][bGod])
-	{
-	    GameTextForPlayer(playerid, "~g~~h~~h~Player has GOD enabled", 2000, 3);
-	    SetPlayerHealth(damagedid, 99999.0);
-	}
-	if(gTeam[playerid] == DM || gTeam[playerid] == SNIPER || gTeam[playerid] == gDUEL)
-	{
-		PlayerPlaySound(playerid, 17802, 0, 0, 0);
-	}
 	return 1;
 }
 
@@ -10852,7 +10875,7 @@ YCMD:caps(playerid, params[], help)
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 		
- 	 	if(IsPlayerAvail(player) && player != playerid)
+ 	 	if(IsPlayerAvail(player))
 	 	{
 			if(PlayerInfo[player][bCaps])
 			{
