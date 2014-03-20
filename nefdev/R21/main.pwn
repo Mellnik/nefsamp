@@ -14570,7 +14570,7 @@ YCMD:score(playerid, params[], help)
 
 YCMD:gangs(playerid, params[], help)
 {
-	new Iterator:Gangs[2]<MAX_PLAYERS>,
+	new Iterator:Gangs[2]<2000>,
 		finstring[1500],
 		tmpstring[35];
 
