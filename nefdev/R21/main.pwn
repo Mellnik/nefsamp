@@ -469,6 +469,15 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 // ===
 
 // -
+// - SUSPECT AC
+// -
+enum
+{
+	SUSPECT_ARMOR,
+	SUSPECT_JETPACK
+};
+
+// -
 // - DIALOGIDS
 // -
 enum
@@ -8210,9 +8219,9 @@ YCMD:sellgc(playerid, params[], help)
     if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 	if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 
-	if(money < 100000 || money > 100000000)
+	if(money < 10000 || money > 100000000)
 	{
-	    return SCM(playerid, -1, ""er"$100,000 - $100,000,000!");
+	    return SCM(playerid, -1, ""er"$10,000 - $100,000,000!");
 	}
 	
 	if(gc < 10 || gc > 1000000)
@@ -9236,7 +9245,7 @@ YCMD:adminhelp(playerid, params[], help)
 
 		format(gstr, sizeof(gstr), ""white"%s\n", StaffLevels[1][e_rank]);
 		strcat(string, gstr);
-		strcat(string, "/rplayers /dplayers /asay /warn /slap /reports /spec /specoff /disarm\n/pweaps /getin /gotoxyza /spectators /caps\n/kick /mute /unmute /adminhq /ncrecords\n\n");
+		strcat(string, "/suspect /asay /warn /slap /reports /spec /specoff /disarm\n/rplayers /dplayers /pweaps /getin /gotoxyza /spectators /caps\n/kick /mute /unmute /adminhq /ncrecords\n\n");
 
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[2][e_rank]);
 		strcat(string, gstr);
@@ -9252,7 +9261,7 @@ YCMD:adminhelp(playerid, params[], help)
 		
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[5][e_rank]);
 		strcat(string, gstr);
-		strcat(string, "/grantnc /onlinefix /setcash /setbcash /setscore /gdestroy /addcash /addscore\n/resetrc /resethouse /resetbizz /sethouseprice /sethousescore\n/setbizzlevel /createhouse /createbizz /createstore /gzonecreate");
+		strcat(string, "/onlinefix /setcash /setbcash /setscore /gdestroy /addcash /addscore\n/resetrc /resethouse /resetbizz /sethouseprice /sethousescore\n/setbizzlevel /createhouse /createbizz /createstore /gzonecreate");
 
         ShowPlayerDialog(playerid, ADMIN_CMD_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" :: Admin Commands", string, "OK", "");
 	}
@@ -9645,7 +9654,7 @@ YCMD:setbcash(playerid, params[], help)
 	}
 	return 1;
 }
-
+/*
 YCMD:grantnc(playerid, params[], help)
 {
 	if(PlayerInfo[playerid][Level] >= MAX_ADMIN_LEVEL)
@@ -9685,6 +9694,76 @@ YCMD:grantnc(playerid, params[], help)
 		else
 		{
 			SCM(playerid, -1, ""er"Player is not connected or unavailable");
+		}
+	}
+	else
+	{
+		SCM(playerid, -1, NO_PERM);
+	}
+	return 1;
+}*/
+
+YCMD:suspect(playerid, params[], help)
+{
+	if(PlayerInfo[playerid][Level] >= 1)
+	{
+		new Iterator:g_Suspect[2]<MAX_PLAYERS>,
+			finstring[1500],
+			tmpstring[35];
+
+		Iter_Init(g_Suspect);
+
+		for(new i = 0; i < MAX_PLAYERS; i++)
+		{
+		    if(!IsPlayerAvail(i)) continue;
+		    
+		    if(PlayerInfo[i][VIP] == 0) {
+                /* ARMOR CHECK */
+				new Float:tmp;
+				GetPlayerArmour(i, tmp);
+				
+				if(tmp >= 0.0) {
+				    Iter_Add(g_Suspect[0], i);
+				    Iter_Add(g_Suspect[1], SUSPECT_ARMOR);
+				}
+
+                /* JETPACK CHECK */
+				if(GetPlayerSpecialAction(i) == SPECIAL_ACTION_USEJETPACK) {
+				    Iter_Add(g_Suspect[0], i);
+				    Iter_Add(g_Suspect[1], SUSPECT_JETPACK);
+				}
+			}
+		}
+
+		if(Iter_Count(g_Suspect[0]) > 0)
+		{
+		    format(tmpstring, sizeof(tmpstring), ""white"%i suspicious players found:\n", Iter_Count(g_Suspect[0]));
+		    strcat(finstring, tmpstring);
+
+		    for(new i = Iter_First(g_Suspect[0]), ac = Iter_First(g_Suspect[1]), count = 0; i != Iter_End(g_Suspect[0]) && ac != Iter_End(g_Suspect[1]); i = Iter_Next(g_Suspect[0], i), ac = Iter_Next(g_Suspect[1], ac), ++count)
+		    {
+		        if(count <= 30)
+		        {
+		            if(ac == SUSPECT_ARMOR) {
+		                format(tmpstring, sizeof(tmpstring), "\n- %s(%i) :: AC_SUSPECT_ARMOR", __GetName(i), i);
+		                strcat(finstring, tmpstring);
+		            } else if(ac == SUSPECT_JETPACK) {
+		                format(tmpstring, sizeof(tmpstring), "\n- %s(%i) :: AC_SUSPECT_JETPACK", __GetName(i), i);
+		                strcat(finstring, tmpstring);
+		            }
+				}
+				else
+				{
+				    format(tmpstring, sizeof(tmpstring), "\n[... too many hackers online, Lol]");
+				    strcat(finstring, tmpstring);
+				    break;
+				}
+		    }
+			ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Suspect AC", finstring, "OK", "");
+		}
+		else
+		{
+		    ShowInfo(playerid, "SUSPECT:", "NO DATA");
 		}
 	}
 	else
@@ -22909,6 +22988,7 @@ LoadServerStaticMeshes()
     Command_AddAltNamed("xmas", "christmas");
     Command_AddAltNamed("xmas", "christ");
 	#endif
+	Command_AddAltNamed("suspect", "sus");
     Command_AddAltNamed("time", "stime");
     Command_AddAltNamed("oban", "offlineban");
     Command_AddAltNamed("concert", "gig");
