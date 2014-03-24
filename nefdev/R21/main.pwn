@@ -9,30 +9,27 @@
 || #################################################################### ||
 \*======================================================================*/
 
+/* NEF Dependencies
+|| sscanf.so | 2.8.1
+|| streamer.so | v2.7
+|| mysql_static.so | R38
+|| irc.so | 1.4.4
+|| dns.so | 2.4
+||
+|| Build Notes:
+|| - Set rcon 0 in server.cfg
+||
+||
+*/
+
 #pragma dynamic 8192
 
 #define IS_RELEASE_BUILD (true)
 #define INC_ENVIORMENT (true)
 #define IRC_CONNECT (true)
-#define WINTER_EDITION (false) // ferriswheelfair.amx
+#define WINTER_EDITION (false) // Requires ferriswheelfair.amx
 #define YSI_IS_SERVER
 
-// -
-// - Plugins
-// -
-// sscanf.so | 2.8.1
-// streamer.so | v2.7
-// mysql_static.so | R38
-// irc.so | 1.4.4
-// dns.so | 2.4
-
-/* Build 21
-- Set rcon 0 in server.cfg
-*/
-
-// -
-// - Includes
-// -
 #include <a_samp>   		// 0.3z
 #include <a_http>           // 0.3z
 #undef MAX_PLAYERS
@@ -41,6 +38,7 @@
 #include <YSI\y_commands>   // 13/02/2014
 #include <YSI\y_master>     // 13/02/2014
 #include <YSI\y_stringhash> // 13/02/2014
+#include <YSI\y_va>         // 13/02/2014
 #include <a_zones>          // V2.0
 #include <sscanf2>      	// 2.8.1
 #include <streamer>     	// v2.7
@@ -64,9 +62,7 @@
 native IsValidVehicle(vehicleid); // undefined in a_samp.inc
 native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 
-// -
-// - MySQL
-// -
+// MySQL
 #define SQL_HOST   						"127.0.0.1"
 #define SQL_PORT                        (3306)
 #if IS_RELEASE_BUILD == true
@@ -79,9 +75,7 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define SQL_DATA                        "nefdev"
 #endif
 
-// -
-// - Enviroment
-// -
+// Server
 #define SVRNAME                      	"New Evolution Freeroam"
 #define SVRSC	                    	"NEF"
 #define SVRLOGO                         "{646464}«(-|-|"nef_yellow"New "nef_green"Evolution "nef_red"Freeroam{F0F0F0}™{646464}|-|-)»"
@@ -124,8 +118,7 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define nef                             "{FFE600}"SVRSC"{FFFFFF}"
 #define NO_PERM                     	"{FF000F}[INFO] {FF000F}Insufficient permissions"
 #define NOT_AVAIL                       "{FF000F}[INFO] {FF000F}You can't use this command now! Use /exit to leave."
-#define er                              "{FF000F}[INFO] {FF000F}"
-// D2D2D2
+#define er                              "{FF000F}[INFO] {FF000F}" // D2D2D2
 #define Error(%1,%2) 					SendClientMessage(%1, -1, "{F42626}[INFO] "GREY2_E""%2)
 #define dl                              "{FFE600}• {F0F0F0}"
 #define notlogged(%1)                   ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef"", ""white"You need to be logged in to use this feature.\n\n"nef_yellow"Type /register to create an account for you current name.", "OK", "")
@@ -150,9 +143,7 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define RGBA(%1,%2,%3,%4) (((((%1) & 0xff) << 24) | (((%2) & 0xff) << 16) | (((%3) & 0xff) << 8) | ((%4) & 0xff)))
 #define UpperToLower(%1) for(new ToLowerChar; ToLowerChar < strlen(%1); ToLowerChar++) if(%1[ToLowerChar] > 64 && %1[ToLowerChar] < 91) %1[ToLowerChar] += 32
 
-// -
-// - DERBY
-// -
+// Derby
 #define DERBY_WIHLE_CAM_M1				-3948.2632, 951.8198, 78.4012
 #define DERBY_WIHLE_CAM_M2          	2953.7620, 486.3492, 44.3681
 #define DERBY_WIHLE_CAM_M3          	214.0030, 1637.5992, 369.9997
@@ -198,17 +189,7 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define DERBY_FREEZE_TIME 				(1750)
 #define DERBY_FREEZE_INTERVAL 			(70)
 
-// -
-// - Firework
-// -
-#define MAX_LIGHTS 						(100)
-#define MAX_PARTS 						(13)
-#define Sprinkleid 						(52)
-#define RBSprinkleid 					(20)
-
-// -
-// - TDM
-// -
+// TDM
 #define DEFAULT_BG_TIME                 (240)
 #define BG_MAP1_WHILECAM                -512.8727, -121.8333, 97.8991
 #define BG_MAP2_WHILECAM                623.2424,-2418.4194,9.4857
@@ -241,31 +222,23 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define BG_TIME                         (240000)
 #define BG_VOTING_TIME                  (15000)
 
-// -
-// - Fallout
-// -
+// Fallout
 #define DEFAULT_FALLOUT_TIME            (240)
 #define FALLOUT_WORLD                   (121212)
 
-// -
-// - Deathmatch
-// -
+// Deathmatch
 #define DM_WORLD                        (100000)
 #define DM_1                            (1)
 #define DM_2                            (2)
 #define DM_3                            (3)
 #define DM_4                            (4)
 
-// -
-// - CNR
-// -
+// CNR
 #define CNR_WORLD                       (20)
 #define COLOR_CNR_COP 					0x1F75FEFF
 #define COLOR_CNR_PRO_ROBBER            0xFF3200FF
 
-// -
-// - GWARS
-// -
+// GWARS
 #define MAX_GZONES						(100)
 #define MAX_GZONES_PER_GANG             (15)
 #define GZONE_SIZE                      (70.0)
@@ -273,23 +246,17 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define COLOR_FRIENDLY                  (0x33FF3399)
 #define COLOR_NONE                      (0xFFFFFFAA)
 
-// -
-// - Houses
-// -
+// Houses
 #define MAX_HOUSES 						(1000)
 #define MAX_PLAYER_HOUSES 				(5)
 #define MAX_HOUSE_OBJECTS               (10)
 
-// -
-// - Properties
-// -
+// Businesses
 #define MAX_PROPS                       (1000)
 #define MAX_PLAYER_PROPS 				(5)
 #define MAX_PROP_LEVEL                  (20)
 
-// -
-// - Other
-// -
+// Misc
 #define REAC_TIME              			(900000)
 #define MAX_BANKS    			 		20
 #define MAX_AMMUNATIONS    		 		20
@@ -325,9 +292,7 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 	%3 = floatround(floatmul(%0 - %2, 60), floatround_tozero); \
 	%4 = floatround(floatmul(floatmul(%0 - %2, 60) - %3, 1000), floatround_tozero)
 
-// -
-// - IRC
-// -
+// IRC
 #if IS_RELEASE_BUILD == true
 #define IRC_SERVER                      "foco.nl.irc.tl"
 #define IRC_PORT                        (6667)
@@ -344,9 +309,7 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define IRC_MAX_BOTS                    (5)
 #endif
 
-// - 
-// - Colors
-// -
+// Colors
 #define SEMI_TRANS                      (0x0A0A0A55)
 #define SEMI_WHITE                      (0xFEFEFEC3)
 #define PURPLE                  		(0x7800FF85)
@@ -392,7 +355,7 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define nef_green                      	"{2DFF00}"
 #define nef_yellow                      "{FFE600}"
 #define nef_red                         "{FF000F}"
-// nefd
+
 // old Stunt Evolution Colors
 #define COLOR_WHITE 					0xFFFFFFFF
 #define COLOR_WHITEP 					0xFFE4C4FF
@@ -434,9 +397,7 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define GREEN_E 						"{3BBD44}"
 #define PURPLE_E 						"{5A00FF}"
 
-// -
-// - Player
-// -
+// Player
 #define COOLDOWN_CHAT                   (5500)
 #define COOLDOWN_CMD_AR                 (1000)
 #define COOLDOWN_CMD_ROB                (10000)
@@ -463,23 +424,25 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define COOLDOWN_CMD_MEDKIT             (120000)
 #define COOLDOWN_VEHICLE                (220)
 
-
-// ===
-// Enums
-// ===
-
-// -
-// - SUSPECT AC
-// -
+// Suspect AC
 enum
 {
 	SUSPECT_ARMOR,
 	SUSPECT_JETPACK
 };
 
-// -
-// - DIALOGIDS
-// -
+// Log
+enum E_LOG_LEVEL
+{
+	LOG_INIT,
+	LOG_EXIT,
+	LOG_ONLINE,
+	LOG_NET,
+	LOG_PLAYER,
+	LOG_WORLD
+};
+
+// Dialogs
 enum
 {
 	EXIT_NONE,
@@ -557,9 +520,7 @@ enum (+= 56)
     NO_DIALOG_ID
 };
 
-// -
-// - MySQL
-// -
+// MySQL
 enum
 {
    	THREAD_GANG_EXIST,
@@ -588,9 +549,7 @@ enum (+= 10)
     ACCOUNT_REQUEST_LOGIN
 };
 
-// -
-// - gTeam data
-// -
+// gTeam
 enum
 {
 	FREEROAM,
@@ -620,17 +579,12 @@ enum
 	JAIL
 };
 
-// -
-// - gang pos
-// -
+// Player related
 enum e_gang_pos
 {
 	E_gang_pos_name[16]
 };
 
-// -
-// - player enum
-// -
 enum E_staff_levels
 {
 	e_level,
@@ -806,6 +760,7 @@ enum e_player_data
 	DuelRequest,
     DuelRequestRecv
 };
+
 enum e_player_ach_data
 {
     E_ach_styler, // Buy a toy (/toy)
@@ -824,9 +779,15 @@ enum e_player_ach_data
 	E_ach_bmxmaster // win /bmx
 };
 
-// -
-// - top stats
-// -
+enum e_credits_matrix
+{
+	E_item_name[32],
+	E_item_credits,
+	E_item_quantity,
+	E_item_duration[32],
+	E_item_description[255]
+};
+
 enum e_top_wanteds
 {
 	E_playerid,
@@ -893,9 +854,6 @@ enum e_top_gungame
 	E_gungame
 };
 
-// -
-// - player toy data
-// -
 enum e_toy_data
 {
 	toy_model,
@@ -911,9 +869,6 @@ enum e_toy_data
 	Float:toy_sz
 };
 
-// -
-// - player pv enum
-// -
 enum e_player_pv_data
 {
 	PVehicleID,
@@ -944,9 +899,7 @@ enum e_player_pv_data
 	Plate[13]
 };
 
-// -
-// - gzone enum
-// -
+// Server related
 enum e_gzone_data
 {
 	iID,
@@ -968,9 +921,6 @@ enum e_gzone_data
 	DefendingGang
 };
 
-// -
-// - house enum
-// -
 enum e_house_data
 {
 	iID,
@@ -992,9 +942,6 @@ enum e_house_data
 	date
 };
 
-// -
-// - property enum
-// -
 enum e_property_data
 {
 	iID,
@@ -1009,6 +956,7 @@ enum e_property_data
 	iconid,
 	date
 };
+
 enum e_prop_matrix
 {
 	E_blevel,
@@ -1016,21 +964,6 @@ enum e_prop_matrix
 	E_bearnings
 };
 
-// -
-// - credits enum
-// -
-enum e_credits_matrix
-{
-	E_item_name[32],
-	E_item_credits,
-	E_item_quantity,
-	E_item_duration[32],
-	E_item_description[255]
-};
-
-// -
-// - house type enum
-// -
 enum e_house_type
 {
 	interior,
@@ -1041,9 +974,6 @@ enum e_house_type
 	price
 };
 
-// -
-// - pv matrix
-// -
 enum e_pv_matrix
 {
 	pv_category,
@@ -1052,9 +982,6 @@ enum e_pv_matrix
 	pv_modelname[30]
 };
 
-// -
-// - derby data
-// -
 enum e_derby_map1_data
 {
 	Float:m1sX,
@@ -1128,9 +1055,6 @@ enum e_derby_map9_data
 	bool:m9sUsed
 };
 
-// -
-// - fallout data
-// -
 enum e_fallout_data
 {
 	I_iShaketimer[101],
@@ -1142,6 +1066,7 @@ enum e_fallout_data
 	I_iJoin,
 	I_tLoseGame
 };
+
 enum
 {
 	e_Fallout_Inactive,
@@ -1150,9 +1075,6 @@ enum
 	e_Fallout_Finish
 };
 
-// -
-// - GunGame data
-// -
 enum e_gungame_data
 {
 	level,
@@ -1165,9 +1087,6 @@ enum e_GunGame
 	GG_iLevel
 };
 
-// -
-// - race data
-// -
 enum e_race_position
 {
 	RP_iPlayer,
@@ -1189,9 +1108,6 @@ enum
 	RaceStatus_Active
 };
 
-// -
-// - firework
-// -
 enum e_firework
 {
     FireCracker,
@@ -31569,4 +31485,21 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 	    }
 	}
 	return 0;
+}
+
+Log(E_LOG_LEVEL:log_level, const fmat[], va_args<>)
+{
+	va_format(gstr2, sizeof(gstr2), fmat, va_start<2>);
+	
+	switch(log_level)
+	{
+	    case LOG_INIT: strins(gstr2, "LogInit: ", 0, sizeof(gstr2));
+		case LOG_EXIT: strins(gstr2, "LogExit: ", 0, sizeof(gstr2));
+		case LOG_ONLINE: strins(gstr2, "LogOnline: ", 0, sizeof(gstr2));
+		case LOG_NET: strins(gstr2, "LogNet: ", 0, sizeof(gstr2));
+		case LOG_PLAYER: strins(gstr2, "LogPlayer: ", 0, sizeof(gstr2));
+		case LOG_WORLD: strins(gstr2, "LogWorld: ", 0, sizeof(gstr2));
+	}
+
+	return print(gstr2),
 }
