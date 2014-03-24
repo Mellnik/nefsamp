@@ -9,47 +9,49 @@
 || #################################################################### ||
 \*======================================================================*/
 
-/* NEF Dependencies
-|| sscanf.so | 2.8.1
-|| streamer.so | v2.7
-|| mysql_static.so | R38
-|| irc.so | 1.4.4
-|| dns.so | 2.4
+/* Build Dependencies
+|| SA-MP Server 0.3z-R1-2
+|| YSI Library 3.1
+|| sscanf Plugin 2.8.1
+|| Streamer Plugin v2.7
+|| MySQL Plugin R38
+|| IRC Plugin 1.4.4
+|| DNS Plugin 2.4
 ||
 || Build Notes:
 || - Set rcon 0 in server.cfg
-||
+|| - Add samp.ban
 ||
 */
 
 #pragma dynamic 8192
 
-#define IS_RELEASE_BUILD (true)
+#define IS_RELEASE_BUILD (false)
 #define INC_ENVIORMENT (true)
 #define IRC_CONNECT (true)
 #define WINTER_EDITION (false) // Requires ferriswheelfair.amx
 #define YSI_IS_SERVER
 
-#include <a_samp>   		// 0.3z
-#include <a_http>           // 0.3z
+#include <a_samp>   		
+#include <a_http>           
 #undef MAX_PLAYERS
 #define MAX_PLAYERS (400)
-#include <YSI\y_iterate>	// 13/02/2014
-#include <YSI\y_commands>   // 13/02/2014
-#include <YSI\y_master>     // 13/02/2014
-#include <YSI\y_stringhash> // 13/02/2014
-#include <YSI\y_va>         // 13/02/2014
+#include <YSI\y_iterate>	
+#include <YSI\y_commands>   
+#include <YSI\y_master>    
+#include <YSI\y_stringhash> 
+#include <YSI\y_va>
+#include <sscanf2>
+#include <streamer>
+#include <a_mysql_R38>
+#include <irc>
+#include <dns>
 #include <a_zones>          // V2.0
-#include <sscanf2>      	// 2.8.1
-#include <streamer>     	// v2.7
 #include <floodcontrol>     // 28/06/2012
 #include <mSelection>       // 1.1 R3
-#include <a_mysql_R38>  	// R38
 #include <Dini>         	// 1.6
-#include <irc>          	// 1.4.4
 #include <md-sort>      	// 13/02/2014
 #include <unixtimetodate> 	// 2.0
-#include <dns>              // v2.4
 #if INC_ENVIORMENT == true
 #include <server_maps>
 #include <server_maps_2>
@@ -1121,10 +1123,7 @@ enum e_firework
     DrawDistance,
 };
 
-// ===
-// global
-// ===
-
+// Global Variables
 new const szRandomInfoTXTs[14][] =
 {
     "~w~Need a ~b~~h~vehicle~w~? Spawn one using ~r~~h~/v~w~!",
@@ -2433,16 +2432,19 @@ main()
 
 }
 
-// ===
-// callbacks
-// ===
-
+// Callbacks
 public OnGameModeInit()
 {
-	print("====================="SVRNAME" "CURRENT_VERSION"=====================");
-	print("Copyright ©2011 - 2014 New Evolution Freeroam");
-
+	Log(LOG_INIT, "s", "NEF Server Copyright ©2011 - 2014 "SVRNAME"");
+    Log(LOG_INIT, "s", "Version: "CURRENT_VERSION"");
+	#if IS_RELEASE_BUILD == true
+	Log(LOG_INIT, "s", "Build Configuration: Release");
+	#else
+	Log(LOG_INIT, "s", "Build Configuration: Development");
+	#endif
+	Log(LOG_INIT, "s", "MySQL: Logging: LOG_ERROR, LOG_WARNING");
 	mysql_log(LOG_ERROR | LOG_WARNING, LOG_TYPE_TEXT);
+	
     MySQL_Connect();
 	MySQL_CleanUp();
 
@@ -10169,7 +10171,7 @@ YCMD:nstats(playerid, params[], help)
         if(IsPlayerAvail(player))
 		{
 			new string[512], ip_port[22];
-			format(string, sizeof(string), ""white"Network Statistics\n\n%s(%i)\n\nConnect Time: %i\nMsgs Recv: %i\nBytes Recv: %i\nMsgs Sent: %i\nBytes Sent: %i\nMsgs Recv per second: %i\nPacketloss: %.2f percent\nConnect Stauts: %i\n",
+			format(string, sizeof(string), ""white"Network Statistics\n\n%s(%i)\n\nConnect Time: %i\nMsgs Recv: %i\nBytes Recv: %i\nMsgs Sent: %i\nBytes Sent: %i\nMsgs Recv per second: %i\nPacketloss: %.2f%s\nConnect Stauts: %i\n",
 			    __GetName(player),
 			    player,
 			    NetStats_GetConnectedTime(player),
@@ -10179,6 +10181,7 @@ YCMD:nstats(playerid, params[], help)
 			    NetStats_BytesSent(player),
 			    NetStats_MessagesRecvPerSecond(player),
 			    NetStats_PacketLossPercent(player),
+			    "%%",
 			    NetStats_ConnectionStatus(player));
 			    
 			NetStats_GetIpPort(playerid, ip_port, sizeof(ip_port));
@@ -21808,25 +21811,15 @@ MySQL_Connect()
 {
     pSQL = mysql_connect(SQL_HOST, SQL_USER, SQL_DATA, SQL_PASS, SQL_PORT, true);
 
-    if(!mysql_errno(pSQL))
+    if(mysql_errno(pSQL) == 0)
     {
-        printf("#Successfully connected to MySQL Server @ %s:%i", SQL_HOST, SQL_PORT);
+		Log(LOG_INIT, "si", "MySQL: Connected @ "SQL_HOST":", SQL_PORT);
     }
     else
     {
-        printf("#Failed to connect, %i. Second try...", mysql_errno(pSQL));
-        pSQL = mysql_connect(SQL_HOST, SQL_USER, SQL_DATA, SQL_PASS, SQL_PORT, true);
-        
-        if(!mysql_errno(pSQL))
-        {
-            printf("#Successfully connected to MySQL Server with second try @ %s:%i", SQL_HOST, SQL_PORT);
-        }
-        else
-        {
-            printf("#Failed to connect to %s:%i Aborting...", SQL_HOST, SQL_PORT);
-            print("====================="SVRNAME" "CURRENT_VERSION"=====================");
-            SendRconCommand("exit");
-        }
+        Log(LOG_INIT, "si", "MySQL: Failed to connect. Error: ", mysql_errno(pSQL));
+
+        SendRconCommand("exit");
     }
 }
 
@@ -31501,5 +31494,5 @@ Log(E_LOG_LEVEL:log_level, const fmat[], va_args<>)
 		case LOG_WORLD: strins(gstr2, "LogWorld: ", 0, sizeof(gstr2));
 	}
 
-	return print(gstr2),
+	return print(gstr2);
 }
