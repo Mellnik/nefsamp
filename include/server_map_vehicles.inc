@@ -2,8 +2,6 @@ new randomColors[24] = {6, 7, 126, 128, 130, 152, 158, 228, 181, 229, 205, 1, 6,
 
 LoadServerVehicles()
 {
-	new count = GetTickCount() + 3600000;
-	
 	// /mc
 	AddStaticVehicleEx(443, -2330.9238, -1620.1328, 485.6623, -91.7400, randomColors[random(23)], randomColors[random(23)], 100);
 	AddStaticVehicleEx(429, -2334.0386, -1599.7668, 485.3716, -108.9000, randomColors[random(23)], randomColors[random(23)], 100);
@@ -498,7 +496,5 @@ LoadServerVehicles()
 	AddStaticVehicleEx(571, 414.6265, 2530.2600, 16.2874, -197.8200, randomColors[random(23)], randomColors[random(23)], 100);
 	AddStaticVehicleEx(572, 427.9752, 2531.0635, 16.7439, -184.6200, randomColors[random(23)], randomColors[random(23)], 100);
 	// /aa end
-	
-	printf("#Server Vehicles loaded in %i ms", (GetTickCount() + 3600000) - count);
 	return 1;
 }

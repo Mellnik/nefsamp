@@ -300,16 +300,15 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define IRC_PORT                        (6667)
 #define IRC_CHANNEL     				"#NEF"
 #define IRC_NICKSERV            		"NickServ"
-#define PLUGIN_VERSION 					"1.4.3"
 #define IRC_MAX_BOTS                    (5)
 #else
 #define IRC_SERVER                      "foco.nl.irc.tl"
 #define IRC_PORT                        (6667)
 #define IRC_CHANNEL     				"#NEF.SAMP.PTS"
 #define IRC_NICKSERV            		"NickServ"
-#define PLUGIN_VERSION 					"1.4.3"
 #define IRC_MAX_BOTS                    (5)
 #endif
+#define PLUGIN_VERSION 					"1.4.4"
 
 // Colors
 #define SEMI_TRANS                      (0x0A0A0A55)
@@ -2435,14 +2434,14 @@ main()
 // Callbacks
 public OnGameModeInit()
 {
-	Log(LOG_INIT, "s", "NEF Server Copyright ©2011 - 2014 "SVRNAME"");
-    Log(LOG_INIT, "s", "Version: "CURRENT_VERSION"");
+	Log(LOG_INIT, "NEF Server Copyright ©2011 - 2014 "SVRNAME"");
+    Log(LOG_INIT, "Version: "CURRENT_VERSION"");
 	#if IS_RELEASE_BUILD == true
-	Log(LOG_INIT, "s", "Build Configuration: Release");
+	Log(LOG_INIT, "Build Configuration: Release");
 	#else
-	Log(LOG_INIT, "s", "Build Configuration: Development");
+	Log(LOG_INIT, "Build Configuration: Development");
 	#endif
-	Log(LOG_INIT, "s", "MySQL: Logging: LOG_ERROR, LOG_WARNING");
+	Log(LOG_INIT, "MySQL: Logging: LOG_ERROR, LOG_WARNING");
 	mysql_log(LOG_ERROR | LOG_WARNING, LOG_TYPE_TEXT);
 	
     MySQL_Connect();
@@ -2456,6 +2455,7 @@ public OnGameModeInit()
     #endif
     Server_MapPatches();
 
+	Log(LOG_INIT, "ProcessServerTravel: Loading Modules in OnGameModeInit");
 	ResetElevatorQueue();
 	Elevator_Initialize();
 	LoadServerStaticMeshes();
@@ -2471,12 +2471,12 @@ public OnGameModeInit()
 	LoadHouses();
 	LoadProps();
 
+	tReactionTimer = SetTimer("xReactionTest", REAC_TIME, true);
+	g_tRaceOpenSelection = SetTimer("OpenNewRace", 40307, false);
 	SetTimer("ProcessTick", 1000, true);
 	SetTimer("LogoSwitch", 10000, true);
 	SetTimer("RandomTXTInfo", 30000, true);
     SetTimer("QueueProcess", 60000, true);
-	tReactionTimer = SetTimer("xReactionTest", REAC_TIME, true);
-	g_tRaceOpenSelection = SetTimer("OpenNewRace", 40307, false);
 	SetTimer("Maths", 980000, true);
 	SetTimer("RandomSvrMsg", SERVERMSGS_TIME, true);
 	SetTimer("DoLotto", 100000, false);
@@ -2484,6 +2484,7 @@ public OnGameModeInit()
     SollIchDirMaEtWatSagen();
 
     LoadServerVehicles();
+    Log(LOG_INIT, "Server Vehicles loaded");
 
 	for(new i = 0; i < MAX_VEHICLES; i++)
 	{
@@ -2493,27 +2494,30 @@ public OnGameModeInit()
 		ChangeVehicleColor(i, (random(128) + 127), (random(128) + 127));
 	}
 
-	print("====================="SVRNAME" "CURRENT_VERSION"=====================");
+	Log(LOG_INIT, "ProcessServerPostTravel: OnGameModeInit");
 	return 1;
 }
 
 public OnGameModeExit()
 {
-	print("Unloading GameMode...");
+	Log(LOG_EXIT, "ProcessServerPreTravel: OnGameModeExit");
 
+	Log(LOG_EXIT, "Garbage cleanup");
     MySQL_CleanUp();
     
 	mysql_stat(gstr2, pSQL);
 	print(gstr2);
 
+	Log(LOG_EXIT, "IRC: Close");
     IRC_QuitBots();
     IRC_DestroyGroup(IRC_GroupID);
 	
 	DestroyElevator();
 
+	Log(LOG_EXIT, "MySQL: Close");
  	mysql_close(pSQL);
  	
-	print("...GameMode unloaded!");
+	Log(LOG_EXIT, "Now exiting.");
 	return 1;
 }
 
@@ -3993,6 +3997,7 @@ public OnPlayerInteriorChange(playerid, newinteriorid, oldinteriorid)
 
 public OnRconLoginAttempt(ip[], password[], success)
 {
+	Log(LOG_ONLINE, "ProcessServerTravel: RconLoginAttempt ", ip);
     new bool:found = false;
 		
 	if(!success)
@@ -19623,7 +19628,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						GetPlayerFacingAngle(playerid, POS[3]);
 
 						PlayerPV[playerid][PVSelect[playerid]][PVehicleID] = CreateVehicle_(PlayerPV[playerid][PVSelect[playerid]][Model], POS[0], POS[1], POS[2], POS[3], 0, 0, -1);
-						PlayerPV[playerid][PVSelect[playerid]][PVehicleLabel] = CreateDynamic3DTextLabel(vlabel, -1, 0.0, 0.0, 0.0, 30.0, INVALID_PLAYER_ID, PlayerPV[playerid][PVSelect[playerid]][PVehicleID], 0, -1, -1, -1, 30.0);
+						PlayerPV[playerid][PVSelect[playerid]][PVehicleLabel] = CreateDynamic3DTextLabel(vlabel, -1, 0.0, 0.0, 0.0, 30.0, INVALID_PLAYER_ID, PlayerPV[playerid][PVSelect[playerid]][PVehicleID], 1, -1, -1, -1, 30.0);
 
 						SetVehicleVirtualWorld(PlayerPV[playerid][PVSelect[playerid]][PVehicleID], GetPlayerVirtualWorld(playerid));
 						LinkVehicleToInterior(PlayerPV[playerid][PVSelect[playerid]][PVehicleID], GetPlayerInterior(playerid));
@@ -19778,7 +19783,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				GetPlayerFacingAngle(playerid, POS[3]);
 
 				PlayerPV[playerid][PVSelect[playerid]][PVehicleID] = CreateVehicle_(PlayerPV[playerid][PVSelect[playerid]][Model], POS[0], POS[1], POS[2], POS[3], 0, 0, -1);
-				PlayerPV[playerid][PVSelect[playerid]][PVehicleLabel] = CreateDynamic3DTextLabel(vlabel, -1, 0.0, 0.0, 0.0, 30.0, INVALID_PLAYER_ID, PlayerPV[playerid][PVSelect[playerid]][PVehicleID], 0, -1, -1, -1, 30.0);
+				PlayerPV[playerid][PVSelect[playerid]][PVehicleLabel] = CreateDynamic3DTextLabel(vlabel, -1, 0.0, 0.0, 0.0, 30.0, INVALID_PLAYER_ID, PlayerPV[playerid][PVSelect[playerid]][PVehicleID], 1, -1, -1, -1, 30.0);
 
 				SetVehicleVirtualWorld(PlayerPV[playerid][PVSelect[playerid]][PVehicleID], GetPlayerVirtualWorld(playerid));
 				LinkVehicleToInterior(PlayerPV[playerid][PVSelect[playerid]][PVehicleID], GetPlayerInterior(playerid));
@@ -19954,7 +19959,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				GetPlayerFacingAngle(playerid, POS[3]);
 
 				PlayerPV[playerid][PVSelect[playerid]][PVehicleID] = CreateVehicle_(PlayerPV[playerid][PVSelect[playerid]][Model], POS[0], POS[1], POS[2], POS[3], 0, 0, -1);
-				PlayerPV[playerid][PVSelect[playerid]][PVehicleLabel] = CreateDynamic3DTextLabel(vlabel, -1, 0.0, 0.0, 0.0, 30.0, INVALID_PLAYER_ID, PlayerPV[playerid][PVSelect[playerid]][PVehicleID], 0, -1, -1, -1, 30.0);
+				PlayerPV[playerid][PVSelect[playerid]][PVehicleLabel] = CreateDynamic3DTextLabel(vlabel, -1, 0.0, 0.0, 0.0, 30.0, INVALID_PLAYER_ID, PlayerPV[playerid][PVSelect[playerid]][PVehicleID], 1, -1, -1, -1, 30.0);
 
 				SetVehicleVirtualWorld(PlayerPV[playerid][PVSelect[playerid]][PVehicleID], GetPlayerVirtualWorld(playerid));
 				LinkVehicleToInterior(PlayerPV[playerid][PVSelect[playerid]][PVehicleID], GetPlayerInterior(playerid));
@@ -20435,10 +20440,10 @@ function:OnGangZoneLoad()
 	new rows, fields;
 	cache_get_data(rows, fields, pSQL);
 	
+	new Cache:Data = cache_save(pSQL);
+	
 	if(rows > 0)
 	{
-	    new Cache:Data = cache_save(pSQL);
-	    
 	    for(new i = 0; i < rows; i++)
 	    {
 	        cache_set_active(Data, pSQL);
@@ -20472,11 +20477,10 @@ function:OnGangZoneLoad()
 
 	        gzoneid++;
 	    }
-	    
-	    cache_delete(Data);
 	}
-
+	cache_set_active(Data, pSQL);
 	printf(">> Loaded %i Gang Zone(s) in %i microseconds", gzoneid, cache_get_query_exec_time(UNIT_MICROSECONDS));
+	cache_delete(Data);
 	return 1;
 }
 
@@ -21813,11 +21817,11 @@ MySQL_Connect()
 
     if(mysql_errno(pSQL) == 0)
     {
-		Log(LOG_INIT, "si", "MySQL: Connected @ "SQL_HOST":", SQL_PORT);
+		Log(LOG_INIT, "MySQL: Connected @ "SQL_HOST":%i", SQL_PORT);
     }
     else
     {
-        Log(LOG_INIT, "si", "MySQL: Failed to connect. Error: ", mysql_errno(pSQL));
+        Log(LOG_INIT, "MySQL: Failed to connect. Error: ", mysql_errno(pSQL));
 
         SendRconCommand("exit");
     }
@@ -21901,7 +21905,8 @@ LoadStores()
 	  		CreateDynamic3DTextLabel(gstr, YELLOW, dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ") + 0.7, 25.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 25.0);
 		}
 	}
- 	printf("#Stores loaded in %i ms", GetTickCount_() - count);
+
+ 	Log(LOG_INIT, "Stores loaded in %i ms", GetTickCount_() - count);
  	return 1;
 }
 
@@ -22034,7 +22039,7 @@ Elevator_Initialize()
 
 		z = (i == 0) ? (13.4713) : (13.4713 + 8.7396 + ((i-1) * 5.45155));
 
-		Label_Floors[i] = Create3DTextLabel(string, RED, 1783.9799, -1300.7660, z, 10.5, 0, 1);
+		Label_Floors[i] = CreateDynamic3DTextLabel(string, RED, 1783.9799, -1300.7660, z, 10.5, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, 0);
 	}
 
 	Floor_OpenDoors(0);
@@ -22053,7 +22058,7 @@ DestroyElevator()
 	{
 	    DestroyObject(Obj_FloorDoors[i][0]);
 		DestroyObject(Obj_FloorDoors[i][1]);
-		Delete3DTextLabel(Label_Floors[i]);
+		DestroyDynamic3DTextLabel(Label_Floors[i]);
 	}
 	return 1;
 }
@@ -22751,7 +22756,7 @@ CreateTextdraws()
 	TextDrawBoxColor(TXTLoading, 170);
 	TextDrawTextSize(TXTLoading, -9.000000, -152.000000);
 	
-	printf("#TextDraws loaded in %i ms", GetTickCount_() - count);
+	Log(LOG_INIT, "TextDraws loaded in %i ms", GetTickCount_() - count);
 	return 1;
 }
 
@@ -22831,11 +22836,7 @@ LoadServerStaticMeshes()
 
 	SendRconCommand(string);
 	SendRconCommand("weburl "SVRURLWWW"");
-	#if IS_RELEASE_BUILD == true
-	SetGameModeText("TdmDerbyRaceCNRFunStuntFreeroam");
-	#else
-	SetGameModeText(""SVRSC" "CURRENT_VERSION"");
-	#endif
+    SetGameModeText("TdmDerbyRaceCNRFunStuntFreeroam");
 
 	SendRconCommand("mapname "SVRSC" "CURRENT_VERSION"");
 	
@@ -23135,7 +23136,7 @@ LoadServerStaticMeshes()
 	AddPlayerClass(285, 1958.3783, 1343.1572, 15.3746, 270.1425, 0, 0, 0, 0, 0, 0);
 	AddPlayerClass(283, 1958.3783, 1343.1572, 15.3746, 270.1425, 0, 0, 0, 0, 0, 0);
 
-	printf("#Server Meshes loaded in %i ms", GetTickCount_() - count);
+	Log(LOG_INIT, "Server Modules loaded in %i ms", GetTickCount_() - count);
 	return 1;
 }
 
@@ -24094,7 +24095,7 @@ LoadVisualStaticMeshes()
 	CreateDynamicObject(19056, 1066.84094, -1760.02844, 12.77734,   0.00000, 0.00000, 0.00000);
 	#endif
 
-	printf("#Visual Meshes loaded in %i ms", GetTickCount_() - count);
+	Log(LOG_INIT, "Static Meshes loaded in %i ms", GetTickCount_() - count);
 	return 1;
 }
 
@@ -24163,7 +24164,7 @@ CreateFinalCar(playerid, pv_slot)
 	format(vlabel, sizeof(vlabel), ""nef_yellow"%s's \n"white"private vehicle", __GetName(playerid));
 
 	PlayerPV[playerid][PVSelect[playerid]][PVehicleID] = CreateVehicle_(PlayerPV[playerid][PVSelect[playerid]][Model], 1826.9821, -1383.8724, 25.3348, 180.0407, 0, 0, -1);
-	PlayerPV[playerid][PVSelect[playerid]][PVehicleLabel] = CreateDynamic3DTextLabel(vlabel, -1, 0.0, 0.0, 0.0, 30.0, INVALID_PLAYER_ID, PlayerPV[playerid][PVSelect[playerid]][PVehicleID], 0, -1, -1, -1, 30.0);
+	PlayerPV[playerid][PVSelect[playerid]][PVehicleLabel] = CreateDynamic3DTextLabel(vlabel, -1, 0.0, 0.0, 0.0, 30.0, INVALID_PLAYER_ID, PlayerPV[playerid][PVSelect[playerid]][PVehicleID], 1, -1, -1, -1, 30.0);
 
 	SetPlayerVirtualWorld(playerid, 0);
 	SetPlayerInterior(playerid, 0);
@@ -31493,6 +31494,5 @@ Log(E_LOG_LEVEL:log_level, const fmat[], va_args<>)
 		case LOG_PLAYER: strins(gstr2, "LogPlayer: ", 0, sizeof(gstr2));
 		case LOG_WORLD: strins(gstr2, "LogWorld: ", 0, sizeof(gstr2));
 	}
-
 	return print(gstr2);
 }
