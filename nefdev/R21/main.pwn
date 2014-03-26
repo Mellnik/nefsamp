@@ -2775,8 +2775,7 @@ public OnPlayerSpawn(playerid)
     		GivePlayerWeapon(playerid, 33, 9999999);
     		GivePlayerWeapon(playerid, 17, 10);
     		GivePlayerWeapon(playerid, 10, 1);
-			SetPlayerHealth(playerid, 100);
-			
+
 			SetPlayerWorldBounds(playerid, 432.0814, -81.74512, 2125.373, 1646.58);
 		}
 		case DM:
@@ -7621,8 +7620,6 @@ YCMD:war(playerid, params[], help)
 	    case 2: SetPlayerPosition(playerid, 291.3683, 1918.2693, 17.6265 + 1, 275.6602);
 	    case 3: SetPlayerPosition(playerid, 236.5930, 1918.7386, 17.6446 + 1, 145.6778);
 	}
-	SetPlayerHealth(playerid, 100.0);
-	
 	ShowPlayerDMTextdraws(playerid);
 	
 	GivePlayerWeapon(playerid, 3, 1);
@@ -7661,7 +7658,6 @@ YCMD:dm(playerid, params[], help)
     CheckPlayerGod(playerid);
     Command_ReProcess(playerid, "/stopanims", false);
     ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
-    SetPlayerHealth(playerid, 100.0);
 	SetPlayerVirtualWorld(playerid, DM_WORLD);
 	ResetPlayerWeapons(playerid);
 	ShowPlayerDMTextdraws(playerid);
@@ -7695,7 +7691,6 @@ YCMD:dm2(playerid, params[], help)
     CheckPlayerGod(playerid);
 	Command_ReProcess(playerid, "/stopanims", false);
     ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
-	SetPlayerHealth(playerid, 100.0);
 	SetPlayerVirtualWorld(playerid, DM_WORLD+1);
 	ResetPlayerWeapons(playerid);
 	ShowPlayerDMTextdraws(playerid);
@@ -7730,7 +7725,6 @@ YCMD:dm3(playerid, params[], help)
     CheckPlayerGod(playerid);
     Command_ReProcess(playerid, "/stopanims", false);
     ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
-    SetPlayerHealth(playerid, 100.0);
 	SetPlayerVirtualWorld(playerid, DM_WORLD+2);
 	ResetPlayerWeapons(playerid);
 	ShowPlayerDMTextdraws(playerid);
@@ -7764,7 +7758,6 @@ YCMD:dm4(playerid, params[], help)
     CheckPlayerGod(playerid);
     Command_ReProcess(playerid, "/stopanims", false);
     ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
-	SetPlayerHealth(playerid, 100.0);
 	SetPlayerVirtualWorld(playerid, DM_WORLD+3);
 	ResetPlayerWeapons(playerid);
 	ShowPlayerDMTextdraws(playerid);
@@ -11686,7 +11679,6 @@ SetPlayerGWarMode(playerid)
 	{
         SetPVarInt(playerid, "HadGod", 0);
         TextDrawHideForPlayer(playerid, TXTGodTD);
-        SetPlayerHealth(playerid, 100.0);
         PlayerInfo[playerid][bGod] = false;
         RandomWeapons(playerid);
   		SCM(playerid, -1, ""orange"God mode has been disabled!");
@@ -17916,7 +17908,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						SetPlayerSkin(playerid, 285);
 						SetPlayerHealth(playerid, 100);
 						SetPlayerArmour(playerid, 100);
-						SetPlayerHealth(playerid, 100);
 						SetPlayerVirtualWorld(playerid, CNR_WORLD);
 						SetPVarInt(playerid, "inCNR", 3);
 						Command_ReProcess(playerid, "/cnrhelp", false);
