@@ -21,13 +21,13 @@
 || Build Notes:
 || - Set rcon 0 in server.cfg
 || - Add samp.ban
-||
+|| - Robbery/Smuggling/Meth Lab/Prostitution/Loan Sharks
 */
 
 #pragma dynamic 8192
 
 #define IS_RELEASE_BUILD (false)
-#define INC_ENVIORMENT (true)
+#define INC_ENVIORMENT (false)
 #define IRC_CONNECT (true)
 #define WINTER_EDITION (false) // Requires ferriswheelfair.amx
 #define YSI_IS_SERVER
@@ -254,6 +254,10 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define MAX_HOUSE_OBJECTS               (10)
 
 // Businesses
+#define MAX_BUSINESSES                  (750)
+#define MAX_BUSINESS_LEVEL              (20)
+#define MAX_PLAYER_BUSINESSES           (5)
+
 #define MAX_PROPS                       (1000)
 #define MAX_PLAYER_PROPS 				(5)
 #define MAX_PROP_LEVEL                  (20)
@@ -402,14 +406,14 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define COOLDOWN_CHAT                   (5500)
 #define COOLDOWN_CMD_AR                 (1000)
 #define COOLDOWN_CMD_ROB                (10000)
-#define COOLDOWN_CMD_BUY                (30000)
-#define COOLDOWN_CMD_PBUY               (30000)
-#define COOLDOWN_CMD_LOCK               (5000)
+#define COOLDOWN_CMD_BUY                (2000)
+#define COOLDOWN_CMD_PBUY               (2000)
+#define COOLDOWN_CMD_LOCK               (1000)
 #define COOLDOWN_CMD_GIVECASH           (120000)
 #define COOLDOWN_CMD_REPORT             (30000)
-#define COOLDOWN_CMD_SELL               (30000)
-#define COOLDOWN_CMD_PSELL              (30000)
-#define COOLDOWN_CMD_CHANGEPASS         (60000)
+#define COOLDOWN_CMD_SELL               (2000)
+#define COOLDOWN_CMD_PSELL              (2000)
+#define COOLDOWN_CMD_CHANGEPASS         (30000)
 #define COOLDOWN_CMD_PM                 (3000)
 #define COOLDOWN_CMD_HITMAN             (30000)
 #define COOLDOWN_CMD_GINVITE            (60000)
@@ -550,7 +554,7 @@ enum (+= 10)
     ACCOUNT_REQUEST_LOGIN
 };
 
-// gTeam
+// Player Team
 enum
 {
 	FREEROAM,
@@ -941,6 +945,35 @@ enum e_house_data
 	E_Obj_ObjectID[MAX_HOUSE_OBJECTS],
 	Text3D:E_Obj_Label[MAX_HOUSE_OBJECTS],
 	date
+};
+
+enum E_BUSINESS_TYPES
+{
+    BUSINESS_LOANSHARKS,
+	BUSINESS_ROBBERY,
+	BUSINESS_SMUGGLING,
+	BUSINESS_NUDE,
+    BUSINESS_METHLAB
+};
+
+enum E_BUSINESS_DATA
+{
+	/* ORM */
+	ORM:e_ormid,
+	
+	/* DATA */
+	e_id,
+	e_owner[MAX_PLAYER_NAME + 1],
+	Float:e_pos[3],
+	E_BUSINESS_TYPES:e_type,
+	e_level,
+	e_sold,
+	e_date,
+	
+	/* INTERNAL */
+	Text3D:e_label_id,
+	e_icon_id,
+	e_pickup_id
 };
 
 enum e_property_data
@@ -1770,6 +1803,7 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
   	HouseInfo[MAX_HOUSES][e_house_data],
   	GZoneInfo[MAX_GZONES][e_gzone_data],
   	PropInfo[MAX_PROPS][e_property_data],
+  	BusinessData[MAX_BUSINESSES][E_BUSINESS_DATA],
   	PVSelect[MAX_PLAYERS],
 	PVCatSel[MAX_PLAYERS],
 	PVVMenuSel[MAX_PLAYERS],
@@ -2469,7 +2503,7 @@ public OnGameModeInit()
 	LoadStores();
 	LoadGZones();
 	LoadHouses();
-	LoadProps();
+	LoadBusinesses();
 
 	tReactionTimer = SetTimer("xReactionTest", REAC_TIME, true);
 	g_tRaceOpenSelection = SetTimer("OpenNewRace", 40307, false);
@@ -8407,6 +8441,19 @@ YCMD:bbuy(playerid, params[], help)
 		if((PlayerInfo[playerid][tickLastPBuy] + COOLDOWN_CMD_PBUY) >= tick)
 		{
 	    	return SCM(playerid, -1, ""er"Please wait a bit before using this cmd again!");
+		}
+	}
+
+	new bool:bFound = false;
+	for(new r = 0; r < MAX_BUSINESSES; r++)
+	{
+	    if(BusinessData[r][e_ormid] == ORM:-1) continue;
+	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, BusinessData[r][e_pos][0], BusinessData[r][e_pos][1], BusinessData[r][e_pos][2])) continue;
+		bFound = true;
+		
+		if(BusinessData[r][e_sold] != 0) {
+		    ShowInfo(playerid, "Business not for sale", "");
+		    break;
 		}
 	}
 
@@ -20385,6 +20432,32 @@ function:OnPropLoadEx(pindex)
 	return 1;
 }
 
+function:OnBusinessLoad()
+{
+	new rows = cache_get_row_count();
+
+	for(new r = 0; r < rows && r < MAX_BUSINESSES; r++)
+	{
+	    new ORM:ormid = BusinessData[r][e_ormid] = orm_create("businesses");
+	    
+	    orm_addvar_int(ormid, BusinessData[r][e_id], "id");
+	    orm_addvar_string(ormid, BusinessData[r][e_owner], "owner");
+	    orm_addvar_float(ormid, BusiensssData[r][e_pos][0], "xpos");
+	    orm_addvar_float(ormid, BusiensssData[r][e_pos][1], "ypos");
+	    orm_addvar_float(ormid, BusiensssData[r][e_pos][2], "zpos");
+	    orm_addvar_int(ormid, _:BusiensssData[r][e_type], "type");
+	    orm_addvar_int(ormid, BusiensssData[r][e_level], "level");
+	    orm_addvar_int(ormid, BusiensssData[r][e_sold], "sold");
+	    orm_addvar_int(ormid, BusiensssData[r][e_date], "date");
+	    
+	    orm_setkey(ormid, "id");
+		orm_apply_cache(ormid, r);
+	}
+	
+	Log(LOG_INIT, "%i businesses loaded in %i microseconds", r, cache_get_query_exec_time(UNIT_MICROSECONDS));
+	return 1;
+}
+
 function:OnPropLoad()
 {
 	new rows, fields;
@@ -20554,10 +20627,9 @@ function:LoadHouses()
 	return 1;
 }
 
-function:LoadProps()
+LoadBusinesses()
 {
-	mysql_tquery(pSQL, "SELECT * FROM `props`;", "OnPropLoad", "");
-	return 1;
+	mysql_tquery(pSQL, "SELECT * FROM `businesses`;", "OnBusinessLoad");
 }
 
 function:LoadGZones()
