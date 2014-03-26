@@ -3553,7 +3553,7 @@ public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY
 {
 	/* PLAYER QUEUED FOR KICK */
 	if(hittype != BULLET_HIT_TYPE_NONE) {
-	    if(PlayerInfo[hitid][KBMarked]) {
+	    if(PlayerInfo[playerid][KBMarked] || PlayerInfo[hitid][KBMarked]) {
 	        return 0;
 	    }
 	}
@@ -3566,6 +3566,28 @@ public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY
 			    return 0;
 	        }
 	    }
+	}
+	
+	/* ANTI DRIVEBY SPAWNZONES */
+	if(hittype == BULLET_HIT_TYPE_PLAYER) {
+	    if(hitid != INVALID_PLAYER_ID) {
+			if(GetPlayerVehicleSeat(playerid) == 0) {
+				for(new i = 0; i < sizeof(g_SpawnAreas); i++) {
+				    if(IsPlayerInDynamicArea(playerid, g_SpawnAreas[i])) {
+						return 0;
+				    }
+				}
+			}
+	    }
+	}
+	
+	/* LAST HIT */
+	if(hittype == BULLET_HIT_TYPE_PLAYER) {
+	    if(hitid != INVALID_PLAYER_ID) {
+	        if(gTeam[hitid] == FREEROAM) {
+	        	PlayerInfo[hitid][tickLastShot] = GetTickCount_();
+			}
+		}
 	}
 	
 	/* HITSOUND */
@@ -3591,15 +3613,6 @@ public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY
 			
 			for(new i = 0; i < 13; i++) {
 			    GivePlayerWeapon(playerid, p_Weapons[i][0], p_Weapons[i][1]);
-			}
-		}
-	}
-	
-	/* LAST HIT */
-	if(hittype == BULLET_HIT_TYPE_PLAYER) {
-	    if(hitid != INVALID_PLAYER_ID) {
-	        if(gTeam[hitid] == FREEROAM) {
-	        	PlayerInfo[hitid][tickLastShot] = GetTickCount_();
 			}
 		}
 	}
@@ -21428,7 +21441,9 @@ MySQL_SavePlayer(playerid, bool:save_pv)
 		__GetName(playerid));
 
 	strcat(query, query2);
-	mysql_pquery(pSQL, query, "", "");
+	
+    mysql_tquery(pSQL, "START TRANSACTION;");
+	mysql_tquery(pSQL, query);
 
 	format(query, sizeof(query), "UPDATE `accounts` SET `Achievements` = '%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i' WHERE `Name` = '%s' LIMIT 1;",
 	    pAch[playerid][E_ach_styler],
@@ -21446,7 +21461,8 @@ MySQL_SavePlayer(playerid, bool:save_pv)
 		pAch[playerid][E_ach_biker],
 		pAch[playerid][E_ach_bmxmaster],
 		__GetName(playerid));
-    mysql_pquery(pSQL, query, "", "");
+		
+    mysql_tquery(pSQL, query);
 
 	if(save_pv)
 	{
@@ -21496,7 +21512,7 @@ MySQL_SavePlayer(playerid, bool:save_pv)
 			PlayerPV[playerid][1][Mod17],
 			PlayerPV[playerid][1][Plate],
 			__GetName(playerid));
-	    mysql_tquery(pSQL, query, "", "");
+	    mysql_tquery(pSQL, query);
 
 		format(query, sizeof(query), "UPDATE `accounts` SET `PV_Slot2` = '%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%s', `PV_Slot3` = '%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%s' WHERE `Name` = '%s' LIMIT 1;",
 			PlayerPV[playerid][2][Model],
@@ -21544,7 +21560,7 @@ MySQL_SavePlayer(playerid, bool:save_pv)
 			PlayerPV[playerid][3][Mod17],
 			PlayerPV[playerid][3][Plate],
 			__GetName(playerid));
-	    mysql_tquery(pSQL, query, "", "");
+	    mysql_tquery(pSQL, query);
 
 		format(query, sizeof(query), "UPDATE `accounts` SET `PV_Slot4` = '%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%s', `PV_Slot5` = '%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%s' WHERE `Name` = '%s' LIMIT 1;",
 			PlayerPV[playerid][4][Model],
@@ -21592,7 +21608,7 @@ MySQL_SavePlayer(playerid, bool:save_pv)
 			PlayerPV[playerid][5][Mod17],
 			PlayerPV[playerid][5][Plate],
 			__GetName(playerid));
-	    mysql_tquery(pSQL, query, "", "");
+	    mysql_tquery(pSQL, query);
 
 		format(query, sizeof(query), "UPDATE `accounts` SET `PV_Slot6` = '%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%s', `PV_Slot7` = '%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%s' WHERE `Name` = '%s' LIMIT 1;",
 			PlayerPV[playerid][6][Model],
@@ -21640,8 +21656,10 @@ MySQL_SavePlayer(playerid, bool:save_pv)
 			PlayerPV[playerid][7][Mod17],
 			PlayerPV[playerid][7][Plate],
 			__GetName(playerid));
-	    mysql_tquery(pSQL, query, "", "");
+	    mysql_tquery(pSQL, query);
 	}
+	
+	mysql_tquery(pSQL, "COMMIT;");
     return 1;
 }
 
@@ -21727,7 +21745,7 @@ MySQL_BanPlayer(PlayerName[], AdminName[], Reason[], lift = 0)
 MySQL_SaveGangZone(id)
 {
 	format(gstr, sizeof(gstr), "UPDATE `gzones` SET `localgang` = %i, `locked` = %i WHERE `id` = %i;", GZoneInfo[id][localGang], GZoneInfo[id][iLocked], GZoneInfo[id][iID]);
-	mysql_tquery(pSQL, gstr, "", "");
+	mysql_pquery(pSQL, gstr);
 }
 
 MySQL_SaveHouse(house, bool:save_items = false)
@@ -21746,15 +21764,16 @@ MySQL_SaveHouse(house, bool:save_items = false)
 		HouseInfo[house][locked],
 		HouseInfo[house][date],
 		HouseInfo[house][iID]);
-    mysql_tquery(pSQL, query, "", "");
+
+    mysql_tquery(pSQL, "START TRANSACTION;");
+    mysql_tquery(pSQL, query);
 		
 	if(save_items)
 	{
 		new Float:POS[6];
 		for(new i = 0; i < MAX_HOUSE_OBJECTS; i++)
 		{
-			if(HouseInfo[house][E_Obj_Model][i] != 0)
-			{
+			if(HouseInfo[house][E_Obj_Model][i] != 0) {
 			    GetDynamicObjectPos(HouseInfo[house][E_Obj_ObjectID][i], POS[0], POS[1], POS[2]);
 			    GetDynamicObjectRot(HouseInfo[house][E_Obj_ObjectID][i], POS[3], POS[4], POS[5]);
 
@@ -21768,14 +21787,14 @@ MySQL_SaveHouse(house, bool:save_items = false)
 				    POS[4],
 				    POS[5],
 				    HouseInfo[house][iID]);
-			}
-			else
-			{
+			} else {
 			    format(query, sizeof(query), "UPDATE `houses` SET `ObjSlot%i` = '0,0.0,0.0,0.0,0.0,0.0,0.0' WHERE `ID` = %i LIMIT 1;", i, HouseInfo[house][iID]);
 			}
-			mysql_tquery(pSQL, query, "", "");
+			mysql_tquery(pSQL, query);
 		}
 	}
+	
+	mysql_tquery(pSQL, "COMMIT;");
 }
 
 MySQL_SaveProp(propertyid)
@@ -25928,7 +25947,7 @@ function:ProcessTick()
 					    --PlayerInfo[i][pJail];
 					    format(gstr2, sizeof(gstr2), "~b~~h~~h~You will be released in %d seconds.~n~Type /escape to attempt to escape [CNR Only]", PlayerInfo[i][pJail]);
 						InfoTD_MSG(i, 1000, gstr2);
-						break;
+						continue;
 					}
 
 				    if(PlayerInfo[i][pJail] <= 0)
