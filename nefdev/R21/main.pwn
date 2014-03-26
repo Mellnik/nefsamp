@@ -8488,12 +8488,13 @@ YCMD:bbuy(playerid, params[], help)
 		
 		SetupBusiness(r);
 		
+		PlayerInfo[playerid][tickLastPBuy] = tick;
+		PlayerInfo[playerid][Props]++;
+		
 		SendInfo(playerid, "SUCCESS!", "");
         PlayerPlaySound(playerid, 1149, 0.0, 0.0, 0.0);
         GivePlayerCash(playerid, -1250000);
         MySQL_SavePlayer(playerid, false);
-
-		PlayerInfo[playerid][tickLastPBuy] = tick;
 		
 	    format(gstr, sizeof(gstr), ""nef" "yellow_e"%s(%i) bought the business %i!", __GetName(playerid), playerid, BusinessData[r][e_id]);
 	    SCMToAll(-1, gstr);
@@ -13816,36 +13817,34 @@ YCMD:setbizzlevel(playerid, params[], help)
 {
     if(!IsPlayerAdmin(playerid) || PlayerInfo[playerid][Level] != MAX_ADMIN_LEVEL) return SCM(playerid, -1, NO_PERM);
 
-	extract params -> new plevel; else
+	extract params -> new blevel; else
 	{
 	    return SCM(playerid, NEF_GREEN, "Usage: /setbizzlevel <level>");
 	}
-	if(plevel > 20 || plevel < 1) return SCM(playerid, -1, ""er"Business level 1 - 20");
+	if(blevel > 20 || blevel < 1) return SCM(playerid, -1, ""er"Business level 1 - 20");
 	
- 	new bool:found = false;
-	for(new i = 0; i < propid; i++)
-	{
-	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, PropInfo[i][E_x], PropInfo[i][E_y], PropInfo[i][E_z])) continue;
-	    found = true;
-
-        PropInfo[i][E_Level] = plevel;
-
-		if(PropInfo[i][sold] == 1)
-		{
-		    format(gstr, sizeof(gstr), ""business_mark"\nOwner: %s\nID: %i\nLevel: %i", PropInfo[i][Owner], PropInfo[i][iID], PropInfo[i][E_Level]);
-		}
-		else
-		{
-		    format(gstr, sizeof(gstr), ""business_mark"\nOwner: ---\nID: %i\nLevel: %i", PropInfo[i][iID], PropInfo[i][E_Level]);
+ 	new bool:bFound = false;
+ 	for(new r = 0; r < MAX_BUSINESSES; r++)
+ 	{
+	    if(BusinessData[r][e_ormid] == ORM:-1) continue;
+	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, BusinessData[r][e_pos][0], BusinessData[r][e_pos][1], BusinessData[r][e_pos][2])) continue;
+		bFound = true;
+		
+		BusinessData[r][e_level] = blevel;
+		
+		if(BusinessData[r][e_sold]) {
+	        format(gstr2, sizeof(gstr2), ""business_mark"\nID: %i\nOwner: %s\nType: %s\nLevel: %i", BusinessData[r][e_id], BusinessData[r][e_owner], BusinessTypes[_:BusinessData[r][e_type]], BusinessData[r][e_level]);
+		} else {
+		    format(gstr2, sizeof(gstr2), ""business_mark"\n"nef_green"FOR SALE! Type /bbuy"white"\nID: %i\nType: %s\nLevel: %i", BusinessData[r][e_id], BusinessTypes[_:BusinessData[r][e_type]], BusinessData[r][e_level]);
 		}
 		
-		UpdateDynamic3DTextLabelText(PropInfo[i][label], -1, gstr);
-	    MySQL_SaveProp(i);
-
-		SendInfo(playerid, "Business level has been set", "");
-	    break;
-	}
-    if(!found) SCM(playerid, -1, ""er"You need to stand in the business pickup (Entrance)");
+		UpdateDynamic3DTextLabelText(BusinessData[r][e_label_id], -1, gstr);
+		orm_update(BusinessData[r][e_ormid]);
+		
+		SendInfo(playerid, "Business level set", "");
+		break;
+ 	}
+ 	if(!bFound) SCM(playerid, -1, ""er"You aren't near of any business");
 	return 1;
 }
 
@@ -13938,28 +13937,45 @@ YCMD:createbizz(playerid, params[], help)
 		return SCM(playerid, -1, NO_PERM);
 	}
 	
-  	new Float:POS[3];
-  	GetPlayerPos(playerid, POS[0], POS[1], POS[2]);
+	new count = 0;
+	for(new i = 0; i < MAX_BUSINESSES; i++) {
+	    if(BusinessData[i][e_ormid] != ORM:-1) {
+			++count;
+	    }
+	}
+	
+	if(count >= MAX_BUSINESSES) {
+	    return SCM(playerid, -1, ""er"Max businesses reached");
+	}
+	
+	new r = -1;
+	for(new i = 0; i < MAX_BUSINESSES; i++) {
+	    if(BusinessData[i][e_ormid] == ORM:-1) {
+	        r = i;
+	        break;
+	    }
+	}
+	
+	if(r == -1) return SCM(playerid, -1, ""er"No free bizz slot");
+	
+    ResetBusiness(r);
+  	GetPlayerPos(playerid, BusinessData[r][e_pos][0], BusinessData[r][e_pos][1], BusinessData[r][e_pos][2]);
+    strmid(BusinessData[r][e_owner], "NoData", 0, MAX_PLAYER_NAME + 1, MAX_PLAYER_NAME + 1);
+    
+    new ORM:ormid = BusinessData[r][e_ormid] = orm_create("businesses");
 
-	PropInfo[propid][E_x] = POS[0];
-	PropInfo[propid][E_y] = POS[1];
-	PropInfo[propid][E_z] = POS[2];
-	PropInfo[propid][E_Level] = 1;
-	PropInfo[propid][sold] = 0;
+    orm_addvar_int(ormid, BusinessData[r][e_id], "id");
+    orm_addvar_string(ormid, BusinessData[r][e_owner], MAX_PLAYER_NAME + 1, "owner");
+    orm_addvar_float(ormid, BusinessData[r][e_pos][0], "xpos");
+    orm_addvar_float(ormid, BusinessData[r][e_pos][1], "ypos");
+    orm_addvar_float(ormid, BusinessData[r][e_pos][2], "zpos");
+    orm_addvar_int(ormid, _:BusinessData[r][e_type], "type");
+    orm_addvar_int(ormid, BusinessData[r][e_level], "level");
+    orm_addvar_int(ormid, BusinessData[r][e_sold], "sold");
+    orm_addvar_int(ormid, BusinessData[r][e_date], "date");
 
-	strmid(PropInfo[propid][Owner], "ForSale", 0, 25, 25);
-
-	new query[356];
-	format(query, sizeof(query), "INSERT INTO `props` VALUES (NULL, '%s', %.2f, %.2f, %.2f, 1, 0, 0);",
-		PropInfo[propid][Owner],
-		PropInfo[propid][E_x],
-	 	PropInfo[propid][E_y],
-		PropInfo[propid][E_z]);
-
-    mysql_tquery(pSQL, query, "", "");
-    mysql_tquery(pSQL, "SELECT * FROM `props` ORDER BY `ID` DESC LIMIT 1;", "OnPropLoadEx", "i", propid);
-
-    propid++;
+    orm_setkey(ormid, "id");
+	orm_insert(ormid, "OnBusinessLoadEx", "i", r);
     return 1;
 }
 
@@ -20399,37 +20415,6 @@ function:OnHouseLoad()
 	return 1;
 }
 
-function:OnPropLoadEx(pindex)
-{
-	new rows, fields;
-	cache_get_data(rows, fields, pSQL);
-
-	if(rows > 0)
-	{
-	    new name[25];
-
-	    PropInfo[pindex][iID] = cache_get_row_int(0, 0, pSQL);
-	    cache_get_row(0, 1, name, pSQL, sizeof(name));
-	    strmid(PropInfo[pindex][Owner], name, 0, 25, 25);
-	    
-		PropInfo[pindex][E_x] = cache_get_row_float(0, 2, pSQL);
-		PropInfo[pindex][E_y] = cache_get_row_float(0, 3, pSQL);
-		PropInfo[pindex][E_z] = cache_get_row_float(0, 4, pSQL);
-		PropInfo[pindex][E_Level] = cache_get_row_int(0, 5, pSQL);
-		PropInfo[pindex][sold] = cache_get_row_int(0, 6, pSQL);
-		PropInfo[pindex][date] = cache_get_row_int(0, 7, pSQL);
-		
-		format(gstr2, sizeof(gstr2), ""business_mark"\nOwner: ---\nID: %i\nLevel: %i", PropInfo[pindex][iID], PropInfo[pindex][E_Level]);
-
-		PropInfo[pindex][label] = CreateDynamic3DTextLabel(gstr2, -1, PropInfo[pindex][E_x], PropInfo[pindex][E_y], floatadd(PropInfo[pindex][E_z], 0.3), 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 30.0);
-		PropInfo[pindex][pickid] = CreateDynamicPickup(1274, 1, PropInfo[pindex][E_x], PropInfo[pindex][E_y], PropInfo[pindex][E_z], -1, -1, -1, 30.0);
-		PropInfo[pindex][iconid] = CreateDynamicMapIcon(PropInfo[pindex][E_x], PropInfo[pindex][E_y], PropInfo[pindex][E_z], 52, 1, 0, -1, -1, 150.0);
-		
-		pindex++;
-	}
-	return 1;
-}
-
 function:OnBusinessLoad()
 {
 	new rows = cache_get_row_count();
@@ -20455,6 +20440,12 @@ function:OnBusinessLoad()
 	}
 	
 	Log(LOG_INIT, "%i businesses loaded in %i microseconds", rows, cache_get_query_exec_time(UNIT_MICROSECONDS));
+	return 1;
+}
+
+function:OnBusinessLoadEx(slot)
+{
+	SetupBusiness(slot);
 	return 1;
 }
 
