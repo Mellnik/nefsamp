@@ -8499,6 +8499,64 @@ YCMD:bbuy(playerid, params[], help)
 	return 1;
 }
 
+YCMD:bsell(playerid, params[], help)
+{
+	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
+    if(!islogged(playerid)) return notlogged(playerid);
+
+	new tick = GetTickCount_();
+	if(PlayerInfo[playerid][Level] != MAX_ADMIN_LEVEL)
+	{
+		if((PlayerInfo[playerid][tickLastPSell] + COOLDOWN_CMD_PSELL) >= tick)
+		{
+	    	return SCM(playerid, -1, ""er"Please wait a bit before using this cmd again!");
+		}
+	}
+
+	new bool:bFound = false;
+	for(new r = 0; r < MAX_BUSINESSES; r++)
+	{
+	    if(BusinessData[r][e_ormid] == ORM:-1) continue;
+	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, BusinessData[r][e_pos][0], BusinessData[r][e_pos][1], BusinessData[r][e_pos][2])) continue;
+		bFound = true;
+
+	    if(!BusinessData[r][e_sold]) {
+			SCM(playerid, -1, ""er"Business can't be sold");
+			break;
+		}
+		if(strcmp(BusinessData[r][e_owner], __GetName(playerid), true)) {
+			SCM(playerid, -1, ""er"You don't own this business");
+			break;
+		}
+		
+	    strmid(BusinessData[r][e_owner], "NoData", 0, MAX_PLAYER_NAME + 1, MAX_PLAYER_NAME + 1);
+	    BusinessData[r][e_sold] = 0;
+        BusinessData[r][e_level] = 1;
+        BusinessData[r][e_date] = 0;
+
+		DestroyDynamic3DTextLabel(BusinessData[r][e_label_id]);
+		DestroyDynamicPickup(BusinessData[r][e_pickup_id]);
+
+        SetupBusiness(r);
+
+	    PlayerInfo[playerid][Props]--;
+	    PlayerInfo[playerid][tickLastPSell] = tick;
+	    
+	    SendInfo(playerid, "SUCCESS!", "");
+	    MySQL_SavePlayer(playerid, false);
+	    PlayerPlaySound(playerid, 1149, 0.0, 0.0, 0.0);
+	    
+	    format(gstr, sizeof(gstr), ""nef" "yellow_e"%s(%i) sold the business %i!", __GetName(playerid), playerid, BusinessData[r][e_id]);
+	    SCMToAll(-1, gstr);
+	    
+	    orm_update(BusinessData[r][e_ormid]);
+	    break;
+	}
+	if(!bFound) SCM(playerid, -1, ""er"You aren't near of any business");
+	return 1;
+}
+
+
 YCMD:buy(playerid, params[], help)
 {
 	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
@@ -8563,59 +8621,6 @@ YCMD:buy(playerid, params[], help)
 	    break;
 	}
 	if(!found) SCM(playerid, -1, ""er"You aren't near of any house");
-	return 1;
-}
-
-YCMD:bsell(playerid, params[], help)
-{
-	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
-    if(!islogged(playerid)) return notlogged(playerid);
-    
-	new tick = GetTickCount_();
-	if(PlayerInfo[playerid][Level] != MAX_ADMIN_LEVEL)
-	{
-		if((PlayerInfo[playerid][tickLastPSell] + COOLDOWN_CMD_PSELL) >= tick)
-		{
-	    	return SCM(playerid, -1, ""er"Please wait a bit before using this cmd again!");
-		}
-	}
-
-	new bool:found = false;
-	for(new i = 0; i < propid; i++)
-	{
-	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, PropInfo[i][E_x], PropInfo[i][E_y], PropInfo[i][E_z])) continue;
-	    found = true;
-
-	    if(!PropInfo[i][sold])
-		{
-			SCM(playerid, -1, ""er"Business can't be sold!");
-			break;
-		}
-		if(strcmp(PropInfo[i][Owner], __GetName(playerid), true))
-		{
-			SCM(playerid, -1, ""er"You don't own this Business!");
-			break;
-		}
-	    strmid(PropInfo[i][Owner], "ForSale", 0, 25, 25);
-	    PropInfo[i][sold] = 0;
-        PropInfo[i][E_Level] = 1;
-        
-	    format(gstr, sizeof(gstr), ""business_mark"\nOwner: ---\nID: %i\nLevel: %i", PropInfo[i][iID], PropInfo[i][E_Level]);
-	    UpdateDynamic3DTextLabelText(PropInfo[i][label], -1, gstr);
-	    DestroyDynamicMapIcon(PropInfo[i][iconid]);
-	    PropInfo[i][iconid] = CreateDynamicMapIcon(PropInfo[i][E_x], PropInfo[i][E_y], PropInfo[i][E_z], 52, 1, 0, -1, -1, 150.0);
-	    PlayerInfo[playerid][Props]--;
-	    PropInfo[i][date] = 0;
-	    SendInfo(playerid, "Business sold", "");
-	    MySQL_SaveProp(i);
-	    MySQL_SavePlayer(playerid, false);
-	    PlayerInfo[playerid][tickLastPSell] = tick;
-	    PlayerPlaySound(playerid, 1149, 0.0, 0.0, 0.0);
-	    format(gstr, sizeof(gstr), ""nef" "yellow_e"%s(%i) sold the business %i!", __GetName(playerid), playerid, PropInfo[i][iID]);
-	    SCMToAll(-1, gstr);
-	    break;
-	}
-	if(!found) SCM(playerid, -1, ""er"You aren't near of any business");
 	return 1;
 }
 
