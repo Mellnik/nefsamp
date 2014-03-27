@@ -20,8 +20,8 @@
 ||
 || Build Notes:
 || - Set rcon 0 in server.cfg
-|| - Add samp.ban
-|| - Robbery/Smuggling/Meth Lab/Prostitution/Loan Sharks
+|| - Add samp.ban	"Loan Sharks",
+|| - Loan Sharks/Robbery/Smuggling/Prostitution/Meth Lab
 */
 
 #pragma dynamic 8192
@@ -257,10 +257,6 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define MAX_BUSINESSES                  (750)
 #define MAX_BUSINESS_LEVEL              (20)
 #define MAX_PLAYER_BUSINESSES           (5)
-
-#define MAX_PROPS                       (1000)
-#define MAX_PLAYER_PROPS 				(5)
-#define MAX_PROP_LEVEL                  (20)
 
 // Misc
 #define REAC_TIME              			(900000)
@@ -498,7 +494,9 @@ enum (+= 56)
 	GANGS_DIALOG,
 	HOUSE_UPGRADE_DIALOG,
 	HOUSE_MENU_DIALOG,
-	PROP_MENU_DIALOG,
+	DIALOG_BUSINESS,
+	DIALOG_UPGRADE_BUSINESS,
+	DIALOG_SET_BUSINESS_TYPE,
 	SETTINGS_DIALOG,
 	GANG_KICK_DIALOG,
 	CLOSE_GANG_DIALOG,
@@ -520,7 +518,6 @@ enum (+= 56)
     COPS_REFILL,
     ROBBER_REFILL,
     NO_CREDITS_DIALOG,
-    PROP_LEVEL_UPGRADE_DIALOG,
     DIALOG_DUEL,
     NO_DIALOG_ID
 };
@@ -658,7 +655,7 @@ enum e_player_data
 	AdditionalPropSlots,
 	AdditionalHouseObjSlots,
 	HouseSlotSelected,
-	PropSlotSelected,
+	BusinessIdSelected,
 	DrawnNumber,
 	TrailerVid,
 	tRainbow,
@@ -994,7 +991,7 @@ enum e_property_data
 enum e_prop_matrix
 {
 	E_blevel,
-	E_bupradecoast,
+	E_bupgradeprice,
 	E_bearnings
 };
 
@@ -1740,7 +1737,6 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
   	beach_m,
 	bb_mcc,
   	houseid,
-  	propid,
   	gzoneid,
   	Text3D:Label_Elevator,
   	Text3D:Label_Floors[21],
@@ -1811,7 +1807,6 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
   	PlayerPV[MAX_PLAYERS][MAX_PLAYER_PVS][e_player_pv_data],
   	HouseInfo[MAX_HOUSES][e_house_data],
   	GZoneInfo[MAX_GZONES][e_gzone_data],
-  	PropInfo[MAX_PROPS][e_property_data],
   	BusinessData[MAX_BUSINESSES][E_BUSINESS_DATA],
   	PVSelect[MAX_PLAYERS],
 	PVCatSel[MAX_PLAYERS],
@@ -15550,7 +15545,7 @@ YCMD:bmenu(playerid, params[], help)
     if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE) return SCM(playerid, RED, NOT_AVAIL);
     new string[512], tmp[64];
 
-    for(new i = 0; i < MAX_PLAYER_PROPS; i++)
+    for(new i = 0; i < MAX_PLAYER_BUSINESSES; i++)
     {
         if(i > PlayerInfo[playerid][AdditionalPropSlots])
         {
@@ -15570,7 +15565,7 @@ YCMD:bmenu(playerid, params[], help)
 		strcat(string, tmp);
     }
 
-    ShowPlayerDialog(playerid, PROP_MENU_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Business Menu", string, "Select", "Cancel");
+    ShowPlayerDialog(playerid, DIALOG_BUSINESS, DIALOG_STYLE_LIST, ""nef" :: Business Menu", string, "Select", "Cancel");
 	return 1;
 }
 
@@ -17210,11 +17205,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		        g_BuildTakeCheckpoints = true;
 				return true;
 		    }
-	        case PROP_MENU_DIALOG:
+	        case DIALOG_BUSINESS:
 	        {
 				format(gstr, sizeof(gstr), ""nef" :: Business Menu > Slot: %i", listitem + 1);
 
-	            PlayerInfo[playerid][PropSlotSelected] = listitem;
+	            PlayerInfo[playerid][BusinessIdSelected] = listitem;
 
 		        if(listitem > PlayerInfo[playerid][AdditionalPropSlots])
 		        {
@@ -17228,12 +17223,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				    }
 				    else
 				    {
-				        ShowPlayerDialog(playerid, PROP_MENU_DIALOG + 1, DIALOG_STYLE_LIST, gstr, "Goto This Business\nUpgrade Business Level", "Select", "Cancel");
+				        ShowPlayerDialog(playerid, DIALOG_BUSINESS + 1, DIALOG_STYLE_LIST, gstr, "Goto This Business\nSet Business Type\nUpgrade Business Level", "Select", "Cancel");
 				    }
 				}
 	            return true;
 	        }
-	        case PROP_MENU_DIALOG + 1:
+	        case DIALOG_BUSINESS + 1:
 	        {
 		        if(gTeam[playerid] != FREEROAM)
 				{
@@ -17245,11 +17240,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 				    case 0:
 				    {
-						new p_id = GetPropIdByPlayerSlotSel(playerid);
+						new r = GetBusinessSlotByDialogSelect(playerid);
 
-						if(p_id != -1)
+						if(r != -1)
 						{
-				   			SetPlayerPos(playerid, PropInfo[p_id][E_x], PropInfo[p_id][E_y], PropInfo[p_id][E_z]);
+				   			SetPlayerPos(playerid, BusinessData[r][e_pos][0], BusinessData[r][e_pos][1], BusinessData[r][e_pos][2]);
 				   			PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
 				   			SetPVarInt(playerid, "doingStunt", 0);
 				   			PlayerInfo[playerid][tickJoin_bmx] = 0;
@@ -17258,45 +17253,63 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				    }
 				    case 1:
 				    {
-				        ShowDialog(playerid, PROP_LEVEL_UPGRADE_DIALOG);
+						ShowDialog(playerid, DIALOG_SET_BUSINESS_TYPE);
+				    }
+				    case 2:
+				    {
+				        ShowDialog(playerid, DIALOG_UPGRADE_BUSINESS);
 				    }
 				}
 	            return true;
 	        }
-	        case PROP_LEVEL_UPGRADE_DIALOG:
+	        case DIALOG_SET_BUSINESS_TYPE:
 	        {
-	            new p_id = GetPropIdByPlayerSlotSel(playerid), string[255], tmp[140];
+	            new r = GetBusinessSlotByDialogSelect(playerid);
+	            
+				if(r != -1) {
+					BusinessData[r][e_type] = E_BUSINESS_TYPES:listitem;
+					SendInfo(playerid, "Business type set", "");
+					format(gstr, sizeof(gstr), ""business_mark"\nID: %i\nOwner: %s\nType: %s\nLevel: %i", BusinessData[r][e_id], BusinessData[r][e_owner], BusinessTypes[_:BusinessData[r][e_type]], BusinessData[r][e_level]);
+					Update3DTextLabelText(BusinessData[r][e_label_id], -1, gstr);
+					orm_update(BusinessData[r][e_ormid]);
+				} else {
+					return SendInfo(playerid, "Couldn't find the business in that slot", "Report on forums", 5000);
+				}
+				return true;
+	        }
+	        case DIALOG_UPGRADE_BUSINESS:
+	        {
+	            new r = GetBusinessSlotByDialogSelect(playerid);
 			    
-				if(p_id != -1)
-				{
-		            if(PropInfo[p_id][E_Level] >= MAX_PROP_LEVEL)
+				if(r != -1) {
+		            if(BusinessData[r][e_level] >= MAX_PLAYER_BUSINESSES)
 		            {
 						Command_ReProcess(playerid, "/bmenu", false);
 						return 1;
 		            }
                 
-		            if(GetPlayerCash(playerid) < BLevelMatrix[PropInfo[p_id][E_Level]][E_bupradecoast])
+		            if(GetPlayerCash(playerid) < BLevelMatrix[BusinessData[r][e_level]][E_bupgradeprice])
 		            {
 		                return SCM(playerid, -1, ""er"You don't have enough money!");
 		            }
 
-                    GivePlayerCash(playerid, -BLevelMatrix[PropInfo[p_id][E_Level]][E_bupradecoast]);
-                    PropInfo[p_id][E_Level]++;
+                    GivePlayerCash(playerid, -BLevelMatrix[BusinessData[r][e_level]][E_bupgradeprice]);
+                    BusinessData[r][e_level]++;
 
-					strcat(string, ""white"You have successfully upgraded your business's level!\n\nCurrent Business Level: ");
-                 	format(tmp, sizeof(tmp), "%i\nCurrent Business Earnings: $%s", PropInfo[p_id][E_Level], number_format(GetPropEearnings(p_id)));
+					gstr2[0] = '\0';
+					strcat(gstr2, ""white"You have successfully upgraded your business's level!\n\nCurrent Business Level: ");
+                 	format(gstr, sizeof(gstr), "%i\nCurrent Business Earnings: $%s", BusinessData[r][e_level], number_format(GetBusinessEarnings(r)));
+                 	strcat(gstr2, gstr);
+	                format(gstr, sizeof(gstr), ""nef" :: Business Level Upgrade > Slot: %i", PlayerInfo[playerid][BusinessIdSelected] + 1);
+					ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, gstr, gstr2, "OK", "");
                  	
-                 	strcat(string, tmp);
-                 	
-				    format(tmp, sizeof(tmp), ""business_mark"\nOwner: %s\nID: %i\nLevel: %i", __GetName(playerid), PropInfo[p_id][iID], PropInfo[p_id][E_Level]);
-				    UpdateDynamic3DTextLabelText(PropInfo[p_id][label], -1, tmp);
+					format(gstr, sizeof(gstr), ""business_mark"\nID: %i\nOwner: %s\nType: %s\nLevel: %i", BusinessData[r][e_id], BusinessData[r][e_owner], BusinessTypes[_:BusinessData[r][e_type]], BusinessData[r][e_level]);
+					Update3DTextLabelText(BusinessData[r][e_label_id], -1, gstr);
 				    
-					MySQL_SaveProp(p_id);
+					orm_update(BusinessData[r][e_ormid]);
+				} else {
+					SendInfo(playerid, "Couldn't find the business in that slot", "Report on forums", 5000);
 				}
-				else return SendInfo(playerid, "Couldn't find the business in that slot", "Report on forums", 5000);
-
-                format(tmp, sizeof(tmp), ""nef" :: Business Level Upgrade > Slot: %i", PlayerInfo[playerid][PropSlotSelected] + 1);
-				ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, tmp, string, "OK", "");
 	            return true;
 	        }
 	        case CM_DIALOG:
@@ -21877,22 +21890,6 @@ MySQL_SaveHouse(house, bool:save_items = false)
 	mysql_tquery(pSQL, "COMMIT;");
 }
 
-MySQL_SaveProp(propertyid)
-{
-    new query[300];
-    format(query, sizeof(query), "UPDATE `props` SET `Owner` = '%s', `XPos` = %.2f, `YPos` = %.2f, `ZPos` = %.2f, `Level` = %i, `Sold` = %i, `Date` = %i WHERE `ID` = %i LIMIT 1;",
-		PropInfo[propertyid][Owner],
-		PropInfo[propertyid][E_x],
-		PropInfo[propertyid][E_y],
-		PropInfo[propertyid][E_z],
-		PropInfo[propertyid][E_Level],
-		PropInfo[propertyid][sold],
-		PropInfo[propertyid][date],
-		PropInfo[propertyid][iID]);
-
-	mysql_tquery(pSQL, query, "", "");
-}
-
 MySQL_FinalGangKick(playerid)
 {
 	format(gstr2, sizeof(gstr2), "UPDATE `accounts` SET `GangID` = 0, `GangPosition` = 0 WHERE `Name` = '%s' LIMIT 1;", PlayerInfo[playerid][GangKickMem]);
@@ -25552,8 +25549,8 @@ function:QueueProcess()
 
 			if(PlayerInfo[i][Props] > 0)
 			{
-			    b_vipearnings = floatround(GetPlayerPropEearnings(i) / 2.5);
-			    format(string3, sizeof(string3), "Business earnings: "green"$%s", number_format(GetPlayerPropEearnings(i)));
+			    b_vipearnings = floatround(GetPlayerBusinessEarnings(i) / 2.5);
+			    format(string3, sizeof(string3), "Business earnings: "green"$%s", number_format(GetPlayerBusinessEarnings(i)));
 			   	if(PlayerInfo[i][VIP] == 1)
    				{
 			   		format(string5, sizeof(string5), "Business earnings "lb_e"(VIP BOOST)"white": "green"$%s", number_format(b_vipearnings));
@@ -25566,7 +25563,7 @@ function:QueueProcess()
 				format(string5, sizeof(string5), "Business earnings "lb_e"(VIP BOOST)"white": "red"---");
 			}
 
-			PlayerInfo[i][Bank] = PlayerInfo[i][Bank] + interest + GetPlayerPropEearnings(i) + vipinterest + b_vipearnings;
+			PlayerInfo[i][Bank] = PlayerInfo[i][Bank] + interest + GetPlayerBusinessEarnings(i) + vipinterest + b_vipearnings;
 
 			format(string2, sizeof(string2), "Bank Balance after PayDay: "green"$%s", number_format(PlayerInfo[i][Bank]));
 
@@ -27874,42 +27871,46 @@ function:ShowDialog(playerid, dialogid)
 		{
 			ShowPlayerDialog(playerid, DIALOG_RACE_RACETYPE, DIALOG_STYLE_LIST, ""nef" :: Race Creation "white"- (Step 1/5)", "Normal Race\nAir Race", "Next", "Exit");
 		}
-	    case PROP_LEVEL_UPGRADE_DIALOG:
+		case DIALOG_SET_BUSINESS_TYPE:
+		{
+		    ShowPlayerDialog(playerid, DIALOG_SET_BUSINESS_TYPE, DIALOG_STYLE_LIST, ""nef" :: Select a business type", "Loan Sharks\nRobbery\nSmuggling\nProstitution\nMeth Lab", "Select", "Back");
+		}
+	    case DIALOG_UPGRADE_BUSINESS:
 	    {
 	        new string[512], tmp[255];
 	        
-	        new p_id = GetPropIdByPlayerSlotSel(playerid);
+	        new r = GetBusinessSlotByDialogSelect(playerid);
 	        
-			if(p_id != -1)
-			{
+			if(r != -1) {
 			    strcat(string, ""white"The higher the level the higher the earnings. Upgrade your business\nlevel to receive more money each payday! Max. Level: 20\n\nCurrent Business Level: ");
 			    
-			    if(PropInfo[p_id][E_Level] >= MAX_PROP_LEVEL)
+			    if(BusinessData[r][e_level] >= MAX_PLAYER_BUSINESSES)
 			    {
-				    format(tmp, sizeof(tmp), "%i\nCurrent Business Earnings: $%s\n\nThis business reached its max. level!", PropInfo[p_id][E_Level], number_format(GetPropEearnings(p_id)));
+				    format(tmp, sizeof(tmp), "%i\nCurrent Business Earnings: $%s\n\nThis business reached its max. level!", BusinessData[r][e_level], number_format(GetBusinessEarnings(r)));
 					strcat(string, tmp);
 			    }
 			    else
 			    {
 				    format(tmp, sizeof(tmp), "%i\nCurrent Business Earnings: $%s\nEarnings in next level: $%s\n\nUpgrade now for "yellow_e"$%s"white"!",
-						PropInfo[p_id][E_Level],
-						number_format(GetPropEearnings(p_id)),
-						number_format(BLevelMatrix[PropInfo[p_id][E_Level]][E_bearnings]),
-						number_format(BLevelMatrix[PropInfo[p_id][E_Level]][E_bupradecoast]));
+						BusinessData[r][e_level],
+						number_format(GetBusinessEarnings(r)),
+						number_format(BLevelMatrix[BusinessData[r][e_level]][E_bearnings]),
+						number_format(BLevelMatrix[BusinessData[r][e_level]][E_bupgradeprice]));
 					strcat(string, tmp);
 				}
-			}
-			else return SendInfo(playerid, "Couldn't find the business in that slot", "Report on forums", 4000);
-	        
-	        format(tmp, sizeof(tmp), ""nef" :: Business Level Upgrade > Slot: %i", PlayerInfo[playerid][PropSlotSelected] + 1);
+				
+	 	        format(tmp, sizeof(tmp), ""nef" :: Business Level Upgrade > Slot: %i", PlayerInfo[playerid][BusinessIdSelected] + 1);
 
-            if(PropInfo[p_id][E_Level] == MAX_PROP_LEVEL)
-            {
-				ShowPlayerDialog(playerid, PROP_LEVEL_UPGRADE_DIALOG, DIALOG_STYLE_MSGBOX, tmp, string, "Back", "");
-			}
-			else
-			{
-                ShowPlayerDialog(playerid, PROP_LEVEL_UPGRADE_DIALOG, DIALOG_STYLE_MSGBOX, tmp, string, "Upgrade", "Back");
+	            if(BusinessData[r][e_level] == MAX_PLAYER_BUSINESSES)
+	            {
+					ShowPlayerDialog(playerid, DIALOG_UPGRADE_BUSINESS, DIALOG_STYLE_MSGBOX, tmp, string, "Back", "");
+				}
+				else
+				{
+	                ShowPlayerDialog(playerid, DIALOG_UPGRADE_BUSINESS, DIALOG_STYLE_MSGBOX, tmp, string, "Upgrade", "Back");
+				}
+			} else {
+                SendInfo(playerid, "Couldn't find the business in that slot", "Report on forums", 4000);
 			}
 		}
 	    case CM_DIALOG:
@@ -29410,16 +29411,16 @@ GetHouseIdByPlayerSlotSel(playerid)
 	return -1;
 }
 
-GetPropIdByPlayerSlotSel(playerid)
+GetBusinessSlotByDialogSelect(playerid)
 {
 	new idx = 0;
-	for(new i = 0; i < propid; i++)
+	for(new r = 0; r < MAX_BUSINESSES; r++)
 	{
-        if(!strcmp(PropInfo[i][Owner], __GetName(playerid), true) && PropInfo[i][sold] == 1)
+        if(!strcmp(BusinessData[r][e_owner], __GetName(playerid), true) && BusinessData[r][e_sold] == 1)
         {
-            if(idx == PlayerInfo[playerid][PropSlotSelected])
+            if(idx == PlayerInfo[playerid][BusinessIdSelected])
             {
-            	return i;
+            	return r;
 			}
 			else idx++;
 		}
@@ -29949,24 +29950,24 @@ function:p_medkit(playerid)
 	return 1;
 }
 
-GetPlayerPropEearnings(playerid)
+GetPlayerBusinessEarnings(playerid)
 {
 	new __int32 = 0;
-	for(new i = 0; i < propid; i++)
+	for(new r = 0; r < MAX_BUSINESSES; r++)
 	{
-	    if(strcmp(PropInfo[i][Owner], __GetName(playerid), true)) continue;
+	    if(strcmp(BusinessData[r][e_owner], __GetName(playerid), true)) continue;
 	    
-	    __int32 += GetPropEearnings(i);
+	    __int32 += GetBusinessEarnings(r);
 	}
 	return __int32;
 }
 
-GetPropEearnings(p_id)
+GetBusinessEarnings(r)
 {
 	new __int32 = 0;
 	for(new i = 0; i < sizeof(BLevelMatrix); i++)
 	{
-		if(i == (PropInfo[p_id][E_Level] - 1))
+		if(i == (BusinessData[r][e_level] - 1))
 		{
 		    __int32 = BLevelMatrix[i][E_bearnings];
 		    return __int32;
@@ -30756,7 +30757,7 @@ ResetPlayerVars(playerid)
 	PlayerInfo[playerid][AdditionalPropSlots] = 0;
 	PlayerInfo[playerid][AdditionalHouseObjSlots] = 0;
 	PlayerInfo[playerid][HouseSlotSelected] = 0;
-	PlayerInfo[playerid][PropSlotSelected] = 0;
+	PlayerInfo[playerid][BusinessIdSelected] = 0;
 	PlayerInfo[playerid][DrawnNumber] = -1;
 	PlayerInfo[playerid][TrailerVid] = -1;
 	PlayerInfo[playerid][tRainbow] = -1;
