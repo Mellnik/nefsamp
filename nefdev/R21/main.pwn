@@ -13830,9 +13830,9 @@ YCMD:setbizzlevel(playerid, params[], help)
 		BusinessData[r][e_level] = blevel;
 		
 		if(BusinessData[r][e_sold]) {
-	        format(gstr2, sizeof(gstr2), ""business_mark"\nID: %i\nOwner: %s\nType: %s\nLevel: %i", BusinessData[r][e_id], BusinessData[r][e_owner], BusinessTypes[_:BusinessData[r][e_type]], BusinessData[r][e_level]);
+	        format(gstr, sizeof(gstr), ""business_mark"\nID: %i\nOwner: %s\nType: %s\nLevel: %i", BusinessData[r][e_id], BusinessData[r][e_owner], BusinessTypes[_:BusinessData[r][e_type]], BusinessData[r][e_level]);
 		} else {
-		    format(gstr2, sizeof(gstr2), ""business_mark"\n"nef_green"FOR SALE! Type /bbuy"white"\nID: %i\nType: %s\nLevel: %i", BusinessData[r][e_id], BusinessTypes[_:BusinessData[r][e_type]], BusinessData[r][e_level]);
+		    format(gstr, sizeof(gstr), ""business_mark"\n"nef_green"FOR SALE! Type /bbuy"white"\nID: %i\nType: %s\nLevel: %i", BusinessData[r][e_id], BusinessTypes[_:BusinessData[r][e_type]], BusinessData[r][e_level]);
 		}
 		
 		UpdateDynamic3DTextLabelText(BusinessData[r][e_label_id], -1, gstr);
@@ -13844,7 +13844,7 @@ YCMD:setbizzlevel(playerid, params[], help)
  	if(!bFound) SCM(playerid, -1, ""er"You aren't near of any business");
 	return 1;
 }
-
+/*
 YCMD:resetbizz(playerid, params[], help)
 {
     if(!IsPlayerAdmin(playerid) || PlayerInfo[playerid][Level] != MAX_ADMIN_LEVEL) return SCM(playerid, -1, NO_PERM);
@@ -13890,7 +13890,7 @@ YCMD:resetbizz(playerid, params[], help)
 	}
     if(!found) SCM(playerid, -1, ""er"You need to stand in the business pickup (Entrance)");
 	return 1;
-}
+}*/
 
 #if IS_RELEASE_BUILD == false
 YCMD:createrace(playerid, params[], help)
@@ -17006,15 +17006,15 @@ function:OnPlayerNameChangeRequest(newname[], playerid)
 
             if(PlayerInfo[playerid][Props] > 0)
             {
-				for(new i = 0; i < propid; i++)
+				for(new r = 0; r < MAX_BUSINESSES; r++)
 				{
-    				if(strcmp(PropInfo[i][Owner], oldname, true)) continue;
+    				if(strcmp(BusinessData[r][e_owner], oldname, true)) continue;
 
-                    strmid(PropInfo[i][Owner], newname, 0, 25, 25);
+                    strmid(BusinessData[r][e_owner], newname, 0, 25, 25);
 
-				    format(query, sizeof(query), ""business_mark"\nOwner: %s\nID: %i\nLevel: %i", __GetName(playerid), PropInfo[i][iID], PropInfo[i][E_Level]);
-				    UpdateDynamic3DTextLabelText(PropInfo[i][label], -1, query);
-				    MySQL_SaveProp(i);
+                    format(gstr, sizeof(gstr), ""business_mark"\nID: %i\nOwner: %s\nType: %s\nLevel: %i", BusinessData[r][e_id], BusinessData[r][e_owner], BusinessTypes[_:BusinessData[r][e_type]], BusinessData[r][e_level]);
+				    UpdateDynamic3DTextLabelText(BusinessData[r][e_label_id], -1, gstr);
+				    orm_update(BusinessData[r][e_ormid]);
 				}
             }
             
