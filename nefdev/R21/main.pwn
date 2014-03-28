@@ -652,7 +652,7 @@ enum e_player_data
 	AdditionalPVSlots,
 	AdditionalToySlots,
 	AdditionalHouseSlots,
-	AdditionalPropSlots,
+	AdditionalBusinessSlots,
 	AdditionalHouseObjSlots,
 	HouseSlotSelected,
 	BusinessIdSelected,
@@ -678,7 +678,7 @@ enum e_player_data
 	MedkitTime,
 	PayDay,
   	Houses,
-	Props,
+	Businesses,
 	GCPlayer,
 	GCNameHash,
 	GCOffer,
@@ -971,21 +971,6 @@ enum E_BUSINESS_DATA
 	Text3D:e_label_id,
 	e_icon_id,
 	e_pickup_id
-};
-
-enum e_property_data
-{
-	iID,
-	Owner[25],
-	Float:E_x,
-	Float:E_y,
-	Float:E_z,
-	Text3D:label,
-	sold,
-	E_Level,
-	pickid,
-	iconid,
-	date
 };
 
 enum e_prop_matrix
@@ -4412,7 +4397,7 @@ public OnPlayerText(playerid, text[])
 	 		format(gstr, sizeof(gstr), "{%06x}%s"white"(%i): %s", GetColor__(playerid) >>> 8, __GetName(playerid), playerid, text);
 			SCMToAll(-1, gstr);
   		}
-		else
+		else if(PlayerInfo[playerid][AOnline] && PlayerInfo[playerid][Level] > 0)
 		{
  	 		format(gstr, sizeof(gstr), "{%06x}%s"white"(%i): {A8DBFF}%s", GetColor__(playerid) >>> 8, __GetName(playerid), playerid, text);
 			SCMToAll(-1, gstr);
@@ -8452,7 +8437,7 @@ YCMD:bbuy(playerid, params[], help)
 		    SendInfo(playerid, "Business not for sale", "");
 		    break;
 		}
-		if(PlayerInfo[playerid][Props] > PlayerInfo[playerid][AdditionalPropSlots]) {
+		if(PlayerInfo[playerid][Businesses] > PlayerInfo[playerid][AdditionalBusinessSlots]) {
 			SCM(playerid, -1, ""er"You do not have any free business slots");
 			break;
 		}
@@ -8477,7 +8462,7 @@ YCMD:bbuy(playerid, params[], help)
 		SetupBusiness(r);
 		
 		PlayerInfo[playerid][tickLastPBuy] = tick;
-		PlayerInfo[playerid][Props]++;
+		PlayerInfo[playerid][Businesses]++;
 		
 		SendInfo(playerid, "SUCCESS!", "");
         PlayerPlaySound(playerid, 1149, 0.0, 0.0, 0.0);
@@ -8534,7 +8519,7 @@ YCMD:bsell(playerid, params[], help)
 
         SetupBusiness(r);
 
-	    PlayerInfo[playerid][Props]--;
+	    PlayerInfo[playerid][Businesses]--;
 	    PlayerInfo[playerid][tickLastPSell] = tick;
 	    
 	    SendInfo(playerid, "SUCCESS!", "");
@@ -10345,7 +10330,7 @@ YCMD:id(playerid, params[], help)
 	
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(IsPlayerAvail(i))
+		if(IsPlayerAvail(i) && PlayerInfo[playerid][AOnline])
 		{
 	  		GetPlayerName(i, playername, MAX_PLAYER_NAME+1);
 			new namelen = strlen(playername), bool:searched = false;
@@ -13858,7 +13843,7 @@ YCMD:resetbizz(playerid, params[], help)
 		    if(!strcmp(PropInfo[i][Owner], __GetName(pid), true) && IsPlayerConnected(pid))
 		    {
 				pfound = true;
-		        PlayerInfo[pid][Props]--;
+		        PlayerInfo[pid][Businesses]--;
 		        SCM(pid, -1, "An admin destroyed your business!");
 				MySQL_SavePlayer(pid, false);
 				break;
@@ -15417,7 +15402,7 @@ YCMD:stats(playerid, params[], help)
 			vip,
 			PlayerInfo[player1][Medkits],
 			PlayerInfo[player1][Houses],
-			PlayerInfo[player1][Props],
+			PlayerInfo[player1][Businesses],
 			PlayerInfo[player1][Wanteds],
 			UTConvert(PlayerInfo[player1][LastLogin]));
 			
@@ -15547,13 +15532,13 @@ YCMD:bmenu(playerid, params[], help)
 
     for(new i = 0; i < MAX_PLAYER_BUSINESSES; i++)
     {
-        if(i > PlayerInfo[playerid][AdditionalPropSlots])
+        if(i > PlayerInfo[playerid][AdditionalBusinessSlots])
         {
             format(tmp, sizeof(tmp), "Business Slot %i "red"(Locked)\n", i + 1);
         }
         else
 		{
-		    if(i < PlayerInfo[playerid][Props])
+		    if(i < PlayerInfo[playerid][Businesses])
 		    {
 			    format(tmp, sizeof(tmp), "Business Slot %i "green2"(Used)\n", i + 1);
 		    }
@@ -16999,7 +16984,7 @@ function:OnPlayerNameChangeRequest(newname[], playerid)
 				}
             }
 
-            if(PlayerInfo[playerid][Props] > 0)
+            if(PlayerInfo[playerid][Businesses] > 0)
             {
 				for(new r = 0; r < MAX_BUSINESSES; r++)
 				{
@@ -17211,13 +17196,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 	            PlayerInfo[playerid][BusinessIdSelected] = listitem;
 
-		        if(listitem > PlayerInfo[playerid][AdditionalPropSlots])
+		        if(listitem > PlayerInfo[playerid][AdditionalBusinessSlots])
 		        {
 		            ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, gstr, ""nef_green"This business slot is locked.\n\n"white"You may unlock it by purchasing an extra slot at Gold Credits (/gc)", "OK", "");
 		        }
 		        else
 				{
-				    if(listitem >= PlayerInfo[playerid][Props])
+				    if(listitem >= PlayerInfo[playerid][Businesses])
 				    {
 				        SendInfo(playerid, "Business slot not in use", "");
 				    }
@@ -17441,14 +17426,14 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	                return 1;
 	            }
 
-				if(PlayerInfo[playerid][AdditionalPropSlots] >= 4)
+				if(PlayerInfo[playerid][AdditionalBusinessSlots] >= 4)
 				{
 				    SCM(playerid, -1, ""er"You already have 4 additional business slots!");
 				    ShowDialog(playerid, CM_DIALOG);
 				    return 1;
 				}
 
-				PlayerInfo[playerid][AdditionalPropSlots]++;
+				PlayerInfo[playerid][AdditionalBusinessSlots]++;
 				
 				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[4][E_item_credits]));
 				SendInfo(playerid, "Item purchased", gstr, 5000);
@@ -21509,13 +21494,13 @@ MySQL_SavePlayer(playerid, bool:save_pv)
 		PlayerInfo[playerid][Reaction],
 		PlayerInfo[playerid][PayDay],
 		PlayerInfo[playerid][Houses],
-		PlayerInfo[playerid][Props],
+		PlayerInfo[playerid][Businesses],
 		PlayerInfo[playerid][GangPosition],
 		PlayerInfo[playerid][GangID],
 		PlayerInfo[playerid][AdditionalPVSlots],
 		PlayerInfo[playerid][AdditionalToySlots],
 		PlayerInfo[playerid][AdditionalHouseSlots],
-		PlayerInfo[playerid][AdditionalPropSlots],
+		PlayerInfo[playerid][AdditionalBusinessSlots],
 		PlayerInfo[playerid][AdditionalHouseObjSlots],
 		PlayerInfo[playerid][DerbyWins]);
 
@@ -25547,7 +25532,7 @@ function:QueueProcess()
 	        }
 	        else format(string4, sizeof(string4), "Bank Interest Gained "lb_e"(VIP BOOST)"white": "red"---");
 
-			if(PlayerInfo[i][Props] > 0)
+			if(PlayerInfo[i][Businesses] > 0)
 			{
 			    b_vipearnings = floatround(GetPlayerBusinessEarnings(i) / 2.5);
 			    format(string3, sizeof(string3), "Business earnings: "green"$%s", number_format(GetPlayerBusinessEarnings(i)));
@@ -25701,9 +25686,9 @@ function:OnQueueReceived()
 						{
 							PlayerInfo[playerid][AdditionalHouseSlots]++;
 						}
-						if(PlayerInfo[playerid][AdditionalPropSlots] < 4)
+						if(PlayerInfo[playerid][AdditionalBusinessSlots] < 4)
 						{
-							PlayerInfo[playerid][AdditionalPropSlots]++;
+							PlayerInfo[playerid][AdditionalBusinessSlots]++;
 						}
 		                
 						SCM(playerid, -1, ""server_sign" "r_besch"You received VIP status + $1,000,000 bank money + 2 PV Slots + 1 House Slot + 1 Bizz Slot!");
@@ -25749,9 +25734,8 @@ function:OnQueueReceived()
 
 			                mysql_tquery(pSQL, gstr2, "", "");
 						}
-						
-						cache_delete(res);
-						
+
+    					cache_delete(res);
 						cache_set_active(Data, pSQL);
 		            }
 		            
@@ -30754,7 +30738,7 @@ ResetPlayerVars(playerid)
 	PlayerInfo[playerid][AdditionalPVSlots] = 0;
 	PlayerInfo[playerid][AdditionalToySlots] = 0;
 	PlayerInfo[playerid][AdditionalHouseSlots] = 0;
-	PlayerInfo[playerid][AdditionalPropSlots] = 0;
+	PlayerInfo[playerid][AdditionalBusinessSlots] = 0;
 	PlayerInfo[playerid][AdditionalHouseObjSlots] = 0;
 	PlayerInfo[playerid][HouseSlotSelected] = 0;
 	PlayerInfo[playerid][BusinessIdSelected] = 0;
@@ -30780,7 +30764,7 @@ ResetPlayerVars(playerid)
 	PlayerInfo[playerid][MedkitTime] = 0;
 	PlayerInfo[playerid][PayDay] = 60;
   	PlayerInfo[playerid][Houses] = 0;
-	PlayerInfo[playerid][Props] = 0;
+	PlayerInfo[playerid][Businesses] = 0;
 	PlayerInfo[playerid][GCPlayer] = INVALID_PLAYER_ID;
 	PlayerInfo[playerid][GCNameHash] = 0;
 	PlayerInfo[playerid][GCOffer] = 0;
@@ -30913,6 +30897,8 @@ function:ForceClassSpawn(playerid)
 
 function:OnPlayerAccountRequest(playerid, namehash, request)
 {
+    if(!IsPlayerConnected(playerid)) return 0;
+
 	if(YHash(__GetName(playerid)) != namehash) {
 	    Kick(playerid);
 		return 0;
@@ -31088,13 +31074,13 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
                 PlayerInfo[playerid][Reaction] = cache_get_row_int(0, 12, pSQL);
                 PlayerInfo[playerid][PayDay] = cache_get_row_int(0, 13, pSQL);
                 PlayerInfo[playerid][Houses] = cache_get_row_int(0, 14, pSQL);
-                PlayerInfo[playerid][Props] = cache_get_row_int(0, 15, pSQL);
+                PlayerInfo[playerid][Businesses] = cache_get_row_int(0, 15, pSQL);
                 PlayerInfo[playerid][GangPosition] = cache_get_row_int(0, 16, pSQL);
                 PlayerInfo[playerid][GangID] = cache_get_row_int(0, 17, pSQL);
                 PlayerInfo[playerid][AdditionalPVSlots] = cache_get_row_int(0, 18, pSQL);
                 PlayerInfo[playerid][AdditionalToySlots] = cache_get_row_int(0, 19, pSQL);
                 PlayerInfo[playerid][AdditionalHouseSlots] = cache_get_row_int(0, 20, pSQL);
-                PlayerInfo[playerid][AdditionalPropSlots] = cache_get_row_int(0, 21, pSQL);
+                PlayerInfo[playerid][AdditionalBusinessSlots] = cache_get_row_int(0, 21, pSQL);
                 PlayerInfo[playerid][AdditionalHouseObjSlots] = cache_get_row_int(0, 22, pSQL);
                 PlayerInfo[playerid][DerbyWins] = cache_get_row_int(0, 24, pSQL);
                 PlayerInfo[playerid][RaceWins] = cache_get_row_int(0, 25, pSQL);
