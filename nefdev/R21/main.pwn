@@ -2820,9 +2820,14 @@ public OnPlayerSpawn(playerid)
 		case ROCKETDM:
 		{
   			ResetPlayerWeapons(playerid);
+  			GivePlayerWeapon(playerid, 35, 99999);
+  			
 			SetPlayerVirtualWorld(playerid, ROCKETDM_WORLD);
-			GivePlayerWeapon(playerid, 35, 99999);
-			SetPlayerInterior(playerid, 0);
+   			SetPlayerInterior(playerid, 0);
+
+			new rand = random(8);
+			SetPlayerPos(playerid, RocketDM_Spawns[rand][0], RocketDM_Spawns[rand][1], RocketDM_Spawns[rand][2] + 2.5);
+			SetPlayerFacingAngle(playerid, RocketDM_Spawns[rand][3]);
 		}
 		case SNIPER:
 		{
@@ -4829,9 +4834,6 @@ public OnPlayerDeath(playerid, killerid, reason)
 				GivePlayerScore_(killerid, 1, true, true);
 				GivePlayerCash(killerid, 2000, true, true);
 		    }
-		    
-			new rand = random(8);
-			SetSpawnInfoEx(playerid, NO_TEAM, GetPlayerSkin(playerid), RocketDM_Spawns[rand][0], RocketDM_Spawns[rand][1], RocketDM_Spawns[rand][2] + 2.5, RocketDM_Spawns[rand][3]);
 		}
 		case gBG_TEAM1:
 		{
