@@ -17249,7 +17249,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 				    case 0:
 				    {
-						new r = GetBusinessSlotByDialogSelect(playerid);
+						new r = GetBusinessSlotBySelection(playerid);
 
 						if(r != -1)
 						{
@@ -17273,7 +17273,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        }
 	        case DIALOG_SET_BUSINESS_TYPE:
 	        {
-	            new r = GetBusinessSlotByDialogSelect(playerid);
+	            new r = GetBusinessSlotBySelection(playerid);
 	            
 				if(r != -1) {
 					BusinessData[r][e_type] = E_BUSINESS_TYPES:listitem;
@@ -17288,7 +17288,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        }
 	        case DIALOG_UPGRADE_BUSINESS:
 	        {
-	            new r = GetBusinessSlotByDialogSelect(playerid);
+	            new r = GetBusinessSlotBySelection(playerid);
 			    
 				if(r != -1) {
 		            if(BusinessData[r][e_level] >= MAX_PLAYER_BUSINESSES)
@@ -20429,7 +20429,7 @@ function:OnHouseLoad()
 			houseid++;
 		}
 	}
-	printf(">> Loaded %i House(s) in %i microseconds", houseid, cache_get_query_exec_time(UNIT_MICROSECONDS));
+	Log(LOG_INIT, "%i houses loaded in %i microseconds", houseid, cache_get_query_exec_time(UNIT_MICROSECONDS));
 	return 1;
 }
 
@@ -20555,7 +20555,7 @@ function:OnGangZoneLoad()
 	    }
 	}
 	cache_set_active(Data, pSQL);
-	printf(">> Loaded %i Gang Zone(s) in %i microseconds", gzoneid, cache_get_query_exec_time(UNIT_MICROSECONDS));
+	Log(LOG_INIT, "%i gang zones loaded in %i microseconds", gzoneid, cache_get_query_exec_time(UNIT_MICROSECONDS));
 	cache_delete(Data);
 	return 1;
 }
@@ -27887,12 +27887,12 @@ function:ShowDialog(playerid, dialogid)
 	    {
 	        new string[512], tmp[255];
 	        
-	        new r = GetBusinessSlotByDialogSelect(playerid);
+	        new r = GetBusinessSlotBySelection(playerid);
 	        
 			if(r != -1) {
 			    strcat(string, ""white"The higher the level the higher the earnings. Upgrade your business\nlevel to receive more money each payday! Max. Level: 20\n\nCurrent Business Level: ");
 			    
-			    if(BusinessData[r][e_level] >= MAX_PLAYER_BUSINESSES)
+			    if(BusinessData[r][e_level] >= MAX_BUSINESS_LEVEL)
 			    {
 				    format(tmp, sizeof(tmp), "%i\nCurrent Business Earnings: $%s\n\nThis business reached its max. level!", BusinessData[r][e_level], number_format(GetBusinessEarnings(r)));
 					strcat(string, tmp);
@@ -27909,7 +27909,7 @@ function:ShowDialog(playerid, dialogid)
 				
 	 	        format(tmp, sizeof(tmp), ""nef" :: Business Level Upgrade > Slot: %i", PlayerInfo[playerid][BusinessIdSelected] + 1);
 
-	            if(BusinessData[r][e_level] == MAX_PLAYER_BUSINESSES)
+	            if(BusinessData[r][e_level] == MAX_BUSINESS_LEVEL)
 	            {
 					ShowPlayerDialog(playerid, DIALOG_UPGRADE_BUSINESS, DIALOG_STYLE_MSGBOX, tmp, string, "Back", "");
 				}
@@ -29419,7 +29419,7 @@ GetHouseIdByPlayerSlotSel(playerid)
 	return -1;
 }
 
-GetBusinessSlotByDialogSelect(playerid)
+GetBusinessSlotBySelection(playerid)
 {
 	new idx = 0;
 	for(new r = 0; r < MAX_BUSINESSES; r++)
