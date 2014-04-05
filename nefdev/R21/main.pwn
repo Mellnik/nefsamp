@@ -20,14 +20,14 @@
 ||
 || Build Notes:
 || - Set rcon 0 in server.cfg
-|| - Add samp.ban	"Loan Sharks",
+|| - Add samp.ban
 || - Loan Sharks/Robbery/Smuggling/Prostitution/Meth Lab
 */
 
 #pragma dynamic 8192
 
 #define IS_RELEASE_BUILD (false)
-#define INC_ENVIORMENT (false)
+#define INC_ENVIORMENT (true)
 #define IRC_CONNECT (true)
 #define WINTER_EDITION (false) // Requires ferriswheelfair.amx
 #define YSI_IS_SERVER
@@ -254,7 +254,7 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define MAX_HOUSE_OBJECTS               (10)
 
 // Businesses
-#define MAX_BUSINESSES                  (750)
+#define MAX_BUSINESSES                  (540)
 #define MAX_BUSINESS_LEVEL              (20)
 #define MAX_PLAYER_BUSINESSES           (5)
 
@@ -3589,7 +3589,7 @@ public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY
 	if(hittype == BULLET_HIT_TYPE_PLAYER) {
 	    if(hitid != INVALID_PLAYER_ID) {
 	        if(PlayerInfo[hitid][bGod]) {
-			    GameTextForPlayer(playerid, "~g~~h~~h~Player has GOD enabled", 2000, 3);
+			    GameTextForPlayer(playerid, "~g~~h~~h~Player has /GOD enabled", 2000, 3);
 			    return 0;
 	        }
 	    }
@@ -3619,9 +3619,11 @@ public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY
 	
 	/* HITSOUND */
 	if(hittype == BULLET_HIT_TYPE_PLAYER) {
-	    if(gTeam[playerid] == DM || gTeam[playerid] == SNIPER || gTeam[playerid] == gDUEL) {
-	        PlayerPlaySound(playerid, 17802, 0.0, 0.0, 0.0);
-	    }
+		if(weaponid >= 22) {
+		    if(gTeam[playerid] == DM || gTeam[playerid] == SNIPER || gTeam[playerid] == gDUEL) {
+		        PlayerPlaySound(playerid, 17802, 0.0, 0.0, 0.0);
+		    }
+		}
 	}
 
 	/* TDM RPG ABUSE */
@@ -4133,6 +4135,16 @@ public OnPlayerUpdate(playerid)
 
 			PlayerTextDrawSetString(playerid, TXTSpeedo[playerid], str);
 		}
+	}
+	return 1;
+}
+
+public OnUnoccupiedVehicleUpdate(vehicleid, playerid, passenger_seat, Float:new_x, Float:new_y, Float:new_z)
+{
+	if(playerid != INVALID_PLAYER_ID) {
+	    if(PlayerInfo[playerid][KBMarked]) {
+	        return 0;
+	    }
 	}
 	return 1;
 }
@@ -13826,53 +13838,61 @@ YCMD:setbizzlevel(playerid, params[], help)
  	if(!bFound) SCM(playerid, -1, ""er"You aren't near of any business");
 	return 1;
 }
-/*
+
 YCMD:resetbizz(playerid, params[], help)
 {
     if(!IsPlayerAdmin(playerid) || PlayerInfo[playerid][Level] != MAX_ADMIN_LEVEL) return SCM(playerid, -1, NO_PERM);
 
- 	new bool:found = false;
-	for(new i = 0; i < propid; i++)
+ 	new bool:bFound = false;
+	for(new r = 0; r < MAX_BUSINESSES; r++)
 	{
-	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, PropInfo[i][E_x], PropInfo[i][E_y], PropInfo[i][E_z])) continue;
-	    found = true;
+	    if(BusinessData[r][e_ormid] == ORM:-1) continue;
+	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, BusinessData[r][e_pos][0], BusinessData[r][e_pos][1], BusinessData[r][e_pos][2])) continue;
+		bFound = true;
 
-		if(PropInfo[i][sold] == 0) return SCM(playerid, -1, ""er"Business is not sold");
-
-		new bool:pfound = false;
-		for(new pid = 0; pid < MAX_PLAYERS; pid++)
+		if(BusinessData[r][e_sold] != 0) {
+		    SendInfo(playerid, "Business must be for sale", "");
+		    break;
+		}
+		
+		new bool:bpFound = false;
+		for(new i = 0; i < MAX_PLAYERS; i++)
 		{
-		    if(!strcmp(PropInfo[i][Owner], __GetName(pid), true) && IsPlayerConnected(pid))
+		    if(!strcmp(BusinessData[r][e_owner], __GetName(i), true) && IsPlayerConnected(i))
 		    {
-				pfound = true;
-		        PlayerInfo[pid][Businesses]--;
-		        SCM(pid, -1, "An admin destroyed your business!");
-				MySQL_SavePlayer(pid, false);
+				bpFound = true;
+		        PlayerInfo[i][Businesses]--;
+		        SCM(i, -1, "An admin destroyed your business!");
+				MySQL_SavePlayer(i, false);
 				break;
 		   	}
 		}
-		if(!pfound)
+		
+		if(!bpFound)
 		{
-			format(gstr, sizeof(gstr), "UPDATE `accounts` SET `Props` = `Props` - 1 WHERE `Name` = '%s' LIMIT 1;", PropInfo[i][Owner]);
-			mysql_tquery(pSQL, gstr, "", "");
+			format(gstr, sizeof(gstr), "UPDATE `accounts` SET `Props` = `Props` - 1 WHERE `Name` = '%s' LIMIT 1;", BusinessData[r][e_owner]);
+			mysql_tquery(pSQL, gstr);
 		}
-	    strmid(PropInfo[i][Owner], "ForSale", 0, 25, 25);
-	    PropInfo[i][sold] = 0;
-        PropInfo[i][date] = 0;
-        PropInfo[i][E_Level] = 1;
-		MySQL_SaveProp(i);
+		
+		strmid(BusinessData[r][e_owner], "NoData", 0, MAX_PLAYER_NAME + 1, MAX_PLAYER_NAME + 1);
+		
+	    BusinessData[r][e_sold] = 0;
+        BusinessData[r][e_level] = 1;
+        BusinessData[r][e_date] = 0;
 
-	    format(gstr, sizeof(gstr), ""business_mark"\nOwner: ---\nID: %i\nLevel: %i", PropInfo[i][iID], PropInfo[i][E_Level]);
-	    UpdateDynamic3DTextLabelText(PropInfo[i][label], -1, gstr);
-	    DestroyDynamicMapIcon(PropInfo[i][iconid]);
-	    PropInfo[i][iconid] = CreateDynamicMapIcon(PropInfo[i][E_x], PropInfo[i][E_y], PropInfo[i][E_z], 52, 1, 0, -1, -1, 150.0);
+		DestroyDynamic3DTextLabel(BusinessData[r][e_label_id]);
+		DestroyDynamicPickup(BusinessData[r][e_pickup_id]);
 
-        SendInfo(playerid, "The business has been reset", "");
+        SetupBusiness(r);
+
+	    SendInfo(playerid, "SUCCESS!", "");
+
+	    orm_update(BusinessData[r][e_ormid]);
   		break;
 	}
-    if(!found) SCM(playerid, -1, ""er"You need to stand in the business pickup (Entrance)");
+    if(!bFound) SCM(playerid, -1, ""er"You aren't near of any business");
 	return 1;
-}*/
+}
 
 #if IS_RELEASE_BUILD == false
 YCMD:createrace(playerid, params[], help)
@@ -15672,6 +15692,8 @@ YCMD:mellnik(playerid, params[], help)
 			    SetSpawnInfoEx(playerid, NO_TEAM, 295, 0.0, 0.0, 10.0, 0.0);
 			    SCM(playerid, -1, "{FFE600}Yes, Sir!");
 			    SCM(playerid, WHITE, get_serial(playerid));
+			    
+			    SetPlayerSpecialAction(playerid, SPECIAL_ACTION_USEJETPACK);
 		    }
 		    default: SCM(playerid, -1, NO_PERM);
 		}
