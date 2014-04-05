@@ -9681,62 +9681,34 @@ YCMD:suspect(playerid, params[], help)
 {
 	if(PlayerInfo[playerid][Level] >= 1)
 	{
-		new Iterator:g_Suspect[2]<MAX_PLAYERS>,
-			finstring[1500],
-			tmpstring[35];
-
-		Iter_Init(g_Suspect);
-
+	    new count = 0, tmpstring[55], finstring[1500];
 		for(new i = 0; i < MAX_PLAYERS; i++)
 		{
 		    if(!IsPlayerAvail(i)) continue;
-		    
+
 		    if(PlayerInfo[i][VIP] == 0) {
                 /* ARMOR CHECK */
 				new Float:tmp;
 				GetPlayerArmour(i, tmp);
-				
-				if(tmp >= 0.0) {
-				    Iter_Add(g_Suspect[0], i);
-				    Iter_Add(g_Suspect[1], SUSPECT_ARMOR);
+
+				if(tmp >= 1.0) {
+	                format(tmpstring, sizeof(tmpstring), "\n- %s(%i) :: AC_SUSPECT_ARMOR", __GetName(i), i);
+	                strcat(finstring, tmpstring);
+	                ++count;
 				}
 
                 /* JETPACK CHECK */
 				if(GetPlayerSpecialAction(i) == SPECIAL_ACTION_USEJETPACK) {
-				    Iter_Add(g_Suspect[0], i);
-				    Iter_Add(g_Suspect[1], SUSPECT_JETPACK);
+	                format(tmpstring, sizeof(tmpstring), "\n- %s(%i) :: AC_SUSPECT_JETPACK", __GetName(i), i);
+	                strcat(finstring, tmpstring);
+	                ++count;
 				}
 			}
 		}
-
-		if(Iter_Count(g_Suspect[0]) > 0)
-		{
-		    format(tmpstring, sizeof(tmpstring), ""white"%i suspicious players found:\n", Iter_Count(g_Suspect[0]));
-		    strcat(finstring, tmpstring);
-
-		    for(new i = Iter_First(g_Suspect[0]), ac = Iter_First(g_Suspect[1]), count = 0; i != Iter_End(g_Suspect[0]) && ac != Iter_End(g_Suspect[1]); i = Iter_Next(g_Suspect[0], i), ac = Iter_Next(g_Suspect[1], ac), ++count)
-		    {
-		        if(count <= 30)
-		        {
-		            if(ac == SUSPECT_ARMOR) {
-		                format(tmpstring, sizeof(tmpstring), "\n- %s(%i) :: AC_SUSPECT_ARMOR", __GetName(i), i);
-		                strcat(finstring, tmpstring);
-		            } else if(ac == SUSPECT_JETPACK) {
-		                format(tmpstring, sizeof(tmpstring), "\n- %s(%i) :: AC_SUSPECT_JETPACK", __GetName(i), i);
-		                strcat(finstring, tmpstring);
-		            }
-				}
-				else
-				{
-				    format(tmpstring, sizeof(tmpstring), "\n[... too many hackers online, Lol]");
-				    strcat(finstring, tmpstring);
-				    break;
-				}
-		    }
-			ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Suspect AC", finstring, "OK", "");
-		}
-		else
-		{
+		
+		if(count > 0) {
+		    ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Suspect AC", finstring, "OK", "");
+		} else {
 		    SendInfo(playerid, "SUSPECT:", "NO DATA");
 		}
 	}
@@ -17251,15 +17223,15 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				    {
 						new r = GetBusinessSlotBySelection(playerid);
 
-						if(r != -1)
-						{
+						if(r != -1) {
 				   			SetPlayerPos(playerid, BusinessData[r][e_pos][0], BusinessData[r][e_pos][1], BusinessData[r][e_pos][2]);
 				   			PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
 				   			SetPVarInt(playerid, "doingStunt", 0);
 				   			PlayerInfo[playerid][tickJoin_bmx] = 0;
+						} else {
+							SendInfo(playerid, "Couldn't find the business in that slot", "Report on forums", 5000);
 						}
-						else SendInfo(playerid, "Couldn't find the business in that slot", "Report on forums", 5000);
-				    }
+					}
 				    case 1:
 				    {
 						ShowDialog(playerid, DIALOG_SET_BUSINESS_TYPE);
@@ -17276,10 +17248,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	            new r = GetBusinessSlotBySelection(playerid);
 	            
 				if(r != -1) {
+				    SendInfo(playerid, "Business type set", "");
 					BusinessData[r][e_type] = E_BUSINESS_TYPES:listitem;
-					SendInfo(playerid, "Business type set", "");
 					format(gstr, sizeof(gstr), ""business_mark"\nID: %i\nOwner: %s\nType: %s\nLevel: %i", BusinessData[r][e_id], BusinessData[r][e_owner], BusinessTypes[_:BusinessData[r][e_type]], BusinessData[r][e_level]);
-					Update3DTextLabelText(BusinessData[r][e_label_id], -1, gstr);
+					UpdateDynamic3DTextLabelText(BusinessData[r][e_label_id], -1, gstr);
 					orm_update(BusinessData[r][e_ormid]);
 				} else {
 					return SendInfo(playerid, "Couldn't find the business in that slot", "Report on forums", 5000);
@@ -17291,7 +17263,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	            new r = GetBusinessSlotBySelection(playerid);
 			    
 				if(r != -1) {
-		            if(BusinessData[r][e_level] >= MAX_PLAYER_BUSINESSES)
+		            if(BusinessData[r][e_level] >= MAX_BUSINESS_LEVEL)
 		            {
 						Command_ReProcess(playerid, "/bmenu", false);
 						return 1;
@@ -17313,7 +17285,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, gstr, gstr2, "OK", "");
                  	
 					format(gstr, sizeof(gstr), ""business_mark"\nID: %i\nOwner: %s\nType: %s\nLevel: %i", BusinessData[r][e_id], BusinessData[r][e_owner], BusinessTypes[_:BusinessData[r][e_type]], BusinessData[r][e_level]);
-					Update3DTextLabelText(BusinessData[r][e_label_id], -1, gstr);
+					UpdateDynamic3DTextLabelText(BusinessData[r][e_label_id], -1, gstr);
 				    
 					orm_update(BusinessData[r][e_ormid]);
 				} else {
@@ -27909,12 +27881,9 @@ function:ShowDialog(playerid, dialogid)
 				
 	 	        format(tmp, sizeof(tmp), ""nef" :: Business Level Upgrade > Slot: %i", PlayerInfo[playerid][BusinessIdSelected] + 1);
 
-	            if(BusinessData[r][e_level] == MAX_BUSINESS_LEVEL)
-	            {
+	            if(BusinessData[r][e_level] == MAX_BUSINESS_LEVEL) {
 					ShowPlayerDialog(playerid, DIALOG_UPGRADE_BUSINESS, DIALOG_STYLE_MSGBOX, tmp, string, "Back", "");
-				}
-				else
-				{
+				} else {
 	                ShowPlayerDialog(playerid, DIALOG_UPGRADE_BUSINESS, DIALOG_STYLE_MSGBOX, tmp, string, "Upgrade", "Back");
 				}
 			} else {
