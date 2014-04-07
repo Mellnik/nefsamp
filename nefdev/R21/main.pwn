@@ -26,7 +26,7 @@
 
 #pragma dynamic 8192
 
-#define IS_RELEASE_BUILD (false)
+#define IS_RELEASE_BUILD (true)
 #define INC_ENVIORMENT (true)
 #define IRC_CONNECT (true)
 #define WINTER_EDITION (false) // Requires ferriswheelfair.amx
@@ -13822,7 +13822,7 @@ YCMD:resetbizz(playerid, params[], help)
 	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, BusinessData[r][e_pos][0], BusinessData[r][e_pos][1], BusinessData[r][e_pos][2])) continue;
 		bFound = true;
 
-		if(BusinessData[r][e_sold] != 0) {
+		if(BusinessData[r][e_sold] == 0) {
 		    SendInfo(playerid, "Business must be for sale", "");
 		    break;
 		}
