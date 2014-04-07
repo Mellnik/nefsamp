@@ -4039,8 +4039,8 @@ public OnPlayerInteriorChange(playerid, newinteriorid, oldinteriorid)
 
 public OnRconLoginAttempt(ip[], password[], success)
 {
-	Log(LOG_ONLINE, "ProcessServerTravel: RconLoginAttempt ", ip);
-    new bool:found = false;
+    Log(LOG_ONLINE, "RconLoginAttempt by %s using %s, failed: %i", ip, password, !success);
+    /*new bool:found = false;
 		
 	if(!success)
  	{
@@ -4075,7 +4075,7 @@ public OnRconLoginAttempt(ip[], password[], success)
 			}
    		}
    		if(!found) AdminMSG(RED, ""yellow"*** "red"Bad remote RCON login attempt");
-	}
+	}*/
     return 1;
 }
 
@@ -6632,8 +6632,8 @@ IRCCMD:say(botid, channel[], user[], host[], params[])
 
 			format(gstr, sizeof(gstr), "02*** %s on IRC: %s", user, params);
 			IRC_GroupSay(IRC_GroupID, channel, gstr);
-			format(gstr, sizeof(gstr), "*** %s on IRC: %s", user, params);
-			SCMToAll(0x0037FFFF, gstr);
+			format(gstr, sizeof(gstr), "*** [IRC] %s: %s", user, params);
+			SCMToAll(GREY, gstr);
 			printf("[IRC] (%s)%s(%i): %s", host, user, botid, params);
 		}
 		else IRC_ReplyCTCP(botid, user, "7Usage: 2!say <message>");
