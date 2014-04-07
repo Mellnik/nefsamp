@@ -21,7 +21,7 @@
 || Build Notes:
 || - Set rcon 0 in server.cfg
 || - Add samp.ban
-|| - Loan Sharks/Robbery/Smuggling/Prostitution/Meth Lab
+|| - Transform props to businesses (Loan Sharks/Robbery/Smuggling/Prostitution/Meth Lab)
 */
 
 #pragma dynamic 8192
@@ -254,7 +254,7 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define MAX_HOUSE_OBJECTS               (10)
 
 // Businesses
-#define MAX_BUSINESSES                  (540)
+#define MAX_BUSINESSES                  (700)
 #define MAX_BUSINESS_LEVEL              (20)
 #define MAX_PLAYER_BUSINESSES           (5)
 
@@ -9692,14 +9692,14 @@ YCMD:suspect(playerid, params[], help)
 				GetPlayerArmour(i, tmp);
 
 				if(tmp >= 1.0) {
-	                format(tmpstring, sizeof(tmpstring), "\n- %s(%i) :: AC_SUSPECT_ARMOR", __GetName(i), i);
+	                format(tmpstring, sizeof(tmpstring), "- %s(%i) :: AC_SUSPECT_ARMOR\n", __GetName(i), i);
 	                strcat(finstring, tmpstring);
 	                ++count;
 				}
 
                 /* JETPACK CHECK */
 				if(GetPlayerSpecialAction(i) == SPECIAL_ACTION_USEJETPACK) {
-	                format(tmpstring, sizeof(tmpstring), "\n- %s(%i) :: AC_SUSPECT_JETPACK", __GetName(i), i);
+	                format(tmpstring, sizeof(tmpstring), "- %s(%i) :: AC_SUSPECT_JETPACK\n", __GetName(i), i);
 	                strcat(finstring, tmpstring);
 	                ++count;
 				}
