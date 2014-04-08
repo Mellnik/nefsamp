@@ -722,7 +722,6 @@ enum E_PLAYER_DATA
 	ExitType,
 	tMedkit,
 	MedkitTime,
-	Businesses,
 	GCPlayer,
 	GCNameHash,
 	GCOffer,
@@ -8446,7 +8445,7 @@ YCMD:bbuy(playerid, params[], help)
 		    SendInfo(playerid, "Business not for sale", "");
 		    break;
 		}
-		if(PlayerData[playerid][Businesses] > PlayerData[playerid][e_addbizzslots]) {
+		if(GetPlayerBusinessCount(__GetName(playerid)) > PlayerData[playerid][e_addbizzslots]) {
 			SCM(playerid, -1, ""er"You do not have any free business slots");
 			break;
 		}
@@ -8471,7 +8470,6 @@ YCMD:bbuy(playerid, params[], help)
 		SetupBusiness(r);
 		
 		PlayerData[playerid][tickLastPBuy] = tick;
-		PlayerData[playerid][Businesses]++;
 		
 		SendInfo(playerid, "SUCCESS!", "");
         PlayerPlaySound(playerid, 1149, 0.0, 0.0, 0.0);
@@ -8528,7 +8526,6 @@ YCMD:bsell(playerid, params[], help)
 
         SetupBusiness(r);
 
-	    PlayerData[playerid][Businesses]--;
 	    PlayerData[playerid][tickLastPSell] = tick;
 	    
 	    SendInfo(playerid, "SUCCESS!", "");
@@ -13809,9 +13806,7 @@ YCMD:resetbizz(playerid, params[], help)
 		    if(!strcmp(BusinessData[r][e_owner], __GetName(i), true) && IsPlayerConnected(i))
 		    {
 				bpFound = true;
-		        PlayerData[i][Businesses]--;
 		        SCM(i, -1, "An admin destroyed your business!");
-				MySQL_SavePlayer(i, false);
 				break;
 		   	}
 		}
@@ -15372,7 +15367,7 @@ YCMD:stats(playerid, params[], help)
 			vip,
 			PlayerData[player1][e_medkits],
 			PlayerData[player1][e_houses],
-			PlayerData[player1][Businesses],
+			GetPlayerBusinessCount(__GetName(playerid)),
 			PlayerData[player1][e_wanteds],
 			UTConvert(PlayerData[player1][e_lastlogin]));
 			
@@ -15508,7 +15503,7 @@ YCMD:bmenu(playerid, params[], help)
         }
         else
 		{
-		    if(i < PlayerData[playerid][Businesses])
+		    if(i < GetPlayerBusinessCount(__GetName(playerid)))
 		    {
 			    format(tmp, sizeof(tmp), "Business Slot %i "green2"(Used)\n", i + 1);
 		    }
@@ -16953,7 +16948,7 @@ function:OnPlayerNameChangeRequest(newname[], playerid)
 				}
             }
 
-            if(PlayerData[playerid][Businesses] > 0)
+            if(GetPlayerBusinessCount(__GetName(playerid)) > 0)
             {
 				for(new r = 0; r < MAX_BUSINESSES; r++)
 				{
@@ -17171,7 +17166,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		        }
 		        else
 				{
-				    if(listitem >= PlayerData[playerid][Businesses])
+				    if(listitem >= GetPlayerBusinessCount(__GetName(playerid)))
 				    {
 				        SendInfo(playerid, "Business slot not in use", "");
 				    }
@@ -21460,7 +21455,6 @@ MySQL_SavePlayer(playerid, bool:save_pv)
 		PlayerData[playerid][e_reaction],
 		PlayerData[playerid][e_payday],
 		PlayerData[playerid][e_houses],
-		PlayerData[playerid][Businesses],
 		PlayerData[playerid][e_gangrank],
 		PlayerData[playerid][e_gangid],
 		PlayerData[playerid][e_addpvslots],
@@ -25497,7 +25491,7 @@ function:QueueProcess()
 	        }
 	        else format(string4, sizeof(string4), "Bank Interest Gained "lb_e"(VIP BOOST)"white": "red"---");
 
-			if(PlayerData[i][Businesses] > 0)
+			if(GetPlayerBusinessCount(__GetName(i)) > 0)
 			{
 			    b_vipearnings = floatround(GetPlayerBusinessEarnings(i) / 2.5);
 			    format(string3, sizeof(string3), "Business earnings: "green"$%s", number_format(GetPlayerBusinessEarnings(i)));
@@ -29922,6 +29916,17 @@ GetBusinessEarnings(r)
 	return 0;
 }
 
+GetPlayerBusinessCount(const name[])
+{
+	mysql_format(pSQL, gstr, sizeof(gstr), "SELECT COUNT(`id`) FROM `businesses` WHERE `owner` = '%e';", name);
+	
+	new Cache:cache = mysql_query(pSQL, gstr);
+	new count = cache_get_row_int(0, 0);
+	cache_delete(cache);
+	
+	return count;
+}
+
 GetCNRCops()
 {
 	new count = 0;
@@ -30726,7 +30731,6 @@ ResetPlayerVars(playerid)
 	PlayerData[playerid][MedkitTime] = 0;
 	PlayerData[playerid][e_payday] = 60;
   	PlayerData[playerid][e_houses] = 0;
-	PlayerData[playerid][Businesses] = 0;
 	PlayerData[playerid][GCPlayer] = INVALID_PLAYER_ID;
 	PlayerData[playerid][GCNameHash] = 0;
 	PlayerData[playerid][GCOffer] = 0;
@@ -31045,7 +31049,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
                 PlayerData[playerid][e_reaction] = cache_get_row_int(0, 12, pSQL);
                 PlayerData[playerid][e_payday] = cache_get_row_int(0, 13, pSQL);
                 PlayerData[playerid][e_houses] = cache_get_row_int(0, 14, pSQL);
-                PlayerData[playerid][Businesses] = cache_get_row_int(0, 15, pSQL);
+
                 PlayerData[playerid][e_gangrank] = cache_get_row_int(0, 16, pSQL);
                 PlayerData[playerid][e_gangid] = cache_get_row_int(0, 17, pSQL);
                 PlayerData[playerid][e_addpvslots] = cache_get_row_int(0, 18, pSQL);
