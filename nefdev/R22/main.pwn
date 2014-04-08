@@ -400,6 +400,7 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 // Player
 #define MAX_PLAYER_SCORE                (999999)
 #define MAX_PLAYER_MONEY                (1000000000)
+#define MAX_PLAYER_IP                   (45)
 #define COOLDOWN_CHAT                   (5500)
 #define COOLDOWN_CMD_AR                 (1000)
 #define COOLDOWN_CMD_ROB                (10000)
@@ -613,9 +614,10 @@ enum E_PLAYER_DATA
 	/* PLAYER DATA */
 	e_accountid,
 	e_name[MAX_PLAYER_NAME + 1],
+	e_ip[MAX_PLAYER_IP + 1],
+	e_level,
 
 	/* INTERNAL */
-    AccountID,
 	bool:GotVIPLInv,
 	bool:bIsDead,
 	bool:bShowToys,
@@ -653,8 +655,6 @@ enum E_PLAYER_DATA
 	tLoadMap,
 	BOOST:Boost,
 	BoostDeplete,
-	sName[25],
-	sIP[16],
 	SavedColor,
 	SavedSkin,
 	Float:fOldPos[4],
@@ -3079,17 +3079,9 @@ public OnPlayerConnect(playerid)
 {
     gTeam[playerid] = FREEROAM;
     
-	new sz_IP[16], sz_Name[25];
+    GetPlayerName(playerid, PlayerData[playerid][e_name], MAX_PLAYER_NAME + 1);
+    GetPlayerIp(playerid, PlayerData[playerid][e_ip], MAX_PLAYER_IP + 1);
     
-    GetPlayerName(playerid, sz_Name, 25);
-	GetPlayerIp(playerid, sz_IP, 16);
-	
-	PlayerData[playerid][sIP][0] = '\0';
-	PlayerData[playerid][sName][0] = '\0';
-	
-	strcat(PlayerData[playerid][sIP], sz_IP, 16);
-	strcat(PlayerData[playerid][sName], sz_Name, 25);
-	
 	if(IsPlayerNPC(playerid)) return 1;
 	if(PlayerData[playerid][bFloodDect]) return 1;
 
@@ -3097,7 +3089,7 @@ public OnPlayerConnect(playerid)
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(!IsPlayerConnected(i) || IsPlayerNPC(i)) continue;
-	    if(!strcmp(__GetIP(i), sz_IP))
+	    if(!strcmp(__GetIP(i), PlayerData[playerid][e_ip]))
 	    {
 	        ++count_t;
 	    }
@@ -8254,7 +8246,7 @@ YCMD:buygc(playerid, params[], help)
 		MySQL_SavePlayer(playerid, false);
 		MySQL_SavePlayer(PlayerData[playerid][GCPlayer], false);
 
-	    format(gstr2, sizeof(gstr2), "INSERT INTO `sells` VALUES (NULL, 2, %i, %i, %i, %i);", PlayerData[playerid][GCOffer], PlayerData[playerid][GCPrice], PlayerData[PlayerData[playerid][GCPlayer]][AccountID], PlayerData[playerid][AccountID]);
+	    format(gstr2, sizeof(gstr2), "INSERT INTO `sells` VALUES (NULL, 2, %i, %i, %i, %i);", PlayerData[playerid][GCOffer], PlayerData[playerid][GCPrice], PlayerData[PlayerData[playerid][GCPlayer]][e_accountid], PlayerData[playerid][e_accountid]);
 	    mysql_tquery(pSQL, gstr2, "", "");
 
 	    format(gstr, sizeof(gstr), ""blue"You have accepted %s's offer and bough %sGC for $%s", __GetName(PlayerData[playerid][GCPlayer]), number_format(PlayerData[playerid][GCOffer]), number_format(PlayerData[playerid][GCPrice]));
@@ -8408,7 +8400,7 @@ YCMD:buyvip(playerid, params[], help)
 		MySQL_SavePlayer(playerid, false);
 		MySQL_SavePlayer(PlayerData[playerid][VIPPlayer], false);
 
-	    format(gstr2, sizeof(gstr2), "INSERT INTO `sells` VALUES (NULL, 1, 1, %i, %i, %i);", PlayerData[playerid][VIPOffer], PlayerData[PlayerData[playerid][VIPPlayer]][AccountID], PlayerData[playerid][AccountID]);
+	    format(gstr2, sizeof(gstr2), "INSERT INTO `sells` VALUES (NULL, 1, 1, %i, %i, %i);", PlayerData[playerid][VIPOffer], PlayerData[PlayerData[playerid][VIPPlayer]][e_accountid], PlayerData[playerid][e_accountid]);
 	    mysql_tquery(pSQL, gstr2, "", "");
 
 	    format(gstr, sizeof(gstr), ""blue"You have accepted %s's offer and bough VIP for $%s", __GetName(PlayerData[playerid][VIPPlayer]), number_format(PlayerData[playerid][VIPOffer]));
@@ -15380,7 +15372,7 @@ YCMD:stats(playerid, params[], help)
  		format(string1, sizeof(string1), ""nef_green"Stats of the player: "white"%s (%i)\n\n\
 	 	Kills: "LB_E"%i\n"white"Deaths: "LB_E"%i\n"white"K/D: "LB_E"%0.2f\n"white"Score: "LB_E"%i\n"white"Money: "LB_E"$%s\n"white"Bank: "LB_E"$%s\n"white"Gold Credits: "LB_E"%sGC\n",
    			__GetName(player1),
-   			PlayerData[player1][AccountID],
+   			PlayerData[player1][e_accountid],
 	 		PlayerData[player1][Kills],
         	PlayerData[player1][Deaths],
         	Float:PlayerData[player1][Kills] / Float:pDeaths,
@@ -16970,11 +16962,8 @@ function:OnPlayerNameChangeRequest(newname[], playerid)
 	    
 		if(SetPlayerName(playerid, newname) == 1) // If successfull
         {
-			new cname[25];
-		    GetPlayerName(playerid, cname, 25);
-			PlayerData[playerid][sName][0] = '\0';
-			strcat(PlayerData[playerid][sName], cname, 25);
-        
+            GetPlayerName(playerid, PlayerData[playerid][e_name], MAX_PLAYER_NAME + 1);
+
             if(PlayerData[playerid][Houses] > 0)
             {
 				for(new i = 0; i < houseid; i++)
@@ -21217,10 +21206,7 @@ function:SkipLogin(playerid)
 	    
 	if(SetPlayerName(playerid, newname) == 1)
 	{
-		new cname[25];
-	    GetPlayerName(playerid, cname, 25);
-		PlayerData[playerid][sName][0] = '\0';
-		strcat(PlayerData[playerid][sName], cname, 25);
+	    GetPlayerName(playerid, PlayerData[playerid][e_name], MAX_PLAYER_NAME + 1);
 			
 		format(string, sizeof(string), ""white"Your name has been changed to %s because you failed to log in.\n\n"nef_yellow"Please restart the game if this is incorrect.", newname);
 		ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef"", string, "OK", "");
@@ -27535,18 +27521,18 @@ __GetPlayerID(const PlayerName[])
 
 __GetName(playerid)
 {
-    new name[25];
-	strcat(name, PlayerData[playerid][sName], 25);
-	
-    return name;
+	new tmp[MAX_PLAYER_NAME + 1];
+	strcat(tmp, PlayerData[playerid][e_name], MAX_PLAYER_NAME + 1);
+
+	return tmp;
 }
 
 __GetIP(playerid)
 {
-	new ip[16];
-	strcat(ip, PlayerData[playerid][sIP], 16);
+	new tmp[MAX_PLAYER_IP + 1];
+	strcat(tmp, PlayerData[playerid][e_ip], MAX_PLAYER_IP + 1);
 
-    return ip;
+	return tmp;
 }
 
 GetColor__(playerid)
@@ -30697,7 +30683,7 @@ ResetPlayerVars(playerid)
 	SetPVarInt(playerid, "Robber", 0);
 	SetPVarInt(playerid, "inCNR", 0);
 
-    PlayerData[playerid][AccountID] = 0;
+    PlayerData[playerid][e_accountid] = 0;
 	PlayerData[playerid][GotVIPLInv] = false;
 	PlayerData[playerid][bIsDead] = false;
 	PlayerData[playerid][bShowToys] = true;
@@ -31008,7 +30994,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 	    }
 	    case ACCOUNT_REQUEST_REGISTER:
 	    {
-		    PlayerData[playerid][AccountID] = cache_insert_id();
+		    PlayerData[playerid][e_accountid] = cache_insert_id();
 		    PlayerData[playerid][RegDate] = gettime();
 			PlayerData[playerid][ExitType] = EXIT_LOGGED;
 			PlayerData[playerid][PayDay] = 60;
@@ -31044,7 +31030,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 	    }
 	    case ACCOUNT_REQUEST_REGISTER + 1:
 	    {
-		    PlayerData[playerid][AccountID] = cache_insert_id();
+		    PlayerData[playerid][e_accountid] = cache_insert_id();
 		    PlayerData[playerid][bLogged] = true;
 
 			format(gstr, sizeof gstr, "["SVRSC"] %s(%i) "GREEN_E"has registered, making the server have a total of "LB2_E"%i "GREEN_E"players registered.", __GetName(playerid), playerid, cache_insert_id());
@@ -31064,7 +31050,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 	    {
 			if(cache_get_row_count() > 0)
 			{
-			    PlayerData[playerid][AccountID] = cache_get_row_int(0, 0, pSQL);
+			    PlayerData[playerid][e_accountid] = cache_get_row_int(0, 0, pSQL);
 			    PlayerData[playerid][SavedColor] = cache_get_row_int(0, 2, pSQL);
 			    PlayerData[playerid][Level] = cache_get_row_int(0, 5, pSQL);
 			    PlayerData[playerid][Score] = cache_get_row_int(0, 6, pSQL);
@@ -31477,7 +31463,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 				format(gstr, sizeof(gstr), "~y~[] ~w~%i", PlayerData[playerid][Wanteds]);
 				PlayerTextDrawSetString(playerid, TXTWantedsTD[playerid], gstr);
 
-			    format(gstr2, sizeof(gstr2), "INSERT INTO `login_log` VALUES (NULL, %i, '%s', UNIX_TIMESTAMP(), 0);", PlayerData[playerid][AccountID], __GetIP(playerid));
+			    format(gstr2, sizeof(gstr2), "INSERT INTO `login_log` VALUES (NULL, %i, '%s', UNIX_TIMESTAMP(), 0);", PlayerData[playerid][e_accountid], __GetIP(playerid));
 			    mysql_tquery(pSQL, gstr2, "", "");
 
 				if(PlayerData[playerid][Level] > 0)
