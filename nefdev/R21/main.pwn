@@ -91,7 +91,7 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #else
 #define CURRENT_VERSION                 "PTS:Build 21"
 #endif
-#define HOTFIX_REV                      "Hotfix #0"
+#define HOTFIX_REV                      "Hotfix #1"
 #define SAMP_VERSION                    "SA-MP 0.3z"
 #define MAX_REPORTS 					(7)
 #define MAX_ADS                         (10)
@@ -3579,10 +3579,12 @@ public OnVehicleRespray(playerid, vehicleid, color1, color2)
 public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY, Float:fZ)
 {
 	/* PLAYER QUEUED FOR KICK */
-	if(hittype != BULLET_HIT_TYPE_NONE) {
-	    if(PlayerInfo[playerid][KBMarked] || PlayerInfo[hitid][KBMarked]) {
-	        return 0;
-	    }
+	if(hittype == BULLET_HIT_TYPE_PLAYER) {
+	    if(hitid != INVALID_PLAYER_ID) {
+		    if(PlayerInfo[playerid][KBMarked] || PlayerInfo[hitid][KBMarked]) {
+		        return 0;
+		    }
+		}
 	}
 	
 	/* GOD CONTROL */

