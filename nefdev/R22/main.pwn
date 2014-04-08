@@ -618,6 +618,13 @@ enum E_PLAYER_DATA
 	e_level,
 	e_score,
 	e_money,
+	e_bank,
+	e_color,
+	e_kills,
+	e_deaths,
+	e_time,
+	e_payday,
+	e_reaction,
 
 	/* INTERNAL */
 	bool:GotVIPLInv,
@@ -657,7 +664,6 @@ enum E_PLAYER_DATA
 	tLoadMap,
 	BOOST:Boost,
 	BoostDeplete,
-	SavedColor,
 	SavedSkin,
 	Float:fOldPos[4],
 	AdditionalPVSlots,
@@ -672,8 +678,6 @@ enum E_PLAYER_DATA
 	tRainbow,
 	tTDhandle,
 	ExitType,
-	Kills,
-	Deaths,
 	DerbyWins,
 	RaceWins,
 	FalloutWins,
@@ -684,7 +688,6 @@ enum E_PLAYER_DATA
 	Medkits,
 	tMedkit,
 	MedkitTime,
-	PayDay,
   	Houses,
 	Businesses,
 	GCPlayer,
@@ -721,9 +724,6 @@ enum E_PLAYER_DATA
   	tickLastCD,
     tickJoin_bmx,
   	LastLogin,
-	Reaction,
-	Bank,
-	TotalTime,
 	ConnectTime,
 	VIP,
 	LastNameChange,
@@ -4253,9 +4253,9 @@ public OnPlayerText(playerid, text[])
 
 			GivePlayerCash(playerid, xCash, true, true);
 
-		    PlayerData[playerid][Reaction]++;
+		    PlayerData[playerid][e_reaction]++;
 		    
-		    if(pAch[playerid][E_ach_toofast] == 0 && PlayerData[playerid][Reaction] >= 10)
+		    if(pAch[playerid][E_ach_toofast] == 0 && PlayerData[playerid][e_reaction] >= 10)
 		    {
 		        GivePlayerAchievement(playerid, "Too Fast", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
 		        pAch[playerid][E_ach_toofast] = 1;
@@ -4440,7 +4440,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 	}
 
     SendDeathMessage(killerid, playerid, reason);
-	PlayerData[playerid][Deaths]++;
+	PlayerData[playerid][e_deaths]++;
 
 	if(killerid != INVALID_PLAYER_ID)
 	{
@@ -4456,13 +4456,13 @@ public OnPlayerDeath(playerid, killerid, reason)
 	if(IsPlayerAvail(killerid))
 	{
 	    SrvStat[3]++;
-		PlayerData[killerid][Kills]++;
+		PlayerData[killerid][e_kills]++;
  		GivePlayerCash(playerid, -250);
 
  		SendInfo(playerid, "Killed By", __GetName(killerid));
 		SendInfo(killerid, "You Killed", __GetName(playerid));
 		
-		if(pAch[killerid][E_ach_grimreaper] == 0 && PlayerData[killerid][Kills] >= 300)
+		if(pAch[killerid][E_ach_grimreaper] == 0 && PlayerData[killerid][e_kills] >= 300)
 		{
 		    GivePlayerAchievement(killerid, "Grimreaper", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
 		    pAch[killerid][E_ach_grimreaper] = 1;
@@ -4475,7 +4475,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 		}
 	}
 
-	if(PlayerData[playerid][Deaths] >= 50 && pAch[playerid][E_ach_restinpeace] == 0)
+	if(PlayerData[playerid][e_deaths] >= 50 && pAch[playerid][E_ach_restinpeace] == 0)
 	{
 	    GivePlayerAchievement(playerid, "Rest in Peace", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
 	    pAch[playerid][E_ach_restinpeace] = 1;
@@ -9607,7 +9607,7 @@ YCMD:setbcash(playerid, params[], help)
 			AdminMSG(-1, gstr);
 			print(gstr);
 			
-			PlayerData[player][Bank] = amount;
+			PlayerData[player][e_bank] = amount;
 		}
 		else
 		{
@@ -11300,10 +11300,10 @@ YCMD:gcreate(playerid, params[], help)
 	if(GetPlayerCash(playerid) < 500000) return SCM(playerid, -1, ""er"You need at least "nef_green"$500,000 "nef_red"for creating a gang!");
  	if(GetPlayerScore_(playerid) < 500) return SCM(playerid, -1, ""er"You need at least "nef_green"500 Score "nef_red"for creating a gang!");
  	
-    PlayerData[playerid][TotalTime] = PlayerData[playerid][TotalTime] + (gettime() - PlayerData[playerid][ConnectTime]);
+    PlayerData[playerid][e_time] = PlayerData[playerid][e_time] + (gettime() - PlayerData[playerid][ConnectTime]);
     PlayerData[playerid][ConnectTime] = gettime();
 
-	if(PlayerData[playerid][TotalTime] < 36000) return SCM(playerid, -1, ""er"You need at least "nef_green"10 hours playing time {D2D2D2}for creating a gang!");
+	if(PlayerData[playerid][e_time] < 36000) return SCM(playerid, -1, ""er"You need at least "nef_green"10 hours playing time {D2D2D2}for creating a gang!");
 
 	new ntmp[144],
 	    ttmp[144];
@@ -14343,7 +14343,7 @@ YCMD:rtests(playerid, params[], help)
 	    if(IsPlayerAvail(i))
 	    {
 	        tests[i][E_playerid] = i;
-	        tests[i][E_test] = PlayerData[i][Reaction];
+	        tests[i][E_test] = PlayerData[i][e_reaction];
 	    }
 	    else
 	    {
@@ -14383,7 +14383,7 @@ YCMD:kills(playerid, params[], help)
 	    if(IsPlayerAvail(i))
 	    {
 	        kills[i][E_playerid] = i;
-	        kills[i][E_kills] = PlayerData[i][Kills];
+	        kills[i][E_kills] = PlayerData[i][e_kills];
 	    }
 	    else
 	    {
@@ -14423,7 +14423,7 @@ YCMD:deaths(playerid, params[], help)
 	    if(IsPlayerAvail(i))
 	    {
 	        deaths[i][E_playerid] = i;
-	        deaths[i][E_deaths] = PlayerData[i][Deaths];
+	        deaths[i][E_deaths] = PlayerData[i][e_deaths];
 	    }
 	    else
 	    {
@@ -14463,9 +14463,9 @@ YCMD:toptime(playerid, params[], help)
 	    if(IsPlayerAvail(i))
 	    {
 	        playingtime[i][E_playerid] = i;
-		    PlayerData[i][TotalTime] = PlayerData[i][TotalTime] + (gettime() - PlayerData[i][ConnectTime]);
+		    PlayerData[i][e_time] = PlayerData[i][e_time] + (gettime() - PlayerData[i][ConnectTime]);
 		    PlayerData[i][ConnectTime] = gettime();
-	        playingtime[i][E_time] = PlayerData[i][TotalTime];
+	        playingtime[i][E_time] = PlayerData[i][e_time];
 	    }
 	    else
 	    {
@@ -14505,7 +14505,7 @@ YCMD:richlist(playerid, params[], help)
 	    if(IsPlayerAvail(i))
 	    {
 	        richlist[i][E_playerid] = i;
-	        richlist[i][E_money] = PlayerData[i][e_money] + PlayerData[i][Bank];
+	        richlist[i][E_money] = PlayerData[i][e_money] + PlayerData[i][e_bank];
 	    }
 	    else
 	    {
@@ -15320,13 +15320,13 @@ YCMD:stats(playerid, params[], help)
 			pDeaths,
 			finstring[sizeof(string1) + sizeof(string2) + sizeof(string3) + sizeof(vip) + 35];
 
- 		if(PlayerData[player1][Deaths] == 0)
+ 		if(PlayerData[player1][e_deaths] == 0)
 	 	{
 	 		pDeaths = 1;
 	 	}
 	 	else
 	 	{
-	 		pDeaths = PlayerData[player1][Deaths];
+	 		pDeaths = PlayerData[player1][e_deaths];
 	 	}
 
 		if(PlayerData[player1][GangPosition] == 0)
@@ -15345,23 +15345,23 @@ YCMD:stats(playerid, params[], help)
 	 	Kills: "LB_E"%i\n"white"Deaths: "LB_E"%i\n"white"K/D: "LB_E"%0.2f\n"white"Score: "LB_E"%i\n"white"Money: "LB_E"$%s\n"white"Bank: "LB_E"$%s\n"white"Gold Credits: "LB_E"%sGC\n",
    			__GetName(player1),
    			PlayerData[player1][e_accountid],
-	 		PlayerData[player1][Kills],
-        	PlayerData[player1][Deaths],
-        	Float:PlayerData[player1][Kills] / Float:pDeaths,
+	 		PlayerData[player1][e_kills],
+        	PlayerData[player1][e_deaths],
+        	Float:PlayerData[player1][e_kills] / Float:pDeaths,
         	GetPlayerScore_(player1),
         	number_format(GetPlayerCash(player1)),
-        	number_format(PlayerData[player1][Bank]),
+        	number_format(PlayerData[player1][e_bank]),
 			number_format(PlayerData[player1][Credits]));
 
 		format(string2, sizeof(string2), ""white"Race wins: "LB_E"%i\n"white"Derby wins: "LB_E"%i\n"white"Reaction wins: "LB_E"%i\n"white"TDM wins: "LB_E"%i\n"white"Fallout wins: "LB_E"%i\n"white"Gungame wins: "LB_E"%i\n"white"Event wins: "LB_E"%i\n"white"Time until PayDay: "LB_E"%i minutes\n",
 	   		PlayerData[player1][RaceWins],
 	   		PlayerData[player1][DerbyWins],
-	   		PlayerData[player1][Reaction],
+	   		PlayerData[player1][e_reaction],
 	   		PlayerData[player1][BGWins],
 	   		PlayerData[player1][FalloutWins],
 	   		PlayerData[player1][GungameWins],
 	   		PlayerData[player1][EventWins],
-	   		PlayerData[player1][PayDay]);
+	   		PlayerData[player1][e_payday]);
 
         format(string3, sizeof(string3), ""white"Playing Time: "LB_E"%s\n"white"Gang: "LB_E"%s\n"white"VIP: "LB_E"%s\n"white"Medkits: "LB_E"%i\n"white"Houses: "LB_E"%i\n"white"Business: "LB_E"%i\n"white"Wanteds: "LB_E"%i\n"white"Last log in: "LB_E"%s",
             GetPlayingTimeFormat(player1),
@@ -15692,7 +15692,7 @@ YCMD:savecolor(playerid, params[], help)
 {
 	if(!islogged(playerid)) return notlogged(playerid);
 
-	if(PlayerData[playerid][SavedColor] == 0)
+	if(PlayerData[playerid][e_color] == 0)
 	{
 	    SCM(playerid, COLOR_GREY, ""nef" "GREY2_E"Color saved! It will be loaded on next login. Use /deletecolor to remove it");
 	}
@@ -15700,7 +15700,7 @@ YCMD:savecolor(playerid, params[], help)
 	{
 	    SCM(playerid, COLOR_GREY, ""nef" "GREY2_E"Saved color overwritten! It will be loaded on next login. Use /deletecolor to remove it");
 	}
-    PlayerData[playerid][SavedColor] = GetPlayerColor(playerid);
+    PlayerData[playerid][e_color] = GetPlayerColor(playerid);
 	return 1;
 }
 
@@ -15708,7 +15708,7 @@ YCMD:deletecolor(playerid, params[], help)
 {
 	if(!islogged(playerid)) return notlogged(playerid);
 
-	if(PlayerData[playerid][SavedColor] == 0)
+	if(PlayerData[playerid][e_color] == 0)
 	{
 	    SCM(playerid, COLOR_GREY, ""nef" "GREY2_E"You have no saved color yet!");
 	}
@@ -15716,7 +15716,7 @@ YCMD:deletecolor(playerid, params[], help)
 	{
 	    SCM(playerid, COLOR_GREY, ""nef" "GREY2_E"Color has been deleted!");
 	}
-    PlayerData[playerid][SavedColor] = 0;
+    PlayerData[playerid][e_color] = 0;
 	return 1;
 }
 
@@ -17615,8 +17615,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	                return 1;
 	            }
 
-				PlayerData[playerid][Deaths] = 0;
-				PlayerData[playerid][Kills] = 0;
+				PlayerData[playerid][e_deaths] = 0;
+				PlayerData[playerid][e_kills] = 0;
 
 				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[13][E_item_credits]));
 				SendInfo(playerid, "Item purchased", gstr, 5000);
@@ -18518,7 +18518,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					}
 					case 5:
 					{
-					    if(PlayerData[playerid][SavedColor] == 0)
+					    if(PlayerData[playerid][e_color] == 0)
 					    {
 					        Command_ReProcess(playerid, "/savecolor", false);
 					    }
@@ -19094,17 +19094,17 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			    {
 				    case 0: // Deposit
 				    {
-				        format(gstr, sizeof(gstr), ""white"» You got "yellow"$%s"white" in your bank account.\n\nType in the amount you want to deposit below:", number_format(PlayerData[playerid][Bank]));
+				        format(gstr, sizeof(gstr), ""white"» You got "yellow"$%s"white" in your bank account.\n\nType in the amount you want to deposit below:", number_format(PlayerData[playerid][e_bank]));
 				        ShowPlayerDialog(playerid, BANK_DIALOG+1, DIALOG_STYLE_INPUT, ""nef" :: Bank > Deposit", gstr, "Deposit", "Cancel");
 				    }
 				    case 1: // Withdraw
 				    {
-				        format(gstr, sizeof(gstr), ""white"» You got "yellow"$%s"white" in your bank account.\n\nType in the amount you want to withdraw below:", number_format(PlayerData[playerid][Bank]));
+				        format(gstr, sizeof(gstr), ""white"» You got "yellow"$%s"white" in your bank account.\n\nType in the amount you want to withdraw below:", number_format(PlayerData[playerid][e_bank]));
 				        ShowPlayerDialog(playerid, BANK_DIALOG+2, DIALOG_STYLE_INPUT, ""nef" :: Bank > Withdraw", gstr, "Withdraw", "Cancel");
 				    }
 				    case 2: // Show Credit
 				    {
-				        format(gstr, sizeof(gstr), ""white"» You got "yellow"$%s"white" in your bank account.", number_format(PlayerData[playerid][Bank]));
+				        format(gstr, sizeof(gstr), ""white"» You got "yellow"$%s"white" in your bank account.", number_format(PlayerData[playerid][e_bank]));
 				        ShowPlayerDialog(playerid, 11231, DIALOG_STYLE_MSGBOX, ""nef" :: Bank > Balance", gstr, "OK", "");
 				    }
 			    }
@@ -19128,7 +19128,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				else
 				{
 					GivePlayerCash(playerid, -inamount);
-					PlayerData[playerid][Bank] += inamount;
+					PlayerData[playerid][e_bank] += inamount;
 					format(gstr, sizeof(gstr), "» You have deposited {FF7800}$%s"white" into your bank account", number_format(inamount));
 					SCM(playerid, WHITE, gstr);
 				}
@@ -19141,7 +19141,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				    return SCM(playerid, WHITE, ""er"Invalid amount");
 				}
 
-				if(outamount > PlayerData[playerid][Bank])
+				if(outamount > PlayerData[playerid][e_bank])
 				{
 					SCM(playerid, WHITE, ""er"You do not have that much money in your bank account!");
 				}
@@ -19152,7 +19152,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				else
 				{
 					GivePlayerCash(playerid, outamount);
-					PlayerData[playerid][Bank] -= outamount;
+					PlayerData[playerid][e_bank] -= outamount;
 					format(gstr, sizeof(gstr), "» You have withdrawn {FF7800}$%s"white" from your bank account", number_format(outamount));
 					SCM(playerid, WHITE, gstr);
 				}
@@ -21141,7 +21141,7 @@ function:SkipRegistration(playerid)
     PlayerData[playerid][AllowSpawn] = true;
 	
     PlayerData[playerid][RegDate] = gettime();
-	PlayerData[playerid][PayDay] = 60;
+	PlayerData[playerid][e_payday] = 60;
 	PlayerData[playerid][ConnectTime] = gettime();
     PlayerData[playerid][Wanteds] = 0;
 	PlayerData[playerid][LastLogin] = gettime();
@@ -21184,7 +21184,7 @@ function:SkipLogin(playerid)
 		ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef"", string, "OK", "");
 		
 	    PlayerData[playerid][RegDate] = gettime();
-		PlayerData[playerid][PayDay] = 60;
+		PlayerData[playerid][e_payday] = 60;
 		PlayerData[playerid][ConnectTime] = gettime();
 	    PlayerData[playerid][Wanteds] = 0;
 		PlayerData[playerid][LastLogin] = gettime();
@@ -21212,15 +21212,15 @@ function:SkipLogin(playerid)
 
 GetPlayingTimeFormat(playerid)
 {
-    PlayerData[playerid][TotalTime] = PlayerData[playerid][TotalTime] + (gettime() - PlayerData[playerid][ConnectTime]);
+    PlayerData[playerid][e_time] = PlayerData[playerid][e_time] + (gettime() - PlayerData[playerid][ConnectTime]);
     PlayerData[playerid][ConnectTime] = gettime();
 
     new ptime[32],
         time[3];
 
-    time[0] = floatround(PlayerData[playerid][TotalTime] / 3600, floatround_floor);
-    time[1] = floatround(PlayerData[playerid][TotalTime] / 60, floatround_floor) % 60;
-    time[2] = floatround(PlayerData[playerid][TotalTime] % 60, floatround_floor);
+    time[0] = floatround(PlayerData[playerid][e_time] / 3600, floatround_floor);
+    time[1] = floatround(PlayerData[playerid][e_time] / 60, floatround_floor) % 60;
+    time[2] = floatround(PlayerData[playerid][e_time] % 60, floatround_floor);
 
 	format(ptime, sizeof(ptime), "%ih %02im %02is", time[0], time[1], time[2]);
 	return ptime;
@@ -21441,7 +21441,7 @@ MySQL_SavePlayer(playerid, bool:save_pv)
 	new query[1400],
 	 	query2[600];
 
-    PlayerData[playerid][TotalTime] = PlayerData[playerid][TotalTime] + (gettime() - PlayerData[playerid][ConnectTime]);
+    PlayerData[playerid][e_time] = PlayerData[playerid][e_time] + (gettime() - PlayerData[playerid][ConnectTime]);
     PlayerData[playerid][ConnectTime] = gettime();
 
 	format(query, sizeof(query), "UPDATE `accounts` SET `Level` = %i, `Score` = %i, `Money` = %i, `Bank` = %i, `Kills` = %i, `Deaths` = %i, `Time` = %i, \
@@ -21450,12 +21450,12 @@ MySQL_SavePlayer(playerid, bool:save_pv)
 		PlayerData[playerid][e_level],
 		GetPlayerScore_(playerid),
 		GetPlayerCash(playerid),
-		PlayerData[playerid][Bank],
-		PlayerData[playerid][Kills],
-		PlayerData[playerid][Deaths],
-		PlayerData[playerid][TotalTime],
-		PlayerData[playerid][Reaction],
-		PlayerData[playerid][PayDay],
+		PlayerData[playerid][e_bank],
+		PlayerData[playerid][e_kills],
+		PlayerData[playerid][e_deaths],
+		PlayerData[playerid][e_time],
+		PlayerData[playerid][e_reaction],
+		PlayerData[playerid][e_payday],
 		PlayerData[playerid][Houses],
 		PlayerData[playerid][Businesses],
 		PlayerData[playerid][GangPosition],
@@ -21468,7 +21468,7 @@ MySQL_SavePlayer(playerid, bool:save_pv)
 		PlayerData[playerid][DerbyWins]);
 
     format(query2, sizeof(query2), ", `Color` = %i, `Medkits` = %i, `Skin` = %i, `GungameWins` = %i, `RaceWins` = %i, `BGWins` = %i, `FalloutWins` = %i, `Wanteds` = %i, `VIP` = %i, `LastNameChange` = %i, `SavedSkin` = %i WHERE `Name` = '%s' LIMIT 1;",
-		PlayerData[playerid][SavedColor],
+		PlayerData[playerid][e_color],
 		PlayerData[playerid][Medkits],
 		GetPlayerSkin(playerid),
 		PlayerData[playerid][GungameWins],
@@ -25460,15 +25460,15 @@ function:QueueProcess()
 	    if(!IsPlayerAvail(i)) continue;
 	    if(IsPlayerOnDesktop(i, 30000)) continue;
 	
-		if(PlayerData[i][PayDay] > 1)
+		if(PlayerData[i][e_payday] > 1)
 		{
-		    PlayerData[i][PayDay]--;
+		    PlayerData[i][e_payday]--;
 		}
-		else if(PlayerData[i][PayDay] <= 1)
+		else if(PlayerData[i][e_payday] <= 1)
 		{
-		    PlayerData[i][PayDay] = 60;
+		    PlayerData[i][e_payday] = 60;
 		    
-		    if((PlayerData[i][Bank] + PlayerData[i][e_money]) > 100000000)
+		    if((PlayerData[i][e_bank] + PlayerData[i][e_money]) > 100000000)
 		    {
 		        continue;
 		    }
@@ -25479,13 +25479,13 @@ function:QueueProcess()
 				string3[100],
 				string4[100],
 				string5[100],
-				interest = floatround(floatmul(floatdiv(PlayerData[i][Bank], 2300.0), 7.0), floatround_round),
+				interest = floatround(floatmul(floatdiv(PlayerData[i][e_bank], 2300.0), 7.0), floatround_round),
 				vipinterest = floatround(interest / 2.5),
 				b_vipearnings = 0;
 
 			GameTextForPlayer(i, "~g~~h~~h~PayDay~n~~w~Paycheck", 6000, 1);
 
-			format(string0, sizeof(string0), "Bank Balance before PayDay: "green"$%s", number_format(PlayerData[i][Bank]));
+			format(string0, sizeof(string0), "Bank Balance before PayDay: "green"$%s", number_format(PlayerData[i][e_bank]));
 			format(string1, sizeof(string1), "Bank Interest Gained: "green"$%s", number_format(interest));
 
 			if(PlayerData[i][VIP] == 1)
@@ -25510,9 +25510,9 @@ function:QueueProcess()
 				format(string5, sizeof(string5), "Business earnings "lb_e"(VIP BOOST)"white": "red"---");
 			}
 
-			PlayerData[i][Bank] = PlayerData[i][Bank] + interest + GetPlayerBusinessEarnings(i) + vipinterest + b_vipearnings;
+			PlayerData[i][e_bank] = PlayerData[i][e_bank] + interest + GetPlayerBusinessEarnings(i) + vipinterest + b_vipearnings;
 
-			format(string2, sizeof(string2), "Bank Balance after PayDay: "green"$%s", number_format(PlayerData[i][Bank]));
+			format(string2, sizeof(string2), "Bank Balance after PayDay: "green"$%s", number_format(PlayerData[i][e_bank]));
 
 			SCM(i, -1, ""green"|--------------------"yellow"PAY-DAY"green"-------------------|");
 			SCM(i, WHITE, string0);
@@ -25634,7 +25634,7 @@ function:OnQueueReceived()
 		            if(playerid != INVALID_PLAYER_ID && islogged(playerid))
 		            {
 		                PlayerData[playerid][VIP] = 1;
-		                PlayerData[playerid][Bank] += 1000000;
+		                PlayerData[playerid][e_bank] += 1000000;
 		                
 		                if(PlayerData[playerid][AdditionalPVSlots] < 7)
 		                {
@@ -25854,7 +25854,7 @@ function:ProcessTick()
 							PlayerData[i][SpecID],
 							hp,
 							ar,
-							number_format((GetPlayerCash(PlayerData[i][SpecID]) + PlayerData[PlayerData[i][SpecID]][Bank])),
+							number_format((GetPlayerCash(PlayerData[i][SpecID]) + PlayerData[PlayerData[i][SpecID]][e_bank])),
 							PlayerData[PlayerData[i][SpecID]][bGod] ? ("Yes") : ("No"));
 							
 						GameTextForPlayer(i, gstr, 30000, 3);
@@ -28476,14 +28476,14 @@ GetPlayerSettings(playerid)
 	    strcat(string, tmpstring);
 	}
 	
-	if(PlayerData[playerid][SavedColor] == 0)
+	if(PlayerData[playerid][e_color] == 0)
 	{
 	    format(tmpstring, sizeof(tmpstring), ""white"6)\tSaved Color\tRandom\n");
 	    strcat(string, tmpstring);
 	}
 	else
 	{
-	    format(tmpstring, sizeof(tmpstring), ""white"6)\tSaved Color\t{%06x}Saved Color\n", PlayerData[playerid][SavedColor] >>> 8);
+	    format(tmpstring, sizeof(tmpstring), ""white"6)\tSaved Color\t{%06x}Saved Color\n", PlayerData[playerid][e_color] >>> 8);
 	    strcat(string, tmpstring);
 	}
 	
@@ -30692,7 +30692,7 @@ ResetPlayerVars(playerid)
 	PlayerData[playerid][tLoadMap] = -1;
 	PlayerData[playerid][Boost] = BOOST:0;
 	PlayerData[playerid][BoostDeplete] = 0;
-	PlayerData[playerid][SavedColor] = 0;
+	PlayerData[playerid][e_color] = 0;
 	PlayerData[playerid][SavedSkin] = -1;
 	PlayerData[playerid][AdditionalPVSlots] = 0;
 	PlayerData[playerid][AdditionalToySlots] = 0;
@@ -30707,8 +30707,8 @@ ResetPlayerVars(playerid)
 	PlayerData[playerid][tTDhandle] = -1;
 	PlayerData[playerid][ExitType] = EXIT_NONE;
 	PlayerData[playerid][e_level] = 0;
-	PlayerData[playerid][Kills] = 0;
-	PlayerData[playerid][Deaths] = 0;
+	PlayerData[playerid][e_kills] = 0;
+	PlayerData[playerid][e_deaths] = 0;
 	PlayerData[playerid][e_money] = 0;
 	PlayerData[playerid][e_score] = 0;
 	PlayerData[playerid][DerbyWins] = 0;
@@ -30721,7 +30721,7 @@ ResetPlayerVars(playerid)
 	PlayerData[playerid][Medkits] = 0;
 	PlayerData[playerid][tMedkit] = -1;
 	PlayerData[playerid][MedkitTime] = 0;
-	PlayerData[playerid][PayDay] = 60;
+	PlayerData[playerid][e_payday] = 60;
   	PlayerData[playerid][Houses] = 0;
 	PlayerData[playerid][Businesses] = 0;
 	PlayerData[playerid][GCPlayer] = INVALID_PLAYER_ID;
@@ -30758,9 +30758,9 @@ ResetPlayerVars(playerid)
   	PlayerData[playerid][tickLastCD] = 0;
     PlayerData[playerid][tickJoin_bmx] = 0;
   	PlayerData[playerid][LastLogin] = 0;
-	PlayerData[playerid][Reaction] = 0;
-	PlayerData[playerid][Bank] = 0;
-	PlayerData[playerid][TotalTime] = 0;
+	PlayerData[playerid][e_reaction] = 0;
+	PlayerData[playerid][e_bank] = 0;
+	PlayerData[playerid][e_time] = 0;
 	PlayerData[playerid][ConnectTime] = 0;
 	PlayerData[playerid][VIP] = 0;
 	PlayerData[playerid][LastNameChange] = 0;
@@ -30968,7 +30968,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 		    PlayerData[playerid][e_accountid] = cache_insert_id();
 		    PlayerData[playerid][RegDate] = gettime();
 			PlayerData[playerid][ExitType] = EXIT_LOGGED;
-			PlayerData[playerid][PayDay] = 60;
+			PlayerData[playerid][e_payday] = 60;
 			PlayerData[playerid][ConnectTime] = gettime();
 		    PlayerData[playerid][AllowSpawn] = true;
 		    PlayerData[playerid][Wanteds] = 0;
@@ -31022,16 +31022,16 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 			if(cache_get_row_count() > 0)
 			{
 			    PlayerData[playerid][e_accountid] = cache_get_row_int(0, 0, pSQL);
-			    PlayerData[playerid][SavedColor] = cache_get_row_int(0, 2, pSQL);
+			    PlayerData[playerid][e_color] = cache_get_row_int(0, 2, pSQL);
 			    PlayerData[playerid][e_level] = cache_get_row_int(0, 5, pSQL);
 			    PlayerData[playerid][e_score] = cache_get_row_int(0, 6, pSQL);
 			    PlayerData[playerid][e_money] = cache_get_row_int(0, 7, pSQL);
-			    PlayerData[playerid][Bank] = cache_get_row_int(0, 8, pSQL);
-			    PlayerData[playerid][Kills] = cache_get_row_int(0, 9, pSQL);
-			    PlayerData[playerid][Deaths] = cache_get_row_int(0, 10, pSQL);
-			    PlayerData[playerid][TotalTime] = cache_get_row_int(0, 11, pSQL);
-                PlayerData[playerid][Reaction] = cache_get_row_int(0, 12, pSQL);
-                PlayerData[playerid][PayDay] = cache_get_row_int(0, 13, pSQL);
+			    PlayerData[playerid][e_bank] = cache_get_row_int(0, 8, pSQL);
+			    PlayerData[playerid][e_kills] = cache_get_row_int(0, 9, pSQL);
+			    PlayerData[playerid][e_deaths] = cache_get_row_int(0, 10, pSQL);
+			    PlayerData[playerid][e_time] = cache_get_row_int(0, 11, pSQL);
+                PlayerData[playerid][e_reaction] = cache_get_row_int(0, 12, pSQL);
+                PlayerData[playerid][e_payday] = cache_get_row_int(0, 13, pSQL);
                 PlayerData[playerid][Houses] = cache_get_row_int(0, 14, pSQL);
                 PlayerData[playerid][Businesses] = cache_get_row_int(0, 15, pSQL);
                 PlayerData[playerid][GangPosition] = cache_get_row_int(0, 16, pSQL);
@@ -31469,9 +31469,9 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 					IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr2);
 				}
 
-				if(PlayerData[playerid][SavedColor] != 0)
+				if(PlayerData[playerid][e_color] != 0)
 				{
-				    SetPlayerColor(playerid, PlayerData[playerid][SavedColor]);
+				    SetPlayerColor(playerid, PlayerData[playerid][e_color]);
 				    SCM(playerid, -1, ""server_sign" "r_besch"Your saved color has been set. (/deletecolor to remove)");
 				}
 
