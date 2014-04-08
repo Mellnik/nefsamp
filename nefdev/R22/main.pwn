@@ -616,6 +616,8 @@ enum E_PLAYER_DATA
 	e_name[MAX_PLAYER_NAME + 1],
 	e_ip[MAX_PLAYER_IP + 1],
 	e_level,
+	e_score,
+	e_money,
 
 	/* INTERNAL */
 	bool:GotVIPLInv,
@@ -670,11 +672,8 @@ enum E_PLAYER_DATA
 	tRainbow,
 	tTDhandle,
 	ExitType,
-	Level,
 	Kills,
 	Deaths,
-	Money,
-	Score,
 	DerbyWins,
 	RaceWins,
 	FalloutWins,
@@ -3503,7 +3502,7 @@ public OnPlayerCommandPerformed(playerid, cmdtext[], success)
 	{
 	    return GameTextForPlayer(playerid, "~b~~h~stop command spam!", 2000, 3);
 	}
-	else if(PlayerData[playerid][iCoolDownCommand] >= 12 && PlayerData[playerid][Level] < 2)
+	else if(PlayerData[playerid][iCoolDownCommand] >= 12 && PlayerData[playerid][e_level] < 2)
 	{
 		format(gstr, sizeof(gstr), "Command-Spam detected! %s(%i) has been kicked!", __GetName(playerid), playerid);
 		AdminMSG(RED, gstr);
@@ -4103,7 +4102,7 @@ public OnPlayerUpdate(playerid)
 	    }
 	    case FREEROAM:
 	    {
-	        if(PlayerData[playerid][Level] != MAX_ADMIN_LEVEL)
+	        if(PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 	        {
 		        switch(GetPlayerWeapon(playerid))
 		        {
@@ -4172,7 +4171,7 @@ public OnPlayerText(playerid, text[])
 	    GameTextForPlayer(playerid, "~b~~h~Do not spam!", 2000, 3);
 	    return 0;
 	}
-	else if(PlayerData[playerid][iCoolDownText] >= 15 && PlayerData[playerid][Level] < 2)
+	else if(PlayerData[playerid][iCoolDownText] >= 15 && PlayerData[playerid][e_level] < 2)
 	{
 		format(gstr, sizeof(gstr), "Chat-Spam detected! %s(%i) has been kicked!", __GetName(playerid), playerid);
 		AdminMSG(RED, gstr);
@@ -4271,13 +4270,13 @@ public OnPlayerText(playerid, text[])
 
     SrvStat[1]++;
 
-	if(PlayerData[playerid][Level] >= 1 && PlayerData[playerid][bDuty] && text[0] == '#')
+	if(PlayerData[playerid][e_level] >= 1 && PlayerData[playerid][bDuty] && text[0] == '#')
 	{
 	    format(gstr, sizeof(gstr), "[ADMIN CHAT] "LG_E"%s(%i): "LB_E"%s", __GetName(playerid), playerid, text[1]);
 		AdminMSG(COLOR_RED, gstr);
 	    return 0;
 	}
-	if(text[0] == '#' && PlayerData[playerid][Level] >= 1)
+	if(text[0] == '#' && PlayerData[playerid][e_level] >= 1)
 	{
 		format(gstr, sizeof(gstr), "[ADMIN CHAT] "LG_E"%s(%i): "LB_E"%s", __GetName(playerid), playerid, text[1]);
 		AdminMSG(COLOR_RED, gstr);
@@ -4341,11 +4340,11 @@ public OnPlayerText(playerid, text[])
 
 	        new tmp[144];
 			tmp[0] = EOS;
-			if(PlayerData[playerid][Level] != 0) strcat(tmp, "{A8DBFF}");
+			if(PlayerData[playerid][e_level] != 0) strcat(tmp, "{A8DBFF}");
 			strcat(tmp, text[pos]);
 			text[pos] = EOS;
 
-			if(PlayerData[playerid][Level] == 0)
+			if(PlayerData[playerid][e_level] == 0)
 			{
 				format(gstr, sizeof(gstr), "{%06x}[%s] %s"white"(%i): %s", GetColor__(playerid) >>> 8, PlayerData[playerid][GangTag], __GetName(playerid), playerid, text);
 				SCMToAll(-1, gstr);
@@ -4360,7 +4359,7 @@ public OnPlayerText(playerid, text[])
 		}
 		else
 		{
-			if(PlayerData[playerid][Level] == 0)
+			if(PlayerData[playerid][e_level] == 0)
 			{
 				format(gstr, sizeof(gstr), "{%06x}[%s] %s"white"(%i): %s", GetColor__(playerid) >>> 8, PlayerData[playerid][GangTag], __GetName(playerid), playerid, text);
 				SCMToAll(-1, gstr);
@@ -4384,10 +4383,10 @@ public OnPlayerText(playerid, text[])
 
         new tmp[144];
 		tmp[0] = EOS;
-		if(PlayerData[playerid][Level] != 0) strcat(tmp, "{A8DBFF}");
+		if(PlayerData[playerid][e_level] != 0) strcat(tmp, "{A8DBFF}");
 		strcat(tmp, text[pos]);
 		text[pos] = EOS;
-		if(PlayerData[playerid][Level] == 0)
+		if(PlayerData[playerid][e_level] == 0)
 		{
 			format(gstr, sizeof(gstr), "{%06x}%s"white"(%i): %s", GetColor__(playerid) >>> 8, __GetName(playerid), playerid, text);
 			SCMToAll(-1, gstr);
@@ -4402,12 +4401,12 @@ public OnPlayerText(playerid, text[])
 	}
 	else
 	{
-		if(PlayerData[playerid][Level] == 0)
+		if(PlayerData[playerid][e_level] == 0)
 		{
 	 		format(gstr, sizeof(gstr), "{%06x}%s"white"(%i): %s", GetColor__(playerid) >>> 8, __GetName(playerid), playerid, text);
 			SCMToAll(-1, gstr);
   		}
-		else if(PlayerData[playerid][AOnline] && PlayerData[playerid][Level] > 0)
+		else if(PlayerData[playerid][AOnline] && PlayerData[playerid][e_level] > 0)
 		{
  	 		format(gstr, sizeof(gstr), "{%06x}%s"white"(%i): {A8DBFF}%s", GetColor__(playerid) >>> 8, __GetName(playerid), playerid, text);
 			SCMToAll(-1, gstr);
@@ -5765,7 +5764,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 	    
   		if(pickupid == VIPLpickup)
   		{
-  		    if(PlayerData[playerid][VIP] == 1 || PlayerData[playerid][Level] > 0)
+  		    if(PlayerData[playerid][VIP] == 1 || PlayerData[playerid][e_level] > 0)
   		    {
   		        LoadMap(playerid);
 	    		SetPlayerPosition(playerid, -3939.1855, 1308.7438, 3.4587, 86.1611, 3);
@@ -8425,7 +8424,7 @@ YCMD:bbuy(playerid, params[], help)
     if(!islogged(playerid)) return notlogged(playerid);
 
 	new tick = GetTickCount_();
-	if(PlayerData[playerid][Level] != MAX_ADMIN_LEVEL)
+	if(PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 	{
 		if((PlayerData[playerid][tickLastPBuy] + COOLDOWN_CMD_PBUY) >= tick)
 		{
@@ -8492,7 +8491,7 @@ YCMD:bsell(playerid, params[], help)
     if(!islogged(playerid)) return notlogged(playerid);
 
 	new tick = GetTickCount_();
-	if(PlayerData[playerid][Level] != MAX_ADMIN_LEVEL)
+	if(PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 	{
 		if((PlayerData[playerid][tickLastPSell] + COOLDOWN_CMD_PSELL) >= tick)
 		{
@@ -8550,7 +8549,7 @@ YCMD:buy(playerid, params[], help)
     if(!islogged(playerid)) return notlogged(playerid);
     
 	new tick = GetTickCount_();
-	if(PlayerData[playerid][Level] != MAX_ADMIN_LEVEL)
+	if(PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 	{
 		if((PlayerData[playerid][tickLastBuy] + COOLDOWN_CMD_BUY) >= tick)
 		{
@@ -8617,7 +8616,7 @@ YCMD:sell(playerid, params[], help)
     if(!islogged(playerid)) return notlogged(playerid);
     
 	new tick = GetTickCount_();
-	if(PlayerData[playerid][Level] != MAX_ADMIN_LEVEL)
+	if(PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 	{
 		if((PlayerData[playerid][tickLastSell] + COOLDOWN_CMD_SELL) >= tick)
 		{
@@ -9206,7 +9205,7 @@ YCMD:tdm(playerid, params[], help)
 
 YCMD:adminhelp(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 1)
+	if(PlayerData[playerid][e_level] >= 1)
 	{
 	    new string[1500];
 
@@ -9414,7 +9413,7 @@ YCMD:hitman(playerid, params[], help)
     if(!islogged(playerid)) return notlogged(playerid);
     
 	new tick = GetTickCount_();
-	if(PlayerData[playerid][Level] != MAX_ADMIN_LEVEL)
+	if(PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 	{
 		if((PlayerData[playerid][tickLastHitman] + COOLDOWN_CMD_HITMAN) >= tick) return SCM(playerid, -1, ""er"You have to wait a bit before using it again!");
 	}
@@ -9428,7 +9427,7 @@ YCMD:hitman(playerid, params[], help)
     if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 	if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 
-	if(PlayerData[playerid][Level] == MAX_ADMIN_LEVEL)
+	if(PlayerData[playerid][e_level] == MAX_ADMIN_LEVEL)
 	{
 	    if(amount < 5000 || amount > 1000000)
 	    {
@@ -9490,7 +9489,7 @@ YCMD:hitman(playerid, params[], help)
 
 YCMD:akill(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 2)
+	if(PlayerData[playerid][e_level] >= 2)
 	{
 	    new player;
 	    if(sscanf(params, "r", player))
@@ -9528,7 +9527,7 @@ YCMD:akill(playerid, params[], help)
 
 YCMD:sethealth(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 4)
+	if(PlayerData[playerid][e_level] >= 4)
 	{
 	    new player, Float:amount;
 	    if(sscanf(params, "rf", player, amount))
@@ -9571,7 +9570,7 @@ YCMD:sethealth(playerid, params[], help)
 
 YCMD:setbcash(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= MAX_ADMIN_LEVEL)
+	if(PlayerData[playerid][e_level] >= MAX_ADMIN_LEVEL)
 	{
 	    new player, amount;
 	    if(sscanf(params, "ri", player, amount))
@@ -9624,7 +9623,7 @@ YCMD:setbcash(playerid, params[], help)
 /*
 YCMD:grantnc(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= MAX_ADMIN_LEVEL)
+	if(PlayerData[playerid][e_level] >= MAX_ADMIN_LEVEL)
 	{
 	    new player;
 	    if(sscanf(params, "r", player))
@@ -9672,7 +9671,7 @@ YCMD:grantnc(playerid, params[], help)
 
 YCMD:suspect(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 1)
+	if(PlayerData[playerid][e_level] >= 1)
 	{
 	    new count = 0, tmpstring[55], finstring[1500];
 		for(new i = 0; i < MAX_PLAYERS; i++)
@@ -9714,7 +9713,7 @@ YCMD:suspect(playerid, params[], help)
 
 YCMD:onlinefix(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= MAX_ADMIN_LEVEL)
+	if(PlayerData[playerid][e_level] >= MAX_ADMIN_LEVEL)
 	{
 	    mysql_query(pSQL, "TRUNCATE TABLE `online`;", false);
 	    
@@ -9738,7 +9737,7 @@ YCMD:onlinefix(playerid, params[], help)
 
 YCMD:setcash(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= MAX_ADMIN_LEVEL)
+	if(PlayerData[playerid][e_level] >= MAX_ADMIN_LEVEL)
 	{
 	    new player, amount;
 	    if(sscanf(params, "ri", player, amount))
@@ -9791,7 +9790,7 @@ YCMD:setcash(playerid, params[], help)
 
 YCMD:addscore(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= MAX_ADMIN_LEVEL)
+	if(PlayerData[playerid][e_level] >= MAX_ADMIN_LEVEL)
 	{
 	    new player, amount;
 	    if(sscanf(params, "ri", player, amount))
@@ -9844,7 +9843,7 @@ YCMD:addscore(playerid, params[], help)
 
 YCMD:addcash(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= MAX_ADMIN_LEVEL)
+	if(PlayerData[playerid][e_level] >= MAX_ADMIN_LEVEL)
 	{
 	    new player, amount;
 	    if(sscanf(params, "ri", player, amount))
@@ -9897,7 +9896,7 @@ YCMD:addcash(playerid, params[], help)
 
 YCMD:setscore(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= MAX_ADMIN_LEVEL)
+	if(PlayerData[playerid][e_level] >= MAX_ADMIN_LEVEL)
 	{
 	    new player, amount;
 	    if(sscanf(params, "ri", player, amount))
@@ -9950,7 +9949,7 @@ YCMD:setscore(playerid, params[], help)
 
 YCMD:online(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 2)
+	if(PlayerData[playerid][e_level] >= 2)
 	{
 	    SendInfo(playerid, "~w~Adminlist: ~g~Online", "");
 		PlayerData[playerid][AOnline] = true;
@@ -9964,7 +9963,7 @@ YCMD:online(playerid, params[], help)
 
 YCMD:offline(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 2)
+	if(PlayerData[playerid][e_level] >= 2)
 	{
 	    SendInfo(playerid, "~w~Adminlist: ~r~Offline", "");
 		PlayerData[playerid][AOnline] = false;
@@ -9979,7 +9978,7 @@ YCMD:offline(playerid, params[], help)
 YCMD:onduty(playerid, params[], help)
 {
 	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
-	if(PlayerData[playerid][Level] >= 2)
+	if(PlayerData[playerid][e_level] >= 2)
 	{
 		if(!PlayerData[playerid][bDuty])
 		{
@@ -10004,7 +10003,7 @@ YCMD:onduty(playerid, params[], help)
 
 YCMD:offduty(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 2)
+	if(PlayerData[playerid][e_level] >= 2)
 	{
     	if(PlayerData[playerid][bDuty])
 		{
@@ -10034,7 +10033,7 @@ YCMD:offduty(playerid, params[], help)
 
 YCMD:eject(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 2)
+	if(PlayerData[playerid][e_level] >= 2)
 	{
 	    new player;
 	 	if(sscanf(params, "r", player))
@@ -10045,7 +10044,7 @@ YCMD:eject(playerid, params[], help)
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 
-		if(PlayerData[player][Level] == MAX_ADMIN_LEVEL && PlayerData[playerid][Level] != MAX_ADMIN_LEVEL)
+		if(PlayerData[player][e_level] == MAX_ADMIN_LEVEL && PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 		{
 			return SCM(playerid, -1, ""er"You cannot use this command on this admin");
 		}
@@ -10086,7 +10085,7 @@ YCMD:eject(playerid, params[], help)
 
 YCMD:burn(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 2)
+	if(PlayerData[playerid][e_level] >= 2)
 	{
 	    new player;
 	 	if(sscanf(params, "r", player))
@@ -10099,7 +10098,7 @@ YCMD:burn(playerid, params[], help)
 
         if(IsPlayerAvail(player))
 		{
-			if(PlayerData[player][Level] > 0)
+			if(PlayerData[player][e_level] > 0)
 			{
 				return SCM(playerid, -1, ""er"You cannot use this command on an admin");
 			}
@@ -10134,7 +10133,7 @@ YCMD:burn(playerid, params[], help)
 
 YCMD:getip(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 3)
+	if(PlayerData[playerid][e_level] >= 3)
 	{
 	    new player;
 	 	if(sscanf(params, "r", player))
@@ -10146,7 +10145,7 @@ YCMD:getip(playerid, params[], help)
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 
-		if(PlayerData[player][Level] >= PlayerData[playerid][Level] && PlayerData[playerid][Level] != MAX_ADMIN_LEVEL)
+		if(PlayerData[player][e_level] >= PlayerData[playerid][e_level] && PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 		{
 			return SCM(playerid, -1, ""er"You cannot use this command on this admin");
 		}
@@ -10172,7 +10171,7 @@ YCMD:getip(playerid, params[], help)
 
 YCMD:nstats(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 3)
+	if(PlayerData[playerid][e_level] >= 3)
 	{
 	    new player;
 	 	if(sscanf(params, "r", player))
@@ -10184,7 +10183,7 @@ YCMD:nstats(playerid, params[], help)
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 
-		if(PlayerData[player][Level] >= PlayerData[playerid][Level] && PlayerData[playerid][Level] != MAX_ADMIN_LEVEL)
+		if(PlayerData[player][e_level] >= PlayerData[playerid][e_level] && PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 		{
 			return SCM(playerid, -1, ""er"You cannot use this command on this admin");
 		}
@@ -10224,7 +10223,7 @@ YCMD:nstats(playerid, params[], help)
 
 YCMD:iplookup(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 3)
+	if(PlayerData[playerid][e_level] >= 3)
 	{
 	    if(sscanf(params, "s[144]", gstr))
 	    {
@@ -10258,7 +10257,7 @@ YCMD:car(playerid, params[], help)
 	if(gTeam[playerid] == FREEROAM)
 	{
 	    if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't spawn a car now");
-	    if(IsPlayerInRangeOfPoint(playerid, 65.0, 1797.3141, -1302.0978, 120.2659) && PlayerData[playerid][Level] < 1) return SCM(playerid, -1, ""er"Can't spawn vehicle at this place!");
+	    if(IsPlayerInRangeOfPoint(playerid, 65.0, 1797.3141, -1302.0978, 120.2659) && PlayerData[playerid][e_level] < 1) return SCM(playerid, -1, ""er"Can't spawn vehicle at this place!");
 
 		CarSpawner(playerid, 415, 120);
 	}
@@ -10334,7 +10333,7 @@ YCMD:id(playerid, params[], help)
 
 YCMD:asay(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 1)
+	if(PlayerData[playerid][e_level] >= 1)
 	{
 	    extract params -> new string:text[144]; else
 	    {
@@ -10355,7 +10354,7 @@ YCMD:asay(playerid, params[], help)
 
 YCMD:announce(playerid, params[], help)
 {
-    if(PlayerData[playerid][Level] >= 3 || IsPlayerAdmin(playerid))
+    if(PlayerData[playerid][e_level] >= 3 || IsPlayerAdmin(playerid))
 	{
 	    extract params -> new string:text[144]; else
 	    {
@@ -10379,7 +10378,7 @@ YCMD:announce(playerid, params[], help)
 
 YCMD:announce2(playerid, params[], help)
 {
-    if(PlayerData[playerid][Level] >= 4 || IsPlayerAdmin(playerid))
+    if(PlayerData[playerid][e_level] >= 4 || IsPlayerAdmin(playerid))
 	{
 	    extract params -> new string:text[144]; else
 	    {
@@ -10407,7 +10406,7 @@ YCMD:announce2(playerid, params[], help)
 
 YCMD:spectators(playerid, params[], help)
 {
-    if(PlayerData[playerid][Level] >= 1)
+    if(PlayerData[playerid][e_level] >= 1)
 	{
 	    new Iterator:speccers<MAX_PLAYERS>;
 		for(new i = 0; i < MAX_PLAYERS; i++)
@@ -10446,7 +10445,7 @@ YCMD:jetpack(playerid, params[], help)
 	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
     if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't use this command now");
 
-	if(PlayerData[playerid][Level] != MAX_ADMIN_LEVEL && PlayerData[playerid][bGWarMode])
+	if(PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL && PlayerData[playerid][bGWarMode])
 	{
 	    new Float:POS[3];
 	    GetPlayerPos(playerid, POS[0], POS[1], POS[2]);
@@ -10471,7 +10470,7 @@ YCMD:go(playerid, params[], help)
 {
     if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 
-	if(PlayerData[playerid][Level] == 0)
+	if(PlayerData[playerid][e_level] == 0)
 	{
 	    if(gTeam[playerid] == FREEROAM)
 	    {
@@ -10488,7 +10487,7 @@ YCMD:go(playerid, params[], help)
 			if(player == playerid) return SCM(playerid, -1, ""er"You may not teleport to yourself");
 			if(gTeam[player] != FREEROAM) return SCM(playerid, -1, ""er"Player is currently unavailable to goto");
 			if(PlayerData[player][Wanteds] != 0) return SCM(playerid, -1, ""er"This player has wanteds");
-			if(PlayerData[player][Level] != 0) return SCM(playerid, -1, ""er"You can't teleport to admins");
+			if(PlayerData[player][e_level] != 0) return SCM(playerid, -1, ""er"You can't teleport to admins");
             if(PlayerData[player][bGWarMode]) return SCM(playerid, -1, ""er"This player is in Gang War");
             if(GetPVarInt(player, "doingStunt") != 0) return SCM(playerid, -1, ""er"Player is doing stunts");
 
@@ -10520,7 +10519,7 @@ YCMD:go(playerid, params[], help)
 		    SCM(playerid, RED, "You need to be in freeroam world");
 		}
 	}
-	else if(PlayerData[playerid][Level] > 0 || IsPlayerAdmin(playerid))
+	else if(PlayerData[playerid][e_level] > 0 || IsPlayerAdmin(playerid))
 	{
 	    new player;
 	 	if(sscanf(params, "r", player))
@@ -10562,7 +10561,7 @@ YCMD:go(playerid, params[], help)
 
 YCMD:cuff(playerid, params[], help)
 {
-    if(PlayerData[playerid][Level] >= 2)
+    if(PlayerData[playerid][e_level] >= 2)
 	{
 	    new player;
 	 	if(sscanf(params, "r", player))
@@ -10597,7 +10596,7 @@ YCMD:cuff(playerid, params[], help)
 
 YCMD:uncuff(playerid, params[], help)
 {
-    if(PlayerData[playerid][Level] >= 2)
+    if(PlayerData[playerid][e_level] >= 2)
 	{
 	    new player;
 	 	if(sscanf(params, "r", player))
@@ -10631,7 +10630,7 @@ YCMD:uncuff(playerid, params[], help)
 
 YCMD:get(playerid, params[], help)
 {
-    if(PlayerData[playerid][Level] >= 3)
+    if(PlayerData[playerid][e_level] >= 3)
 	{
 	    new player;
 	 	if(sscanf(params, "r", player))
@@ -10644,7 +10643,7 @@ YCMD:get(playerid, params[], help)
 		if(gTeam[playerid] != FREEROAM) return SCM(playerid, -1, ""er"Not useable in minigames");
 		if(PlayerData[player][bIsDead]) return SCM(playerid, -1, ""er"Cannot teleport dead players");
 		
-		if(PlayerData[player][Level] == MAX_ADMIN_LEVEL && PlayerData[playerid][Level] != MAX_ADMIN_LEVEL)
+		if(PlayerData[player][e_level] == MAX_ADMIN_LEVEL && PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 		{
 			return SCM(playerid, -1, ""er"You cannot use this command on this admin");
 		}
@@ -10692,7 +10691,7 @@ YCMD:get(playerid, params[], help)
 
 YCMD:ncrecords(playerid, params[], help)
 {
-    if(PlayerData[playerid][VIP] != 1 && PlayerData[playerid][Level] == 0) return Command_ReProcess(playerid, "/vip", false);
+    if(PlayerData[playerid][VIP] != 1 && PlayerData[playerid][e_level] == 0) return Command_ReProcess(playerid, "/vip", false);
 
 	new name[25];
 	if(sscanf(params, "s[24]", name))
@@ -10710,7 +10709,7 @@ YCMD:ncrecords(playerid, params[], help)
 
 YCMD:warn(playerid, params[], help)
 {
-    if(PlayerData[playerid][Level] >= 1)
+    if(PlayerData[playerid][e_level] >= 1)
 	{
  		new player, reason[144];
 		if(sscanf(params, "rs[144]", player, reason))
@@ -10721,7 +10720,7 @@ YCMD:warn(playerid, params[], help)
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 
-		if(PlayerData[player][Level] == MAX_ADMIN_LEVEL)
+		if(PlayerData[player][e_level] == MAX_ADMIN_LEVEL)
 		{
 	 		return SCM(playerid, -1, ""er"You cannot use this command on this admin");
 		}
@@ -10764,7 +10763,7 @@ YCMD:warn(playerid, params[], help)
 
 YCMD:mkick(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 3)
+	if(PlayerData[playerid][e_level] >= 3)
 	{
 		new player;
 		if(sscanf(params, "r", player))
@@ -10777,7 +10776,7 @@ YCMD:mkick(playerid, params[], help)
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 		
- 	 	if(IsPlayerAvail(player) && player != playerid && PlayerData[player][Level] != MAX_ADMIN_LEVEL)
+ 	 	if(IsPlayerAvail(player) && player != playerid && PlayerData[player][e_level] != MAX_ADMIN_LEVEL)
 	 	{
 			if(gTeam[player] == FREEROAM)
 			{
@@ -10867,7 +10866,7 @@ YCMD:rtime(playerid, params[], help)
 
 YCMD:caps(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 1)
+	if(PlayerData[playerid][e_level] >= 1)
 	{
  		new player;
 		if(sscanf(params, "r", player))
@@ -10907,7 +10906,7 @@ YCMD:caps(playerid, params[], help)
 
 YCMD:day(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 2)
+	if(PlayerData[playerid][e_level] >= 2)
 	{
 	    SetWorldTime(12);
 	    SetWeather(1);
@@ -10923,7 +10922,7 @@ YCMD:day(playerid, params[], help)
 
 YCMD:dawn(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 2)
+	if(PlayerData[playerid][e_level] >= 2)
 	{
 		SetWorldTime(6);
 		SetWeather(1);
@@ -10939,7 +10938,7 @@ YCMD:dawn(playerid, params[], help)
 
 YCMD:night(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 2)
+	if(PlayerData[playerid][e_level] >= 2)
 	{
 	    SetWorldTime(0);
 	    SetWeather(17);
@@ -10955,7 +10954,7 @@ YCMD:night(playerid, params[], help)
 
 YCMD:kick(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 1)
+	if(PlayerData[playerid][e_level] >= 1)
 	{
  		new player, reason[144];
 		if(sscanf(params, "rs[144]", player, reason))
@@ -10971,7 +10970,7 @@ YCMD:kick(playerid, params[], help)
 		
 		if(PlayerData[player][KBMarked]) return SCM(playerid, -1, ""er"Can't kick this player!");
 		
-		if(IsPlayerAvail(player) && player != playerid && PlayerData[player][Level] != MAX_ADMIN_LEVEL)
+		if(IsPlayerAvail(player) && player != playerid && PlayerData[player][e_level] != MAX_ADMIN_LEVEL)
 		{
 			format(gstr, sizeof(gstr), ""yellow"** "red"%s(%i) has been kicked by Admin %s(%i) [Reason: %s]", __GetName(player), player, __GetName(playerid), playerid, reason);
 			SCMToAll(YELLOW, gstr);
@@ -10996,7 +10995,7 @@ YCMD:kick(playerid, params[], help)
 
 YCMD:mute(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 1)
+	if(PlayerData[playerid][e_level] >= 1)
 	{
  		new player, time, reason[144];
 		if(sscanf(params, "ris[144]", player, time, reason))
@@ -11009,7 +11008,7 @@ YCMD:mute(playerid, params[], help)
 		
 		if(time < 1 || time > 10000) return SCM(playerid, -1, ""er"seconds > 0 bitch please :p");
 
-		if(IsPlayerAvail(player) && player != playerid && PlayerData[player][Level] != MAX_ADMIN_LEVEL)
+		if(IsPlayerAvail(player) && player != playerid && PlayerData[player][e_level] != MAX_ADMIN_LEVEL)
 		{
 			if(PlayerData[player][Muted])
 			{
@@ -11039,7 +11038,7 @@ YCMD:mute(playerid, params[], help)
 
 YCMD:unmute(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 1)
+	if(PlayerData[playerid][e_level] >= 1)
 	{
  		new player;
 		if(sscanf(params, "r", player))
@@ -11169,7 +11168,7 @@ YCMD:grename(playerid, params[], help)
 
 YCMD:gzonecreate(playerid, params[], help)
 {
-    if(!IsPlayerAdmin(playerid) || PlayerData[playerid][Level] != MAX_ADMIN_LEVEL)
+    if(!IsPlayerAdmin(playerid) || PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 	{
 		return SCM(playerid, -1, NO_PERM);
 	}
@@ -11220,7 +11219,7 @@ YCMD:gzonecreate(playerid, params[], help)
 
 YCMD:gzonereset(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] == MAX_ADMIN_LEVEL)
+	if(PlayerData[playerid][e_level] == MAX_ADMIN_LEVEL)
 	{
 	    new bool:found = false;
 	    for(new i = 0; i < gzoneid; i++)
@@ -11263,7 +11262,7 @@ YCMD:gzonereset(playerid, params[], help)
 
 YCMD:gdestroy(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= MAX_ADMIN_LEVEL)
+	if(PlayerData[playerid][e_level] >= MAX_ADMIN_LEVEL)
 	{
 		new to_destroy[22];
 		if(sscanf(params, "s[21]", to_destroy))
@@ -11658,7 +11657,7 @@ YCMD:ginvite(playerid, params[], help)
     if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 
 	new tick = GetTickCount_();
-	if(PlayerData[playerid][Level] != MAX_ADMIN_LEVEL)
+	if(PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 	{
 		if((PlayerData[playerid][tickLastGInvite] + COOLDOWN_CMD_GINVITE) >= tick) return SCM(playerid, -1, ""er"Please wait a bit before inviting again!");
 	}
@@ -11876,7 +11875,7 @@ YCMD:gcar(playerid, params[], help)
 	    if(isnull(params))
 	    {
 	        if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't spawn a car now");
-	        if(IsPlayerInRangeOfPoint(playerid, 65.0, 1797.3141, -1302.0978, 120.2659) && PlayerData[playerid][Level] < 1) return SCM(playerid, -1, ""er"Can't spawn vehicle at this place!");
+	        if(IsPlayerInRangeOfPoint(playerid, 65.0, 1797.3141, -1302.0978, 120.2659) && PlayerData[playerid][e_level] < 1) return SCM(playerid, -1, ""er"Can't spawn vehicle at this place!");
 	        
 	        format(gstr, sizeof(gstr), "SELECT `Vehicle` FROM `gangs` WHERE `ID` = %i LIMIT 1;", PlayerData[playerid][GangID]);
 			new Cache:res = mysql_query(pSQL, gstr);
@@ -11948,7 +11947,7 @@ YCMD:gcar(playerid, params[], help)
 
 YCMD:unban(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 4)
+	if(PlayerData[playerid][e_level] >= 4)
 	{
 	    if(sscanf(params, "s[144]", gstr))
 	    {
@@ -11978,7 +11977,7 @@ YCMD:unban(playerid, params[], help)
 
 YCMD:oban(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 4)
+	if(PlayerData[playerid][e_level] >= 4)
 	{
 	    new player[144], reason[144];
 	    if(sscanf(params, "s[144]s[144]", player, reason))
@@ -12011,7 +12010,7 @@ YCMD:oban(playerid, params[], help)
 
 YCMD:tban(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 2)
+	if(PlayerData[playerid][e_level] >= 2)
 	{
 	    new player, reason[144], time;
 	    if(sscanf(params, "rs[144]i", player, reason, time))
@@ -12032,7 +12031,7 @@ YCMD:tban(playerid, params[], help)
 		    return SCM(playerid, -1, ""er"You have specified invalid characters");
 		}
 
-	  	if(PlayerData[player][Level] != MAX_ADMIN_LEVEL)
+	  	if(PlayerData[player][e_level] != MAX_ADMIN_LEVEL)
 	  	{
 		 	if(IsPlayerAvail(player))
 			{
@@ -12082,7 +12081,7 @@ YCMD:tban(playerid, params[], help)
 
 YCMD:ban(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 2)
+	if(PlayerData[playerid][e_level] >= 2)
 	{
 	    new player, reason[144];
 	    if(sscanf(params, "rs[144]", player, reason))
@@ -12102,7 +12101,7 @@ YCMD:ban(playerid, params[], help)
 		    return SCM(playerid, -1, ""er"You have specified invalid characters");
 		}
 
-	  	if(PlayerData[player][Level] != MAX_ADMIN_LEVEL)
+	  	if(PlayerData[player][e_level] != MAX_ADMIN_LEVEL)
 	  	{
 		 	if(IsPlayerAvail(player))
 			{
@@ -12158,7 +12157,7 @@ YCMD:ban(playerid, params[], help)
 
 YCMD:resetrc(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] == MAX_ADMIN_LEVEL)
+	if(PlayerData[playerid][e_level] == MAX_ADMIN_LEVEL)
 	{
 	    if(!strcmp(params, "all", true))
 	    {
@@ -12193,7 +12192,7 @@ YCMD:resetrc(playerid, params[], help)
 
 YCMD:deleterecord(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 3)
+	if(PlayerData[playerid][e_level] >= 3)
 	{
 	    new map;
 		if(sscanf(params, "i", map))
@@ -12219,7 +12218,7 @@ YCMD:deleterecord(playerid, params[], help)
 
 YCMD:raceforcemap(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 3)
+	if(PlayerData[playerid][e_level] >= 3)
 	{
 	    if(g_RaceStatus == RaceStatus_StandBy) return SCM(playerid, -1, ""er"Race is currently in standby mode!");
 	    
@@ -12250,7 +12249,7 @@ YCMD:raceforcemap(playerid, params[], help)
 
 YCMD:main(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] == MAX_ADMIN_LEVEL && IsPlayerAdmin(playerid))
+	if(PlayerData[playerid][e_level] == MAX_ADMIN_LEVEL && IsPlayerAdmin(playerid))
 	{
 	    SetTimer("mainmode", 60000, false);
 	    GlobalMain = true;
@@ -12266,7 +12265,7 @@ YCMD:main(playerid, params[], help)
 
 YCMD:giveweapon(playerid, params[], help)
 {
-    if(PlayerData[playerid][Level] >= 3)
+    if(PlayerData[playerid][e_level] >= 3)
     {
 		new weaponID, weaponName[20], player, ammo_a;
 
@@ -12281,7 +12280,7 @@ YCMD:giveweapon(playerid, params[], help)
 		if(IsPlayerAvail(player))
 		{
 	        if(gTeam[player] != FREEROAM) return SCM(playerid, -1, ""er"Player is in a minigame!");
-	        if(PlayerData[player][bGod] && PlayerData[playerid][Level] != MAX_ADMIN_LEVEL) return SCM(playerid, -1, ""er"You can't give players weapons who enabled GOD");
+	        if(PlayerData[player][bGod] && PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL) return SCM(playerid, -1, ""er"You can't give players weapons who enabled GOD");
 
 			if(ammo_a < 0 || ammo_a > 10000)
 			{
@@ -12291,7 +12290,7 @@ YCMD:giveweapon(playerid, params[], help)
 			}
 
 	        if(weaponID == 35 || weaponID == 36 || weaponID == 39 || weaponID == 44 || weaponID == 45|| weaponID == 40) return SCM(playerid, -1, ""er"Can't give restriced weapon");
-			if(weaponID == 38 && PlayerData[playerid][Level] != MAX_ADMIN_LEVEL) return SCM(playerid, -1, NO_PERM);
+			if(weaponID == 38 && PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL) return SCM(playerid, -1, NO_PERM);
 
 			if(weaponID <= 0 && weaponID >= 47)
 			{
@@ -12326,7 +12325,7 @@ YCMD:giveweapon(playerid, params[], help)
 
 YCMD:dplayers(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 1)
+	if(PlayerData[playerid][e_level] >= 1)
 	{
 		new string[512], tmp[50];
 		for(new i = 0; i < MAX_PLAYERS; i++)
@@ -12348,7 +12347,7 @@ YCMD:dplayers(playerid, params[], help)
 
 YCMD:rplayers(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 1)
+	if(PlayerData[playerid][e_level] >= 1)
 	{
 		new string[512], tmp[50], count = 0;
 		for(new i = 0; i < MAX_PLAYERS; i++)
@@ -12372,7 +12371,7 @@ YCMD:rplayers(playerid, params[], help)
 
 YCMD:connectbots(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 3)
+	if(PlayerData[playerid][e_level] >= 3)
 	{
 	    #if IRC_CONNECT == true
 		IRC_QuitBots();
@@ -12390,7 +12389,7 @@ YCMD:connectbots(playerid, params[], help)
 
 YCMD:jail(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 2)
+	if(PlayerData[playerid][e_level] >= 2)
 	{
 		new player, time, reason[144];
 		if(sscanf(params, "ris[144]", player, time, reason))
@@ -12464,7 +12463,7 @@ YCMD:jail(playerid, params[], help)
 
 YCMD:unjail(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 2)
+	if(PlayerData[playerid][e_level] >= 2)
 	{
 	    new player;
 		if(sscanf(params, "r", player))
@@ -12511,7 +12510,7 @@ YCMD:unjail(playerid, params[], help)
 
 YCMD:slap(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 1)
+	if(PlayerData[playerid][e_level] >= 1)
 	{
 	    new player;
 	 	if(sscanf(params, "r", player))
@@ -12522,7 +12521,7 @@ YCMD:slap(playerid, params[], help)
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 		
-		if(IsPlayerAvail(player) && PlayerData[player][Level] != MAX_ADMIN_LEVEL)
+		if(IsPlayerAvail(player) && PlayerData[player][e_level] != MAX_ADMIN_LEVEL)
 		{
 		    switch(gTeam[player])
 		    {
@@ -12558,7 +12557,7 @@ YCMD:slap(playerid, params[], help)
 
 YCMD:gotoxyza(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 1)
+	if(PlayerData[playerid][e_level] >= 1)
 	{
 	    if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't use this command now");
 		new Float:POS[4];
@@ -12589,7 +12588,7 @@ YCMD:gotoxyza(playerid, params[], help)
 
 YCMD:rv(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 2)
+	if(PlayerData[playerid][e_level] >= 2)
 	{
 	    new reason[60];
 	    if(sscanf(params, "s[59]", reason))
@@ -12621,7 +12620,7 @@ YCMD:rv(playerid, params[], help)
 
 YCMD:disarm(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 1)
+	if(PlayerData[playerid][e_level] >= 1)
 	{
 	    new player;
 		if(sscanf(params, "r", player))
@@ -12632,10 +12631,10 @@ YCMD:disarm(playerid, params[], help)
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 		
-		if(IsPlayerAvail(player) && PlayerData[player][Level] != MAX_ADMIN_LEVEL)
+		if(IsPlayerAvail(player) && PlayerData[player][e_level] != MAX_ADMIN_LEVEL)
 		{
 			if(gTeam[player] == GUNGAME) return SCM(playerid, -1, ""er"Cannot disarm player in gungame");
-		    if(!IsPlayerAvail(player) || PlayerData[player][Level] >= PlayerData[playerid][Level]) return SCM(playerid, -1, ""er"Player is not available or is an higher level admin than you");
+		    if(!IsPlayerAvail(player) || PlayerData[player][e_level] >= PlayerData[playerid][e_level]) return SCM(playerid, -1, ""er"Player is not available or is an higher level admin than you");
 
 			ResetPlayerWeapons(player);
 
@@ -12656,7 +12655,7 @@ YCMD:disarm(playerid, params[], help)
 
 YCMD:getin(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 1)
+	if(PlayerData[playerid][e_level] >= 1)
 	{
 		new seat, player;
 		if(sscanf(params, "ri", player, seat))
@@ -12734,7 +12733,7 @@ YCMD:getin(playerid, params[], help)
 
 YCMD:pweaps(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 1)
+	if(PlayerData[playerid][e_level] >= 1)
 	{
 	    new player;
 	    if(sscanf(params, "r", player))
@@ -12789,15 +12788,15 @@ YCMD:admins(playerid, params[], help)
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(!IsPlayerAvail(i)) continue;
-	    if(PlayerData[i][Level] > 0 && PlayerData[i][AOnline])
+	    if(PlayerData[i][e_level] > 0 && PlayerData[i][AOnline])
 	    {
 	        if(IsPlayerOnDesktop(i))
 	        {
-				format(gstr, sizeof(gstr), "* %s(%i) (%s) [AFK]\n", __GetName(i), i, StaffLevels[PlayerData[i][Level]][e_rank]);
+				format(gstr, sizeof(gstr), "* %s(%i) (%s) [AFK]\n", __GetName(i), i, StaffLevels[PlayerData[i][e_level]][e_rank]);
 			}
 			else
 			{
-			    format(gstr, sizeof(gstr), "* %s(%i) (%s)\n", __GetName(i), i, StaffLevels[PlayerData[i][Level]][e_rank]);
+			    format(gstr, sizeof(gstr), "* %s(%i) (%s)\n", __GetName(i), i, StaffLevels[PlayerData[i][e_level]][e_rank]);
 			}
 			strcat(finstring, gstr);
 			count++;
@@ -12873,7 +12872,7 @@ YCMD:vips(playerid, params[], help)
 
 /*YCMD:a(playerid, params[], help)
 {
-    if(PlayerData[playerid][Level] == 0) return SCM(playerid, -1, NO_PERM);
+    if(PlayerData[playerid][e_level] == 0) return SCM(playerid, -1, NO_PERM);
     
 	if(sscanf(params, "s[144]", gstr))
 	{
@@ -12887,7 +12886,7 @@ YCMD:vips(playerid, params[], help)
 
 YCMD:p(playerid, params[], help)
 {
-	if(PlayerData[playerid][VIP] != 1 && PlayerData[playerid][Level] == 0) return Command_ReProcess(playerid, "/vip", false);
+	if(PlayerData[playerid][VIP] != 1 && PlayerData[playerid][e_level] == 0) return Command_ReProcess(playerid, "/vip", false);
 
 	if(sscanf(params, "s[144]", gstr))
 	{
@@ -12918,7 +12917,7 @@ YCMD:vipli(playerid, params[], help)
 	if(PlayerData[playerid][VIP] == 1)
 	{
 		new tick = GetTickCount_();
-	 	if(PlayerData[playerid][Level] != MAX_ADMIN_LEVEL)
+	 	if(PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 		{
 			if((PlayerData[playerid][tickLastVIPLInv] + COOLDOWN_CMD_VIPLI) >= tick)
 			{
@@ -12938,7 +12937,7 @@ YCMD:vipli(playerid, params[], help)
  		if(IsPlayerAvail(player))
 		{
 			if(PlayerData[player][VIP] == 1) return SCM(playerid, -1, ""er"You cannot invite this player");
-			if(PlayerData[player][Level] > 0) return SCM(playerid, -1, ""er"You cannot invite this player");
+			if(PlayerData[player][e_level] > 0) return SCM(playerid, -1, ""er"You cannot invite this player");
 
 			PlayerData[player][GotVIPLInv] = true;
 
@@ -13016,7 +13015,7 @@ YCMD:hydra(playerid, params[], help)
 	if(PlayerData[playerid][VIP] == 1)
 	{
 	    if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
-	    if(IsPlayerInRangeOfPoint(playerid, 65.0, 1797.3141, -1302.0978, 120.2659) && PlayerData[playerid][Level] < 1) return SCM(playerid, -1, ""er"Can't spawn vehicle at this place!");
+	    if(IsPlayerInRangeOfPoint(playerid, 65.0, 1797.3141, -1302.0978, 120.2659) && PlayerData[playerid][e_level] < 1) return SCM(playerid, -1, ""er"Can't spawn vehicle at this place!");
 		
 		CarSpawner(playerid, 520, 120);
 	}
@@ -13277,7 +13276,7 @@ YCMD:adminhq(playerid, params[], help)
 {
     if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 
-	if(PlayerData[playerid][Level] > 0)
+	if(PlayerData[playerid][e_level] > 0)
 	{
 		SetPlayerPos(playerid, 1797.4270,-1300.9581,120.2656);
 		format(gstr, sizeof(gstr), ""nef" Admin %s(%i) teleported to Admin's Headquarter! (/adminhq)", __GetName(playerid), playerid);
@@ -13400,7 +13399,7 @@ YCMD:rainbow(playerid, params[], help)
 
 YCMD:setadminlevel(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] == MAX_ADMIN_LEVEL || IsPlayerAdmin(playerid) || IsWhitelisted(__GetIP(playerid)))
+	if(PlayerData[playerid][e_level] == MAX_ADMIN_LEVEL || IsPlayerAdmin(playerid) || IsWhitelisted(__GetIP(playerid)))
 	{
 	    new player, alevel;
 	 	if(sscanf(params, "ri", player, alevel))
@@ -13417,7 +13416,7 @@ YCMD:setadminlevel(playerid, params[], help)
 			{
 				return SCM(playerid, -1, ""er"Incorrect Level");
 			}
-			if(alevel == PlayerData[player][Level])
+			if(alevel == PlayerData[player][e_level])
 			{
 				return SCM(playerid, -1, ""er"Player is already this level");
 			}
@@ -13434,7 +13433,7 @@ YCMD:setadminlevel(playerid, params[], help)
 			}
 			SCM(player, BLUE, gstr);
 
-			if(alevel > PlayerData[player][Level])
+			if(alevel > PlayerData[player][e_level])
 			{
 				GameTextForPlayer(player, "Promoted", 5000, 3);
 			}
@@ -13449,7 +13448,7 @@ YCMD:setadminlevel(playerid, params[], help)
 			format(gstr, sizeof(gstr), "Admin %s has made %s Level %i at %i:%i:%i", __GetName(playerid), __GetName(player), alevel, time[0], time[1], time[2]);
             SCM(player, BLUE, gstr);
             print(gstr);
-			PlayerData[player][Level] = alevel;
+			PlayerData[player][e_level] = alevel;
 		}
 		else
 		{
@@ -13480,7 +13479,7 @@ YCMD:report(playerid, params[], help)
     if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 	if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 	
- 	if(IsPlayerAvail(player) && player != playerid && PlayerData[player][Level] == 0)
+ 	if(IsPlayerAvail(player) && player != playerid && PlayerData[player][e_level] == 0)
 	{
 		if(strlen(reason) < 4) return SCM(playerid, -1, ""er"Please write a proper reason");
 
@@ -13512,7 +13511,7 @@ YCMD:report(playerid, params[], help)
 
 YCMD:reports(playerid, params[], help)
 {
-    if(PlayerData[playerid][Level] >= 1)
+    if(PlayerData[playerid][e_level] >= 1)
 	{
         new ReportCount;
 		for(new i = 1; i < MAX_REPORTS; i++)
@@ -13590,7 +13589,7 @@ YCMD:race(playerid, params[], help)
 /*
 YCMD:sethouseowner(playerid, params[], help)
 {
-    if(!IsPlayerAdmin(playerid) || PlayerData[playerid][Level] != MAX_ADMIN_LEVEL) return SCM(playerid, -1, NO_PERM);
+    if(!IsPlayerAdmin(playerid) || PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL) return SCM(playerid, -1, NO_PERM);
 
 	new owner[128];
 	if(sscanf(params, "s[128]", owner))
@@ -13635,7 +13634,7 @@ YCMD:sethouseowner(playerid, params[], help)
 
 YCMD:sethouseprice(playerid, params[], help)
 {
-    if(!IsPlayerAdmin(playerid) || PlayerData[playerid][Level] != MAX_ADMIN_LEVEL) return SCM(playerid, -1, NO_PERM);
+    if(!IsPlayerAdmin(playerid) || PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL) return SCM(playerid, -1, NO_PERM);
 
 	extract params -> new hprice; else
 	{
@@ -13665,7 +13664,7 @@ YCMD:sethouseprice(playerid, params[], help)
 
 YCMD:sethousescore(playerid, params[], help)
 {
-    if(!IsPlayerAdmin(playerid) || PlayerData[playerid][Level] != MAX_ADMIN_LEVEL) return SCM(playerid, -1, NO_PERM);
+    if(!IsPlayerAdmin(playerid) || PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL) return SCM(playerid, -1, NO_PERM);
 
 	extract params -> new hscore; else
 	{
@@ -13695,7 +13694,7 @@ YCMD:sethousescore(playerid, params[], help)
 
 YCMD:resethouse(playerid, params[], help)
 {
-    if(!IsPlayerAdmin(playerid) || PlayerData[playerid][Level] != MAX_ADMIN_LEVEL) return SCM(playerid, -1, NO_PERM);
+    if(!IsPlayerAdmin(playerid) || PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL) return SCM(playerid, -1, NO_PERM);
 
  	new bool:found = false;
 	for(new i = 0; i < houseid; i++)
@@ -13752,7 +13751,7 @@ YCMD:resethouse(playerid, params[], help)
 
 YCMD:setbizzlevel(playerid, params[], help)
 {
-    if(!IsPlayerAdmin(playerid) || PlayerData[playerid][Level] != MAX_ADMIN_LEVEL) return SCM(playerid, -1, NO_PERM);
+    if(!IsPlayerAdmin(playerid) || PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL) return SCM(playerid, -1, NO_PERM);
 
 	extract params -> new blevel; else
 	{
@@ -13787,7 +13786,7 @@ YCMD:setbizzlevel(playerid, params[], help)
 
 YCMD:resetbizz(playerid, params[], help)
 {
-    if(!IsPlayerAdmin(playerid) || PlayerData[playerid][Level] != MAX_ADMIN_LEVEL) return SCM(playerid, -1, NO_PERM);
+    if(!IsPlayerAdmin(playerid) || PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL) return SCM(playerid, -1, NO_PERM);
 
  	new bool:bFound = false;
 	for(new r = 0; r < MAX_BUSINESSES; r++)
@@ -13843,7 +13842,7 @@ YCMD:resetbizz(playerid, params[], help)
 #if IS_RELEASE_BUILD == false
 YCMD:createrace(playerid, params[], help)
 {
-	if(IsPlayerAdmin(playerid) && PlayerData[playerid][Level] == MAX_ADMIN_LEVEL)
+	if(IsPlayerAdmin(playerid) && PlayerData[playerid][e_level] == MAX_ADMIN_LEVEL)
 	{
 		if(g_BuildRace != INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"There's already someone building a race!");
 		if(g_RaceStatus == RaceStatus_Active) return SCM(playerid, -1, ""er"Wait first till race ends!");
@@ -13877,7 +13876,7 @@ YCMD:createrace(playerid, params[], help)
 
 YCMD:createbizz(playerid, params[], help)
 {
-    if(!IsPlayerAdmin(playerid) || PlayerData[playerid][Level] != MAX_ADMIN_LEVEL)
+    if(!IsPlayerAdmin(playerid) || PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 	{
 		return SCM(playerid, -1, NO_PERM);
 	}
@@ -13926,7 +13925,7 @@ YCMD:createbizz(playerid, params[], help)
 
 YCMD:createhouse(playerid, params[], help)
 {
-    if(!IsPlayerAdmin(playerid) || PlayerData[playerid][Level] != MAX_ADMIN_LEVEL)
+    if(!IsPlayerAdmin(playerid) || PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 	{
 		return SCM(playerid, -1, NO_PERM);
 	}
@@ -13979,7 +13978,7 @@ YCMD:createhouse(playerid, params[], help)
 
 YCMD:createstore(playerid, params[], help)
 {
-    if(!IsPlayerAdmin(playerid) || PlayerData[playerid][Level] != MAX_ADMIN_LEVEL)
+    if(!IsPlayerAdmin(playerid) || PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 	{
 		return SCM(playerid, -1, NO_PERM);
 	}
@@ -14506,7 +14505,7 @@ YCMD:richlist(playerid, params[], help)
 	    if(IsPlayerAvail(i))
 	    {
 	        richlist[i][E_playerid] = i;
-	        richlist[i][E_money] = PlayerData[i][Money] + PlayerData[i][Bank];
+	        richlist[i][E_money] = PlayerData[i][e_money] + PlayerData[i][Bank];
 	    }
 	    else
 	    {
@@ -14899,7 +14898,7 @@ YCMD:harefill(playerid, params[], help)
 
 YCMD:spec(playerid, params[], help)
 {
-    if(PlayerData[playerid][Level] >= 1 || IsPlayerAdmin(playerid) || PlayerData[playerid][VIP] == 1)
+    if(PlayerData[playerid][e_level] >= 1 || IsPlayerAdmin(playerid) || PlayerData[playerid][VIP] == 1)
 	{
 	    new player;
 	 	if(sscanf(params, "r", player))
@@ -14912,8 +14911,8 @@ YCMD:spec(playerid, params[], help)
 
  		if(IsPlayerAvail(player) && player != playerid)
 		{
-			if(PlayerData[playerid][Level] == 0 && PlayerData[playerid][VIP] == 1 && PlayerData[player][Level] > 0) return SCM(playerid, -1, ""er"You may not spectate admins");
-			if(PlayerData[player][Level] == MAX_ADMIN_LEVEL && PlayerData[playerid][Level] != MAX_ADMIN_LEVEL) return SCM(playerid, -1, ""er"You cannot use this command on this admin");
+			if(PlayerData[playerid][e_level] == 0 && PlayerData[playerid][VIP] == 1 && PlayerData[player][e_level] > 0) return SCM(playerid, -1, ""er"You may not spectate admins");
+			if(PlayerData[player][e_level] == MAX_ADMIN_LEVEL && PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL) return SCM(playerid, -1, ""er"You cannot use this command on this admin");
 			if(gTeam[player] == SPEC) return SCM(playerid, -1, ""er"Player is spectating someone else");
 			if(PlayerData[player][bIsDead]) return SCM(playerid, -1, ""er"Player is not alive");
 			if(GetPlayerState(player) == PLAYER_STATE_SPECTATING) return SCM(playerid, -1, ""er"Player is in spectating state");
@@ -14978,7 +14977,7 @@ YCMD:spec(playerid, params[], help)
 
 YCMD:specoff(playerid, params[], help)
 {
-    if(PlayerData[playerid][Level] >= 1 || IsPlayerAdmin(playerid) || PlayerData[playerid][VIP] == 1)
+    if(PlayerData[playerid][e_level] >= 1 || IsPlayerAdmin(playerid) || PlayerData[playerid][VIP] == 1)
 	{
         if(gTeam[playerid] == SPEC)
 		{
@@ -15000,7 +14999,7 @@ YCMD:specoff(playerid, params[], help)
 
 YCMD:freeze(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 3)
+	if(PlayerData[playerid][e_level] >= 3)
 	{
 		new player;
 		if(sscanf(params, "r", player))
@@ -15014,7 +15013,7 @@ YCMD:freeze(playerid, params[], help)
 	 	
         if(IsPlayerAvail(player) && player != playerid)
 		{
-			if(PlayerData[player][Level] > 0)
+			if(PlayerData[player][e_level] > 0)
 			{
 				return SCM(playerid, -1, ""er"You cannot use this command on an admin");
 			}
@@ -15043,7 +15042,7 @@ YCMD:freeze(playerid, params[], help)
 
 YCMD:unfreeze(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 2)
+	if(PlayerData[playerid][e_level] >= 2)
 	{
 		new player;
 		if(sscanf(params, "r", player))
@@ -15083,7 +15082,7 @@ YCMD:unfreeze(playerid, params[], help)
 
 YCMD:clearchat(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 3)
+	if(PlayerData[playerid][e_level] >= 3)
 	{
 		for(new i = 0; i < 129; i++)
 		{
@@ -15102,7 +15101,7 @@ YCMD:move(playerid, params[], help)
 	if(gTeam[playerid] == FREEROAM)
 	{
 	    if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You cant use this command now!");
-		if(PlayerData[playerid][Level] >= 2)
+		if(PlayerData[playerid][e_level] >= 2)
 		{
 		    if(isnull(params))
 			{
@@ -15406,7 +15405,7 @@ YCMD:stats(playerid, params[], help)
 
 YCMD:healall(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 4)
+	if(PlayerData[playerid][e_level] >= 4)
 	{
 	   	for(new i = 0; i < MAX_PLAYERS; i++)
  		{
@@ -15431,7 +15430,7 @@ YCMD:healall(playerid, params[], help)
 
 YCMD:armourall(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 4)
+	if(PlayerData[playerid][e_level] >= 4)
 	{
 	   	for(new i = 0; i < MAX_PLAYERS; i++)
  		{
@@ -15533,7 +15532,7 @@ YCMD:settings(playerid, params[], help)
 
 YCMD:advsave(playerid, params[], help)
 {
-    if(PlayerData[playerid][Level] == MAX_ADMIN_LEVEL && IsPlayerAdmin(playerid))
+    if(PlayerData[playerid][e_level] == MAX_ADMIN_LEVEL && IsPlayerAdmin(playerid))
     {
 	    new File:lFile = fopen("/Other/advsave.txt", io_append),
 	     	logData[255],
@@ -15578,7 +15577,7 @@ YCMD:m(playerid, params[], help)
 
 YCMD:opengate(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] == MAX_ADMIN_LEVEL || PlayerData[playerid][VIP] == 1)
+	if(PlayerData[playerid][e_level] == MAX_ADMIN_LEVEL || PlayerData[playerid][VIP] == 1)
 	{
 		if(!IsPlayerInRangeOfPoint(playerid, 15.0, -205.68774, -2285.10693, 30.65776)) return SCM(playerid, -1, ""er"You need to be closer");
 		if(IsMellnikGateMoving) return SCM(playerid, -1, ""er"Gate is currently working");
@@ -15594,7 +15593,7 @@ YCMD:opengate(playerid, params[], help)
 
 YCMD:closegate(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] == MAX_ADMIN_LEVEL || PlayerData[playerid][VIP] == 1)
+	if(PlayerData[playerid][e_level] == MAX_ADMIN_LEVEL || PlayerData[playerid][VIP] == 1)
 	{
 		if(!IsPlayerInRangeOfPoint(playerid, 15.0, -205.68774, -2285.10693, 30.65776)) return SCM(playerid, -1, ""er"You need to be closer");
 		if(IsMellnikGateMoving) return SCM(playerid, -1, ""er"Gate is currently working");
@@ -15628,7 +15627,7 @@ YCMD:rampdown(playerid, params[], help)
 
 YCMD:mellnik(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] == MAX_ADMIN_LEVEL)
+	if(PlayerData[playerid][e_level] == MAX_ADMIN_LEVEL)
 	{
 		switch(YHash(__GetName(playerid), false))
 		{
@@ -15824,14 +15823,14 @@ YCMD:weather(playerid, params[], help)
 
 YCMD:cashfall(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 4)
+	if(PlayerData[playerid][e_level] >= 4)
 	{
 		extract params -> new money; else
 		{
 			return SCM(playerid, NEF_GREEN, "Usage: /cashfall <cash>");
 		}
 
-		if(PlayerData[playerid][Level] == MAX_ADMIN_LEVEL) {
+		if(PlayerData[playerid][e_level] == MAX_ADMIN_LEVEL) {
 			if(money > 25000 || money < 1) return SCM(playerid, -1, ""er"Cash: $1 - $25,000");
 		} else {
 		    if(money > 10000 || money < 1) return SCM(playerid, -1, ""er"Cash: $1 - $10,000");
@@ -15859,14 +15858,14 @@ YCMD:cashfall(playerid, params[], help)
 
 YCMD:scorefall(playerid, params[], help)
 {
-	if(PlayerData[playerid][Level] >= 4)
+	if(PlayerData[playerid][e_level] >= 4)
 	{
 		extract params -> new score; else
 		{
 			return SCM(playerid, NEF_GREEN, "Usage: /scorefall <score>");
 		}
 
-		if(PlayerData[playerid][Level] == MAX_ADMIN_LEVEL) {
+		if(PlayerData[playerid][e_level] == MAX_ADMIN_LEVEL) {
 			if(score > 100 || score < 1) return SCM(playerid, -1, ""er"Score: 1 - 100");
 		} else {
 		    if(score > 100 || score < 1) return SCM(playerid, -1, ""er"Score: 1 - 25");
@@ -15907,7 +15906,7 @@ YCMD:ignore(playerid, params[], help)
 	if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 		
 	if(player == playerid) return SCM(playerid, -1, ""er"You cannot ignore yourself!");
-	if(PlayerData[player][Level] > 0) return SCM(playerid, -1, ""er"You cannot ignore Admins!");
+	if(PlayerData[player][e_level] > 0) return SCM(playerid, -1, ""er"You cannot ignore Admins!");
 
 	if(Iter_Contains(PlayerIgnore[playerid], player))
 	{
@@ -16025,7 +16024,7 @@ YCMD:tpm(playerid, params[], help)
 YCMD:givecash(playerid, params[], help)
 {
 	new tick = GetTickCount_();
-	if(PlayerData[playerid][Level] != MAX_ADMIN_LEVEL)
+	if(PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 	{
 		if((PlayerData[playerid][tickLastGiveCash] + COOLDOWN_CMD_GIVECASH) >= tick)
 		{
@@ -16595,7 +16594,7 @@ YCMD:rob(playerid, params[], help)
 	if(gTeam[playerid] == CNR)
 	{
 		new tick = GetTickCount_();
-		if(PlayerData[playerid][Level] != MAX_ADMIN_LEVEL)
+		if(PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 		{
 			if((PlayerData[playerid][tickLastRob] + COOLDOWN_CMD_ROB) >= tick)
 			{
@@ -16695,7 +16694,7 @@ YCMD:rob(playerid, params[], help)
 YCMD:ar(playerid, params[], help)
 {
 	new tick = GetTickCount_();
-	if(PlayerData[playerid][Level] != MAX_ADMIN_LEVEL)
+	if(PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 	{
 		if((PlayerData[playerid][tickLastAr] + COOLDOWN_CMD_AR) >= tick)
 		{
@@ -16861,8 +16860,8 @@ YCMD:v(playerid, params[], help)
 {
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
     if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't spawn a car now");
-	if(IsPlayerInRangeOfPoint(playerid, 70.0, 1786.5049, -1298.0465, 120.2656) && PlayerData[playerid][Level] < 2) return SCM(playerid, -1, ""er"Can't spawn vehicle at this place!");
-	if(IsPlayerInRangeOfPoint(playerid, 50.0, -377.2038, 2131.4634, 133.1797) && PlayerData[playerid][Level] < 2) return SCM(playerid, -1, ""er"Can't spawn vehicle at this place!");
+	if(IsPlayerInRangeOfPoint(playerid, 70.0, 1786.5049, -1298.0465, 120.2656) && PlayerData[playerid][e_level] < 2) return SCM(playerid, -1, ""er"Can't spawn vehicle at this place!");
+	if(IsPlayerInRangeOfPoint(playerid, 50.0, -377.2038, 2131.4634, 133.1797) && PlayerData[playerid][e_level] < 2) return SCM(playerid, -1, ""er"Can't spawn vehicle at this place!");
 	if(strlen(params) > 29) return SCM(playerid, NEF_YELLOW, "I don't know that vehicle...");
 
 	if(gTeam[playerid] == FREEROAM)
@@ -21233,15 +21232,15 @@ CarSpawner(playerid, model, respawn_delay = -1, bool:spawnzone_check = true)
 	
 	if(model == 432 || model == 425 || model == 447 || model == 571 || model == 568 || model == 539 || model == 545 || model == 464)
 	{
-	    if(PlayerData[playerid][Level] != MAX_ADMIN_LEVEL)
+	    if(PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 	    {
             return SCM(playerid, -1, ""er"Only founders can spawn this");
 		}
 	}
 	
-	if(model == 520 && PlayerData[playerid][VIP] == 0 && PlayerData[playerid][Level] == 0) return SCM(playerid, -1, ""er"Only admins can spawn this");
+	if(model == 520 && PlayerData[playerid][VIP] == 0 && PlayerData[playerid][e_level] == 0) return SCM(playerid, -1, ""er"Only admins can spawn this");
 	
-	if(model == 520 && PlayerData[playerid][Level] != MAX_ADMIN_LEVEL && PlayerData[playerid][bGWarMode])
+	if(model == 520 && PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL && PlayerData[playerid][bGWarMode])
 	{
 	    new Float:POS[3];
 	    GetPlayerPos(playerid, POS[0], POS[1], POS[2]);
@@ -21378,7 +21377,7 @@ AdminMSG(color, const string[], bool:beep = false)
 	new count = 0;
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(IsPlayerAvail(i) && PlayerData[i][Level] >= 1)
+		if(IsPlayerAvail(i) && PlayerData[i][e_level] >= 1)
 		{
 			SCM(i, color, string);
 			if(beep) PlayerPlaySound(i, 1057, 0.0, 0.0, 0.0);
@@ -21392,7 +21391,7 @@ VIPMSG(color, const msg[])
 {
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(IsPlayerAvail(i) && (PlayerData[i][VIP] == 1 || PlayerData[i][Level] > 0))
+		if(IsPlayerAvail(i) && (PlayerData[i][VIP] == 1 || PlayerData[i][e_level] > 0))
 		{
 			SCM(i, color, msg);
 		}
@@ -21448,7 +21447,7 @@ MySQL_SavePlayer(playerid, bool:save_pv)
 	format(query, sizeof(query), "UPDATE `accounts` SET `Level` = %i, `Score` = %i, `Money` = %i, `Bank` = %i, `Kills` = %i, `Deaths` = %i, `Time` = %i, \
 	`Reaction` = %i, `PayDay` = %i, `Houses` = %i, `Props` = %i, `GangPosition` = %i, `GangID` = %i, `AdditionalPVSlots` = %i, `AdditionalToySlots` = %i, \
 	`AdditionalHouseSlots` = %i, `AdditionalPropSlots` = %i, `AdditionalHouseObjSlots` = %i, `DerbyWins` = %i",
-		PlayerData[playerid][Level],
+		PlayerData[playerid][e_level],
 		GetPlayerScore_(playerid),
 		GetPlayerCash(playerid),
 		PlayerData[playerid][Bank],
@@ -25469,7 +25468,7 @@ function:QueueProcess()
 		{
 		    PlayerData[i][PayDay] = 60;
 		    
-		    if((PlayerData[i][Bank] + PlayerData[i][Money]) > 100000000)
+		    if((PlayerData[i][Bank] + PlayerData[i][e_money]) > 100000000)
 		    {
 		        continue;
 		    }
@@ -27312,23 +27311,23 @@ GameTimeConvert(seconds)
 SetPlayerCash(playerid, amount)
 {
 	if(playerid == INVALID_PLAYER_ID) return 1;
-	if(PlayerData[playerid][Money] >= 1000000000) return 1;
+	if(PlayerData[playerid][e_money] >= 1000000000) return 1;
     ResetPlayerMoney(playerid);
-	PlayerData[playerid][Money] = amount;
-    GivePlayerMoney(playerid, PlayerData[playerid][Money]);
+	PlayerData[playerid][e_money] = amount;
+    GivePlayerMoney(playerid, PlayerData[playerid][e_money]);
     return 1;
 }
 
 GivePlayerCash(playerid, amount, bool:populate = true, bool:boost = false)
 {
 	if(playerid == INVALID_PLAYER_ID) return 1;
-	if(PlayerData[playerid][Money] >= 1000000000) return 1;
+	if(PlayerData[playerid][e_money] >= 1000000000) return 1;
 
     ResetPlayerMoney(playerid);
     
     if(amount < 0)
     {
-        PlayerData[playerid][Money] += amount;
+        PlayerData[playerid][e_money] += amount;
         format(gstr, sizeof(gstr), "~r~~h~~h~-$%s", number_format(amount * -1));
 	}
 	else
@@ -27337,23 +27336,23 @@ GivePlayerCash(playerid, amount, bool:populate = true, bool:boost = false)
 		{
 			if(PlayerData[playerid][Boost] & BOOST_MONEY_x2)
 			{
-			    PlayerData[playerid][Money] += amount * 2;
+			    PlayerData[playerid][e_money] += amount * 2;
 			    format(gstr, sizeof(gstr), "~g~~h~~h~+$%s (x2 Boost)", number_format(amount * 2));
 			}
 			else if(PlayerData[playerid][Boost] & BOOST_MONEY_x3 || PlayerData[playerid][Boost] & BOOST_MASTER)
 			{
-			    PlayerData[playerid][Money] += amount * 3;
+			    PlayerData[playerid][e_money] += amount * 3;
 			    format(gstr, sizeof(gstr), "~g~~h~~h~+$%s (x3 Boost)", number_format(amount * 3));
 			}
 			else
 			{
-		    	PlayerData[playerid][Money] += amount;
+		    	PlayerData[playerid][e_money] += amount;
 		    	format(gstr, sizeof(gstr), "~g~~h~~h~+$%s", number_format(amount));
 			}
 		}
 		else
 		{
-		    PlayerData[playerid][Money] += amount;
+		    PlayerData[playerid][e_money] += amount;
 		    format(gstr, sizeof(gstr), "~g~~h~~h~+$%s", number_format(amount));
 		}
 	}
@@ -27365,14 +27364,14 @@ GivePlayerCash(playerid, amount, bool:populate = true, bool:boost = false)
 		SetTimerEx("HideMoneyTD", 3000, false, "ii", playerid, YHash(__GetName(playerid), false));
     }
 	
-    GivePlayerMoney(playerid, PlayerData[playerid][Money]);
+    GivePlayerMoney(playerid, PlayerData[playerid][e_money]);
 	return 1;
 }
 
 GetPlayerCash(playerid)
 {
     if(playerid == INVALID_PLAYER_ID) return 1;
-	return PlayerData[playerid][Money];
+	return PlayerData[playerid][e_money];
 }
 
 GivePlayerScore_(playerid, amount, bool:populate = true, bool:boost = false)
@@ -27389,28 +27388,28 @@ GivePlayerScore_(playerid, amount, bool:populate = true, bool:boost = false)
 		{
 			if(PlayerData[playerid][Boost] & BOOST_SCORE_x2)
 			{
-			    PlayerData[playerid][Score] += amount * 2;
+			    PlayerData[playerid][e_score] += amount * 2;
 			    format(gstr, sizeof(gstr), "~y~~h~+%s Score (x2 Boost)", number_format(amount * 2));
 			}
 			else if(PlayerData[playerid][Boost] & BOOST_SCORE_x3 || PlayerData[playerid][Boost] & BOOST_MASTER)
 			{
-			    PlayerData[playerid][Score] += amount * 3;
+			    PlayerData[playerid][e_score] += amount * 3;
 			    format(gstr, sizeof(gstr), "~y~~h~+%s Score (x3 Boost)", number_format(amount * 3));
 			}
 			else
 			{
-			    PlayerData[playerid][Score] += amount;
+			    PlayerData[playerid][e_score] += amount;
 			    format(gstr, sizeof(gstr), "~y~~h~+%s Score", number_format(amount));
 			}
 		}
 		else
 		{
-		    PlayerData[playerid][Score] += amount;
+		    PlayerData[playerid][e_score] += amount;
 		    format(gstr, sizeof(gstr), "~y~~h~+%s Score", number_format(amount));
 		}
 	}
 
-	SetPlayerScore(playerid, PlayerData[playerid][Score]);
+	SetPlayerScore(playerid, PlayerData[playerid][e_score]);
 	
     if(populate)
     {
@@ -27419,7 +27418,7 @@ GivePlayerScore_(playerid, amount, bool:populate = true, bool:boost = false)
 		SetTimerEx("HideScoreTD", 3000, false, "ii", playerid, YHash(__GetName(playerid), false));
     }
 	
-	if(pAch[playerid][E_ach_scorewhore] == 0 && PlayerData[playerid][Score] >= 2000)
+	if(pAch[playerid][E_ach_scorewhore] == 0 && PlayerData[playerid][e_score] >= 2000)
 	{
 	    GivePlayerAchievement(playerid, "Score Whore", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
 	    pAch[playerid][E_ach_scorewhore] = 1;
@@ -27430,10 +27429,10 @@ GivePlayerScore_(playerid, amount, bool:populate = true, bool:boost = false)
 SetPlayerScore_(playerid, amount)
 {
     if(playerid == INVALID_PLAYER_ID) return 1;
-	PlayerData[playerid][Score] = amount;
-    SetPlayerScore(playerid, PlayerData[playerid][Score]);
+	PlayerData[playerid][e_score] = amount;
+    SetPlayerScore(playerid, PlayerData[playerid][e_score]);
     
- 	if(pAch[playerid][E_ach_scorewhore] == 0 && PlayerData[playerid][Score] >= 2000)
+ 	if(pAch[playerid][E_ach_scorewhore] == 0 && PlayerData[playerid][e_score] >= 2000)
 	{
 	    GivePlayerAchievement(playerid, "Score Whore", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
 	    pAch[playerid][E_ach_scorewhore] = 1;
@@ -27444,7 +27443,7 @@ SetPlayerScore_(playerid, amount)
 GetPlayerScore_(playerid)
 {
     if(playerid == INVALID_PLAYER_ID) return -1;
-	return PlayerData[playerid][Score];
+	return PlayerData[playerid][e_score];
 }
 
 NewMinigameJoin(playerid, const minigame[], const cmd[])
@@ -28941,8 +28940,8 @@ GivePlayerAchievement(playerid, achname[], stuffz[])
 	if(GetPVarInt(playerid, "AchShowing") == 1) return 1;
 
 	GivePlayerCash(playerid, 30000, true, true);
-    PlayerData[playerid][Score] += 10;
-	SetPlayerScore(playerid, PlayerData[playerid][Score]);
+    PlayerData[playerid][e_score] += 10;
+	SetPlayerScore(playerid, PlayerData[playerid][e_score]);
 
 	format(gstr, sizeof(gstr), ""nef" {%06x}%s(%i) "GREEN_E"has unlocked the achievement '%s'!", GetColor__(playerid) >>> 8, __GetName(playerid), playerid, achname);
 	SCMToAll(-1, gstr);
@@ -30707,11 +30706,11 @@ ResetPlayerVars(playerid)
 	PlayerData[playerid][tRainbow] = -1;
 	PlayerData[playerid][tTDhandle] = -1;
 	PlayerData[playerid][ExitType] = EXIT_NONE;
-	PlayerData[playerid][Level] = 0;
+	PlayerData[playerid][e_level] = 0;
 	PlayerData[playerid][Kills] = 0;
 	PlayerData[playerid][Deaths] = 0;
-	PlayerData[playerid][Money] = 0;
-	PlayerData[playerid][Score] = 0;
+	PlayerData[playerid][e_money] = 0;
+	PlayerData[playerid][e_score] = 0;
 	PlayerData[playerid][DerbyWins] = 0;
 	PlayerData[playerid][RaceWins] = 0;
 	PlayerData[playerid][FalloutWins] = 0;
@@ -31024,9 +31023,9 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 			{
 			    PlayerData[playerid][e_accountid] = cache_get_row_int(0, 0, pSQL);
 			    PlayerData[playerid][SavedColor] = cache_get_row_int(0, 2, pSQL);
-			    PlayerData[playerid][Level] = cache_get_row_int(0, 5, pSQL);
-			    PlayerData[playerid][Score] = cache_get_row_int(0, 6, pSQL);
-			    PlayerData[playerid][Money] = cache_get_row_int(0, 7, pSQL);
+			    PlayerData[playerid][e_level] = cache_get_row_int(0, 5, pSQL);
+			    PlayerData[playerid][e_score] = cache_get_row_int(0, 6, pSQL);
+			    PlayerData[playerid][e_money] = cache_get_row_int(0, 7, pSQL);
 			    PlayerData[playerid][Bank] = cache_get_row_int(0, 8, pSQL);
 			    PlayerData[playerid][Kills] = cache_get_row_int(0, 9, pSQL);
 			    PlayerData[playerid][Deaths] = cache_get_row_int(0, 10, pSQL);
@@ -31428,8 +31427,8 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 				    MySQL_LoadPlayerGang(playerid);
 				}
 
-  			 	SetPlayerScore_(playerid, PlayerData[playerid][Score]);
-			 	SetPlayerCash(playerid, PlayerData[playerid][Money]);
+  			 	SetPlayerScore_(playerid, PlayerData[playerid][e_score]);
+			 	SetPlayerCash(playerid, PlayerData[playerid][e_money]);
 			 	PlayerData[playerid][ConnectTime] = gettime();
 
 				format(gstr, sizeof(gstr), "~y~[] ~w~%i", PlayerData[playerid][Wanteds]);
@@ -31438,9 +31437,9 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 			    format(gstr2, sizeof(gstr2), "INSERT INTO `login_log` VALUES (NULL, %i, '%s', UNIX_TIMESTAMP(), 0);", PlayerData[playerid][e_accountid], __GetIP(playerid));
 			    mysql_tquery(pSQL, gstr2, "", "");
 
-				if(PlayerData[playerid][Level] > 0)
+				if(PlayerData[playerid][e_level] > 0)
 				{
-					format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"Successfully logged in. (Level: %s)", StaffLevels[PlayerData[playerid][Level]][e_rank]);
+					format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"Successfully logged in. (Level: %s)", StaffLevels[PlayerData[playerid][e_level]][e_rank]);
 					SCM(playerid, -1, gstr2);
 					format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"You were last online at %s and registered on %s", UTConvert(PlayerData[playerid][LastLogin]), UTConvert(PlayerData[playerid][RegDate]));
   					SCM(playerid, -1, gstr2);
