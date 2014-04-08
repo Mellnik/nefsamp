@@ -633,6 +633,20 @@ enum E_PLAYER_DATA
 	e_addhouseslots,
 	e_addbizzslots,
 	e_addhouseitemslots,
+	e_derbywins,
+	e_racewins,
+	e_tdmwins,
+	e_falloutwins,
+	e_gungamewins,
+	e_eventwins,
+	e_wanteds,
+	e_vip,
+	e_credits,
+	e_medkits,
+	e_regdate,
+	e_lastlogin,
+	e_lastnc,
+	e_skinsave,
 
 	/* INTERNAL */
     tickLastAr,
@@ -698,7 +712,6 @@ enum E_PLAYER_DATA
 	tLoadMap,
 	BOOST:Boost,
 	BoostDeplete,
-	SavedSkin,
 	Float:fOldPos[4],
 	HouseSlotSelected,
 	BusinessIdSelected,
@@ -707,14 +720,6 @@ enum E_PLAYER_DATA
 	tRainbow,
 	tTDhandle,
 	ExitType,
-	DerbyWins,
-	RaceWins,
-	FalloutWins,
-	GungameWins,
-	EventWins,
-	BGWins,
-	Credits,
-	Medkits,
 	tMedkit,
 	MedkitTime,
 	Businesses,
@@ -726,13 +731,9 @@ enum E_PLAYER_DATA
 	VIPNameHash,
 	VIPOffer,
 	VehicleSpamViolation,
-  	LastLogin,
 	ConnectTime,
-	VIP,
-	LastNameChange,
 	Warnings,
 	RankSelected,
-	Wanteds,
 	HitmanHit,
 	Vehicle,
 	Text3D:AdminDutyLabel,
@@ -745,7 +746,6 @@ enum E_PLAYER_DATA
 	GangAssignRank[MAX_PLAYER_NAME+1],
  	GangName[21],
  	GangTag[5],
- 	RegDate,
  	HouseIntSelected,
 	Float:sX,
 	Float:sY,
@@ -2563,7 +2563,7 @@ public OnPlayerRequestClass(playerid, classid)
 		PlayerData[playerid][AllowSpawn] = false;
 		KickEx(playerid);*/
 	    new rand = random(4);
-	    SetSpawnInfoEx(playerid, NO_TEAM, PlayerData[playerid][SavedSkin] != -1 ? PlayerData[playerid][SavedSkin] : GetPlayerSkin(playerid), WorldSpawns[rand][0], WorldSpawns[rand][1], WorldSpawns[rand][2] + 3.0, WorldSpawns[rand][3]);
+	    SetSpawnInfoEx(playerid, NO_TEAM, PlayerData[playerid][e_skinsave] != -1 ? PlayerData[playerid][e_skinsave] : GetPlayerSkin(playerid), WorldSpawns[rand][0], WorldSpawns[rand][1], WorldSpawns[rand][2] + 3.0, WorldSpawns[rand][3]);
         SetTimerEx("ForceClassSpawn", 10, 0, "i", playerid);
 		return 0;
 	}
@@ -2571,7 +2571,7 @@ public OnPlayerRequestClass(playerid, classid)
     PlayerData[playerid][bFirstSpawn] = true;
 
     new rand = random(4);
-    SetSpawnInfoEx(playerid, NO_TEAM, PlayerData[playerid][SavedSkin] != -1 ? PlayerData[playerid][SavedSkin] : GetPlayerSkin(playerid), WorldSpawns[rand][0], WorldSpawns[rand][1], WorldSpawns[rand][2] + 3.0, WorldSpawns[rand][3]);
+    SetSpawnInfoEx(playerid, NO_TEAM, PlayerData[playerid][e_skinsave] != -1 ? PlayerData[playerid][e_skinsave] : GetPlayerSkin(playerid), WorldSpawns[rand][0], WorldSpawns[rand][1], WorldSpawns[rand][2] + 3.0, WorldSpawns[rand][3]);
 
 	TextDrawShowForPlayer(playerid, TXTTeleportInfo);
 	HidePlayerInfoTextdraws(playerid);
@@ -2586,7 +2586,7 @@ public OnPlayerRequestClass(playerid, classid)
 	TextDrawShowForPlayer(playerid, TXTWinterEdition);
 	#endif
 
-	if(PlayerData[playerid][SavedSkin] != -1)
+	if(PlayerData[playerid][e_skinsave] != -1)
 	{
 	    SetTimerEx("ForceClassSpawn", 10, 0, "i", playerid);
 	    SCM(playerid, -1, ""server_sign" "r_besch"Your saved skin has been set. (/deleteskin to remove)");
@@ -2655,7 +2655,7 @@ public OnPlayerSpawn(playerid)
 		RandomWeapons(playerid);
 		HidePlayerWelcomeTextdraws(playerid);
 		ShowPlayerInfoTextdraws(playerid);
-		if(PlayerData[playerid][VIP] == 1)
+		if(PlayerData[playerid][e_vip] == 1)
 		{
 		    SetPlayerArmour(playerid, 100.0);
 		}
@@ -2692,7 +2692,7 @@ public OnPlayerSpawn(playerid)
             SavePos(playerid);
 			SyncGangZones(playerid);
 
-			if(PlayerData[playerid][VIP] == 1)
+			if(PlayerData[playerid][e_vip] == 1)
 			{
 			    SetPlayerArmour(playerid, 100.0);
 			}
@@ -3029,7 +3029,7 @@ public OnPlayerSpawn(playerid)
 					SetPVarInt(playerid, "inCNR", 5);
 				}
   			}
- 			if(PlayerData[playerid][VIP] == 1)
+ 			if(PlayerData[playerid][e_vip] == 1)
 			{
 			    SetPlayerArmour(playerid, 100.0);
 			}
@@ -4600,12 +4600,12 @@ public OnPlayerDeath(playerid, killerid, reason)
 	    
 	        if(IsPlayerAvail(killerid) && (playerid != killerid) && gTeam[killerid] == FREEROAM)
      		{
-			    PlayerData[killerid][Wanteds]++;
+			    PlayerData[killerid][e_wanteds]++;
 
-				format(gstr2, sizeof(gstr2), "~y~[] ~w~%i", PlayerData[killerid][Wanteds]);
+				format(gstr2, sizeof(gstr2), "~y~[] ~w~%i", PlayerData[killerid][e_wanteds]);
 				PlayerTextDrawSetString(killerid, TXTWantedsTD[killerid], gstr2);
 
-				switch(PlayerData[killerid][Wanteds])
+				switch(PlayerData[killerid][e_wanteds])
 				{
 				    case 3:
 				    {
@@ -4678,10 +4678,10 @@ public OnPlayerDeath(playerid, killerid, reason)
 					}
 				}
 
-				if(PlayerData[playerid][Wanteds] > 2)
+				if(PlayerData[playerid][e_wanteds] > 2)
 				{
-					new money = floatround((1400 * PlayerData[playerid][Wanteds]) / 2.6),
-						score = floatround((2 * PlayerData[playerid][Wanteds]) / 2.5);
+					new money = floatround((1400 * PlayerData[playerid][e_wanteds]) / 2.6),
+						score = floatround((2 * PlayerData[playerid][e_wanteds]) / 2.5);
 
 					GivePlayerScore_(killerid, score, true, true);
 					GivePlayerCash(killerid, money, true, true);
@@ -4692,15 +4692,15 @@ public OnPlayerDeath(playerid, killerid, reason)
 					GivePlayerCash(killerid, 1100, true, true);
 				}
 
-				if(PlayerData[playerid][Wanteds] >= 3)
+				if(PlayerData[playerid][e_wanteds] >= 3)
 				{
-				    format(gstr, sizeof(gstr), "* {%06x}%s(%i) "RED_E"ended %s's(%i) killstreak of %i kills!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid, __GetName(playerid), playerid, PlayerData[playerid][Wanteds]);
+				    format(gstr, sizeof(gstr), "* {%06x}%s(%i) "RED_E"ended %s's(%i) killstreak of %i kills!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid, __GetName(playerid), playerid, PlayerData[playerid][e_wanteds]);
 				    SCMToAll(COLOR_RED, gstr);
 				}
 
-				PlayerData[playerid][Wanteds] = 0;
+				PlayerData[playerid][e_wanteds] = 0;
 				
-				format(gstr, sizeof(gstr), "~y~[] ~w~%i", PlayerData[playerid][Wanteds]);
+				format(gstr, sizeof(gstr), "~y~[] ~w~%i", PlayerData[playerid][e_wanteds]);
 				PlayerTextDrawSetString(playerid, TXTWantedsTD[playerid], gstr);
 				
 			  	// Nur Kills bei FREEROAM werten für GangScore
@@ -4964,9 +4964,9 @@ public OnPlayerDeath(playerid, killerid, reason)
 
 					if(gWinners[0] < MAX_PLAYERS && gWinners[0] != INVALID_PLAYER_ID)
 					{
-					    PlayerData[gWinners[0]][GungameWins]++;
+					    PlayerData[gWinners[0]][e_gungamewins]++;
 
-                       	if(pAch[gWinners[0]][E_ach_oneshot2kills] == 0 && PlayerData[gWinners[0]][GungameWins] >= 10)
+                       	if(pAch[gWinners[0]][E_ach_oneshot2kills] == 0 && PlayerData[gWinners[0]][e_gungamewins] >= 10)
 						{
 						    GivePlayerAchievement(gWinners[0], "One Shot Two Kills", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
 						    pAch[gWinners[0]][E_ach_oneshot2kills] = 1;
@@ -5619,9 +5619,9 @@ public OnPlayerEnterRaceCheckpoint(playerid)
 		            points = 3;
 					Prize[0] = random(10000);
 					Prize[1] = 10;
-					PlayerData[playerid][RaceWins]++;
+					PlayerData[playerid][e_racewins]++;
 
-					if(pAch[playerid][E_ach_eliteracer] == 0 && PlayerData[playerid][RaceWins] >= 10)
+					if(pAch[playerid][E_ach_eliteracer] == 0 && PlayerData[playerid][e_racewins] >= 10)
 					{
 					    GivePlayerAchievement(playerid, "Elite Racer", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
 					    pAch[playerid][E_ach_eliteracer] = 1;
@@ -5767,7 +5767,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 	    
   		if(pickupid == VIPLpickup)
   		{
-  		    if(PlayerData[playerid][VIP] == 1 || PlayerData[playerid][e_level] > 0)
+  		    if(PlayerData[playerid][e_vip] == 1 || PlayerData[playerid][e_level] > 0)
   		    {
   		        LoadMap(playerid);
 	    		SetPlayerPosition(playerid, -3939.1855, 1308.7438, 3.4587, 86.1611, 3);
@@ -8169,7 +8169,7 @@ function:OnChartRecv(playerid)
 YCMD:sellgc(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
-	if(PlayerData[playerid][Credits] <= 0) return SCM(playerid, -1, ""er"You don't own any GC!");
+	if(PlayerData[playerid][e_credits] <= 0) return SCM(playerid, -1, ""er"You don't own any GC!");
 
 	new player, gc, money;
 	if(sscanf(params, "rii", player, gc, money))
@@ -8190,11 +8190,11 @@ YCMD:sellgc(playerid, params[], help)
 	    return SCM(playerid, -1, ""er"GC: 10 - $1,000,000!");
 	}
 	
-	if(gc > PlayerData[playerid][Credits]) return SCM(playerid, -1, ""er"You don't have that much GC.");
+	if(gc > PlayerData[playerid][e_credits]) return SCM(playerid, -1, ""er"You don't have that much GC.");
 
 	if(IsPlayerAvail(player) && player != playerid)
 	{
-	    if(PlayerData[player][Credits] >= 10000000) return SCM(playerid, -1, ""er"This player reached the max gc limit of 10kk.");
+	    if(PlayerData[player][e_credits] >= 10000000) return SCM(playerid, -1, ""er"This player reached the max gc limit of 10kk.");
         if(!islogged(player)) return SCM(playerid, -1, ""er"This player is not registered!");
 
 	    PlayerData[player][GCPlayer] = playerid;
@@ -8222,9 +8222,9 @@ YCMD:buygc(playerid, params[], help)
     if(!islogged(playerid)) return notlogged(playerid);
     
 	if(PlayerData[playerid][GCPlayer] == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"No one has offered you GC yet.");
-    if(PlayerData[playerid][Credits] >= 10000000) return SCM(playerid, -1, ""er"You have reached the max gc limit of 10kk.");
+    if(PlayerData[playerid][e_credits] >= 10000000) return SCM(playerid, -1, ""er"You have reached the max gc limit of 10kk.");
 
-	if(IsPlayerAvail(PlayerData[playerid][GCPlayer]) && PlayerData[PlayerData[playerid][GCPlayer]][Credits] >= PlayerData[playerid][GCOffer] && PlayerData[playerid][GCNameHash] == YHash(__GetName(PlayerData[playerid][GCPlayer]), false))
+	if(IsPlayerAvail(PlayerData[playerid][GCPlayer]) && PlayerData[PlayerData[playerid][GCPlayer]][e_credits] >= PlayerData[playerid][GCOffer] && PlayerData[playerid][GCNameHash] == YHash(__GetName(PlayerData[playerid][GCPlayer]), false))
 	{
 		if(GetPlayerCash(playerid) < PlayerData[playerid][GCPrice]) return SCM(playerid, -1, ""er"You do not have enough money!");
 
@@ -8328,7 +8328,7 @@ YCMD:ads(playerid, params[], help)
 YCMD:sellvip(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
-	if(PlayerData[playerid][VIP] == 0) return SCM(playerid, -1, ""er"You don't own VIP!");
+	if(PlayerData[playerid][e_vip] == 0) return SCM(playerid, -1, ""er"You don't own VIP!");
 	
 	new player, money;
 	if(sscanf(params, "ri", player, money))
@@ -8346,7 +8346,7 @@ YCMD:sellvip(playerid, params[], help)
 
 	if(IsPlayerAvail(player) && player != playerid)
 	{
-	    if(PlayerData[player][VIP] == 1) return SCM(playerid, -1, ""er"This player already owns VIP!");
+	    if(PlayerData[player][e_vip] == 1) return SCM(playerid, -1, ""er"This player already owns VIP!");
 	    if(!islogged(player)) return SCM(playerid, -1, ""er"This player is not registered!");
 	    
 	    PlayerData[player][VIPPlayer] = playerid;
@@ -8373,9 +8373,9 @@ YCMD:buyvip(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
 	if(PlayerData[playerid][VIPPlayer] == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"No one has offered you VIP yet.");
-    if(PlayerData[playerid][VIP] == 1) return SCM(playerid, -1, ""er"You already have VIP status.");
+    if(PlayerData[playerid][e_vip] == 1) return SCM(playerid, -1, ""er"You already have VIP status.");
 
-	if(IsPlayerAvail(PlayerData[playerid][VIPPlayer]) && PlayerData[PlayerData[playerid][VIPPlayer]][VIP] == 1 && PlayerData[playerid][VIPNameHash] == YHash(__GetName(PlayerData[playerid][VIPPlayer]), false))
+	if(IsPlayerAvail(PlayerData[playerid][VIPPlayer]) && PlayerData[PlayerData[playerid][VIPPlayer]][e_vip] == 1 && PlayerData[playerid][VIPNameHash] == YHash(__GetName(PlayerData[playerid][VIPPlayer]), false))
 	{
 		if(GetPlayerCash(playerid) < PlayerData[playerid][VIPOffer]) return SCM(playerid, -1, ""er"You do not have enough money!");
 
@@ -8385,8 +8385,8 @@ YCMD:buyvip(playerid, params[], help)
 		GivePlayerCash(PlayerData[playerid][VIPPlayer], PlayerData[playerid][VIPOffer]);
 		GivePlayerCash(playerid, -PlayerData[playerid][VIPOffer]);
 
-		PlayerData[playerid][VIP] = 1;
-		PlayerData[PlayerData[playerid][VIPPlayer]][VIP] = 0;
+		PlayerData[playerid][e_vip] = 1;
+		PlayerData[PlayerData[playerid][VIPPlayer]][e_vip] = 0;
 
 		PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
 		PlayerPlaySound(PlayerData[playerid][VIPPlayer], 1057, 0.0, 0.0, 0.0);
@@ -9642,7 +9642,7 @@ YCMD:grantnc(playerid, params[], help)
 		if(IsPlayerAvail(player))
 		{
 		
-		    PlayerData[player][LastNameChange] = gettime() - 7786000;
+		    PlayerData[player][e_lastnc] = gettime() - 7786000;
 
 			if(player != playerid)
 			{
@@ -9681,7 +9681,7 @@ YCMD:suspect(playerid, params[], help)
 		{
 		    if(!IsPlayerAvail(i)) continue;
 
-		    if(PlayerData[i][VIP] == 0) {
+		    if(PlayerData[i][e_vip] == 0) {
                 /* ARMOR CHECK */
 				new Float:tmp;
 				GetPlayerArmour(i, tmp);
@@ -10444,7 +10444,7 @@ YCMD:spectators(playerid, params[], help)
 
 YCMD:jetpack(playerid, params[], help)
 {
-    if(PlayerData[playerid][VIP] == 0) return Command_ReProcess(playerid, "/vip", false);
+    if(PlayerData[playerid][e_vip] == 0) return Command_ReProcess(playerid, "/vip", false);
 	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
     if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't use this command now");
 
@@ -10489,7 +10489,7 @@ YCMD:go(playerid, params[], help)
   			if(Iter_Contains(PlayerIgnore[player], playerid)) return SCM(playerid, -1, ""er"This player ignores you");
 			if(player == playerid) return SCM(playerid, -1, ""er"You may not teleport to yourself");
 			if(gTeam[player] != FREEROAM) return SCM(playerid, -1, ""er"Player is currently unavailable to goto");
-			if(PlayerData[player][Wanteds] != 0) return SCM(playerid, -1, ""er"This player has wanteds");
+			if(PlayerData[player][e_wanteds] != 0) return SCM(playerid, -1, ""er"This player has wanteds");
 			if(PlayerData[player][e_level] != 0) return SCM(playerid, -1, ""er"You can't teleport to admins");
             if(PlayerData[player][bGWarMode]) return SCM(playerid, -1, ""er"This player is in Gang War");
             if(GetPVarInt(player, "doingStunt") != 0) return SCM(playerid, -1, ""er"Player is doing stunts");
@@ -10694,7 +10694,7 @@ YCMD:get(playerid, params[], help)
 
 YCMD:ncrecords(playerid, params[], help)
 {
-    if(PlayerData[playerid][VIP] != 1 && PlayerData[playerid][e_level] == 0) return Command_ReProcess(playerid, "/vip", false);
+    if(PlayerData[playerid][e_vip] != 1 && PlayerData[playerid][e_level] == 0) return Command_ReProcess(playerid, "/vip", false);
 
 	new name[25];
 	if(sscanf(params, "s[24]", name))
@@ -12810,7 +12810,7 @@ YCMD:admins(playerid, params[], help)
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(!IsPlayerAvail(i)) continue;
-	    if(PlayerData[i][VIP] == 1)
+	    if(PlayerData[i][e_vip] == 1)
 	    {
 	        if(IsPlayerOnDesktop(i))
 	        {
@@ -12846,7 +12846,7 @@ YCMD:vips(playerid, params[], help)
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(!IsPlayerAvail(i)) continue;
-	    if(PlayerData[i][VIP] == 1)
+	    if(PlayerData[i][e_vip] == 1)
 	    {
             if(IsPlayerOnDesktop(i))
             {
@@ -12889,7 +12889,7 @@ YCMD:vips(playerid, params[], help)
 
 YCMD:p(playerid, params[], help)
 {
-	if(PlayerData[playerid][VIP] != 1 && PlayerData[playerid][e_level] == 0) return Command_ReProcess(playerid, "/vip", false);
+	if(PlayerData[playerid][e_vip] != 1 && PlayerData[playerid][e_level] == 0) return Command_ReProcess(playerid, "/vip", false);
 
 	if(sscanf(params, "s[144]", gstr))
 	{
@@ -12917,7 +12917,7 @@ YCMD:p(playerid, params[], help)
 
 YCMD:vipli(playerid, params[], help)
 {
-	if(PlayerData[playerid][VIP] == 1)
+	if(PlayerData[playerid][e_vip] == 1)
 	{
 		new tick = GetTickCount_();
 	 	if(PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
@@ -12939,7 +12939,7 @@ YCMD:vipli(playerid, params[], help)
 		
  		if(IsPlayerAvail(player))
 		{
-			if(PlayerData[player][VIP] == 1) return SCM(playerid, -1, ""er"You cannot invite this player");
+			if(PlayerData[player][e_vip] == 1) return SCM(playerid, -1, ""er"You cannot invite this player");
 			if(PlayerData[player][e_level] > 0) return SCM(playerid, -1, ""er"You cannot invite this player");
 
 			PlayerData[player][GotVIPLInv] = true;
@@ -12966,7 +12966,7 @@ YCMD:vipli(playerid, params[], help)
 
 YCMD:accept(playerid, params[], help)
 {
-    if(PlayerData[playerid][VIP] == 1) return SCM(playerid, -1, ""er"You can't use this command as VIP");
+    if(PlayerData[playerid][e_vip] == 1) return SCM(playerid, -1, ""er"You can't use this command as VIP");
     
 	if(!PlayerData[playerid][GotVIPLInv])
 	{
@@ -13015,7 +13015,7 @@ YCMD:vip(playerid, params[], help)
 
 YCMD:hydra(playerid, params[], help)
 {
-	if(PlayerData[playerid][VIP] == 1)
+	if(PlayerData[playerid][e_vip] == 1)
 	{
 	    if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 	    if(IsPlayerInRangeOfPoint(playerid, 65.0, 1797.3141, -1302.0978, 120.2659) && PlayerData[playerid][e_level] < 1) return SCM(playerid, -1, ""er"Can't spawn vehicle at this place!");
@@ -13086,7 +13086,7 @@ YCMD:god(playerid, params[], help)
 
 YCMD:v70(playerid, params[], help) // Cheetah
 {
-	if(PlayerData[playerid][VIP] == 0) return 1;
+	if(PlayerData[playerid][e_vip] == 0) return 1;
 
     CarSpawner(playerid, 415);
 
@@ -13117,7 +13117,7 @@ YCMD:v70(playerid, params[], help) // Cheetah
 
 YCMD:v71(playerid, params[], help)// Infernus
 {
-	if(PlayerData[playerid][VIP] == 0) return 1;
+	if(PlayerData[playerid][e_vip] == 0) return 1;
 	
     CarSpawner(playerid, 411);
 
@@ -13148,7 +13148,7 @@ YCMD:v71(playerid, params[], help)// Infernus
 
 YCMD:v72(playerid, params[], help) // Huntley
 {
-	if(PlayerData[playerid][VIP] == 0) return 1;
+	if(PlayerData[playerid][e_vip] == 0) return 1;
 	
     CarSpawner(playerid, 579);
 
@@ -13200,7 +13200,7 @@ YCMD:v72(playerid, params[], help) // Huntley
 
 YCMD:v73(playerid, params[], help) // Bullet
 {
-	if(PlayerData[playerid][VIP] == 0) return 1;
+	if(PlayerData[playerid][e_vip] == 0) return 1;
 	
     CarSpawner(playerid, 541);
 
@@ -13237,7 +13237,7 @@ YCMD:v73(playerid, params[], help) // Bullet
 
 YCMD:v74(playerid, params[], help) // NRG
 {
-	if(PlayerData[playerid][VIP] == 0) return 1;
+	if(PlayerData[playerid][e_vip] == 0) return 1;
 	
     CarSpawner(playerid, 522);
 
@@ -13287,7 +13287,7 @@ YCMD:adminhq(playerid, params[], help)
 	 	ResetPlayerWorld(playerid);
 	 	PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=83836", 1797.3141, -1302.0978, 120.2659, 50.0, 1);
 	}
-	else if(PlayerData[playerid][VIP] == 1)
+	else if(PlayerData[playerid][e_vip] == 1)
 	{
 		SetPlayerPos(playerid, 1797.4270,-1300.9581,120.2656);
 		format(gstr, sizeof(gstr), ""nef" VIP %s(%i) teleported to Admin's Headquarter! (/adminhq)", __GetName(playerid), playerid);
@@ -13308,7 +13308,7 @@ YCMD:adminhq(playerid, params[], help)
 
 YCMD:cd(playerid, params[], help)
 {
-    if(PlayerData[playerid][VIP] == 0) return Command_ReProcess(playerid, "/vip", false);
+    if(PlayerData[playerid][e_vip] == 0) return Command_ReProcess(playerid, "/vip", false);
     
    	new tick = GetTickCount_();
 	if((PlayerData[playerid][tickLastCD] + COOLDOWN_CMD_CD) >= tick)
@@ -13373,7 +13373,7 @@ function:CountdownVIP()
 
 YCMD:rainbow(playerid, params[], help)
 {
-    if(PlayerData[playerid][VIP] == 0) return Command_ReProcess(playerid, "/vip", false);
+    if(PlayerData[playerid][e_vip] == 0) return Command_ReProcess(playerid, "/vip", false);
     
 	if(GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
 	{
@@ -14186,7 +14186,7 @@ YCMD:gungames(playerid, params[], help)
 	    if(IsPlayerAvail(i))
 	    {
 	        gungames[i][E_playerid] = i;
-	        gungames[i][E_gungame] = PlayerData[i][GungameWins];
+	        gungames[i][E_gungame] = PlayerData[i][e_gungamewins];
 	    }
 	    else
 	    {
@@ -14226,7 +14226,7 @@ YCMD:fallouts(playerid, params[], help)
 	    if(IsPlayerAvail(i))
 	    {
 	        fallouts[i][E_playerid] = i;
-	        fallouts[i][E_fallout] = PlayerData[i][FalloutWins];
+	        fallouts[i][E_fallout] = PlayerData[i][e_falloutwins];
 	    }
 	    else
 	    {
@@ -14266,7 +14266,7 @@ YCMD:derbys(playerid, params[], help)
 	    if(IsPlayerAvail(i))
 	    {
 	        derbys[i][E_playerid] = i;
-	        derbys[i][E_derby] = PlayerData[i][DerbyWins];
+	        derbys[i][E_derby] = PlayerData[i][e_derbywins];
 	    }
 	    else
 	    {
@@ -14306,7 +14306,7 @@ YCMD:races(playerid, params[], help)
 	    if(IsPlayerAvail(i))
 	    {
 	        races[i][E_playerid] = i;
-	        races[i][E_race] = PlayerData[i][RaceWins];
+	        races[i][E_race] = PlayerData[i][e_racewins];
 	    }
 	    else
 	    {
@@ -14548,7 +14548,7 @@ YCMD:wanteds(playerid, params[], help)
 	    if(IsPlayerAvail(i))
 	    {
 	        wanteds[i][E_playerid] = i;
-	        wanteds[i][E_wanteds] = PlayerData[i][Wanteds];
+	        wanteds[i][E_wanteds] = PlayerData[i][e_wanteds];
 	    }
 	    else
 	    {
@@ -14705,7 +14705,7 @@ YCMD:top(playerid, params[], help)
 
 YCMD:vcontrol(playerid, params[], help)
 {
-    if(PlayerData[playerid][VIP] == 1)
+    if(PlayerData[playerid][e_vip] == 1)
 	{
 	    if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 
@@ -14725,7 +14725,7 @@ YCMD:vcontrol(playerid, params[], help)
 
 YCMD:label(playerid, params[], help)
 {
-    if(PlayerData[playerid][VIP] == 1)
+    if(PlayerData[playerid][e_vip] == 1)
 	{
 	    if(PlayerData[playerid][VIPLabel] == Text3D:-1)
 	    {
@@ -14745,7 +14745,7 @@ YCMD:label(playerid, params[], help)
 
 YCMD:elabel(playerid, params[], help)
 {
-    if(PlayerData[playerid][VIP] == 1)
+    if(PlayerData[playerid][e_vip] == 1)
 	{
 	    if(PlayerData[playerid][VIPLabel] != Text3D:-1)
 	    {
@@ -14765,7 +14765,7 @@ YCMD:elabel(playerid, params[], help)
 
 YCMD:dlabel(playerid, params[], help)
 {
-    if(PlayerData[playerid][VIP] == 1)
+    if(PlayerData[playerid][e_vip] == 1)
 	{
 	    if(PlayerData[playerid][VIPLabel] != Text3D:-1)
 	    {
@@ -14787,7 +14787,7 @@ YCMD:dlabel(playerid, params[], help)
 
 YCMD:trailer(playerid, params[], help)
 {
-    if(PlayerData[playerid][VIP] == 1)
+    if(PlayerData[playerid][e_vip] == 1)
 	{
 	    if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 	    
@@ -14836,7 +14836,7 @@ YCMD:trailer(playerid, params[], help)
 
 YCMD:ramp(playerid, params[], help)
 {
-    if(PlayerData[playerid][VIP] == 1)
+    if(PlayerData[playerid][e_vip] == 1)
 	{
 		if(GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
 		{
@@ -14886,7 +14886,7 @@ YCMD:harefill(playerid, params[], help)
 {
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
 	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
-    if(PlayerData[playerid][VIP] == 1)
+    if(PlayerData[playerid][e_vip] == 1)
 	{
 	    if(PlayerData[playerid][bGod]) return SCM(playerid, -1, ""er"You need to disable GodMode first. (/god)");
 	    if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
@@ -14901,7 +14901,7 @@ YCMD:harefill(playerid, params[], help)
 
 YCMD:spec(playerid, params[], help)
 {
-    if(PlayerData[playerid][e_level] >= 1 || IsPlayerAdmin(playerid) || PlayerData[playerid][VIP] == 1)
+    if(PlayerData[playerid][e_level] >= 1 || IsPlayerAdmin(playerid) || PlayerData[playerid][e_vip] == 1)
 	{
 	    new player;
 	 	if(sscanf(params, "r", player))
@@ -14914,7 +14914,7 @@ YCMD:spec(playerid, params[], help)
 
  		if(IsPlayerAvail(player) && player != playerid)
 		{
-			if(PlayerData[playerid][e_level] == 0 && PlayerData[playerid][VIP] == 1 && PlayerData[player][e_level] > 0) return SCM(playerid, -1, ""er"You may not spectate admins");
+			if(PlayerData[playerid][e_level] == 0 && PlayerData[playerid][e_vip] == 1 && PlayerData[player][e_level] > 0) return SCM(playerid, -1, ""er"You may not spectate admins");
 			if(PlayerData[player][e_level] == MAX_ADMIN_LEVEL && PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL) return SCM(playerid, -1, ""er"You cannot use this command on this admin");
 			if(gTeam[player] == SPEC) return SCM(playerid, -1, ""er"Player is spectating someone else");
 			if(PlayerData[player][bIsDead]) return SCM(playerid, -1, ""er"Player is not alive");
@@ -14980,7 +14980,7 @@ YCMD:spec(playerid, params[], help)
 
 YCMD:specoff(playerid, params[], help)
 {
-    if(PlayerData[playerid][e_level] >= 1 || IsPlayerAdmin(playerid) || PlayerData[playerid][VIP] == 1)
+    if(PlayerData[playerid][e_level] >= 1 || IsPlayerAdmin(playerid) || PlayerData[playerid][e_vip] == 1)
 	{
         if(gTeam[playerid] == SPEC)
 		{
@@ -15254,7 +15254,7 @@ YCMD:mk(playerid, params[], help)
 	{
     	return SCM(playerid, -1, ""er"Please wait a bit before using this cmd again!");
 	}
-	if(PlayerData[playerid][Medkits] <= 0)
+	if(PlayerData[playerid][e_medkits] <= 0)
 	{
 	    return SCM(playerid, -1, ""er"You don't own any medkits!");
 	}
@@ -15268,7 +15268,7 @@ YCMD:mk(playerid, params[], help)
 	}
 	
 	PlayerData[playerid][MedkitTime] = 50;
-	PlayerData[playerid][Medkits]--;
+	PlayerData[playerid][e_medkits]--;
 	
 	PlayerPlaySound(playerid, 1052, 0.0, 0.0, 0.0);
 	
@@ -15338,7 +15338,7 @@ YCMD:stats(playerid, params[], help)
 		}
 		else strcat(gangnam, PlayerData[player1][GangName]);
 
-		if(PlayerData[player1][VIP] != 0)
+		if(PlayerData[player1][e_vip] != 0)
 		{
 		    strmid(vip, "Yes", 0, 5, 5);
 		}
@@ -15354,32 +15354,32 @@ YCMD:stats(playerid, params[], help)
         	GetPlayerScore_(player1),
         	number_format(GetPlayerCash(player1)),
         	number_format(PlayerData[player1][e_bank]),
-			number_format(PlayerData[player1][Credits]));
+			number_format(PlayerData[player1][e_credits]));
 
 		format(string2, sizeof(string2), ""white"Race wins: "LB_E"%i\n"white"Derby wins: "LB_E"%i\n"white"Reaction wins: "LB_E"%i\n"white"TDM wins: "LB_E"%i\n"white"Fallout wins: "LB_E"%i\n"white"Gungame wins: "LB_E"%i\n"white"Event wins: "LB_E"%i\n"white"Time until PayDay: "LB_E"%i minutes\n",
-	   		PlayerData[player1][RaceWins],
-	   		PlayerData[player1][DerbyWins],
+	   		PlayerData[player1][e_racewins],
+	   		PlayerData[player1][e_derbywins],
 	   		PlayerData[player1][e_reaction],
-	   		PlayerData[player1][BGWins],
-	   		PlayerData[player1][FalloutWins],
-	   		PlayerData[player1][GungameWins],
-	   		PlayerData[player1][EventWins],
+	   		PlayerData[player1][e_tdmwins],
+	   		PlayerData[player1][e_falloutwins],
+	   		PlayerData[player1][e_gungamewins],
+	   		PlayerData[player1][e_eventwins],
 	   		PlayerData[player1][e_payday]);
 
         format(string3, sizeof(string3), ""white"Playing Time: "LB_E"%s\n"white"Gang: "LB_E"%s\n"white"VIP: "LB_E"%s\n"white"Medkits: "LB_E"%i\n"white"Houses: "LB_E"%i\n"white"Business: "LB_E"%i\n"white"Wanteds: "LB_E"%i\n"white"Last log in: "LB_E"%s",
             GetPlayingTimeFormat(player1),
 			gangnam,
 			vip,
-			PlayerData[player1][Medkits],
+			PlayerData[player1][e_medkits],
 			PlayerData[player1][e_houses],
 			PlayerData[player1][Businesses],
-			PlayerData[player1][Wanteds],
-			UTConvert(PlayerData[player1][LastLogin]));
+			PlayerData[player1][e_wanteds],
+			UTConvert(PlayerData[player1][e_lastlogin]));
 			
 		if(islogged(player1))
 		{
 			strcat(string3, "\n"white"Register Date: "LB_E"");
-			strcat(string3, UTConvert(PlayerData[player1][RegDate]));
+			strcat(string3, UTConvert(PlayerData[player1][e_regdate]));
 		}
 			
 		if(PlayerData[player1][BoostDeplete] != 0)
@@ -15580,7 +15580,7 @@ YCMD:m(playerid, params[], help)
 
 YCMD:opengate(playerid, params[], help)
 {
-	if(PlayerData[playerid][e_level] == MAX_ADMIN_LEVEL || PlayerData[playerid][VIP] == 1)
+	if(PlayerData[playerid][e_level] == MAX_ADMIN_LEVEL || PlayerData[playerid][e_vip] == 1)
 	{
 		if(!IsPlayerInRangeOfPoint(playerid, 15.0, -205.68774, -2285.10693, 30.65776)) return SCM(playerid, -1, ""er"You need to be closer");
 		if(IsMellnikGateMoving) return SCM(playerid, -1, ""er"Gate is currently working");
@@ -15596,7 +15596,7 @@ YCMD:opengate(playerid, params[], help)
 
 YCMD:closegate(playerid, params[], help)
 {
-	if(PlayerData[playerid][e_level] == MAX_ADMIN_LEVEL || PlayerData[playerid][VIP] == 1)
+	if(PlayerData[playerid][e_level] == MAX_ADMIN_LEVEL || PlayerData[playerid][e_vip] == 1)
 	{
 		if(!IsPlayerInRangeOfPoint(playerid, 15.0, -205.68774, -2285.10693, 30.65776)) return SCM(playerid, -1, ""er"You need to be closer");
 		if(IsMellnikGateMoving) return SCM(playerid, -1, ""er"Gate is currently working");
@@ -15657,7 +15657,7 @@ YCMD:saveskin(playerid, params[], help)
 {
 	if(!islogged(playerid)) return notlogged(playerid);
 
-	if(PlayerData[playerid][SavedSkin] == -1)
+	if(PlayerData[playerid][e_skinsave] == -1)
 	{
 	    SCM(playerid, COLOR_GREY, ""nef" "GREY2_E"Skin saved! Skipping class selection next login. Use /deleteskin to remove it");
 	}
@@ -15669,7 +15669,7 @@ YCMD:saveskin(playerid, params[], help)
 	
 	if(IsValidSkin(skin))
 	{
-    	PlayerData[playerid][SavedSkin] = skin;
+    	PlayerData[playerid][e_skinsave] = skin;
 	}
 	else SCM(playerid, -1, ""er"Invalid skin ID");
 	return 1;
@@ -15679,7 +15679,7 @@ YCMD:deleteskin(playerid, params[], help)
 {
 	if(!islogged(playerid)) return notlogged(playerid);
 
-	if(PlayerData[playerid][SavedSkin] == -1)
+	if(PlayerData[playerid][e_skinsave] == -1)
 	{
 	    SCM(playerid, COLOR_GREY, ""nef" "GREY2_E"You have no saved skin yet!");
 	}
@@ -15687,7 +15687,7 @@ YCMD:deleteskin(playerid, params[], help)
 	{
 	    SCM(playerid, COLOR_GREY, ""nef" "GREY2_E"Skin has been deleted!");
 	}
-    PlayerData[playerid][SavedSkin] = -1;
+    PlayerData[playerid][e_skinsave] = -1;
 	return 1;
 }
 
@@ -16988,11 +16988,11 @@ function:OnPlayerNameChangeRequest(newname[], playerid)
             format(query, sizeof(query), "UPDATE `viporder` SET `receiver` = '%s' WHERE `receiver` = '%s';", newname, oldname);
             mysql_tquery(pSQL, query, "", "");
 
-			PlayerData[playerid][LastNameChange] = gettime();
+			PlayerData[playerid][e_lastnc] = gettime();
 			
 			DestroyPlayerVehicles(playerid);
 			
-			new nextnc = (PlayerData[playerid][LastNameChange] + ((PlayerData[playerid][VIP] == 1) ? (2592000) : (7776000)));
+			new nextnc = (PlayerData[playerid][e_lastnc] + ((PlayerData[playerid][e_vip] == 1) ? (2592000) : (7776000)));
 			
 			format(query, sizeof(query), ""white"You have successfully changed your name.\n\nNew name: %s\nOld name: %s\nNext namechange available: %s", newname, oldname, UTConvert(nextnc));
 			ShowPlayerDialog(playerid, NAME_CHANGE_DIALOG + 5, DIALOG_STYLE_MSGBOX, ""nef" :: Namechange", query, "OK", "");
@@ -17420,14 +17420,14 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	                return 1;
 	            }
 
-				if(((PlayerData[playerid][VIP] == 1) ? (PlayerData[playerid][LastNameChange] + 2592000) : (PlayerData[playerid][LastNameChange] + 7776000)) < gettime())
+				if(((PlayerData[playerid][e_vip] == 1) ? (PlayerData[playerid][e_lastnc] + 2592000) : (PlayerData[playerid][e_lastnc] + 7776000)) < gettime())
 				{
 				    SCM(playerid, -1, ""er"You can already change your name!");
 				    ShowDialog(playerid, CM_DIALOG);
 				    return 1;
 				}
 
-				PlayerData[playerid][LastNameChange] = 0;
+				PlayerData[playerid][e_lastnc] = 0;
                 
 				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[5][E_item_credits]));
 				SendInfo(playerid, "Item purchased", gstr, 5000);
@@ -17444,7 +17444,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	                return 1;
 	            }
 
-				PlayerData[playerid][Medkits] += 20;
+				PlayerData[playerid][e_medkits] += 20;
 
 				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[6][E_item_credits]));
 				SendInfo(playerid, "Item purchased", gstr, 5000);
@@ -17461,7 +17461,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	                return 1;
 	            }
 
-				PlayerData[playerid][Medkits] += 100;
+				PlayerData[playerid][e_medkits] += 100;
 
 				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[7][E_item_credits]));
 				SendInfo(playerid, "Item purchased", gstr, 5000);
@@ -17847,7 +17847,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
   	    			}
 					case 4: // Swat
   	    			{
-  	    				if(PlayerData[playerid][VIP] == 0)
+  	    				if(PlayerData[playerid][e_vip] == 0)
 						{
 							SCM(playerid, COLOR_GREY, "Server: "RED_E"You must be VIP to use the swat feature! Check /vip for more info.");
                             Command_ReProcess(playerid, "/cnr", false);
@@ -18533,7 +18533,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					}
 					case 6:
 					{
-					    if(PlayerData[playerid][SavedSkin] == -1)
+					    if(PlayerData[playerid][e_skinsave] == -1)
 					    {
 					        Command_ReProcess(playerid, "/saveskin", false);
 					    }
@@ -19410,7 +19410,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 				    case 0:
    					{
-    					if(PlayerData[playerid][VIP] == 0)
+    					if(PlayerData[playerid][e_vip] == 0)
 						{
 							return SCM(playerid, -1, ""er"You need to be VIP to access this section");
 						}
@@ -19750,7 +19750,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			}
 			case CARBUY_DIALOG:
 			{
-                if(PlayerData[playerid][VIP] == 0 && listitem == 8)
+                if(PlayerData[playerid][e_vip] == 0 && listitem == 8)
                 {
 					SCM(playerid, -1, ""er"You need to be VIP");
 					ShowDialog(playerid, CARBUY_DIALOG);
@@ -21050,7 +21050,7 @@ function:BattleGround()
 		    {
 		        GivePlayerCash(i, money, true, true);
 		        GivePlayerScore_(i, 10, true, true);
-		        PlayerData[i][BGWins]++;
+		        PlayerData[i][e_tdmwins]++;
 		    }
 		}
 	}
@@ -21070,7 +21070,7 @@ function:BattleGround()
 		    {
 		        GivePlayerCash(i, money, true, true);
 		        GivePlayerScore_(i, 10, true, true);
-		        PlayerData[i][BGWins]++;
+		        PlayerData[i][e_tdmwins]++;
 		    }
 		}
 	}
@@ -21143,14 +21143,14 @@ function:SkipRegistration(playerid)
 {
     PlayerData[playerid][AllowSpawn] = true;
 	
-    PlayerData[playerid][RegDate] = gettime();
+    PlayerData[playerid][e_regdate] = gettime();
 	PlayerData[playerid][e_payday] = 60;
 	PlayerData[playerid][ConnectTime] = gettime();
-    PlayerData[playerid][Wanteds] = 0;
-	PlayerData[playerid][LastLogin] = gettime();
-	PlayerData[playerid][LastNameChange] = 0;
+    PlayerData[playerid][e_wanteds] = 0;
+	PlayerData[playerid][e_lastlogin] = gettime();
+	PlayerData[playerid][e_lastnc] = 0;
 	
-	format(gstr, sizeof(gstr), "~y~[] ~w~%i", PlayerData[playerid][Wanteds]);
+	format(gstr, sizeof(gstr), "~y~[] ~w~%i", PlayerData[playerid][e_wanteds]);
 	PlayerTextDrawSetString(playerid, TXTWantedsTD[playerid], gstr);
 	
 	ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef"", ""white"You have chosen not to register.\n\n"red"Please note:\n"white"Your statistics won't be saved.\nYou will be limited to some features.\nYou can register at any time using /register.\n\nEnjoy playing here at "nef"!", "OK", "");
@@ -21186,14 +21186,14 @@ function:SkipLogin(playerid)
 		format(string, sizeof(string), ""white"Your name has been changed to %s because you failed to log in.\n\n"nef_yellow"Please restart the game if this is incorrect.", newname);
 		ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef"", string, "OK", "");
 		
-	    PlayerData[playerid][RegDate] = gettime();
+	    PlayerData[playerid][e_regdate] = gettime();
 		PlayerData[playerid][e_payday] = 60;
 		PlayerData[playerid][ConnectTime] = gettime();
-	    PlayerData[playerid][Wanteds] = 0;
-		PlayerData[playerid][LastLogin] = gettime();
-		PlayerData[playerid][LastNameChange] = 0;
+	    PlayerData[playerid][e_wanteds] = 0;
+		PlayerData[playerid][e_lastlogin] = gettime();
+		PlayerData[playerid][e_lastnc] = 0;
 
-		format(gstr, sizeof(gstr), "~y~[] ~w~%i", PlayerData[playerid][Wanteds]);
+		format(gstr, sizeof(gstr), "~y~[] ~w~%i", PlayerData[playerid][e_wanteds]);
 		PlayerTextDrawSetString(playerid, TXTWantedsTD[playerid], gstr);
 
 		SrvStat[2]++;
@@ -21241,7 +21241,7 @@ CarSpawner(playerid, model, respawn_delay = -1, bool:spawnzone_check = true)
 		}
 	}
 	
-	if(model == 520 && PlayerData[playerid][VIP] == 0 && PlayerData[playerid][e_level] == 0) return SCM(playerid, -1, ""er"Only admins can spawn this");
+	if(model == 520 && PlayerData[playerid][e_vip] == 0 && PlayerData[playerid][e_level] == 0) return SCM(playerid, -1, ""er"Only admins can spawn this");
 	
 	if(model == 520 && PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL && PlayerData[playerid][bGWarMode])
 	{
@@ -21394,7 +21394,7 @@ VIPMSG(color, const msg[])
 {
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(IsPlayerAvail(i) && (PlayerData[i][VIP] == 1 || PlayerData[i][e_level] > 0))
+		if(IsPlayerAvail(i) && (PlayerData[i][e_vip] == 1 || PlayerData[i][e_level] > 0))
 		{
 			SCM(i, color, msg);
 		}
@@ -21468,20 +21468,20 @@ MySQL_SavePlayer(playerid, bool:save_pv)
 		PlayerData[playerid][e_addhouseslots],
 		PlayerData[playerid][e_addbizzslots],
 		PlayerData[playerid][e_addhouseitemslots],
-		PlayerData[playerid][DerbyWins]);
+		PlayerData[playerid][e_derbywins]);
 
     format(query2, sizeof(query2), ", `Color` = %i, `Medkits` = %i, `Skin` = %i, `GungameWins` = %i, `RaceWins` = %i, `BGWins` = %i, `FalloutWins` = %i, `Wanteds` = %i, `VIP` = %i, `LastNameChange` = %i, `SavedSkin` = %i WHERE `Name` = '%s' LIMIT 1;",
 		PlayerData[playerid][e_color],
-		PlayerData[playerid][Medkits],
+		PlayerData[playerid][e_medkits],
 		GetPlayerSkin(playerid),
-		PlayerData[playerid][GungameWins],
-		PlayerData[playerid][RaceWins],
-		PlayerData[playerid][BGWins],
-		PlayerData[playerid][FalloutWins],
-		PlayerData[playerid][Wanteds],
-		PlayerData[playerid][VIP],
-		PlayerData[playerid][LastNameChange],
-		PlayerData[playerid][SavedSkin],
+		PlayerData[playerid][e_gungamewins],
+		PlayerData[playerid][e_racewins],
+		PlayerData[playerid][e_tdmwins],
+		PlayerData[playerid][e_falloutwins],
+		PlayerData[playerid][e_wanteds],
+		PlayerData[playerid][e_vip],
+		PlayerData[playerid][e_lastnc],
+		PlayerData[playerid][e_skinsave],
 		__GetName(playerid));
 
 	strcat(query, query2);
@@ -21751,19 +21751,19 @@ MySQL_GangRename(playerid, newgangname[], newgangtag[])
 
 MySQL_RegisterAccount(playerid, password[])
 {
-	PlayerData[playerid][LastLogin] = gettime();
-	PlayerData[playerid][LastNameChange] = 0;
+	PlayerData[playerid][e_lastlogin] = gettime();
+	PlayerData[playerid][e_lastnc] = 0;
 
-	mysql_format(pSQL, gstr2, sizeof(gstr2), "INSERT INTO `accounts` (`Name`, `Color`, `Hash`, `IP`, `GangPosition`, `GangID`, `RegDate`, `LastLogin`) VALUES ('%e', 0, SHA1('%e'), '%e', 0, 0, %i, %i);", __GetName(playerid), password, __GetIP(playerid), gettime(), PlayerData[playerid][LastLogin]);
+	mysql_format(pSQL, gstr2, sizeof(gstr2), "INSERT INTO `accounts` (`Name`, `Color`, `Hash`, `IP`, `GangPosition`, `GangID`, `RegDate`, `LastLogin`) VALUES ('%e', 0, SHA1('%e'), '%e', 0, 0, %i, %i);", __GetName(playerid), password, __GetIP(playerid), gettime(), PlayerData[playerid][e_lastlogin]);
 	mysql_pquery(pSQL, gstr2, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_REGISTER);
 }
 
 MySQL_RegisterAccount2(playerid, password[])
 {
-	PlayerData[playerid][LastLogin] = gettime();
-	PlayerData[playerid][LastNameChange] = 0;
+	PlayerData[playerid][e_lastlogin] = gettime();
+	PlayerData[playerid][e_lastnc] = 0;
 
-	mysql_format(pSQL, gstr2, sizeof(gstr2), "INSERT INTO `accounts` (`Name`, `Color`, `Hash`, `IP`, `GangPosition`, `GangID`, `RegDate`, `LastLogin`) VALUES ('%e', 0, SHA1('%e'), '%e', 0, 0, %i, %i);", __GetName(playerid), password, __GetIP(playerid), gettime(), PlayerData[playerid][LastLogin]);
+	mysql_format(pSQL, gstr2, sizeof(gstr2), "INSERT INTO `accounts` (`Name`, `Color`, `Hash`, `IP`, `GangPosition`, `GangID`, `RegDate`, `LastLogin`) VALUES ('%e', 0, SHA1('%e'), '%e', 0, 0, %i, %i);", __GetName(playerid), password, __GetIP(playerid), gettime(), PlayerData[playerid][e_lastlogin]);
 	mysql_pquery(pSQL, gstr2, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_REGISTER + 1);
 }
 
@@ -25338,9 +25338,9 @@ function:Derby()
 			{
 			    if(DerbyWinner[i])
 			    {
-			    	PlayerData[i][DerbyWins]++;
+			    	PlayerData[i][e_derbywins]++;
 
-					if(PlayerData[i][DerbyWins] >= 20 && pAch[i][E_ach_destroyer] == 0)
+					if(PlayerData[i][e_derbywins] >= 20 && pAch[i][E_ach_destroyer] == 0)
 					{
 					    GivePlayerAchievement(i, "Destroyer", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
 					    pAch[i][E_ach_destroyer] = 1;
@@ -25491,7 +25491,7 @@ function:QueueProcess()
 			format(string0, sizeof(string0), "Bank Balance before PayDay: "green"$%s", number_format(PlayerData[i][e_bank]));
 			format(string1, sizeof(string1), "Bank Interest Gained: "green"$%s", number_format(interest));
 
-			if(PlayerData[i][VIP] == 1)
+			if(PlayerData[i][e_vip] == 1)
 			{
 	        	format(string4, sizeof(string4), "Bank Interest Gained "lb_e"(VIP BOOST)"white": "green"$%s", number_format(vipinterest));
 	        }
@@ -25501,7 +25501,7 @@ function:QueueProcess()
 			{
 			    b_vipearnings = floatround(GetPlayerBusinessEarnings(i) / 2.5);
 			    format(string3, sizeof(string3), "Business earnings: "green"$%s", number_format(GetPlayerBusinessEarnings(i)));
-			   	if(PlayerData[i][VIP] == 1)
+			   	if(PlayerData[i][e_vip] == 1)
    				{
 			   		format(string5, sizeof(string5), "Business earnings "lb_e"(VIP BOOST)"white": "green"$%s", number_format(b_vipearnings));
 				}
@@ -25636,7 +25636,7 @@ function:OnQueueReceived()
 		            new playerid = __GetPlayerID(name);
 		            if(playerid != INVALID_PLAYER_ID && islogged(playerid))
 		            {
-		                PlayerData[playerid][VIP] = 1;
+		                PlayerData[playerid][e_vip] = 1;
 		                PlayerData[playerid][e_bank] += 1000000;
 		                
 		                if(PlayerData[playerid][e_addpvslots] < 7)
@@ -26945,9 +26945,9 @@ function:DecideFalloutWinners()
                 GivePlayerCash(i, money, true, true);
 				GivePlayerScore_(i, 5, true, true);
 				
-				PlayerData[i][FalloutWins]++;
+				PlayerData[i][e_falloutwins]++;
 				
-				if(pAch[i][E_ach_deepimpact] == 0 && PlayerData[i][FalloutWins] >= 10)
+				if(pAch[i][E_ach_deepimpact] == 0 && PlayerData[i][e_falloutwins] >= 10)
 				{
 				    GivePlayerAchievement(i, "Deep Impact", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
 				    pAch[i][E_ach_deepimpact] = 1;
@@ -27900,29 +27900,29 @@ function:ShowDialog(playerid, dialogid)
 	    {
 	        new string[1024];
 
-	        if(PlayerData[playerid][VIP] == 1)
+	        if(PlayerData[playerid][e_vip] == 1)
 	        {
-	            if((PlayerData[playerid][LastNameChange] + 2592000) > gettime())
+	            if((PlayerData[playerid][e_lastnc] + 2592000) > gettime())
 	            {
 	                format(string, sizeof(string), ""red"Namechange not possible"white"\n\nNamechange cooldown: 30 days "lb_e"(VIP)"white"\nLast Namechange: %s\nNext Namechange available: %s\nCurrent Name: %s",
-						UTConvert(PlayerData[playerid][LastNameChange]),
-						UTConvert(PlayerData[playerid][LastNameChange] + 2592000),
+						UTConvert(PlayerData[playerid][e_lastnc]),
+						UTConvert(PlayerData[playerid][e_lastnc] + 2592000),
 						__GetName(playerid));
 					return ShowPlayerDialog(playerid, NAME_CHANGE_DIALOG + 5, DIALOG_STYLE_MSGBOX, ""nef" :: Namechange", string, "OK", "");
 	            }
 	            else
 	            {
-	                if(PlayerData[playerid][LastNameChange] == 0)
+	                if(PlayerData[playerid][e_lastnc] == 0)
 	                {
 		                format(string, sizeof(string), ""green"Namechange possible"white"\n\nNamechange cooldown: 30 days "lb_e"(VIP)"white"\nLast Namechange: Never\nNext Namechange available: %s\nCurrent Name: %s\n\nEnter a new valid nickname below:",
-							UTConvert(PlayerData[playerid][RegDate]),
+							UTConvert(PlayerData[playerid][e_regdate]),
 							__GetName(playerid));
 	                }
 	                else
 	                {
 		                format(string, sizeof(string), ""green"Namechange possible"white"\n\nNamechange cooldown: 30 days "lb_e"(VIP)"white"\nLast Namechange: %s\nNext Namechange available: %s\nCurrent Name: %s\n\nEnter a new valid nickname below:",
-							UTConvert(PlayerData[playerid][LastNameChange]),
-							UTConvert(PlayerData[playerid][LastNameChange] + 2592000),
+							UTConvert(PlayerData[playerid][e_lastnc]),
+							UTConvert(PlayerData[playerid][e_lastnc] + 2592000),
 							__GetName(playerid));
 	                }
 	                
@@ -27931,27 +27931,27 @@ function:ShowDialog(playerid, dialogid)
 	        }
 	        else
 	        {
-	            if((PlayerData[playerid][LastNameChange] + 7776000) > gettime())
+	            if((PlayerData[playerid][e_lastnc] + 7776000) > gettime())
 	            {
 	                format(string, sizeof(string), ""red"Namechange not possible"white"\n\nNamechange cooldown: 90 days\nLast Namechange: %s\nNext Namechange available: %s\nCurrent Name: %s",
-						UTConvert(PlayerData[playerid][LastNameChange]),
-						UTConvert(PlayerData[playerid][LastNameChange] + 7776000),
+						UTConvert(PlayerData[playerid][e_lastnc]),
+						UTConvert(PlayerData[playerid][e_lastnc] + 7776000),
 						__GetName(playerid));
 					return ShowPlayerDialog(playerid, NAME_CHANGE_DIALOG + 5, DIALOG_STYLE_MSGBOX, ""nef" :: Namechange", string, "OK", "");
 	            }
 	            else
 	            {
-	                if(PlayerData[playerid][LastNameChange] == 0)
+	                if(PlayerData[playerid][e_lastnc] == 0)
 	                {
 		                format(string, sizeof(string), ""green"Namechange possible"white"\n\nNamechange cooldown: 90 days\nLast Namechange: Never\nNext Namechange available: %s\nCurrent Name: %s\n\nEnter a new valid nickname below:",
-							UTConvert(PlayerData[playerid][RegDate]),
+							UTConvert(PlayerData[playerid][e_regdate]),
 							__GetName(playerid));
 	                }
 	                else
 	                {
 		                format(string, sizeof(string), ""green"Namechange possible"white"\n\nNamechange cooldown: 90 days\nLast Namechange: %s\nNext Namechange available: %s\nCurrent Name: %s\n\nEnter a new valid nickname below:",
-							UTConvert(PlayerData[playerid][LastNameChange]),
-							UTConvert(PlayerData[playerid][LastNameChange] + 7776000),
+							UTConvert(PlayerData[playerid][e_lastnc]),
+							UTConvert(PlayerData[playerid][e_lastnc] + 7776000),
 							__GetName(playerid));
 	                }
 
@@ -28490,14 +28490,14 @@ GetPlayerSettings(playerid)
 	    strcat(string, tmpstring);
 	}
 	
-	if(PlayerData[playerid][SavedSkin] == -1)
+	if(PlayerData[playerid][e_skinsave] == -1)
 	{
 	    format(tmpstring, sizeof(tmpstring), ""white"7)\tSaved Skin\tRandom\n");
 	    strcat(string, tmpstring);
 	}
 	else
 	{
-	    format(tmpstring, sizeof(tmpstring), ""white"7)\tSaved Skin\tID: %i\n", PlayerData[playerid][SavedSkin]);
+	    format(tmpstring, sizeof(tmpstring), ""white"7)\tSaved Skin\tID: %i\n", PlayerData[playerid][e_skinsave]);
 	    strcat(string, tmpstring);
 	}
 
@@ -29243,8 +29243,8 @@ function:AlterPlayerCredits(playerid, amount)
 {
 	format(gstr, sizeof(gstr), "INSERT INTO `creditslog` VALUES (NULL, '%s', %i, %i);", __GetName(playerid), amount, gettime());
 	mysql_tquery(pSQL, gstr, "", "");
-	PlayerData[playerid][Credits] += amount;
-	format(gstr, sizeof(gstr), "UPDATE `accounts` SET `Credits` = %i WHERE `Name` = '%s' LIMIT 1;", PlayerData[playerid][Credits], __GetName(playerid));
+	PlayerData[playerid][e_credits] += amount;
+	format(gstr, sizeof(gstr), "UPDATE `accounts` SET `Credits` = %i WHERE `Name` = '%s' LIMIT 1;", PlayerData[playerid][e_credits], __GetName(playerid));
 	mysql_tquery(pSQL, gstr, "", "");
 	PlayerPlaySound(playerid, 1058, 0.0, 0.0, 0.0);
 	return 1;
@@ -29793,7 +29793,7 @@ GetItem(index)
 
 GetCredits(playerid)
 {
-	new c = PlayerData[playerid][Credits];
+	new c = PlayerData[playerid][e_credits];
 	return c;
 }
 
@@ -30696,7 +30696,7 @@ ResetPlayerVars(playerid)
 	PlayerData[playerid][Boost] = BOOST:0;
 	PlayerData[playerid][BoostDeplete] = 0;
 	PlayerData[playerid][e_color] = 0;
-	PlayerData[playerid][SavedSkin] = -1;
+	PlayerData[playerid][e_skinsave] = -1;
 	PlayerData[playerid][e_addpvslots] = 0;
 	PlayerData[playerid][e_addtoyslots] = 0;
 	PlayerData[playerid][e_addhouseslots] = 0;
@@ -30714,14 +30714,14 @@ ResetPlayerVars(playerid)
 	PlayerData[playerid][e_deaths] = 0;
 	PlayerData[playerid][e_money] = 0;
 	PlayerData[playerid][e_score] = 0;
-	PlayerData[playerid][DerbyWins] = 0;
-	PlayerData[playerid][RaceWins] = 0;
-	PlayerData[playerid][FalloutWins] = 0;
-	PlayerData[playerid][GungameWins] = 0;
-	PlayerData[playerid][EventWins] = 0;
-	PlayerData[playerid][BGWins] = 0;
-	PlayerData[playerid][Credits] = 0;
-	PlayerData[playerid][Medkits] = 0;
+	PlayerData[playerid][e_derbywins] = 0;
+	PlayerData[playerid][e_racewins] = 0;
+	PlayerData[playerid][e_falloutwins] = 0;
+	PlayerData[playerid][e_gungamewins] = 0;
+	PlayerData[playerid][e_eventwins] = 0;
+	PlayerData[playerid][e_tdmwins] = 0;
+	PlayerData[playerid][e_credits] = 0;
+	PlayerData[playerid][e_medkits] = 0;
 	PlayerData[playerid][tMedkit] = -1;
 	PlayerData[playerid][MedkitTime] = 0;
 	PlayerData[playerid][e_payday] = 60;
@@ -30760,16 +30760,16 @@ ResetPlayerVars(playerid)
   	PlayerData[playerid][tickPlayerUpdate] = 0;
   	PlayerData[playerid][tickLastCD] = 0;
     PlayerData[playerid][tickJoin_bmx] = 0;
-  	PlayerData[playerid][LastLogin] = 0;
+  	PlayerData[playerid][e_lastlogin] = 0;
 	PlayerData[playerid][e_reaction] = 0;
 	PlayerData[playerid][e_bank] = 0;
 	PlayerData[playerid][e_time] = 0;
 	PlayerData[playerid][ConnectTime] = 0;
-	PlayerData[playerid][VIP] = 0;
-	PlayerData[playerid][LastNameChange] = 0;
+	PlayerData[playerid][e_vip] = 0;
+	PlayerData[playerid][e_lastnc] = 0;
 	PlayerData[playerid][Warnings] = 0;
 	PlayerData[playerid][RankSelected] = 0;
-	PlayerData[playerid][Wanteds] = 0;
+	PlayerData[playerid][e_wanteds] = 0;
 	PlayerData[playerid][HitmanHit] = 0;
 	PlayerData[playerid][Vehicle] = -1;
 	PlayerData[playerid][AdminDutyLabel] = Text3D:-1;
@@ -30784,7 +30784,7 @@ ResetPlayerVars(playerid)
 	PlayerData[playerid][GangAssignRank][0] = '\0';
  	PlayerData[playerid][GangName][0] = '\0';
  	PlayerData[playerid][GangTag][0] = '\0';
-	PlayerData[playerid][RegDate] = 0;
+	PlayerData[playerid][e_regdate] = 0;
  	PlayerData[playerid][HouseIntSelected] = 0;
 	PlayerData[playerid][SpecID] = INVALID_PLAYER_ID;
 	PlayerData[playerid][tTimerHP] = -1;
@@ -30969,12 +30969,12 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 	    case ACCOUNT_REQUEST_REGISTER:
 	    {
 		    PlayerData[playerid][e_accountid] = cache_insert_id();
-		    PlayerData[playerid][RegDate] = gettime();
+		    PlayerData[playerid][e_regdate] = gettime();
 			PlayerData[playerid][ExitType] = EXIT_LOGGED;
 			PlayerData[playerid][e_payday] = 60;
 			PlayerData[playerid][ConnectTime] = gettime();
 		    PlayerData[playerid][AllowSpawn] = true;
-		    PlayerData[playerid][Wanteds] = 0;
+		    PlayerData[playerid][e_wanteds] = 0;
 		    PlayerData[playerid][bLogged] = true;
 
 			format(gstr, sizeof gstr, "["SVRSC"] %s(%i) "GREEN_E"has registered, making the server have a total of "LB2_E"%i "GREEN_E"players registered.", __GetName(playerid), playerid, cache_insert_id());
@@ -30986,7 +30986,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 			format(gstr, sizeof(gstr), "~b~~h~~h~Welcome to "SVRSC", ~r~~h~~h~%s~b~~h~~h~!~n~~b~~h~~h~You have successfully registered and logged in!", __GetName(playerid));
 			InfoTD_MSG(playerid, 5000, gstr);
 
-			format(gstr, sizeof(gstr), "~y~[] ~w~%i", PlayerData[playerid][Wanteds]);
+			format(gstr, sizeof(gstr), "~y~[] ~w~%i", PlayerData[playerid][e_wanteds]);
 			PlayerTextDrawSetString(playerid, TXTWantedsTD[playerid], gstr);
 
 			SrvStat[2]++;
@@ -31053,26 +31053,26 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
                 PlayerData[playerid][e_addhouseslots] = cache_get_row_int(0, 20, pSQL);
                 PlayerData[playerid][e_addbizzslots] = cache_get_row_int(0, 21, pSQL);
                 PlayerData[playerid][e_addhouseitemslots] = cache_get_row_int(0, 22, pSQL);
-                PlayerData[playerid][DerbyWins] = cache_get_row_int(0, 24, pSQL);
-                PlayerData[playerid][RaceWins] = cache_get_row_int(0, 25, pSQL);
-                PlayerData[playerid][BGWins] = cache_get_row_int(0, 26, pSQL);
-                PlayerData[playerid][FalloutWins] = cache_get_row_int(0, 27, pSQL);
-                PlayerData[playerid][GungameWins] = cache_get_row_int(0, 28, pSQL);
-                PlayerData[playerid][EventWins] = cache_get_row_int(0, 29, pSQL);
-                PlayerData[playerid][Wanteds] = cache_get_row_int(0, 30, pSQL);
-                PlayerData[playerid][VIP] = cache_get_row_int(0, 31, pSQL);
-                PlayerData[playerid][Credits] = cache_get_row_int(0, 32, pSQL);
-                PlayerData[playerid][Medkits] = cache_get_row_int(0, 33, pSQL);
-                PlayerData[playerid][RegDate] = cache_get_row_int(0, 34, pSQL);
-                PlayerData[playerid][LastLogin] = cache_get_row_int(0, 35, pSQL);
-                PlayerData[playerid][LastNameChange] = cache_get_row_int(0, 36, pSQL);
+                PlayerData[playerid][e_derbywins] = cache_get_row_int(0, 24, pSQL);
+                PlayerData[playerid][e_racewins] = cache_get_row_int(0, 25, pSQL);
+                PlayerData[playerid][e_tdmwins] = cache_get_row_int(0, 26, pSQL);
+                PlayerData[playerid][e_falloutwins] = cache_get_row_int(0, 27, pSQL);
+                PlayerData[playerid][e_gungamewins] = cache_get_row_int(0, 28, pSQL);
+                PlayerData[playerid][e_eventwins] = cache_get_row_int(0, 29, pSQL);
+                PlayerData[playerid][e_wanteds] = cache_get_row_int(0, 30, pSQL);
+                PlayerData[playerid][e_vip] = cache_get_row_int(0, 31, pSQL);
+                PlayerData[playerid][e_credits] = cache_get_row_int(0, 32, pSQL);
+                PlayerData[playerid][e_medkits] = cache_get_row_int(0, 33, pSQL);
+                PlayerData[playerid][e_regdate] = cache_get_row_int(0, 34, pSQL);
+                PlayerData[playerid][e_lastlogin] = cache_get_row_int(0, 35, pSQL);
+                PlayerData[playerid][e_lastnc] = cache_get_row_int(0, 36, pSQL);
 
 				new sskin = cache_get_row_int(0, 57, pSQL);
 
                 if(IsValidSkin(sskin)) {
-                    PlayerData[playerid][SavedSkin] = sskin;
+                    PlayerData[playerid][e_skinsave] = sskin;
                 } else {
-					PlayerData[playerid][SavedSkin] = -1;
+					PlayerData[playerid][e_skinsave] = -1;
                 }
 
 				new buffer[255];
@@ -31443,7 +31443,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 			 	SetPlayerCash(playerid, PlayerData[playerid][e_money]);
 			 	PlayerData[playerid][ConnectTime] = gettime();
 
-				format(gstr, sizeof(gstr), "~y~[] ~w~%i", PlayerData[playerid][Wanteds]);
+				format(gstr, sizeof(gstr), "~y~[] ~w~%i", PlayerData[playerid][e_wanteds]);
 				PlayerTextDrawSetString(playerid, TXTWantedsTD[playerid], gstr);
 
 			    format(gstr2, sizeof(gstr2), "INSERT INTO `login_log` VALUES (NULL, %i, '%s', UNIX_TIMESTAMP(), 0);", PlayerData[playerid][e_accountid], __GetIP(playerid));
@@ -31453,7 +31453,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 				{
 					format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"Successfully logged in. (Level: %s)", StaffLevels[PlayerData[playerid][e_level]][e_rank]);
 					SCM(playerid, -1, gstr2);
-					format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"You were last online at %s and registered on %s", UTConvert(PlayerData[playerid][LastLogin]), UTConvert(PlayerData[playerid][RegDate]));
+					format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"You were last online at %s and registered on %s", UTConvert(PlayerData[playerid][e_lastlogin]), UTConvert(PlayerData[playerid][e_regdate]));
   					SCM(playerid, -1, gstr2);
 					format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"You've been online for %s", GetPlayingTimeFormat(playerid));
 					SCM(playerid, -1, gstr2);
@@ -31461,13 +31461,13 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 		   		else
 		   		{
 				   	SCM(playerid, -1, ""server_sign" "r_besch"Successfully logged in!");
-					format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"You were last online at %s and registered on %s", UTConvert(PlayerData[playerid][LastLogin]), UTConvert(PlayerData[playerid][RegDate]));
+					format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"You were last online at %s and registered on %s", UTConvert(PlayerData[playerid][e_lastlogin]), UTConvert(PlayerData[playerid][e_regdate]));
   					SCM(playerid, -1, gstr2);
 					format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"You've been online for %s", GetPlayingTimeFormat(playerid));
 					SCM(playerid, -1, gstr2);
 				}
 
-				if(PlayerData[playerid][VIP] == 1)
+				if(PlayerData[playerid][e_vip] == 1)
 				{
                     format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"VIP %s(%i) logged in!", __GetName(playerid), playerid);
                     SCMToAll(-1, gstr2);
