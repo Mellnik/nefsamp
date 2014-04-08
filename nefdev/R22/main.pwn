@@ -625,8 +625,42 @@ enum E_PLAYER_DATA
 	e_time,
 	e_payday,
 	e_reaction,
+	e_houses,
+	e_gangid,
+	e_gangrank,
+	e_addpvslots,
+	e_addtoyslots,
+	e_addhouseslots,
+	e_addbizzslots,
+	e_addhouseitemslots,
 
 	/* INTERNAL */
+    tickLastAr,
+	tickLastShot,
+	tickLastRob,
+	tickVehicleEnterTime,
+	tickLastGiveCash,
+	tickLastMedkit,
+	tickLastVIPLInv,
+	tickLastRefill,
+	tickLastReport,
+	tickLastHitman,
+	tickLastGInvite,
+	tickLastGKick,
+	tickLastGCreate,
+	tickLastLocked,
+	tickLastBIKEC,
+  	tickLastBuy,
+  	tickLastPBuy,
+  	tickLastSell,
+  	tickLastPSell,
+  	tickLastPW,
+  	tickLastChat,
+  	tickLastPM,
+  	tickPlayerUpdate,
+  	tickLastCD,
+    tickJoin_bmx,
+	
 	bool:GotVIPLInv,
 	bool:bIsDead,
 	bool:bShowToys,
@@ -666,11 +700,6 @@ enum E_PLAYER_DATA
 	BoostDeplete,
 	SavedSkin,
 	Float:fOldPos[4],
-	AdditionalPVSlots,
-	AdditionalToySlots,
-	AdditionalHouseSlots,
-	AdditionalBusinessSlots,
-	AdditionalHouseObjSlots,
 	HouseSlotSelected,
 	BusinessIdSelected,
 	DrawnNumber,
@@ -688,7 +717,6 @@ enum E_PLAYER_DATA
 	Medkits,
 	tMedkit,
 	MedkitTime,
-  	Houses,
 	Businesses,
 	GCPlayer,
 	GCNameHash,
@@ -698,31 +726,6 @@ enum E_PLAYER_DATA
 	VIPNameHash,
 	VIPOffer,
 	VehicleSpamViolation,
-    tickLastAr,
-	tickLastShot,
-	tickLastRob,
-	tickVehicleEnterTime,
-	tickLastGiveCash,
-	tickLastMedkit,
-	tickLastVIPLInv,
-	tickLastRefill,
-	tickLastReport,
-	tickLastHitman,
-	tickLastGInvite,
-	tickLastGKick,
-	tickLastGCreate,
-	tickLastLocked,
-	tickLastBIKEC,
-  	tickLastBuy,
-  	tickLastPBuy,
-  	tickLastSell,
-  	tickLastPSell,
-  	tickLastPW,
-  	tickLastChat,
-  	tickLastPM,
-  	tickPlayerUpdate,
-  	tickLastCD,
-    tickJoin_bmx,
   	LastLogin,
 	ConnectTime,
 	VIP,
@@ -736,9 +739,7 @@ enum E_PLAYER_DATA
 	Text3D:VIPLabel,
 	ChatWrote,
 	tMute,
- 	GangPosition,
  	TmpGangID,
- 	GangID,
 	Text3D:GangLabel,
 	GangKickMem[MAX_PLAYER_NAME+1],
 	GangAssignRank[MAX_PLAYER_NAME+1],
@@ -3571,10 +3572,12 @@ public OnVehicleRespray(playerid, vehicleid, color1, color2)
 public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY, Float:fZ)
 {
 	/* PLAYER QUEUED FOR KICK */
-	if(hittype != BULLET_HIT_TYPE_NONE) {
-	    if(PlayerData[playerid][KBMarked] || PlayerData[hitid][KBMarked]) {
-	        return 0;
-	    }
+	if(hittype == BULLET_HIT_TYPE_PLAYER) {
+	    if(hitid != INVALID_PLAYER_ID) {
+		    if(PlayerData[playerid][KBMarked] || PlayerData[hitid][KBMarked]) {
+		        return 0;
+		    }
+		}
 	}
 	
 	/* GOD CONTROL */
@@ -3777,12 +3780,12 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				{
 				    if(IsPlayerConnected(i))
 				    {
-				        if(PlayerData[i][GangID] == gangid || PlayerData[i][TmpGangID] == gangid)
+				        if(PlayerData[i][e_gangid] == gangid || PlayerData[i][TmpGangID] == gangid)
 				        {
 					        PlayerData[i][gInvite] = false;
-					        PlayerData[i][GangID] = 0;
+					        PlayerData[i][e_gangid] = 0;
 					        PlayerData[i][TmpGangID] = 0;
-					        PlayerData[i][GangPosition] = GANG_POS_NONE;
+					        PlayerData[i][e_gangrank] = GANG_POS_NONE;
 					        PlayerData[i][GangName][0] = '\0';
 							PlayerData[i][GangTag][0] = '\0';
 							MySQL_SavePlayer(i, false);
@@ -3864,8 +3867,8 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				for(new i = 0; i < MAX_PLAYERS; i++)
 				{
 				    if(!IsPlayerConnected(i)) continue;
-				    if(PlayerData[i][GangPosition] == 0) continue;
-				    if(PlayerData[i][GangID] != PlayerData[extraid][GangID]) continue;
+				    if(PlayerData[i][e_gangrank] == 0) continue;
+				    if(PlayerData[i][e_gangid] != PlayerData[extraid][e_gangid]) continue;
 				    if(count <= 20)
 				    {
 				        new tmp[MAX_PLAYER_NAME + 1 + 16];
@@ -3893,8 +3896,8 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		}
 		case THREAD_CREATE_GANG:
 		{
-			PlayerData[extraid][GangPosition] = GANG_POS_MAIN_LEADER;
-			PlayerData[extraid][GangID] = cache_insert_id();
+			PlayerData[extraid][e_gangrank] = GANG_POS_MAIN_LEADER;
+			PlayerData[extraid][e_gangid] = cache_insert_id();
 
             GivePlayerCash(extraid, -500000);
 
@@ -3926,14 +3929,14 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		    {
 				rows = cache_get_row_int(0, 0, pSQL);
 				
-				if(PlayerData[extraid][GangPosition] == GANG_POS_LEADER || PlayerData[extraid][GangPosition] == GANG_POS_MAIN_LEADER)
+				if(PlayerData[extraid][e_gangrank] == GANG_POS_LEADER || PlayerData[extraid][e_gangrank] == GANG_POS_MAIN_LEADER)
 				{
-					if(PlayerData[extraid][GangPosition] == GANG_POS_LEADER && rows == GANG_POS_LEADER)
+					if(PlayerData[extraid][e_gangrank] == GANG_POS_LEADER && rows == GANG_POS_LEADER)
 					{
 					    return SCM(extraid, -1, ""er"Cannot assign!");
 					}
 
-			        if(PlayerData[extraid][GangPosition] == GANG_POS_LEADER && rows == GANG_POS_MAIN_LEADER)
+			        if(PlayerData[extraid][e_gangrank] == GANG_POS_LEADER && rows == GANG_POS_MAIN_LEADER)
 			        {
 			            return SCM(extraid, -1, ""er"You can't set the Founder's rank!");
 			        }
@@ -3958,7 +3961,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		case THREAD_ASSIGN_RANK_2:
 		{
 		    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s's Rank has been assigned to %s", PlayerData[extraid][GangAssignRank], GangPositions[PlayerData[extraid][RankSelected]][E_gang_pos_name]);
-			GangMSG(PlayerData[extraid][GangID], gstr);
+			GangMSG(PlayerData[extraid][e_gangid], gstr);
 
 			PlayerData[extraid][RankSelected] = 0;
 			PlayerData[extraid][GangAssignRank][0] = '\0';
@@ -3988,7 +3991,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		case THREAD_KICK_FROM_GANG_2:
 		{
 		    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s kicked %s out of the gang", __GetName(extraid), PlayerData[extraid][GangKickMem]);
-			GangMSG(PlayerData[extraid][GangID], gstr);
+			GangMSG(PlayerData[extraid][e_gangid], gstr);
 
             PlayerData[extraid][GangKickMem][0] = '\0';
 		}
@@ -4307,10 +4310,10 @@ public OnPlayerText(playerid, text[])
 	    PlayerData[playerid][ChatWrote]++;
 	}
 
-	if(text[0] == '!' && PlayerData[playerid][GangPosition] != 0)
+	if(text[0] == '!' && PlayerData[playerid][e_gangrank] != 0)
 	{
 	    format(gstr, sizeof(gstr), ""gang_sign" {%06x}%s(%i)"r_besch": %s", GetColor__(playerid) >>> 8, __GetName(playerid), playerid, text[1]);
-		GangMSG(PlayerData[playerid][GangID], gstr);
+		GangMSG(PlayerData[playerid][e_gangid], gstr);
 		
 		format(gstr, sizeof(gstr), "[GC] %s(%i): %s", __GetName(playerid), playerid, text[1]);
 		AdminMSG(GREY, gstr);
@@ -4328,7 +4331,7 @@ public OnPlayerText(playerid, text[])
 	format(gstr2, sizeof(gstr2), "02[%i] 07%s: %s", playerid, __GetName(playerid), gstr);
     IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr2);
 
-	if(PlayerData[playerid][GangPosition] != 0)
+	if(PlayerData[playerid][e_gangrank] != 0)
 	{
 	 	if(strlen(text) > 80)
 		{
@@ -4701,9 +4704,9 @@ public OnPlayerDeath(playerid, killerid, reason)
 				PlayerTextDrawSetString(playerid, TXTWantedsTD[playerid], gstr);
 				
 			  	// Nur Kills bei FREEROAM werten für GangScore
-			 	if(PlayerData[killerid][GangPosition] > 0 && PlayerData[playerid][GangID] != PlayerData[killerid][GangID])
+			 	if(PlayerData[killerid][e_gangrank] > 0 && PlayerData[playerid][e_gangid] != PlayerData[killerid][e_gangid])
 				{
-				  	MySQL_UpdateGangScore(PlayerData[killerid][GangID], 1);
+				  	MySQL_UpdateGangScore(PlayerData[killerid][e_gangid], 1);
 			 	}
 	        }
 	    }
@@ -5099,7 +5102,7 @@ public OnPlayerEnterDynamicArea(playerid, areaid)
 	
 	for(new i = 0; i < gzoneid; i++)
 	{
-	    if(GZoneInfo[i][localGang] == PlayerData[playerid][GangID] && GZoneInfo[i][bUnderAttack] && areaid == GZoneInfo[i][zsphere])
+	    if(GZoneInfo[i][localGang] == PlayerData[playerid][e_gangid] && GZoneInfo[i][bUnderAttack] && areaid == GZoneInfo[i][zsphere])
 	    {
 	        // Player entered GWAR
 			//SCM(playerid, -1, ""orange"You have joined the Gang War! Type /gcapture near the flag when no enemy is around!");
@@ -5108,7 +5111,7 @@ public OnPlayerEnterDynamicArea(playerid, areaid)
 			break;
 		}
 
-		if(GZoneInfo[i][zsphere] == areaid && GZoneInfo[i][bUnderAttack] && GZoneInfo[i][localGang] != PlayerData[playerid][GangID] && GZoneInfo[i][AttackingGang] != PlayerData[playerid][GangID])
+		if(GZoneInfo[i][zsphere] == areaid && GZoneInfo[i][bUnderAttack] && GZoneInfo[i][localGang] != PlayerData[playerid][e_gangid] && GZoneInfo[i][AttackingGang] != PlayerData[playerid][e_gangid])
 		{
 		    if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
 			{
@@ -5132,7 +5135,7 @@ public OnPlayerLeaveDynamicArea(playerid, areaid)
 {
 	for(new i = 0; i < gzoneid; i++)
 	{
-	    if(GZoneInfo[i][localGang] == PlayerData[playerid][GangID] && GZoneInfo[i][bUnderAttack] && areaid == GZoneInfo[i][zsphere] && PlayerData[playerid][bGWarMode])
+	    if(GZoneInfo[i][localGang] == PlayerData[playerid][e_gangid] && GZoneInfo[i][bUnderAttack] && areaid == GZoneInfo[i][zsphere] && PlayerData[playerid][bGWarMode])
 	    {
 	        // Player left GWAR
             SCM(playerid, -1, ""orange"You have left the gang zone! Get back fast and defend it!");
@@ -7858,7 +7861,7 @@ YCMD:l(playerid, params[], help)
 	
 	for(new i = 0; i < gzoneid; i++)
 	{
-	    if(GZoneInfo[i][bUnderAttack] && (GZoneInfo[i][localGang] == PlayerData[playerid][GangID] || GZoneInfo[i][AttackingGang] == PlayerData[playerid][GangID]))
+	    if(GZoneInfo[i][bUnderAttack] && (GZoneInfo[i][localGang] == PlayerData[playerid][e_gangid] || GZoneInfo[i][AttackingGang] == PlayerData[playerid][e_gangid]))
 	    {
 	        if(GZONE_SIZE + 100.0 > GetDistance3D(PlayerData[playerid][sX], PlayerData[playerid][sY], PlayerData[playerid][sZ], GZoneInfo[i][E_x], GZoneInfo[i][E_y], GZoneInfo[i][E_z]))
 	        {
@@ -8443,7 +8446,7 @@ YCMD:bbuy(playerid, params[], help)
 		    SendInfo(playerid, "Business not for sale", "");
 		    break;
 		}
-		if(PlayerData[playerid][Businesses] > PlayerData[playerid][AdditionalBusinessSlots]) {
+		if(PlayerData[playerid][Businesses] > PlayerData[playerid][e_addbizzslots]) {
 			SCM(playerid, -1, ""er"You do not have any free business slots");
 			break;
 		}
@@ -8568,7 +8571,7 @@ YCMD:buy(playerid, params[], help)
 			SCM(playerid, -1, ""er"House is not buyable");
 			break;
 		}
-		if(PlayerData[playerid][Houses] > PlayerData[playerid][AdditionalHouseSlots])
+		if(PlayerData[playerid][e_houses] > PlayerData[playerid][e_addhouseslots])
 		{
 			SCM(playerid, -1, ""er"You have no free house slot!");
 			break;
@@ -8595,7 +8598,7 @@ YCMD:buy(playerid, params[], help)
 	    HouseInfo[i][pickid] = CreateDynamicPickup(1272, 1, HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], -1, -1, -1, 30.0);
 	    GivePlayerCash(playerid, -HouseInfo[i][price]);
 	    HouseInfo[i][date] = gettime();
-	    PlayerData[playerid][Houses]++;
+	    PlayerData[playerid][e_houses]++;
 	    SendInfo(playerid, "House bought", "");
 	    MySQL_SaveHouse(i);
 	    MySQL_SavePlayer(playerid, false);
@@ -8662,7 +8665,7 @@ YCMD:sell(playerid, params[], help)
 	    DestroyDynamicPickup(HouseInfo[i][pickid]);
 	    HouseInfo[i][iconid] = CreateDynamicMapIcon(HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], 31, 1, 0, -1, -1, 150.0);
 	    HouseInfo[i][pickid] = CreateDynamicPickup(1273, 1, HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], -1, -1, -1, 30.0);
-	    PlayerData[playerid][Houses]--;
+	    PlayerData[playerid][e_houses]--;
 	    HouseInfo[i][date] = 0;
 	    GivePlayerCash(playerid, floatround(HouseInfo[i][price] / 4));
 	    SendInfo(playerid, "House sold", "");
@@ -11115,8 +11118,8 @@ YCMD:grename(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
 
-	if(PlayerData[playerid][GangID] == 0) return SCM(playerid, -1, ""er"You are not in any gang");
-	if(PlayerData[playerid][GangPosition] != 6) return SCM(playerid, -1, ""er"You need to be the gang founder");
+	if(PlayerData[playerid][e_gangid] == 0) return SCM(playerid, -1, ""er"You are not in any gang");
+	if(PlayerData[playerid][e_gangrank] != 6) return SCM(playerid, -1, ""er"You need to be the gang founder");
 	if(GetPlayerCash(playerid) < 100000) return SCM(playerid, -1, ""er"You need $100,000 to rename your gang");
 	
 	new buff[144], buff2[144];
@@ -11296,7 +11299,7 @@ YCMD:gcreate(playerid, params[], help)
 		return SCM(playerid, -1, ""er"Please wait a bit before using this command again!");
 	}
 
-	if(PlayerData[playerid][GangID] != 0) return SCM(playerid, -1, ""er"You are already in a gang");
+	if(PlayerData[playerid][e_gangid] != 0) return SCM(playerid, -1, ""er"You are already in a gang");
 	if(GetPlayerCash(playerid) < 500000) return SCM(playerid, -1, ""er"You need at least "nef_green"$500,000 "nef_red"for creating a gang!");
  	if(GetPlayerScore_(playerid) < 500) return SCM(playerid, -1, ""er"You need at least "nef_green"500 Score "nef_red"for creating a gang!");
  	
@@ -11362,7 +11365,7 @@ YCMD:gcapture(playerid, params[], help)
     if(!islogged(playerid)) return notlogged(playerid);
 
     if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
-    if(PlayerData[playerid][GangID] == 0) return SCM(playerid, -1, ""er"You aren't in any gang! Create a gang /gcreate or join one.");
+    if(PlayerData[playerid][e_gangid] == 0) return SCM(playerid, -1, ""er"You aren't in any gang! Create a gang /gcreate or join one.");
     
 	new bool:found = false;
 	for(new i = 0; i < gzoneid; i++)
@@ -11372,7 +11375,7 @@ YCMD:gcapture(playerid, params[], help)
 
 		if(!GZoneInfo[i][bUnderAttack]) return ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" Gang War", ""white"This zone is not under attack.", "OK", "");
 
-		if(GZoneInfo[i][DefendingGang] != PlayerData[playerid][GangID])
+		if(GZoneInfo[i][DefendingGang] != PlayerData[playerid][e_gangid])
 		{
 		    return ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" Gang War", ""white"This zone does not belong to your gang.", "OK", "");
 		}
@@ -11383,7 +11386,7 @@ YCMD:gcapture(playerid, params[], help)
 		for(new ii = 0; ii < MAX_PLAYERS; ii++)
 		{
 		    if(!IsPlayerAvail(ii)) continue;
-		    if(PlayerData[ii][GangID] != GZoneInfo[i][AttackingGang]) continue;
+		    if(PlayerData[ii][e_gangid] != GZoneInfo[i][AttackingGang]) continue;
 		    if(IsPlayerOnDesktop(ii, 2500)) continue;
 		    
 			GetPlayerPos(ii, POS[0], POS[1], POS[2]);
@@ -11411,19 +11414,19 @@ YCMD:gcapture(playerid, params[], help)
 			{
 			    if(IsPlayerAvail(ii) && PlayerData[ii][bGWarMode])
 			    {
-			        if(PlayerData[ii][GangID] == GZoneInfo[i][AttackingGang] || PlayerData[ii][GangID] == GZoneInfo[i][DefendingGang])
+			        if(PlayerData[ii][e_gangid] == GZoneInfo[i][AttackingGang] || PlayerData[ii][e_gangid] == GZoneInfo[i][DefendingGang])
 			        {
 			    		ResetPlayerGWarMode(ii, false);
 					}
 					
-					if(PlayerData[ii][GangID] == GZoneInfo[i][DefendingGang])
+					if(PlayerData[ii][e_gangid] == GZoneInfo[i][DefendingGang])
 					{
 					    GivePlayerCash(ii, 20000);
 					}
 				}
 			}
 
-			format(gstr, sizeof(gstr), ""gang_sign" "r_besch" %s %s(%i) re-captured zone '%s' which was under attack.", GangPositions[PlayerData[playerid][GangPosition]][E_gang_pos_name], __GetName(playerid), playerid, GZoneInfo[i][sZoneName]);
+			format(gstr, sizeof(gstr), ""gang_sign" "r_besch" %s %s(%i) re-captured zone '%s' which was under attack.", GangPositions[PlayerData[playerid][e_gangrank]][E_gang_pos_name], __GetName(playerid), playerid, GZoneInfo[i][sZoneName]);
 			GangMSG(GZoneInfo[i][DefendingGang], gstr);
 
 			MySQL_UpdateGangScore(GZoneInfo[i][localGang], 5);
@@ -11451,13 +11454,13 @@ YCMD:gzones(playerid, params[], help)
     if(!islogged(playerid)) return notlogged(playerid);
 
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode. Use /exit");
-    if(PlayerData[playerid][GangID] == 0) return SCM(playerid, -1, ""er"You aren't in any gang");
+    if(PlayerData[playerid][e_gangid] == 0) return SCM(playerid, -1, ""er"You aren't in any gang");
     
 	new str[1024], count = 0;
 
 	for(new i = 0; i < gzoneid; i++)
 	{
-	    if(PlayerData[playerid][GangID] == GZoneInfo[i][localGang])
+	    if(PlayerData[playerid][e_gangid] == GZoneInfo[i][localGang])
 	    {
 	        format(gstr, sizeof(gstr), "\n%i - %s", ++count, GZoneInfo[i][sZoneName]);
 	        strcat(str, gstr);
@@ -11507,8 +11510,8 @@ YCMD:gwar(playerid, params[], help)
     if(!islogged(playerid)) return notlogged(playerid);
 
     if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
-	if(PlayerData[playerid][GangID] == 0) return SCM(playerid, -1, ""er"You aren't in any gang! Create a gang /gcreate or join one.");
-	if(PlayerData[playerid][GangPosition] < GANG_POS_SENIOR_MEMBER) return SCM(playerid, -1, ""er"You you need to be at least Senior Member in your gang!");
+	if(PlayerData[playerid][e_gangid] == 0) return SCM(playerid, -1, ""er"You aren't in any gang! Create a gang /gcreate or join one.");
+	if(PlayerData[playerid][e_gangrank] < GANG_POS_SENIOR_MEMBER) return SCM(playerid, -1, ""er"You you need to be at least Senior Member in your gang!");
 
 	new bool:found = false;
 	for(new i = 0; i < gzoneid; i++)
@@ -11518,7 +11521,7 @@ YCMD:gwar(playerid, params[], help)
 
 		if(GZoneInfo[i][bUnderAttack]) return ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" Gang War", ""white"This Gang Zone is currently under attack!", "OK", "");
 
-		if(GZoneInfo[i][localGang] == PlayerData[playerid][GangID])
+		if(GZoneInfo[i][localGang] == PlayerData[playerid][e_gangid])
 		{
 		    return ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" Gang War", ""white"This zone already belongs to your gang!", "OK", "");
 		}
@@ -11530,9 +11533,9 @@ YCMD:gwar(playerid, params[], help)
             return 1;
 		}
 		
-		if(GetGZonesByGang(PlayerData[playerid][GangID]) >= MAX_GZONES_PER_GANG) return ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" Gang War", ""white"Your gang owns the maximum of 15 zones", "OK", "");
+		if(GetGZonesByGang(PlayerData[playerid][e_gangid]) >= MAX_GZONES_PER_GANG) return ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" Gang War", ""white"Your gang owns the maximum of 15 zones", "OK", "");
 		
-		if(Iter_Contains(iterGangWar, PlayerData[playerid][GangID]))
+		if(Iter_Contains(iterGangWar, PlayerData[playerid][e_gangid]))
 		{
 		    return ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" Gang War", ""white"You can't attack this zone because your gang is already\ninvloved in another Gang War!", "OK", "");
 		}
@@ -11540,7 +11543,7 @@ YCMD:gwar(playerid, params[], help)
 		if(GZoneInfo[i][localGang] == 0)
 		{
 		    GZoneInfo[i][bUnderAttack] = true;
-		    GZoneInfo[i][AttackingGang] = PlayerData[playerid][GangID];
+		    GZoneInfo[i][AttackingGang] = PlayerData[playerid][e_gangid];
 		    GZoneInfo[i][iTimeLeft] = 60;
 		    GZoneInfo[i][DefendingGang] = 0;
 		    
@@ -11550,7 +11553,7 @@ YCMD:gwar(playerid, params[], help)
 		    new count = 0;
 		    for(new ii = 0; ii < MAX_PLAYERS; ii++)
 		    {
-		        if(PlayerData[ii][GangID] == PlayerData[playerid][GangID] && IsPlayerAvail(ii))
+		        if(PlayerData[ii][e_gangid] == PlayerData[playerid][e_gangid] && IsPlayerAvail(ii))
 		        {
 		            if(IsPlayerInRangeOfPoint(ii, 30.0, GZoneInfo[i][E_x], GZoneInfo[i][E_y], GZoneInfo[i][E_z]))
 		            {
@@ -11563,12 +11566,12 @@ YCMD:gwar(playerid, params[], help)
 			}
 
 		    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s(%i) is capturing the zone: '%s' %i members have been tied!", __GetName(playerid), playerid, GZoneInfo[i][sZoneName], count);
-			GangMSG(PlayerData[playerid][GangID], gstr);
+			GangMSG(PlayerData[playerid][e_gangid], gstr);
 			
 			format(gstr, sizeof(gstr), ""orange"%s(%i) has started capturing the zone '%s' with %i gang member(s)!", __GetName(playerid), playerid, GZoneInfo[i][sZoneName], count);
 			SCMToAll(-1, gstr);
 			
-			Iter_Add(iterGangWar, PlayerData[playerid][GangID]);
+			Iter_Add(iterGangWar, PlayerData[playerid][e_gangid]);
 		}
 		else
 		{
@@ -11578,7 +11581,7 @@ YCMD:gwar(playerid, params[], help)
 			}
 		
 		    GZoneInfo[i][bUnderAttack] = true;
-		    GZoneInfo[i][AttackingGang] = PlayerData[playerid][GangID];
+		    GZoneInfo[i][AttackingGang] = PlayerData[playerid][e_gangid];
 		    GZoneInfo[i][iTimeLeft] = 180;
 		    GZoneInfo[i][DefendingGang] = GZoneInfo[i][localGang];
 
@@ -11588,7 +11591,7 @@ YCMD:gwar(playerid, params[], help)
 		    new count = 0;
 		    for(new ii = 0; ii < MAX_PLAYERS; ii++)
 		    {
-		        if(PlayerData[ii][GangID] == PlayerData[playerid][GangID] && IsPlayerAvail(ii))
+		        if(PlayerData[ii][e_gangid] == PlayerData[playerid][e_gangid] && IsPlayerAvail(ii))
 		        {
 		            if(IsPlayerInRangeOfPoint(ii, 30.0, GZoneInfo[i][E_x], GZoneInfo[i][E_y], GZoneInfo[i][E_z]))
 		            {
@@ -11601,15 +11604,15 @@ YCMD:gwar(playerid, params[], help)
 			}
 
 		    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s(%i) is capturing the zone: '%s' %i members have been tied!", __GetName(playerid), playerid, GZoneInfo[i][sZoneName], count);
-			GangMSG(PlayerData[playerid][GangID], gstr);
+			GangMSG(PlayerData[playerid][e_gangid], gstr);
 
-		    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"Gang %s started a war against your gang at %s!", GetGangNameByID(PlayerData[playerid][GangID]), GZoneInfo[i][sZoneName]);
+		    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"Gang %s started a war against your gang at %s!", GetGangNameByID(PlayerData[playerid][e_gangid]), GZoneInfo[i][sZoneName]);
 			GangMSG(GZoneInfo[i][localGang], gstr);
 
 			format(gstr, sizeof(gstr), ""orange"%s(%i) has started capturing the zone '%s' with %i gang member(s)!", __GetName(playerid), playerid, GZoneInfo[i][sZoneName], count);
 			SCMToAll(-1, gstr);
 		    
-		    Iter_Add(iterGangWar, PlayerData[playerid][GangID]);
+		    Iter_Add(iterGangWar, PlayerData[playerid][e_gangid]);
 		    Iter_Add(iterGangWar, GZoneInfo[i][localGang]);
 		}
 	    break;
@@ -11661,8 +11664,8 @@ YCMD:ginvite(playerid, params[], help)
 	{
 		if((PlayerData[playerid][tickLastGInvite] + COOLDOWN_CMD_GINVITE) >= tick) return SCM(playerid, -1, ""er"Please wait a bit before inviting again!");
 	}
-	if(PlayerData[playerid][GangID] == 0) return SCM(playerid, -1, ""er"You aren't in any gang!");
-	if(PlayerData[playerid][GangPosition] < GANG_POS_ADVISOR) return SCM(playerid, -1, ""er"You you need to be at least advisor");
+	if(PlayerData[playerid][e_gangid] == 0) return SCM(playerid, -1, ""er"You aren't in any gang!");
+	if(PlayerData[playerid][e_gangrank] < GANG_POS_ADVISOR) return SCM(playerid, -1, ""er"You you need to be at least advisor");
 
 	new player;
 	if(sscanf(params, "r", player))
@@ -11682,15 +11685,15 @@ YCMD:ginvite(playerid, params[], help)
 
     if(!islogged(player)) return SCM(playerid, -1, ""er"This player is not registered!");
     if(player == playerid) return SCM(playerid, -1, ""er"You can't invite yourself");
-    if(PlayerData[player][GangID] != 0) return SCM(playerid, -1, ""er"Player is already in a gang");
+    if(PlayerData[player][e_gangid] != 0) return SCM(playerid, -1, ""er"Player is already in a gang");
 	if(GetPlayerScore_(player) < 100) return SCM(playerid, -1, ""er"Player needs at least 100 score");
     if(PlayerData[player][gInvite]) return SCM(playerid, -1, ""er"Player has been already invited by someone else!");
     if(!IsPlayerAvail(player)) return SCM(playerid, -1, ""er"Player is not available!");
 
-    PlayerData[player][TmpGangID] = PlayerData[playerid][GangID];
+    PlayerData[player][TmpGangID] = PlayerData[playerid][e_gangid];
     PlayerData[player][gInvite] = true;
-    PlayerData[player][GangID] = 0;
-    PlayerData[player][GangPosition] = GANG_POS_NONE;
+    PlayerData[player][e_gangid] = 0;
+    PlayerData[player][e_gangrank] = GANG_POS_NONE;
     strmid(PlayerData[player][GangName], PlayerData[playerid][GangName], 0, 21, 21);
     strmid(PlayerData[player][GangTag], PlayerData[playerid][GangTag], 0, 5, 5);
     
@@ -11708,11 +11711,11 @@ YCMD:gdeny(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
     
-    if(PlayerData[playerid][GangID] != 0) return SCM(playerid, -1, ""er"You are already in a gang!");
+    if(PlayerData[playerid][e_gangid] != 0) return SCM(playerid, -1, ""er"You are already in a gang!");
     if(!PlayerData[playerid][gInvite]) return SCM(playerid, -1, ""er"You haven't been invited!");
     PlayerData[playerid][TmpGangID] = 0;
-    PlayerData[playerid][GangID] = 0;
-    PlayerData[playerid][GangPosition] = GANG_POS_NONE;
+    PlayerData[playerid][e_gangid] = 0;
+    PlayerData[playerid][e_gangrank] = GANG_POS_NONE;
     PlayerData[playerid][gInvite] = false;
     PlayerData[playerid][GangName][0] = '\0';
     PlayerData[playerid][GangTag][0] = '\0';
@@ -11724,9 +11727,9 @@ YCMD:gclose(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
     
-    if(PlayerData[playerid][GangID] == 0) return SCM(playerid, -1, ""er"You aren't in any gang!");
-    if(PlayerData[playerid][GangPosition] != GANG_POS_MAIN_LEADER) return SCM(playerid, -1, ""er"You have to be the gang Founder!");
-	if(Iter_Contains(iterGangWar, PlayerData[playerid][GangID])) return SCM(playerid, -1, ""er"You can't close your gang while being in a Gang War!");
+    if(PlayerData[playerid][e_gangid] == 0) return SCM(playerid, -1, ""er"You aren't in any gang!");
+    if(PlayerData[playerid][e_gangrank] != GANG_POS_MAIN_LEADER) return SCM(playerid, -1, ""er"You have to be the gang Founder!");
+	if(Iter_Contains(iterGangWar, PlayerData[playerid][e_gangid])) return SCM(playerid, -1, ""er"You can't close your gang while being in a Gang War!");
 
 	ShowDialog(playerid, CLOSE_GANG_DIALOG);
 	return 1;
@@ -11736,18 +11739,18 @@ YCMD:gjoin(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
     
-    if(PlayerData[playerid][GangID] != 0) return SCM(playerid, -1, ""er"You are already in a gang!");
+    if(PlayerData[playerid][e_gangid] != 0) return SCM(playerid, -1, ""er"You are already in a gang!");
     if(!PlayerData[playerid][gInvite]) return SCM(playerid, -1, ""er"You did not get any invitations!");
     
 	PlayerData[playerid][gInvite] = false;
-	PlayerData[playerid][GangPosition] = GANG_POS_JUNIOR_MEMBER;
-	PlayerData[playerid][GangID] = PlayerData[playerid][TmpGangID];
+	PlayerData[playerid][e_gangrank] = GANG_POS_JUNIOR_MEMBER;
+	PlayerData[playerid][e_gangid] = PlayerData[playerid][TmpGangID];
 	PlayerData[playerid][TmpGangID] = 0;
 
     MySQL_SavePlayer(playerid, false);
 
 	format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s(%i) has joined the gang!", __GetName(playerid), playerid);
-	GangMSG(PlayerData[playerid][GangID], gstr);
+	GangMSG(PlayerData[playerid][e_gangid], gstr);
 
 	format(gstr, sizeof(gstr), ""gang_sign" "r_besch"You joined the gang "yellow"%s"white"!", PlayerData[playerid][GangName]);
 	SCM(playerid, -1, gstr);
@@ -11769,7 +11772,7 @@ YCMD:gmenu(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
     
-    if(PlayerData[playerid][GangID] == 0) return SCM(playerid, -1, ""er"You aren't in any gang!");
+    if(PlayerData[playerid][e_gangid] == 0) return SCM(playerid, -1, ""er"You aren't in any gang!");
 
 	ShowDialog(playerid, GMENU_DIALOG);
 	return 1;
@@ -11780,17 +11783,17 @@ YCMD:gleave(playerid, params[], help)
     if(!islogged(playerid)) return notlogged(playerid);
     
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode. Use /exit");
-    if(PlayerData[playerid][GangID] == 0) return SCM(playerid, -1, ""er"You aren't in any gang");
-    if(PlayerData[playerid][GangPosition] == GANG_POS_MAIN_LEADER) return SCM(playerid, -1, ""er"You can't leave a gang as Founder");
+    if(PlayerData[playerid][e_gangid] == 0) return SCM(playerid, -1, ""er"You aren't in any gang");
+    if(PlayerData[playerid][e_gangrank] == GANG_POS_MAIN_LEADER) return SCM(playerid, -1, ""er"You can't leave a gang as Founder");
 		
 	format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s(%i) has left the gang", __GetName(playerid), playerid);
-    GangMSG(PlayerData[playerid][GangID], gstr);
+    GangMSG(PlayerData[playerid][e_gangid], gstr);
     SCM(playerid, -1, ""gang_sign" You've left your gang!");
 
-    PlayerData[playerid][GangID] = 0;
+    PlayerData[playerid][e_gangid] = 0;
     PlayerData[playerid][GangName][0] = '\0';
     PlayerData[playerid][GangTag][0] = '\0';
- 	PlayerData[playerid][GangPosition] = GANG_POS_NONE;
+ 	PlayerData[playerid][e_gangrank] = GANG_POS_NONE;
 
     MySQL_SavePlayer(playerid, false);
     SyncGangZones(playerid);
@@ -11807,8 +11810,8 @@ YCMD:gsetrank(playerid, params[], help)
     if(!islogged(playerid)) return notlogged(playerid);
     
     if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
-	if(PlayerData[playerid][GangID] == 0) return SCM(playerid, -1, ""er"You aren't in any gang");
-    if(PlayerData[playerid][GangPosition] < GANG_POS_LEADER) return SCM(playerid, -1, ""er"You have to be at least the gang leader to set ranks");
+	if(PlayerData[playerid][e_gangid] == 0) return SCM(playerid, -1, ""er"You aren't in any gang");
+    if(PlayerData[playerid][e_gangrank] < GANG_POS_LEADER) return SCM(playerid, -1, ""er"You have to be at least the gang leader to set ranks");
     
     ShowDialog(playerid, GANG_SET_RANK_DIALOG);
 	return 1;
@@ -11823,8 +11826,8 @@ YCMD:gkick(playerid, params[], help)
 	new tick = GetTickCount_();
 	if((PlayerData[playerid][tickLastGKick] + COOLDOWN_CMD_GKICK) >= tick) return SCM(playerid, -1, ""er"Please wait a bit before kicking again!");
 
-    if(PlayerData[playerid][GangID] == 0) return SCM(playerid, -1, ""er"You aren't in any gang");
-	if(PlayerData[playerid][GangPosition] != GANG_POS_MAIN_LEADER) return SCM(playerid, -1, ""er"You have to be the gang founder to uninvite players");
+    if(PlayerData[playerid][e_gangid] == 0) return SCM(playerid, -1, ""er"You aren't in any gang");
+	if(PlayerData[playerid][e_gangrank] != GANG_POS_MAIN_LEADER) return SCM(playerid, -1, ""er"You have to be the gang founder to uninvite players");
 
 	ShowDialog(playerid, GANG_KICK_DIALOG);
 	
@@ -11836,8 +11839,8 @@ YCMD:gcolor(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
 
-    if(PlayerData[playerid][GangID] == 0) return SCM(playerid, -1, ""er"You aren't in any gang!");
-    if(PlayerData[playerid][GangPosition] < GANG_POS_LEADER) return SCM(playerid, -1, ""er"You have to be at least the gang leader to set colors");
+    if(PlayerData[playerid][e_gangid] == 0) return SCM(playerid, -1, ""er"You aren't in any gang!");
+    if(PlayerData[playerid][e_gangrank] < GANG_POS_LEADER) return SCM(playerid, -1, ""er"You have to be at least the gang leader to set colors");
     
 	new r, g, b;
 	if(sscanf(params, "iii", r, g, b) || !(0 <= r <= 255) || !(0 <= g <= 255) || !(0 <= b <= 255))
@@ -11854,11 +11857,11 @@ YCMD:gcolor(playerid, params[], help)
 		
 		new col = RGBA(r, g, b, 255);
 
-		format(gstr, sizeof(gstr), "UPDATE `gangs` SET `Color` = %i WHERE `ID` = %i;", col, PlayerData[playerid][GangID]);
+		format(gstr, sizeof(gstr), "UPDATE `gangs` SET `Color` = %i WHERE `ID` = %i;", col, PlayerData[playerid][e_gangid]);
 		mysql_tquery(pSQL, gstr, "", "");
 
 	    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s set the gang color to {%06x}NEW COLOR", __GetName(playerid), col >>> 8);
-		GangMSG(PlayerData[playerid][GangID], gstr);
+		GangMSG(PlayerData[playerid][e_gangid], gstr);
 	}
 	return 1;
 }
@@ -11867,7 +11870,7 @@ YCMD:gcar(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
 
-    if(PlayerData[playerid][GangID] == 0) return SCM(playerid, -1, ""er"You aren't in any gang!");
+    if(PlayerData[playerid][e_gangid] == 0) return SCM(playerid, -1, ""er"You aren't in any gang!");
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
 
 	if(gTeam[playerid] == FREEROAM)
@@ -11877,7 +11880,7 @@ YCMD:gcar(playerid, params[], help)
 	        if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't spawn a car now");
 	        if(IsPlayerInRangeOfPoint(playerid, 65.0, 1797.3141, -1302.0978, 120.2659) && PlayerData[playerid][e_level] < 1) return SCM(playerid, -1, ""er"Can't spawn vehicle at this place!");
 	        
-	        format(gstr, sizeof(gstr), "SELECT `Vehicle` FROM `gangs` WHERE `ID` = %i LIMIT 1;", PlayerData[playerid][GangID]);
+	        format(gstr, sizeof(gstr), "SELECT `Vehicle` FROM `gangs` WHERE `ID` = %i LIMIT 1;", PlayerData[playerid][e_gangid]);
 			new Cache:res = mysql_query(pSQL, gstr);
 			
 			if(cache_get_row_count(pSQL) != 0)
@@ -11901,7 +11904,7 @@ YCMD:gcar(playerid, params[], help)
 		else
 		{
 		    if(strlen(params) > 29) return SCM(playerid, NEF_YELLOW, "I don't know that vehicle...");
-		    if(PlayerData[playerid][GangPosition] < GANG_POS_LEADER) return SCM(playerid, -1, ""er"You have to be at least the gang leader to set the gang car");
+		    if(PlayerData[playerid][e_gangrank] < GANG_POS_LEADER) return SCM(playerid, -1, ""er"You have to be at least the gang leader to set the gang car");
 		    
 	 	    new gcar = -1;
 
@@ -11930,11 +11933,11 @@ YCMD:gcar(playerid, params[], help)
 
 			if(gcar != -1)
 			{
-				format(gstr, sizeof(gstr), "UPDATE `gangs` SET `Vehicle` = %i WHERE `ID` = %i;", gcar, PlayerData[playerid][GangID]);
+				format(gstr, sizeof(gstr), "UPDATE `gangs` SET `Vehicle` = %i WHERE `ID` = %i;", gcar, PlayerData[playerid][e_gangid]);
 				mysql_tquery(pSQL, gstr, "", "");
 
 			    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s set the gang vehicle to %s", __GetName(playerid), VehicleNames[gcar - 400]);
-				GangMSG(PlayerData[playerid][GangID], gstr);
+				GangMSG(PlayerData[playerid][e_gangid], gstr);
 			}
 		}
 	}
@@ -13707,7 +13710,7 @@ YCMD:resethouse(playerid, params[], help)
 		new player = __GetPlayerID(HouseInfo[i][Owner]);
 		if(player != INVALID_PLAYER_ID)
 		{
-	        PlayerData[player][Houses]--;
+	        PlayerData[player][e_houses]--;
 	        SCM(player, -1, "An admin destroyed your house!");
 			MySQL_SavePlayer(player, false);
 		}
@@ -14623,9 +14626,9 @@ YCMD:gangs(playerid, params[], help)
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(!IsPlayerAvail(i)) continue;
-        if(PlayerData[i][GangID] > 0 && !Iter_Contains(Gangs[0], PlayerData[i][GangID]))
+        if(PlayerData[i][e_gangid] > 0 && !Iter_Contains(Gangs[0], PlayerData[i][e_gangid]))
         {
-            Iter_Add(Gangs[0], PlayerData[i][GangID]);
+            Iter_Add(Gangs[0], PlayerData[i][e_gangid]);
             Iter_Add(Gangs[1], i);
         }
 	}
@@ -15329,7 +15332,7 @@ YCMD:stats(playerid, params[], help)
 	 		pDeaths = PlayerData[player1][e_deaths];
 	 	}
 
-		if(PlayerData[player1][GangPosition] == 0)
+		if(PlayerData[player1][e_gangrank] == 0)
 		{
 			strcat(gangnam, "- None -");
 		}
@@ -15368,7 +15371,7 @@ YCMD:stats(playerid, params[], help)
 			gangnam,
 			vip,
 			PlayerData[player1][Medkits],
-			PlayerData[player1][Houses],
+			PlayerData[player1][e_houses],
 			PlayerData[player1][Businesses],
 			PlayerData[player1][Wanteds],
 			UTConvert(PlayerData[player1][LastLogin]));
@@ -15468,13 +15471,13 @@ YCMD:hmenu(playerid, params[], help)
     
     for(new i = 0; i < MAX_PLAYER_HOUSES; i++)
     {
-        if(i > PlayerData[playerid][AdditionalHouseSlots])
+        if(i > PlayerData[playerid][e_addhouseslots])
         {
             format(tmp, sizeof(tmp), "House Slot %i "red"(Locked)\n", i + 1);
         }
         else
 		{
-		    if(i < PlayerData[playerid][Houses])
+		    if(i < PlayerData[playerid][e_houses])
 		    {
 			    format(tmp, sizeof(tmp), "House Slot %i "green2"(Used)\n", i + 1);
 		    }
@@ -15499,7 +15502,7 @@ YCMD:bmenu(playerid, params[], help)
 
     for(new i = 0; i < MAX_PLAYER_BUSINESSES; i++)
     {
-        if(i > PlayerData[playerid][AdditionalBusinessSlots])
+        if(i > PlayerData[playerid][e_addbizzslots])
         {
             format(tmp, sizeof(tmp), "Business Slot %i "red"(Locked)\n", i + 1);
         }
@@ -16257,7 +16260,7 @@ YCMD:toys(playerid, params[], help)
 
 	for(new i = 0; i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
 	{
-	    if(i > PlayerData[playerid][AdditionalToySlots] + 4)
+	    if(i > PlayerData[playerid][e_addtoyslots] + 4)
 	    {
 		    format(tmp, sizeof(tmp), "Slot %i "red"(Locked)\n", i + 1);
 	    }
@@ -16741,9 +16744,9 @@ YCMD:ar(playerid, params[], help)
 					GivePlayerScore_(playerid, 5, true, true);
 				    SCM(playerid, COLOR_BLUE, ""nef" "RED_E"You have received 5 score and $10,000 for catching a criminal!");
 				    
-				 	if(PlayerData[i][GangPosition] > 0 && PlayerData[i][GangID] != PlayerData[playerid][GangID])
+				 	if(PlayerData[i][e_gangrank] > 0 && PlayerData[i][e_gangid] != PlayerData[playerid][e_gangid])
 					{
-					  	MySQL_UpdateGangScore(PlayerData[playerid][GangID], 1);
+					  	MySQL_UpdateGangScore(PlayerData[playerid][e_gangid], 1);
 				 	}
 	    		}
     		}
@@ -16936,7 +16939,7 @@ function:OnPlayerNameChangeRequest(newname[], playerid)
         {
             GetPlayerName(playerid, PlayerData[playerid][e_name], MAX_PLAYER_NAME + 1);
 
-            if(PlayerData[playerid][Houses] > 0)
+            if(PlayerData[playerid][e_houses] > 0)
             {
 				for(new i = 0; i < houseid; i++)
 				{
@@ -17162,7 +17165,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 	            PlayerData[playerid][BusinessIdSelected] = listitem;
 
-		        if(listitem > PlayerData[playerid][AdditionalBusinessSlots])
+		        if(listitem > PlayerData[playerid][e_addbizzslots])
 		        {
 		            ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, gstr, ""nef_green"This business slot is locked.\n\n"white"You may unlock it by purchasing an extra slot at Gold Credits (/gc)", "OK", "");
 		        }
@@ -17296,14 +17299,14 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	                return 1;
 	            }
 	        
-				if(PlayerData[playerid][AdditionalToySlots] >= 5)
+				if(PlayerData[playerid][e_addtoyslots] >= 5)
 				{
 				    SCM(playerid, -1, ""er"You already have 5 additional toy slots!");
 				    ShowDialog(playerid, CM_DIALOG);
 				    return 1;
 				}
 				
-				PlayerData[playerid][AdditionalToySlots]++;
+				PlayerData[playerid][e_addtoyslots]++;
 				
 				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[0][E_item_credits]));
 				SendInfo(playerid, "Item purchased", gstr, 5000);
@@ -17320,14 +17323,14 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	                return 1;
 	            }
 
-				if(PlayerData[playerid][AdditionalPVSlots] >= 7)
+				if(PlayerData[playerid][e_addpvslots] >= 7)
 				{
 				    SCM(playerid, -1, ""er"You already have 7 additional private vehicle slots!");
 				    ShowDialog(playerid, CM_DIALOG);
 				    return 1;
 				}
 
-				PlayerData[playerid][AdditionalPVSlots]++;
+				PlayerData[playerid][e_addpvslots]++;
 
 				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[1][E_item_credits]));
 				SendInfo(playerid, "Item purchased", gstr, 5000);
@@ -17344,14 +17347,14 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	                return 1;
 	            }
 
-				if(PlayerData[playerid][AdditionalHouseSlots] >= 4)
+				if(PlayerData[playerid][e_addhouseslots] >= 4)
 				{
 				    SCM(playerid, -1, ""er"You already have 4 additional house slots!");
 				    ShowDialog(playerid, CM_DIALOG);
 				    return 1;
 				}
 
-				PlayerData[playerid][AdditionalHouseSlots]++;
+				PlayerData[playerid][e_addhouseslots]++;
 
 				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[2][E_item_credits]));
 				SendInfo(playerid, "Item purchased", gstr, 5000);
@@ -17368,14 +17371,14 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	                return 1;
 	            }
 
-				if(PlayerData[playerid][AdditionalHouseObjSlots] >= 7)
+				if(PlayerData[playerid][e_addhouseitemslots] >= 7)
 				{
 				    SCM(playerid, -1, ""er"You already have 7 additional house item slots!");
 				    ShowDialog(playerid, CM_DIALOG);
 				    return 1;
 				}
 
-				PlayerData[playerid][AdditionalHouseObjSlots]++;
+				PlayerData[playerid][e_addhouseitemslots]++;
 
 				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[3][E_item_credits]));
 				SendInfo(playerid, "Item purchased", gstr, 5000);
@@ -17392,14 +17395,14 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	                return 1;
 	            }
 
-				if(PlayerData[playerid][AdditionalBusinessSlots] >= 4)
+				if(PlayerData[playerid][e_addbizzslots] >= 4)
 				{
 				    SCM(playerid, -1, ""er"You already have 4 additional business slots!");
 				    ShowDialog(playerid, CM_DIALOG);
 				    return 1;
 				}
 
-				PlayerData[playerid][AdditionalBusinessSlots]++;
+				PlayerData[playerid][e_addbizzslots]++;
 				
 				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[4][E_item_credits]));
 				SendInfo(playerid, "Item purchased", gstr, 5000);
@@ -17937,13 +17940,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				
 	            PlayerData[playerid][HouseSlotSelected] = listitem;
 	            
-		        if(listitem > PlayerData[playerid][AdditionalHouseSlots])
+		        if(listitem > PlayerData[playerid][e_addhouseslots])
 		        {
 		            ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, gstr, ""nef_green"This house slot is locked.\n\n"white"You may unlock it by purchasing an extra slot at Gold Credits (/gc)", "OK", "");
 		        }
 		        else
 				{
-				    if(listitem >= PlayerData[playerid][Houses])
+				    if(listitem >= PlayerData[playerid][e_houses])
 				    {
 				        SendInfo(playerid, "House slot is not in use", "");
 				    }
@@ -18002,7 +18005,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 							for(new i = 0; i < MAX_HOUSE_OBJECTS; i++)
 							{
-								if(i > PlayerData[playerid][AdditionalHouseObjSlots] + 2)
+								if(i > PlayerData[playerid][e_addhouseitemslots] + 2)
 								{
 								    format(tmp, sizeof(tmp), "House Item Slot %i "red"(Locked)\n", i + 1);
 								}
@@ -18033,7 +18036,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				format(gstr, sizeof(gstr), ""nef" :: House Menu > Slot: %i > Item Slot %i", PlayerData[playerid][HouseSlotSelected] + 1, listitem + 1);
 
-				if(listitem > PlayerData[playerid][AdditionalHouseObjSlots] + 2)
+				if(listitem > PlayerData[playerid][e_addhouseitemslots] + 2)
 				{
 				    ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, gstr, ""nef_green"This house item slot is locked.\n\n"white"You may unlock it by purchasing an extra slot at Gold Credits (/gc)", "OK", "");
 				}
@@ -18344,16 +18347,16 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		  		if(ID != INVALID_PLAYER_ID)
 		  		{
 					if(!IsPlayerAvail(ID)) return SCM(playerid, -1, ""er"Spieler ist not available");
-		        	if(PlayerData[ID][GangID] != PlayerData[playerid][GangID]) return SCM(playerid, -1, ""er"This player is not in your gang!");
-		        	if(PlayerData[ID][GangPosition] == PlayerData[playerid][RankSelected]) return SCM(playerid, -1, ""er"Player is already this rank!");
-		        	if(PlayerData[ID][GangPosition] >= PlayerData[playerid][GangPosition]) return SCM(playerid, -1, ""er"You can't assign this rank to this player!");
+		        	if(PlayerData[ID][e_gangid] != PlayerData[playerid][e_gangid]) return SCM(playerid, -1, ""er"This player is not in your gang!");
+		        	if(PlayerData[ID][e_gangrank] == PlayerData[playerid][RankSelected]) return SCM(playerid, -1, ""er"Player is already this rank!");
+		        	if(PlayerData[ID][e_gangrank] >= PlayerData[playerid][e_gangrank]) return SCM(playerid, -1, ""er"You can't assign this rank to this player!");
 
-			  		PlayerData[ID][GangPosition] = PlayerData[playerid][RankSelected];
+			  		PlayerData[ID][e_gangrank] = PlayerData[playerid][RankSelected];
 
 		  			MySQL_SavePlayer(ID, false);
 
 				    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s set %s's rank to %s", __GetName(playerid), __GetName(ID), GangPositions[PlayerData[playerid][RankSelected]][E_gang_pos_name]);
-					GangMSG(PlayerData[playerid][GangID], gstr);
+					GangMSG(PlayerData[playerid][e_gangid], gstr);
 					
 					PlayerData[playerid][RankSelected] = 0;
 				}
@@ -18366,14 +18369,14 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        case CLOSE_GANG_DIALOG:
 	        {
 	            new query[255];
-				format(query, sizeof(query), "UPDATE `accounts` SET `GangPosition` = 0, `GangID` = 0 WHERE `GangID` = %i;", PlayerData[playerid][GangID]);
+				format(query, sizeof(query), "UPDATE `accounts` SET `GangPosition` = 0, `GangID` = 0 WHERE `GangID` = %i;", PlayerData[playerid][e_gangid]);
 				mysql_tquery(pSQL, query, "", "");
 
-				GangMSG(PlayerData[playerid][GangID], ""gang_sign" "r_besch"The gang has been closed by it's Leader");
+				GangMSG(PlayerData[playerid][e_gangid], ""gang_sign" "r_besch"The gang has been closed by it's Leader");
 
 				for(new i = 0; i < gzoneid; i++)
 				{
-				    if(GZoneInfo[i][localGang] == PlayerData[playerid][GangID])
+				    if(GZoneInfo[i][localGang] == PlayerData[playerid][e_gangid])
 				    {
 						GZoneInfo[i][iTimeLeft] = 0;
 						GZoneInfo[i][bUnderAttack] = false;
@@ -18393,12 +18396,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 				    if(IsPlayerConnected(i) && i != playerid)
 				    {
-				        if(PlayerData[i][GangID] == PlayerData[playerid][GangID] || PlayerData[i][TmpGangID] == PlayerData[playerid][GangID])
+				        if(PlayerData[i][e_gangid] == PlayerData[playerid][e_gangid] || PlayerData[i][TmpGangID] == PlayerData[playerid][e_gangid])
 				        {
 					        PlayerData[i][gInvite] = false;
-					        PlayerData[i][GangID] = 0;
+					        PlayerData[i][e_gangid] = 0;
 					        PlayerData[i][TmpGangID] = 0;
-					        PlayerData[i][GangPosition] = GANG_POS_NONE;
+					        PlayerData[i][e_gangrank] = GANG_POS_NONE;
 					        PlayerData[i][GangName][0] = '\0';
 							PlayerData[i][GangTag][0] = '\0';
 							MySQL_SavePlayer(i, false);
@@ -18413,13 +18416,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				    }
 				}
 
-				format(query, sizeof(query), "DELETE FROM `gangs` WHERE `ID` = %i LIMIT 1;", PlayerData[playerid][GangID]);
+				format(query, sizeof(query), "DELETE FROM `gangs` WHERE `ID` = %i LIMIT 1;", PlayerData[playerid][e_gangid]);
 				mysql_tquery(pSQL, query, "", "");
 
 			    PlayerData[playerid][gInvite] = false;
-			    PlayerData[playerid][GangID] = 0;
+			    PlayerData[playerid][e_gangid] = 0;
 			    PlayerData[playerid][TmpGangID] = 0;
-			    PlayerData[playerid][GangPosition] = GANG_POS_NONE;
+			    PlayerData[playerid][e_gangrank] = GANG_POS_NONE;
 			    PlayerData[playerid][GangName][0] = '\0';
 				PlayerData[playerid][GangTag][0] = '\0';
 				MySQL_SavePlayer(playerid, false);
@@ -18450,13 +18453,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		  		if(ID != INVALID_PLAYER_ID)
 		  		{
 					if(!IsPlayerAvail(ID)) return SCM(playerid, -1, ""er"Spieler ist not available");
-		        	if(PlayerData[ID][GangID] != PlayerData[playerid][GangID]) return SCM(playerid, -1, ""er"This player is not in your gang!");
-		        	if(PlayerData[ID][GangPosition] == GANG_POS_MAIN_LEADER) return SCM(playerid, -1, ""er"You cannot kick other leaders!");
+		        	if(PlayerData[ID][e_gangid] != PlayerData[playerid][e_gangid]) return SCM(playerid, -1, ""er"This player is not in your gang!");
+		        	if(PlayerData[ID][e_gangrank] == GANG_POS_MAIN_LEADER) return SCM(playerid, -1, ""er"You cannot kick other leaders!");
 
                     PlayerData[ID][GangName][0] = '\0';
                     PlayerData[ID][GangTag][0] = '\0';
-					PlayerData[ID][GangID] = 0;
-			  		PlayerData[ID][GangPosition] = 0;
+					PlayerData[ID][e_gangid] = 0;
+			  		PlayerData[ID][e_gangrank] = 0;
 
 		  			MySQL_SavePlayer(ID, false);
 
@@ -18467,7 +18470,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					}
 					
 				    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s kicked %s out of the gang", __GetName(playerid), PlayerData[playerid][GangKickMem]);
-					GangMSG(PlayerData[playerid][GangID], gstr);
+					GangMSG(PlayerData[playerid][e_gangid], gstr);
 
 			        SCM(ID, -1, ""gang_sign" You have been kicked out of your gang!");
 			        
@@ -18973,11 +18976,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		        {
 		            case 0:
 		            {
-						MySQL_FetchGangInfo(playerid, PlayerData[playerid][GangID]);
+						MySQL_FetchGangInfo(playerid, PlayerData[playerid][e_gangid]);
 		            }
 		            case 1:
 		            {
-		                MySQL_FetchGangMemberNames(playerid, PlayerData[playerid][GangID]);
+		                MySQL_FetchGangMemberNames(playerid, PlayerData[playerid][e_gangid]);
 		            }
 		            case 2:
 		            {
@@ -19319,7 +19322,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				format(gstr, sizeof(gstr), ""nef" :: Player Toys > Slot: %i", listitem + 1);
 					
-			    if(listitem > PlayerData[playerid][AdditionalToySlots] + 4)
+			    if(listitem > PlayerData[playerid][e_addtoyslots] + 4)
 			    {
 			        ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, gstr, ""nef_green"This toy slot is locked.\n\n"white"You may unlock it by purchasing an extra slot at Gold Credits (/gc)", "OK", "");
 			    }
@@ -19623,7 +19626,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			}
 			case VMENU_DIALOG:
 			{
-                if(listitem > PlayerData[playerid][AdditionalPVSlots])
+                if(listitem > PlayerData[playerid][e_addpvslots])
 			    {
 					format(gstr, sizeof(gstr), ""nef" :: Private Vehicle Menu > Slot: %i", listitem + 1);
 			        ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, gstr, ""nef_green"This vehicle slot is locked.\n\n"white"You may unlock it by purchasing an extra slot at Gold Credits (/gc)", "OK", "");
@@ -20277,8 +20280,8 @@ public OnReverseDNS(ip[], host[], extra)
 
 function:CancelGangCreation(playerid)
 {
-	PlayerData[playerid][GangPosition] = 0;
-	PlayerData[playerid][GangID] = 0;
+	PlayerData[playerid][e_gangrank] = 0;
+	PlayerData[playerid][e_gangid] = 0;
 	PlayerData[playerid][GangName][0] = '\0';
 	PlayerData[playerid][GangTag][0] = '\0';
  	return 1;
@@ -20512,7 +20515,7 @@ SyncGangZones(playerid)
 	    }
 	    else
 	    {
-			if(PlayerData[playerid][GangID] == GZoneInfo[i][localGang])
+			if(PlayerData[playerid][e_gangid] == GZoneInfo[i][localGang])
 			{
 				GangZoneShowForPlayer(playerid, GZoneInfo[i][zoneid], COLOR_FRIENDLY);
 			}
@@ -21111,8 +21114,8 @@ function:AutoLogin(playerid)
     PlayerData[playerid][bLogged] = true;
     PlayerData[playerid][ExitType] = EXIT_LOGGED;
     
-    MySQL_LoadPlayer(playerid);
     MySQL_UpdateAccount(playerid);
+    MySQL_LoadAccount(playerid);
 	return 1;
 }
 
@@ -21364,7 +21367,7 @@ GangMSG(gGangID, const string[])
 	{
 	    if(IsPlayerAvail(i))
 	    {
-			if(PlayerData[i][GangID] == gGangID && PlayerData[i][GangPosition] != GANG_POS_NONE)
+			if(PlayerData[i][e_gangid] == gGangID && PlayerData[i][e_gangrank] != GANG_POS_NONE)
 			{
 				SCM(i, RED, string);
 			}
@@ -21410,27 +21413,27 @@ MySQL_UpdateGangScore(gGangID, value)
 	mysql_tquery(pSQL, gstr2, "", "");
 }
 
-MySQL_LoadPlayer(playerid)
+MySQL_LoadAccount(playerid)
 {
-	mysql_format(pSQL, gstr2, sizeof(gstr2), "SELECT * FROM `accounts` WHERE `Name` = '%e' LIMIT 1;", __GetName(playerid));
-	mysql_pquery(pSQL, gstr2, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_LOAD);
+	mysql_format(pSQL, gstr2, sizeof(gstr2), "SELECT * FROM `accounts` WHERE `name` = '%e' LIMIT 1;", __GetName(playerid));
+	mysql_tquery(pSQL, gstr2, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_LOAD);
 }
 
 MySQL_LoadPlayerGang(playerid)
 {
-	format(gstr2, sizeof(gstr2), "SELECT `GangName`, `GangTag` FROM `gangs` WHERE `ID` = %i LIMIT 1;", PlayerData[playerid][GangID]);
+	format(gstr2, sizeof(gstr2), "SELECT `GangName`, `GangTag` FROM `gangs` WHERE `ID` = %i LIMIT 1;", PlayerData[playerid][e_gangid]);
 	mysql_pquery(pSQL, gstr2, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_GANG_LOAD);
 }
 
 MySQL_AssignRankIfExist(playerid)
 {
-  	format(gstr2, sizeof(gstr2), "SELECT `GangPosition` FROM `accounts` WHERE `GangID` = %i AND `Name` = '%s';", PlayerData[playerid][GangID], PlayerData[playerid][GangAssignRank]);
+  	format(gstr2, sizeof(gstr2), "SELECT `GangPosition` FROM `accounts` WHERE `GangID` = %i AND `Name` = '%s';", PlayerData[playerid][e_gangid], PlayerData[playerid][GangAssignRank]);
   	mysql_tquery(pSQL, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_ASSIGN_RANK, playerid, pSQL);
 }
 
 MySQL_KickFromGangIfExist(playerid)
 {
-  	format(gstr2, sizeof(gstr2), "SELECT `GangPosition` FROM `accounts` WHERE `GangID` = %i AND `Name` = '%s';", PlayerData[playerid][GangID], PlayerData[playerid][GangKickMem]);
+  	format(gstr2, sizeof(gstr2), "SELECT `GangPosition` FROM `accounts` WHERE `GangID` = %i AND `Name` = '%s';", PlayerData[playerid][e_gangid], PlayerData[playerid][GangKickMem]);
   	mysql_tquery(pSQL, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_KICK_FROM_GANG, playerid, pSQL);
 }
 
@@ -21456,15 +21459,15 @@ MySQL_SavePlayer(playerid, bool:save_pv)
 		PlayerData[playerid][e_time],
 		PlayerData[playerid][e_reaction],
 		PlayerData[playerid][e_payday],
-		PlayerData[playerid][Houses],
+		PlayerData[playerid][e_houses],
 		PlayerData[playerid][Businesses],
-		PlayerData[playerid][GangPosition],
-		PlayerData[playerid][GangID],
-		PlayerData[playerid][AdditionalPVSlots],
-		PlayerData[playerid][AdditionalToySlots],
-		PlayerData[playerid][AdditionalHouseSlots],
-		PlayerData[playerid][AdditionalBusinessSlots],
-		PlayerData[playerid][AdditionalHouseObjSlots],
+		PlayerData[playerid][e_gangrank],
+		PlayerData[playerid][e_gangid],
+		PlayerData[playerid][e_addpvslots],
+		PlayerData[playerid][e_addtoyslots],
+		PlayerData[playerid][e_addhouseslots],
+		PlayerData[playerid][e_addbizzslots],
+		PlayerData[playerid][e_addhouseitemslots],
 		PlayerData[playerid][DerbyWins]);
 
     format(query2, sizeof(query2), ", `Color` = %i, `Medkits` = %i, `Skin` = %i, `GungameWins` = %i, `RaceWins` = %i, `BGWins` = %i, `FalloutWins` = %i, `Wanteds` = %i, `VIP` = %i, `LastNameChange` = %i, `SavedSkin` = %i WHERE `Name` = '%s' LIMIT 1;",
@@ -21769,7 +21772,7 @@ MySQL_UpdateAccount(playerid)
     if(PlayerData[playerid][bLogged])
     {
 	    mysql_format(pSQL, gstr2, sizeof(gstr2), "UPDATE `accounts` SET `IP` = '%e', `LastLogin` = %i WHERE `Name` = '%e' LIMIT 1;", __GetIP(playerid), gettime(), __GetName(playerid));
-	    mysql_pquery(pSQL, gstr2);
+	    mysql_tquery(pSQL, gstr2);
 	}
 }
 
@@ -24150,7 +24153,7 @@ PVSlotSelect(playerid)
 
     for(new i = 0; i < MAX_PLAYER_PVS; i++)
     {
-        if(i > PlayerData[playerid][AdditionalPVSlots]) // Can not use
+        if(i > PlayerData[playerid][e_addpvslots]) // Can not use
         {
         	format(tmp, sizeof(tmp), ""white"PV Slot %i "red"(Locked)\n", i + 1);
         	strcat(string, tmp);
@@ -24176,7 +24179,7 @@ PVSlotSelect(playerid)
 
 CreateFinalCar(playerid, pv_slot)
 {
-	if(pv_slot > PlayerData[playerid][AdditionalPVSlots])
+	if(pv_slot > PlayerData[playerid][e_addpvslots])
 	{
 	    SendInfo(playerid, "This PV slot is locked", "");
 	    PVSlotSelect(playerid);
@@ -25636,21 +25639,21 @@ function:OnQueueReceived()
 		                PlayerData[playerid][VIP] = 1;
 		                PlayerData[playerid][e_bank] += 1000000;
 		                
-		                if(PlayerData[playerid][AdditionalPVSlots] < 7)
+		                if(PlayerData[playerid][e_addpvslots] < 7)
 		                {
-		                    PlayerData[playerid][AdditionalPVSlots]++;
+		                    PlayerData[playerid][e_addpvslots]++;
 		                }
-		                if(PlayerData[playerid][AdditionalPVSlots] < 7)
+		                if(PlayerData[playerid][e_addpvslots] < 7)
 		                {
-		                    PlayerData[playerid][AdditionalPVSlots]++;
+		                    PlayerData[playerid][e_addpvslots]++;
 		                }
-						if(PlayerData[playerid][AdditionalHouseSlots] < 4)
+						if(PlayerData[playerid][e_addhouseslots] < 4)
 						{
-							PlayerData[playerid][AdditionalHouseSlots]++;
+							PlayerData[playerid][e_addhouseslots]++;
 						}
-						if(PlayerData[playerid][AdditionalBusinessSlots] < 4)
+						if(PlayerData[playerid][e_addbizzslots] < 4)
 						{
-							PlayerData[playerid][AdditionalBusinessSlots]++;
+							PlayerData[playerid][e_addbizzslots]++;
 						}
 		                
 						SCM(playerid, -1, ""server_sign" "r_besch"You received VIP status + $1,000,000 bank money + 2 PV Slots + 1 House Slot + 1 Bizz Slot!");
@@ -26086,7 +26089,7 @@ function:ProcessTick()
 			    new Iterator:Players<MAX_PLAYERS>;
 			    for(new ii = 0; ii < MAX_PLAYERS; ii++)
 			    {
-			        if(IsPlayerAvail(ii) && PlayerData[ii][GangID] == GZoneInfo[i][AttackingGang] && PlayerData[ii][bGWarMode])
+			        if(IsPlayerAvail(ii) && PlayerData[ii][e_gangid] == GZoneInfo[i][AttackingGang] && PlayerData[ii][bGWarMode])
 			        {
 			            if(!IsPlayerInRangeOfPoint(ii, GZONE_SIZE, GZoneInfo[i][E_x], GZoneInfo[i][E_y], GZoneInfo[i][E_z]) || IsPlayerOnDesktop(ii, 50000)) continue;
                         if(IsPlayerOnDesktop(ii, 2500)) continue;
@@ -26109,7 +26112,7 @@ function:ProcessTick()
 						{
 						    if(IsPlayerAvail(ii) && PlayerData[ii][bGWarMode])
 						    {
-						        if(PlayerData[ii][GangID] == GZoneInfo[i][AttackingGang] || PlayerData[ii][GangID] == GZoneInfo[i][DefendingGang])
+						        if(PlayerData[ii][e_gangid] == GZoneInfo[i][AttackingGang] || PlayerData[ii][e_gangid] == GZoneInfo[i][DefendingGang])
 						        {
 						    		ResetPlayerGWarMode(ii);
 								}
@@ -26137,7 +26140,7 @@ function:ProcessTick()
 						{
 						    if(IsPlayerAvail(ii) && PlayerData[ii][bGWarMode])
 						    {
-						        if(PlayerData[ii][GangID] == GZoneInfo[i][AttackingGang] || PlayerData[ii][GangID] == GZoneInfo[i][DefendingGang])
+						        if(PlayerData[ii][e_gangid] == GZoneInfo[i][AttackingGang] || PlayerData[ii][e_gangid] == GZoneInfo[i][DefendingGang])
 						        {
 						    		ResetPlayerGWarMode(ii);
 								}
@@ -26201,12 +26204,12 @@ function:ProcessTick()
 					{
 					    if(IsPlayerAvail(ii) && PlayerData[ii][bGWarMode])
 					    {
-					        if(PlayerData[ii][GangID] == GZoneInfo[i][AttackingGang] || PlayerData[ii][GangID] == GZoneInfo[i][DefendingGang])
+					        if(PlayerData[ii][e_gangid] == GZoneInfo[i][AttackingGang] || PlayerData[ii][e_gangid] == GZoneInfo[i][DefendingGang])
 					        {
 					    		ResetPlayerGWarMode(ii);
 							}
 
-							if(PlayerData[ii][GangID] == GZoneInfo[i][AttackingGang])
+							if(PlayerData[ii][e_gangid] == GZoneInfo[i][AttackingGang])
 							{
 							    GivePlayerCash(ii, 20000);
 							}
@@ -27967,11 +27970,11 @@ function:ShowDialog(playerid, dialogid)
 		}
 	    case GANG_SET_RANK_DIALOG:
 	    {
-			if(PlayerData[playerid][GangPosition] == GANG_POS_LEADER)
+			if(PlayerData[playerid][e_gangrank] == GANG_POS_LEADER)
 			{
 			    ShowPlayerDialog(playerid, GANG_SET_RANK_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Gang Rank Menu", ""grey"Select a rank below:\nJunior Member\nMember\nSenior Member\nAdvisor", "Next", "Cancel");
 			}
-			else if(PlayerData[playerid][GangPosition] == GANG_POS_MAIN_LEADER)
+			else if(PlayerData[playerid][e_gangrank] == GANG_POS_MAIN_LEADER)
 			{
 	    		ShowPlayerDialog(playerid, GANG_SET_RANK_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Gang Rank Menu", ""grey"Select a rank below:\nJunior Member\nMember\nSenior Member\nAdvisor\nLeader", "Next", "Cancel");
 			}
@@ -28048,7 +28051,7 @@ function:ShowDialog(playerid, dialogid)
 		    
 		    for(new i = 0; i < MAX_PLAYER_PVS; i++)
 		    {
-		        if(i > PlayerData[playerid][AdditionalPVSlots]) // Can not use
+		        if(i > PlayerData[playerid][e_addpvslots]) // Can not use
 		        {
 	            	format(tmp, sizeof(tmp), ""white"PV Slot %i "red"(Locked)\n", i + 1);
 	            	strcat(string, tmp);
@@ -28082,7 +28085,7 @@ function:ShowDialog(playerid, dialogid)
 		{
 		    format(gstr, sizeof(gstr), ""grey"[%s] %s "white"- Gang Menu", PlayerData[playerid][GangTag], PlayerData[playerid][GangName]);
 		
-		    switch(PlayerData[playerid][GangPosition])
+		    switch(PlayerData[playerid][e_gangrank])
 			{
 			    case GANG_POS_JUNIOR_MEMBER, GANG_POS_MEMBER, GANG_POS_SENIOR_MEMBER, GANG_POS_ADVISOR:
 			    {
@@ -29807,17 +29810,17 @@ function:OnGangRenameAttempt(playerid, newgangname[], newgangtag[])
 	{
 	    for(new i = 0; i < MAX_PLAYERS; i++)
 	    {
-	        if(PlayerData[i][GangID] == PlayerData[playerid][GangID] || PlayerData[i][TmpGangID] == PlayerData[playerid][GangID])
+	        if(PlayerData[i][e_gangid] == PlayerData[playerid][e_gangid] || PlayerData[i][TmpGangID] == PlayerData[playerid][e_gangid])
 	        {
 	            strmid(PlayerData[i][GangName], newgangname, 0, 21, 21);
 	            strmid(PlayerData[i][GangTag], newgangtag, 0, 5, 5);
 	        }
 	    }
-	    format(gstr2, sizeof(gstr2), "UPDATE `gangs` SET `GangName` = '%s', `GangTag` = '%s' WHERE `ID` = %i LIMIT 1;", newgangname, newgangtag, PlayerData[playerid][GangID]);
+	    format(gstr2, sizeof(gstr2), "UPDATE `gangs` SET `GangName` = '%s', `GangTag` = '%s' WHERE `ID` = %i LIMIT 1;", newgangname, newgangtag, PlayerData[playerid][e_gangid]);
 	    mysql_tquery(pSQL, gstr2, "", "");
 	    
 	    format(gstr2, sizeof(gstr2), ""gang_sign" "r_besch"Gang Founder %s(%i) changed the gang's name to [%s]%s", __GetName(playerid), playerid, newgangtag, newgangname);
-		GangMSG(PlayerData[playerid][GangID], gstr2);
+		GangMSG(PlayerData[playerid][e_gangid], gstr2);
 		
 		GivePlayerCash(playerid, -100000);
 	}
@@ -30694,11 +30697,11 @@ ResetPlayerVars(playerid)
 	PlayerData[playerid][BoostDeplete] = 0;
 	PlayerData[playerid][e_color] = 0;
 	PlayerData[playerid][SavedSkin] = -1;
-	PlayerData[playerid][AdditionalPVSlots] = 0;
-	PlayerData[playerid][AdditionalToySlots] = 0;
-	PlayerData[playerid][AdditionalHouseSlots] = 0;
-	PlayerData[playerid][AdditionalBusinessSlots] = 0;
-	PlayerData[playerid][AdditionalHouseObjSlots] = 0;
+	PlayerData[playerid][e_addpvslots] = 0;
+	PlayerData[playerid][e_addtoyslots] = 0;
+	PlayerData[playerid][e_addhouseslots] = 0;
+	PlayerData[playerid][e_addbizzslots] = 0;
+	PlayerData[playerid][e_addhouseitemslots] = 0;
 	PlayerData[playerid][HouseSlotSelected] = 0;
 	PlayerData[playerid][BusinessIdSelected] = 0;
 	PlayerData[playerid][DrawnNumber] = -1;
@@ -30722,7 +30725,7 @@ ResetPlayerVars(playerid)
 	PlayerData[playerid][tMedkit] = -1;
 	PlayerData[playerid][MedkitTime] = 0;
 	PlayerData[playerid][e_payday] = 60;
-  	PlayerData[playerid][Houses] = 0;
+  	PlayerData[playerid][e_houses] = 0;
 	PlayerData[playerid][Businesses] = 0;
 	PlayerData[playerid][GCPlayer] = INVALID_PLAYER_ID;
 	PlayerData[playerid][GCNameHash] = 0;
@@ -30773,9 +30776,9 @@ ResetPlayerVars(playerid)
 	PlayerData[playerid][VIPLabel] = Text3D:-1;
 	PlayerData[playerid][ChatWrote] = 0;
 	PlayerData[playerid][tMute] = -1;
- 	PlayerData[playerid][GangPosition] = GANG_POS_NONE;
+ 	PlayerData[playerid][e_gangrank] = GANG_POS_NONE;
  	PlayerData[playerid][TmpGangID] = 0;
- 	PlayerData[playerid][GangID] = 0;
+ 	PlayerData[playerid][e_gangid] = 0;
 	PlayerData[playerid][GangLabel] = Text3D:-1;
 	PlayerData[playerid][GangKickMem][0] = '\0';
 	PlayerData[playerid][GangAssignRank][0] = '\0';
@@ -31021,6 +31024,15 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 	    {
 			if(cache_get_row_count() > 0)
 			{
+				new ORM:ormid = PlayerData[playerid][e_ormid] = orm_create("accounts");
+
+				orm_addvar_int(ormid, PlayerData[playerid][e_accountid], "id");
+				orm_addvar_string(ormid, PlayerData[playerid][e_name], MAX_PLAYER_NAME + 1, "name");
+				orm_addvar_int(ormid, PlayerData[playerid][e_level], "level");
+
+				orm_setkey(ormid, "id");
+				orm_apply_cache(ormid, 0);
+				
 			    PlayerData[playerid][e_accountid] = cache_get_row_int(0, 0, pSQL);
 			    PlayerData[playerid][e_color] = cache_get_row_int(0, 2, pSQL);
 			    PlayerData[playerid][e_level] = cache_get_row_int(0, 5, pSQL);
@@ -31032,15 +31044,15 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 			    PlayerData[playerid][e_time] = cache_get_row_int(0, 11, pSQL);
                 PlayerData[playerid][e_reaction] = cache_get_row_int(0, 12, pSQL);
                 PlayerData[playerid][e_payday] = cache_get_row_int(0, 13, pSQL);
-                PlayerData[playerid][Houses] = cache_get_row_int(0, 14, pSQL);
+                PlayerData[playerid][e_houses] = cache_get_row_int(0, 14, pSQL);
                 PlayerData[playerid][Businesses] = cache_get_row_int(0, 15, pSQL);
-                PlayerData[playerid][GangPosition] = cache_get_row_int(0, 16, pSQL);
-                PlayerData[playerid][GangID] = cache_get_row_int(0, 17, pSQL);
-                PlayerData[playerid][AdditionalPVSlots] = cache_get_row_int(0, 18, pSQL);
-                PlayerData[playerid][AdditionalToySlots] = cache_get_row_int(0, 19, pSQL);
-                PlayerData[playerid][AdditionalHouseSlots] = cache_get_row_int(0, 20, pSQL);
-                PlayerData[playerid][AdditionalBusinessSlots] = cache_get_row_int(0, 21, pSQL);
-                PlayerData[playerid][AdditionalHouseObjSlots] = cache_get_row_int(0, 22, pSQL);
+                PlayerData[playerid][e_gangrank] = cache_get_row_int(0, 16, pSQL);
+                PlayerData[playerid][e_gangid] = cache_get_row_int(0, 17, pSQL);
+                PlayerData[playerid][e_addpvslots] = cache_get_row_int(0, 18, pSQL);
+                PlayerData[playerid][e_addtoyslots] = cache_get_row_int(0, 19, pSQL);
+                PlayerData[playerid][e_addhouseslots] = cache_get_row_int(0, 20, pSQL);
+                PlayerData[playerid][e_addbizzslots] = cache_get_row_int(0, 21, pSQL);
+                PlayerData[playerid][e_addhouseitemslots] = cache_get_row_int(0, 22, pSQL);
                 PlayerData[playerid][DerbyWins] = cache_get_row_int(0, 24, pSQL);
                 PlayerData[playerid][RaceWins] = cache_get_row_int(0, 25, pSQL);
                 PlayerData[playerid][BGWins] = cache_get_row_int(0, 26, pSQL);
@@ -31422,7 +31434,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 				    PlayerPV[playerid][7][Mod17],
 				    PlayerPV[playerid][7][Plate]);
 
-   				if(PlayerData[playerid][GangID] != 0)
+   				if(PlayerData[playerid][e_gangid] != 0)
 				{
 				    MySQL_LoadPlayerGang(playerid);
 				}
@@ -31500,8 +31512,8 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
  			    format(gstr, sizeof(gstr), ""nef_yellow"Gang:"white" %s", PlayerData[playerid][GangName]);
 				PlayerData[playerid][GangLabel] = CreateDynamic3DTextLabel(gstr, -1, 0.0, 0.0, 0.5, 20.0, playerid, INVALID_VEHICLE_ID, 1, -1, -1, -1, 20.0);
 
-			    format(gstr, sizeof(gstr), ""gang_sign" "grey"%s %s(%i) logged in!", GangPositions[PlayerData[playerid][GangPosition]][E_gang_pos_name], __GetName(playerid), playerid);
-				GangMSG(PlayerData[playerid][GangID], gstr);
+			    format(gstr, sizeof(gstr), ""gang_sign" "grey"%s %s(%i) logged in!", GangPositions[PlayerData[playerid][e_gangrank]][E_gang_pos_name], __GetName(playerid), playerid);
+				GangMSG(PlayerData[playerid][e_gangid], gstr);
 			}
 	        return 1;
 	    }
@@ -31513,8 +31525,8 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 				PlayerData[playerid][bLogged] = true;
                 PlayerData[playerid][ExitType] = EXIT_LOGGED;
 
-		        MySQL_LoadPlayer(playerid);
-		        MySQL_UpdateAccount(playerid);
+				MySQL_UpdateAccount(playerid);
+				MySQL_LoadAccount(playerid);
 			}
 			else
 			{
