@@ -623,6 +623,7 @@ enum E_PLAYER_DATA
 	e_kills,
 	e_deaths,
 	e_time,
+	e_skin,
 	e_payday,
 	e_reaction,
 	e_houses,
@@ -674,7 +675,6 @@ enum E_PLAYER_DATA
   	tickPlayerUpdate,
   	tickLastCD,
     tickJoin_bmx,
-	
 	bool:GotVIPLInv,
 	bool:bIsDead,
 	bool:bShowToys,
@@ -30768,6 +30768,7 @@ ResetPlayerVars(playerid)
 	PlayerData[playerid][e_reaction] = 0;
 	PlayerData[playerid][e_bank] = 0;
 	PlayerData[playerid][e_time] = 0;
+	PlayerData[playerid][e_skin] = 0;
 	PlayerData[playerid][ConnectTime] = 0;
 	PlayerData[playerid][e_vip] = 0;
 	PlayerData[playerid][e_lastnc] = 0;
@@ -31033,51 +31034,50 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 				orm_addvar_int(ormid, PlayerData[playerid][e_accountid], "id");
 				orm_addvar_string(ormid, PlayerData[playerid][e_name], MAX_PLAYER_NAME + 1, "name");
 				orm_addvar_int(ormid, PlayerData[playerid][e_level], "level");
+				orm_addvar_int(ormid, PlayerData[playerid][e_score], "score");
+				orm_addvar_int(ormid, PlayerData[playerid][e_money], "money");
+				orm_addvar_int(ormid, PlayerData[playerid][e_bank], "bank");
+				orm_addvar_int(ormid, PlayerData[playerid][e_color], "color");
+				orm_addvar_int(ormid, PlayerData[playerid][e_kills], "kills");
+				orm_addvar_int(ormid, PlayerData[playerid][e_deaths], "deaths");
+				orm_addvar_int(ormid, PlayerData[playerid][e_time], "time");
+				orm_addvar_int(ormid, PlayerData[playerid][e_skin], "skin");
+				orm_addvar_int(ormid, PlayerData[playerid][e_payday], "payday");
+				orm_addvar_int(ormid, PlayerData[playerid][e_reaction], "reaction");
+				orm_addvar_int(ormid, PlayerData[playerid][e_houses], "houses");
+				orm_addvar_int(ormid, PlayerData[playerid][e_gangid], "gangid");
+				orm_addvar_int(ormid, PlayerData[playerid][e_gangrank], "gangrank");
+				orm_addvar_int(ormid, PlayerData[playerid][e_addpvslots], "addpvslots");
+				orm_addvar_int(ormid, PlayerData[playerid][e_addtoyslots], "addtoyslots");
+				orm_addvar_int(ormid, PlayerData[playerid][e_addhouseslots], "addhouseslots");
+				orm_addvar_int(ormid, PlayerData[playerid][e_addbizzslots], "addbizzslots");
+				orm_addvar_int(ormid, PlayerData[playerid][e_addhouseitemslots], "addhouseitemslots");
+				orm_addvar_int(ormid, PlayerData[playerid][e_derbywins], "derbywins");
+				orm_addvar_int(ormid, PlayerData[playerid][e_racewins], "racewins");
+				orm_addvar_int(ormid, PlayerData[playerid][e_tdmwins], "tdmwins");
+				orm_addvar_int(ormid, PlayerData[playerid][e_falloutwins], "falloutwins");
+				orm_addvar_int(ormid, PlayerData[playerid][e_gungamewins], "gungamewins");
+				orm_addvar_int(ormid, PlayerData[playerid][e_eventwins], "eventwins");
+				orm_addvar_int(ormid, PlayerData[playerid][e_wanteds], "wanteds");
+				orm_addvar_int(ormid, PlayerData[playerid][e_vip], "vip");
+				orm_addvar_int(ormid, PlayerData[playerid][e_credits], "credits");
+				orm_addvar_int(ormid, PlayerData[playerid][e_medkits], "medkits");
+				orm_addvar_int(ormid, PlayerData[playerid][e_regdate], "regdate");
+				orm_addvar_int(ormid, PlayerData[playerid][e_lastlogin], "lastlogin");
+				orm_addvar_int(ormid, PlayerData[playerid][e_lastnc], "lastnc");
+				orm_addvar_int(ormid, PlayerData[playerid][e_skinsave], "skinsave");
 
 				orm_setkey(ormid, "id");
 				orm_apply_cache(ormid, 0);
-				
-			    PlayerData[playerid][e_accountid] = cache_get_row_int(0, 0, pSQL);
-			    PlayerData[playerid][e_color] = cache_get_row_int(0, 2, pSQL);
-			    PlayerData[playerid][e_level] = cache_get_row_int(0, 5, pSQL);
-			    PlayerData[playerid][e_score] = cache_get_row_int(0, 6, pSQL);
-			    PlayerData[playerid][e_money] = cache_get_row_int(0, 7, pSQL);
-			    PlayerData[playerid][e_bank] = cache_get_row_int(0, 8, pSQL);
-			    PlayerData[playerid][e_kills] = cache_get_row_int(0, 9, pSQL);
-			    PlayerData[playerid][e_deaths] = cache_get_row_int(0, 10, pSQL);
-			    PlayerData[playerid][e_time] = cache_get_row_int(0, 11, pSQL);
-                PlayerData[playerid][e_reaction] = cache_get_row_int(0, 12, pSQL);
-                PlayerData[playerid][e_payday] = cache_get_row_int(0, 13, pSQL);
-                PlayerData[playerid][e_houses] = cache_get_row_int(0, 14, pSQL);
 
-                PlayerData[playerid][e_gangrank] = cache_get_row_int(0, 16, pSQL);
-                PlayerData[playerid][e_gangid] = cache_get_row_int(0, 17, pSQL);
-                PlayerData[playerid][e_addpvslots] = cache_get_row_int(0, 18, pSQL);
-                PlayerData[playerid][e_addtoyslots] = cache_get_row_int(0, 19, pSQL);
-                PlayerData[playerid][e_addhouseslots] = cache_get_row_int(0, 20, pSQL);
-                PlayerData[playerid][e_addbizzslots] = cache_get_row_int(0, 21, pSQL);
-                PlayerData[playerid][e_addhouseitemslots] = cache_get_row_int(0, 22, pSQL);
-                PlayerData[playerid][e_derbywins] = cache_get_row_int(0, 24, pSQL);
-                PlayerData[playerid][e_racewins] = cache_get_row_int(0, 25, pSQL);
-                PlayerData[playerid][e_tdmwins] = cache_get_row_int(0, 26, pSQL);
-                PlayerData[playerid][e_falloutwins] = cache_get_row_int(0, 27, pSQL);
-                PlayerData[playerid][e_gungamewins] = cache_get_row_int(0, 28, pSQL);
-                PlayerData[playerid][e_eventwins] = cache_get_row_int(0, 29, pSQL);
-                PlayerData[playerid][e_wanteds] = cache_get_row_int(0, 30, pSQL);
-                PlayerData[playerid][e_vip] = cache_get_row_int(0, 31, pSQL);
-                PlayerData[playerid][e_credits] = cache_get_row_int(0, 32, pSQL);
-                PlayerData[playerid][e_medkits] = cache_get_row_int(0, 33, pSQL);
-                PlayerData[playerid][e_regdate] = cache_get_row_int(0, 34, pSQL);
-                PlayerData[playerid][e_lastlogin] = cache_get_row_int(0, 35, pSQL);
-                PlayerData[playerid][e_lastnc] = cache_get_row_int(0, 36, pSQL);
+				if(!IsValidSkin(PlayerData[playerid][e_skinsave])) {
+				    PlayerData[playerid][e_skinsave] = -1;
+				}
 
-				new sskin = cache_get_row_int(0, 57, pSQL);
-
-                if(IsValidSkin(sskin)) {
-                    PlayerData[playerid][e_skinsave] = sskin;
-                } else {
-					PlayerData[playerid][e_skinsave] = -1;
-                }
+				if(PlayerData[playerid][e_gangid] != 0)
+				{
+					MySQL_LoadPlayerGang(playerid);
+				}
 
 				new buffer[255];
 
@@ -31438,11 +31438,6 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 				    PlayerPV[playerid][7][Mod17],
 				    PlayerPV[playerid][7][Plate]);
 
-   				if(PlayerData[playerid][e_gangid] != 0)
-				{
-				    MySQL_LoadPlayerGang(playerid);
-				}
-
   			 	SetPlayerScore_(playerid, PlayerData[playerid][e_score]);
 			 	SetPlayerCash(playerid, PlayerData[playerid][e_money]);
 			 	PlayerData[playerid][ConnectTime] = gettime();
@@ -31499,13 +31494,9 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 	    case ACCOUNT_REQUEST_GANG_LOAD:
 	    {
 		    if(cache_get_row_count() > 0)
-		    {
-		        new buffer[25];
-
-		        cache_get_row(0, 0, buffer, pSQL, sizeof(buffer));
-		        strmid(PlayerData[playerid][GangName], buffer, 0, 25, 25);
-				cache_get_row(0, 1, buffer, pSQL, sizeof(buffer));
-				strmid(PlayerData[playerid][GangTag], buffer, 0, 5, 5);
+			{
+		        cache_get_row(0, 0, PlayerData[playerid][GangName], pSQL, 25);
+		        cache_get_row(0, 1, PlayerData[playerid][GangTag], pSQL, 5);
 
 				if(PlayerData[playerid][GangLabel] != Text3D:-1)
 				{
