@@ -1,6 +1,6 @@
 /*======================================================================*\
 || #################################################################### ||
-|| # Project New Evolution Freeroam - Build 21 	        			  # ||
+|| # Project New Evolution Freeroam - Build 22 	        			  # ||
 || # ---------------------------------------------------------------- # ||
 || # Copyright ©2011-2014 New Evolution Freeroam	  				  # ||
 || # Created by Mellnik                                               # ||
@@ -19,16 +19,14 @@
 || DNS Plugin 2.4
 ||
 || Build Notes:
-|| - Set rcon 0 in server.cfg
-|| - Add samp.ban
-|| - Transform props to businesses (Loan Sharks/Robbery/Smuggling/Prostitution/Meth Lab)
+|| - Run accupgrade.amx
 */
 
 #pragma dynamic 8192
 
-#define IS_RELEASE_BUILD (true)
-#define INC_ENVIORMENT (true)
-#define IRC_CONNECT (true)
+#define IS_RELEASE_BUILD (false)
+#define INC_ENVIORMENT (false)
+#define IRC_CONNECT (false)
 #define WINTER_EDITION (false) // Requires ferriswheelfair.amx
 #define YSI_IS_SERVER
 
@@ -85,11 +83,12 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define SVRURLWWW                       "www.nefserver.net"
 #define SVRFORUM                        "forum.nefserver.net"
 #define SERVER_IP                       "31.204.152.218:7777"
-#define HOSTNAME                        " 	        NEF » ×DM/Stunt/Race/Freeroam/Minigames×"
+//#define HOSTNAME                        " 	        NEF » ×DM/Stunt/Race/Freeroam/Minigames×"
+#define HOSTNAME                        " 	      NEF (0.3z) » ×DM/Stunt/Race/Freeroam/Minigames×"
 #if IS_RELEASE_BUILD == true
-#define CURRENT_VERSION                 "Build 21"
+#define CURRENT_VERSION                 "Build 22"
 #else
-#define CURRENT_VERSION                 "PTS:Build 21"
+#define CURRENT_VERSION                 "PTS:Build 22"
 #endif
 #define HOTFIX_REV                      "Hotfix #0"
 #define SAMP_VERSION                    "SA-MP 0.3z"
@@ -399,6 +398,8 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define PURPLE_E 						"{5A00FF}"
 
 // Player
+#define MAX_PLAYER_SCORE                (999999)
+#define MAX_PLAYER_MONEY                (1000000000)
 #define COOLDOWN_CHAT                   (5500)
 #define COOLDOWN_CMD_AR                 (1000)
 #define COOLDOWN_CMD_ROB                (10000)
@@ -604,8 +605,16 @@ enum BOOST:(<<= 1)
 	BOOST_MASTER
 };
 
-enum e_player_data
+enum E_PLAYER_DATA
 {
+	/* ORM */
+	ORM:e_ormid,
+	
+	/* PLAYER DATA */
+	e_accountid,
+	e_name[MAX_PLAYER_NAME + 1],
+
+	/* INTERNAL */
     AccountID,
 	bool:GotVIPLInv,
 	bool:bIsDead,
@@ -1788,7 +1797,8 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
   	AdminLC,
   	AdminLC2,
   	gLastMap[MAX_PLAYERS],
-  	PlayerInfo[MAX_PLAYERS][e_player_data],
+  	PlayerInfo[MAX_PLAYERS][E_PLAYER_DATA],
+  	PlayerData[MAX_PLAYERS][E_PLAYER_DATA],
   	PlayerPV[MAX_PLAYERS][MAX_PLAYER_PVS][e_player_pv_data],
   	HouseInfo[MAX_HOUSES][e_house_data],
   	GZoneInfo[MAX_GZONES][e_gzone_data],
