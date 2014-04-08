@@ -550,6 +550,7 @@ enum (+= 10)
 	ACCOUNT_REQUEST_REGISTER,
 	ACCOUNT_REQUEST_LOAD,
 	ACCOUNT_REQUEST_GANG_LOAD,
+	ACCOUNT_REQUEST_ACHS_LOAD,
     ACCOUNT_REQUEST_LOGIN
 };
 
@@ -4217,6 +4218,7 @@ public OnPlayerText(playerid, text[])
 		    {
 		        GivePlayerAchievement(playerid, "Too Fast", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
 		        PlayerAchData[playerid][e_ach_toofast] = 1;
+		        MySQL_SaveAchievement(playerid, 4);
 		    }
 		    
 			GivePlayerScore_(playerid, xScore, true, true);
@@ -4424,12 +4426,14 @@ public OnPlayerDeath(playerid, killerid, reason)
 		{
 		    GivePlayerAchievement(killerid, "Grimreaper", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
 		    PlayerAchData[killerid][e_ach_grimreaper] = 1;
+		    MySQL_SaveAchievement(playerid, 1);
 		}
 		
 	 	if(reason == 4 && PlayerAchData[killerid][e_ach_silentkiller] == 0)
 		{
 		    GivePlayerAchievement(killerid, "Silent Killer", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
 	 		PlayerAchData[killerid][e_ach_silentkiller] = 1;
+	 		MySQL_SaveAchievement(playerid, 8);
 		}
 	}
 
@@ -4437,6 +4441,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 	{
 	    GivePlayerAchievement(playerid, "Rest in Peace", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
 	    PlayerAchData[playerid][e_ach_restinpeace] = 1;
+	    MySQL_SaveAchievement(playerid, 7);
 	}
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
@@ -4605,6 +4610,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 						{
 						    GivePlayerAchievement(killerid, "Masskiller", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
 						    PlayerAchData[killerid][e_ach_masskiller] = 1;
+						    MySQL_SaveAchievement(playerid, 2);
 						}
 					}
 					case 30:
@@ -4925,6 +4931,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 						{
 						    GivePlayerAchievement(gWinners[0], "One Shot Two Kills", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
 						    PlayerAchData[gWinners[0]][e_ach_oneshot2kills] = 1;
+						    MySQL_SaveAchievement(gWinners[0], 9);
 						}
 
 						GivePlayerScore_(gWinners[0], 10, true, true);
@@ -5137,6 +5144,7 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 				{
 					PlayerAchData[playerid][e_ach_biker] = 1;
   					GivePlayerAchievement(playerid, "Biker", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
+  					MySQL_SaveAchievement(playerid, 12);
 				}
 				SetPVarInt(playerid, "doingStunt", 0);
 				PlayerData[playerid][tickJoin_bmx] = 0;
@@ -5169,6 +5177,7 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 					{
 						PlayerAchData[playerid][e_ach_skydiver] = 1;
       					GivePlayerAchievement(playerid, "Skydiver", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
+      					MySQL_SaveAchievement(playerid, 11);
 					}
 				}
 			}
@@ -5199,6 +5208,7 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 					{
 						PlayerAchData[playerid][e_ach_skydiver] = 1;
       					GivePlayerAchievement(playerid, "Skydiver", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
+      					MySQL_SaveAchievement(playerid, 11);
 					}
 				}
 			}
@@ -5269,6 +5279,7 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 				{
 					PlayerAchData[playerid][e_ach_bmxmaster] = 1;
   					GivePlayerAchievement(playerid, "BMX Master", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
+  					MySQL_SaveAchievement(playerid, 13);
 				}
 				SetPVarInt(playerid, "doingStunt", 0);
 				PlayerData[playerid][tickJoin_bmx] = 0;
@@ -5580,6 +5591,7 @@ public OnPlayerEnterRaceCheckpoint(playerid)
 					{
 					    GivePlayerAchievement(playerid, "Elite Racer", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
 					    PlayerAchData[playerid][e_ach_eliteracer] = 1;
+					    MySQL_SaveAchievement(playerid, 3);
 					}
 		        }
 			    case 2:
@@ -6092,6 +6104,7 @@ public OnPlayerModelSelection(playerid, response, listid, modelid)
 		    {
 		        GivePlayerAchievement(playerid, "Styler", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
 		        PlayerAchData[playerid][e_ach_styler] = 1;
+		        MySQL_SaveAchievement(playerid, 0);
 		    }
 	    }
 	}
@@ -21348,6 +21361,12 @@ MySQL_LoadAccount(playerid)
 	mysql_tquery(pSQL, gstr2, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_LOAD);
 }
 
+MySQL_LoadPlayerAchs(playerid)
+{
+	mysql_format(pSQL, gstr2, sizeof(gstr2), "SELECT `type` FROM `toys` WHERE `id` = %i;", PlayerData[playerid][e_accountid]);
+	mysql_pquery(pSQL, gstr2, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_ACHS_LOAD);
+}
+
 MySQL_LoadPlayerGang(playerid)
 {
 	format(gstr2, sizeof(gstr2), "SELECT `GangName`, `GangTag` FROM `gangs` WHERE `ID` = %i LIMIT 1;", PlayerData[playerid][e_gangid]);
@@ -25272,6 +25291,7 @@ function:Derby()
 					{
 					    GivePlayerAchievement(i, "Destroyer", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
 					    PlayerAchData[i][e_ach_destroyer] = 1;
+					    MySQL_SaveAchievement(i, 6);
 					}
 
 					new money = (3500 * CurrentDerbyPlayers),
@@ -26879,6 +26899,7 @@ function:DecideFalloutWinners()
 				{
 				    GivePlayerAchievement(i, "Deep Impact", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
 				    PlayerAchData[i][e_ach_deepimpact] = 1;
+				    MySQL_SaveAchievement(i, 10);
 				}
 				
 				gTeam[i] = FREEROAM;
@@ -27353,6 +27374,7 @@ GivePlayerScore_(playerid, amount, bool:populate = true, bool:boost = false)
 	{
 	    GivePlayerAchievement(playerid, "Score Whore", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
 	    PlayerAchData[playerid][e_ach_scorewhore] = 1;
+	    MySQL_SaveAchievement(playerid, 5);
 	}
 	return 1;
 }
@@ -27367,6 +27389,7 @@ SetPlayerScore_(playerid, amount)
 	{
 	    GivePlayerAchievement(playerid, "Score Whore", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
 	    PlayerAchData[playerid][e_ach_scorewhore] = 1;
+	    MySQL_SaveAchievement(playerid, 5);
 	}
 	return 1;
 }
@@ -27579,6 +27602,15 @@ AttachPlayerToys(playerid)
             PlayerToys[playerid][i][toy_sx],
             PlayerToys[playerid][i][toy_sy],
             PlayerToys[playerid][i][toy_sz]);
+	}
+}
+
+MySQL_SaveAchievement(playerid, ach)
+{
+	if(islogged(playerid))
+	{
+		mysql_format(pSQL, gstr, sizeof(gstr), "INSERT INTO `achievements` VALUES (%i, %i, UNIX_TIMESTAMP());", PlayerData[playerid][e_accountid], ach);
+		mysql_pquery(pSQL, gstr);
 	}
 }
 
@@ -31016,25 +31048,10 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 				if(PlayerData[playerid][e_gangid] != 0) {
 					MySQL_LoadPlayerGang(playerid);
 				}
+				
+				MySQL_LoadPlayerAchs(playerid);
 
 				new buffer[255];
-
-				cache_get_row(0, 37, buffer, pSQL, sizeof(buffer));
-				sscanf(buffer, "p<,>iiiiiiiiiiiiii",
-	                PlayerAchData[playerid][e_ach_styler],
-	                PlayerAchData[playerid][e_ach_grimreaper],
-	                PlayerAchData[playerid][e_ach_masskiller],
-	                PlayerAchData[playerid][e_ach_eliteracer],
-	                PlayerAchData[playerid][e_ach_toofast],
-	                PlayerAchData[playerid][e_ach_scorewhore],
-	                PlayerAchData[playerid][e_ach_destroyer],
-	                PlayerAchData[playerid][e_ach_restinpeace],
-	                PlayerAchData[playerid][e_ach_silentkiller],
-	                PlayerAchData[playerid][e_ach_oneshot2kills],
-	                PlayerAchData[playerid][e_ach_deepimpact],
-	                PlayerAchData[playerid][e_ach_skydiver],
-	                PlayerAchData[playerid][e_ach_biker],
-					PlayerAchData[playerid][e_ach_bmxmaster]);
 
                 cache_get_row(0, 38, buffer, pSQL, sizeof(buffer)); // Slot 0
 				sscanf(buffer, "p<,>iifffffffff",
@@ -31448,6 +31465,33 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 			    format(gstr, sizeof(gstr), ""gang_sign" "grey"%s %s(%i) logged in!", GangPositions[PlayerData[playerid][e_gangrank]][E_gang_pos_name], __GetName(playerid), playerid);
 				GangMSG(PlayerData[playerid][e_gangid], gstr);
 			}
+	        return 1;
+	    }
+	    case ACCOUNT_REQUEST_ACHS_LOAD:
+	    {
+	        if(cache_get_row_count() > 0)
+	        {
+				for(new i = 0; i < cache_get_row_count(); i++)
+				{
+				    switch(cache_get_row_int(i, 0))
+				    {
+				        case 0: PlayerAchData[playerid][e_ach_styler] = 1;
+				        case 1: PlayerAchData[playerid][e_ach_grimreaper] = 1;
+				        case 2: PlayerAchData[playerid][e_ach_masskiller] = 1;
+				        case 3: PlayerAchData[playerid][e_ach_eliteracer] = 1;
+				        case 4: PlayerAchData[playerid][e_ach_toofast] = 1;
+				        case 5: PlayerAchData[playerid][e_ach_scorewhore] = 1;
+				        case 6: PlayerAchData[playerid][e_ach_destroyer] = 1;
+				        case 7: PlayerAchData[playerid][e_ach_restinpeace] = 1;
+				        case 8: PlayerAchData[playerid][e_ach_silentkiller] = 1;
+				        case 9: PlayerAchData[playerid][e_ach_oneshot2kills] = 1;
+				        case 10: PlayerAchData[playerid][e_ach_deepimpact] = 1;
+				        case 11: PlayerAchData[playerid][e_ach_skydiver] = 1;
+				        case 12: PlayerAchData[playerid][e_ach_biker] = 1;
+				        case 13: PlayerAchData[playerid][e_ach_bmxmaster] = 1;
+				    }
+				}
+	        }
 	        return 1;
 	    }
 	    case ACCOUNT_REQUEST_LOGIN:
