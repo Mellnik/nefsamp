@@ -2622,8 +2622,6 @@ public OnPlayerRequestClass(playerid, classid)
 
 public OnPlayerRequestSpawn(playerid)
 {
-    if(IsPlayerNPC(playerid)) return 1;
-
 	if(!PlayerData[playerid][AllowSpawn])
 	{
 	    //SCM(playerid, -1, ""er"You are not logged in!");
@@ -2634,8 +2632,6 @@ public OnPlayerRequestSpawn(playerid)
 
 public OnPlayerSpawn(playerid)
 {
-    if(IsPlayerNPC(playerid)) return 1;
-
     if(PlayerData[playerid][bShowToys] && !PlayerData[playerid][bFirstSpawn]) AttachPlayerToys(playerid);
     
     if(PlayerData[playerid][bFirstSpawn])
@@ -3056,8 +3052,7 @@ public OnPlayerSpawn(playerid)
 public OnPlayerFloodControl(playerid, iCount, iTimeSpan)
 {
     PlayerData[playerid][bFloodDect] = false;
-    if(IsPlayerNPC(playerid)) return 1;
-    
+
 	new p_IP[16];
 	GetPlayerIp(playerid, p_IP, 16);
     
@@ -3082,13 +3077,12 @@ public OnPlayerConnect(playerid)
     GetPlayerName(playerid, PlayerData[playerid][e_name], MAX_PLAYER_NAME + 1);
     GetPlayerIp(playerid, PlayerData[playerid][e_ip], MAX_PLAYER_IP + 1);
     
-	if(IsPlayerNPC(playerid)) return 1;
 	if(PlayerData[playerid][bFloodDect]) return 1;
 
 	new count_t = 0;
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-	    if(!IsPlayerConnected(i) || IsPlayerNPC(i)) continue;
+	    if(!IsPlayerConnected(i)) continue;
 	    if(!strcmp(__GetIP(i), PlayerData[playerid][e_ip]))
 	    {
 	        ++count_t;
@@ -3178,9 +3172,7 @@ public OnPlayerDisconnect(playerid, reason)
 {
 	mysql_format(pSQL, gstr, sizeof(gstr), "DELETE FROM `online` WHERE `name` = '%e';", __GetName(playerid));
 	mysql_pquery(pSQL, gstr);
-	
-    if(IsPlayerNPC(playerid)) return 1;
-    
+
 	PlayerData[playerid][bLoadMap] = false;
 
    	if(PlayerData[playerid][ExitType] == EXIT_FIRST_SPAWNED && PlayerData[playerid][bLogged])
@@ -3784,7 +3776,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 
 				for(new i = 0; i < MAX_PLAYERS; i++)
 				{
-				    if(IsPlayerConnected(i) && !IsPlayerNPC(i))
+				    if(IsPlayerConnected(i))
 				    {
 				        if(PlayerData[i][GangID] == gangid || PlayerData[i][TmpGangID] == gangid)
 				        {
@@ -3872,7 +3864,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 
 				for(new i = 0; i < MAX_PLAYERS; i++)
 				{
-				    if(IsPlayerNPC(i) || !IsPlayerConnected(i)) continue;
+				    if(!IsPlayerConnected(i)) continue;
 				    if(PlayerData[i][GangPosition] == 0) continue;
 				    if(PlayerData[i][GangID] != PlayerData[extraid][GangID]) continue;
 				    if(count <= 20)
@@ -8936,7 +8928,7 @@ YCMD:duel(playerid, params[], help)
         {
             if(PlayerData[playerid][DuelRequestRecv] == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Player is not available");
             if(!IsPlayerAvail(PlayerData[playerid][DuelRequestRecv])) return SCM(playerid, -1, ""er"Player is not available");
-            if(gTeam[PlayerData[playerid][DuelRequestRecv]] != FREEROAM) return SCM(playerid, -1, ""er"Player is not in normal world");
+            if(gTeam[PlayerData[playerid][DuelRequestRecv]] != FREEROAM) return SCM(playerid, -1, ""er"Player is not in freeroam world");
             if(IsPlayerOnDesktop(PlayerData[playerid][DuelRequestRecv], 1500)) return SCM(playerid, -1, ""er"Player is on desktop");
             if(PlayerData[PlayerData[playerid][DuelRequestRecv]][DuelRequest] != playerid) return SCM(playerid, -1, ""er"Error: Players do not match");
 
@@ -9728,7 +9720,7 @@ YCMD:onlinefix(playerid, params[], help)
 	    
 	    for(new i = 0; i < MAX_PLAYERS; i++)
 	    {
-	        if(IsPlayerConnected(i) && !IsPlayerNPC(i))
+	        if(IsPlayerConnected(i))
 	        {
 				format(gstr, sizeof(gstr), "INSERT INTO `online` VALUES (NULL, '%s', '%s', UNIX_TIMESTAMP());", __GetName(i), __GetIP(i));
 				mysql_tquery(pSQL, gstr, "", "");
@@ -10484,23 +10476,16 @@ YCMD:go(playerid, params[], help)
 	    if(gTeam[playerid] == FREEROAM)
 	    {
 		    new player;
-		 	if(sscanf(params, "u", player))
+		 	if(sscanf(params, "r", player))
 			{
 				return SCM(playerid, NEF_GREEN, "Usage: /go <playerid>");
 		  	}
 		  	
 			if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 			if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
-			
-			if(!IsPlayerNPC(player))
-			{
-				if(!IsPlayerAvail(player)) return SCM(playerid, -1, ""er"Player is not avialable");
-			}
-  			if(Iter_Contains(PlayerIgnore[player], playerid))
-			{
-			    return SCM(playerid, -1, ""er"This player ignores you");
-			}
-			if(player == playerid) return SCM(playerid, -1, ""er"This will not work");
+			if(!IsPlayerAvail(player)) return SCM(playerid, -1, ""er"Player is not avialable");
+  			if(Iter_Contains(PlayerIgnore[player], playerid)) return SCM(playerid, -1, ""er"This player ignores you");
+			if(player == playerid) return SCM(playerid, -1, ""er"You may not teleport to yourself");
 			if(gTeam[player] != FREEROAM) return SCM(playerid, -1, ""er"Player is currently unavailable to goto");
 			if(PlayerData[player][Wanteds] != 0) return SCM(playerid, -1, ""er"This player has wanteds");
 			if(PlayerData[player][Level] != 0) return SCM(playerid, -1, ""er"You can't teleport to admins");
@@ -10508,10 +10493,10 @@ YCMD:go(playerid, params[], help)
             if(GetPVarInt(player, "doingStunt") != 0) return SCM(playerid, -1, ""er"Player is doing stunts");
 
 			new Float:POS[3];
-
 			GetPlayerPos(player, POS[0], POS[1], POS[2]);
 			SetPlayerInterior(playerid, GetPlayerInterior(player));
 	        SetPlayerVirtualWorld(playerid, GetPlayerVirtualWorld(player));
+	        
 			if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
 			{
 				SetVehiclePos(GetPlayerVehicleID(playerid), floatadd(POS[0], 3), POS[1], POS[2]);
@@ -10522,6 +10507,7 @@ YCMD:go(playerid, params[], help)
 			{
 				SetPlayerPos(playerid, floatadd(POS[0], 2), POS[1], POS[2]);
 			}
+			
 			format(gstr, sizeof(gstr), "You have teleported to %s(%i)!", __GetName(player), player);
 			SCM(playerid, BLUE, gstr);
 			format(gstr, sizeof(gstr), "%s(%i) has teleported to you!", __GetName(playerid), playerid);
@@ -10531,55 +10517,45 @@ YCMD:go(playerid, params[], help)
 		}
 		else
 		{
-		    SCM(playerid, RED, "You need to be in normal world");
+		    SCM(playerid, RED, "You need to be in freeroam world");
 		}
 	}
-	else if(PlayerData[playerid][Level] >= 1 || IsPlayerAdmin(playerid))
+	else if(PlayerData[playerid][Level] > 0 || IsPlayerAdmin(playerid))
 	{
 	    new player;
-	 	if(sscanf(params, "u", player))
+	 	if(sscanf(params, "r", player))
 		{
 			return SCM(playerid, NEF_GREEN, "Usage: /go <playerid>");
 	  	}
 	  	
 		if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
-			
-		if(!IsPlayerNPC(player))
-		{
-			if(!IsPlayerAvail(player)) return SCM(playerid, -1, ""er"Player is not avialable");
-		}
-		
+		if(!IsPlayerAvail(player)) return SCM(playerid, -1, ""er"Player is not avialable");
 		if(gTeam[player] != FREEROAM) return SCM(playerid, -1, ""er"Player is currently unavailable to goto");
+		if(player == playerid) return SCM(playerid, -1, ""er"You may not teleport to yourself");
 		
-	 	if(player != playerid)
-	 	{
-			new Float:POS[3];
+		new Float:POS[3];
+		GetPlayerPos(player, POS[0], POS[1], POS[2]);
+		SetPlayerInterior(playerid, GetPlayerInterior(player));
+		SetPlayerVirtualWorld(playerid, GetPlayerVirtualWorld(player));
 
-			GetPlayerPos(player, POS[0], POS[1], POS[2]);
-			SetPlayerInterior(playerid, GetPlayerInterior(player));
-			SetPlayerVirtualWorld(playerid, GetPlayerVirtualWorld(player));
-			if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
-			{
-				SetVehiclePos(GetPlayerVehicleID(playerid), floatadd(POS[0], 2), POS[1], POS[2]);
-				LinkVehicleToInterior(GetPlayerVehicleID(playerid), GetPlayerInterior(player));
-				SetVehicleVirtualWorld(GetPlayerVehicleID(playerid), GetPlayerVirtualWorld(player));
-			}
-			else
-			{
-				SetPlayerPos(playerid, floatadd(POS[0], 2), POS[1], POS[2]);
-			}
-			format(gstr, sizeof(gstr), "You have teleported to %s(%i)!", __GetName(player), player);
-			SCM(playerid, BLUE, gstr);
-			format(gstr, sizeof(gstr), "%s(%i) has teleported to you!", __GetName(playerid), playerid);
-			SCM(player, BLUE, gstr);
-			SetPVarInt(playerid, "doingStunt", 0);
-			PlayerData[playerid][tickJoin_bmx] = 0;
+		if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
+		{
+			SetVehiclePos(GetPlayerVehicleID(playerid), floatadd(POS[0], 2), POS[1], POS[2]);
+			LinkVehicleToInterior(GetPlayerVehicleID(playerid), GetPlayerInterior(player));
+			SetVehicleVirtualWorld(GetPlayerVehicleID(playerid), GetPlayerVirtualWorld(player));
 		}
 		else
 		{
-			SCM(playerid, -1, ""er"Player is not available or is yourself");
+			SetPlayerPos(playerid, floatadd(POS[0], 2), POS[1], POS[2]);
 		}
+
+		format(gstr, sizeof(gstr), "You have teleported to %s(%i)!", __GetName(player), player);
+		SCM(playerid, BLUE, gstr);
+		format(gstr, sizeof(gstr), "%s(%i) has teleported to you!", __GetName(playerid), playerid);
+		SCM(player, BLUE, gstr);
+		SetPVarInt(playerid, "doingStunt", 0);
+		PlayerData[playerid][tickJoin_bmx] = 0;
 	}
 	return 1;
 }
@@ -10852,7 +10828,7 @@ YCMD:avgping(playerid, params[], help)
 	
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-	    if(IsPlayerConnected(i) && !IsPlayerNPC(i))
+	    if(IsPlayerConnected(i))
 	    {
 			players++;
 			pings += GetPlayerPing(i);
@@ -11267,7 +11243,7 @@ YCMD:gzonereset(playerid, params[], help)
 	        
 	        for(new ii = 0; ii < MAX_PLAYERS; ii++)
 	        {
-			    if(IsPlayerConnected(ii) && !IsPlayerNPC(ii))
+			    if(IsPlayerConnected(ii) )
 			    {
 					SyncGangZones(ii);
 			    }
@@ -11707,7 +11683,6 @@ YCMD:ginvite(playerid, params[], help)
 
     if(!islogged(player)) return SCM(playerid, -1, ""er"This player is not registered!");
     if(player == playerid) return SCM(playerid, -1, ""er"You can't invite yourself");
-	if(IsPlayerNPC(player)) return SCM(playerid, -1, ""er"You can't invite NPCS");
     if(PlayerData[player][GangID] != 0) return SCM(playerid, -1, ""er"Player is already in a gang");
 	if(GetPlayerScore_(player) < 100) return SCM(playerid, -1, ""er"Player needs at least 100 score");
     if(PlayerData[player][gInvite]) return SCM(playerid, -1, ""er"Player has been already invited by someone else!");
@@ -12049,7 +12024,6 @@ YCMD:tban(playerid, params[], help)
 
 		if(strlen(reason) > 50 || isnull(reason) || strlen(reason) < 2) return SCM(playerid, -1, ""er"Ban reason length: 2-50");
 	    if(player == playerid) return SCM(playerid, -1, ""er"You can not ban yourself");
-	  	if(IsPlayerNPC(player)) return SCM(playerid, -1, ""er"You can not ban NPCs");
         if(PlayerData[player][KBMarked]) return SCM(playerid, -1, ""er"This player is flagged for disconnect");
         if(time < 5 || time > 10080) return SCM(playerid, -1, ""er"5-10080 minutes");
 
@@ -12121,7 +12095,6 @@ YCMD:ban(playerid, params[], help)
 	    
 		if(strlen(reason) > 50 || isnull(reason) || strlen(reason) < 2) return SCM(playerid, -1, ""er"Ban reason length: 2-50");
 	    if(player == playerid) return SCM(playerid, -1, ""er"You can not ban yourself");
-	  	if(IsPlayerNPC(player)) return SCM(playerid, -1, ""er"You can not ban NPCs");
         if(PlayerData[player][KBMarked]) return SCM(playerid, -1, ""er"This player is flagged for disconnect");
         
 		if(badsql(reason, false) != 0)
@@ -18419,7 +18392,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				for(new i = 0; i < MAX_PLAYERS; i++)
 				{
-				    if(IsPlayerConnected(i) && !IsPlayerNPC(i) && i != playerid)
+				    if(IsPlayerConnected(i) && i != playerid)
 				    {
 				        if(PlayerData[i][GangID] == PlayerData[playerid][GangID] || PlayerData[i][TmpGangID] == PlayerData[playerid][GangID])
 				        {
@@ -22891,7 +22864,6 @@ function:mainmode()
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(IsPlayerNPC(i)) continue;
 	    if(IsPlayerConnected(i))
 	    {
 			SCM(i, -1, "Your account has been saved and you have been disconnected");
