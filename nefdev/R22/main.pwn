@@ -21365,9 +21365,53 @@ MySQL_RegisterAccount(playerid, password[])
 {
 	PlayerData[playerid][e_lastlogin] = gettime();
 	PlayerData[playerid][e_lastnc] = 0;
+    PlayerData[playerid][e_regdate] = gettime();
+    PlayerData[playerid][e_payday] = 60;
+    PlayerData[playerid][e_wanteds] = 0;
 
-	mysql_format(pSQL, gstr2, sizeof(gstr2), "INSERT INTO `accounts` (`name`, `Color`, `Hash`, `IP`, `GangPosition`, `GangID`, `RegDate`, `LastLogin`) VALUES ('%e', 0, SHA1('%e'), '%e', 0, 0, %i, %i);", __GetName(playerid), password, __GetIP(playerid), gettime(), PlayerData[playerid][e_lastlogin]);
-	mysql_pquery(pSQL, gstr2, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_REGISTER);
+	new ORM:ormid = PlayerData[playerid][e_ormid] = orm_create("accounts");
+
+	orm_addvar_int(ormid, PlayerData[playerid][e_accountid], "id");
+	orm_addvar_string(ormid, PlayerData[playerid][e_name], MAX_PLAYER_NAME + 1, "name");
+	orm_addvar_int(ormid, PlayerData[playerid][e_level], "level");
+	orm_addvar_int(ormid, PlayerData[playerid][e_score], "score");
+	orm_addvar_int(ormid, PlayerData[playerid][e_money], "money");
+	orm_addvar_int(ormid, PlayerData[playerid][e_bank], "bank");
+	orm_addvar_int(ormid, PlayerData[playerid][e_color], "color");
+	orm_addvar_int(ormid, PlayerData[playerid][e_kills], "kills");
+	orm_addvar_int(ormid, PlayerData[playerid][e_deaths], "deaths");
+	orm_addvar_int(ormid, PlayerData[playerid][e_time], "time");
+	orm_addvar_int(ormid, PlayerData[playerid][e_skin], "skin");
+	orm_addvar_int(ormid, PlayerData[playerid][e_payday], "payday");
+	orm_addvar_int(ormid, PlayerData[playerid][e_reaction], "reaction");
+	orm_addvar_int(ormid, PlayerData[playerid][e_houses], "houses");
+	orm_addvar_int(ormid, PlayerData[playerid][e_gangid], "gangid");
+	orm_addvar_int(ormid, PlayerData[playerid][e_gangrank], "gangrank");
+	orm_addvar_int(ormid, PlayerData[playerid][e_addpvslots], "addpvslots");
+	orm_addvar_int(ormid, PlayerData[playerid][e_addtoyslots], "addtoyslots");
+	orm_addvar_int(ormid, PlayerData[playerid][e_addhouseslots], "addhouseslots");
+	orm_addvar_int(ormid, PlayerData[playerid][e_addbizzslots], "addbizzslots");
+	orm_addvar_int(ormid, PlayerData[playerid][e_addhouseitemslots], "addhouseitemslots");
+	orm_addvar_int(ormid, PlayerData[playerid][e_derbywins], "derbywins");
+	orm_addvar_int(ormid, PlayerData[playerid][e_racewins], "racewins");
+	orm_addvar_int(ormid, PlayerData[playerid][e_tdmwins], "tdmwins");
+	orm_addvar_int(ormid, PlayerData[playerid][e_falloutwins], "falloutwins");
+	orm_addvar_int(ormid, PlayerData[playerid][e_gungamewins], "gungamewins");
+	orm_addvar_int(ormid, PlayerData[playerid][e_eventwins], "eventwins");
+	orm_addvar_int(ormid, PlayerData[playerid][e_wanteds], "wanteds");
+	orm_addvar_int(ormid, PlayerData[playerid][e_vip], "vip");
+	orm_addvar_int(ormid, PlayerData[playerid][e_credits], "credits");
+	orm_addvar_int(ormid, PlayerData[playerid][e_medkits], "medkits");
+	orm_addvar_int(ormid, PlayerData[playerid][e_regdate], "regdate");
+	orm_addvar_int(ormid, PlayerData[playerid][e_lastlogin], "lastlogin");
+	orm_addvar_int(ormid, PlayerData[playerid][e_lastnc], "lastnc");
+	orm_addvar_int(ormid, PlayerData[playerid][e_skinsave], "skinsave");
+
+	orm_setkey(ormid, "id");
+	orm_insert(ormid, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_REGISTER);
+
+	mysql_format(pSQL, gstr, sizeof(gstr), "UPDATE `accounts` SET `hash` = SHA1('%e'), `ip` = '%s' WHERE `name` = '%s';", password, __GetIP(playerid), __GetName(playerid));
+	mysql_tquery(pSQL, gstr);
 }
 
 MySQL_RegisterAccount2(playerid, password[])
@@ -30508,14 +30552,11 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 	    }
 	    case ACCOUNT_REQUEST_REGISTER:
 	    {
-		    PlayerData[playerid][e_accountid] = cache_insert_id();
-		    PlayerData[playerid][e_regdate] = gettime();
 			PlayerData[playerid][ExitType] = EXIT_LOGGED;
-			PlayerData[playerid][e_payday] = 60;
 			PlayerData[playerid][ConnectTime] = gettime();
 		    PlayerData[playerid][AllowSpawn] = true;
-		    PlayerData[playerid][e_wanteds] = 0;
 		    PlayerData[playerid][bLogged] = true;
+            SrvStat[2]++;
 
 			format(gstr, sizeof gstr, "["SVRSC"] %s(%i) "GREEN_E"has registered, making the server have a total of "LB2_E"%i "GREEN_E"players registered.", __GetName(playerid), playerid, cache_insert_id());
 			SCMToAll(COLOR_PINK, gstr);
@@ -30529,10 +30570,8 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 			format(gstr, sizeof(gstr), "~y~[] ~w~%i", PlayerData[playerid][e_wanteds]);
 			PlayerTextDrawSetString(playerid, TXTWantedsTD[playerid], gstr);
 
-			SrvStat[2]++;
-
 		    GameTextForPlayer(playerid, "Welcome", 3000, 4);
-	  		GivePlayerCash(playerid, 200000, false);
+	  		GivePlayerCash(playerid, 20000, false);
 	    	GameTextForPlayer(playerid, "~n~+$20,000~n~Startcash", 3000, 1);
 			SCM(playerid, -1, ""server_sign" "r_besch"You are now registered, and have been logged in!");
 
@@ -30601,6 +30640,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 				orm_addvar_int(ormid, PlayerData[playerid][e_lastlogin], "lastlogin");
 				orm_addvar_int(ormid, PlayerData[playerid][e_lastnc], "lastnc");
 				orm_addvar_int(ormid, PlayerData[playerid][e_skinsave], "skinsave");
+				
 				orm_setkey(ormid, "id");
 				orm_apply_cache(ormid, 0);
 
