@@ -3127,7 +3127,7 @@ public OnPlayerConnect(playerid)
 	}
 	else
 	{
-	    Log(LOG_PLAYER, "%s(%i, %s, %s) connected.", __GetName(playerid), playerid, __GetIP(playerid), __GetSerial(playerid));
+	    Log(LOG_NET, "%s(%i, %s, %s) connected.", __GetName(playerid), playerid, __GetIP(playerid), __GetSerial(playerid));
 	
 		TextDrawShowForPlayer(playerid, TXTOnJoin[0]);
 		TextDrawShowForPlayer(playerid, TXTOnJoin[1]);
@@ -16813,7 +16813,7 @@ function:OnPlayerNameChangeRequest(newname[], playerid)
 				}
             }
             
-            format(query, sizeof(query), "UPDATE `accounts` SET `Name` = '%s' WHERE `Name` = '%s' LIMIT 1;", newname, oldname);
+            format(query, sizeof(query), "UPDATE `accounts` SET `name` = '%s' WHERE `name` = '%s' LIMIT 1;", newname, oldname);
             mysql_tquery(pSQL, query, "", "");
             
             format(query, sizeof(query), "UPDATE `race_records` SET `name` = '%s' WHERE `name` = '%s';", newname, oldname);
@@ -16841,7 +16841,7 @@ function:OnPlayerNameChangeRequest(newname[], playerid)
 			new nextnc = (PlayerData[playerid][e_lastnc] + ((PlayerData[playerid][e_vip] == 1) ? (2592000) : (7776000)));
 			
 			format(query, sizeof(query), ""white"You have successfully changed your name.\n\nNew name: %s\nOld name: %s\nNext namechange available: %s", newname, oldname, UTConvert(nextnc));
-			ShowPlayerDialog(playerid, NAME_CHANGE_DIALOG + 5, DIALOG_STYLE_MSGBOX, ""nef" :: Namechange", query, "OK", "");
+			ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Namechange", query, "OK", "");
 			
 			format(query, sizeof(query), ""nef" %s(%i) has changed their name to %s", oldname, playerid, newname);
 			SCMToAll(-1, query);
@@ -18139,11 +18139,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 if(!strcmp(inputtext, __GetName(playerid), false)) return SCM(playerid, -1, ""er"You are already using that name");
 	            if(!strcmp(inputtext, __GetName(playerid), true)) return SCM(playerid, -1, ""er"The name only differs in case. Just relog with that.");
 
-				new newname[MAX_PLAYER_NAME+1], query[255];
-				mysql_escape_string(inputtext, newname, pSQL, MAX_PLAYER_NAME+1);
+				new newname[MAX_PLAYER_NAME + 1];
+				mysql_escape_string(inputtext, newname, pSQL, MAX_PLAYER_NAME + 1);
 				
-                format(query, sizeof(query), "SELECT `ID` FROM `accounts` WHERE `Name` = '%s';", newname);
-                mysql_tquery(pSQL, query, "OnPlayerNameChangeRequest", "si", newname, playerid);
+                mysql_format(pSQL, gstr, sizeof(gstr), "SELECT `id` FROM `accounts` WHERE `name` = '%e';", inputtext);
+                mysql_tquery(pSQL, gstr, "OnPlayerNameChangeRequest", "si", newname, playerid);
 	            return true;
 	        }
 	        case HAREFILL_DIALOG:
@@ -27423,7 +27423,7 @@ function:ShowDialog(playerid, dialogid)
 						UTConvert(PlayerData[playerid][e_lastnc]),
 						UTConvert(PlayerData[playerid][e_lastnc] + 2592000),
 						__GetName(playerid));
-					return ShowPlayerDialog(playerid, NAME_CHANGE_DIALOG + 5, DIALOG_STYLE_MSGBOX, ""nef" :: Namechange", string, "OK", "");
+					return ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Namechange", string, "OK", "");
 	            }
 	            else
 	            {
@@ -27452,7 +27452,7 @@ function:ShowDialog(playerid, dialogid)
 						UTConvert(PlayerData[playerid][e_lastnc]),
 						UTConvert(PlayerData[playerid][e_lastnc] + 7776000),
 						__GetName(playerid));
-					return ShowPlayerDialog(playerid, NAME_CHANGE_DIALOG + 5, DIALOG_STYLE_MSGBOX, ""nef" :: Namechange", string, "OK", "");
+					return ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Namechange", string, "OK", "");
 	            }
 	            else
 	            {
