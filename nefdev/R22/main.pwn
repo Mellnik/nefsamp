@@ -547,6 +547,7 @@ enum (+= 10)
 	ACCOUNT_REQUEST_IP_BANNED,
 	ACCOUNT_REQUEST_EXIST,
 	ACCOUNT_REQUEST_AUTO_LOGIN,
+	ACCOUNT_REQUST_VERIFY_REGISTER,
 	ACCOUNT_REQUEST_REGISTER,
 	ACCOUNT_REQUEST_LOAD,
 	ACCOUNT_REQUEST_GANG_LOAD,
@@ -3125,6 +3126,8 @@ public OnPlayerConnect(playerid)
 	}
 	else
 	{
+	    Log(LOG_PLAYER, "%s(%i, %s, %s) connected.", __GetName(playerid), playerid, __GetIP(playerid), __GetSerial(playerid));
+	
 		TextDrawShowForPlayer(playerid, TXTOnJoin[0]);
 		TextDrawShowForPlayer(playerid, TXTOnJoin[1]);
 		TextDrawHideForPlayer(playerid, TXTTeleportInfo);
@@ -30923,9 +30926,35 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 		    }
 		    else
 		    {
-		        RequestRegistration(playerid);
+		        mysql_format(pSQL, gstr, sizeof(gstr), "SELECT COUNT(`id`) FROM `accounts` WHERE `ip` = '%s' AND `regdate` > (UNIX_TIMESTAMP() - 5184000);", __GetIP(playerid));
+		        mysql_pquery(pSQL, gstr, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUST_VERIFY_REGISTER);
 		    }
 	        return 1;
+	    }
+	    case ACCOUNT_REQUST_VERIFY_REGISTER:
+	    {
+	        if(cache_get_row_count() > 4)
+	        {
+	            Log(LOG_PLAYER, "%s, %i accounts found by %s. Kicking player...", __GetName(playerid), cache_get_row_count(), __GetIP(playerid));
+				Kick(playerid);
+			}
+			else
+			{
+		        mysql_format(pSQL, gstr, sizeof(gstr), "SELECT COUNT(`id`) FROM `accounts` WHERE `serial` = '%s' AND `regdate` > (UNIX_TIMESTAMP() - 5184000);", __GetSerial(playerid));
+		        mysql_pquery(pSQL, gstr, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUST_VERIFY_REGISTER + 1);
+			}
+	    }
+	    case ACCOUNT_REQUST_VERIFY_REGISTER + 1:
+	    {
+	        if(cache_get_row_count() > 5)
+	        {
+	            Log(LOG_PLAYER, "%s, %i accounts found by %s. Kicking player...", __GetName(playerid), cache_get_row_count(), __GetSerial(playerid));
+				Kick(playerid);
+	        }
+	        else
+	        {
+	            RequestRegistration(playerid);
+	        }
 	    }
 	    case ACCOUNT_REQUEST_AUTO_LOGIN:
 	    {
