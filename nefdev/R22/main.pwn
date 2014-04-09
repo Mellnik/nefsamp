@@ -899,25 +899,7 @@ enum E_PV_DATA
 	e_vehicleid,
 	Text3D:e_labelid,
 	e_neon1,
-	e_neon2,
-
-	Mod1,
-	Mod2,
-	Mod3,
-	Mod4,
-	Mod5,
-	Mod6,
-	Mod7,
-	Mod8,
-	Mod9,
-	Mod10,
-	Mod11,
-	Mod12,
-	Mod13,
-	Mod14,
-	Mod15,
-	Mod16,
-	Mod17
+	e_neon2
 };
 
 // Server related
@@ -19554,25 +19536,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					    PlayerPVData[playerid][PVVMenuSel[playerid]][e_paintjob] = -1;
 					    PlayerPVData[playerid][PVVMenuSel[playerid]][e_color1] = 0;
 					    PlayerPVData[playerid][PVVMenuSel[playerid]][e_color2] = 0;
-					    PlayerPVData[playerid][PVVMenuSel[playerid]][Mod1] = 0;
-					    PlayerPVData[playerid][PVVMenuSel[playerid]][Mod2] = 0;
-					    PlayerPVData[playerid][PVVMenuSel[playerid]][Mod3] = 0;
-					    PlayerPVData[playerid][PVVMenuSel[playerid]][Mod4] = 0;
-					    PlayerPVData[playerid][PVVMenuSel[playerid]][Mod5] = 0;
-					    PlayerPVData[playerid][PVVMenuSel[playerid]][Mod6] = 0;
-					    PlayerPVData[playerid][PVVMenuSel[playerid]][Mod7] = 0;
-					    PlayerPVData[playerid][PVVMenuSel[playerid]][Mod8] = 0;
-					    PlayerPVData[playerid][PVVMenuSel[playerid]][Mod9] = 0;
-					    PlayerPVData[playerid][PVVMenuSel[playerid]][Mod10] = 0;
-					    PlayerPVData[playerid][PVVMenuSel[playerid]][Mod11] = 0;
-					    PlayerPVData[playerid][PVVMenuSel[playerid]][Mod12] = 0;
-					    PlayerPVData[playerid][PVVMenuSel[playerid]][Mod13] = 0;
-					    PlayerPVData[playerid][PVVMenuSel[playerid]][Mod14] = 0;
-					    PlayerPVData[playerid][PVVMenuSel[playerid]][Mod15] = 0;
-					    PlayerPVData[playerid][PVVMenuSel[playerid]][Mod16] = 0;
-					    PlayerPVData[playerid][PVVMenuSel[playerid]][Mod17] = 0;
 					    PlayerPVData[playerid][PVVMenuSel[playerid]][e_neon1] = -1;
 					    PlayerPVData[playerid][PVVMenuSel[playerid]][e_neon2] = -1;
+					    for(new i = 0; i < 17; i++)
+					    {
+					        PlayerPVData[playerid][PVVMenuSel[playerid]][e_mods][i] = 0;
+					    }
 
                         strmid(PlayerPVData[playerid][PVVMenuSel[playerid]][e_plate], "Plate", 0, 13, 13);
                         
@@ -26750,89 +26719,12 @@ function:ModVehiclePaintJob(playerid)
 
 function:ModVehicleComponents(playerid)
 {
-	if(PlayerPVData[playerid][PVSelect[playerid]][Mod1] != 0)
-	{
-		AddVehicleComponent(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][Mod1]);
-	}
-
-	if(PlayerPVData[playerid][PVSelect[playerid]][Mod2] != 0)
-	{
-		AddVehicleComponent(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][Mod2]);
-	}
-
-	if(PlayerPVData[playerid][PVSelect[playerid]][Mod3] != 0)
-	{
-		AddVehicleComponent(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][Mod3]);
-	}
-
-	if(PlayerPVData[playerid][PVSelect[playerid]][Mod4] != 0)
-	{
-		AddVehicleComponent(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][Mod4]);
-	}
-
-	if(PlayerPVData[playerid][PVSelect[playerid]][Mod5] != 0)
-	{
-		AddVehicleComponent(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][Mod5]);
-	}
-
-	if(PlayerPVData[playerid][PVSelect[playerid]][Mod6] != 0)
-	{
-		AddVehicleComponent(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][Mod6]);
-	}
-
-	if(PlayerPVData[playerid][PVSelect[playerid]][Mod7] != 0)
-	{
-		AddVehicleComponent(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][Mod7]);
-	}
-
-	if(PlayerPVData[playerid][PVSelect[playerid]][Mod8] != 0)
-	{
-		AddVehicleComponent(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][Mod8]);
-  	}
-
-	if(PlayerPVData[playerid][PVSelect[playerid]][Mod9] != 0)
-	{
-		AddVehicleComponent(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][Mod9]);
-	}
-
-	if(PlayerPVData[playerid][PVSelect[playerid]][Mod10] != 0)
-	{
-		AddVehicleComponent(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][Mod10]);
-	}
-
-	if(PlayerPVData[playerid][PVSelect[playerid]][Mod11] != 0)
-	{
-		AddVehicleComponent(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][Mod11]);
-	}
-
-	if(PlayerPVData[playerid][PVSelect[playerid]][Mod12] != 0)
-	{
-		AddVehicleComponent(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][Mod12]);
-	}
-
-	if(PlayerPVData[playerid][PVSelect[playerid]][Mod13] != 0)
-	{
-		AddVehicleComponent(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][Mod13]);
-	}
-
-	if(PlayerPVData[playerid][PVSelect[playerid]][Mod14] != 0)
-	{
-		AddVehicleComponent(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][Mod14]);
-	}
-
-	if(PlayerPVData[playerid][PVSelect[playerid]][Mod15] != 0)
-	{
-		AddVehicleComponent(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][Mod15]);
-	}
-
-	if(PlayerPVData[playerid][PVSelect[playerid]][Mod16] != 0)
-	{
-		AddVehicleComponent(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][Mod16]);
-	}
-
-	if(PlayerPVData[playerid][PVSelect[playerid]][Mod17] != 0)
-	{
-		AddVehicleComponent(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][Mod17]);
+    for(new i = 0; i < 17; i++)
+    {
+        if(PlayerPVData[playerid][PVSelect[playerid]][e_mods][i] != 0)
+        {
+            AddVehicleComponent(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][e_mods][i]);
+        }
 	}
 	return 1;
 }
@@ -26843,7 +26735,7 @@ function:SaveVehComponets(playerid, componentid)
 	{
     	if(componentid == pv_spoiler[s][0])
 		{
-      		PlayerPVData[playerid][PVSelect[playerid]][Mod1] = componentid;
+      		PlayerPVData[playerid][PVSelect[playerid]][e_mods][0] = componentid;
    	    }
 	}
 
@@ -26851,7 +26743,7 @@ function:SaveVehComponets(playerid, componentid)
 	{
     	if(componentid == pv_nitro[s][0])
 		{
-    		PlayerPVData[playerid][PVSelect[playerid]][Mod2] = componentid;
+    		PlayerPVData[playerid][PVSelect[playerid]][e_mods][1] = componentid;
    		}
 	}
 
@@ -26859,7 +26751,7 @@ function:SaveVehComponets(playerid, componentid)
 	{
     	if(componentid == pv_fbumper[s][0])
 		{
-    		PlayerPVData[playerid][PVSelect[playerid]][Mod3] = componentid;
+    		PlayerPVData[playerid][PVSelect[playerid]][e_mods][2] = componentid;
    	 	}
 	}
 
@@ -26867,7 +26759,7 @@ function:SaveVehComponets(playerid, componentid)
 	{
     	if(componentid == pv_rbumper[s][0])
 		{
-    		PlayerPVData[playerid][PVSelect[playerid]][Mod4] = componentid;
+    		PlayerPVData[playerid][PVSelect[playerid]][e_mods][3] = componentid;
    		}
 	}
 
@@ -26875,7 +26767,7 @@ function:SaveVehComponets(playerid, componentid)
 	{
      	if(componentid == pv_exhaust[s][0])
 		{
-       		PlayerPVData[playerid][PVSelect[playerid]][Mod5] = componentid;
+       		PlayerPVData[playerid][PVSelect[playerid]][e_mods][4] = componentid;
 		}
 	}
 
@@ -26883,7 +26775,7 @@ function:SaveVehComponets(playerid, componentid)
 	{
 		if(componentid == pv_bventr[s][0])
 		{
-			PlayerPVData[playerid][PVSelect[playerid]][Mod6] = componentid;
+			PlayerPVData[playerid][PVSelect[playerid]][e_mods][5] = componentid;
  		}
 	}
 
@@ -26891,7 +26783,7 @@ function:SaveVehComponets(playerid, componentid)
 	{
 		if(componentid == pv_bventl[s][0])
 		{
-			PlayerPVData[playerid][PVSelect[playerid]][Mod7] = componentid;
+			PlayerPVData[playerid][PVSelect[playerid]][e_mods][6] = componentid;
  		}
 	}
 
@@ -26899,7 +26791,7 @@ function:SaveVehComponets(playerid, componentid)
 	{
 		if(componentid == pv_bscoop[s][0])
 		{
-			PlayerPVData[playerid][PVSelect[playerid]][Mod8] = componentid;
+			PlayerPVData[playerid][PVSelect[playerid]][e_mods][7] = componentid;
  		}
 	}
 
@@ -26907,7 +26799,7 @@ function:SaveVehComponets(playerid, componentid)
 	{
 		if(componentid == pv_roof[s][0])
 		{
-			PlayerPVData[playerid][PVSelect[playerid]][Mod9] = componentid;
+			PlayerPVData[playerid][PVSelect[playerid]][e_mods][8] = componentid;
 		}
 	}
 
@@ -26915,7 +26807,7 @@ function:SaveVehComponets(playerid, componentid)
 	{
 		if(componentid == pv_lskirt[s][0])
 		{
-			PlayerPVData[playerid][PVSelect[playerid]][Mod10] = componentid;
+			PlayerPVData[playerid][PVSelect[playerid]][e_mods][9] = componentid;
 		}
 	}
 
@@ -26923,7 +26815,7 @@ function:SaveVehComponets(playerid, componentid)
 	{
 		if(componentid == pv_rskirt[s][0])
 		{
-			PlayerPVData[playerid][PVSelect[playerid]][Mod11] = componentid;
+			PlayerPVData[playerid][PVSelect[playerid]][e_mods][10] = componentid;
  		}
 	}
 
@@ -26931,7 +26823,7 @@ function:SaveVehComponets(playerid, componentid)
 	{
 		if(componentid == pv_hydraulics[s][0])
 		{
-			PlayerPVData[playerid][PVSelect[playerid]][Mod12] = componentid;
+			PlayerPVData[playerid][PVSelect[playerid]][e_mods][11] = componentid;
 		}
 	}
 
@@ -26939,7 +26831,7 @@ function:SaveVehComponets(playerid, componentid)
 	{
      	if(componentid == pv_base[s][0])
  		{
-       		PlayerPVData[playerid][PVSelect[playerid]][Mod13] = componentid;
+       		PlayerPVData[playerid][PVSelect[playerid]][e_mods][12] = componentid;
 		}
 	}
 
@@ -26947,7 +26839,7 @@ function:SaveVehComponets(playerid, componentid)
 	{
      	if(componentid == pv_rbbars[s][0])
  		{
-       		PlayerPVData[playerid][PVSelect[playerid]][Mod14] = componentid;
+       		PlayerPVData[playerid][PVSelect[playerid]][e_mods][13] = componentid;
  		}
 	}
 
@@ -26955,7 +26847,7 @@ function:SaveVehComponets(playerid, componentid)
 	{
     	if(componentid == pv_fbbars[s][0])
 		{
-    		PlayerPVData[playerid][PVSelect[playerid]][Mod15] = componentid;
+    		PlayerPVData[playerid][PVSelect[playerid]][e_mods][14] = componentid;
 		}
 	}
 
@@ -26963,7 +26855,7 @@ function:SaveVehComponets(playerid, componentid)
 	{
     	if(componentid == pv_wheels[s][0])
 		{
-      		PlayerPVData[playerid][PVSelect[playerid]][Mod16] = componentid;
+      		PlayerPVData[playerid][PVSelect[playerid]][e_mods][15] = componentid;
    	    }
 	}
 
@@ -26971,7 +26863,7 @@ function:SaveVehComponets(playerid, componentid)
 	{
     	if(componentid == pv_lights[s][0])
 		{
-			PlayerPVData[playerid][PVSelect[playerid]][Mod17] = componentid;
+			PlayerPVData[playerid][PVSelect[playerid]][e_mods][16] = componentid;
  		}
     }
 	return 1;
@@ -27294,25 +27186,12 @@ PreparePlayerPV(playerid)
 	    PlayerPVData[playerid][i][e_paintjob] = -1;
 	    PlayerPVData[playerid][i][e_color1] = 0;
 	    PlayerPVData[playerid][i][e_color2] = 0;
-	    PlayerPVData[playerid][i][Mod1] = 0;
-	    PlayerPVData[playerid][i][Mod2] = 0;
-	    PlayerPVData[playerid][i][Mod3] = 0;
-	    PlayerPVData[playerid][i][Mod4] = 0;
-	    PlayerPVData[playerid][i][Mod5] = 0;
-	    PlayerPVData[playerid][i][Mod6] = 0;
-	    PlayerPVData[playerid][i][Mod7] = 0;
-	    PlayerPVData[playerid][i][Mod8] = 0;
-	    PlayerPVData[playerid][i][Mod9] = 0;
-	    PlayerPVData[playerid][i][Mod10] = 0;
-	    PlayerPVData[playerid][i][Mod11] = 0;
-	    PlayerPVData[playerid][i][Mod12] = 0;
-	    PlayerPVData[playerid][i][Mod13] = 0;
-	    PlayerPVData[playerid][i][Mod14] = 0;
-	    PlayerPVData[playerid][i][Mod15] = 0;
-	    PlayerPVData[playerid][i][Mod16] = 0;
-	    PlayerPVData[playerid][i][Mod17] = 0;
-	    PlayerPVData[playerid][i][e_neon1] = -1;
+ 	    PlayerPVData[playerid][i][e_neon1] = -1;
 	    PlayerPVData[playerid][i][e_neon2] = -1;
+		for(new r = 0; r < 17; r++)
+	    {
+            PlayerPVData[playerid][i][e_mods][r] = 0;
+	    }
 	    strmid(PlayerPVData[playerid][i][e_plate], "Plate", 0, 13, 13);
 	}
 }
@@ -30812,15 +30691,15 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 					
 					PlayerToyData[playerid][r][toy_model] = cache_get_row_int(i, 2);
 					PlayerToyData[playerid][r][toy_bone] = cache_get_row_int(i, 3);
-					PlayerToyData[playerid][r][toy_x] = cache_get_row_int(i, 4);
-					PlayerToyData[playerid][r][toy_y] = cache_get_row_int(i, 5);
-					PlayerToyData[playerid][r][toy_z] = cache_get_row_int(i, 6);
-					PlayerToyData[playerid][r][toy_rx] = cache_get_row_int(i, 7);
-					PlayerToyData[playerid][r][toy_ry] = cache_get_row_int(i, 8);
-					PlayerToyData[playerid][r][toy_rz] = cache_get_row_int(i, 9);
-					PlayerToyData[playerid][r][toy_sx] = cache_get_row_int(i, 10);
-					PlayerToyData[playerid][r][toy_sy] = cache_get_row_int(i, 11);
-					PlayerToyData[playerid][r][toy_sz] = cache_get_row_int(i, 12);
+					PlayerToyData[playerid][r][toy_x] = cache_get_row_float(i, 4);
+					PlayerToyData[playerid][r][toy_y] = cache_get_row_float(i, 5);
+					PlayerToyData[playerid][r][toy_z] = cache_get_row_float(i, 6);
+					PlayerToyData[playerid][r][toy_rx] = cache_get_row_float(i, 7);
+					PlayerToyData[playerid][r][toy_ry] = cache_get_row_float(i, 8);
+					PlayerToyData[playerid][r][toy_rz] = cache_get_row_float(i, 9);
+					PlayerToyData[playerid][r][toy_sx] = cache_get_row_float(i, 10);
+					PlayerToyData[playerid][r][toy_sy] = cache_get_row_float(i, 11);
+					PlayerToyData[playerid][r][toy_sz] = cache_get_row_float(i, 12);
 	            }
 	        }
 	        return 1;
