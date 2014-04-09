@@ -885,9 +885,6 @@ enum E_TOY_DATA
 
 enum E_PV_DATA
 {
-	/* ORM */
-	ORM:e_ormid,
-	
 	/* DATA */
 	e_model,
 	e_plate[13],
@@ -21269,7 +21266,8 @@ MySQL_SaveAccount(playerid, bool:toys = true, bool:pv = true)
     
     orm_update(PlayerData[playerid][e_ormid]);
 
-    if(toys) {
+    if(toys)
+	{
         mysql_format(pSQL, gstr, sizeof(gstr), "DELETE FROM `toys` WHERE `id` = %i;", PlayerData[playerid][e_accountid]);
 		mysql_tquery(pSQL, gstr);
 		
@@ -21297,9 +21295,44 @@ MySQL_SaveAccount(playerid, bool:toys = true, bool:pv = true)
 		}
     }
 
-    if(pv) {
+    if(pv)
+	{
         mysql_format(pSQL, gstr, sizeof(gstr), "DELETE FROM `vehicles` WHERE `id` = %i;", PlayerData[playerid][e_accountid]);
 		mysql_tquery(pSQL, gstr);
+		
+		new buff[512];
+		for(new i = 0; i < MAX_PLAYER_PVS; i++)
+		{
+		    if(PlayerPVData[playerid][i][e_model] != 0)
+		    {
+		        mysql_format(pSQL, buff, sizeof(buff), "INSERT INTO `vehicles` VALUES (%i, %i, %i, '%e', %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i, %i);",
+				    PlayerData[playerid][e_accountid],
+				    i,
+				    PlayerPVData[playerid][i][e_model],
+				    PlayerPVData[playerid][i][e_plate],
+				    PlayerPVData[playerid][i][e_paintjob],
+				    PlayerPVData[playerid][i][e_color1],
+				    PlayerPVData[playerid][i][e_color2],
+				    PlayerPVData[playerid][i][e_mods][0],
+				    PlayerPVData[playerid][i][e_mods][1],
+				    PlayerPVData[playerid][i][e_mods][2],
+				    PlayerPVData[playerid][i][e_mods][3],
+				    PlayerPVData[playerid][i][e_mods][4],
+				    PlayerPVData[playerid][i][e_mods][5],
+				    PlayerPVData[playerid][i][e_mods][6],
+				    PlayerPVData[playerid][i][e_mods][7],
+				    PlayerPVData[playerid][i][e_mods][8],
+				    PlayerPVData[playerid][i][e_mods][9],
+				    PlayerPVData[playerid][i][e_mods][10],
+				    PlayerPVData[playerid][i][e_mods][11],
+				    PlayerPVData[playerid][i][e_mods][12],
+				    PlayerPVData[playerid][i][e_mods][13],
+				    PlayerPVData[playerid][i][e_mods][14],
+				    PlayerPVData[playerid][i][e_mods][15],
+				    PlayerPVData[playerid][i][e_mods][16]);
+				mysql_tquery(pSQL, buff);
+		    }
+		}
     }
     return 1;
 }
