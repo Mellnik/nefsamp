@@ -2633,7 +2633,7 @@ public OnPlayerRequestSpawn(playerid)
 
 public OnPlayerSpawn(playerid)
 {
-    if(PlayerData[playerid][bShowToys] && !PlayerData[playerid][bFirstSpawn]) AttachPlayerToyData(playerid);
+    if(PlayerData[playerid][bShowToys] && !PlayerData[playerid][bFirstSpawn]) AttachPlayerToy(playerid);
     
     if(PlayerData[playerid][bFirstSpawn])
     {
@@ -2641,7 +2641,7 @@ public OnPlayerSpawn(playerid)
 		PlayerData[playerid][AllowSpawn] = false;
 		RemovePlayerAttachedObject(playerid, 0);
 		RemovePlayerAttachedObject(playerid, 1);
-		AttachPlayerToyData(playerid);
+		AttachPlayerToy(playerid);
 		StopAudioStreamForPlayer(playerid);
 		ResetPlayerWorld(playerid);
 		PlayerData[playerid][ExitType] = EXIT_FIRST_SPAWNED;
@@ -16084,11 +16084,11 @@ YCMD:toggletoys(playerid, params[], help)
 
 	if(PlayerData[playerid][bShowToys])
 	{
-	    RemovePlayerToyData(playerid);
+	    RemovePlayerToy(playerid);
 	}
 	else if(!PlayerData[playerid][bShowToys])
 	{
-	    AttachPlayerToyData(playerid);
+	    AttachPlayerToy(playerid);
 	}
 
 	PlayerData[playerid][bShowToys] = !PlayerData[playerid][bShowToys];
@@ -21295,283 +21295,44 @@ MySQL_KickFromGangIfExist(playerid)
 
 MySQL_SaveAccount(playerid, bool:toys = true, bool:pv = true)
 {
+    if(!islogged(playerid)) return 1;
+    
+    PlayerData[playerid][e_time] = PlayerData[playerid][e_time] + (gettime() - PlayerData[playerid][ConnectTime]);
+    PlayerData[playerid][ConnectTime] = gettime();
+    
     orm_update(PlayerData[playerid][e_ormid]);
 
     if(toys) {
-
+        mysql_format(pSQL, gstr, sizeof(gstr), "DELETE FROM `toys` WHERE `id` = %i;", PlayerData[playerid][e_accountid]);
+		mysql_tquery(pSQL, gstr);
+		
+		new buff[512];
+		for(new i = 0; i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
+		{
+		    if(PlayerToyData[playerid][i][toy_model] != 0)
+		    {
+				mysql_format(pSQL, buff, sizeof(buff), "INSERT INTO `toys` VALUES (%i, %i, %i, %i, %f, %f, %f, %f, %f, %f, %f, %f, %f);",
+				    PlayerData[playerid][e_accountid],
+				    i,
+				    PlayerToyData[playerid][i][toy_model],
+				    PlayerToyData[playerid][i][toy_bone],
+				    PlayerToyData[playerid][i][toy_x],
+				    PlayerToyData[playerid][i][toy_y],
+				    PlayerToyData[playerid][i][toy_z],
+				    PlayerToyData[playerid][i][toy_rx],
+				    PlayerToyData[playerid][i][toy_ry],
+				    PlayerToyData[playerid][i][toy_rz],
+				    PlayerToyData[playerid][i][toy_sx],
+				    PlayerToyData[playerid][i][toy_sy],
+				    PlayerToyData[playerid][i][toy_sz]);
+				mysql_tquery(pSQL, buff);
+		    }
+		}
     }
 
     if(pv) {
 
     }
-}
-
-MySQL_SavePlayer(playerid, bool:save_pv)
-{
-	if(!islogged(playerid)) return 1;
-	
-	new query[1400],
-	 	query2[600];
-
-    PlayerData[playerid][e_time] = PlayerData[playerid][e_time] + (gettime() - PlayerData[playerid][ConnectTime]);
-    PlayerData[playerid][ConnectTime] = gettime();
-
-	format(query, sizeof(query), "UPDATE `accounts` SET `Level` = %i, `Score` = %i, `Money` = %i, `Bank` = %i, `Kills` = %i, `Deaths` = %i, `Time` = %i, \
-	`Reaction` = %i, `PayDay` = %i, `Houses` = %i, `Props` = %i, `GangPosition` = %i, `GangID` = %i, `AdditionalPVSlots` = %i, `AdditionalToySlots` = %i, \
-	`AdditionalHouseSlots` = %i, `AdditionalPropSlots` = %i, `AdditionalHouseObjSlots` = %i, `DerbyWins` = %i",
-		PlayerData[playerid][e_level],
-		GetPlayerScore_(playerid),
-		GetPlayerCash(playerid),
-		PlayerData[playerid][e_bank],
-		PlayerData[playerid][e_kills],
-		PlayerData[playerid][e_deaths],
-		PlayerData[playerid][e_time],
-		PlayerData[playerid][e_reaction],
-		PlayerData[playerid][e_payday],
-		PlayerData[playerid][e_houses],
-		PlayerData[playerid][e_gangrank],
-		PlayerData[playerid][e_gangid],
-		PlayerData[playerid][e_addpvslots],
-		PlayerData[playerid][e_addtoyslots],
-		PlayerData[playerid][e_addhouseslots],
-		PlayerData[playerid][e_addbizzslots],
-		PlayerData[playerid][e_addhouseitemslots],
-		PlayerData[playerid][e_derbywins]);
-
-    format(query2, sizeof(query2), ", `Color` = %i, `Medkits` = %i, `Skin` = %i, `GungameWins` = %i, `RaceWins` = %i, `BGWins` = %i, `FalloutWins` = %i, `Wanteds` = %i, `VIP` = %i, `LastNameChange` = %i, `SavedSkin` = %i WHERE `Name` = '%s' LIMIT 1;",
-		PlayerData[playerid][e_color],
-		PlayerData[playerid][e_medkits],
-		GetPlayerSkin(playerid),
-		PlayerData[playerid][e_gungamewins],
-		PlayerData[playerid][e_racewins],
-		PlayerData[playerid][e_tdmwins],
-		PlayerData[playerid][e_falloutwins],
-		PlayerData[playerid][e_wanteds],
-		PlayerData[playerid][e_vip],
-		PlayerData[playerid][e_lastnc],
-		PlayerData[playerid][e_skinsave],
-		__GetName(playerid));
-
-	strcat(query, query2);
-	
-    mysql_tquery(pSQL, "START TRANSACTION;");
-	mysql_tquery(pSQL, query);
-
-	format(query, sizeof(query), "UPDATE `accounts` SET `Achievements` = '%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i' WHERE `Name` = '%s' LIMIT 1;",
-	    PlayerAchData[playerid][e_ach_styler],
-	    PlayerAchData[playerid][e_ach_grimreaper],
-	    PlayerAchData[playerid][e_ach_masskiller],
-	    PlayerAchData[playerid][e_ach_eliteracer],
-	    PlayerAchData[playerid][e_ach_toofast],
-	    PlayerAchData[playerid][e_ach_scorewhore],
-	    PlayerAchData[playerid][e_ach_destroyer],
-	    PlayerAchData[playerid][e_ach_restinpeace],
-	    PlayerAchData[playerid][e_ach_silentkiller],
-		PlayerAchData[playerid][e_ach_oneshot2kills],
-		PlayerAchData[playerid][e_ach_deepimpact],
-		PlayerAchData[playerid][e_ach_skydiver],
-		PlayerAchData[playerid][e_ach_biker],
-		PlayerAchData[playerid][e_ach_bmxmaster],
-		__GetName(playerid));
-		
-    mysql_tquery(pSQL, query);
-
-	if(save_pv)
-	{
-		format(query, sizeof(query), "UPDATE `accounts` SET `PV_Slot0` = '%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%s', `PV_Slot1` = '%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%s' WHERE `Name` = '%s' LIMIT 1;",
-			PlayerPV[playerid][0][Model],
-			PlayerPV[playerid][0][PaintJob],
-			PlayerPV[playerid][0][Color1],
-			PlayerPV[playerid][0][Color2],
-			PlayerPV[playerid][0][Mod1],
-			PlayerPV[playerid][0][Mod2],
-			PlayerPV[playerid][0][Mod3],
-			PlayerPV[playerid][0][Mod4],
-			PlayerPV[playerid][0][Mod5],
-			PlayerPV[playerid][0][Mod6],
-			PlayerPV[playerid][0][Mod7],
-			PlayerPV[playerid][0][Mod8],
-			PlayerPV[playerid][0][Mod9],
-			PlayerPV[playerid][0][Mod10],
-			PlayerPV[playerid][0][Mod11],
-			PlayerPV[playerid][0][Mod12],
-			PlayerPV[playerid][0][Mod13],
-			PlayerPV[playerid][0][Mod14],
-			PlayerPV[playerid][0][Mod15],
-			PlayerPV[playerid][0][Mod16],
-			PlayerPV[playerid][0][Mod17],
-			PlayerPV[playerid][0][Plate],
-			PlayerPV[playerid][1][Model],
-			PlayerPV[playerid][1][PaintJob],
-			PlayerPV[playerid][1][Color1],
-			PlayerPV[playerid][1][Color2],
-			PlayerPV[playerid][1][Mod1],
-			PlayerPV[playerid][1][Mod2],
-			PlayerPV[playerid][1][Mod3],
-			PlayerPV[playerid][1][Mod4],
-			PlayerPV[playerid][1][Mod5],
-			PlayerPV[playerid][1][Mod6],
-			PlayerPV[playerid][1][Mod7],
-			PlayerPV[playerid][1][Mod8],
-			PlayerPV[playerid][1][Mod9],
-			PlayerPV[playerid][1][Mod10],
-			PlayerPV[playerid][1][Mod11],
-			PlayerPV[playerid][1][Mod12],
-			PlayerPV[playerid][1][Mod13],
-			PlayerPV[playerid][1][Mod14],
-			PlayerPV[playerid][1][Mod15],
-			PlayerPV[playerid][1][Mod16],
-			PlayerPV[playerid][1][Mod17],
-			PlayerPV[playerid][1][Plate],
-			__GetName(playerid));
-	    mysql_tquery(pSQL, query);
-
-		format(query, sizeof(query), "UPDATE `accounts` SET `PV_Slot2` = '%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%s', `PV_Slot3` = '%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%s' WHERE `Name` = '%s' LIMIT 1;",
-			PlayerPV[playerid][2][Model],
-			PlayerPV[playerid][2][PaintJob],
-			PlayerPV[playerid][2][Color1],
-			PlayerPV[playerid][2][Color2],
-			PlayerPV[playerid][2][Mod1],
-			PlayerPV[playerid][2][Mod2],
-			PlayerPV[playerid][2][Mod3],
-			PlayerPV[playerid][2][Mod4],
-			PlayerPV[playerid][2][Mod5],
-			PlayerPV[playerid][2][Mod6],
-			PlayerPV[playerid][2][Mod7],
-			PlayerPV[playerid][2][Mod8],
-			PlayerPV[playerid][2][Mod9],
-			PlayerPV[playerid][2][Mod10],
-			PlayerPV[playerid][2][Mod11],
-			PlayerPV[playerid][2][Mod12],
-			PlayerPV[playerid][2][Mod13],
-			PlayerPV[playerid][2][Mod14],
-			PlayerPV[playerid][2][Mod15],
-			PlayerPV[playerid][2][Mod16],
-			PlayerPV[playerid][2][Mod17],
-			PlayerPV[playerid][2][Plate],
-			PlayerPV[playerid][3][Model],
-			PlayerPV[playerid][3][PaintJob],
-			PlayerPV[playerid][3][Color1],
-			PlayerPV[playerid][3][Color2],
-			PlayerPV[playerid][3][Mod1],
-			PlayerPV[playerid][3][Mod2],
-			PlayerPV[playerid][3][Mod3],
-			PlayerPV[playerid][3][Mod4],
-			PlayerPV[playerid][3][Mod5],
-			PlayerPV[playerid][3][Mod6],
-			PlayerPV[playerid][3][Mod7],
-			PlayerPV[playerid][3][Mod8],
-			PlayerPV[playerid][3][Mod9],
-			PlayerPV[playerid][3][Mod10],
-			PlayerPV[playerid][3][Mod11],
-			PlayerPV[playerid][3][Mod12],
-			PlayerPV[playerid][3][Mod13],
-			PlayerPV[playerid][3][Mod14],
-			PlayerPV[playerid][3][Mod15],
-			PlayerPV[playerid][3][Mod16],
-			PlayerPV[playerid][3][Mod17],
-			PlayerPV[playerid][3][Plate],
-			__GetName(playerid));
-	    mysql_tquery(pSQL, query);
-
-		format(query, sizeof(query), "UPDATE `accounts` SET `PV_Slot4` = '%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%s', `PV_Slot5` = '%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%s' WHERE `Name` = '%s' LIMIT 1;",
-			PlayerPV[playerid][4][Model],
-			PlayerPV[playerid][4][PaintJob],
-			PlayerPV[playerid][4][Color1],
-			PlayerPV[playerid][4][Color2],
-			PlayerPV[playerid][4][Mod1],
-			PlayerPV[playerid][4][Mod2],
-			PlayerPV[playerid][4][Mod3],
-			PlayerPV[playerid][4][Mod4],
-			PlayerPV[playerid][4][Mod5],
-			PlayerPV[playerid][4][Mod6],
-			PlayerPV[playerid][4][Mod7],
-			PlayerPV[playerid][4][Mod8],
-			PlayerPV[playerid][4][Mod9],
-			PlayerPV[playerid][4][Mod10],
-			PlayerPV[playerid][4][Mod11],
-			PlayerPV[playerid][4][Mod12],
-			PlayerPV[playerid][4][Mod13],
-			PlayerPV[playerid][4][Mod14],
-			PlayerPV[playerid][4][Mod15],
-			PlayerPV[playerid][4][Mod16],
-			PlayerPV[playerid][4][Mod17],
-			PlayerPV[playerid][4][Plate],
-			PlayerPV[playerid][5][Model],
-			PlayerPV[playerid][5][PaintJob],
-			PlayerPV[playerid][5][Color1],
-			PlayerPV[playerid][5][Color2],
-			PlayerPV[playerid][5][Mod1],
-			PlayerPV[playerid][5][Mod2],
-			PlayerPV[playerid][5][Mod3],
-			PlayerPV[playerid][5][Mod4],
-			PlayerPV[playerid][5][Mod5],
-			PlayerPV[playerid][5][Mod6],
-			PlayerPV[playerid][5][Mod7],
-			PlayerPV[playerid][5][Mod8],
-			PlayerPV[playerid][5][Mod9],
-			PlayerPV[playerid][5][Mod10],
-			PlayerPV[playerid][5][Mod11],
-			PlayerPV[playerid][5][Mod12],
-			PlayerPV[playerid][5][Mod13],
-			PlayerPV[playerid][5][Mod14],
-			PlayerPV[playerid][5][Mod15],
-			PlayerPV[playerid][5][Mod16],
-			PlayerPV[playerid][5][Mod17],
-			PlayerPV[playerid][5][Plate],
-			__GetName(playerid));
-	    mysql_tquery(pSQL, query);
-
-		format(query, sizeof(query), "UPDATE `accounts` SET `PV_Slot6` = '%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%s', `PV_Slot7` = '%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%i,%s' WHERE `Name` = '%s' LIMIT 1;",
-			PlayerPV[playerid][6][Model],
-			PlayerPV[playerid][6][PaintJob],
-			PlayerPV[playerid][6][Color1],
-			PlayerPV[playerid][6][Color2],
-			PlayerPV[playerid][6][Mod1],
-			PlayerPV[playerid][6][Mod2],
-			PlayerPV[playerid][6][Mod3],
-			PlayerPV[playerid][6][Mod4],
-			PlayerPV[playerid][6][Mod5],
-			PlayerPV[playerid][6][Mod6],
-			PlayerPV[playerid][6][Mod7],
-			PlayerPV[playerid][6][Mod8],
-			PlayerPV[playerid][6][Mod9],
-			PlayerPV[playerid][6][Mod10],
-			PlayerPV[playerid][6][Mod11],
-			PlayerPV[playerid][6][Mod12],
-			PlayerPV[playerid][6][Mod13],
-			PlayerPV[playerid][6][Mod14],
-			PlayerPV[playerid][6][Mod15],
-			PlayerPV[playerid][6][Mod16],
-			PlayerPV[playerid][6][Mod17],
-			PlayerPV[playerid][6][Plate],
-			PlayerPV[playerid][7][Model],
-			PlayerPV[playerid][7][PaintJob],
-			PlayerPV[playerid][7][Color1],
-			PlayerPV[playerid][7][Color2],
-			PlayerPV[playerid][7][Mod1],
-			PlayerPV[playerid][7][Mod2],
-			PlayerPV[playerid][7][Mod3],
-			PlayerPV[playerid][7][Mod4],
-			PlayerPV[playerid][7][Mod5],
-			PlayerPV[playerid][7][Mod6],
-			PlayerPV[playerid][7][Mod7],
-			PlayerPV[playerid][7][Mod8],
-			PlayerPV[playerid][7][Mod9],
-			PlayerPV[playerid][7][Mod10],
-			PlayerPV[playerid][7][Mod11],
-			PlayerPV[playerid][7][Mod12],
-			PlayerPV[playerid][7][Mod13],
-			PlayerPV[playerid][7][Mod14],
-			PlayerPV[playerid][7][Mod15],
-			PlayerPV[playerid][7][Mod16],
-			PlayerPV[playerid][7][Mod17],
-			PlayerPV[playerid][7][Plate],
-			__GetName(playerid));
-	    mysql_tquery(pSQL, query);
-	}
-	
-	mysql_tquery(pSQL, "COMMIT;");
     return 1;
 }
 
@@ -27495,7 +27256,7 @@ PreparePlayerToy(playerid)
 	}
 }
 
-RemovePlayerToyData(playerid)
+RemovePlayerToy(playerid)
 {
 	for(new i = 0; i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
 	{
@@ -27506,23 +27267,26 @@ RemovePlayerToyData(playerid)
 	}
 }
 
-AttachPlayerToyData(playerid)
+AttachPlayerToy(playerid)
 {
 	for(new i = 0; i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
 	{
-        SetPlayerAttachedObject(playerid,
-            i,
-            PlayerToyData[playerid][i][toy_model],
-            PlayerToyData[playerid][i][toy_bone],
-            PlayerToyData[playerid][i][toy_x],
-            PlayerToyData[playerid][i][toy_y],
-            PlayerToyData[playerid][i][toy_z],
-            PlayerToyData[playerid][i][toy_rx],
-            PlayerToyData[playerid][i][toy_ry],
-            PlayerToyData[playerid][i][toy_rz],
-            PlayerToyData[playerid][i][toy_sx],
-            PlayerToyData[playerid][i][toy_sy],
-            PlayerToyData[playerid][i][toy_sz]);
+	    if(PlayerToyData[playerid][i][toy_model] != 0)
+	    {
+	        SetPlayerAttachedObject(playerid,
+	            i,
+	            PlayerToyData[playerid][i][toy_model],
+	            PlayerToyData[playerid][i][toy_bone],
+	            PlayerToyData[playerid][i][toy_x],
+	            PlayerToyData[playerid][i][toy_y],
+	            PlayerToyData[playerid][i][toy_z],
+	            PlayerToyData[playerid][i][toy_rx],
+	            PlayerToyData[playerid][i][toy_ry],
+	            PlayerToyData[playerid][i][toy_rz],
+	            PlayerToyData[playerid][i][toy_sx],
+	            PlayerToyData[playerid][i][toy_sy],
+	            PlayerToyData[playerid][i][toy_sz]);
+		 }
 	}
 }
 
@@ -27532,144 +27296,6 @@ MySQL_SaveAchievement(playerid, ach)
 	{
 		mysql_format(pSQL, gstr, sizeof(gstr), "INSERT INTO `achievements` VALUES (%i, %i, UNIX_TIMESTAMP());", PlayerData[playerid][e_accountid], ach);
 		mysql_pquery(pSQL, gstr);
-	}
-}
-
-MySQL_SavePlayerToyData(playerid)
-{
-    if(islogged(playerid))
-    {
-		new query[1024];
-
-		format(query, sizeof(query), "UPDATE `accounts` SET `Toy_Slot0` = '%i,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f', `Toy_Slot1` = '%i,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f' WHERE `Name` = '%s' LIMIT 1;",
-			PlayerToyData[playerid][0][toy_model],
-		    PlayerToyData[playerid][0][toy_bone],
-		    PlayerToyData[playerid][0][toy_x],
-		    PlayerToyData[playerid][0][toy_y],
-		    PlayerToyData[playerid][0][toy_z],
-		    PlayerToyData[playerid][0][toy_rx],
-		    PlayerToyData[playerid][0][toy_ry],
-		    PlayerToyData[playerid][0][toy_rz],
-		    PlayerToyData[playerid][0][toy_sx],
-		    PlayerToyData[playerid][0][toy_sy],
-		    PlayerToyData[playerid][0][toy_sz],
-			PlayerToyData[playerid][1][toy_model],
-		    PlayerToyData[playerid][1][toy_bone],
-		    PlayerToyData[playerid][1][toy_x],
-		    PlayerToyData[playerid][1][toy_y],
-		    PlayerToyData[playerid][1][toy_z],
-		    PlayerToyData[playerid][1][toy_rx],
-		    PlayerToyData[playerid][1][toy_ry],
-		    PlayerToyData[playerid][1][toy_rz],
-		    PlayerToyData[playerid][1][toy_sx],
-		    PlayerToyData[playerid][1][toy_sy],
-		    PlayerToyData[playerid][1][toy_sz],
-		    __GetName(playerid));
-	    mysql_tquery(pSQL, query, "", "");
-
-		format(query, sizeof(query), "UPDATE `accounts` SET `Toy_Slot2` = '%i,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f', `Toy_Slot3` = '%i,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f' WHERE `Name` = '%s' LIMIT 1;",
-			PlayerToyData[playerid][2][toy_model],
-		    PlayerToyData[playerid][2][toy_bone],
-		    PlayerToyData[playerid][2][toy_x],
-		    PlayerToyData[playerid][2][toy_y],
-		    PlayerToyData[playerid][2][toy_z],
-		    PlayerToyData[playerid][2][toy_rx],
-		    PlayerToyData[playerid][2][toy_ry],
-		    PlayerToyData[playerid][2][toy_rz],
-		    PlayerToyData[playerid][2][toy_sx],
-		    PlayerToyData[playerid][2][toy_sy],
-		    PlayerToyData[playerid][2][toy_sz],
-			PlayerToyData[playerid][3][toy_model],
-		    PlayerToyData[playerid][3][toy_bone],
-		    PlayerToyData[playerid][3][toy_x],
-		    PlayerToyData[playerid][3][toy_y],
-		    PlayerToyData[playerid][3][toy_z],
-		    PlayerToyData[playerid][3][toy_rx],
-		    PlayerToyData[playerid][3][toy_ry],
-		    PlayerToyData[playerid][3][toy_rz],
-		    PlayerToyData[playerid][3][toy_sx],
-		    PlayerToyData[playerid][3][toy_sy],
-		    PlayerToyData[playerid][3][toy_sz],
-		    __GetName(playerid));
-	    mysql_tquery(pSQL, query, "", "");
-
-		format(query, sizeof(query), "UPDATE `accounts` SET `Toy_Slot4` = '%i,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f', `Toy_Slot5` = '%i,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f' WHERE `Name` = '%s' LIMIT 1;",
-			PlayerToyData[playerid][4][toy_model],
-		    PlayerToyData[playerid][4][toy_bone],
-		    PlayerToyData[playerid][4][toy_x],
-		    PlayerToyData[playerid][4][toy_y],
-		    PlayerToyData[playerid][4][toy_z],
-		    PlayerToyData[playerid][4][toy_rx],
-		    PlayerToyData[playerid][4][toy_ry],
-		    PlayerToyData[playerid][4][toy_rz],
-		    PlayerToyData[playerid][4][toy_sx],
-		    PlayerToyData[playerid][4][toy_sy],
-		    PlayerToyData[playerid][4][toy_sz],
-			PlayerToyData[playerid][5][toy_model],
-		    PlayerToyData[playerid][5][toy_bone],
-		    PlayerToyData[playerid][5][toy_x],
-		    PlayerToyData[playerid][5][toy_y],
-		    PlayerToyData[playerid][5][toy_z],
-		    PlayerToyData[playerid][5][toy_rx],
-		    PlayerToyData[playerid][5][toy_ry],
-		    PlayerToyData[playerid][5][toy_rz],
-		    PlayerToyData[playerid][5][toy_sx],
-		    PlayerToyData[playerid][5][toy_sy],
-		    PlayerToyData[playerid][5][toy_sz],
-		    __GetName(playerid));
-	    mysql_tquery(pSQL, query, "", "");
-
-		format(query, sizeof(query), "UPDATE `accounts` SET `Toy_Slot6` = '%i,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f', `Toy_Slot7` = '%i,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f' WHERE `Name` = '%s' LIMIT 1;",
-			PlayerToyData[playerid][6][toy_model],
-		    PlayerToyData[playerid][6][toy_bone],
-		    PlayerToyData[playerid][6][toy_x],
-		    PlayerToyData[playerid][6][toy_y],
-		    PlayerToyData[playerid][6][toy_z],
-		    PlayerToyData[playerid][6][toy_rx],
-		    PlayerToyData[playerid][6][toy_ry],
-		    PlayerToyData[playerid][6][toy_rz],
-		    PlayerToyData[playerid][6][toy_sx],
-		    PlayerToyData[playerid][6][toy_sy],
-		    PlayerToyData[playerid][6][toy_sz],
-			PlayerToyData[playerid][7][toy_model],
-		    PlayerToyData[playerid][7][toy_bone],
-		    PlayerToyData[playerid][7][toy_x],
-		    PlayerToyData[playerid][7][toy_y],
-		    PlayerToyData[playerid][7][toy_z],
-		    PlayerToyData[playerid][7][toy_rx],
-		    PlayerToyData[playerid][7][toy_ry],
-		    PlayerToyData[playerid][7][toy_rz],
-		    PlayerToyData[playerid][7][toy_sx],
-		    PlayerToyData[playerid][7][toy_sy],
-		    PlayerToyData[playerid][7][toy_sz],
-		    __GetName(playerid));
-	    mysql_tquery(pSQL, query, "", "");
-
-		format(query, sizeof(query), "UPDATE `accounts` SET `Toy_Slot8` = '%i,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f', `Toy_Slot9` = '%i,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f' WHERE `Name` = '%s' LIMIT 1;",
-			PlayerToyData[playerid][8][toy_model],
-		    PlayerToyData[playerid][8][toy_bone],
-		    PlayerToyData[playerid][8][toy_x],
-		    PlayerToyData[playerid][8][toy_y],
-		    PlayerToyData[playerid][8][toy_z],
-		    PlayerToyData[playerid][8][toy_rx],
-		    PlayerToyData[playerid][8][toy_ry],
-		    PlayerToyData[playerid][8][toy_rz],
-		    PlayerToyData[playerid][8][toy_sx],
-		    PlayerToyData[playerid][8][toy_sy],
-		    PlayerToyData[playerid][8][toy_sz],
-			PlayerToyData[playerid][9][toy_model],
-		    PlayerToyData[playerid][9][toy_bone],
-		    PlayerToyData[playerid][9][toy_x],
-		    PlayerToyData[playerid][9][toy_y],
-		    PlayerToyData[playerid][9][toy_z],
-		    PlayerToyData[playerid][9][toy_rx],
-		    PlayerToyData[playerid][9][toy_ry],
-		    PlayerToyData[playerid][9][toy_rz],
-		    PlayerToyData[playerid][9][toy_sx],
-		    PlayerToyData[playerid][9][toy_sy],
-		    PlayerToyData[playerid][9][toy_sz],
-		    __GetName(playerid));
-	    mysql_tquery(pSQL, query, "", "");
 	}
 }
 
