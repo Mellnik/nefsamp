@@ -21298,7 +21298,8 @@ MySQL_SaveAccount(playerid, bool:toys = true, bool:pv = true)
     }
 
     if(pv) {
-
+        mysql_format(pSQL, gstr, sizeof(gstr), "DELETE FROM `vehicles` WHERE `id` = %i;", PlayerData[playerid][e_accountid]);
+		mysql_tquery(pSQL, gstr);
     }
     return 1;
 }
@@ -30693,7 +30694,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 	    {
 	        if(cache_get_row_count() > 0)
 	        {
-	            for(new i = 0; i < cache_get_row_count(); i++)
+	            for(new i = 0; i < cache_get_row_count() && i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
 	            {
 					new r = cache_get_row_int(i, 1);
 					
@@ -30716,7 +30717,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 	    {
 	        if(cache_get_row_count() > 0)
 	        {
-				for(new i = 0; i < cache_get_row_count(); i++)
+				for(new i = 0; i < cache_get_row_count() && i < MAX_PLAYER_PVS; i++)
 				{
 				    new r = cache_get_row_int(i, 1);
 				    
