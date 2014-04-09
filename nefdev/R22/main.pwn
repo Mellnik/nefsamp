@@ -2473,8 +2473,8 @@ public OnGameModeInit()
 	#else
 	Log(LOG_INIT, "Build Configuration: Development");
 	#endif
-	Log(LOG_INIT, "MySQL: Logging: LOG_ERROR, LOG_WARNING");
-	mysql_log(LOG_ERROR | LOG_WARNING, LOG_TYPE_TEXT);
+	Log(LOG_INIT, "MySQL: Logging: LOG_ERROR | LOG_WARNING | LOG_DEBUG");
+	mysql_log(LOG_ERROR | LOG_WARNING | LOG_DEBUG, LOG_TYPE_TEXT);
 	
     MySQL_Connect();
 	MySQL_CleanUp();
@@ -3169,9 +3169,8 @@ public OnPlayerDisconnect(playerid, reason)
 
    	if(PlayerData[playerid][ExitType] == EXIT_FIRST_SPAWNED && PlayerData[playerid][bLogged])
 	{
-		MySQL_SavePlayer(playerid, true);
-        MySQL_SavePlayerToys(playerid);
-
+	    MySQL_SaveAccount(playerid);
+	    
 		switch(gTeam[playerid])
 		{
 		    case gDUEL:
@@ -3780,7 +3779,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 					        PlayerData[i][e_gangrank] = GANG_POS_NONE;
 					        PlayerData[i][GangName][0] = '\0';
 							PlayerData[i][GangTag][0] = '\0';
-							MySQL_SavePlayer(i, false);
+							MySQL_SaveAccount(i, false, false);
 					 		if(PlayerData[i][GangLabel] != Text3D:-1)
 							{
 							    DestroyDynamic3DTextLabel(PlayerData[i][GangLabel]);
@@ -3893,7 +3892,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 
             GivePlayerCash(extraid, -500000);
 
-            MySQL_SavePlayer(extraid, false);
+			MySQL_SaveAccount(extraid, false, false);
 
 			format(gstr, sizeof(gstr), ""nef" "yellow_e"%s(%i) has created a new gang: '"nef_yellow"%s"white"'", __GetName(extraid), extraid, PlayerData[extraid][GangName]);
             SCMToAll(-1, gstr);
@@ -8205,8 +8204,8 @@ YCMD:buygc(playerid, params[], help)
 		PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
 		PlayerPlaySound(PlayerData[playerid][GCPlayer], 1057, 0.0, 0.0, 0.0);
 
-		MySQL_SavePlayer(playerid, false);
-		MySQL_SavePlayer(PlayerData[playerid][GCPlayer], false);
+        MySQL_SaveAccount(playerid, false, false);
+		MySQL_SaveAccount(PlayerData[playerid][GCPlayer], false, false);
 
 	    format(gstr2, sizeof(gstr2), "INSERT INTO `sells` VALUES (NULL, 2, %i, %i, %i, %i);", PlayerData[playerid][GCOffer], PlayerData[playerid][GCPrice], PlayerData[PlayerData[playerid][GCPlayer]][e_accountid], PlayerData[playerid][e_accountid]);
 	    mysql_tquery(pSQL, gstr2, "", "");
@@ -8292,102 +8291,6 @@ YCMD:ads(playerid, params[], help)
 	else ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_LIST, "Last Adverts (/ad <text>)", ass, "Close", "");
 	return 1;
 }
-/*
-YCMD:sellvip(playerid, params[], help)
-{
-    if(!islogged(playerid)) return notlogged(playerid);
-	if(PlayerData[playerid][e_vip] == 0) return SCM(playerid, -1, ""er"You don't own VIP!");
-	
-	new player, money;
-	if(sscanf(params, "ri", player, money))
-	{
-		return SCM(playerid, NEF_GREEN, "Usage: /sellvip <playerid> <money>");
-	}
-	
-    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
-	if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
-
-	if(money < 1 || money > 1000000000)
-	{
-	    return SCM(playerid, -1, ""er"$1 - $1,000,000,000!");
-	}
-
-	if(IsPlayerAvail(player) && player != playerid)
-	{
-	    if(PlayerData[player][e_vip] == 1) return SCM(playerid, -1, ""er"This player already owns VIP!");
-	    if(!islogged(player)) return SCM(playerid, -1, ""er"This player is not registered!");
-	    
-	    PlayerData[player][VIPPlayer] = playerid;
-	    PlayerData[player][VIPOffer] = money;
-	    PlayerData[player][VIPNameHash] = YHash(__GetName(playerid), false);
-	    
-	    format(gstr, sizeof(gstr), ""blue"You have offered %s(%i) your V.I.P status for $%s", __GetName(player), player, number_format(money));
-	    SCM(playerid, -1, gstr);
-	    format(gstr, sizeof(gstr), ""blue"%s(%i) is offering you their V.I.P status for $%s, type /buyvip to accept", __GetName(playerid), playerid, number_format(money));
-	    SCM(player, -1, gstr);
-	    SCM(player, -1, ""red"PLEASE NOTE: "blue"You won't receive $1,000,000 nor the bizz/vehicle slots when buying VIP from a player");
-	    
-		PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
-		PlayerPlaySound(player, 1057, 0.0, 0.0, 0.0);
-	}
-	else
-	{
-		SCM(playerid, -1, ""er"That player is not available or yourself");
-	}
-	return 1;
-}
-
-YCMD:buyvip(playerid, params[], help)
-{
-    if(!islogged(playerid)) return notlogged(playerid);
-	if(PlayerData[playerid][VIPPlayer] == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"No one has offered you VIP yet.");
-    if(PlayerData[playerid][e_vip] == 1) return SCM(playerid, -1, ""er"You already have VIP status.");
-
-	if(IsPlayerAvail(PlayerData[playerid][VIPPlayer]) && PlayerData[PlayerData[playerid][VIPPlayer]][e_vip] == 1 && PlayerData[playerid][VIPNameHash] == YHash(__GetName(PlayerData[playerid][VIPPlayer]), false))
-	{
-		if(GetPlayerCash(playerid) < PlayerData[playerid][VIPOffer]) return SCM(playerid, -1, ""er"You do not have enough money!");
-
-        SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
-        SetPlayerSpecialAction(PlayerData[playerid][VIPPlayer], SPECIAL_ACTION_NONE);
-
-		GivePlayerCash(PlayerData[playerid][VIPPlayer], PlayerData[playerid][VIPOffer]);
-		GivePlayerCash(playerid, -PlayerData[playerid][VIPOffer]);
-
-		PlayerData[playerid][e_vip] = 1;
-		PlayerData[PlayerData[playerid][VIPPlayer]][e_vip] = 0;
-
-		PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
-		PlayerPlaySound(PlayerData[playerid][VIPPlayer], 1057, 0.0, 0.0, 0.0);
-
-		MySQL_SavePlayer(playerid, false);
-		MySQL_SavePlayer(PlayerData[playerid][VIPPlayer], false);
-
-	    format(gstr2, sizeof(gstr2), "INSERT INTO `sells` VALUES (NULL, 1, 1, %i, %i, %i);", PlayerData[playerid][VIPOffer], PlayerData[PlayerData[playerid][VIPPlayer]][e_accountid], PlayerData[playerid][e_accountid]);
-	    mysql_tquery(pSQL, gstr2, "", "");
-
-	    format(gstr, sizeof(gstr), ""blue"You have accepted %s's offer and bough VIP for $%s", __GetName(PlayerData[playerid][VIPPlayer]), number_format(PlayerData[playerid][VIPOffer]));
-	    SCM(playerid, -1, gstr);
-	    format(gstr, sizeof(gstr), ""blue"%s(%i) has accepted your offer. You sold your VIP for $%s", __GetName(playerid), playerid, number_format(PlayerData[playerid][VIPOffer]));
-	    SCM(PlayerData[playerid][VIPPlayer], -1, gstr);
-		print(gstr);
-		
-	    format(gstr, sizeof(gstr), ""orange"[NEF] %s(%i) sold their VIP status to %s(%i) for $%s", __GetName(PlayerData[playerid][VIPPlayer]), PlayerData[playerid][VIPPlayer], __GetName(playerid), playerid, number_format(PlayerData[playerid][VIPOffer]));
-	    SCMToAll(-1, gstr);
-	    print(gstr);
-	    
-  		format(gstr, sizeof(gstr), "3,1GC:4 %s(%i) sold their VIP status to %s(%i) for $%s", __GetName(PlayerData[playerid][VIPPlayer]), PlayerData[playerid][VIPPlayer], __GetName(playerid), playerid, number_format(PlayerData[playerid][VIPOffer]));
-		IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
-	    
-	    PlayerData[playerid][VIPPlayer] = INVALID_PLAYER_ID;
-	    PlayerData[playerid][VIPOffer] = 0;
-	    PlayerData[playerid][VIPNameHash] = 0;
-	}
-	else
-	{
-		SCM(playerid, -1, ""er"This player has either gone offline or does not own VIP status.");
-	}
-	return 1;
-}*/
 
 YCMD:bbuy(playerid, params[], help)
 {
@@ -8443,7 +8346,7 @@ YCMD:bbuy(playerid, params[], help)
 		SendInfo(playerid, "SUCCESS!", "");
         PlayerPlaySound(playerid, 1149, 0.0, 0.0, 0.0);
         GivePlayerCash(playerid, -1250000);
-        MySQL_SavePlayer(playerid, false);
+        MySQL_SaveAccount(playerid, false, false);
 		
 	    format(gstr, sizeof(gstr), ""nef" "yellow_e"%s(%i) bought the business %i!", __GetName(playerid), playerid, BusinessData[r][e_id]);
 	    SCMToAll(-1, gstr);
@@ -8498,7 +8401,6 @@ YCMD:bsell(playerid, params[], help)
 	    PlayerData[playerid][tickLastPSell] = tick;
 	    
 	    SendInfo(playerid, "SUCCESS!", "");
-	    MySQL_SavePlayer(playerid, false);
 	    PlayerPlaySound(playerid, 1149, 0.0, 0.0, 0.0);
 	    
 	    format(gstr, sizeof(gstr), ""nef" "yellow_e"%s(%i) sold the business %i!", __GetName(playerid), playerid, BusinessData[r][e_id]);
@@ -8567,7 +8469,7 @@ YCMD:buy(playerid, params[], help)
 	    PlayerData[playerid][e_houses]++;
 	    SendInfo(playerid, "House bought", "");
 	    MySQL_SaveHouse(i);
-	    MySQL_SavePlayer(playerid, false);
+	    MySQL_SaveAccount(playerid, false, false);
 	    PlayerData[playerid][tickLastBuy] = tick;
 	    PlayerPlaySound(playerid, 1149, 0.0, 0.0, 0.0);
 	    format(gstr, sizeof(gstr), ""nef" "yellow_e"%s(%i) bought the house %i for $%s!", __GetName(playerid), playerid, HouseInfo[i][iID], number_format(HouseInfo[i][price]));
@@ -8636,7 +8538,7 @@ YCMD:sell(playerid, params[], help)
 	    GivePlayerCash(playerid, floatround(HouseInfo[i][price] / 4));
 	    SendInfo(playerid, "House sold", "");
 	    MySQL_SaveHouse(i, true);
-	    MySQL_SavePlayer(playerid, false);
+	    MySQL_SaveAccount(playerid, false, false);
 	    PlayerData[playerid][tickLastSell] = tick;
 	    PlayerPlaySound(playerid, 1149, 0.0, 0.0, 0.0);
 	    format(gstr, sizeof(gstr), ""nef" "yellow_e"%s(%i) sold the house %i for $%s!", __GetName(playerid), playerid, HouseInfo[i][iID], number_format(floatround(HouseInfo[i][price] / 4)));
@@ -11691,7 +11593,7 @@ YCMD:gjoin(playerid, params[], help)
 	PlayerData[playerid][e_gangid] = PlayerData[playerid][TmpGangID];
 	PlayerData[playerid][TmpGangID] = 0;
 
-    MySQL_SavePlayer(playerid, false);
+    MySQL_SaveAccount(playerid, false, false);
 
 	format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s(%i) has joined the gang!", __GetName(playerid), playerid);
 	GangMSG(PlayerData[playerid][e_gangid], gstr);
@@ -11739,7 +11641,7 @@ YCMD:gleave(playerid, params[], help)
     PlayerData[playerid][GangTag][0] = '\0';
  	PlayerData[playerid][e_gangrank] = GANG_POS_NONE;
 
-    MySQL_SavePlayer(playerid, false);
+    MySQL_SaveAccount(playerid, false, false);
     SyncGangZones(playerid);
 	if(PlayerData[playerid][GangLabel] != Text3D:-1)
 	{
@@ -13389,7 +13291,7 @@ YCMD:setadminlevel(playerid, params[], help)
 				GameTextForPlayer(player, "Demoted", 5000, 3);
 			}
 			
-			MySQL_SavePlayer(player, false);
+			MySQL_SaveAccount(playerid, false, false);
 			format(gstr, sizeof(gstr), "You have made %s Level %i at %i:%i:%i", __GetName(player), alevel, time[0], time[1], time[2]);
 			SCM(playerid, BLUE, gstr);
 			format(gstr, sizeof(gstr), "Admin %s has made %s Level %i at %i:%i:%i", __GetName(playerid), __GetName(player), alevel, time[0], time[1], time[2]);
@@ -13656,7 +13558,7 @@ YCMD:resethouse(playerid, params[], help)
 		{
 	        PlayerData[player][e_houses]--;
 	        SCM(player, -1, "An admin destroyed your house!");
-			MySQL_SavePlayer(player, false);
+			MySQL_SaveAccount(player, false, false);
 		}
 		else
 		{
@@ -16945,8 +16847,7 @@ function:OnPlayerNameChangeRequest(newname[], playerid)
 			format(query, sizeof(query), "2Server: 3 %s(%i)4 has changed their name to %s", oldname, playerid, newname);
 			IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, query),
 			
-			MySQL_SavePlayer(playerid, true);
-			MySQL_SavePlayerToys(playerid);
+			MySQL_SaveAccount(playerid);
         }
         else
         {
@@ -18295,7 +18196,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 			  		PlayerData[ID][e_gangrank] = PlayerData[playerid][RankSelected];
 
-		  			MySQL_SavePlayer(ID, false);
+		  			MySQL_SaveAccount(ID, false, false);
 
 				    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s set %s's rank to %s", __GetName(playerid), __GetName(ID), GangPositions[PlayerData[playerid][RankSelected]][E_gang_pos_name]);
 					GangMSG(PlayerData[playerid][e_gangid], gstr);
@@ -18346,7 +18247,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					        PlayerData[i][e_gangrank] = GANG_POS_NONE;
 					        PlayerData[i][GangName][0] = '\0';
 							PlayerData[i][GangTag][0] = '\0';
-							MySQL_SavePlayer(i, false);
+							MySQL_SaveAccount(i, false, false);
 					 		if(PlayerData[i][GangLabel] != Text3D:-1)
 							{
 							    DestroyDynamic3DTextLabel(PlayerData[i][GangLabel]);
@@ -18367,7 +18268,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			    PlayerData[playerid][e_gangrank] = GANG_POS_NONE;
 			    PlayerData[playerid][GangName][0] = '\0';
 				PlayerData[playerid][GangTag][0] = '\0';
-				MySQL_SavePlayer(playerid, false);
+                MySQL_SaveAccount(playerid, false, false);
 
                 SyncGangZones(playerid);
 
@@ -18403,7 +18304,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					PlayerData[ID][e_gangid] = 0;
 			  		PlayerData[ID][e_gangrank] = 0;
 
-		  			MySQL_SavePlayer(ID, false);
+		  			MySQL_SaveAccount(ID, false, false);
 
 					if(PlayerData[ID][GangLabel] != Text3D:-1)
 					{
@@ -18800,7 +18701,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	      		    format(gstr, sizeof(gstr), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", __GetName(playerid), HouseInfo[h_id][iID], number_format(HouseInfo[h_id][price]), HouseInfo[h_id][E_score], HouseIntTypes[PlayerData[playerid][HouseIntSelected]][intname]);
 	    			UpdateDynamic3DTextLabelText(HouseInfo[h_id][label], -1, gstr);
 	                MySQL_SaveHouse(h_id, true);
-	                MySQL_SavePlayer(playerid, false);
+	                MySQL_SaveAccount(playerid, false, false);
 	                SCM(playerid, GREEN, "Successfully upgraded the interior!");
                 }
                 else SendInfo(playerid, "Couldn't find the house in that slot", "Report on forums", 5000);
@@ -19682,7 +19583,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
                         strmid(PlayerPV[playerid][PVVMenuSel[playerid]][Plate], "Plate", 0, 13, 13);
                         
-                        MySQL_SavePlayer(playerid, true);
+                        MySQL_SaveAccount(playerid, false, true);
                         
                         SendInfo(playerid, "Vehicle sold", "");
 					}
@@ -21382,6 +21283,19 @@ MySQL_KickFromGangIfExist(playerid)
 {
   	format(gstr2, sizeof(gstr2), "SELECT `GangPosition` FROM `accounts` WHERE `GangID` = %i AND `Name` = '%s';", PlayerData[playerid][e_gangid], PlayerData[playerid][GangKickMem]);
   	mysql_tquery(pSQL, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_KICK_FROM_GANG, playerid, pSQL);
+}
+
+MySQL_SaveAccount(playerid, bool:toys = true, bool:pv = true)
+{
+    orm_update(PlayerData[playerid][e_ormid]);
+
+    if(toys) {
+
+    }
+
+    if(pv) {
+
+    }
 }
 
 MySQL_SavePlayer(playerid, bool:save_pv)
@@ -24176,7 +24090,7 @@ CreateFinalCar(playerid, pv_slot)
 
     ShowPlayerDialog(playerid, 5003, DIALOG_STYLE_MSGBOX, ""white"Vehicle bought!", ""white"You can now use these commands:\n\n/pv\n/lock\n/unlock", "OK", "");
 
-	MySQL_SavePlayer(playerid, true);
+	MySQL_SaveAccount(playerid, false, true);
     return 1;
 }
 
@@ -25513,7 +25427,7 @@ function:OnQueueReceived()
 
 						format(gstr2, sizeof(gstr2), "~r~~h~~h~You were given ~b~~h~~h~%sGC ~r~~h~~h~!", number_format(credits));
 						InfoTD_MSG(playerid, 10000, gstr2);
-						MySQL_SavePlayer(playerid, true);
+						MySQL_SaveAccount(playerid);
 		            }
 		            else
 		            {
@@ -25606,7 +25520,7 @@ function:OnQueueReceived()
 						SCM(playerid, -1, ""server_sign" "r_besch"You received VIP status + $1,000,000 bank money + 2 PV Slots + 1 House Slot + 1 Bizz Slot!");
 
 						InfoTD_MSG(playerid, 10000, "~r~~h~~h~You received VIP status + $1,000,000 bank money + 2 PV Slots + 1 House Slot + 1 Bizz Slot!");
-						MySQL_SavePlayer(playerid, true);
+						MySQL_SaveAccount(playerid);
 		            }
 		            else
 		            {
@@ -30641,6 +30555,7 @@ PreparePlayerVars(playerid)
 	SetPVarInt(playerid, "Robber", 0);
 	SetPVarInt(playerid, "inCNR", 0);
 
+    PlayerData[playerid][e_ormid] = ORM:-1;
     PlayerData[playerid][e_accountid] = 0;
 	PlayerData[playerid][GotVIPLInv] = false;
 	PlayerData[playerid][bIsDead] = false;
@@ -31002,7 +30917,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 
 			PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
 
-			MySQL_SavePlayer(playerid, true);
+			MySQL_SaveAccount(playerid, false, false);
 			MySQL_UpdateAccount(playerid);
 	        return 1;
 	    }
@@ -31020,7 +30935,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 
 			SrvStat[2]++;
 
-			MySQL_SavePlayer(playerid, true);
+            MySQL_SaveAccount(playerid, false, false);
 			MySQL_UpdateAccount(playerid);
 			return 1;
 	    }
