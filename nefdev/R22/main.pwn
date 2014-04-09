@@ -553,6 +553,7 @@ enum (+= 10)
 	ACCOUNT_REQUEST_GANG_LOAD,
 	ACCOUNT_REQUEST_ACHS_LOAD,
 	ACCOUNT_REQUEST_TOYS_LOAD,
+	ACCOUNT_REQUEST_PVS_LOAD,
     ACCOUNT_REQUEST_LOGIN
 };
 
@@ -21235,6 +21236,12 @@ MySQL_LoadPlayerToys(playerid)
 	mysql_pquery(pSQL, gstr, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_TOYS_LOAD);
 }
 
+MySQL_LoadPlayerPVs(playerid)
+{
+	mysql_format(pSQL, gstr, sizeof(gstr), "SELECT * FROM `vehicles` WHERE `id` = %i;", PlayerData[playerid][e_accountid]);
+	mysql_pquery(pSQL, gstr, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_PVS_LOAD);
+}
+
 MySQL_LoadPlayerGang(playerid)
 {
 	format(gstr2, sizeof(gstr2), "SELECT `GangName`, `GangTag` FROM `gangs` WHERE `ID` = %i LIMIT 1;", PlayerData[playerid][e_gangid]);
@@ -30585,6 +30592,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 				
 				MySQL_LoadPlayerAchs(playerid);
 				MySQL_LoadPlayerToys(playerid);
+				MySQL_LoadPlayerPVs(playerid);
 
   			 	SetPlayerScore_(playerid, PlayerData[playerid][e_score]);
 			 	SetPlayerCash(playerid, PlayerData[playerid][e_money]);
@@ -30701,6 +30709,27 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 					PlayerToyData[playerid][r][toy_sy] = cache_get_row_float(i, 11);
 					PlayerToyData[playerid][r][toy_sz] = cache_get_row_float(i, 12);
 	            }
+	        }
+	        return 1;
+	    }
+	    case ACCOUNT_REQUEST_PVS_LOAD:
+	    {
+	        if(cache_get_row_count() > 0)
+	        {
+				for(new i = 0; i < cache_get_row_count(); i++)
+				{
+				    new r = cache_get_row_int(i, 1);
+				    
+				    PlayerPVData[playerid][r][e_model] = cache_get_row_int(i, 2);
+				    cache_get_row(i, 3, PlayerPVData[playerid][r][e_plate], pSQL, 13);
+				    PlayerPVData[playerid][r][e_paintjob] = cache_get_row_int(i, 4);
+				    PlayerPVData[playerid][r][e_color1] = cache_get_row_int(i, 5);
+				    PlayerPVData[playerid][r][e_color2] = cache_get_row_int(i, 6);
+				    for(new m = 0; m < 17; m++)
+				    {
+				        PlayerPVData[playerid][r][e_mods][m] = cache_get_row_int(i, m + 7);
+				    }
+				}
 	        }
 	        return 1;
 	    }
