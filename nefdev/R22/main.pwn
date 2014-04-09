@@ -552,6 +552,7 @@ enum (+= 10)
 	ACCOUNT_REQUEST_LOAD,
 	ACCOUNT_REQUEST_GANG_LOAD,
 	ACCOUNT_REQUEST_ACHS_LOAD,
+	ACCOUNT_REQUEST_TOYS_LOAD,
     ACCOUNT_REQUEST_LOGIN
 };
 
@@ -866,7 +867,7 @@ enum e_top_gungame
 	E_gungame
 };
 
-enum e_toy_data
+enum E_TOY_DATA
 {
 	toy_model,
 	toy_bone,
@@ -1677,7 +1678,6 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
 	MellnikGate,
 	MellnikRamp,
 	LastPlayerText[MAX_PLAYERS][144],
-    PlayerToys[MAX_PLAYERS][MAX_PLAYER_ATTACHED_OBJECTS][e_toy_data],
 	StartTime,
 	hVIPVehObj[MAX_PLAYERS][13],
   	FalloutInfo[e_fallout_data],
@@ -1798,6 +1798,7 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
   	gLastMap[MAX_PLAYERS],
   	PlayerData[MAX_PLAYERS][E_PLAYER_DATA],
   	PlayerAchData[MAX_PLAYERS][E_PLAYER_ACH_DATA],
+  	PlayerToyData[MAX_PLAYERS][MAX_PLAYER_ATTACHED_OBJECTS][E_TOY_DATA],
   	PlayerPV[MAX_PLAYERS][MAX_PLAYER_PVS][e_player_pv_data],
   	HouseInfo[MAX_HOUSES][e_house_data],
   	GZoneInfo[MAX_GZONES][e_gzone_data],
@@ -2632,7 +2633,7 @@ public OnPlayerRequestSpawn(playerid)
 
 public OnPlayerSpawn(playerid)
 {
-    if(PlayerData[playerid][bShowToys] && !PlayerData[playerid][bFirstSpawn]) AttachPlayerToys(playerid);
+    if(PlayerData[playerid][bShowToys] && !PlayerData[playerid][bFirstSpawn]) AttachPlayerToyData(playerid);
     
     if(PlayerData[playerid][bFirstSpawn])
     {
@@ -2640,7 +2641,7 @@ public OnPlayerSpawn(playerid)
 		PlayerData[playerid][AllowSpawn] = false;
 		RemovePlayerAttachedObject(playerid, 0);
 		RemovePlayerAttachedObject(playerid, 1);
-		AttachPlayerToys(playerid);
+		AttachPlayerToyData(playerid);
 		StopAudioStreamForPlayer(playerid);
 		ResetPlayerWorld(playerid);
 		PlayerData[playerid][ExitType] = EXIT_FIRST_SPAWNED;
@@ -3398,6 +3399,7 @@ public OnPlayerDisconnect(playerid, reason)
 	
     DestroyPlayerVehicles(playerid, true);
 
+	orm_destroy(PlayerData[playerid][e_ormid]);
     PreparePlayerVars(playerid);
 
 	PreparePlayerPV(playerid);
@@ -6092,8 +6094,8 @@ public OnPlayerModelSelection(playerid, response, listid, modelid)
 		    }
 		    GivePlayerCash(playerid, -10000);
 
-            PlayerToys[playerid][PlayerData[playerid][toy_selected]][toy_model] = modelid;
-			SetPlayerAttachedObject(playerid, PlayerData[playerid][toy_selected], PlayerToys[playerid][PlayerData[playerid][toy_selected]][toy_model], 1);
+            PlayerToyData[playerid][PlayerData[playerid][toy_selected]][toy_model] = modelid;
+			SetPlayerAttachedObject(playerid, PlayerData[playerid][toy_selected], PlayerToyData[playerid][PlayerData[playerid][toy_selected]][toy_model], 1);
 
 			EditAttachedObject(playerid, PlayerData[playerid][toy_selected]);
 		    ShowPlayerToyTextdraws(playerid);
@@ -6548,15 +6550,15 @@ public OnPlayerEditAttachedObject(playerid, response, index, modelid, boneid, Fl
     {
         SendInfo(playerid, "Toy position saved", "");
 
-        PlayerToys[playerid][index][toy_x] = fOffsetX;
-        PlayerToys[playerid][index][toy_y] = fOffsetY;
-        PlayerToys[playerid][index][toy_z] = fOffsetZ;
-        PlayerToys[playerid][index][toy_rx] = fRotX;
-        PlayerToys[playerid][index][toy_ry] = fRotY;
-        PlayerToys[playerid][index][toy_rz] = fRotZ;
-        PlayerToys[playerid][index][toy_sx] = fScaleX;
-        PlayerToys[playerid][index][toy_sy] = fScaleY;
-        PlayerToys[playerid][index][toy_sz] = fScaleZ;
+        PlayerToyData[playerid][index][toy_x] = fOffsetX;
+        PlayerToyData[playerid][index][toy_y] = fOffsetY;
+        PlayerToyData[playerid][index][toy_z] = fOffsetZ;
+        PlayerToyData[playerid][index][toy_rx] = fRotX;
+        PlayerToyData[playerid][index][toy_ry] = fRotY;
+        PlayerToyData[playerid][index][toy_rz] = fRotZ;
+        PlayerToyData[playerid][index][toy_sx] = fScaleX;
+        PlayerToyData[playerid][index][toy_sy] = fScaleY;
+        PlayerToyData[playerid][index][toy_sz] = fScaleZ;
     }
     else
     {
@@ -6566,15 +6568,15 @@ public OnPlayerEditAttachedObject(playerid, response, index, modelid, boneid, Fl
 			index,
 			modelid,
 			boneid,
-			PlayerToys[playerid][index][toy_x],
-			PlayerToys[playerid][index][toy_y],
-			PlayerToys[playerid][index][toy_z],
-			PlayerToys[playerid][index][toy_rx],
-			PlayerToys[playerid][index][toy_ry],
-			PlayerToys[playerid][index][toy_rz],
-			PlayerToys[playerid][index][toy_sx],
-			PlayerToys[playerid][index][toy_sy],
-			PlayerToys[playerid][index][toy_sz]);
+			PlayerToyData[playerid][index][toy_x],
+			PlayerToyData[playerid][index][toy_y],
+			PlayerToyData[playerid][index][toy_z],
+			PlayerToyData[playerid][index][toy_rx],
+			PlayerToyData[playerid][index][toy_ry],
+			PlayerToyData[playerid][index][toy_rz],
+			PlayerToyData[playerid][index][toy_sx],
+			PlayerToyData[playerid][index][toy_sy],
+			PlayerToyData[playerid][index][toy_sz]);
     }
     return 1;
 }
@@ -16082,11 +16084,11 @@ YCMD:toggletoys(playerid, params[], help)
 
 	if(PlayerData[playerid][bShowToys])
 	{
-	    RemovePlayerToys(playerid);
+	    RemovePlayerToyData(playerid);
 	}
 	else if(!PlayerData[playerid][bShowToys])
 	{
-	    AttachPlayerToys(playerid);
+	    AttachPlayerToyData(playerid);
 	}
 
 	PlayerData[playerid][bShowToys] = !PlayerData[playerid][bShowToys];
@@ -16110,7 +16112,7 @@ YCMD:toys(playerid, params[], help)
 	    }
 	    else
 	    {
-		    if(PlayerToys[playerid][i][toy_model] == 0)
+		    if(PlayerToyData[playerid][i][toy_model] == 0)
 			{
 			    format(tmp, sizeof(tmp), "Slot %i\n", i + 1);
 			}
@@ -19172,7 +19174,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			    {
 			        PlayerData[playerid][toy_selected] = listitem;
 			        
-					if(PlayerToys[playerid][listitem][toy_model] == 0)
+					if(PlayerToyData[playerid][listitem][toy_model] == 0)
 					{
 					    ShowModelSelectionMenu(playerid, toyslist, "Select Toy", 0x0500009C, 0x050000FF, 0xFAFAFA4D);
 					}
@@ -19211,7 +19213,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						{
 							RemovePlayerAttachedObject(playerid, PlayerData[playerid][toy_selected]);
 						}
-						PlayerToys[playerid][PlayerData[playerid][toy_selected]][toy_model] = 0;
+						PlayerToyData[playerid][PlayerData[playerid][toy_selected]][toy_model] = 0;
 						SendInfo(playerid, "Toy removed", "");
 					}
 				}
@@ -19220,7 +19222,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			case TOY_DIALOG + 2: //change bone
 			{
 			    listitem++;
-			    PlayerToys[playerid][PlayerData[playerid][toy_selected]][toy_bone] = listitem;
+			    PlayerToyData[playerid][PlayerData[playerid][toy_selected]][toy_bone] = listitem;
 
 			    if(IsPlayerAttachedObjectSlotUsed(playerid, PlayerData[playerid][toy_selected]))
 				{
@@ -19231,17 +19233,17 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 	            SetPlayerAttachedObject(playerid,
 	                listitem,
-	                PlayerToys[playerid][listitem][toy_model],
-	                PlayerToys[playerid][listitem][toy_bone],
-	                PlayerToys[playerid][listitem][toy_x],
-	                PlayerToys[playerid][listitem][toy_y],
-	                PlayerToys[playerid][listitem][toy_z],
-	                PlayerToys[playerid][listitem][toy_rx],
-	                PlayerToys[playerid][listitem][toy_ry],
-	                PlayerToys[playerid][listitem][toy_rz],
-	                PlayerToys[playerid][listitem][toy_sx],
-	                PlayerToys[playerid][listitem][toy_sy],
-	                PlayerToys[playerid][listitem][toy_sz]);
+	                PlayerToyData[playerid][listitem][toy_model],
+	                PlayerToyData[playerid][listitem][toy_bone],
+	                PlayerToyData[playerid][listitem][toy_x],
+	                PlayerToyData[playerid][listitem][toy_y],
+	                PlayerToyData[playerid][listitem][toy_z],
+	                PlayerToyData[playerid][listitem][toy_rx],
+	                PlayerToyData[playerid][listitem][toy_ry],
+	                PlayerToyData[playerid][listitem][toy_rz],
+	                PlayerToyData[playerid][listitem][toy_sx],
+	                PlayerToyData[playerid][listitem][toy_sy],
+	                PlayerToyData[playerid][listitem][toy_sz]);
 
 			    SendInfo(playerid, "Bone changed", "");
 			    return true;
@@ -21263,8 +21265,14 @@ MySQL_LoadAccount(playerid)
 
 MySQL_LoadPlayerAchs(playerid)
 {
-	mysql_format(pSQL, gstr2, sizeof(gstr2), "SELECT `type` FROM `toys` WHERE `id` = %i;", PlayerData[playerid][e_accountid]);
-	mysql_pquery(pSQL, gstr2, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_ACHS_LOAD);
+	mysql_format(pSQL, gstr, sizeof(gstr), "SELECT `type` FROM `achievements` WHERE `id` = %i;", PlayerData[playerid][e_accountid]);
+	mysql_pquery(pSQL, gstr, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_ACHS_LOAD);
+}
+
+MySQL_LoadPlayerToys(playerid)
+{
+	mysql_format(pSQL, gstr, sizeof(gstr), "SELECT * FROM `toys` WHERE `id` = %i;", PlayerData[playerid][e_accountid]);
+	mysql_pquery(pSQL, gstr, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_TOYS_LOAD);
 }
 
 MySQL_LoadPlayerGang(playerid)
@@ -27473,21 +27481,21 @@ PreparePlayerToy(playerid)
 {
 	for(new i = 0; i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
 	{
-		PlayerToys[playerid][i][toy_model] = 0;
-		PlayerToys[playerid][i][toy_bone] = 1;
-		PlayerToys[playerid][i][toy_x] = 0.0;
-		PlayerToys[playerid][i][toy_y] = 0.0;
-		PlayerToys[playerid][i][toy_z] = 0.0;
-		PlayerToys[playerid][i][toy_rx] = 0.0;
-		PlayerToys[playerid][i][toy_ry] = 0.0;
-		PlayerToys[playerid][i][toy_rz] = 0.0;
-		PlayerToys[playerid][i][toy_sx] = 1.0;
-		PlayerToys[playerid][i][toy_sy] = 1.0;
-		PlayerToys[playerid][i][toy_sz] = 1.0;
+		PlayerToyData[playerid][i][toy_model] = 0;
+		PlayerToyData[playerid][i][toy_bone] = 1;
+		PlayerToyData[playerid][i][toy_x] = 0.0;
+		PlayerToyData[playerid][i][toy_y] = 0.0;
+		PlayerToyData[playerid][i][toy_z] = 0.0;
+		PlayerToyData[playerid][i][toy_rx] = 0.0;
+		PlayerToyData[playerid][i][toy_ry] = 0.0;
+		PlayerToyData[playerid][i][toy_rz] = 0.0;
+		PlayerToyData[playerid][i][toy_sx] = 1.0;
+		PlayerToyData[playerid][i][toy_sy] = 1.0;
+		PlayerToyData[playerid][i][toy_sz] = 1.0;
 	}
 }
 
-RemovePlayerToys(playerid)
+RemovePlayerToyData(playerid)
 {
 	for(new i = 0; i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
 	{
@@ -27498,23 +27506,23 @@ RemovePlayerToys(playerid)
 	}
 }
 
-AttachPlayerToys(playerid)
+AttachPlayerToyData(playerid)
 {
 	for(new i = 0; i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
 	{
         SetPlayerAttachedObject(playerid,
             i,
-            PlayerToys[playerid][i][toy_model],
-            PlayerToys[playerid][i][toy_bone],
-            PlayerToys[playerid][i][toy_x],
-            PlayerToys[playerid][i][toy_y],
-            PlayerToys[playerid][i][toy_z],
-            PlayerToys[playerid][i][toy_rx],
-            PlayerToys[playerid][i][toy_ry],
-            PlayerToys[playerid][i][toy_rz],
-            PlayerToys[playerid][i][toy_sx],
-            PlayerToys[playerid][i][toy_sy],
-            PlayerToys[playerid][i][toy_sz]);
+            PlayerToyData[playerid][i][toy_model],
+            PlayerToyData[playerid][i][toy_bone],
+            PlayerToyData[playerid][i][toy_x],
+            PlayerToyData[playerid][i][toy_y],
+            PlayerToyData[playerid][i][toy_z],
+            PlayerToyData[playerid][i][toy_rx],
+            PlayerToyData[playerid][i][toy_ry],
+            PlayerToyData[playerid][i][toy_rz],
+            PlayerToyData[playerid][i][toy_sx],
+            PlayerToyData[playerid][i][toy_sy],
+            PlayerToyData[playerid][i][toy_sz]);
 	}
 }
 
@@ -27527,139 +27535,139 @@ MySQL_SaveAchievement(playerid, ach)
 	}
 }
 
-MySQL_SavePlayerToys(playerid)
+MySQL_SavePlayerToyData(playerid)
 {
     if(islogged(playerid))
     {
 		new query[1024];
 
 		format(query, sizeof(query), "UPDATE `accounts` SET `Toy_Slot0` = '%i,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f', `Toy_Slot1` = '%i,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f' WHERE `Name` = '%s' LIMIT 1;",
-			PlayerToys[playerid][0][toy_model],
-		    PlayerToys[playerid][0][toy_bone],
-		    PlayerToys[playerid][0][toy_x],
-		    PlayerToys[playerid][0][toy_y],
-		    PlayerToys[playerid][0][toy_z],
-		    PlayerToys[playerid][0][toy_rx],
-		    PlayerToys[playerid][0][toy_ry],
-		    PlayerToys[playerid][0][toy_rz],
-		    PlayerToys[playerid][0][toy_sx],
-		    PlayerToys[playerid][0][toy_sy],
-		    PlayerToys[playerid][0][toy_sz],
-			PlayerToys[playerid][1][toy_model],
-		    PlayerToys[playerid][1][toy_bone],
-		    PlayerToys[playerid][1][toy_x],
-		    PlayerToys[playerid][1][toy_y],
-		    PlayerToys[playerid][1][toy_z],
-		    PlayerToys[playerid][1][toy_rx],
-		    PlayerToys[playerid][1][toy_ry],
-		    PlayerToys[playerid][1][toy_rz],
-		    PlayerToys[playerid][1][toy_sx],
-		    PlayerToys[playerid][1][toy_sy],
-		    PlayerToys[playerid][1][toy_sz],
+			PlayerToyData[playerid][0][toy_model],
+		    PlayerToyData[playerid][0][toy_bone],
+		    PlayerToyData[playerid][0][toy_x],
+		    PlayerToyData[playerid][0][toy_y],
+		    PlayerToyData[playerid][0][toy_z],
+		    PlayerToyData[playerid][0][toy_rx],
+		    PlayerToyData[playerid][0][toy_ry],
+		    PlayerToyData[playerid][0][toy_rz],
+		    PlayerToyData[playerid][0][toy_sx],
+		    PlayerToyData[playerid][0][toy_sy],
+		    PlayerToyData[playerid][0][toy_sz],
+			PlayerToyData[playerid][1][toy_model],
+		    PlayerToyData[playerid][1][toy_bone],
+		    PlayerToyData[playerid][1][toy_x],
+		    PlayerToyData[playerid][1][toy_y],
+		    PlayerToyData[playerid][1][toy_z],
+		    PlayerToyData[playerid][1][toy_rx],
+		    PlayerToyData[playerid][1][toy_ry],
+		    PlayerToyData[playerid][1][toy_rz],
+		    PlayerToyData[playerid][1][toy_sx],
+		    PlayerToyData[playerid][1][toy_sy],
+		    PlayerToyData[playerid][1][toy_sz],
 		    __GetName(playerid));
 	    mysql_tquery(pSQL, query, "", "");
 
 		format(query, sizeof(query), "UPDATE `accounts` SET `Toy_Slot2` = '%i,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f', `Toy_Slot3` = '%i,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f' WHERE `Name` = '%s' LIMIT 1;",
-			PlayerToys[playerid][2][toy_model],
-		    PlayerToys[playerid][2][toy_bone],
-		    PlayerToys[playerid][2][toy_x],
-		    PlayerToys[playerid][2][toy_y],
-		    PlayerToys[playerid][2][toy_z],
-		    PlayerToys[playerid][2][toy_rx],
-		    PlayerToys[playerid][2][toy_ry],
-		    PlayerToys[playerid][2][toy_rz],
-		    PlayerToys[playerid][2][toy_sx],
-		    PlayerToys[playerid][2][toy_sy],
-		    PlayerToys[playerid][2][toy_sz],
-			PlayerToys[playerid][3][toy_model],
-		    PlayerToys[playerid][3][toy_bone],
-		    PlayerToys[playerid][3][toy_x],
-		    PlayerToys[playerid][3][toy_y],
-		    PlayerToys[playerid][3][toy_z],
-		    PlayerToys[playerid][3][toy_rx],
-		    PlayerToys[playerid][3][toy_ry],
-		    PlayerToys[playerid][3][toy_rz],
-		    PlayerToys[playerid][3][toy_sx],
-		    PlayerToys[playerid][3][toy_sy],
-		    PlayerToys[playerid][3][toy_sz],
+			PlayerToyData[playerid][2][toy_model],
+		    PlayerToyData[playerid][2][toy_bone],
+		    PlayerToyData[playerid][2][toy_x],
+		    PlayerToyData[playerid][2][toy_y],
+		    PlayerToyData[playerid][2][toy_z],
+		    PlayerToyData[playerid][2][toy_rx],
+		    PlayerToyData[playerid][2][toy_ry],
+		    PlayerToyData[playerid][2][toy_rz],
+		    PlayerToyData[playerid][2][toy_sx],
+		    PlayerToyData[playerid][2][toy_sy],
+		    PlayerToyData[playerid][2][toy_sz],
+			PlayerToyData[playerid][3][toy_model],
+		    PlayerToyData[playerid][3][toy_bone],
+		    PlayerToyData[playerid][3][toy_x],
+		    PlayerToyData[playerid][3][toy_y],
+		    PlayerToyData[playerid][3][toy_z],
+		    PlayerToyData[playerid][3][toy_rx],
+		    PlayerToyData[playerid][3][toy_ry],
+		    PlayerToyData[playerid][3][toy_rz],
+		    PlayerToyData[playerid][3][toy_sx],
+		    PlayerToyData[playerid][3][toy_sy],
+		    PlayerToyData[playerid][3][toy_sz],
 		    __GetName(playerid));
 	    mysql_tquery(pSQL, query, "", "");
 
 		format(query, sizeof(query), "UPDATE `accounts` SET `Toy_Slot4` = '%i,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f', `Toy_Slot5` = '%i,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f' WHERE `Name` = '%s' LIMIT 1;",
-			PlayerToys[playerid][4][toy_model],
-		    PlayerToys[playerid][4][toy_bone],
-		    PlayerToys[playerid][4][toy_x],
-		    PlayerToys[playerid][4][toy_y],
-		    PlayerToys[playerid][4][toy_z],
-		    PlayerToys[playerid][4][toy_rx],
-		    PlayerToys[playerid][4][toy_ry],
-		    PlayerToys[playerid][4][toy_rz],
-		    PlayerToys[playerid][4][toy_sx],
-		    PlayerToys[playerid][4][toy_sy],
-		    PlayerToys[playerid][4][toy_sz],
-			PlayerToys[playerid][5][toy_model],
-		    PlayerToys[playerid][5][toy_bone],
-		    PlayerToys[playerid][5][toy_x],
-		    PlayerToys[playerid][5][toy_y],
-		    PlayerToys[playerid][5][toy_z],
-		    PlayerToys[playerid][5][toy_rx],
-		    PlayerToys[playerid][5][toy_ry],
-		    PlayerToys[playerid][5][toy_rz],
-		    PlayerToys[playerid][5][toy_sx],
-		    PlayerToys[playerid][5][toy_sy],
-		    PlayerToys[playerid][5][toy_sz],
+			PlayerToyData[playerid][4][toy_model],
+		    PlayerToyData[playerid][4][toy_bone],
+		    PlayerToyData[playerid][4][toy_x],
+		    PlayerToyData[playerid][4][toy_y],
+		    PlayerToyData[playerid][4][toy_z],
+		    PlayerToyData[playerid][4][toy_rx],
+		    PlayerToyData[playerid][4][toy_ry],
+		    PlayerToyData[playerid][4][toy_rz],
+		    PlayerToyData[playerid][4][toy_sx],
+		    PlayerToyData[playerid][4][toy_sy],
+		    PlayerToyData[playerid][4][toy_sz],
+			PlayerToyData[playerid][5][toy_model],
+		    PlayerToyData[playerid][5][toy_bone],
+		    PlayerToyData[playerid][5][toy_x],
+		    PlayerToyData[playerid][5][toy_y],
+		    PlayerToyData[playerid][5][toy_z],
+		    PlayerToyData[playerid][5][toy_rx],
+		    PlayerToyData[playerid][5][toy_ry],
+		    PlayerToyData[playerid][5][toy_rz],
+		    PlayerToyData[playerid][5][toy_sx],
+		    PlayerToyData[playerid][5][toy_sy],
+		    PlayerToyData[playerid][5][toy_sz],
 		    __GetName(playerid));
 	    mysql_tquery(pSQL, query, "", "");
 
 		format(query, sizeof(query), "UPDATE `accounts` SET `Toy_Slot6` = '%i,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f', `Toy_Slot7` = '%i,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f' WHERE `Name` = '%s' LIMIT 1;",
-			PlayerToys[playerid][6][toy_model],
-		    PlayerToys[playerid][6][toy_bone],
-		    PlayerToys[playerid][6][toy_x],
-		    PlayerToys[playerid][6][toy_y],
-		    PlayerToys[playerid][6][toy_z],
-		    PlayerToys[playerid][6][toy_rx],
-		    PlayerToys[playerid][6][toy_ry],
-		    PlayerToys[playerid][6][toy_rz],
-		    PlayerToys[playerid][6][toy_sx],
-		    PlayerToys[playerid][6][toy_sy],
-		    PlayerToys[playerid][6][toy_sz],
-			PlayerToys[playerid][7][toy_model],
-		    PlayerToys[playerid][7][toy_bone],
-		    PlayerToys[playerid][7][toy_x],
-		    PlayerToys[playerid][7][toy_y],
-		    PlayerToys[playerid][7][toy_z],
-		    PlayerToys[playerid][7][toy_rx],
-		    PlayerToys[playerid][7][toy_ry],
-		    PlayerToys[playerid][7][toy_rz],
-		    PlayerToys[playerid][7][toy_sx],
-		    PlayerToys[playerid][7][toy_sy],
-		    PlayerToys[playerid][7][toy_sz],
+			PlayerToyData[playerid][6][toy_model],
+		    PlayerToyData[playerid][6][toy_bone],
+		    PlayerToyData[playerid][6][toy_x],
+		    PlayerToyData[playerid][6][toy_y],
+		    PlayerToyData[playerid][6][toy_z],
+		    PlayerToyData[playerid][6][toy_rx],
+		    PlayerToyData[playerid][6][toy_ry],
+		    PlayerToyData[playerid][6][toy_rz],
+		    PlayerToyData[playerid][6][toy_sx],
+		    PlayerToyData[playerid][6][toy_sy],
+		    PlayerToyData[playerid][6][toy_sz],
+			PlayerToyData[playerid][7][toy_model],
+		    PlayerToyData[playerid][7][toy_bone],
+		    PlayerToyData[playerid][7][toy_x],
+		    PlayerToyData[playerid][7][toy_y],
+		    PlayerToyData[playerid][7][toy_z],
+		    PlayerToyData[playerid][7][toy_rx],
+		    PlayerToyData[playerid][7][toy_ry],
+		    PlayerToyData[playerid][7][toy_rz],
+		    PlayerToyData[playerid][7][toy_sx],
+		    PlayerToyData[playerid][7][toy_sy],
+		    PlayerToyData[playerid][7][toy_sz],
 		    __GetName(playerid));
 	    mysql_tquery(pSQL, query, "", "");
 
 		format(query, sizeof(query), "UPDATE `accounts` SET `Toy_Slot8` = '%i,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f', `Toy_Slot9` = '%i,%i,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f,%.2f' WHERE `Name` = '%s' LIMIT 1;",
-			PlayerToys[playerid][8][toy_model],
-		    PlayerToys[playerid][8][toy_bone],
-		    PlayerToys[playerid][8][toy_x],
-		    PlayerToys[playerid][8][toy_y],
-		    PlayerToys[playerid][8][toy_z],
-		    PlayerToys[playerid][8][toy_rx],
-		    PlayerToys[playerid][8][toy_ry],
-		    PlayerToys[playerid][8][toy_rz],
-		    PlayerToys[playerid][8][toy_sx],
-		    PlayerToys[playerid][8][toy_sy],
-		    PlayerToys[playerid][8][toy_sz],
-			PlayerToys[playerid][9][toy_model],
-		    PlayerToys[playerid][9][toy_bone],
-		    PlayerToys[playerid][9][toy_x],
-		    PlayerToys[playerid][9][toy_y],
-		    PlayerToys[playerid][9][toy_z],
-		    PlayerToys[playerid][9][toy_rx],
-		    PlayerToys[playerid][9][toy_ry],
-		    PlayerToys[playerid][9][toy_rz],
-		    PlayerToys[playerid][9][toy_sx],
-		    PlayerToys[playerid][9][toy_sy],
-		    PlayerToys[playerid][9][toy_sz],
+			PlayerToyData[playerid][8][toy_model],
+		    PlayerToyData[playerid][8][toy_bone],
+		    PlayerToyData[playerid][8][toy_x],
+		    PlayerToyData[playerid][8][toy_y],
+		    PlayerToyData[playerid][8][toy_z],
+		    PlayerToyData[playerid][8][toy_rx],
+		    PlayerToyData[playerid][8][toy_ry],
+		    PlayerToyData[playerid][8][toy_rz],
+		    PlayerToyData[playerid][8][toy_sx],
+		    PlayerToyData[playerid][8][toy_sy],
+		    PlayerToyData[playerid][8][toy_sz],
+			PlayerToyData[playerid][9][toy_model],
+		    PlayerToyData[playerid][9][toy_bone],
+		    PlayerToyData[playerid][9][toy_x],
+		    PlayerToyData[playerid][9][toy_y],
+		    PlayerToyData[playerid][9][toy_z],
+		    PlayerToyData[playerid][9][toy_rx],
+		    PlayerToyData[playerid][9][toy_ry],
+		    PlayerToyData[playerid][9][toy_rz],
+		    PlayerToyData[playerid][9][toy_sx],
+		    PlayerToyData[playerid][9][toy_sy],
+		    PlayerToyData[playerid][9][toy_sz],
 		    __GetName(playerid));
 	    mysql_tquery(pSQL, query, "", "");
 	}
@@ -30858,6 +30866,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 		        mysql_format(pSQL, gstr, sizeof(gstr), "SELECT COUNT(`id`) FROM `accounts` WHERE `serial` = '%s' AND `regdate` > (UNIX_TIMESTAMP() - 5184000);", __GetSerial(playerid));
 		        mysql_pquery(pSQL, gstr, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUST_VERIFY_REGISTER + 1);
 			}
+			return 1;
 	    }
 	    case ACCOUNT_REQUST_VERIFY_REGISTER + 1:
 	    {
@@ -30870,6 +30879,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 	        {
 	            RequestRegistration(playerid);
 	        }
+	        return 1;
 	    }
 	    case ACCOUNT_REQUEST_AUTO_LOGIN:
 	    {
@@ -30994,6 +31004,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 				}
 				
 				MySQL_LoadPlayerAchs(playerid);
+				MySQL_LoadPlayerToys(playerid);
 
   			 	SetPlayerScore_(playerid, PlayerData[playerid][e_score]);
 			 	SetPlayerCash(playerid, PlayerData[playerid][e_money]);
@@ -31003,10 +31014,13 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 				mysql_format(pSQL, gstr, sizeof(gstr), "INSERT INTO `loginlog` VALUES (%i, '%s', 0, UNIX_TIMESTAMP());", PlayerData[playerid][e_accountid], __GetIP(playerid));
 				mysql_pquery(pSQL, gstr);
 
-				if(PlayerData[playerid][e_level] > 0){
+				if(PlayerData[playerid][e_level] > 0)
+				{
 					format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"Successfully logged in. (Level: %s)", StaffLevels[PlayerData[playerid][e_level]][e_rank]);
 					SCM(playerid, -1, gstr2);
-		   		} else {
+		   		}
+		   		else
+				{
 				   	SCM(playerid, -1, ""server_sign" "r_besch"Successfully logged in!");
 				}
 
@@ -31014,17 +31028,22 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 				SCM(playerid, -1, gstr);
 				format(gstr, sizeof(gstr), ""server_sign" "r_besch"You've been online for %s", GetPlayingTimeFormat(playerid));
 				SCM(playerid, -1, gstr);
-				if(PlayerData[playerid][e_color] != 0) {
+				
+				if(PlayerData[playerid][e_color] != 0)
+				{
 				    SetPlayerColor(playerid, PlayerData[playerid][e_color]);
 				    SCM(playerid, -1, ""server_sign" "r_besch"Your saved color has been set. (/deletecolor to remove)");
 				}
 
-				if(PlayerData[playerid][e_vip] == 1) {
+				if(PlayerData[playerid][e_vip] == 1)
+				{
                     format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"VIP %s(%i) logged in!", __GetName(playerid), playerid);
                     SCMToAll(-1, gstr2);
 					format(gstr2, sizeof(gstr2), "02[%i] 03*** VIP %s has joined the server.", playerid, __GetName(playerid));
 					IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr2);
-				} else {
+				}
+				else
+				{
 					format(gstr2, sizeof(gstr2), "02[%i] 03*** %s has joined the server.", playerid, __GetName(playerid));
 					IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr2);
 				}
@@ -31079,6 +31098,29 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 				        case 13: PlayerAchData[playerid][e_ach_bmxmaster] = 1;
 				    }
 				}
+	        }
+	        return 1;
+	    }
+	    case ACCOUNT_REQUEST_TOYS_LOAD:
+	    {
+	        if(cache_get_row_count() > 0)
+	        {
+	            for(new i = 0; i < cache_get_row_count(); i++)
+	            {
+					new r = cache_get_row_int(i, 1);
+					
+					PlayerToyData[playerid][r][toy_model] = cache_get_row_int(i, 2);
+					PlayerToyData[playerid][r][toy_bone] = cache_get_row_int(i, 3);
+					PlayerToyData[playerid][r][toy_x] = cache_get_row_int(i, 4);
+					PlayerToyData[playerid][r][toy_y] = cache_get_row_int(i, 5);
+					PlayerToyData[playerid][r][toy_z] = cache_get_row_int(i, 6);
+					PlayerToyData[playerid][r][toy_rx] = cache_get_row_int(i, 7);
+					PlayerToyData[playerid][r][toy_ry] = cache_get_row_int(i, 8);
+					PlayerToyData[playerid][r][toy_rz] = cache_get_row_int(i, 9);
+					PlayerToyData[playerid][r][toy_sx] = cache_get_row_int(i, 10);
+					PlayerToyData[playerid][r][toy_sy] = cache_get_row_int(i, 11);
+					PlayerToyData[playerid][r][toy_sz] = cache_get_row_int(i, 12);
+	            }
 	        }
 	        return 1;
 	    }
