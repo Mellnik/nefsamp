@@ -882,14 +882,25 @@ enum E_TOY_DATA
 	Float:toy_sz
 };
 
-enum e_player_pv_data
+enum E_PV_DATA
 {
-	PVehicleID,
-	Text3D:PVehicleLabel,
-	Model,
-	PaintJob,
-	Color1,
-	Color2,
+	/* ORM */
+	ORM:e_ormid,
+	
+	/* DATA */
+	e_model,
+	e_plate[13],
+	e_paintjob,
+	e_color1,
+	e_color2,
+	e_mods[17],
+	
+	/* INTERNAL */
+	e_vehicleid,
+	Text3D:e_labelid,
+	e_neon1,
+	e_neon2,
+
 	Mod1,
 	Mod2,
 	Mod3,
@@ -906,10 +917,7 @@ enum e_player_pv_data
 	Mod14,
 	Mod15,
 	Mod16,
-	Mod17,
-	Neon1,
-	Neon2,
-	Plate[13]
+	Mod17
 };
 
 // Server related
@@ -1799,7 +1807,7 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
   	PlayerData[MAX_PLAYERS][E_PLAYER_DATA],
   	PlayerAchData[MAX_PLAYERS][E_PLAYER_ACH_DATA],
   	PlayerToyData[MAX_PLAYERS][MAX_PLAYER_ATTACHED_OBJECTS][E_TOY_DATA],
-  	PlayerPV[MAX_PLAYERS][MAX_PLAYER_PVS][e_player_pv_data],
+  	PlayerPVData[MAX_PLAYERS][MAX_PLAYER_PVS][E_PV_DATA],
   	HouseInfo[MAX_HOUSES][e_house_data],
   	GZoneInfo[MAX_GZONES][e_gzone_data],
   	BusinessData[MAX_BUSINESSES][E_BUSINESS_DATA],
@@ -3528,7 +3536,7 @@ public OnVehicleMod(playerid, vehicleid, componentid)
 	
 	if(PVSelect[playerid] != -1)
 	{
-	    if(PlayerPV[playerid][PVSelect[playerid]][PVehicleID] == vehicleid)
+	    if(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid] == vehicleid)
 	    {
 	        SaveVehComponets(playerid, componentid);
 	    }
@@ -3540,9 +3548,9 @@ public OnVehiclePaintjob(playerid, vehicleid, paintjobid)
 {
 	if(PVSelect[playerid] != -1)
 	{
-	    if(PlayerPV[playerid][PVSelect[playerid]][PVehicleID] == vehicleid)
+	    if(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid] == vehicleid)
 	    {
-	        PlayerPV[playerid][PVSelect[playerid]][PaintJob] = paintjobid;
+	        PlayerPVData[playerid][PVSelect[playerid]][e_paintjob] = paintjobid;
 	    }
 	}
 	return 1;
@@ -3552,10 +3560,10 @@ public OnVehicleRespray(playerid, vehicleid, color1, color2)
 {
 	if(PVSelect[playerid] != -1)
 	{
-	    if(PlayerPV[playerid][PVSelect[playerid]][PVehicleID] == vehicleid)
+	    if(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid] == vehicleid)
 	    {
-	        PlayerPV[playerid][PVSelect[playerid]][Color1] = color1;
-	        PlayerPV[playerid][PVSelect[playerid]][Color2] = color2;
+	        PlayerPVData[playerid][PVSelect[playerid]][e_color1] = color1;
+	        PlayerPVData[playerid][PVSelect[playerid]][e_color2] = color2;
 	    }
 	}
 	return 1;
@@ -8553,7 +8561,7 @@ YCMD:unlock(playerid, params[], help)
 		{
 		    if(PVSelect[playerid] != -1)
 		    {
-			    if(GetPlayerVehicleID(playerid) == PlayerPV[playerid][PVSelect[playerid]][PVehicleID])
+			    if(GetPlayerVehicleID(playerid) == PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid])
 			    {
 	      			for(new i = 0; i < MAX_PLAYERS; i++)
 				    {
@@ -8626,7 +8634,7 @@ YCMD:lock(playerid, params[], help)
 		{
 		    if(PVSelect[playerid] != -1)
 		    {
-			    if(GetPlayerVehicleID(playerid) == PlayerPV[playerid][PVSelect[playerid]][PVehicleID])
+			    if(GetPlayerVehicleID(playerid) == PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid])
 			    {
 	      			for(new i = 0; i < MAX_PLAYERS; i++)
 				    {
@@ -13222,7 +13230,7 @@ YCMD:rainbow(playerid, params[], help)
 
 	if(PVSelect[playerid] != -1)
 	{
-	    if(GetPlayerVehicleID(playerid) == PlayerPV[playerid][PVSelect[playerid]][PVehicleID]) return SCM(playerid, -1, ""er"Not possible in PVs!");
+	    if(GetPlayerVehicleID(playerid) == PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid]) return SCM(playerid, -1, ""er"Not possible in PVs!");
 	}
 
 	if(!PlayerData[playerid][bRainbow])
@@ -15019,10 +15027,10 @@ YCMD:cc(playerid, params[], help)
 
 	if(PVSelect[playerid] != -1)
 	{
-	    if(GetPlayerVehicleID(playerid) == PlayerPV[playerid][PVSelect[playerid]][PVehicleID])
+	    if(GetPlayerVehicleID(playerid) == PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid])
 	    {
-	        PlayerPV[playerid][PVSelect[playerid]][Color1] = color1;
-	        PlayerPV[playerid][PVSelect[playerid]][Color2] = color2;
+	        PlayerPVData[playerid][PVSelect[playerid]][e_color1] = color1;
+	        PlayerPVData[playerid][PVSelect[playerid]][e_color2] = color2;
 	        GivePlayerCash(playerid, -500);
 		}
 	}
@@ -16676,7 +16684,7 @@ YCMD:nos(playerid, params[], help)
     {
 		if(PVSelect[playerid] != -1)
 		{
-		    if(GetPlayerVehicleID(playerid) == PlayerPV[playerid][PVSelect[playerid]][PVehicleID]) return SCM(playerid, -1, ""er"Not useable in private vehicles");
+		    if(GetPlayerVehicleID(playerid) == PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid]) return SCM(playerid, -1, ""er"Not useable in private vehicles");
 		}
 
         PlayerPlaySound(playerid, 1133, 0.0, 0.0, 0.0);
@@ -16739,7 +16747,7 @@ public OnVehicleSpawn(vehicleid)
 	{
 		if(IsPlayerConnected(i) && PVSelect[i] != -1)
 		{
-		    if(PlayerPV[i][PVSelect[i]][PVehicleID] == vehicleid)
+		    if(PlayerPVData[i][PVSelect[i]][e_vehicleid] == vehicleid)
 			{
 				ModVehicleColor(i);
 				ModVehiclePaintJob(i);
@@ -19462,7 +19470,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			    {
 			        PVVMenuSel[playerid] = listitem;
 			        
-				   	if(PlayerPV[playerid][PVVMenuSel[playerid]][Model] == 0)
+				   	if(PlayerPVData[playerid][PVVMenuSel[playerid]][e_model] == 0)
 					{
 					    SendInfo(playerid, "PV slot is not in use", "");
 					    return 1;
@@ -19491,15 +19499,15 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						GetPlayerPos(playerid, POS[0], POS[1], POS[2]);
 						GetPlayerFacingAngle(playerid, POS[3]);
 
-						PlayerPV[playerid][PVSelect[playerid]][PVehicleID] = CreateVehicle_(PlayerPV[playerid][PVSelect[playerid]][Model], POS[0], POS[1], POS[2], POS[3], 0, 0, -1);
-						PlayerPV[playerid][PVSelect[playerid]][PVehicleLabel] = CreateDynamic3DTextLabel(vlabel, -1, 0.0, 0.0, 0.0, 30.0, INVALID_PLAYER_ID, PlayerPV[playerid][PVSelect[playerid]][PVehicleID], 1, -1, -1, -1, 30.0);
+						PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid] = CreateVehicle_(PlayerPVData[playerid][PVSelect[playerid]][e_model], POS[0], POS[1], POS[2], POS[3], 0, 0, -1);
+						PlayerPVData[playerid][PVSelect[playerid]][e_labelid] = CreateDynamic3DTextLabel(vlabel, -1, 0.0, 0.0, 0.0, 30.0, INVALID_PLAYER_ID, PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], 1, -1, -1, -1, 30.0);
 
-						SetVehicleVirtualWorld(PlayerPV[playerid][PVSelect[playerid]][PVehicleID], GetPlayerVirtualWorld(playerid));
-						LinkVehicleToInterior(PlayerPV[playerid][PVSelect[playerid]][PVehicleID], GetPlayerInterior(playerid));
-						SetVehicleNumberPlate(PlayerPV[playerid][PVSelect[playerid]][PVehicleID], PlayerPV[playerid][PVSelect[playerid]][Plate]);
-						SetVehicleToRespawn(PlayerPV[playerid][PVSelect[playerid]][PVehicleID]);
+						SetVehicleVirtualWorld(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], GetPlayerVirtualWorld(playerid));
+						LinkVehicleToInterior(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], GetPlayerInterior(playerid));
+						SetVehicleNumberPlate(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][e_plate]);
+						SetVehicleToRespawn(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid]);
 
-						PutPlayerInVehicle(playerid, PlayerPV[playerid][PVSelect[playerid]][PVehicleID], 0);
+						PutPlayerInVehicle(playerid, PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], 0);
 
 						SendInfo(playerid, "Private Vehicle Spawned", "");
 					}
@@ -19517,56 +19525,56 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					}
 					case 4:
 					{
-						if(PlayerPV[playerid][PVVMenuSel[playerid]][Neon1] != -1)
+						if(PlayerPVData[playerid][PVVMenuSel[playerid]][e_neon1] != -1)
 						{
-							DestroyDynamicObject(PlayerPV[playerid][PVVMenuSel[playerid]][Neon1]);
-							PlayerPV[playerid][PVVMenuSel[playerid]][Neon1] = -1;
+							DestroyDynamicObject(PlayerPVData[playerid][PVVMenuSel[playerid]][e_neon1]);
+							PlayerPVData[playerid][PVVMenuSel[playerid]][e_neon1] = -1;
 						}
-						if(PlayerPV[playerid][PVVMenuSel[playerid]][Neon2] != -1)
+						if(PlayerPVData[playerid][PVVMenuSel[playerid]][e_neon2] != -1)
 						{
-							DestroyDynamicObject(PlayerPV[playerid][PVVMenuSel[playerid]][Neon2]);
-							PlayerPV[playerid][PVVMenuSel[playerid]][Neon2] = -1;
+							DestroyDynamicObject(PlayerPVData[playerid][PVVMenuSel[playerid]][e_neon2]);
+							PlayerPVData[playerid][PVVMenuSel[playerid]][e_neon2] = -1;
 						}
-					    if(PlayerPV[playerid][PVVMenuSel[playerid]][PVehicleLabel] != Text3D:-1)
+					    if(PlayerPVData[playerid][PVVMenuSel[playerid]][e_labelid] != Text3D:-1)
 					    {
-					        DestroyDynamic3DTextLabel(PlayerPV[playerid][PVVMenuSel[playerid]][PVehicleLabel]);
-					        PlayerPV[playerid][PVVMenuSel[playerid]][PVehicleLabel] = Text3D:-1;
+					        DestroyDynamic3DTextLabel(PlayerPVData[playerid][PVVMenuSel[playerid]][e_labelid]);
+					        PlayerPVData[playerid][PVVMenuSel[playerid]][e_labelid] = Text3D:-1;
 					    }
-						if(PlayerPV[playerid][PVVMenuSel[playerid]][PVehicleID] != -1)
+						if(PlayerPVData[playerid][PVVMenuSel[playerid]][e_vehicleid] != -1)
 						{
-							DestroyVehicle_(PlayerPV[playerid][PVVMenuSel[playerid]][PVehicleID]);
-							PlayerPV[playerid][PVVMenuSel[playerid]][PVehicleID] = -1;
+							DestroyVehicle_(PlayerPVData[playerid][PVVMenuSel[playerid]][e_vehicleid]);
+							PlayerPVData[playerid][PVVMenuSel[playerid]][e_vehicleid] = -1;
 						}
 
-                        GivePlayerCash(playerid, floatround(GetPVPriceByModelId(PlayerPV[playerid][PVVMenuSel[playerid]][Model]) / 2));
+                        GivePlayerCash(playerid, floatround(GetPVPriceByModelId(PlayerPVData[playerid][PVVMenuSel[playerid]][e_model]) / 2));
 
-						PlayerPV[playerid][PVVMenuSel[playerid]][PVehicleID] = -1;
-						PlayerPV[playerid][PVVMenuSel[playerid]][PVehicleLabel] = Text3D:-1;
-					    PlayerPV[playerid][PVVMenuSel[playerid]][Model] = 0;
-					    PlayerPV[playerid][PVVMenuSel[playerid]][PaintJob] = -1;
-					    PlayerPV[playerid][PVVMenuSel[playerid]][Color1] = 0;
-					    PlayerPV[playerid][PVVMenuSel[playerid]][Color2] = 0;
-					    PlayerPV[playerid][PVVMenuSel[playerid]][Mod1] = 0;
-					    PlayerPV[playerid][PVVMenuSel[playerid]][Mod2] = 0;
-					    PlayerPV[playerid][PVVMenuSel[playerid]][Mod3] = 0;
-					    PlayerPV[playerid][PVVMenuSel[playerid]][Mod4] = 0;
-					    PlayerPV[playerid][PVVMenuSel[playerid]][Mod5] = 0;
-					    PlayerPV[playerid][PVVMenuSel[playerid]][Mod6] = 0;
-					    PlayerPV[playerid][PVVMenuSel[playerid]][Mod7] = 0;
-					    PlayerPV[playerid][PVVMenuSel[playerid]][Mod8] = 0;
-					    PlayerPV[playerid][PVVMenuSel[playerid]][Mod9] = 0;
-					    PlayerPV[playerid][PVVMenuSel[playerid]][Mod10] = 0;
-					    PlayerPV[playerid][PVVMenuSel[playerid]][Mod11] = 0;
-					    PlayerPV[playerid][PVVMenuSel[playerid]][Mod12] = 0;
-					    PlayerPV[playerid][PVVMenuSel[playerid]][Mod13] = 0;
-					    PlayerPV[playerid][PVVMenuSel[playerid]][Mod14] = 0;
-					    PlayerPV[playerid][PVVMenuSel[playerid]][Mod15] = 0;
-					    PlayerPV[playerid][PVVMenuSel[playerid]][Mod16] = 0;
-					    PlayerPV[playerid][PVVMenuSel[playerid]][Mod17] = 0;
-					    PlayerPV[playerid][PVVMenuSel[playerid]][Neon1] = -1;
-					    PlayerPV[playerid][PVVMenuSel[playerid]][Neon2] = -1;
+						PlayerPVData[playerid][PVVMenuSel[playerid]][e_vehicleid] = -1;
+						PlayerPVData[playerid][PVVMenuSel[playerid]][e_labelid] = Text3D:-1;
+					    PlayerPVData[playerid][PVVMenuSel[playerid]][e_model] = 0;
+					    PlayerPVData[playerid][PVVMenuSel[playerid]][e_paintjob] = -1;
+					    PlayerPVData[playerid][PVVMenuSel[playerid]][e_color1] = 0;
+					    PlayerPVData[playerid][PVVMenuSel[playerid]][e_color2] = 0;
+					    PlayerPVData[playerid][PVVMenuSel[playerid]][Mod1] = 0;
+					    PlayerPVData[playerid][PVVMenuSel[playerid]][Mod2] = 0;
+					    PlayerPVData[playerid][PVVMenuSel[playerid]][Mod3] = 0;
+					    PlayerPVData[playerid][PVVMenuSel[playerid]][Mod4] = 0;
+					    PlayerPVData[playerid][PVVMenuSel[playerid]][Mod5] = 0;
+					    PlayerPVData[playerid][PVVMenuSel[playerid]][Mod6] = 0;
+					    PlayerPVData[playerid][PVVMenuSel[playerid]][Mod7] = 0;
+					    PlayerPVData[playerid][PVVMenuSel[playerid]][Mod8] = 0;
+					    PlayerPVData[playerid][PVVMenuSel[playerid]][Mod9] = 0;
+					    PlayerPVData[playerid][PVVMenuSel[playerid]][Mod10] = 0;
+					    PlayerPVData[playerid][PVVMenuSel[playerid]][Mod11] = 0;
+					    PlayerPVData[playerid][PVVMenuSel[playerid]][Mod12] = 0;
+					    PlayerPVData[playerid][PVVMenuSel[playerid]][Mod13] = 0;
+					    PlayerPVData[playerid][PVVMenuSel[playerid]][Mod14] = 0;
+					    PlayerPVData[playerid][PVVMenuSel[playerid]][Mod15] = 0;
+					    PlayerPVData[playerid][PVVMenuSel[playerid]][Mod16] = 0;
+					    PlayerPVData[playerid][PVVMenuSel[playerid]][Mod17] = 0;
+					    PlayerPVData[playerid][PVVMenuSel[playerid]][e_neon1] = -1;
+					    PlayerPVData[playerid][PVVMenuSel[playerid]][e_neon2] = -1;
 
-                        strmid(PlayerPV[playerid][PVVMenuSel[playerid]][Plate], "Plate", 0, 13, 13);
+                        strmid(PlayerPVData[playerid][PVVMenuSel[playerid]][e_plate], "Plate", 0, 13, 13);
                         
                         MySQL_SaveAccount(playerid, false, true);
                         
@@ -19646,112 +19654,112 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				GetPlayerPos(playerid, POS[0], POS[1], POS[2]);
 				GetPlayerFacingAngle(playerid, POS[3]);
 
-				PlayerPV[playerid][PVSelect[playerid]][PVehicleID] = CreateVehicle_(PlayerPV[playerid][PVSelect[playerid]][Model], POS[0], POS[1], POS[2], POS[3], 0, 0, -1);
-				PlayerPV[playerid][PVSelect[playerid]][PVehicleLabel] = CreateDynamic3DTextLabel(vlabel, -1, 0.0, 0.0, 0.0, 30.0, INVALID_PLAYER_ID, PlayerPV[playerid][PVSelect[playerid]][PVehicleID], 1, -1, -1, -1, 30.0);
+				PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid] = CreateVehicle_(PlayerPVData[playerid][PVSelect[playerid]][e_model], POS[0], POS[1], POS[2], POS[3], 0, 0, -1);
+				PlayerPVData[playerid][PVSelect[playerid]][e_labelid] = CreateDynamic3DTextLabel(vlabel, -1, 0.0, 0.0, 0.0, 30.0, INVALID_PLAYER_ID, PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], 1, -1, -1, -1, 30.0);
 
-				SetVehicleVirtualWorld(PlayerPV[playerid][PVSelect[playerid]][PVehicleID], GetPlayerVirtualWorld(playerid));
-				LinkVehicleToInterior(PlayerPV[playerid][PVSelect[playerid]][PVehicleID], GetPlayerInterior(playerid));
-				SetVehicleNumberPlate(PlayerPV[playerid][PVSelect[playerid]][PVehicleID], PlayerPV[playerid][PVSelect[playerid]][Plate]);
-				SetVehicleToRespawn(PlayerPV[playerid][PVSelect[playerid]][PVehicleID]);
+				SetVehicleVirtualWorld(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], GetPlayerVirtualWorld(playerid));
+				LinkVehicleToInterior(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], GetPlayerInterior(playerid));
+				SetVehicleNumberPlate(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][e_plate]);
+				SetVehicleToRespawn(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid]);
 
-				PutPlayerInVehicle(playerid, PlayerPV[playerid][PVSelect[playerid]][PVehicleID], 0);
+				PutPlayerInVehicle(playerid, PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], 0);
 
 			    //Red\nGreen\nBlue\nYellow\nWhite\nPink\nRemove Neon
 			    switch(listitem)
 			    {
 			        case 0:
 			        {
-			            if(IsNeonBikeModel(GetVehicleModel(PlayerPV[playerid][PVSelect[playerid]][PVehicleID])))
+			            if(IsNeonBikeModel(GetVehicleModel(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid])))
 			            {
-			                PlayerPV[playerid][PVSelect[playerid]][Neon1] = CreateDynamicObject(18647, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, -1, -1);
-			                AttachDynamicObjectToVehicle(PlayerPV[playerid][PVSelect[playerid]][Neon1], PlayerPV[playerid][PVSelect[playerid]][PVehicleID], 0.000000,0.000000,-0.674999,0.000000,0.000000,0.000000);
+			                PlayerPVData[playerid][PVSelect[playerid]][e_neon1] = CreateDynamicObject(18647, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, -1, -1);
+			                AttachDynamicObjectToVehicle(PlayerPVData[playerid][PVSelect[playerid]][e_neon1], PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], 0.000000,0.000000,-0.674999,0.000000,0.000000,0.000000);
 			            }
 			            else
 			            {
-							PlayerPV[playerid][PVSelect[playerid]][Neon1] = CreateDynamicObject(18647, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, -1, -1);
-					        PlayerPV[playerid][PVSelect[playerid]][Neon2] = CreateDynamicObject(18647, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, -1, -1);
-					        AttachDynamicObjectToVehicle(PlayerPV[playerid][PVSelect[playerid]][Neon1], PlayerPV[playerid][PVSelect[playerid]][PVehicleID], -0.8, 0.0, -0.70, 0.0, 0.0, 0.0);
-					        AttachDynamicObjectToVehicle(PlayerPV[playerid][PVSelect[playerid]][Neon2], PlayerPV[playerid][PVSelect[playerid]][PVehicleID],  0.8, 0.0, -0.70, 0.0, 0.0, 0.0);
+							PlayerPVData[playerid][PVSelect[playerid]][e_neon1] = CreateDynamicObject(18647, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, -1, -1);
+					        PlayerPVData[playerid][PVSelect[playerid]][e_neon2] = CreateDynamicObject(18647, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, -1, -1);
+					        AttachDynamicObjectToVehicle(PlayerPVData[playerid][PVSelect[playerid]][e_neon1], PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], -0.8, 0.0, -0.70, 0.0, 0.0, 0.0);
+					        AttachDynamicObjectToVehicle(PlayerPVData[playerid][PVSelect[playerid]][e_neon2], PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid],  0.8, 0.0, -0.70, 0.0, 0.0, 0.0);
 						}
 				        SendInfo(playerid, "Neon attached", "");
 	     			}
 				    case 1:
 				    {
-			            if(IsNeonBikeModel(GetVehicleModel(PlayerPV[playerid][PVSelect[playerid]][PVehicleID])))
+			            if(IsNeonBikeModel(GetVehicleModel(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid])))
 			            {
-			                PlayerPV[playerid][PVSelect[playerid]][Neon1] = CreateDynamicObject(18649, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, -1, -1);
-			                AttachDynamicObjectToVehicle(PlayerPV[playerid][PVSelect[playerid]][Neon1], PlayerPV[playerid][PVSelect[playerid]][PVehicleID], 0.000000,0.000000,-0.674999,0.000000,0.000000,0.000000);
+			                PlayerPVData[playerid][PVSelect[playerid]][e_neon1] = CreateDynamicObject(18649, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, -1, -1);
+			                AttachDynamicObjectToVehicle(PlayerPVData[playerid][PVSelect[playerid]][e_neon1], PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], 0.000000,0.000000,-0.674999,0.000000,0.000000,0.000000);
 			            }
 			            else
 			            {
-					        PlayerPV[playerid][PVSelect[playerid]][Neon1] = CreateDynamicObject(18649, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, -1, -1);
-					        PlayerPV[playerid][PVSelect[playerid]][Neon2] = CreateDynamicObject(18649, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, -1, -1);
-					        AttachDynamicObjectToVehicle(PlayerPV[playerid][PVSelect[playerid]][Neon1], PlayerPV[playerid][PVSelect[playerid]][PVehicleID], -0.8, 0.0, -0.70, 0.0, 0.0, 0.0);
-					        AttachDynamicObjectToVehicle(PlayerPV[playerid][PVSelect[playerid]][Neon2], PlayerPV[playerid][PVSelect[playerid]][PVehicleID],  0.8, 0.0, -0.70, 0.0, 0.0, 0.0);
+					        PlayerPVData[playerid][PVSelect[playerid]][e_neon1] = CreateDynamicObject(18649, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, -1, -1);
+					        PlayerPVData[playerid][PVSelect[playerid]][e_neon2] = CreateDynamicObject(18649, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, -1, -1);
+					        AttachDynamicObjectToVehicle(PlayerPVData[playerid][PVSelect[playerid]][e_neon1], PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], -0.8, 0.0, -0.70, 0.0, 0.0, 0.0);
+					        AttachDynamicObjectToVehicle(PlayerPVData[playerid][PVSelect[playerid]][e_neon2], PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid],  0.8, 0.0, -0.70, 0.0, 0.0, 0.0);
 						}
 				        SendInfo(playerid, "Neon attached", "");
 					}
 	    			case 2:
 				    {
-			            if(IsNeonBikeModel(GetVehicleModel(PlayerPV[playerid][PVSelect[playerid]][PVehicleID])))
+			            if(IsNeonBikeModel(GetVehicleModel(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid])))
 			            {
-			                PlayerPV[playerid][PVSelect[playerid]][Neon1] = CreateDynamicObject(18648, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, -1, -1);
-			                AttachDynamicObjectToVehicle(PlayerPV[playerid][PVSelect[playerid]][Neon1], PlayerPV[playerid][PVSelect[playerid]][PVehicleID], 0.000000,0.000000,-0.674999,0.000000,0.000000,0.000000);
+			                PlayerPVData[playerid][PVSelect[playerid]][e_neon1] = CreateDynamicObject(18648, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, -1, -1);
+			                AttachDynamicObjectToVehicle(PlayerPVData[playerid][PVSelect[playerid]][e_neon1], PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], 0.000000,0.000000,-0.674999,0.000000,0.000000,0.000000);
 			            }
 			            else
 			            {
-					        PlayerPV[playerid][PVSelect[playerid]][Neon1] = CreateDynamicObject(18648, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, -1, -1);
-					        PlayerPV[playerid][PVSelect[playerid]][Neon2] = CreateDynamicObject(18648, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, -1, -1);
-					        AttachDynamicObjectToVehicle(PlayerPV[playerid][PVSelect[playerid]][Neon1], PlayerPV[playerid][PVSelect[playerid]][PVehicleID], -0.8, 0.0, -0.70, 0.0, 0.0, 0.0);
-					        AttachDynamicObjectToVehicle(PlayerPV[playerid][PVSelect[playerid]][Neon2], PlayerPV[playerid][PVSelect[playerid]][PVehicleID],  0.8, 0.0, -0.70, 0.0, 0.0, 0.0);
+					        PlayerPVData[playerid][PVSelect[playerid]][e_neon1] = CreateDynamicObject(18648, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, -1, -1);
+					        PlayerPVData[playerid][PVSelect[playerid]][e_neon2] = CreateDynamicObject(18648, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, -1, -1);
+					        AttachDynamicObjectToVehicle(PlayerPVData[playerid][PVSelect[playerid]][e_neon1], PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], -0.8, 0.0, -0.70, 0.0, 0.0, 0.0);
+					        AttachDynamicObjectToVehicle(PlayerPVData[playerid][PVSelect[playerid]][e_neon2], PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid],  0.8, 0.0, -0.70, 0.0, 0.0, 0.0);
                         }
 				        SendInfo(playerid, "Neon attached", "");
 				    }
 				    case 3:
 				    {
-			            if(IsNeonBikeModel(GetVehicleModel(PlayerPV[playerid][PVSelect[playerid]][PVehicleID])))
+			            if(IsNeonBikeModel(GetVehicleModel(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid])))
 			            {
-			                PlayerPV[playerid][PVSelect[playerid]][Neon1] = CreateDynamicObject(18650, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, -1, -1);
-			                AttachDynamicObjectToVehicle(PlayerPV[playerid][PVSelect[playerid]][Neon1], PlayerPV[playerid][PVSelect[playerid]][PVehicleID], 0.000000,0.000000,-0.674999,0.000000,0.000000,0.000000);
+			                PlayerPVData[playerid][PVSelect[playerid]][e_neon1] = CreateDynamicObject(18650, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, -1, -1);
+			                AttachDynamicObjectToVehicle(PlayerPVData[playerid][PVSelect[playerid]][e_neon1], PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], 0.000000,0.000000,-0.674999,0.000000,0.000000,0.000000);
 			            }
 			            else
 			            {
-		           		    PlayerPV[playerid][PVSelect[playerid]][Neon1] = CreateDynamicObject(18650, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, -1, -1);
-					        PlayerPV[playerid][PVSelect[playerid]][Neon2] = CreateDynamicObject(18650, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, -1, -1);
-					        AttachDynamicObjectToVehicle(PlayerPV[playerid][PVSelect[playerid]][Neon1], PlayerPV[playerid][PVSelect[playerid]][PVehicleID], -0.8, 0.0, -0.70, 0.0, 0.0, 0.0);
-					        AttachDynamicObjectToVehicle(PlayerPV[playerid][PVSelect[playerid]][Neon2], PlayerPV[playerid][PVSelect[playerid]][PVehicleID],  0.8, 0.0, -0.70, 0.0, 0.0, 0.0);
+		           		    PlayerPVData[playerid][PVSelect[playerid]][e_neon1] = CreateDynamicObject(18650, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, -1, -1);
+					        PlayerPVData[playerid][PVSelect[playerid]][e_neon2] = CreateDynamicObject(18650, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, -1, -1);
+					        AttachDynamicObjectToVehicle(PlayerPVData[playerid][PVSelect[playerid]][e_neon1], PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], -0.8, 0.0, -0.70, 0.0, 0.0, 0.0);
+					        AttachDynamicObjectToVehicle(PlayerPVData[playerid][PVSelect[playerid]][e_neon2], PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid],  0.8, 0.0, -0.70, 0.0, 0.0, 0.0);
                         }
 				        SendInfo(playerid, "Neon attached", "");
 					}
 	    			case 4:
 				    {
-			            if(IsNeonBikeModel(GetVehicleModel(PlayerPV[playerid][PVSelect[playerid]][PVehicleID])))
+			            if(IsNeonBikeModel(GetVehicleModel(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid])))
 			            {
-			                PlayerPV[playerid][PVSelect[playerid]][Neon1] = CreateDynamicObject(18652, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, -1, -1);
-			                AttachDynamicObjectToVehicle(PlayerPV[playerid][PVSelect[playerid]][Neon1], PlayerPV[playerid][PVSelect[playerid]][PVehicleID], 0.000000,0.000000,-0.674999,0.000000,0.000000,0.000000);
+			                PlayerPVData[playerid][PVSelect[playerid]][e_neon1] = CreateDynamicObject(18652, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, -1, -1);
+			                AttachDynamicObjectToVehicle(PlayerPVData[playerid][PVSelect[playerid]][e_neon1], PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], 0.000000,0.000000,-0.674999,0.000000,0.000000,0.000000);
 			            }
 			            else
 			            {
-		           		    PlayerPV[playerid][PVSelect[playerid]][Neon1] = CreateDynamicObject(18652, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, -1, -1);
-					        PlayerPV[playerid][PVSelect[playerid]][Neon2] = CreateDynamicObject(18652, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, -1, -1);
-					        AttachDynamicObjectToVehicle(PlayerPV[playerid][PVSelect[playerid]][Neon1], PlayerPV[playerid][PVSelect[playerid]][PVehicleID], -0.8, 0.0, -0.70, 0.0, 0.0, 0.0);
-					        AttachDynamicObjectToVehicle(PlayerPV[playerid][PVSelect[playerid]][Neon2], PlayerPV[playerid][PVSelect[playerid]][PVehicleID],  0.8, 0.0, -0.70, 0.0, 0.0, 0.0);
+		           		    PlayerPVData[playerid][PVSelect[playerid]][e_neon1] = CreateDynamicObject(18652, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, -1, -1);
+					        PlayerPVData[playerid][PVSelect[playerid]][e_neon2] = CreateDynamicObject(18652, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, -1, -1);
+					        AttachDynamicObjectToVehicle(PlayerPVData[playerid][PVSelect[playerid]][e_neon1], PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], -0.8, 0.0, -0.70, 0.0, 0.0, 0.0);
+					        AttachDynamicObjectToVehicle(PlayerPVData[playerid][PVSelect[playerid]][e_neon2], PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid],  0.8, 0.0, -0.70, 0.0, 0.0, 0.0);
 				        }
 				        SendInfo(playerid, "Neon attached", "");
 	       			}
 	    			case 5:
 				    {
-			            if(IsNeonBikeModel(GetVehicleModel(PlayerPV[playerid][PVSelect[playerid]][PVehicleID])))
+			            if(IsNeonBikeModel(GetVehicleModel(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid])))
 			            {
-			                PlayerPV[playerid][PVSelect[playerid]][Neon1] = CreateDynamicObject(18651, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, -1, -1);
-			                AttachDynamicObjectToVehicle(PlayerPV[playerid][PVSelect[playerid]][Neon1], PlayerPV[playerid][PVSelect[playerid]][PVehicleID], 0.000000,0.000000,-0.674999,0.000000,0.000000,0.000000);
+			                PlayerPVData[playerid][PVSelect[playerid]][e_neon1] = CreateDynamicObject(18651, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, -1, -1);
+			                AttachDynamicObjectToVehicle(PlayerPVData[playerid][PVSelect[playerid]][e_neon1], PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], 0.000000,0.000000,-0.674999,0.000000,0.000000,0.000000);
 			            }
 			            else
 			            {
-		           		    PlayerPV[playerid][PVSelect[playerid]][Neon1] = CreateDynamicObject(18651, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, -1, -1);
-					        PlayerPV[playerid][PVSelect[playerid]][Neon2] = CreateDynamicObject(18651, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, -1, -1);
-					        AttachDynamicObjectToVehicle(PlayerPV[playerid][PVSelect[playerid]][Neon1], PlayerPV[playerid][PVSelect[playerid]][PVehicleID], -0.8, 0.0, -0.70, 0.0, 0.0, 0.0);
-					        AttachDynamicObjectToVehicle(PlayerPV[playerid][PVSelect[playerid]][Neon2], PlayerPV[playerid][PVSelect[playerid]][PVehicleID],  0.8, 0.0, -0.70, 0.0, 0.0, 0.0);
+		           		    PlayerPVData[playerid][PVSelect[playerid]][e_neon1] = CreateDynamicObject(18651, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, -1, -1);
+					        PlayerPVData[playerid][PVSelect[playerid]][e_neon2] = CreateDynamicObject(18651, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, -1, -1);
+					        AttachDynamicObjectToVehicle(PlayerPVData[playerid][PVSelect[playerid]][e_neon1], PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], -0.8, 0.0, -0.70, 0.0, 0.0, 0.0);
+					        AttachDynamicObjectToVehicle(PlayerPVData[playerid][PVSelect[playerid]][e_neon2], PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid],  0.8, 0.0, -0.70, 0.0, 0.0, 0.0);
 				        }
 				        SendInfo(playerid, "Neon attached", "");
 	       			}
@@ -19801,14 +19809,14 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				 	ShowDialog(playerid, CUSTOM_PLATE_DIALOG);
 					return 1;
 				}
-				if(sscanf(inputtext, "s[13]", PlayerPV[playerid][PVVMenuSel[playerid]][Plate]))
+				if(sscanf(inputtext, "s[13]", PlayerPVData[playerid][PVVMenuSel[playerid]][e_plate]))
 				{
 					SCM(playerid, RED, ""er"You entered an invalid character!");
 				 	ShowDialog(playerid, CUSTOM_PLATE_DIALOG);
 				 	return 1;
 				}
 
-                mysql_escape_string(PlayerPV[playerid][PVVMenuSel[playerid]][Plate], PlayerPV[playerid][PVVMenuSel[playerid]][Plate], pSQL, 13);
+                mysql_escape_string(PlayerPVData[playerid][PVVMenuSel[playerid]][e_plate], PlayerPVData[playerid][PVVMenuSel[playerid]][e_plate], pSQL, 13);
 
 				DestroyPlayerVehicles(playerid);
 				
@@ -19822,15 +19830,15 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				GetPlayerPos(playerid, POS[0], POS[1], POS[2]);
 				GetPlayerFacingAngle(playerid, POS[3]);
 
-				PlayerPV[playerid][PVSelect[playerid]][PVehicleID] = CreateVehicle_(PlayerPV[playerid][PVSelect[playerid]][Model], POS[0], POS[1], POS[2], POS[3], 0, 0, -1);
-				PlayerPV[playerid][PVSelect[playerid]][PVehicleLabel] = CreateDynamic3DTextLabel(vlabel, -1, 0.0, 0.0, 0.0, 30.0, INVALID_PLAYER_ID, PlayerPV[playerid][PVSelect[playerid]][PVehicleID], 1, -1, -1, -1, 30.0);
+				PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid] = CreateVehicle_(PlayerPVData[playerid][PVSelect[playerid]][e_model], POS[0], POS[1], POS[2], POS[3], 0, 0, -1);
+				PlayerPVData[playerid][PVSelect[playerid]][e_labelid] = CreateDynamic3DTextLabel(vlabel, -1, 0.0, 0.0, 0.0, 30.0, INVALID_PLAYER_ID, PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], 1, -1, -1, -1, 30.0);
 
-				SetVehicleVirtualWorld(PlayerPV[playerid][PVSelect[playerid]][PVehicleID], GetPlayerVirtualWorld(playerid));
-				LinkVehicleToInterior(PlayerPV[playerid][PVSelect[playerid]][PVehicleID], GetPlayerInterior(playerid));
-				SetVehicleNumberPlate(PlayerPV[playerid][PVSelect[playerid]][PVehicleID], PlayerPV[playerid][PVSelect[playerid]][Plate]);
-				SetVehicleToRespawn(PlayerPV[playerid][PVSelect[playerid]][PVehicleID]);
+				SetVehicleVirtualWorld(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], GetPlayerVirtualWorld(playerid));
+				LinkVehicleToInterior(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], GetPlayerInterior(playerid));
+				SetVehicleNumberPlate(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][e_plate]);
+				SetVehicleToRespawn(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid]);
 
-				PutPlayerInVehicle(playerid, PlayerPV[playerid][PVSelect[playerid]][PVehicleID], 0);
+				PutPlayerInVehicle(playerid, PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], 0);
 
 				SendInfo(playerid, "Plate changed", "");
 			    return true;
@@ -23860,9 +23868,9 @@ PVSlotSelect(playerid)
 		}
         else // Can use
 		{
-            if(PlayerPV[playerid][i][Model] != 0)
+            if(PlayerPVData[playerid][i][e_model] != 0)
             {
-            	format(tmp, sizeof(tmp), ""white"PV Slot %i "green2"(Used) (Vehicle: %s)\n", i + 1, GetPVNameByModelId(PlayerPV[playerid][i][Model]));
+            	format(tmp, sizeof(tmp), ""white"PV Slot %i "green2"(Used) (Vehicle: %s)\n", i + 1, GetPVNameByModelId(PlayerPVData[playerid][i][e_model]));
             	strcat(string, tmp);
 			}
 			else
@@ -23886,7 +23894,7 @@ CreateFinalCar(playerid, pv_slot)
 	    return 1;
 	}
 
-	if(PlayerPV[playerid][pv_slot][Model] != 0)
+	if(PlayerPVData[playerid][pv_slot][e_model] != 0)
 	{
 	    SendInfo(playerid, "This PV slot is in use", "");
 	    PVSlotSelect(playerid);
@@ -23902,27 +23910,27 @@ CreateFinalCar(playerid, pv_slot)
 	}
 
     PVSelect[playerid] = pv_slot;
-    PlayerPV[playerid][PVSelect[playerid]][Model] = PlayerPVTMP[playerid][0];
-    strmid(PlayerPV[playerid][PVSelect[playerid]][Plate], PlayerPVTMPPlate[playerid], 0, 13, 13);
+    PlayerPVData[playerid][PVSelect[playerid]][e_model] = PlayerPVTMP[playerid][0];
+    strmid(PlayerPVData[playerid][PVSelect[playerid]][e_plate], PlayerPVTMPPlate[playerid], 0, 13, 13);
     
 	new vlabel[100];
 
 	format(vlabel, sizeof(vlabel), ""nef_yellow"%s's \n"white"private vehicle", __GetName(playerid));
 
-	PlayerPV[playerid][PVSelect[playerid]][PVehicleID] = CreateVehicle_(PlayerPV[playerid][PVSelect[playerid]][Model], 1826.9821, -1383.8724, 25.3348, 180.0407, 0, 0, -1);
-	PlayerPV[playerid][PVSelect[playerid]][PVehicleLabel] = CreateDynamic3DTextLabel(vlabel, -1, 0.0, 0.0, 0.0, 30.0, INVALID_PLAYER_ID, PlayerPV[playerid][PVSelect[playerid]][PVehicleID], 1, -1, -1, -1, 30.0);
+	PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid] = CreateVehicle_(PlayerPVData[playerid][PVSelect[playerid]][e_model], 1826.9821, -1383.8724, 25.3348, 180.0407, 0, 0, -1);
+	PlayerPVData[playerid][PVSelect[playerid]][e_labelid] = CreateDynamic3DTextLabel(vlabel, -1, 0.0, 0.0, 0.0, 30.0, INVALID_PLAYER_ID, PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], 1, -1, -1, -1, 30.0);
 
 	SetPlayerVirtualWorld(playerid, 0);
 	SetPlayerInterior(playerid, 0);
-	SetVehicleVirtualWorld(PlayerPV[playerid][PVSelect[playerid]][PVehicleID], 0);
-	LinkVehicleToInterior(PlayerPV[playerid][PVSelect[playerid]][PVehicleID], 0);
+	SetVehicleVirtualWorld(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], 0);
+	LinkVehicleToInterior(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], 0);
     GivePlayerCash(playerid, -PlayerPVTMP[playerid][1]);
 
-    SetVehicleNumberPlate(PlayerPV[playerid][PVSelect[playerid]][PVehicleID], PlayerPV[playerid][PVSelect[playerid]][Plate]);
-    SetVehicleToRespawn(PlayerPV[playerid][PVSelect[playerid]][PVehicleID]);
+    SetVehicleNumberPlate(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][e_plate]);
+    SetVehicleToRespawn(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid]);
 
     TogglePlayerControllable(playerid, true);
-    PutPlayerInVehicle(playerid, PlayerPV[playerid][PVSelect[playerid]][PVehicleID], 0);
+    PutPlayerInVehicle(playerid, PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], 0);
     SendInfo(playerid, "Private vehicle purchased", "");
     gTeam[playerid] = FREEROAM;
 
@@ -26724,107 +26732,107 @@ function:ModVehicleColor(playerid)
 	new color1,
 	    color2;
 
-	color1 = PlayerPV[playerid][PVSelect[playerid]][Color1] != 0 ? PlayerPV[playerid][PVSelect[playerid]][Color1] : 0;
-	color2 = PlayerPV[playerid][PVSelect[playerid]][Color2] != 0 ? PlayerPV[playerid][PVSelect[playerid]][Color2] : 0;
+	color1 = PlayerPVData[playerid][PVSelect[playerid]][e_color1] != 0 ? PlayerPVData[playerid][PVSelect[playerid]][e_color1] : 0;
+	color2 = PlayerPVData[playerid][PVSelect[playerid]][e_color2] != 0 ? PlayerPVData[playerid][PVSelect[playerid]][e_color2] : 0;
 
-	ChangeVehicleColor(PlayerPV[playerid][PVSelect[playerid]][PVehicleID], color1, color2);
+	ChangeVehicleColor(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], color1, color2);
 	return 1;
 }
 
 function:ModVehiclePaintJob(playerid)
 {
-	if(PlayerPV[playerid][PVSelect[playerid]][PaintJob] != -1)
+	if(PlayerPVData[playerid][PVSelect[playerid]][e_paintjob] != -1)
 	{
-		ChangeVehiclePaintjob(PlayerPV[playerid][PVSelect[playerid]][PVehicleID], PlayerPV[playerid][PVSelect[playerid]][PaintJob]);
+		ChangeVehiclePaintjob(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][e_paintjob]);
 	}
 	return 1;
 }
 
 function:ModVehicleComponents(playerid)
 {
-	if(PlayerPV[playerid][PVSelect[playerid]][Mod1] != 0)
+	if(PlayerPVData[playerid][PVSelect[playerid]][Mod1] != 0)
 	{
-		AddVehicleComponent(PlayerPV[playerid][PVSelect[playerid]][PVehicleID], PlayerPV[playerid][PVSelect[playerid]][Mod1]);
+		AddVehicleComponent(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][Mod1]);
 	}
 
-	if(PlayerPV[playerid][PVSelect[playerid]][Mod2] != 0)
+	if(PlayerPVData[playerid][PVSelect[playerid]][Mod2] != 0)
 	{
-		AddVehicleComponent(PlayerPV[playerid][PVSelect[playerid]][PVehicleID], PlayerPV[playerid][PVSelect[playerid]][Mod2]);
+		AddVehicleComponent(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][Mod2]);
 	}
 
-	if(PlayerPV[playerid][PVSelect[playerid]][Mod3] != 0)
+	if(PlayerPVData[playerid][PVSelect[playerid]][Mod3] != 0)
 	{
-		AddVehicleComponent(PlayerPV[playerid][PVSelect[playerid]][PVehicleID], PlayerPV[playerid][PVSelect[playerid]][Mod3]);
+		AddVehicleComponent(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][Mod3]);
 	}
 
-	if(PlayerPV[playerid][PVSelect[playerid]][Mod4] != 0)
+	if(PlayerPVData[playerid][PVSelect[playerid]][Mod4] != 0)
 	{
-		AddVehicleComponent(PlayerPV[playerid][PVSelect[playerid]][PVehicleID], PlayerPV[playerid][PVSelect[playerid]][Mod4]);
+		AddVehicleComponent(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][Mod4]);
 	}
 
-	if(PlayerPV[playerid][PVSelect[playerid]][Mod5] != 0)
+	if(PlayerPVData[playerid][PVSelect[playerid]][Mod5] != 0)
 	{
-		AddVehicleComponent(PlayerPV[playerid][PVSelect[playerid]][PVehicleID], PlayerPV[playerid][PVSelect[playerid]][Mod5]);
+		AddVehicleComponent(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][Mod5]);
 	}
 
-	if(PlayerPV[playerid][PVSelect[playerid]][Mod6] != 0)
+	if(PlayerPVData[playerid][PVSelect[playerid]][Mod6] != 0)
 	{
-		AddVehicleComponent(PlayerPV[playerid][PVSelect[playerid]][PVehicleID], PlayerPV[playerid][PVSelect[playerid]][Mod6]);
+		AddVehicleComponent(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][Mod6]);
 	}
 
-	if(PlayerPV[playerid][PVSelect[playerid]][Mod7] != 0)
+	if(PlayerPVData[playerid][PVSelect[playerid]][Mod7] != 0)
 	{
-		AddVehicleComponent(PlayerPV[playerid][PVSelect[playerid]][PVehicleID], PlayerPV[playerid][PVSelect[playerid]][Mod7]);
+		AddVehicleComponent(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][Mod7]);
 	}
 
-	if(PlayerPV[playerid][PVSelect[playerid]][Mod8] != 0)
+	if(PlayerPVData[playerid][PVSelect[playerid]][Mod8] != 0)
 	{
-		AddVehicleComponent(PlayerPV[playerid][PVSelect[playerid]][PVehicleID], PlayerPV[playerid][PVSelect[playerid]][Mod8]);
+		AddVehicleComponent(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][Mod8]);
   	}
 
-	if(PlayerPV[playerid][PVSelect[playerid]][Mod9] != 0)
+	if(PlayerPVData[playerid][PVSelect[playerid]][Mod9] != 0)
 	{
-		AddVehicleComponent(PlayerPV[playerid][PVSelect[playerid]][PVehicleID], PlayerPV[playerid][PVSelect[playerid]][Mod9]);
+		AddVehicleComponent(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][Mod9]);
 	}
 
-	if(PlayerPV[playerid][PVSelect[playerid]][Mod10] != 0)
+	if(PlayerPVData[playerid][PVSelect[playerid]][Mod10] != 0)
 	{
-		AddVehicleComponent(PlayerPV[playerid][PVSelect[playerid]][PVehicleID], PlayerPV[playerid][PVSelect[playerid]][Mod10]);
+		AddVehicleComponent(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][Mod10]);
 	}
 
-	if(PlayerPV[playerid][PVSelect[playerid]][Mod11] != 0)
+	if(PlayerPVData[playerid][PVSelect[playerid]][Mod11] != 0)
 	{
-		AddVehicleComponent(PlayerPV[playerid][PVSelect[playerid]][PVehicleID], PlayerPV[playerid][PVSelect[playerid]][Mod11]);
+		AddVehicleComponent(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][Mod11]);
 	}
 
-	if(PlayerPV[playerid][PVSelect[playerid]][Mod12] != 0)
+	if(PlayerPVData[playerid][PVSelect[playerid]][Mod12] != 0)
 	{
-		AddVehicleComponent(PlayerPV[playerid][PVSelect[playerid]][PVehicleID], PlayerPV[playerid][PVSelect[playerid]][Mod12]);
+		AddVehicleComponent(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][Mod12]);
 	}
 
-	if(PlayerPV[playerid][PVSelect[playerid]][Mod13] != 0)
+	if(PlayerPVData[playerid][PVSelect[playerid]][Mod13] != 0)
 	{
-		AddVehicleComponent(PlayerPV[playerid][PVSelect[playerid]][PVehicleID], PlayerPV[playerid][PVSelect[playerid]][Mod13]);
+		AddVehicleComponent(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][Mod13]);
 	}
 
-	if(PlayerPV[playerid][PVSelect[playerid]][Mod14] != 0)
+	if(PlayerPVData[playerid][PVSelect[playerid]][Mod14] != 0)
 	{
-		AddVehicleComponent(PlayerPV[playerid][PVSelect[playerid]][PVehicleID], PlayerPV[playerid][PVSelect[playerid]][Mod14]);
+		AddVehicleComponent(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][Mod14]);
 	}
 
-	if(PlayerPV[playerid][PVSelect[playerid]][Mod15] != 0)
+	if(PlayerPVData[playerid][PVSelect[playerid]][Mod15] != 0)
 	{
-		AddVehicleComponent(PlayerPV[playerid][PVSelect[playerid]][PVehicleID], PlayerPV[playerid][PVSelect[playerid]][Mod15]);
+		AddVehicleComponent(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][Mod15]);
 	}
 
-	if(PlayerPV[playerid][PVSelect[playerid]][Mod16] != 0)
+	if(PlayerPVData[playerid][PVSelect[playerid]][Mod16] != 0)
 	{
-		AddVehicleComponent(PlayerPV[playerid][PVSelect[playerid]][PVehicleID], PlayerPV[playerid][PVSelect[playerid]][Mod16]);
+		AddVehicleComponent(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][Mod16]);
 	}
 
-	if(PlayerPV[playerid][PVSelect[playerid]][Mod17] != 0)
+	if(PlayerPVData[playerid][PVSelect[playerid]][Mod17] != 0)
 	{
-		AddVehicleComponent(PlayerPV[playerid][PVSelect[playerid]][PVehicleID], PlayerPV[playerid][PVSelect[playerid]][Mod17]);
+		AddVehicleComponent(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][Mod17]);
 	}
 	return 1;
 }
@@ -26835,7 +26843,7 @@ function:SaveVehComponets(playerid, componentid)
 	{
     	if(componentid == pv_spoiler[s][0])
 		{
-      		PlayerPV[playerid][PVSelect[playerid]][Mod1] = componentid;
+      		PlayerPVData[playerid][PVSelect[playerid]][Mod1] = componentid;
    	    }
 	}
 
@@ -26843,7 +26851,7 @@ function:SaveVehComponets(playerid, componentid)
 	{
     	if(componentid == pv_nitro[s][0])
 		{
-    		PlayerPV[playerid][PVSelect[playerid]][Mod2] = componentid;
+    		PlayerPVData[playerid][PVSelect[playerid]][Mod2] = componentid;
    		}
 	}
 
@@ -26851,7 +26859,7 @@ function:SaveVehComponets(playerid, componentid)
 	{
     	if(componentid == pv_fbumper[s][0])
 		{
-    		PlayerPV[playerid][PVSelect[playerid]][Mod3] = componentid;
+    		PlayerPVData[playerid][PVSelect[playerid]][Mod3] = componentid;
    	 	}
 	}
 
@@ -26859,7 +26867,7 @@ function:SaveVehComponets(playerid, componentid)
 	{
     	if(componentid == pv_rbumper[s][0])
 		{
-    		PlayerPV[playerid][PVSelect[playerid]][Mod4] = componentid;
+    		PlayerPVData[playerid][PVSelect[playerid]][Mod4] = componentid;
    		}
 	}
 
@@ -26867,7 +26875,7 @@ function:SaveVehComponets(playerid, componentid)
 	{
      	if(componentid == pv_exhaust[s][0])
 		{
-       		PlayerPV[playerid][PVSelect[playerid]][Mod5] = componentid;
+       		PlayerPVData[playerid][PVSelect[playerid]][Mod5] = componentid;
 		}
 	}
 
@@ -26875,7 +26883,7 @@ function:SaveVehComponets(playerid, componentid)
 	{
 		if(componentid == pv_bventr[s][0])
 		{
-			PlayerPV[playerid][PVSelect[playerid]][Mod6] = componentid;
+			PlayerPVData[playerid][PVSelect[playerid]][Mod6] = componentid;
  		}
 	}
 
@@ -26883,7 +26891,7 @@ function:SaveVehComponets(playerid, componentid)
 	{
 		if(componentid == pv_bventl[s][0])
 		{
-			PlayerPV[playerid][PVSelect[playerid]][Mod7] = componentid;
+			PlayerPVData[playerid][PVSelect[playerid]][Mod7] = componentid;
  		}
 	}
 
@@ -26891,7 +26899,7 @@ function:SaveVehComponets(playerid, componentid)
 	{
 		if(componentid == pv_bscoop[s][0])
 		{
-			PlayerPV[playerid][PVSelect[playerid]][Mod8] = componentid;
+			PlayerPVData[playerid][PVSelect[playerid]][Mod8] = componentid;
  		}
 	}
 
@@ -26899,7 +26907,7 @@ function:SaveVehComponets(playerid, componentid)
 	{
 		if(componentid == pv_roof[s][0])
 		{
-			PlayerPV[playerid][PVSelect[playerid]][Mod9] = componentid;
+			PlayerPVData[playerid][PVSelect[playerid]][Mod9] = componentid;
 		}
 	}
 
@@ -26907,7 +26915,7 @@ function:SaveVehComponets(playerid, componentid)
 	{
 		if(componentid == pv_lskirt[s][0])
 		{
-			PlayerPV[playerid][PVSelect[playerid]][Mod10] = componentid;
+			PlayerPVData[playerid][PVSelect[playerid]][Mod10] = componentid;
 		}
 	}
 
@@ -26915,7 +26923,7 @@ function:SaveVehComponets(playerid, componentid)
 	{
 		if(componentid == pv_rskirt[s][0])
 		{
-			PlayerPV[playerid][PVSelect[playerid]][Mod11] = componentid;
+			PlayerPVData[playerid][PVSelect[playerid]][Mod11] = componentid;
  		}
 	}
 
@@ -26923,7 +26931,7 @@ function:SaveVehComponets(playerid, componentid)
 	{
 		if(componentid == pv_hydraulics[s][0])
 		{
-			PlayerPV[playerid][PVSelect[playerid]][Mod12] = componentid;
+			PlayerPVData[playerid][PVSelect[playerid]][Mod12] = componentid;
 		}
 	}
 
@@ -26931,7 +26939,7 @@ function:SaveVehComponets(playerid, componentid)
 	{
      	if(componentid == pv_base[s][0])
  		{
-       		PlayerPV[playerid][PVSelect[playerid]][Mod13] = componentid;
+       		PlayerPVData[playerid][PVSelect[playerid]][Mod13] = componentid;
 		}
 	}
 
@@ -26939,7 +26947,7 @@ function:SaveVehComponets(playerid, componentid)
 	{
      	if(componentid == pv_rbbars[s][0])
  		{
-       		PlayerPV[playerid][PVSelect[playerid]][Mod14] = componentid;
+       		PlayerPVData[playerid][PVSelect[playerid]][Mod14] = componentid;
  		}
 	}
 
@@ -26947,7 +26955,7 @@ function:SaveVehComponets(playerid, componentid)
 	{
     	if(componentid == pv_fbbars[s][0])
 		{
-    		PlayerPV[playerid][PVSelect[playerid]][Mod15] = componentid;
+    		PlayerPVData[playerid][PVSelect[playerid]][Mod15] = componentid;
 		}
 	}
 
@@ -26955,7 +26963,7 @@ function:SaveVehComponets(playerid, componentid)
 	{
     	if(componentid == pv_wheels[s][0])
 		{
-      		PlayerPV[playerid][PVSelect[playerid]][Mod16] = componentid;
+      		PlayerPVData[playerid][PVSelect[playerid]][Mod16] = componentid;
    	    }
 	}
 
@@ -26963,7 +26971,7 @@ function:SaveVehComponets(playerid, componentid)
 	{
     	if(componentid == pv_lights[s][0])
 		{
-			PlayerPV[playerid][PVSelect[playerid]][Mod17] = componentid;
+			PlayerPVData[playerid][PVSelect[playerid]][Mod17] = componentid;
  		}
     }
 	return 1;
@@ -27280,32 +27288,32 @@ PreparePlayerPV(playerid)
     PVSelect[playerid] = -1;
 	for(new i = 0; i < MAX_PLAYER_PVS; i++)
 	{
-		PlayerPV[playerid][i][PVehicleID] = -1;
-		PlayerPV[playerid][i][PVehicleLabel] = Text3D:-1;
-	    PlayerPV[playerid][i][Model] = 0;
-	    PlayerPV[playerid][i][PaintJob] = -1;
-	    PlayerPV[playerid][i][Color1] = 0;
-	    PlayerPV[playerid][i][Color2] = 0;
-	    PlayerPV[playerid][i][Mod1] = 0;
-	    PlayerPV[playerid][i][Mod2] = 0;
-	    PlayerPV[playerid][i][Mod3] = 0;
-	    PlayerPV[playerid][i][Mod4] = 0;
-	    PlayerPV[playerid][i][Mod5] = 0;
-	    PlayerPV[playerid][i][Mod6] = 0;
-	    PlayerPV[playerid][i][Mod7] = 0;
-	    PlayerPV[playerid][i][Mod8] = 0;
-	    PlayerPV[playerid][i][Mod9] = 0;
-	    PlayerPV[playerid][i][Mod10] = 0;
-	    PlayerPV[playerid][i][Mod11] = 0;
-	    PlayerPV[playerid][i][Mod12] = 0;
-	    PlayerPV[playerid][i][Mod13] = 0;
-	    PlayerPV[playerid][i][Mod14] = 0;
-	    PlayerPV[playerid][i][Mod15] = 0;
-	    PlayerPV[playerid][i][Mod16] = 0;
-	    PlayerPV[playerid][i][Mod17] = 0;
-	    PlayerPV[playerid][i][Neon1] = -1;
-	    PlayerPV[playerid][i][Neon2] = -1;
-	    strmid(PlayerPV[playerid][i][Plate], "Plate", 0, 13, 13);
+		PlayerPVData[playerid][i][e_vehicleid] = -1;
+		PlayerPVData[playerid][i][e_labelid] = Text3D:-1;
+	    PlayerPVData[playerid][i][e_model] = 0;
+	    PlayerPVData[playerid][i][e_paintjob] = -1;
+	    PlayerPVData[playerid][i][e_color1] = 0;
+	    PlayerPVData[playerid][i][e_color2] = 0;
+	    PlayerPVData[playerid][i][Mod1] = 0;
+	    PlayerPVData[playerid][i][Mod2] = 0;
+	    PlayerPVData[playerid][i][Mod3] = 0;
+	    PlayerPVData[playerid][i][Mod4] = 0;
+	    PlayerPVData[playerid][i][Mod5] = 0;
+	    PlayerPVData[playerid][i][Mod6] = 0;
+	    PlayerPVData[playerid][i][Mod7] = 0;
+	    PlayerPVData[playerid][i][Mod8] = 0;
+	    PlayerPVData[playerid][i][Mod9] = 0;
+	    PlayerPVData[playerid][i][Mod10] = 0;
+	    PlayerPVData[playerid][i][Mod11] = 0;
+	    PlayerPVData[playerid][i][Mod12] = 0;
+	    PlayerPVData[playerid][i][Mod13] = 0;
+	    PlayerPVData[playerid][i][Mod14] = 0;
+	    PlayerPVData[playerid][i][Mod15] = 0;
+	    PlayerPVData[playerid][i][Mod16] = 0;
+	    PlayerPVData[playerid][i][Mod17] = 0;
+	    PlayerPVData[playerid][i][e_neon1] = -1;
+	    PlayerPVData[playerid][i][e_neon2] = -1;
+	    strmid(PlayerPVData[playerid][i][e_plate], "Plate", 0, 13, 13);
 	}
 }
 
@@ -27644,9 +27652,9 @@ function:ShowDialog(playerid, dialogid)
 				}
 		        else // Can use
 				{
-		            if(PlayerPV[playerid][i][Model] != 0)
+		            if(PlayerPVData[playerid][i][e_model] != 0)
 		            {
-		            	format(tmp, sizeof(tmp), ""white"PV Slot %i "green2"(Used) (Vehicle: %s)\n", i + 1, GetPVNameByModelId(PlayerPV[playerid][i][Model]));
+		            	format(tmp, sizeof(tmp), ""white"PV Slot %i "green2"(Used) (Vehicle: %s)\n", i + 1, GetPVNameByModelId(PlayerPVData[playerid][i][e_model]));
 		            	strcat(string, tmp);
 					}
 					else
@@ -28141,7 +28149,7 @@ function:ChangeColors(playerid)
 
 	if(PVSelect[playerid] != -1)
 	{
-	    if(vehid == PlayerPV[playerid][PVSelect[playerid]][PVehicleID]) return 1;
+	    if(vehid == PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid]) return 1;
 	}
 
 	if(PlayerData[playerid][bRainbow] && GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
@@ -30121,25 +30129,25 @@ DestroyPlayerVehicles(playerid, bool:minigames = false)
 
 	if(PVSelect[playerid] != -1)
 	{
-		if(PlayerPV[playerid][PVSelect[playerid]][Neon1] != -1)
+		if(PlayerPVData[playerid][PVSelect[playerid]][e_neon1] != -1)
 		{
-			DestroyDynamicObject(PlayerPV[playerid][PVSelect[playerid]][Neon1]);
-			PlayerPV[playerid][PVSelect[playerid]][Neon1] = -1;
+			DestroyDynamicObject(PlayerPVData[playerid][PVSelect[playerid]][e_neon1]);
+			PlayerPVData[playerid][PVSelect[playerid]][e_neon1] = -1;
 		}
-		if(PlayerPV[playerid][PVSelect[playerid]][Neon2] != -1)
+		if(PlayerPVData[playerid][PVSelect[playerid]][e_neon2] != -1)
 		{
-			DestroyDynamicObject(PlayerPV[playerid][PVSelect[playerid]][Neon2]);
-			PlayerPV[playerid][PVSelect[playerid]][Neon2] = -1;
+			DestroyDynamicObject(PlayerPVData[playerid][PVSelect[playerid]][e_neon2]);
+			PlayerPVData[playerid][PVSelect[playerid]][e_neon2] = -1;
 		}
-	    if(PlayerPV[playerid][PVSelect[playerid]][PVehicleLabel] != Text3D:-1)
+	    if(PlayerPVData[playerid][PVSelect[playerid]][e_labelid] != Text3D:-1)
 	    {
-	        DestroyDynamic3DTextLabel(PlayerPV[playerid][PVSelect[playerid]][PVehicleLabel]);
-	        PlayerPV[playerid][PVSelect[playerid]][PVehicleLabel] = Text3D:-1;
+	        DestroyDynamic3DTextLabel(PlayerPVData[playerid][PVSelect[playerid]][e_labelid]);
+	        PlayerPVData[playerid][PVSelect[playerid]][e_labelid] = Text3D:-1;
 	    }
-		if(PlayerPV[playerid][PVSelect[playerid]][PVehicleID] != -1)
+		if(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid] != -1)
 		{
-			DestroyVehicle_(PlayerPV[playerid][PVSelect[playerid]][PVehicleID]);
-			PlayerPV[playerid][PVSelect[playerid]][PVehicleID] = -1;
+			DestroyVehicle_(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid]);
+			PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid] = -1;
 		}
 	}
 	
