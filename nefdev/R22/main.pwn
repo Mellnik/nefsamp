@@ -13,13 +13,13 @@
 || SA-MP Server 0.3z-R1-2
 || YSI Library 3.1
 || sscanf Plugin 2.8.1
-|| Streamer Plugin v2.7
+|| Streamer Plugin v2.7.1
 || MySQL Plugin R38
 || IRC Plugin 1.4.4
 || DNS Plugin 2.4
 ||
 || Build Notes:
-|| - Run accupgrade.amx
+|| - Run dbupgrade.amx
 */
 
 #pragma dynamic 8192
