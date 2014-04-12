@@ -10,7 +10,7 @@
 \*======================================================================*/
 
 /* Build Dependencies
-|| SA-MP Server 0.3z-R1-2
+|| SA-MP Server 0.3z-R2
 || YSI Library 3.1
 || sscanf Plugin 2.8.1
 || Streamer Plugin v2.7.1
@@ -25,8 +25,8 @@
 #pragma dynamic 8192
 
 #define IS_RELEASE_BUILD (false)
-#define INC_ENVIORMENT (false)
-#define IRC_CONNECT (false)
+#define INC_ENVIORMENT (true)
+#define IRC_CONNECT (true)
 #define WINTER_EDITION (false) // Requires ferriswheelfair.amx
 #define YSI_IS_SERVER
 
@@ -84,7 +84,7 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define SVRFORUM                        "forum.nefserver.net"
 #define SERVER_IP                       "31.204.152.218:7777"
 //#define HOSTNAME                        " 	        NEF » ×DM/Stunt/Race/Freeroam/Minigames×"
-#define HOSTNAME                        " 	      NEF (0.3z) » ×DM/Stunt/Race/Freeroam/Minigames×"
+#define HOSTNAME                        " 	   NEF (0.3z) » ×DM/Stunt/Race/Freeroam/Minigames×"
 #if IS_RELEASE_BUILD == true
 #define CURRENT_VERSION                 "Build 22"
 #else
