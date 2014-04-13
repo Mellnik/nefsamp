@@ -2523,7 +2523,7 @@ public OnGameModeInit()
 
 public OnGameModeExit()
 {
-	Log(LOG_EXIT, "ProcessServerPreTravel: OnGameModeExit");
+	Log(LOG_EXIT, "ProcessServerTravel: OnGameModeExit");
 
 	Log(LOG_EXIT, "Garbage cleanup");
     MySQL_CleanUp();
@@ -2636,15 +2636,14 @@ public OnPlayerSpawn(playerid)
 		ResetPlayerWorld(playerid);
 		PlayerData[playerid][ExitType] = EXIT_FIRST_SPAWNED;
 		SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
-		SetPlayerHealth(playerid, 100.0);
 		SetCameraBehindPlayer(playerid);
 		StopAudioStreamForPlayer(playerid);
-		//PlayerPlaySound(playerid, 1184, 0, 0, 0);
 		StopAudioStreamForPlayer(playerid);
 		//RandomSpawn(playerid);
 		RandomWeapons(playerid);
 		HidePlayerWelcomeTextdraws(playerid);
 		ShowPlayerInfoTextdraws(playerid);
+		SetPlayerHealth(playerid, 100.0);
 		if(PlayerData[playerid][e_vip] == 1)
 		{
 		    SetPlayerArmour(playerid, 100.0);
@@ -9950,12 +9949,11 @@ YCMD:burn(playerid, params[], help)
 			if(!DerbyWinner[player] && gTeam[player] == DERBY) return SCM(playerid, -1, ""er"You can't use this command on that player now");
 		    
 		    new Float:POS[3];
-
+			GetPlayerPos(player, POS[0], POS[1], POS[2]);
+			CreateExplosion(POS[0] + 0.02, POS[1] + 0.3, POS[2] + 3, 1, 10.0);
+			
 			format(gstr, sizeof(gstr), "You have burnt %s(%i)", __GetName(player), player);
 			SCM(playerid, BLUE, gstr);
-			GetPlayerPos(player, POS[0], POS[1], POS[2]);
-			CreateExplosion(POS[0], POS[1], POS[2] + 3, 1, 10);
-			
 			format(gstr, sizeof(gstr), ""red"Adm: %s(%i) has been burnt by %s(%i)", __GetName(player), player, __GetName(playerid), playerid);
 			AdminMSG(-1, gstr);
 			print(gstr);
@@ -27805,6 +27803,17 @@ function:InitSession(playerid)
 	PlayerTextDrawTextSize(playerid, TXTGunGameInfo[playerid], 640.000000, -7.000000);
 	PlayerTextDrawSetSelectable(playerid, TXTGunGameInfo[playerid], 0);
 
+	TXTSpeedo[playerid] = CreatePlayerTextDraw(playerid, 147.500000, 325.499938, "Speed");
+	PlayerTextDrawLetterSize(playerid, TXTSpeedo[playerid], 0.569999, 3.338332);
+	PlayerTextDrawTextSize(playerid, TXTSpeedo[playerid], 0.000000, 2.333331);
+	PlayerTextDrawAlignment(playerid, TXTSpeedo[playerid], 1);
+	PlayerTextDrawColor(playerid, TXTSpeedo[playerid], -1);
+	PlayerTextDrawSetShadow(playerid, TXTSpeedo[playerid], 0);
+	PlayerTextDrawSetOutline(playerid, TXTSpeedo[playerid], 1);
+	PlayerTextDrawBackgroundColor(playerid, TXTSpeedo[playerid],0x73B1ED55);
+	PlayerTextDrawFont(playerid, TXTSpeedo[playerid], 2);
+	PlayerTextDrawSetProportional(playerid, TXTSpeedo[playerid], 1);
+
 	PreloadAnimLib(playerid, "DANCING");
     PreloadAnimLib(playerid, "DANCING");
 
@@ -27954,17 +27963,6 @@ function:InitSession(playerid)
 	RemoveBuildingForPlayer(playerid, 978, -1183.7344, 2.2891, 13.9844, 0.25);
 	RemoveBuildingForPlayer(playerid, 16594, -25.2109, 2338.7813, 27.5078, 0.25);
 	RemoveBuildingForPlayer(playerid, 16108, -25.2109, 2338.7813, 27.5078, 0.25);
-	
-	TXTSpeedo[playerid] = CreatePlayerTextDraw(playerid, 147.500000, 325.499938, "Speed");
-	PlayerTextDrawLetterSize(playerid, TXTSpeedo[playerid], 0.569999, 3.338332);
-	PlayerTextDrawTextSize(playerid, TXTSpeedo[playerid], 0.000000, 2.333331);
-	PlayerTextDrawAlignment(playerid, TXTSpeedo[playerid], 1);
-	PlayerTextDrawColor(playerid, TXTSpeedo[playerid], -1);
-	PlayerTextDrawSetShadow(playerid, TXTSpeedo[playerid], 0);
-	PlayerTextDrawSetOutline(playerid, TXTSpeedo[playerid], 1);
-	PlayerTextDrawBackgroundColor(playerid, TXTSpeedo[playerid],0x73B1ED55);
-	PlayerTextDrawFont(playerid, TXTSpeedo[playerid], 2);
-	PlayerTextDrawSetProportional(playerid, TXTSpeedo[playerid], 1);
 	return 1;
 }
 
