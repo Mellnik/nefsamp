@@ -706,7 +706,6 @@ enum E_PLAYER_DATA
 	bool:bGWarMode,
 	bool:bLoadMap,
 	bool:KBMarked,
-	bool:SniperAiming,
 	bool:bFloodDect,
 	bool:bLogged,
 	bool:bSpeedo,
@@ -4377,9 +4376,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 	{
 		return Kick(playerid);
 	}
-
-    PlayerData[playerid][SniperAiming] = false;
-
+	
 	if(PlayerData[playerid][bLoadMap])
 	{
 		KillTimer(PlayerData[playerid][tLoadMap]);
@@ -6278,21 +6275,6 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 	    return ShowDialog(playerid, BANK_DIALOG);
 	}
 
-    if(HOLDING(KEY_HANDBRAKE))
-    {
-        if(GetPlayerState(playerid) == PLAYER_STATE_ONFOOT && GetPlayerWeapon(playerid) == 34)
-        {
-			PlayerData[playerid][SniperAiming] = true;
-		}
-	}
-    if(RELEASED(KEY_HANDBRAKE))
-    {
-        if(GetPlayerState(playerid) == PLAYER_STATE_ONFOOT && GetPlayerWeapon(playerid) == 34)
-        {
-			PlayerData[playerid][SniperAiming] = false;
-		}
-	}
-
 	if(GetPVarInt(playerid, "doingStunt") != 0) return 1;
 
 	if(gTeam[playerid] == FREEROAM)
@@ -6364,13 +6346,18 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 		    }
 		}
 
-		if(PlayerData[playerid][SuperJump] && GetPlayerState(playerid) == PLAYER_STATE_ONFOOT && Key(KEY_JUMP) && !PlayerData[playerid][SniperAiming])
+		if(PlayerData[playerid][SuperJump] && GetPlayerState(playerid) == PLAYER_STATE_ONFOOT && Key(KEY_JUMP))
 		{
 		    if(!PlayerData[playerid][bGWarMode])
 		    {
-				new Float:POS[3];
-				GetPlayerVelocity(playerid, POS[0], POS[1], POS[2]);
-				SetPlayerVelocity(playerid, POS[0], POS[1], floatadd(POS[2], 5.0));
+		        new cammode = GetPlayerCameraMode(playerid);
+		        
+		        if(cammode != 7 && cammode != 46 && cammode != 51 && cammode != 53)
+		        {
+					new Float:POS[3];
+					GetPlayerVelocity(playerid, POS[0], POS[1], POS[2]);
+					SetPlayerVelocity(playerid, POS[0], POS[1], floatadd(POS[2], 5.0));
+				}
 			}
 			return 1;
 		}
@@ -6492,6 +6479,7 @@ public OnPlayerClickMap(playerid, Float:fX, Float:fY, Float:fZ)
 
 public OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y, Float:z, Float:rx, Float:ry, Float:rz)
 {
+    CancelEdit(playerid);
 	if(!IsValidDynamicObject(objectid)) return 1;
 
     if(response == EDIT_RESPONSE_CANCEL)
@@ -6605,7 +6593,7 @@ IRCCMD:cc(botid, channel[], user[], host[], params[])
 {
    	if(!IRC_IsHalfop(botid, channel, user)) return 0;
 
-	for(new i = 0; i < 129; i++)
+	for(new i = 0; i < 21; i++)
 	{
 	    SCMToAll(COLOR_SYSTEM, " ");
 	}
@@ -14965,7 +14953,7 @@ YCMD:clearchat(playerid, params[], help)
 {
 	if(PlayerData[playerid][e_level] >= 3)
 	{
-		for(new i = 0; i < 129; i++)
+		for(new i = 0; i < 21; i++)
 		{
 			SCMToAll(GREEN, " ");
 		}
@@ -30278,7 +30266,6 @@ PreparePlayerVars(playerid)
 	PlayerData[playerid][bGWarMode] = false;
 	PlayerData[playerid][bLoadMap] = false;
 	PlayerData[playerid][KBMarked] = false;
-	PlayerData[playerid][SniperAiming] = false;
 	PlayerData[playerid][bFloodDect] = false;
 	PlayerData[playerid][bLogged] = false;
 	PlayerData[playerid][bSpeedo] = false;
