@@ -401,6 +401,7 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define MAX_PLAYER_SCORE                (999999)
 #define MAX_PLAYER_MONEY                (1000000000)
 #define MAX_PLAYER_IP                   (45)
+#define COOLDOWN_CMD_BAN                (125000)
 #define COOLDOWN_CHAT                   (5500)
 #define COOLDOWN_CMD_AR                 (1000)
 #define COOLDOWN_CMD_ROB                (10000)
@@ -679,6 +680,8 @@ enum E_PLAYER_DATA
   	tickPlayerUpdate,
   	tickLastCD,
     tickJoin_bmx,
+    tickLastBan,
+    iKickBanIssued,
 	bool:GotVIPLInv,
 	bool:bIsDead,
 	bool:bShowToys,
@@ -2636,7 +2639,6 @@ public OnPlayerSpawn(playerid)
 		SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
 		SetPlayerHealth(playerid, 100.0);
 		SetCameraBehindPlayer(playerid);
-		PlayerData[playerid][tickLastChat] = 0;
 		StopAudioStreamForPlayer(playerid);
 		//PlayerPlaySound(playerid, 1184, 0, 0, 0);
 		StopAudioStreamForPlayer(playerid);
@@ -9068,11 +9070,11 @@ YCMD:adminhelp(playerid, params[], help)
 
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[2][e_rank]);
 		strcat(string, gstr);
-		strcat(string, "/online /offline /onduty /offduty /akill /rv /day /night /dawn\n/burn /move /tban /ban /cuff /uncuff /jail /unjail /unfreeze\n\n");
+		strcat(string, "/online /offline /onduty /offduty /akill /rv /day\n/burn /move /tban /ban /cuff /uncuff /jail /unjail /unfreeze\n\n");
 		
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[3][e_rank]);
 		strcat(string, gstr);
-		strcat(string, "/freeze /eject /go /getip /get /mkick /clearchat /iplookup\n/giveweapon /announce /connectbots /raceforcemap /deleterecord /nstats\n\n");
+		strcat(string, "/freeze /eject /go /getip /get /mkick /clearchat /iplookup /dawn\n/night /giveweapon /announce /connectbots /raceforcemap /deleterecord /nstats\n\n");
 		
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[4][e_rank]);
 		strcat(string, gstr);
@@ -10153,9 +10155,9 @@ YCMD:id(playerid, params[], help)
 		return SCM(playerid, NEF_GREEN, "Usage: /id <nick/part of nick>");
 	}
 	
-	new found, string[128], playername[MAX_PLAYER_NAME+1];
-	format(string, sizeof(string), "Searched for: %s ", params);
-	SCM(playerid, GREEN, string);
+	new found, playername[MAX_PLAYER_NAME + 1];
+	format(gstr, sizeof(gstr), "Searched for: %s", params);
+	SCM(playerid, GREEN, gstr);
 	
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -10169,9 +10171,8 @@ YCMD:id(playerid, params[], help)
 				{
 					if(strfind(playername, params, true) == pos)
 					{
-		                found++;
-						format(string, sizeof(string), "%i. %s (ID %i)", found, playername, i);
-						SCM(playerid, GREEN, string);
+						format(gstr, sizeof(gstr), "%i. %s (ID %i)", ++found, playername, i);
+						SCM(playerid, GREEN, gstr);
 						searched = true;
 					}
 				}
@@ -10773,7 +10774,7 @@ YCMD:day(playerid, params[], help)
 
 YCMD:dawn(playerid, params[], help)
 {
-	if(PlayerData[playerid][e_level] >= 2)
+	if(PlayerData[playerid][e_level] >= 3)
 	{
 		SetWorldTime(6);
 		SetWeather(1);
@@ -10789,7 +10790,7 @@ YCMD:dawn(playerid, params[], help)
 
 YCMD:night(playerid, params[], help)
 {
-	if(PlayerData[playerid][e_level] >= 2)
+	if(PlayerData[playerid][e_level] >= 3)
 	{
 	    SetWorldTime(0);
 	    SetWeather(17);
@@ -10807,6 +10808,26 @@ YCMD:kick(playerid, params[], help)
 {
 	if(PlayerData[playerid][e_level] >= 1)
 	{
+	    if(PlayerData[playerid][e_level] <= 2)
+	    {
+		    new tick = GetTickCount_();
+
+			if((PlayerData[playerid][iKickBanIssued] >= 3) && ((PlayerData[playerid][tickLastBan] + COOLDOWN_CMD_BAN) >= tick))
+			{
+				SCM(playerid, -1, ""er"Wait a bit before using this command again");
+			    return 0;
+			}
+			else if((PlayerData[playerid][iKickBanIssued] >= 3) && ((PlayerData[playerid][tickLastBan] + COOLDOWN_CMD_BAN) <= tick))
+			{
+		        PlayerData[playerid][iKickBanIssued] = 0;
+		        PlayerData[playerid][tickLastBan] = tick;
+			}
+			else
+			{
+			    PlayerData[playerid][iKickBanIssued]++;
+			}
+	    }
+	    
  		new player, reason[144];
 		if(sscanf(params, "rs[144]", player, reason))
 		{
@@ -11459,6 +11480,7 @@ SetPlayerGWarMode(playerid)
         TextDrawHideForPlayer(playerid, TXTGodTD);
         PlayerData[playerid][bGod] = false;
         RandomWeapons(playerid);
+		SetPlayerHealth(playerid, 100.0);
   		SCM(playerid, -1, ""orange"God mode has been disabled!");
 	}
 	
@@ -11843,6 +11865,26 @@ YCMD:tban(playerid, params[], help)
 {
 	if(PlayerData[playerid][e_level] >= 2)
 	{
+	    if(PlayerData[playerid][e_level] <= 2)
+	    {
+		    new tick = GetTickCount_();
+
+			if((PlayerData[playerid][iKickBanIssued] >= 3) && ((PlayerData[playerid][tickLastBan] + COOLDOWN_CMD_BAN) >= tick))
+			{
+				SCM(playerid, -1, ""er"Wait a bit before using this command again");
+			    return 0;
+			}
+			else if((PlayerData[playerid][iKickBanIssued] >= 3) && ((PlayerData[playerid][tickLastBan] + COOLDOWN_CMD_BAN) <= tick))
+			{
+		        PlayerData[playerid][iKickBanIssued] = 0;
+		        PlayerData[playerid][tickLastBan] = tick;
+			}
+			else
+			{
+			    PlayerData[playerid][iKickBanIssued]++;
+			}
+	    }
+	    
 	    new player, reason[144], time;
 	    if(sscanf(params, "rs[144]i", player, reason, time))
 	    {
@@ -11914,6 +11956,26 @@ YCMD:ban(playerid, params[], help)
 {
 	if(PlayerData[playerid][e_level] >= 2)
 	{
+	    if(PlayerData[playerid][e_level] <= 2)
+	    {
+		    new tick = GetTickCount_();
+
+			if((PlayerData[playerid][iKickBanIssued] >= 3) && ((PlayerData[playerid][tickLastBan] + COOLDOWN_CMD_BAN) >= tick))
+			{
+				SCM(playerid, -1, ""er"Wait a bit before using this command again");
+			    return 0;
+			}
+			else if((PlayerData[playerid][iKickBanIssued] >= 3) && ((PlayerData[playerid][tickLastBan] + COOLDOWN_CMD_BAN) <= tick))
+			{
+		        PlayerData[playerid][iKickBanIssued] = 0;
+		        PlayerData[playerid][tickLastBan] = tick;
+			}
+			else
+			{
+			    PlayerData[playerid][iKickBanIssued]++;
+			}
+	    }
+	    
 	    new player, reason[144];
 	    if(sscanf(params, "rs[144]", player, reason))
 	    {
@@ -21247,14 +21309,14 @@ MySQL_LoadPlayerGang(playerid)
 
 MySQL_AssignRankIfExist(playerid)
 {
-  	mysql_format(pSQL, gstr, sizeof(gstr), "SELECT `gangrank` FROM `accounts` WHERE `gangid` = %i AND `name` = '%e';", PlayerData[playerid][e_gangid], PlayerData[playerid][GangAssignRank]);
-  	mysql_tquery(pSQL, gstr, "OnQueryFinish", "siii", gstr, THREAD_ASSIGN_RANK, playerid, pSQL);
+  	mysql_format(pSQL, gstr2, sizeof(gstr2), "SELECT `gangrank` FROM `accounts` WHERE `gangid` = %i AND `name` = '%e';", PlayerData[playerid][e_gangid], PlayerData[playerid][GangAssignRank]);
+  	mysql_tquery(pSQL, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_ASSIGN_RANK, playerid, pSQL);
 }
 
 MySQL_KickFromGangIfExist(playerid)
 {
-  	mysql_format(pSQL, gstr, sizeof(gstr), "SELECT `gangrank` FROM `accounts` WHERE `gangid` = %i AND `name` = '%e';", PlayerData[playerid][e_gangid], PlayerData[playerid][GangKickMem]);
-  	mysql_tquery(pSQL, gstr, "OnQueryFinish", "siii", gstr, THREAD_KICK_FROM_GANG, playerid, pSQL);
+  	mysql_format(pSQL, gstr2, sizeof(gstr2), "SELECT `gangrank` FROM `accounts` WHERE `gangid` = %i AND `name` = '%e';", PlayerData[playerid][e_gangid], PlayerData[playerid][GangKickMem]);
+  	mysql_tquery(pSQL, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_KICK_FROM_GANG, playerid, pSQL);
 }
 
 MySQL_SaveAccount(playerid, bool:toys = true, bool:pv = true)
@@ -21428,8 +21490,8 @@ MySQL_RegisterAccount(playerid, password[])
 	orm_setkey(ormid, "id");
 	orm_insert(ormid, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_REGISTER);
 
-	mysql_format(pSQL, gstr, sizeof(gstr), "UPDATE `accounts` SET `hash` = SHA1('%e'), `ip` = '%s' WHERE `name` = '%s';", password, __GetIP(playerid), __GetName(playerid));
-	mysql_tquery(pSQL, gstr);
+	mysql_format(pSQL, gstr2, sizeof(gstr2), "UPDATE `accounts` SET `hash` = SHA1('%e'), `ip` = '%s' WHERE `name` = '%s';", password, __GetIP(playerid), __GetName(playerid));
+	mysql_tquery(pSQL, gstr2);
 }
 
 MySQL_RegisterAccount2(playerid, password[])
@@ -21481,16 +21543,16 @@ MySQL_RegisterAccount2(playerid, password[])
 	orm_setkey(ormid, "id");
 	orm_insert(ormid, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_REGISTER + 1);
 
-	mysql_format(pSQL, gstr, sizeof(gstr), "UPDATE `accounts` SET `hash` = SHA1('%e'), `ip` = '%s' WHERE `name` = '%s';", password, __GetIP(playerid), __GetName(playerid));
-	mysql_tquery(pSQL, gstr);
+	mysql_format(pSQL, gstr2, sizeof(gstr2), "UPDATE `accounts` SET `hash` = SHA1('%e'), `ip` = '%s' WHERE `name` = '%s';", password, __GetIP(playerid), __GetName(playerid));
+	mysql_tquery(pSQL, gstr2);
 }
 
 MySQL_UpdateAccount(playerid)
 {
     if(PlayerData[playerid][bLogged])
     {
-	    mysql_format(pSQL, gstr, sizeof(gstr), "UPDATE `accounts` SET `ip` = '%e', `serial` = '%e', `lastlogin` = %i WHERE `name` = '%e' LIMIT 1;", __GetIP(playerid), __GetSerial(playerid), gettime(), __GetName(playerid));
-	    mysql_tquery(pSQL, gstr);
+	    mysql_format(pSQL, gstr2, sizeof(gstr2), "UPDATE `accounts` SET `ip` = '%e', `serial` = '%e', `lastlogin` = %i WHERE `name` = '%e' LIMIT 1;", __GetIP(playerid), __GetSerial(playerid), gettime(), __GetName(playerid));
+	    mysql_tquery(pSQL, gstr2);
 	}
 }
 
@@ -21561,14 +21623,14 @@ MySQL_SaveHouse(house, bool:save_items = false)
 
 MySQL_FinalGangKick(playerid)
 {
-	mysql_format(pSQL, gstr, sizeof(gstr), "UPDATE `accounts` SET `gangid` = 0, `gangrank` = 0 WHERE `name` = '%e' LIMIT 1;", PlayerData[playerid][GangKickMem]);
-	mysql_tquery(pSQL, gstr, "OnQueryFinish", "siii", gstr, THREAD_KICK_FROM_GANG_2, playerid, pSQL);
+	mysql_format(pSQL, gstr2, sizeof(gstr2), "UPDATE `accounts` SET `gangid` = 0, `gangrank` = 0 WHERE `name` = '%e' LIMIT 1;", PlayerData[playerid][GangKickMem]);
+	mysql_tquery(pSQL, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_KICK_FROM_GANG_2, playerid, pSQL);
 }
 
 MySQL_FinalRankAssign(playerid)
 {
-	mysql_format(pSQL, gstr, sizeof(gstr), "UPDATE `accounts` SET `gangrank` = %i WHERE `name` = '%e' LIMIT 1;", PlayerData[playerid][RankSelected], PlayerData[playerid][GangAssignRank]);
-	mysql_tquery(pSQL, gstr, "OnQueryFinish", "siii", gstr, THREAD_ASSIGN_RANK_2, playerid, pSQL);
+	mysql_format(pSQL, gstr2, sizeof(gstr), "UPDATE `accounts` SET `gangrank` = %i WHERE `name` = '%e' LIMIT 1;", PlayerData[playerid][RankSelected], PlayerData[playerid][GangAssignRank]);
+	mysql_tquery(pSQL, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_ASSIGN_RANK_2, playerid, pSQL);
 }
 
 MySQL_CleanUp()
@@ -25289,10 +25351,10 @@ function:OnQueueReceived()
 		            }
 		            else
 		            {
-		                mysql_format(pSQL, gstr, sizeof(gstr), "UPDATE `accounts` SET `credits` = `credits` + %i WHERE `name` = '%e' LIMIT 1;", credits, name);
-		                mysql_tquery(pSQL, gstr);
-						mysql_format(pSQL, gstr, sizeof(gstr), "INSERT INTO `creditslog` VALUES (NULL, '%e', %i, %i);", name, credits, gettime());
-						mysql_tquery(pSQL, gstr);
+		                mysql_format(pSQL, gstr2, sizeof(gstr2), "UPDATE `accounts` SET `credits` = `credits` + %i WHERE `name` = '%e' LIMIT 1;", credits, name);
+		                mysql_tquery(pSQL, gstr2);
+						mysql_format(pSQL, gstr2, sizeof(gstr2), "INSERT INTO `creditslog` VALUES (NULL, '%e', %i, %i);", name, credits, gettime());
+						mysql_tquery(pSQL, gstr2);
 		            }
 		            
 					format(gstr, sizeof(gstr), "~p~%s received %s credits for donating!", name, number_format(credits));
@@ -27291,11 +27353,13 @@ AttachPlayerToy(playerid)
 
 MySQL_SaveAchievement(playerid, ach)
 {
-	if(islogged(playerid))
+	if(playerid == INVALID_PLAYER_ID) return 0;
+	if(PlayerData[playerid][bLogged])
 	{
 		mysql_format(pSQL, gstr, sizeof(gstr), "INSERT INTO `achievements` VALUES (%i, %i, UNIX_TIMESTAMP());", PlayerData[playerid][e_accountid], ach);
 		mysql_pquery(pSQL, gstr);
 	}
+	return 1;
 }
 
 function:ShowDialog(playerid, dialogid)
@@ -30293,6 +30357,8 @@ PreparePlayerVars(playerid)
   	PlayerData[playerid][tickPlayerUpdate] = 0;
   	PlayerData[playerid][tickLastCD] = 0;
     PlayerData[playerid][tickJoin_bmx] = 0;
+    PlayerData[playerid][iKickBanIssued] = 0,
+    PlayerData[playerid][tickLastBan] = 0,
   	PlayerData[playerid][e_lastlogin] = 0;
 	PlayerData[playerid][e_reaction] = 0;
 	PlayerData[playerid][e_bank] = 0;
@@ -30476,8 +30542,8 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 		    }
 		    else
 		    {
-		        mysql_format(pSQL, gstr, sizeof(gstr), "SELECT COUNT(`id`) FROM `accounts` WHERE `ip` = '%s' AND `regdate` > (UNIX_TIMESTAMP() - 5184000);", __GetIP(playerid));
-		        mysql_pquery(pSQL, gstr, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUST_VERIFY_REGISTER);
+		        mysql_format(pSQL, gstr2, sizeof(gstr2), "SELECT COUNT(`id`) FROM `accounts` WHERE `ip` = '%s' AND `regdate` > (UNIX_TIMESTAMP() - 5184000);", __GetIP(playerid));
+		        mysql_pquery(pSQL, gstr2, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUST_VERIFY_REGISTER);
 		    }
 	        return 1;
 	    }
@@ -30490,8 +30556,8 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 			}
 			else
 			{
-		        mysql_format(pSQL, gstr, sizeof(gstr), "SELECT COUNT(`id`) FROM `accounts` WHERE `serial` = '%e' AND `regdate` > (UNIX_TIMESTAMP() - 5184000);", __GetSerial(playerid));
-		        mysql_pquery(pSQL, gstr, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUST_VERIFY_REGISTER + 1);
+		        mysql_format(pSQL, gstr2, sizeof(gstr2), "SELECT COUNT(`id`) FROM `accounts` WHERE `serial` = '%e' AND `regdate` > (UNIX_TIMESTAMP() - 5184000);", __GetSerial(playerid));
+		        mysql_pquery(pSQL, gstr2, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUST_VERIFY_REGISTER + 1);
 			}
 			return 1;
 	    }
