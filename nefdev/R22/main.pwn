@@ -13,7 +13,7 @@
 || SA-MP Server 0.3z-R2
 || YSI Library 3.1
 || sscanf Plugin 2.8.1
-|| Streamer Plugin v2.7.1
+|| Streamer Plugin v2.7
 || MySQL Plugin R38
 || IRC Plugin 1.4.4
 || DNS Plugin 2.4
@@ -31,7 +31,7 @@
 #define YSI_IS_SERVER
 
 #include <a_samp>   		
-#include <a_http>           
+#include <a_http>           // API Requests
 #undef MAX_PLAYERS
 #define MAX_PLAYERS (400)
 #include <YSI\y_iterate>	
@@ -84,14 +84,14 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define SVRFORUM                        "forum.nefserver.net"
 #define SERVER_IP                       "31.204.152.218:7777"
 //#define HOSTNAME                        " 	        NEF » ×DM/Stunt/Race/Freeroam/Minigames×"
-#define HOSTNAME                        " 	   NEF (0.3z) » ×DM/Stunt/Race/Freeroam/Minigames×"
+#define HOSTNAME                        " 	 NEF (0.3z) » ×Stunt/DM/Race/Freeroam/Minigames×"
 #if IS_RELEASE_BUILD == true
 #define CURRENT_VERSION                 "Build 22"
 #else
 #define CURRENT_VERSION                 "PTS:Build 22"
 #endif
 #define HOTFIX_REV                      "Hotfix #0"
-#define SAMP_VERSION                    "SA-MP 0.3z"
+#define SAMP_VERSION                    "SA-MP 0.3z-R2"
 #define MAX_REPORTS 					(7)
 #define MAX_ADS                         (10)
 #define MAX_GANG_NAME					(20)
@@ -4988,12 +4988,10 @@ public OnPlayerDeath(playerid, killerid, reason)
 		}
 	}
 	
-	new msg[128], killerName[MAX_PLAYER_NAME+1], reasonMsg[32], playerName[MAX_PLAYER_NAME+1];
-	GetPlayerName(killerid, killerName, sizeof(killerName));
-	GetPlayerName(playerid, playerName, sizeof(playerName));
-	if (killerid != INVALID_PLAYER_ID)
+	new reasonMsg[32];
+	if(killerid != INVALID_PLAYER_ID)
 	{
-		switch (reason)
+		switch(reason)
 		{
 			case 0: reasonMsg = "Unarmed";
 			case 1: reasonMsg = "Brass Knuckles";
@@ -5033,18 +5031,18 @@ public OnPlayerDeath(playerid, killerid, reason)
 			case 51: reasonMsg = "Explosion";
 			default: reasonMsg = "Unknown";
 		}
-		format(msg, sizeof(msg), "04*** %s killed %s. (%s)", killerName, playerName, reasonMsg);
+		format(gstr, sizeof(gstr), "04*** %s killed %s. (%s)", __GetName(killerid), __GetName(playerid), reasonMsg);
 	}
 	else
 	{
 		switch(reason)
 		{
-			case 53: format(msg, sizeof(msg), "04*** %s died. (Drowned)", playerName);
-			case 54: format(msg, sizeof(msg), "04*** %s died. (Collision)", playerName);
-			default: format(msg, sizeof(msg), "04*** %s died.", playerName);
+			case 53: format(gstr, sizeof(gstr), "04*** %s died. (Drowned)", __GetName(playerid));
+			case 54: format(gstr, sizeof(gstr), "04*** %s died. (Collision)", __GetName(playerid));
+			default: format(gstr, sizeof(gstr), "04*** %s died.", __GetName(playerid));
 		}
 	}
-	IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, msg);
+	IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 	return 1;
 }
 
