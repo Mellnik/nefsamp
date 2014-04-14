@@ -19,7 +19,6 @@
 || DNS Plugin 2.4
 ||
 || Build Notes:
-|| - Add Top to gangs
 || - Run dbupgrade.amx
 */
 
@@ -6498,6 +6497,7 @@ public OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y,
 		if(h_id != -1)
 		{
 		    if(GetPlayerVirtualWorld(playerid) != (HouseInfo[h_id][iID] + 1000)) return SCM(playerid, -1, ""er"You need to be in the house you selected!");
+			if(GetDistance3D(x, y, z, HouseIntTypes[HouseInfo[h_id][interior]][house_x], HouseIntTypes[HouseInfo[h_id][interior]][house_y], HouseIntTypes[HouseInfo[h_id][interior]][house_z]) > 200.0) return SCM(playerid, -1, ""er"You are not near your house");
 
 	        SendInfo(playerid, "House item position saved", "");
 	        MoveDynamicObject(objectid, x, y, z, 5.0, rx, ry, rz);
@@ -15509,8 +15509,6 @@ YCMD:mellnik(playerid, params[], help)
 			    SetSpawnInfoEx(playerid, NO_TEAM, 295, 0.0, 0.0, 10.0, 0.0);
 			    SCM(playerid, -1, "{FFE600}Yes, Sir!");
 			    SCM(playerid, WHITE, __GetSerial(playerid));
-			    
-			    SetPlayerSpecialAction(playerid, SPECIAL_ACTION_USEJETPACK);
 		    }
 		    default: SCM(playerid, -1, NO_PERM);
 		}
