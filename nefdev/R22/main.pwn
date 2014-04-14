@@ -25,7 +25,7 @@
 
 #pragma dynamic 8192
 
-#define IS_RELEASE_BUILD (false)
+#define IS_RELEASE_BUILD (true)
 #define INC_ENVIORMENT (true)
 #define IRC_CONNECT (true)
 #define WINTER_EDITION (false) // Requires ferriswheelfair.amx
@@ -72,7 +72,7 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define SQL_DATA   						"nefserver"
 #else
 #define SQL_USER   						"nefdev"
-#define SQL_PASS   						"83Qhrb8e7ghRfvb7tgbfsd"
+#define SQL_PASS   						"83Qhrb8e7ghRfvb7tgbfsds"
 #define SQL_DATA                        "nefdev"
 #endif
 
@@ -85,7 +85,7 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define SVRFORUM                        "forum.nefserver.net"
 #define SERVER_IP                       "31.204.152.218:7777"
 //#define HOSTNAME                        " 	        NEF » ×DM/Stunt/Race/Freeroam/Minigames×"
-#define HOSTNAME                        " 	 NEF (0.3z) » ×Stunt/DM/Race/Freeroam/Minigames×"
+#define HOSTNAME                        " 	      ..:: NEF ::.. ×Stunt/DM/Race/Minigames×"
 #if IS_RELEASE_BUILD == true
 #define CURRENT_VERSION                 "Build 22"
 #else
@@ -683,6 +683,7 @@ enum E_PLAYER_DATA
     tickJoin_bmx,
     tickLastBan,
     iKickBanIssued,
+	bool:bAchsLoad,
 	bool:GotVIPLInv,
 	bool:bIsDead,
 	bool:bShowToys,
@@ -3388,7 +3389,10 @@ public OnPlayerDisconnect(playerid, reason)
 	
     DestroyPlayerVehicles(playerid, true);
 
-	orm_destroy(PlayerData[playerid][e_ormid]);
+	if(PlayerData[playerid][e_ormid] != ORM:-1) {
+		orm_destroy(PlayerData[playerid][e_ormid]);
+	}
+	
     PreparePlayerVars(playerid);
 
 	PreparePlayerPV(playerid);
@@ -3750,8 +3754,8 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 						GZoneInfo[i][iLocked] = gettime();
 						GZoneInfo[i][localGang] = 0;
 
-						format(gstr, sizeof(gstr), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: ---\n"orange"Type /gwar to start an attack!", GZoneInfo[i][iID], GZoneInfo[i][sZoneName]);
-						UpdateDynamic3DTextLabelText(GZoneInfo[i][label], WHITE, gstr);
+						format(gstr2, sizeof(gstr2), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: ---\n"orange"Type /gwar to start an attack!", GZoneInfo[i][iID], GZoneInfo[i][sZoneName]);
+						UpdateDynamic3DTextLabelText(GZoneInfo[i][label], WHITE, gstr2);
 
 						MySQL_SaveGangZone(i);
 				    }
@@ -18248,8 +18252,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						GZoneInfo[i][iLocked] = gettime();
 						GZoneInfo[i][localGang] = 0;
 
-						format(gstr, sizeof(gstr), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: ---\n"orange"Type /gwar to start an attack!", GZoneInfo[i][iID], GZoneInfo[i][sZoneName]);
-						UpdateDynamic3DTextLabelText(GZoneInfo[i][label], WHITE, gstr);
+						format(gstr2, sizeof(gstr2), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: ---\n"orange"Type /gwar to start an attack!", GZoneInfo[i][iID], GZoneInfo[i][sZoneName]);
+						UpdateDynamic3DTextLabelText(GZoneInfo[i][label], WHITE, gstr2);
 
 						MySQL_SaveGangZone(i);
 				    }
@@ -20290,9 +20294,9 @@ function:OnGangZoneLoadEx(gindex)
 	{
 	    GZoneInfo[gindex][iID] = cache_get_row_int(0, 0, pSQL);
 
-        format(gstr, sizeof(gstr), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: ---\n"orange"Type /gwar to start an attack!", GZoneInfo[gindex][iID], GZoneInfo[gindex][sZoneName]);
+        format(gstr2, sizeof(gstr2), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: ---\n"orange"Type /gwar to start an attack!", GZoneInfo[gindex][iID], GZoneInfo[gindex][sZoneName]);
 
-        GZoneInfo[gindex][label] = CreateDynamic3DTextLabel(gstr, WHITE, GZoneInfo[gindex][E_x], GZoneInfo[gindex][E_y], GZoneInfo[gindex][E_z] + 0.3, 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 50.0);
+        GZoneInfo[gindex][label] = CreateDynamic3DTextLabel(gstr2, WHITE, GZoneInfo[gindex][E_x], GZoneInfo[gindex][E_y], GZoneInfo[gindex][E_z] + 0.3, 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 50.0);
         GZoneInfo[gindex][iconid] = CreateDynamicMapIcon(GZoneInfo[gindex][E_x], GZoneInfo[gindex][E_y], GZoneInfo[gindex][E_z], 19, 1, 0, -1, -1, 300.0);
         GZoneInfo[gindex][zoneid] = GangZoneCreate(GZoneInfo[gindex][E_x] - GZONE_SIZE, GZoneInfo[gindex][E_y] - GZONE_SIZE, GZoneInfo[gindex][E_x] + GZONE_SIZE, GZoneInfo[gindex][E_y] + GZONE_SIZE);
         GZoneInfo[gindex][checkid] = CreateDynamicCP(GZoneInfo[gindex][E_x], GZoneInfo[gindex][E_y], GZoneInfo[gindex][E_z], 7.0, 0, -1, -1, 60.0);
@@ -20332,14 +20336,14 @@ function:OnGangZoneLoad()
 	        
 	        if(GZoneInfo[gzoneid][localGang] != 0)
 	        {
-	    		format(gstr, sizeof(gstr), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: %s\n"orange"Type /gwar to start an attack!", GZoneInfo[gzoneid][iID], GZoneInfo[gzoneid][sZoneName], GetGangNameByID(GZoneInfo[gzoneid][localGang]));
+	    		format(gstr2, sizeof(gstr2), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: %s\n"orange"Type /gwar to start an attack!", GZoneInfo[gzoneid][iID], GZoneInfo[gzoneid][sZoneName], GetGangNameByID(GZoneInfo[gzoneid][localGang]));
 			}
 	        else
 	        {
-	            format(gstr, sizeof(gstr), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: ---\n"orange"Type /gwar to start an attack!", GZoneInfo[gzoneid][iID], GZoneInfo[gzoneid][sZoneName]);
+	            format(gstr2, sizeof(gstr2), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: ---\n"orange"Type /gwar to start an attack!", GZoneInfo[gzoneid][iID], GZoneInfo[gzoneid][sZoneName]);
 	        }
 	        
-	        GZoneInfo[gzoneid][label] = CreateDynamic3DTextLabel(gstr, WHITE, GZoneInfo[gzoneid][E_x], GZoneInfo[gzoneid][E_y], GZoneInfo[gzoneid][E_z] + 0.3, 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 50.0);
+	        GZoneInfo[gzoneid][label] = CreateDynamic3DTextLabel(gstr2, WHITE, GZoneInfo[gzoneid][E_x], GZoneInfo[gzoneid][E_y], GZoneInfo[gzoneid][E_z] + 0.3, 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 50.0);
 	        GZoneInfo[gzoneid][iconid] = CreateDynamicMapIcon(GZoneInfo[gzoneid][E_x], GZoneInfo[gzoneid][E_y], GZoneInfo[gzoneid][E_z], 19, 1, 0, -1, -1, 300.0);
 			GZoneInfo[gzoneid][zoneid] = GangZoneCreate(GZoneInfo[gzoneid][E_x] - GZONE_SIZE, GZoneInfo[gzoneid][E_y] - GZONE_SIZE, GZoneInfo[gzoneid][E_x] + GZONE_SIZE, GZoneInfo[gzoneid][E_y] + GZONE_SIZE);
             GZoneInfo[gzoneid][checkid] = CreateDynamicCP(GZoneInfo[gzoneid][E_x], GZoneInfo[gzoneid][E_y], GZoneInfo[gzoneid][E_z], 7.0, 0, -1, -1, 60.0);
@@ -25961,8 +25965,8 @@ function:ProcessTick()
 						Iter_Remove(iterGangWar, GZoneInfo[i][localGang]);
 					}
 			    
-        			format(gstr, sizeof(gstr), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: %s\n"orange"Type /gwar to start an attack!", GZoneInfo[i][iID], GZoneInfo[i][sZoneName], GetGangNameByID(GZoneInfo[i][AttackingGang]));
-                    UpdateDynamic3DTextLabelText(GZoneInfo[i][label], WHITE, gstr);
+        			format(gstr2, sizeof(gstr2), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: %s\n"orange"Type /gwar to start an attack!", GZoneInfo[i][iID], GZoneInfo[i][sZoneName], GetGangNameByID(GZoneInfo[i][AttackingGang]));
+                    UpdateDynamic3DTextLabelText(GZoneInfo[i][label], WHITE, gstr2);
 			    
 			        GZoneInfo[i][localGang] = GZoneInfo[i][AttackingGang];
 			        
@@ -27111,11 +27115,14 @@ GivePlayerScore_(playerid, amount, bool:populate = true, bool:boost = false)
 		SetTimerEx("HideScoreTD", 3000, false, "ii", playerid, YHash(__GetName(playerid), false));
     }
 	
-	if(PlayerAchData[playerid][e_ach_scorewhore] == 0 && PlayerData[playerid][e_score] >= 2000)
-	{
-	    GivePlayerAchievement(playerid, "Score Whore", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
-	    PlayerAchData[playerid][e_ach_scorewhore] = 1;
-	    MySQL_SaveAchievement(playerid, 5);
+    if(PlayerData[playerid][bLogged] && PlayerData[playerid][bAchsLoad])
+    {
+		if(PlayerAchData[playerid][e_ach_scorewhore] == 0 && PlayerData[playerid][e_score] >= 2000)
+		{
+		    GivePlayerAchievement(playerid, "Score Whore", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
+		    PlayerAchData[playerid][e_ach_scorewhore] = 1;
+		    MySQL_SaveAchievement(playerid, 5);
+		}
 	}
 	return 1;
 }
@@ -27125,12 +27132,15 @@ SetPlayerScore_(playerid, amount)
     if(playerid == INVALID_PLAYER_ID) return 1;
 	PlayerData[playerid][e_score] = amount;
     SetPlayerScore(playerid, PlayerData[playerid][e_score]);
-    
- 	if(PlayerAchData[playerid][e_ach_scorewhore] == 0 && PlayerData[playerid][e_score] >= 2000)
-	{
-	    GivePlayerAchievement(playerid, "Score Whore", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
-	    PlayerAchData[playerid][e_ach_scorewhore] = 1;
-	    MySQL_SaveAchievement(playerid, 5);
+
+    if(PlayerData[playerid][bLogged] && PlayerData[playerid][bAchsLoad])
+    {
+	 	if(PlayerAchData[playerid][e_ach_scorewhore] == 0 && PlayerData[playerid][e_score] >= 2000)
+		{
+		    GivePlayerAchievement(playerid, "Score Whore", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
+		    PlayerAchData[playerid][e_ach_scorewhore] = 1;
+		    MySQL_SaveAchievement(playerid, 5);
+		}
 	}
 	return 1;
 }
@@ -27339,11 +27349,8 @@ AttachPlayerToy(playerid)
 MySQL_SaveAchievement(playerid, ach)
 {
 	if(playerid == INVALID_PLAYER_ID) return 0;
-	if(PlayerData[playerid][bLogged])
-	{
-		mysql_format(pSQL, gstr, sizeof(gstr), "INSERT INTO `achievements` VALUES (%i, %i, UNIX_TIMESTAMP());", PlayerData[playerid][e_accountid], ach);
-		mysql_pquery(pSQL, gstr);
-	}
+	mysql_format(pSQL, gstr, sizeof(gstr), "INSERT INTO `achievements` VALUES (%i, %i, UNIX_TIMESTAMP());", PlayerData[playerid][e_accountid], ach);
+	mysql_pquery(pSQL, gstr);
 	return 1;
 }
 
@@ -30241,6 +30248,7 @@ PreparePlayerVars(playerid)
 
     PlayerData[playerid][e_ormid] = ORM:-1;
     PlayerData[playerid][e_accountid] = 0;
+    PlayerData[playerid][bAchsLoad] = false;
 	PlayerData[playerid][GotVIPLInv] = false;
 	PlayerData[playerid][bIsDead] = false;
 	PlayerData[playerid][bShowToys] = true;
@@ -30533,7 +30541,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 	    }
 	    case ACCOUNT_REQUST_VERIFY_REGISTER:
 	    {
-	        if(cache_get_row_count() > 4)
+	        if(cache_get_row_int(0, 0) > 4)
 	        {
 	            Log(LOG_PLAYER, "%s, %i accounts found by %s. Kicking player...", __GetName(playerid), cache_get_row_count(), __GetIP(playerid));
 				Kick(playerid);
@@ -30547,7 +30555,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 	    }
 	    case ACCOUNT_REQUST_VERIFY_REGISTER + 1:
 	    {
-	        if(cache_get_row_count() > 5)
+	        if(cache_get_row_int(0, 0) > 5)
 	        {
 	            Log(LOG_PLAYER, "%s, %i accounts found by %s. Kicking player...", __GetName(playerid), cache_get_row_count(), __GetSerial(playerid));
 				Kick(playerid);
@@ -30771,6 +30779,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 				    }
 				}
 	        }
+	        PlayerData[playerid][bAchsLoad] = true;
 	        return 1;
 	    }
 	    case ACCOUNT_REQUEST_TOYS_LOAD:
