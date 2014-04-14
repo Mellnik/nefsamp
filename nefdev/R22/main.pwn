@@ -19,6 +19,7 @@
 || DNS Plugin 2.4
 ||
 || Build Notes:
+|| - Add Top to gangs
 || - Run dbupgrade.amx
 */
 
@@ -21257,7 +21258,7 @@ MySQL_FetchGangInfo(playerid, gGangID)
 
 MySQL_UpdateGangScore(gGangID, value)
 {
-	format(gstr2, sizeof(gstr2), "UPDATE `gangs` SET `GangScore` = `GangScore` + %i WHERE `ID` = %i LIMIT 1;", value, gGangID);
+	format(gstr2, sizeof(gstr2), "UPDATE `gangs` SET `GangScore` = `GangScore` + %i, `Top` = `Top` + %i WHERE `ID` = %i LIMIT 1;", value, value, gGangID);
 	mysql_tquery(pSQL, gstr2, "", "");
 }
 
@@ -21409,7 +21410,7 @@ MySQL_ExistGang(playerid)
 
 MySQL_CreateGang(playerid)
 {
-    format(gstr2, sizeof(gstr2), "INSERT INTO `gangs` VALUES (NULL, '%s', '%s', 0, %i, -84215197, 0);", PlayerData[playerid][GangName], PlayerData[playerid][GangTag], gettime());
+    format(gstr2, sizeof(gstr2), "INSERT INTO `gangs` VALUES (NULL, '%s', '%s', 0, %i, -84215197, 0, 0);", PlayerData[playerid][GangName], PlayerData[playerid][GangTag], gettime());
     mysql_tquery(pSQL, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_CREATE_GANG, playerid, pSQL);
 }
 
