@@ -11805,7 +11805,7 @@ YCMD:unban(playerid, params[], help)
 		}
 
 	    format(gstr, sizeof(gstr), "SELECT `ID` FROM `bans` WHERE `PlayerName` = '%s' LIMIT 1;", escape);
-	    mysql_tquery(pSQL, gstr, "OnUnbanAttempt", "is", playerid, escape);
+	    mysql_pquery(pSQL, gstr, "OnUnbanAttempt", "is", playerid, escape);
 	}
 	else
 	{
@@ -29562,16 +29562,30 @@ function:OnUnbanAttempt(playerid, unban[])
 
 	if(rows > 0)
 	{
-	    new query[128];
-	    format(query, sizeof(query), "DELETE FROM `bans` WHERE `PlayerName` = '%s' LIMIT 1;", unban);
-
-	    mysql_tquery(pSQL, query, "", "");
+	    format(gstr, sizeof(gstr), "DELETE FROM `bans` WHERE `PlayerName` = '%s' LIMIT 1;", unban);
+	    mysql_pquery(pSQL, gstr);
+	    
+	    format(gstr, sizeof(gstr), "SELECT `ip` FROM `accounts` WHERE `name` = '%s';", unban);
+	    mysql_pquery(pSQL, gstr, "OnUnbanAttempt2");
 
 	    SCM(playerid, -1, ""er"Player has been unbanned!");
 	}
 	else
 	{
 	    SCM(playerid, -1, ""er"Player is not banned or does not exist");
+	}
+	return 1;
+}
+
+function:OnUnbanAttempt2()
+{
+	if(cache_get_row_count() > 0)
+	{
+	    new ip[46];
+	    cache_get_row(0, 0, ip, pSQL, sizeof(ip));
+	    
+	    format(gstr, sizeof(gstr), "DELETE FROM `blacklist` WHERE `IP` = '%s';", ip);
+	    mysql_pquery(pSQL, gstr);
 	}
 	return 1;
 }
