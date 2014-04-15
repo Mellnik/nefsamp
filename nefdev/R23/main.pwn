@@ -1,6 +1,6 @@
 /*======================================================================*\
 || #################################################################### ||
-|| # Project New Evolution Freeroam - Build 22 	        			  # ||
+|| # Project New Evolution Freeroam - Build 23 	        			  # ||
 || # ---------------------------------------------------------------- # ||
 || # Copyright ©2011-2014 New Evolution Freeroam	  				  # ||
 || # Created by Mellnik                                               # ||
@@ -17,9 +17,6 @@
 || MySQL Plugin R38
 || IRC Plugin 1.4.4
 || DNS Plugin 2.4
-||
-|| Build Notes:
-|| - Run dbupgrade.amx
 */
 
 #pragma dynamic 8192
@@ -86,9 +83,9 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 //#define HOSTNAME                        " 	        NEF » ×DM/Stunt/Race/Freeroam/Minigames×"
 #define HOSTNAME                        " 	      ..:: NEF ::.. ×Stunt/DM/Race/Minigames×"
 #if IS_RELEASE_BUILD == true
-#define CURRENT_VERSION                 "Build 22"
+#define CURRENT_VERSION                 "Build 23"
 #else
-#define CURRENT_VERSION                 "PTS:Build 22"
+#define CURRENT_VERSION                 "PTS:Build 23"
 #endif
 #define HOTFIX_REV                      "Hotfix #0"
 #define SAMP_VERSION                    "SA-MP 0.3z-R2"
@@ -6309,17 +6306,17 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 			    return 1;
 			}
 			
+			if(Key(KEY_FIRE))
+			{
+				new Float:POS[3], vid = GetPlayerVehicleID(playerid);
+				GetVehicleVelocity(vid, POS[0], POS[1], POS[2]);
+				SetVehicleVelocity(vid, POS[0] * 1.3, POS[1] * 1.3, POS[2] * 1.3);
+				if(IsComponentIdCompatible(GetVehicleModel(vid), 1010)) AddVehicleComponent(vid, 1010);
+				return 1;
+	   		}
+
 		    if(PlayerData[playerid][SpeedBoost])
 		    {
-				if(Key(KEY_FIRE))
-				{
-					new Float:POS[3], vid = GetPlayerVehicleID(playerid);
-					GetVehicleVelocity(vid, POS[0], POS[1], POS[2]);
-					SetVehicleVelocity(vid, POS[0] * 1.3, POS[1] * 1.3, POS[2] * 1.3);
-					if(IsComponentIdCompatible(GetVehicleModel(vid), 1010)) AddVehicleComponent(vid, 1010);
-					return 1;
-		   		}
-
 				if(Key(KEY_CROUCH))
 				{
 					new Float:POS[3], vid = GetPlayerVehicleID(playerid);
