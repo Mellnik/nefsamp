@@ -394,6 +394,12 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define GREEN_E 						"{3BBD44}"
 #define PURPLE_E 						"{5A00FF}"
 
+// NEF 2.0 Colors
+//#define X_RED                           ()
+//#define X_RED_L                         ()
+//#define x_red                           ""
+#define x_red_l                         "{F64B4B}"
+
 // Player
 #define MAX_PLAYER_SCORE                (999999)
 #define MAX_PLAYER_MONEY                (1000000000)
@@ -1460,7 +1466,7 @@ new const BLevelMatrix[21][e_prop_matrix] =
 	{20, 2000000, 30000}
 };
 
-new const PVMatrix[100][e_pv_matrix] =
+new const PVMatrix[101][e_pv_matrix] =
 {
 	{0, 536, 595000, "Blade"},
 	{0, 575, 390000, "Broadway"},
@@ -1535,6 +1541,7 @@ new const PVMatrix[100][e_pv_matrix] =
     {6, 455, 75000, "Flatbed"},
     {6, 414, 50000, "Mule"},
     {6, 478, 50000, "Walton"},
+    {6, 600, 75000, "Picador"},
     {7, 574, 50000, "Sweeper"},
     {7, 508, 250000, "Journey"},
     {7, 588, 100000, "Hotdog"},
@@ -4642,7 +4649,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 
 				if(PlayerData[playerid][e_wanteds] >= 3)
 				{
-				    format(gstr, sizeof(gstr), "* {%06x}%s(%i) "RED_E"ended %s's(%i) killstreak of %i kills!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid, __GetName(playerid), playerid, PlayerData[playerid][e_wanteds]);
+				    format(gstr, sizeof(gstr), "* {%06x}%s(%i) "x_red_l"ended %s's(%i) killstreak of %i kills!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid, __GetName(playerid), playerid, PlayerData[playerid][e_wanteds]);
 				    SCMToAll(COLOR_RED, gstr);
 				}
 
@@ -19605,21 +19612,21 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return 1;
                 }
 			
-			    new string[2048], tmp[128];
+			    new string[2048];
 			    
         	    for(new i = 0; i < sizeof(PVMatrix); i++)
         	    {
         	        if(PVMatrix[i][pv_category] == listitem)
         	        {
-        	            format(tmp, sizeof(tmp), "%s "green"$%s\n", PVMatrix[i][pv_modelname], number_format(PVMatrix[i][pv_price]));
-        	            strcat(string, tmp);
+        	            format(gstr, sizeof(gstr), "%s "green"$%s\n", PVMatrix[i][pv_modelname], number_format(PVMatrix[i][pv_price]));
+        	            strcat(string, gstr);
         	        }
         	    }
 			    
 			    PVCatSel[playerid] = listitem;
 			    
-			    format(tmp, sizeof(tmp), ""nef" :: Private Vehicles > %s", PVCategorys[listitem]);
-			    ShowPlayerDialog(playerid, CARBUY_DIALOG + 1, DIALOG_STYLE_LIST, tmp, string, "Select", "Back");
+			    format(gstr, sizeof(gstr), ""nef" :: Private Vehicles > %s", PVCategorys[listitem]);
+			    ShowPlayerDialog(playerid, CARBUY_DIALOG + 1, DIALOG_STYLE_LIST, gstr, string, "Select", "Back");
 			    return true;
 			}
 			case CARBUY_DIALOG + 1:
@@ -27344,8 +27351,11 @@ AttachPlayerToy(playerid)
 MySQL_SaveAchievement(playerid, ach)
 {
 	if(playerid == INVALID_PLAYER_ID) return 0;
-	mysql_format(pSQL, gstr, sizeof(gstr), "INSERT INTO `achievements` VALUES (%i, %i, UNIX_TIMESTAMP());", PlayerData[playerid][e_accountid], ach);
-	mysql_pquery(pSQL, gstr);
+	if(islogged(playerid))
+	{
+		mysql_format(pSQL, gstr, sizeof(gstr), "INSERT INTO `achievements` VALUES (%i, %i, UNIX_TIMESTAMP());", PlayerData[playerid][e_accountid], ach);
+		mysql_pquery(pSQL, gstr);
+	}
 	return 1;
 }
 
@@ -29581,7 +29591,7 @@ function:OnUnbanAttempt2()
 {
 	if(cache_get_row_count() > 0)
 	{
-	    new ip[46];
+	    new ip[MAX_PLAYER_IP + 1];
 	    cache_get_row(0, 0, ip, pSQL, sizeof(ip));
 	    
 	    format(gstr, sizeof(gstr), "DELETE FROM `blacklist` WHERE `IP` = '%s';", ip);
