@@ -27477,11 +27477,11 @@ function:ShowDialog(playerid, dialogid)
 
 	        if(PlayerData[playerid][e_vip] == 1)
 	        {
-	            if((PlayerData[playerid][e_lastnc] + 2592000) > gettime())
+	            if((PlayerData[playerid][e_lastnc] + 1209600) > gettime())
 	            {
-	                format(string, sizeof(string), ""red"Namechange not possible"white"\n\nNamechange cooldown: 30 days "lb_e"(VIP)"white"\nLast Namechange: %s\nNext Namechange available: %s\nCurrent Name: %s",
+	                format(string, sizeof(string), ""red"Namechange not possible"white"\n\nNamechange cooldown: 14 days "lb_e"(VIP)"white"\nLast Namechange: %s\nNext Namechange available: %s\nCurrent Name: %s",
 						UTConvert(PlayerData[playerid][e_lastnc]),
-						UTConvert(PlayerData[playerid][e_lastnc] + 2592000),
+						UTConvert(PlayerData[playerid][e_lastnc] + 1209600),
 						__GetName(playerid));
 					return ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Namechange", string, "OK", "");
 	            }
@@ -27489,15 +27489,15 @@ function:ShowDialog(playerid, dialogid)
 	            {
 	                if(PlayerData[playerid][e_lastnc] == 0)
 	                {
-		                format(string, sizeof(string), ""green"Namechange possible"white"\n\nNamechange cooldown: 30 days "lb_e"(VIP)"white"\nLast Namechange: Never\nNext Namechange available: %s\nCurrent Name: %s\n\nEnter a new valid nickname below:",
+		                format(string, sizeof(string), ""green"Namechange possible"white"\n\nNamechange cooldown: 14 days "lb_e"(VIP)"white"\nLast Namechange: Never\nNext Namechange available: %s\nCurrent Name: %s\n\nEnter a new valid nickname below:",
 							UTConvert(PlayerData[playerid][e_regdate]),
 							__GetName(playerid));
 	                }
 	                else
 	                {
-		                format(string, sizeof(string), ""green"Namechange possible"white"\n\nNamechange cooldown: 30 days "lb_e"(VIP)"white"\nLast Namechange: %s\nNext Namechange available: %s\nCurrent Name: %s\n\nEnter a new valid nickname below:",
+		                format(string, sizeof(string), ""green"Namechange possible"white"\n\nNamechange cooldown: 14 days "lb_e"(VIP)"white"\nLast Namechange: %s\nNext Namechange available: %s\nCurrent Name: %s\n\nEnter a new valid nickname below:",
 							UTConvert(PlayerData[playerid][e_lastnc]),
-							UTConvert(PlayerData[playerid][e_lastnc] + 2592000),
+							UTConvert(PlayerData[playerid][e_lastnc] + 1209600),
 							__GetName(playerid));
 	                }
 	                
@@ -27506,11 +27506,11 @@ function:ShowDialog(playerid, dialogid)
 	        }
 	        else
 	        {
-	            if((PlayerData[playerid][e_lastnc] + 7776000) > gettime())
+	            if((PlayerData[playerid][e_lastnc] + 2678400) > gettime())
 	            {
-	                format(string, sizeof(string), ""red"Namechange not possible"white"\n\nNamechange cooldown: 90 days\nLast Namechange: %s\nNext Namechange available: %s\nCurrent Name: %s",
+	                format(string, sizeof(string), ""red"Namechange not possible"white"\n\nNamechange cooldown: 30 days\nLast Namechange: %s\nNext Namechange available: %s\nCurrent Name: %s",
 						UTConvert(PlayerData[playerid][e_lastnc]),
-						UTConvert(PlayerData[playerid][e_lastnc] + 7776000),
+						UTConvert(PlayerData[playerid][e_lastnc] + 2678400),
 						__GetName(playerid));
 					return ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Namechange", string, "OK", "");
 	            }
@@ -27518,15 +27518,15 @@ function:ShowDialog(playerid, dialogid)
 	            {
 	                if(PlayerData[playerid][e_lastnc] == 0)
 	                {
-		                format(string, sizeof(string), ""green"Namechange possible"white"\n\nNamechange cooldown: 90 days\nLast Namechange: Never\nNext Namechange available: %s\nCurrent Name: %s\n\nEnter a new valid nickname below:",
+		                format(string, sizeof(string), ""green"Namechange possible"white"\n\nNamechange cooldown: 30 days\nLast Namechange: Never\nNext Namechange available: %s\nCurrent Name: %s\n\nEnter a new valid nickname below:",
 							UTConvert(PlayerData[playerid][e_regdate]),
 							__GetName(playerid));
 	                }
 	                else
 	                {
-		                format(string, sizeof(string), ""green"Namechange possible"white"\n\nNamechange cooldown: 90 days\nLast Namechange: %s\nNext Namechange available: %s\nCurrent Name: %s\n\nEnter a new valid nickname below:",
+		                format(string, sizeof(string), ""green"Namechange possible"white"\n\nNamechange cooldown: 30 days\nLast Namechange: %s\nNext Namechange available: %s\nCurrent Name: %s\n\nEnter a new valid nickname below:",
 							UTConvert(PlayerData[playerid][e_lastnc]),
-							UTConvert(PlayerData[playerid][e_lastnc] + 7776000),
+							UTConvert(PlayerData[playerid][e_lastnc] + 2678400),
 							__GetName(playerid));
 	                }
 
