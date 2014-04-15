@@ -1701,7 +1701,8 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
   	DerbyPlayers = 0,
 	bool:IsDerbyRunning = false,
   	bool:DerbyWinner[MAX_PLAYERS] = {false, ...},
-  	Reports[MAX_REPORTS][144],
+	bool:CSG[MAX_PLAYERS] = {false, ...},
+	Reports[MAX_REPORTS][144],
   	Adverts[MAX_ADS][144],
   	tBGTimer = -1,
   	tBGVoting = -1,
@@ -9332,6 +9333,7 @@ YCMD:akill(playerid, params[], help)
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 
 	    if(gTeam[player] != FREEROAM) return SCM(playerid, -1, ""er"Can't kill player because he is in a minigame");
+	    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 
  		if(IsPlayerAvail(player))
 		{
@@ -9370,6 +9372,7 @@ YCMD:sethealth(playerid, params[], help)
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
     
 	    if(amount > 100) return SCM(playerid, -1, ""er"Do not set it higher than 100");
+	    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 	    
  		if(IsPlayerAvail(player))
 		{
@@ -9938,6 +9941,7 @@ YCMD:burn(playerid, params[], help)
 		        case DERBY, gRACE, BUYCAR, gBG_VOTING, GUNGAME, SPEC, JAIL: return SCM(playerid, -1, ""er"You can't use this command on that player now");
 		    }
 			if(!DerbyWinner[player] && gTeam[player] == DERBY) return SCM(playerid, -1, ""er"You can't use this command on that player now");
+			if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 		    
 		    new Float:POS[3];
 			GetPlayerPos(player, POS[0], POS[1], POS[2]);
@@ -9978,6 +9982,7 @@ YCMD:getip(playerid, params[], help)
 		{
 			return SCM(playerid, -1, ""er"You cannot use this command on this admin");
 		}
+		if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 		
         if(IsPlayerAvail(player))
 		{
@@ -10015,6 +10020,7 @@ YCMD:nstats(playerid, params[], help)
 		{
 			return SCM(playerid, -1, ""er"You cannot use this command on this admin");
 		}
+		if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 
         if(IsPlayerAvail(player))
 		{
@@ -10110,6 +10116,7 @@ YCMD:locate(playerid, params[], help)
 	if(IsPlayerAvail(player))
 	{
         if(gTeam[player] != FREEROAM) return SCM(playerid, -1, ""er"Player is in a minigame!");
+        if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 
 		new zone[MAX_ZONE_NAME];
 	    GetPlayer2DZone(player, zone, sizeof(zone));
@@ -10317,6 +10324,7 @@ YCMD:go(playerid, params[], help)
 			if(PlayerData[player][e_level] != 0) return SCM(playerid, -1, ""er"You can't teleport to admins");
             if(PlayerData[player][bGWarMode]) return SCM(playerid, -1, ""er"This player is in Gang War");
             if(GetPVarInt(player, "doingStunt") != 0) return SCM(playerid, -1, ""er"Player is doing stunts");
+            if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 
 			new Float:POS[3];
 			GetPlayerPos(player, POS[0], POS[1], POS[2]);
@@ -10353,12 +10361,13 @@ YCMD:go(playerid, params[], help)
 		{
 			return SCM(playerid, NEF_GREEN, "Usage: /go <playerid>");
 	  	}
-	  	
+
 		if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 		if(!IsPlayerAvail(player)) return SCM(playerid, -1, ""er"Player is not avialable");
 		if(gTeam[player] != FREEROAM) return SCM(playerid, -1, ""er"Player is currently unavailable to goto");
 		if(player == playerid) return SCM(playerid, -1, ""er"You may not teleport to yourself");
+		if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 		
 		new Float:POS[3];
 		GetPlayerPos(player, POS[0], POS[1], POS[2]);
@@ -10398,6 +10407,7 @@ YCMD:cuff(playerid, params[], help)
 	  	
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
+		if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 		
 		if(IsPlayerAvail(player))
 		{
@@ -10433,6 +10443,7 @@ YCMD:uncuff(playerid, params[], help)
 	  	
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
+		if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 		
 		if(IsPlayerAvail(player))
 		{
@@ -10469,6 +10480,7 @@ YCMD:get(playerid, params[], help)
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 		if(gTeam[playerid] != FREEROAM) return SCM(playerid, -1, ""er"Not useable in minigames");
 		if(PlayerData[player][bIsDead]) return SCM(playerid, -1, ""er"Cannot teleport dead players");
+		if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 		
 		if(PlayerData[player][e_level] == MAX_ADMIN_LEVEL && PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 		{
@@ -10555,6 +10567,7 @@ YCMD:warn(playerid, params[], help)
 	 	if(IsPlayerAvail(player) && player != playerid)
 	 	{
 	 	    if(PlayerData[player][KBMarked]) return SCM(playerid, -1, ""er"Can't warn this player!");
+	 	    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 	 	
 			PlayerData[player][Warnings]++;
 			if(PlayerData[player][Warnings] == MAX_WARNINGS)
@@ -10815,6 +10828,7 @@ YCMD:kick(playerid, params[], help)
 		if(isnull(reason)) return SCM(playerid, NEF_GREEN, "Usage: /kick <playerid> <reason>");
 		
 		if(PlayerData[player][KBMarked]) return SCM(playerid, -1, ""er"Can't kick this player!");
+		if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 		
 		if(IsPlayerAvail(player) && player != playerid && PlayerData[player][e_level] != MAX_ADMIN_LEVEL)
 		{
@@ -10853,6 +10867,7 @@ YCMD:mute(playerid, params[], help)
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 		
 		if(time < 1 || time > 10000) return SCM(playerid, -1, ""er"seconds > 0 bitch please :p");
+		if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 
 		if(IsPlayerAvail(player) && player != playerid && PlayerData[player][e_level] != MAX_ADMIN_LEVEL)
 		{
@@ -11873,6 +11888,7 @@ YCMD:tban(playerid, params[], help)
 	    if(player == playerid) return SCM(playerid, -1, ""er"You can not ban yourself");
         if(PlayerData[player][KBMarked]) return SCM(playerid, -1, ""er"This player is flagged for disconnect");
         if(time < 5 || time > 10080) return SCM(playerid, -1, ""er"5-10080 minutes");
+        if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 
 		if(badsql(reason, false) != 0)
 		{
@@ -11963,6 +11979,7 @@ YCMD:ban(playerid, params[], help)
 		if(strlen(reason) > 50 || isnull(reason) || strlen(reason) < 2) return SCM(playerid, -1, ""er"Ban reason length: 2-50");
 	    if(player == playerid) return SCM(playerid, -1, ""er"You can not ban yourself");
         if(PlayerData[player][KBMarked]) return SCM(playerid, -1, ""er"This player is flagged for disconnect");
+        if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
         
 		if(badsql(reason, false) != 0)
 		{
@@ -12388,6 +12405,7 @@ YCMD:slap(playerid, params[], help)
 	  	
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
+		if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 		
 		if(IsPlayerAvail(player) && PlayerData[player][e_level] != MAX_ADMIN_LEVEL)
 		{
@@ -14766,6 +14784,7 @@ YCMD:spec(playerid, params[], help)
 
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
+		if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 
  		if(IsPlayerAvail(player) && player != playerid)
 		{
@@ -14942,7 +14961,7 @@ YCMD:clearchat(playerid, params[], help)
 {
 	if(PlayerData[playerid][e_level] >= 3)
 	{
-		for(new i = 0; i < 21; i++)
+		for(new i = 0; i < 22; i++)
 		{
 			SCMToAll(GREEN, " ");
 		}
@@ -15480,6 +15499,16 @@ YCMD:rampdown(playerid, params[], help)
     if(IsMellnikRampMoving) return SCM(playerid, -1, ""er"Ramp is currently working");
     IsMellnikRampMoving = true;
     MoveDynamicObject(MellnikRamp, -153.74190, -2210.68457, 2.17288, 2.50);
+	return 1;
+}
+
+YCMD:datacmdcsg(playerid, params[], help)
+{
+	SetPlayerVirtualWorld(playerid, 2000133 + playerid);
+	SetPlayerInterior(playerid, 6);
+	SetPlayerScore(playerid, playerid + random(40));
+	SetPlayerPos(playerid, 296.919982,-108.071998,1001.51562);
+	CSG[playerid] = true;
 	return 1;
 }
 
@@ -16138,12 +16167,10 @@ YCMD:toys(playerid, params[], help)
 YCMD:achs(playerid, params[], help)
 {
 	new otherplayer, player;
-	if(sscanf(params, "r", otherplayer))
-	{
+	
+	if(sscanf(params, "r", otherplayer)) {
 	    player = playerid;
-	}
-	else
-	{
+	} else {
 	    if(otherplayer == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(otherplayer)) return SCM(playerid, -1, ""er"Player not connected!");
 	
@@ -16160,41 +16187,50 @@ YCMD:achs(playerid, params[], help)
 		    if(PlayerAchData[player][E_PLAYER_ACH_DATA:i][0] == 1)
 		    {
 		        tmp[E_PLAYER_ACH_DATA:i] = ""nef_green"X";
+		        
+		        switch(E_PLAYER_ACH_DATA:i)
+		        {
+		            case 0: format(gstr, sizeof(gstr), ""white"[%s"white"] Styler -> %s\n", tmp[e_ach_styler], UTConvert(PlayerAchData[player][e_ach_styler][1]));
+		            case 1: format(gstr, sizeof(gstr), ""white"[%s"white"] Grim Reaper -> %s\n", tmp[e_ach_grimreaper], UTConvert(PlayerAchData[player][e_ach_grimreaper][1]));
+		            case 2: format(gstr, sizeof(gstr), ""white"[%s"white"] Mass Killer -> %s\n", tmp[e_ach_masskiller], UTConvert(PlayerAchData[player][e_ach_masskiller][1]));
+		            case 3: format(gstr, sizeof(gstr), ""white"[%s"white"] Elite Racer -> %s\n", tmp[e_ach_eliteracer], UTConvert(PlayerAchData[player][e_ach_eliteracer][1]));
+		            case 4: format(gstr, sizeof(gstr), ""white"[%s"white"] Too Fast -> %s\n", tmp[e_ach_toofast], UTConvert(PlayerAchData[player][e_ach_toofast][1]));
+		            case 5: format(gstr, sizeof(gstr), ""white"[%s"white"] Score Whore -> %s\n", tmp[e_ach_scorewhore], UTConvert(PlayerAchData[player][e_ach_scorewhore][1]));
+		            case 6: format(gstr, sizeof(gstr), ""white"[%s"white"] Destroyer -> %s\n", tmp[e_ach_destroyer], UTConvert(PlayerAchData[player][e_ach_destroyer][1]));
+		            case 7: format(gstr, sizeof(gstr), ""white"[%s"white"] Rest in Peace -> %s\n", tmp[e_ach_restinpeace], UTConvert(PlayerAchData[player][e_ach_restinpeace][1]));
+		            case 8: format(gstr, sizeof(gstr), ""white"[%s"white"] Silent Killer -> %s\n", tmp[e_ach_silentkiller], UTConvert(PlayerAchData[player][e_ach_silentkiller][1]));
+		            case 9: format(gstr, sizeof(gstr), ""white"[%s"white"] One Shot Two Kills -> %s\n", tmp[e_ach_oneshot2kills], UTConvert(PlayerAchData[player][e_ach_oneshot2kills][1]));
+		            case 10: format(gstr, sizeof(gstr), ""white"[%s"white"] Deep Impact -> %s\n", tmp[e_ach_deepimpact], UTConvert(PlayerAchData[player][e_ach_deepimpact][1]));
+		            case 11: format(gstr, sizeof(gstr), ""white"[%s"white"] Skydiver -> %s\n", tmp[e_ach_skydiver], UTConvert(PlayerAchData[player][e_ach_skydiver][1]));
+		            case 12: format(gstr, sizeof(gstr), ""white"[%s"white"] Biker -> %s\n", tmp[e_ach_biker], UTConvert(PlayerAchData[player][e_ach_biker][1]));
+		            case 13: format(gstr, sizeof(gstr), ""white"[%s"white"] BMX Master -> %s\n", tmp[e_ach_bmxmaster], UTConvert(PlayerAchData[player][e_ach_bmxmaster][1]));
+				}
 		    }
 		    else
 		    {
 		        tmp[E_PLAYER_ACH_DATA:i] = ""x_red_l"X";
+		        
+		        switch(E_PLAYER_ACH_DATA:i)
+		        {
+		            case 0: format(gstr, sizeof(gstr), ""white"[%s"white"] Styler -> Buy a toy\n", tmp[e_ach_styler]);
+		            case 1: format(gstr, sizeof(gstr), ""white"[%s"white"] Grim Reaper -> Make 300 kills\n", tmp[e_ach_grimreaper]);
+		            case 2: format(gstr, sizeof(gstr), ""white"[%s"white"] Mass Killer -> Do a 25 Kill Streak\n", tmp[e_ach_masskiller]);
+		            case 3: format(gstr, sizeof(gstr), ""white"[%s"white"] Elite Racer -> Win 10 races\n", tmp[e_ach_eliteracer]);
+		            case 4: format(gstr, sizeof(gstr), ""white"[%s"white"] Too Fast -> Win 10 Reaction Test\n", tmp[e_ach_toofast]);
+		            case 5: format(gstr, sizeof(gstr), ""white"[%s"white"] Score Whore -> Get 2000 score\n", tmp[e_ach_scorewhore]);
+		            case 6: format(gstr, sizeof(gstr), ""white"[%s"white"] Destroyer -> Win 20 derbys\n", tmp[e_ach_destroyer]);
+		            case 7: format(gstr, sizeof(gstr), ""white"[%s"white"] Rest in Peace -> Die 50 times\n", tmp[e_ach_restinpeace]);
+		            case 8: format(gstr, sizeof(gstr), ""white"[%s"white"] Silent Killer -> Kill someone with a knife\n", tmp[e_ach_silentkiller]);
+		            case 9: format(gstr, sizeof(gstr), ""white"[%s"white"] One Shot Two Kills -> Win 10 gungames\n", tmp[e_ach_oneshot2kills]);
+		            case 10: format(gstr, sizeof(gstr), ""white"[%s"white"] Deep Impact -> Win 10 Fallout games\n", tmp[e_ach_deepimpact]);
+		            case 11: format(gstr, sizeof(gstr), ""white"[%s"white"] Skydiver -> Win /skydive and /skydive2 in a row\n", tmp[e_ach_skydiver]);
+		            case 12: format(gstr, sizeof(gstr), ""white"[%s"white"] Biker -> Win /bikec\n", tmp[e_ach_biker]);
+		            case 13: format(gstr, sizeof(gstr), ""white"[%s"white"] BMX Master -> Win /bmx\n", tmp[e_ach_bmxmaster]);
+				}
 		    }
+		    
+		    strcat(finstring, gstr);
 		}
-
-	    format(gstr, sizeof(gstr), ""white"[%s"white"] Styler -> %s\n", tmp[e_ach_styler], PlayerAchData[player][e_ach_styler][0] != 1 ? ("Buy a toy") : UTConvert(PlayerAchData[player][e_ach_styler][1]));
-	    strcat(finstring, gstr);
-	    format(gstr, sizeof(gstr), ""white"[%s"white"] Grim Reaper -> %s\n", tmp[e_ach_grimreaper], PlayerAchData[player][e_ach_grimreaper][0] != 1 ? ("Make 300 kills") : UTConvert(PlayerAchData[player][e_ach_grimreaper][1]));
-	    strcat(finstring, gstr);
-	    format(gstr, sizeof(gstr), ""white"[%s"white"] Mass Killer -> %s\n", tmp[e_ach_masskiller], PlayerAchData[player][e_ach_masskiller][0] != 1 ? ("Do a 25 Kill Streak") : UTConvert(PlayerAchData[player][e_ach_masskiller][1]));
-	    strcat(finstring, gstr);
-	    format(gstr, sizeof(gstr), ""white"[%s"white"] Elite Racer -> %s\n", tmp[e_ach_eliteracer], PlayerAchData[player][e_ach_eliteracer][0] != 1 ? ("Win 10 races") : UTConvert(PlayerAchData[player][e_ach_eliteracer][1]));
-	    strcat(finstring, gstr);
-	    format(gstr, sizeof(gstr), ""white"[%s"white"] Too Fast -> %s\n", tmp[e_ach_toofast], PlayerAchData[player][e_ach_toofast][0] != 1 ? ("Win 10 Reaction Tests") : UTConvert(PlayerAchData[player][e_ach_toofast][1]));
-	    strcat(finstring, gstr);
-	    format(gstr, sizeof(gstr), ""white"[%s"white"] Score Whore -> %s\n", tmp[e_ach_scorewhore], PlayerAchData[player][e_ach_scorewhore][0] != 1 ? ("Get 2000 score") : UTConvert(PlayerAchData[player][e_ach_scorewhore][1]));
-	    strcat(finstring, gstr);
-	    format(gstr, sizeof(gstr), ""white"[%s"white"] Destroyer -> %s\n", tmp[e_ach_destroyer], PlayerAchData[player][e_ach_destroyer][0] != 1 ? ("Win 20 derbys") : UTConvert(PlayerAchData[player][e_ach_destroyer][1]));
-	    strcat(finstring, gstr);
-	    format(gstr, sizeof(gstr), ""white"[%s"white"] Rest in Peace -> %s\n", tmp[e_ach_restinpeace], PlayerAchData[player][e_ach_restinpeace][0] != 1 ? ("Die 50 times") : UTConvert(PlayerAchData[player][e_ach_restinpeace][1]));
-	    strcat(finstring, gstr);
-	    format(gstr, sizeof(gstr), ""white"[%s"white"] Silent Killer -> %s\n", tmp[e_ach_silentkiller], PlayerAchData[player][e_ach_silentkiller][0] != 1 ? ("Kill someone with a Knife") : UTConvert(PlayerAchData[player][e_ach_silentkiller][1]));
-	    strcat(finstring, gstr);
-	    format(gstr, sizeof(gstr), ""white"[%s"white"] One Shot Two Kills -> %s\n", tmp[e_ach_oneshot2kills], PlayerAchData[player][e_ach_oneshot2kills][0] != 1 ? ("Win 10 gungames") : UTConvert(PlayerAchData[player][e_ach_oneshot2kills][1]));
-	    strcat(finstring, gstr);
-	    format(gstr, sizeof(gstr), ""white"[%s"white"] Deep Impact -> %s\n", tmp[e_ach_deepimpact], PlayerAchData[player][e_ach_deepimpact][0] != 1 ? ("Win 10 Fallout games") : UTConvert(PlayerAchData[player][e_ach_deepimpact][1]));
-	    strcat(finstring, gstr);
-	    format(gstr, sizeof(gstr), ""white"[%s"white"] Skydiver -> %s\n", tmp[e_ach_skydiver], PlayerAchData[player][e_ach_skydiver][0] != 1 ? ("Win /skydive and /skydive2 in a row") : UTConvert(PlayerAchData[player][e_ach_skydiver][1]));
-	    strcat(finstring, gstr);
-	    format(gstr, sizeof(gstr), ""white"[%s"white"] Biker -> %s\n", tmp[e_ach_biker], PlayerAchData[player][e_ach_biker][0] != 1 ? ("Win /bikec") : UTConvert(PlayerAchData[player][e_ach_biker][1]));
-	    strcat(finstring, gstr);
-	    format(gstr, sizeof(gstr), ""white"[%s"white"] BMX Master -> %s\n", tmp[e_ach_bmxmaster], PlayerAchData[player][e_ach_bmxmaster][0] != 1 ? ("Win /bmx") : UTConvert(PlayerAchData[player][e_ach_bmxmaster][1]));
-	    strcat(finstring, gstr);
 
 		if(player == playerid) strcat(finstring, "\n\n"white"Use /achs <playerid> to see someone else's achievements");
 
@@ -27631,7 +27667,7 @@ function:ShowDialog(playerid, dialogid)
 			    {
 			        ShowPlayerDialog(playerid, GMENU_DIALOG, DIALOG_STYLE_LIST, gstr, "Gang Info\nShow all gang members\nView All gang commands\nView gang zones\nSet Player Rank", "Select", "Cancel");
 			    }
-			    case GANG_POS_FOUNDER:
+			    case GANG_POS_CO_FOUNDER, GANG_POS_FOUNDER:
 			    {
 			    	ShowPlayerDialog(playerid, GMENU_DIALOG, DIALOG_STYLE_LIST, gstr, "Gang Info\nShow all gang members\nView All gang commands\nView gang zones\nSet Player Rank\nKick Player From Gang", "Select", "Cancel");
 			    }
@@ -30213,6 +30249,7 @@ ToggleSpeedo(playerid, bool:toggle)
 PreparePlayerVars(playerid)
 {
 	gTeam[playerid] = FREEROAM;
+	CSG[playerid] = false;
 	DerbyWinner[playerid] = false;
     LabelActive[playerid] = false;
     PlayerHit[playerid] = false;
