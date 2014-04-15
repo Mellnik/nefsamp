@@ -2474,8 +2474,8 @@ public OnGameModeInit()
 	#else
 	Log(LOG_INIT, "Build Configuration: Development");
 	#endif
-	Log(LOG_INIT, "MySQL: Logging: LOG_ERROR | LOG_WARNING | LOG_DEBUG");
-	mysql_log(LOG_ERROR | LOG_WARNING | LOG_DEBUG, LOG_TYPE_TEXT);
+	Log(LOG_INIT, "MySQL: Logging: LOG_ERROR | LOG_WARNING");
+	mysql_log(LOG_ERROR | LOG_WARNING, LOG_TYPE_TEXT);
 	
     MySQL_Connect();
 	MySQL_CleanUp();
