@@ -17027,13 +17027,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		    }
 	        case DIALOG_BUSINESS:
 	        {
-				format(gstr, sizeof(gstr), ""nef" :: Business Menu > Slot: %i", listitem + 1);
+				format(gstr2, sizeof(gstr2), ""nef" :: Business Menu > Slot: %i", listitem + 1);
 
 	            PlayerData[playerid][BusinessIdSelected] = listitem;
 
 		        if(listitem > PlayerData[playerid][e_addbizzslots])
 		        {
-		            ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, gstr, ""nef_green"This business slot is locked.\n\n"white"You may unlock it by purchasing an extra slot at Gold Credits (/gc)", "OK", "");
+		            ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, gstr2, ""nef_green"This business slot is locked.\n\n"white"You may unlock it by purchasing an extra slot at Gold Credits (/gc)", "OK", "");
 		        }
 		        else
 				{
@@ -17043,7 +17043,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				    }
 				    else
 				    {
-				        ShowPlayerDialog(playerid, DIALOG_BUSINESS + 1, DIALOG_STYLE_LIST, gstr, "Goto This Business\nSet Business Type\nUpgrade Business Level", "Select", "Cancel");
+				        ShowPlayerDialog(playerid, DIALOG_BUSINESS + 1, DIALOG_STYLE_LIST, gstr2, "Goto This Business\nSet Business Type\nUpgrade Business Level", "Select", "Cancel");
 				    }
 				}
 	            return true;
