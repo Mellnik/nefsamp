@@ -16159,44 +16159,44 @@ YCMD:achs(playerid, params[], help)
 		{
 		    if(PlayerAchData[player][E_PLAYER_ACH_DATA:i][0] == 1)
 		    {
-		        tmp[E_PLAYER_ACH_DATA:i] = ""GREEN_E"•";
+		        tmp[E_PLAYER_ACH_DATA:i] = ""nef_green"X";
 		    }
 		    else
 		    {
-		        tmp[E_PLAYER_ACH_DATA:i] = ""RED_E"•";
+		        tmp[E_PLAYER_ACH_DATA:i] = ""x_red_l"X";
 		    }
 		}
 
-	    format(gstr, sizeof(gstr), ""white"[%s"white"] Styler "LB2_E"-> Buy a toy\n", tmp[e_ach_styler]);
+	    format(gstr, sizeof(gstr), ""white"[%s"white"] Styler -> %s\n", tmp[e_ach_styler], PlayerAchData[player][e_ach_styler][0] != 1 ? ("Buy a toy") : UTConvert(PlayerAchData[player][e_ach_styler][1]));
 	    strcat(finstring, gstr);
-	    format(gstr, sizeof(gstr), ""white"[%s"white"] Grim Reaper "LB2_E"-> Make 300 kills\n", tmp[e_ach_grimreaper]);
+	    format(gstr, sizeof(gstr), ""white"[%s"white"] Grim Reaper -> %s\n", tmp[e_ach_grimreaper], PlayerAchData[player][e_ach_grimreaper][0] != 1 ? ("Make 300 kills") : UTConvert(PlayerAchData[player][e_ach_grimreaper][1]));
 	    strcat(finstring, gstr);
-	    format(gstr, sizeof(gstr), ""white"[%s"white"] Mass Killer "LB2_E"-> Do a 25 Kill Streak\n", tmp[e_ach_masskiller]);
+	    format(gstr, sizeof(gstr), ""white"[%s"white"] Mass Killer -> %s\n", tmp[e_ach_masskiller], PlayerAchData[player][e_ach_masskiller][0] != 1 ? ("Do a 25 Kill Streak") : UTConvert(PlayerAchData[player][e_ach_masskiller][1]));
 	    strcat(finstring, gstr);
-	    format(gstr, sizeof(gstr), ""white"[%s"white"] Elite Racer "LB2_E"-> Win 10 races\n", tmp[e_ach_eliteracer]);
+	    format(gstr, sizeof(gstr), ""white"[%s"white"] Elite Racer -> %s\n", tmp[e_ach_eliteracer], PlayerAchData[player][e_ach_eliteracer][0] != 1 ? ("Win 10 races") : UTConvert(PlayerAchData[player][e_ach_eliteracer][1]));
 	    strcat(finstring, gstr);
-	    format(gstr, sizeof(gstr), ""white"[%s"white"] Too Fast "LB2_E"-> Win 10 Reaction Tests\n", tmp[e_ach_toofast]);
+	    format(gstr, sizeof(gstr), ""white"[%s"white"] Too Fast -> %s\n", tmp[e_ach_toofast], PlayerAchData[player][e_ach_toofast][0] != 1 ? ("Win 10 Reaction Tests") : UTConvert(PlayerAchData[player][e_ach_toofast][1]));
 	    strcat(finstring, gstr);
-	    format(gstr, sizeof(gstr), ""white"[%s"white"] Score Whore "LB2_E"-> Get 2000 score\n", tmp[e_ach_scorewhore]);
+	    format(gstr, sizeof(gstr), ""white"[%s"white"] Score Whore -> %s\n", tmp[e_ach_scorewhore], PlayerAchData[player][e_ach_scorewhore][0] != 1 ? ("Get 2000 score") : UTConvert(PlayerAchData[player][e_ach_scorewhore][1]));
 	    strcat(finstring, gstr);
-	    format(gstr, sizeof(gstr), ""white"[%s"white"] Destroyer "LB2_E"-> Win 20 derbys\n", tmp[e_ach_destroyer]);
+	    format(gstr, sizeof(gstr), ""white"[%s"white"] Destroyer -> %s\n", tmp[e_ach_destroyer], PlayerAchData[player][e_ach_destroyer][0] != 1 ? ("Win 20 derbys") : UTConvert(PlayerAchData[player][e_ach_destroyer][1]));
 	    strcat(finstring, gstr);
-	    format(gstr, sizeof(gstr), ""white"[%s"white"] Rest in Peace "LB2_E"-> Die 50 times\n", tmp[e_ach_restinpeace]);
+	    format(gstr, sizeof(gstr), ""white"[%s"white"] Rest in Peace -> %s\n", tmp[e_ach_restinpeace], PlayerAchData[player][e_ach_restinpeace][0] != 1 ? ("Die 50 times") : UTConvert(PlayerAchData[player][e_ach_restinpeace][1]));
 	    strcat(finstring, gstr);
-	    format(gstr, sizeof(gstr), ""white"[%s"white"] Silent Killer "LB2_E"-> Kill someone with a Knife\n", tmp[e_ach_silentkiller]);
+	    format(gstr, sizeof(gstr), ""white"[%s"white"] Silent Killer -> %s\n", tmp[e_ach_silentkiller], PlayerAchData[player][e_ach_silentkiller][0] != 1 ? ("Kill someone with a Knife") : UTConvert(PlayerAchData[player][e_ach_silentkiller][1]));
 	    strcat(finstring, gstr);
-	    format(gstr, sizeof(gstr), ""white"[%s"white"] One Shot Two Kills "LB2_E"-> Win 10 gungames\n", tmp[e_ach_oneshot2kills]);
+	    format(gstr, sizeof(gstr), ""white"[%s"white"] One Shot Two Kills -> %s\n", tmp[e_ach_oneshot2kills], PlayerAchData[player][e_ach_oneshot2kills][0] != 1 ? ("Win 10 gungames") : UTConvert(PlayerAchData[player][e_ach_oneshot2kills][1]));
 	    strcat(finstring, gstr);
-	    format(gstr, sizeof(gstr), ""white"[%s"white"] Deep Impact "LB2_E"-> Win 10 Fallout games\n", tmp[e_ach_deepimpact]);
+	    format(gstr, sizeof(gstr), ""white"[%s"white"] Deep Impact -> %s\n", tmp[e_ach_deepimpact], PlayerAchData[player][e_ach_deepimpact][0] != 1 ? ("Win 10 Fallout games") : UTConvert(PlayerAchData[player][e_ach_deepimpact][1]));
 	    strcat(finstring, gstr);
-	    format(gstr, sizeof(gstr), ""white"[%s"white"] Skydiver "LB2_E"-> Win /skydive and /skydive2 in a row\n", tmp[e_ach_skydiver]);
+	    format(gstr, sizeof(gstr), ""white"[%s"white"] Skydiver -> %s\n", tmp[e_ach_skydiver], PlayerAchData[player][e_ach_skydiver][0] != 1 ? ("Win /skydive and /skydive2 in a row") : UTConvert(PlayerAchData[player][e_ach_skydiver][1]));
 	    strcat(finstring, gstr);
-	    format(gstr, sizeof(gstr), ""white"[%s"white"] Biker "LB2_E"-> Win /bikec\n", tmp[e_ach_biker]);
+	    format(gstr, sizeof(gstr), ""white"[%s"white"] Biker -> %s\n", tmp[e_ach_biker], PlayerAchData[player][e_ach_biker][0] != 1 ? ("Win /bikec") : UTConvert(PlayerAchData[player][e_ach_biker][1]));
 	    strcat(finstring, gstr);
-	    format(gstr, sizeof(gstr), ""white"[%s"white"] BMX Master "LB2_E"-> Win /bmx\n", tmp[e_ach_bmxmaster]);
+	    format(gstr, sizeof(gstr), ""white"[%s"white"] BMX Master -> %s\n", tmp[e_ach_bmxmaster], PlayerAchData[player][e_ach_bmxmaster][0] != 1 ? ("Win /bmx") : UTConvert(PlayerAchData[player][e_ach_bmxmaster][1]));
 	    strcat(finstring, gstr);
 
-	    strcat(finstring, "\n\n"white"Use /achs <playerid> to see someone else's achievements");
+		if(player == playerid) strcat(finstring, "\n\n"white"Use /achs <playerid> to see someone else's achievements");
 
 		ShowPlayerDialog(playerid, ACHS_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" :: Achievements", finstring, "OK", "");
 	}
