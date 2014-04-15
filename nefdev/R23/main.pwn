@@ -17,6 +17,9 @@
 || MySQL Plugin R38
 || IRC Plugin 1.4.4
 || DNS Plugin 2.4
+||
+|| Build specific:
+|| UPDATE `accounts` SET `gangrank` = 7 WHERE `gangrank` = 6;
 */
 
 #pragma dynamic 8192
@@ -99,7 +102,8 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define GANG_POS_SENIOR_MEMBER          (3)
 #define GANG_POS_ADVISOR                (4)
 #define GANG_POS_LEADER                 (5)
-#define GANG_POS_MAIN_LEADER            (6)
+#define GANG_POS_CO_FOUNDER             (6)
+#define GANG_POS_FOUNDER            	(7)
 #define house_mark                      "{FFFFFF}[{88EE88}House{FFFFFF}]"
 #define business_mark                   "{FFFFFF}[{AAAAFF}Business{FFFFFF}]"
 #define gwars_mark                      "{FFFFFF}[{2DFF00}Gang Zone{FFFFFF}]"
@@ -1405,7 +1409,7 @@ new Derby_Map9Spawns[MAX_DERBY_PLAYERS][e_derby_map9_data] =
 	{4507.0502, -1796.4394, 3.5054, 120.5433, false}
 };
 
-new const GangPositions[7][e_gang_pos] =
+new const GangPositions[8][e_gang_pos] =
 {
 	{"None"},
 	{"Junior Member"},
@@ -1413,6 +1417,7 @@ new const GangPositions[7][e_gang_pos] =
 	{"Senior Member"},
 	{"Advisor"},
 	{"Leader"},
+	{"Co-Founder"},
 	{"Gang Founder"}
 };
 
@@ -3884,7 +3889,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		}
 		case THREAD_CREATE_GANG:
 		{
-			PlayerData[extraid][e_gangrank] = GANG_POS_MAIN_LEADER;
+			PlayerData[extraid][e_gangrank] = GANG_POS_FOUNDER;
 			PlayerData[extraid][e_gangid] = cache_insert_id();
 
             GivePlayerCash(extraid, -500000);
@@ -3917,17 +3922,17 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		    {
 				rows = cache_get_row_int(0, 0, pSQL);
 				
-				if(PlayerData[extraid][e_gangrank] == GANG_POS_LEADER || PlayerData[extraid][e_gangrank] == GANG_POS_MAIN_LEADER)
+				if(PlayerData[extraid][e_gangrank] == GANG_POS_LEADER || PlayerData[extraid][e_gangrank] == GANG_POS_FOUNDER || PlayerData[extraid][e_gangrank] == GANG_POS_CO_FOUNDER)
 				{
-					if(PlayerData[extraid][e_gangrank] == GANG_POS_LEADER && rows == GANG_POS_LEADER)
+					if(PlayerData[extraid][e_gangrank] == GANG_POS_LEADER && rows >= GANG_POS_LEADER)
 					{
-					    return SCM(extraid, -1, ""er"Cannot assign!");
+					    return SCM(extraid, -1, ""er"Cannot assign as this player has the same or a greater rank than you!");
 					}
-
-			        if(PlayerData[extraid][e_gangrank] == GANG_POS_LEADER && rows == GANG_POS_MAIN_LEADER)
-			        {
-			            return SCM(extraid, -1, ""er"You can't set the Founder's rank!");
-			        }
+					
+					if(PlayerData[extraid][e_gangrank] == GANG_POS_CO_FOUNDER && rows >= GANG_POS_CO_FOUNDER)
+					{
+					    return SCM(extraid, -1, ""er"Cannot assign as this player has the same or a greater rank than you!");
+					}
 
 					if(rows == PlayerData[extraid][RankSelected])
 					{
@@ -3961,7 +3966,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 
 	  		if(rows > 0)
 		    {
-				if(cache_get_row_int(0, 0, pSQL) == GANG_POS_MAIN_LEADER)
+				if(cache_get_row_int(0, 0, pSQL) == GANG_POS_FOUNDER)
 				{
 				    SCM(extraid, -1, ""er"You cannot kick other the Founder!");
 				}
@@ -6658,11 +6663,6 @@ YCMD:sfpd(playerid, params[], help)
     PortPlayerMapVeh(playerid, -1624.2128,674.2734,6.9573,219.9653,-1623.9940,674.0118,7.1875,219.9653, "San Fierro Police Department", "sfpd");
     return 1;
 }
-YCMD:skyroad4(playerid, params[], help)
-{
-    PortPlayerMapVeh(playerid, 587.9016,1400.4779,1228.1453,3.2243,587.9016,1400.4779,1228.1453,3.2243, "Skyroad 4", "skyroad4");
-    return 1;
-}
 YCMD:dfun(playerid, params[], help)
 {
     PortPlayerMapVeh(playerid, 3638.867, 1179.233, 10.214, 0.0,  3638.867, 1179.233, 10.214, 0.0, "Dune Fun", "dfun");
@@ -6789,6 +6789,11 @@ YCMD:gd(playerid, params[], help)
     PortPlayerMapVeh(playerid, 551.1603,860.3625,7113.0366,268.0655,551.1603,860.3625,7113.0366,268.0655, "Going Down", "gd");
     return 1;
 }
+YCMD:skyroad(playerid, params[], help)
+{
+    PortPlayerMapVeh(playerid, 2999.2258, -1433.3010, 1244.1365, 101.9770, 2954.5017, -1441.2960, 1245.5, 100.9987, "Skyroad", "skyroad");
+    return 1;
+}
 YCMD:skyroad2(playerid, params[], help)
 {
     PortPlayerMapVeh(playerid, 2912.3618,-792.8673,10.7623,264.6945,2912.3618,-792.8673,10.7623,264.6945, "Skyroad 2", "skyroad2");
@@ -6799,9 +6804,9 @@ YCMD:skyroad3(playerid, params[], help)
     PortPlayerMapVeh(playerid, 205.0412,2481.6416,16.5166,148.2003,205.0412,2481.6416,16.5166,148.2003, "Skyroad 3", "skyroad3");
     return 1;
 }
-YCMD:skyroad(playerid, params[], help)
+YCMD:skyroad4(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid,  2999.2258, -1433.3010, 1244.1365, 101.9770, 2954.5017, -1441.2960, 1245.5, 100.9987, "Skyroad", "skyroad");
+    PortPlayerMapVeh(playerid, 587.9016,1400.4779,1228.1453,3.2243,587.9016,1400.4779,1228.1453,3.2243, "Skyroad 4", "skyroad4");
     return 1;
 }
 YCMD:wj(playerid, params[], help)
@@ -11571,7 +11576,7 @@ YCMD:gclose(playerid, params[], help)
     if(!islogged(playerid)) return notlogged(playerid);
     
     if(PlayerData[playerid][e_gangid] == 0) return SCM(playerid, -1, ""er"You aren't in any gang!");
-    if(PlayerData[playerid][e_gangrank] != GANG_POS_MAIN_LEADER) return SCM(playerid, -1, ""er"You have to be the gang Founder!");
+    if(PlayerData[playerid][e_gangrank] != GANG_POS_FOUNDER) return SCM(playerid, -1, ""er"You have to be the gang Founder!");
 	if(Iter_Contains(iterGangWar, PlayerData[playerid][e_gangid])) return SCM(playerid, -1, ""er"You can't close your gang while being in a Gang War!");
 
 	ShowDialog(playerid, CLOSE_GANG_DIALOG);
@@ -11627,7 +11632,7 @@ YCMD:gleave(playerid, params[], help)
     
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode. Use /exit");
     if(PlayerData[playerid][e_gangid] == 0) return SCM(playerid, -1, ""er"You aren't in any gang");
-    if(PlayerData[playerid][e_gangrank] == GANG_POS_MAIN_LEADER) return SCM(playerid, -1, ""er"You can't leave a gang as Founder");
+    if(PlayerData[playerid][e_gangrank] == GANG_POS_FOUNDER) return SCM(playerid, -1, ""er"You can't leave a gang as Founder");
 		
 	format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s(%i) has left the gang", __GetName(playerid), playerid);
     GangMSG(PlayerData[playerid][e_gangid], gstr);
@@ -11670,7 +11675,7 @@ YCMD:gkick(playerid, params[], help)
 	if((PlayerData[playerid][tickLastGKick] + COOLDOWN_CMD_GKICK) >= tick) return SCM(playerid, -1, ""er"Please wait a bit before kicking again!");
 
     if(PlayerData[playerid][e_gangid] == 0) return SCM(playerid, -1, ""er"You aren't in any gang");
-	if(PlayerData[playerid][e_gangrank] != GANG_POS_MAIN_LEADER) return SCM(playerid, -1, ""er"You have to be the gang founder to uninvite players");
+	if(PlayerData[playerid][e_gangrank] < GANG_POS_CO_FOUNDER) return SCM(playerid, -1, ""er"You have to be at least the Co-Founder");
 
 	ShowDialog(playerid, GANG_KICK_DIALOG);
 	
@@ -18216,7 +18221,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				
 		  		if(ID != INVALID_PLAYER_ID)
 		  		{
-					if(!IsPlayerAvail(ID)) return SCM(playerid, -1, ""er"Spieler ist not available");
+					if(!IsPlayerAvail(ID)) return SCM(playerid, -1, ""er"Player ist not available");
 		        	if(PlayerData[ID][e_gangid] != PlayerData[playerid][e_gangid]) return SCM(playerid, -1, ""er"This player is not in your gang!");
 		        	if(PlayerData[ID][e_gangrank] == PlayerData[playerid][RankSelected]) return SCM(playerid, -1, ""er"Player is already this rank!");
 		        	if(PlayerData[ID][e_gangrank] >= PlayerData[playerid][e_gangrank]) return SCM(playerid, -1, ""er"You can't assign this rank to this player!");
@@ -18323,7 +18328,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		  		{
 					if(!IsPlayerAvail(ID)) return SCM(playerid, -1, ""er"Spieler ist not available");
 		        	if(PlayerData[ID][e_gangid] != PlayerData[playerid][e_gangid]) return SCM(playerid, -1, ""er"This player is not in your gang!");
-		        	if(PlayerData[ID][e_gangrank] == GANG_POS_MAIN_LEADER) return SCM(playerid, -1, ""er"You cannot kick other leaders!");
+		        	if(PlayerData[ID][e_gangrank] == GANG_POS_FOUNDER) return SCM(playerid, -1, ""er"You cannot kick other leaders!");
 
                     PlayerData[ID][GangName][0] = '\0';
                     PlayerData[ID][GangTag][0] = '\0';
@@ -21620,13 +21625,13 @@ MySQL_FinalGangKick(playerid)
 
 MySQL_FinalRankAssign(playerid)
 {
-	mysql_format(pSQL, gstr2, sizeof(gstr), "UPDATE `accounts` SET `gangrank` = %i WHERE `name` = '%e' LIMIT 1;", PlayerData[playerid][RankSelected], PlayerData[playerid][GangAssignRank]);
+	mysql_format(pSQL, gstr2, sizeof(gstr2), "UPDATE `accounts` SET `gangrank` = %i WHERE `name` = '%e' LIMIT 1;", PlayerData[playerid][RankSelected], PlayerData[playerid][GangAssignRank]);
 	mysql_tquery(pSQL, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_ASSIGN_RANK_2, playerid, pSQL);
 }
 
 MySQL_CleanUp()
 {
-	mysql_pquery(pSQL, "TRUNCATE TABLE `online`;");
+	mysql_tquery(pSQL, "TRUNCATE TABLE `online`;");
 }
 
 MySQL_Connect()
@@ -27545,14 +27550,12 @@ function:ShowDialog(playerid, dialogid)
 		}
 	    case GANG_SET_RANK_DIALOG:
 	    {
-			if(PlayerData[playerid][e_gangrank] == GANG_POS_LEADER)
-			{
-			    ShowPlayerDialog(playerid, GANG_SET_RANK_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Gang Rank Menu", ""grey"Select a rank below:\nJunior Member\nMember\nSenior Member\nAdvisor", "Next", "Cancel");
-			}
-			else if(PlayerData[playerid][e_gangrank] == GANG_POS_MAIN_LEADER)
-			{
-	    		ShowPlayerDialog(playerid, GANG_SET_RANK_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Gang Rank Menu", ""grey"Select a rank below:\nJunior Member\nMember\nSenior Member\nAdvisor\nLeader", "Next", "Cancel");
-			}
+	        switch(PlayerData[playerid][e_gangrank])
+	        {
+	            case GANG_POS_LEADER: ShowPlayerDialog(playerid, GANG_SET_RANK_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Gang Rank Menu", ""grey"Select a rank below:\nJunior Member\nMember\nSenior Member\nAdvisor", "Next", "Cancel");
+	            case GANG_POS_CO_FOUNDER: ShowPlayerDialog(playerid, GANG_SET_RANK_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Gang Rank Menu", ""grey"Select a rank below:\nJunior Member\nMember\nSenior Member\nAdvisor\nLeader", "Next", "Cancel");
+	            case GANG_POS_FOUNDER: ShowPlayerDialog(playerid, GANG_SET_RANK_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Gang Rank Menu", ""grey"Select a rank below:\nJunior Member\nMember\nSenior Member\nAdvisor\nLeader\nCo-Founder", "Next", "Cancel");
+	        }
 		}
 	    case CLOSE_GANG_DIALOG:
 	    {
@@ -27670,7 +27673,7 @@ function:ShowDialog(playerid, dialogid)
 			    {
 			        ShowPlayerDialog(playerid, GMENU_DIALOG, DIALOG_STYLE_LIST, gstr, "Gang Info\nShow all gang members\nView All gang commands\nView gang zones\nSet Player Rank", "Select", "Cancel");
 			    }
-			    case GANG_POS_MAIN_LEADER:
+			    case GANG_POS_FOUNDER:
 			    {
 			    	ShowPlayerDialog(playerid, GMENU_DIALOG, DIALOG_STYLE_LIST, gstr, "Gang Info\nShow all gang members\nView All gang commands\nView gang zones\nSet Player Rank\nKick Player From Gang", "Select", "Cancel");
 			    }
