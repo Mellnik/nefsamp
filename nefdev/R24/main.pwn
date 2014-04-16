@@ -1,6 +1,6 @@
 /*======================================================================*\
 || #################################################################### ||
-|| # Project New Evolution Freeroam - Build 23 	        			  # ||
+|| # Project New Evolution Freeroam - Build 24 	        			  # ||
 || # ---------------------------------------------------------------- # ||
 || # Copyright ©2011-2014 New Evolution Freeroam	  				  # ||
 || # Created by Mellnik                                               # ||
@@ -19,7 +19,7 @@
 || DNS Plugin 2.4
 ||
 || Build specific:
-|| UPDATE `accounts` SET `gangrank` = 7 WHERE `gangrank` = 6;
+|| 
 */
 
 #pragma dynamic 8192
@@ -83,12 +83,11 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define SVRURLWWW                       "www.nefserver.net"
 #define SVRFORUM                        "forum.nefserver.net"
 #define SERVER_IP                       "31.204.152.218:7777"
-//#define HOSTNAME                        " 	        NEF » ×DM/Stunt/Race/Freeroam/Minigames×"
 #define HOSTNAME                        " 	      ..:: NEF ::.. ×Stunt/DM/Race/Minigames×"
 #if IS_RELEASE_BUILD == true
-#define CURRENT_VERSION                 "Build 23"
+#define CURRENT_VERSION                 "Build 24"
 #else
-#define CURRENT_VERSION                 "PTS:Build 23"
+#define CURRENT_VERSION                 "PTS:Build 24"
 #endif
 #define HOTFIX_REV                      "Hotfix #0"
 #define SAMP_VERSION                    "SA-MP 0.3z-R2"
@@ -697,7 +696,7 @@ enum E_PLAYER_DATA
 	bool:AllowSpawn,
  	bool:bDuty,
 	bool:Muted,
- 	bool:SpeedBoost,
+ 	bool:bSpeedBoost,
  	bool:SuperJump,
 	bool:AOnline,
  	bool:gInvite,
@@ -6296,17 +6295,17 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 			    return 1;
 			}
 			
-			if(Key(KEY_FIRE))
+			if(PlayerData[playerid][bSpeedBoost])
 			{
-				new Float:POS[3], vid = GetPlayerVehicleID(playerid);
-				GetVehicleVelocity(vid, POS[0], POS[1], POS[2]);
-				SetVehicleVelocity(vid, POS[0] * 1.3, POS[1] * 1.3, POS[2] * 1.3);
-				if(IsComponentIdCompatible(GetVehicleModel(vid), 1010)) AddVehicleComponent(vid, 1010);
-				return 1;
-	   		}
-
-		    if(PlayerData[playerid][SpeedBoost])
-		    {
+				if(Key(KEY_FIRE))
+				{
+					new Float:POS[3], vid = GetPlayerVehicleID(playerid);
+					GetVehicleVelocity(vid, POS[0], POS[1], POS[2]);
+					SetVehicleVelocity(vid, POS[0] * 1.3, POS[1] * 1.3, POS[2] * 1.3);
+					if(IsComponentIdCompatible(GetVehicleModel(vid), 1010)) AddVehicleComponent(vid, 1010);
+					return 1;
+		   		}
+		   		
 				if(Key(KEY_CROUCH))
 				{
 					new Float:POS[3], vid = GetPlayerVehicleID(playerid);
@@ -6324,6 +6323,15 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 					SetVehicleHealth(vid, 1000.0);
 				    return 1;
 				}
+			}
+			else
+			{
+				if(Key(KEY_FIRE))
+				{
+					new vid = GetPlayerVehicleID(playerid);
+					if(IsComponentIdCompatible(GetVehicleModel(vid), 1010)) AddVehicleComponent(vid, 1010);
+					return 1;
+		   		}
 			}
 		}
 
@@ -8019,7 +8027,7 @@ YCMD:sb(playerid, params[], help)
 {
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
 	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
-	if(PlayerData[playerid][SpeedBoost])
+	if(PlayerData[playerid][bSpeedBoost])
     {
      	SCM(playerid, YELLOW, "SpeedBoost has been disabled!");
 	}
@@ -8028,7 +8036,7 @@ YCMD:sb(playerid, params[], help)
 	    SCM(playerid, YELLOW, "SpeedBoost has been enabled!");
 	}
 	PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
-	PlayerData[playerid][SpeedBoost] = !PlayerData[playerid][SpeedBoost];
+	PlayerData[playerid][bSpeedBoost] = !PlayerData[playerid][bSpeedBoost];
 	return 1;
 }
 
@@ -11386,7 +11394,7 @@ YCMD:gwar(playerid, params[], help)
 		    GZoneInfo[i][iTimeLeft] = 60;
 		    GZoneInfo[i][DefendingGang] = 0;
 		    
-		    format(gstr, sizeof(gstr), "Gang War: %s~n~Defend the Gang Zone!~n~~n~~n~Timeleft: 0:60", GZoneInfo[i][sZoneName]);
+		    format(gstr, sizeof(gstr), "Gang War: %s~n~Defend the Gang Zone!~n~~n~~n~Timeleft: 1:00", GZoneInfo[i][sZoneName]);
 		    TextDrawSetString(GZoneInfo[i][E_Txt], gstr);
 		    
 		    new count = 0;
@@ -11421,10 +11429,10 @@ YCMD:gwar(playerid, params[], help)
 		
 		    GZoneInfo[i][bUnderAttack] = true;
 		    GZoneInfo[i][AttackingGang] = PlayerData[playerid][e_gangid];
-		    GZoneInfo[i][iTimeLeft] = 180;
+		    GZoneInfo[i][iTimeLeft] = 150;
 		    GZoneInfo[i][DefendingGang] = GZoneInfo[i][localGang];
 
-		    format(gstr, sizeof(gstr), "Gang War: %s~n~Defend the Gang Zone!~n~~n~~n~Timeleft: 3:00", GZoneInfo[i][sZoneName]);
+		    format(gstr, sizeof(gstr), "Gang War: %s~n~Defend the Gang Zone!~n~~n~~n~Timeleft: 2:30", GZoneInfo[i][sZoneName]);
 		    TextDrawSetString(GZoneInfo[i][E_Txt], gstr);
 		    
 		    new count = 0;
@@ -11474,7 +11482,7 @@ SetPlayerGWarMode(playerid)
   		SCM(playerid, -1, ""orange"God mode has been disabled!");
 	}
 	
-	PlayerData[playerid][SpeedBoost] = false;
+	PlayerData[playerid][bSpeedBoost] = false;
     PlayerData[playerid][SuperJump] = false;
     PlayerData[playerid][bGWarMode] = true;
 }
@@ -11489,7 +11497,7 @@ ResetPlayerGWarMode(playerid, bool:msg = true)
     }
     
     PlayerData[playerid][bGWarMode] = false;
-	PlayerData[playerid][SpeedBoost] = true;
+	PlayerData[playerid][bSpeedBoost] = true;
     PlayerData[playerid][SuperJump] = false;
 }
 
@@ -28004,7 +28012,7 @@ GetPlayerSettings(playerid)
 	new string[1024],
 	    tmpstring[128];
 
-	if(PlayerData[playerid][SpeedBoost])
+	if(PlayerData[playerid][bSpeedBoost])
 	{
 	    format(tmpstring, sizeof(tmpstring), ""white"1)\tSpeedboost\t"vgreen"[ON]\n");
 	    strcat(string, tmpstring);
@@ -30286,7 +30294,7 @@ PreparePlayerVars(playerid)
 	PlayerData[playerid][AllowSpawn] = false;
  	PlayerData[playerid][bDuty] = false;
 	PlayerData[playerid][Muted] = false;
- 	PlayerData[playerid][SpeedBoost] = true;
+ 	PlayerData[playerid][bSpeedBoost] = true;
  	PlayerData[playerid][SuperJump] = false;
 	PlayerData[playerid][AOnline] = true;
  	PlayerData[playerid][gInvite] = false;
@@ -30792,24 +30800,6 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 				{
 				    PlayerAchData[playerid][E_PLAYER_ACH_DATA:cache_get_row_int(i, 0)][0] = 1;
 				    PlayerAchData[playerid][E_PLAYER_ACH_DATA:cache_get_row_int(i, 0)][1] = cache_get_row_int(i, 1);
-				/*
-				    switch(cache_get_row_int(i, 0))
-				    {
-				        case 0: PlayerAchData[playerid][e_ach_styler][0] = 1, PlayerAchData[playerid][e_ach_styler][1] = cache_get_row_int(i, 1);
-				        case 1: PlayerAchData[playerid][e_ach_grimreaper][0] = 1, PlayerAchData[playerid][e_ach_grimreaper][1] = cache_get_row_int(i, 1);
-				        case 2: PlayerAchData[playerid][e_ach_masskiller][0] = 1, PlayerAchData[playerid][e_ach_masskiller][1] = cache_get_row_int(i, 1);
-				        case 3: PlayerAchData[playerid][e_ach_eliteracer][0] = 1, PlayerAchData[playerid][e_ach_eliteracer][1] = cache_get_row_int(i, 1);
-				        case 4: PlayerAchData[playerid][e_ach_toofast][0] = 1, PlayerAchData[playerid][e_ach_toofast][1] = cache_get_row_int(i, 1);
-				        case 5: PlayerAchData[playerid][e_ach_scorewhore][0] = 1, PlayerAchData[playerid][e_ach_scorewhore][1] = cache_get_row_int(i, 1);
-				        case 6: PlayerAchData[playerid][e_ach_destroyer][0] = 1, PlayerAchData[playerid][e_ach_destroyer][1] = cache_get_row_int(i, 1);
-				        case 7: PlayerAchData[playerid][e_ach_restinpeace][0] = 1, PlayerAchData[playerid][e_ach_restinpeace][1] = cache_get_row_int(i, 1);
-				        case 8: PlayerAchData[playerid][e_ach_silentkiller][0] = 1, PlayerAchData[playerid][e_ach_silentkiller][1] = cache_get_row_int(i, 1);
-				        case 9: PlayerAchData[playerid][e_ach_oneshot2kills][0] = 1, PlayerAchData[playerid][e_ach_oneshot2kills][1] = cache_get_row_int(i, 1);
-				        case 10: PlayerAchData[playerid][e_ach_deepimpact][0] = 1, PlayerAchData[playerid][e_ach_deepimpact][1] = cache_get_row_int(i, 1);
-				        case 11: PlayerAchData[playerid][e_ach_skydiver][0] = 1, PlayerAchData[playerid][e_ach_skydiver][1] = cache_get_row_int(i, 1);
-				        case 12: PlayerAchData[playerid][e_ach_biker][0] = 1, PlayerAchData[playerid][e_ach_biker][1] = cache_get_row_int(i, 1);
-				        case 13: PlayerAchData[playerid][e_ach_bmxmaster][0] = 1, PlayerAchData[playerid][e_ach_bmxmaster][1] = cache_get_row_int(i, 1);
-				    }*/
 				}
 	        }
 	        PlayerData[playerid][bAchsLoad] = true;
