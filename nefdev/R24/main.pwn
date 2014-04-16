@@ -24,9 +24,9 @@
 
 #pragma dynamic 8192
 
-#define IS_RELEASE_BUILD (false)
+#define IS_RELEASE_BUILD (true)
 #define INC_ENVIORMENT (true)
-#define IRC_CONNECT (false)
+#define IRC_CONNECT (true)
 #define WINTER_EDITION (false) // Requires ferriswheelfair.amx
 #define YSI_IS_SERVER
 
@@ -6749,12 +6749,17 @@ YCMD:treehouse(playerid, params[], help)
 }
 YCMD:trackmania(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid, 1297.3998, -5626.5122, 81.7, 149.0596,1297.3998, -5626.5122, 81.7, 149.0596, "Trackmania", "trackmania");
+    PortPlayerMapVeh(playerid, 1297.3998, -5626.5122, 81.7, 149.0596,1297.3998, -5626.5122, 81.7, 149.0596, "Trackmania", "tm");
     return 1;
 }
 YCMD:trackmania2(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid, -1929.1312, 6627.0327, 12.0, 180.0,-1929.1312, 6627.0327, 12.0, 180.0, "Trackmania", "trackmania2");
+    PortPlayerMapVeh(playerid, -1929.1312, 6627.0327, 12.0, 180.0,-1929.1312, 6627.0327, 12.0, 180.0, "Trackmania 2", "tm2");
+    return 1;
+}
+YCMD:trackmania3(playerid, params[], help)
+{
+    PortPlayerMapVeh(playerid, -5697.0776,2790.4932,5.6020,359.4344, -5697.0776,2790.4932,5.6020,359.4344, "Trackmania 3", "tm3");
     return 1;
 }
 YCMD:ip(playerid, params[], help)
@@ -22832,6 +22837,7 @@ LoadServerStaticMeshes()
 	Command_AddAltNamed("mc", "chiliad");
 	Command_AddAltNamed("trackmania", "tm");
 	Command_AddAltNamed("trackmania2", "tm2");
+	Command_AddAltNamed("trackmania3", "tm3");
 	Command_AddAltNamed("a51", "area51");
 	Command_AddAltNamed("bs", "bsn");
 	Command_AddAltNamed("driftcity", "dc");
@@ -23267,6 +23273,7 @@ LoadVisualStaticMeshes()
 	AddTeleport(6, "San Fierro Drift", "sfdrift", -2410.9963, -600.7848, 132.3277);
 	AddTeleport(3, "Trackmania", "tm", 1297.3998, -5626.5122, 81.7);
 	AddTeleport(3, "Trackmania 2", "tm2", -1929.1312, 6627.0327, 12.0);
+	AddTeleport(3, "Trackmania 3", "tm3", -5697.0776,2790.4932,5.6020);
 	AddTeleport(3, "Infernus Paradise", "ip", -5051.7461, -2237.2556, 10.9);
 	AddTeleport(3, "Infernus Paradise 2", "ip2", -297.6044, 3682.8264, 24.0);
 	AddTeleport(3, "Infernus Paradise 3", "ip3", 4546.4175,655.6476,13.4803);
@@ -23348,7 +23355,7 @@ LoadVisualStaticMeshes()
 	AddTeleport(8, "San Fierro", "sf", -1990.6650, 136.9297, 27.3110);
 	AddTeleport(6, "Snow Market", "snow", -719.7679,1723.9852,7.0400);
 	AddTeleport(0, "Sherman Dam", "sd", -793.2972,2230.8733,45.0103);
-	AddTeleport(3, "Roller Coaster", "rc", 35.7414,-899.6901,1761.7263);
+	AddTeleport(0, "Roller Coaster", "rc", 35.7414,-899.6901,1761.7263);
 	AddTeleport(0, "Quarry", "quarry",  833.0357,851.8098,12.0047);
 	AddTeleport(8, "Area 51", "a51", 307.2482,2050.7505,17.6406);
 	AddTeleport(3, "Base Jump", "bj", 294.3475,-1610.8379,494.6685);

@@ -2,6 +2,19 @@ new randomColors[24] = {6, 7, 126, 128, 130, 152, 158, 228, 181, 229, 205, 1, 6,
 
 LoadServerVehicles()
 {
+	// /tm3
+	AddStaticVehicleEx(411,-5697.7421900,2779.8515600,5.9188000,0.0000000, randomColors[random(23)], randomColors[random(23)], 100);
+	AddStaticVehicleEx(411,-5701.2421900,2779.8515600,5.9188000,0.0000000, randomColors[random(23)], randomColors[random(23)], 100);
+	AddStaticVehicleEx(411,-5704.7597700,2779.8515600,5.9188000,0.0000000, randomColors[random(23)], randomColors[random(23)], 100);
+	AddStaticVehicleEx(411,-5708.2851600,2779.8515600,5.9188000,0.0000000, randomColors[random(23)], randomColors[random(23)], 100);
+	AddStaticVehicleEx(411,-5711.9794900,2779.8515600,5.9188000,0.0000000, randomColors[random(23)], randomColors[random(23)], 100);
+	AddStaticVehicleEx(411,-5715.5205100,2779.8515600,5.9188000,0.0000000, randomColors[random(23)], randomColors[random(23)], 100);
+	AddStaticVehicleEx(411,-5694.0156200,2779.8515600,5.9188000,0.0000000, randomColors[random(23)], randomColors[random(23)], 100);
+	AddStaticVehicleEx(411,-5690.2656200,2779.8515600,5.9188000,0.0000000, randomColors[random(23)], randomColors[random(23)], 100);
+	AddStaticVehicleEx(411,-5686.5156200,2779.8515600,5.9188000,0.0000000, randomColors[random(23)], randomColors[random(23)], 100);
+	AddStaticVehicleEx(411,-5683.0156200,2779.8515600,5.9188000,0.0000000, randomColors[random(23)], randomColors[random(23)], 100);
+	AddStaticVehicleEx(411,-5679.9218700,2779.8515600,5.9188000,0.0000000, randomColors[random(23)], randomColors[random(23)], 100);
+
 	// /mc
 	AddStaticVehicleEx(443, -2330.9238, -1620.1328, 485.6623, -91.7400, randomColors[random(23)], randomColors[random(23)], 100);
 	AddStaticVehicleEx(429, -2334.0386, -1599.7668, 485.3716, -108.9000, randomColors[random(23)], randomColors[random(23)], 100);
