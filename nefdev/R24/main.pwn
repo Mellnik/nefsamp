@@ -24,9 +24,9 @@
 
 #pragma dynamic 8192
 
-#define IS_RELEASE_BUILD (true)
+#define IS_RELEASE_BUILD (false)
 #define INC_ENVIORMENT (true)
-#define IRC_CONNECT (true)
+#define IRC_CONNECT (false)
 #define WINTER_EDITION (false) // Requires ferriswheelfair.amx
 #define YSI_IS_SERVER
 
@@ -4480,7 +4480,9 @@ public OnPlayerDeath(playerid, killerid, reason)
 			{
 			    if(PlayerData[i][DuelRequestRecv] == playerid && gTeam[i] == gDUEL) // Sender lost
 			    {
-		            format(gstr, sizeof(gstr), ">> DUEL: %s won the duel against %s!", __GetName(i), __GetName(playerid));
+		            new Float:HP;
+		            GetPlayerHealth(i, HP);
+		            format(gstr, sizeof(gstr), ">> DUEL: %s won the duel against %s and has %.2f HP left!", __GetName(i), __GetName(playerid), HP);
 		            SCMToAll(NEF_RED, gstr);
 		            
  		            gTeam[i] = FREEROAM;
@@ -4508,7 +4510,9 @@ public OnPlayerDeath(playerid, killerid, reason)
 			    {
 			        if(PlayerData[i][DuelRequest] == playerid) // Sender won
 			        {
-			            format(gstr, sizeof(gstr), ">> DUEL: %s won the duel against %s!", __GetName(i), __GetName(playerid));
+			            new Float:HP;
+			            GetPlayerHealth(i, HP);
+			            format(gstr, sizeof(gstr), ">> DUEL: %s won the duel against %s and has %.2f HP left!", __GetName(i), __GetName(playerid), HP);
 			            SCMToAll(NEF_RED, gstr);
 
 	 		            gTeam[i] = FREEROAM;
@@ -23255,131 +23259,130 @@ LoadVisualStaticMeshes()
 	CreateObject(11237, 217.10001, -1999.30005, 37.10000,   0.00000, 0.00000, 220.00000, 350.0);
 	// beach end*/
     
-    AddTeleport(5, "Gold Credits", "gc", 1858.1874,-1466.7080,13.3981);
-	AddTeleport(9, "Drift", "drift", -344.308, 1528.474, 75.159);
-	AddTeleport(9, "Drift City", "dc", 3431.8589, 484.3132, 1788.7490);
-	AddTeleport(9, "Drift Island", "df", 3075.9263,-3153.9749,49.1486);
-	AddTeleport(9, "Las Venturas Drift", "lvdrift", 2333.8508,1405.8370,42.5904);
-	AddTeleport(9, "San Fierro Drift", "sfdrift", -2410.9963, -600.7848, 132.3277);
+    AddTeleport(4, "Gold Credits", "gc", 1858.1874,-1466.7080,13.3981);
+	AddTeleport(6, "Drift", "drift", -344.308, 1528.474, 75.159);
+	AddTeleport(6, "Drift City", "dc", 3431.8589, 484.3132, 1788.7490);
+	AddTeleport(6, "Drift Island", "df", 3075.9263,-3153.9749,49.1486);
+	AddTeleport(6, "Las Venturas Drift", "lvdrift", 2333.8508,1405.8370,42.5904);
+	AddTeleport(6, "San Fierro Drift", "sfdrift", -2410.9963, -600.7848, 132.3277);
 	AddTeleport(3, "Trackmania", "tm", 1297.3998, -5626.5122, 81.7);
 	AddTeleport(3, "Trackmania 2", "tm2", -1929.1312, 6627.0327, 12.0);
 	AddTeleport(3, "Infernus Paradise", "ip", -5051.7461, -2237.2556, 10.9);
 	AddTeleport(3, "Infernus Paradise 2", "ip2", -297.6044, 3682.8264, 24.0);
 	AddTeleport(3, "Infernus Paradise 3", "ip3", 4546.4175,655.6476,13.4803);
-	AddTeleport(3, "Speed", "speed", 680.2595, -1361.8927, 2550.2214);
-	AddTeleport(3, "Disney", "disney", 400.2232,636.9904,16.8194);
+	AddTeleport(1, "Speed", "speed", 680.2595, -1361.8927, 2550.2214);
+	AddTeleport(0, "Disney", "disney", 400.2232,636.9904,16.8194);
 	AddTeleport(4, "Mellnik's Island", "mi", -3801.8572, 498.8828, 16.5183);
 	AddTeleport(4, "Mellnik's House", "mh", -182.9842,-2245.7412,31.1492);
-	AddTeleport(4, "Treehouse", "treehouse", -804.6822, -2075.3076, 47.1331);
-	AddTeleport(4, "Party", "party", -377.2038,2131.4634,133.1797);
+	AddTeleport(2, "Treehouse", "treehouse", -804.6822, -2075.3076, 47.1331);
+	AddTeleport(2, "Party", "party", -377.2038,2131.4634,133.1797);
 	AddTeleport(4, "Balloon", "balloon", 295.4890,-1813.5734,52.0518);
-	AddTeleport(1, "Bike Challange", "bikec", 1102.3887, 1355.4951, 10.8203);
-	AddTeleport(5, "Hayclimb", "hayclimb", -1788.4408, 575.2750, 35.1641);
+	AddTeleport(3, "Bike Challange", "bikec", 1102.3887, 1355.4951, 10.8203);
+	AddTeleport(3, "Hayclimb", "hayclimb", -1788.4408, 575.2750, 35.1641);
 	AddTeleport(1, "HalfPipe", "hp", 2848.1548,-1977.4320,10.6646);
-	AddTeleport(5, "Slide", "slide", 1572.9949, -1238.7869, 277.7445);
-	AddTeleport(4, "Tugfun", "tugfun", 2774.316, -1309.180, 4316.250);
-	AddTeleport(1, "Drop", "drop", 309.7934, 5461.4546, 3426.6863);
-	AddTeleport(5, "XSlide", "xslide", 1862.760, 1337.315, 55.933);
-	AddTeleport(3, "Loop Jump", "loopjump", -2682.3909, 385.2379, 924.8377);
-	AddTeleport(3, "Death Jump", "deathjump", 2629.9734,-1029.7679,882.9141);
-	AddTeleport(3, "Glass Jump", "glassjump", 2121.4280, 2560.6331, 514.7283);
+	AddTeleport(1, "Slide", "slide", 1572.9949, -1238.7869, 277.7445);
+	AddTeleport(2, "Tugfun", "tugfun", 2774.316, -1309.180, 4316.250);
+	AddTeleport(2, "Drop", "drop", 309.7934, 5461.4546, 3426.6863);
+	AddTeleport(0, "XSlide", "xslide", 1862.760, 1337.315, 55.933);
+	AddTeleport(1, "Loop Jump", "loopjump", -2682.3909, 385.2379, 924.8377);
+	AddTeleport(1, "Death Jump", "deathjump", 2629.9734,-1029.7679,882.9141);
+	AddTeleport(1, "Glass Jump", "glassjump", 2121.4280, 2560.6331, 514.7283);
 	AddTeleport(1, "Going Down", "gd", 551.1603,860.3625,7113.0366);
-	AddTeleport(1, "Maze 1", "maze", 2330.3174, 535.1375, 2.9512);
-	AddTeleport(1, "Maze 2", "maze2", 1458.9336, 1854.9144, 54.7362);
-	AddTeleport(1, "Maze 3", "maze3", 836.5298,-2048.2273,12.8672);
-	AddTeleport(1, "Maze 4", "maze4", 983.0536,2691.7898,10.6925);
-	AddTeleport(3, "Tunnel Jump", "bikejump", -494.527, 1600.167, 844.297);
-	AddTeleport(3, "Bike Jump", "bikejump", 641.9279,2222.7144,940.5793);
-	AddTeleport(3, "Globe", "globe", 1954.7849,1915.3772,144.7200);
-	AddTeleport(3, "Quarry Jump", "qjump", 868.278,245.432,587.522);
-	AddTeleport(2, "Skydive", "skydive", 3887.5874,3891.2942,2017.7869);
-	AddTeleport(2, "Skydive 2", "skydive2", -1288.0760,-44.0085,4216.4507);
-	AddTeleport(2, "Skydive 3", "skydive3", 2875,-3233,3268);
-	AddTeleport(2, "Skydive 4", "skydive4", 118.210845,3658.245859,836.183776);
-	AddTeleport(2, "Skydive 5", "skydive5", 239.3282, 3754.8267, 888.9833);
-	AddTeleport(2, "Skydive 6", "skydive6", -1854.9218,-3813.2405,1160.8369);
-	AddTeleport(0, "BMX Parkour", "bmx", 3362.586, -1939.724, 43.027);
-	AddTeleport(0, "Quad Parkour", "qp", -2904.806, 880.312, 5.354);
-	AddTeleport(0, "Quad Parkour 2", "qp2", 2121.9146,2397.7786,51.2586);
-	AddTeleport(8, "Los Santos Beach", "beach", 341.8535, -1852.6327, 8.2618);
-	AddTeleport(4, "Mount Chilliad", "mc", -2330.8264,-1636.1765,485.6543);
-	AddTeleport(7, "Bayside", "bayside", -2227.2446,2326.8723,7.5469);
-	AddTeleport(7, "San Fierro Airport", "sfa", -1196.3280, -17.4523, 15.8281);
-	AddTeleport(7, "Los Santos Airport", "lsa", 2012.4763,-2448.1399,14.6396);
-	AddTeleport(7, "Los Santos", "ls", 2494.7476, -1666.6097, 13.3438);
-	AddTeleport(7, "Los Santos Police Department", "lspd", 1542.5554, -1674.7850, 13.5547);
-	AddTeleport(7, "Las Venturas Police Department", "lvpd", 2290.5759,2421.3708, 10.8203);
-	AddTeleport(7, "San Fierro Police Department", "sfpd", -1624.2128,674.2734,6.9573);
-	AddTeleport(3, "Skyroad", "skyroad", 2999.2258, -1433.3010, 1244.1365);
-	AddTeleport(4, "Tube", "tube", 1254.5294,-2285.2883,1084.8463);
-	AddTeleport(4, "Dune Fun", "dfun",  3638.867, 1179.233, 10.214);
-	AddTeleport(4, "Dune Fun 2", "dfun2", 473.3654,-1883.9589,2.4099);
-	AddTeleport(3, "Skyroad 2", "skyroad2", 2912.3618,-792.8673,10.7623);
-	AddTeleport(3, "Skyroad 3", "skyroad3", 205.0412,2481.6416,16.5166);
-	AddTeleport(3, "Skyroad 4", "skyroad4", 587.9016,1400.4779,1228.1453);
-	AddTeleport(3, "Water Jump", "wj", 341.6029,2008.7330,571.1588);
-	AddTeleport(3, "Jizzy Jump", "jj", -1683.663452, 2010.888916, 1104.387393);
-	AddTeleport(8, "Abandoned Airport", "aa", 386.0204, 2541.1179, 18.0953);
-	AddTeleport(6, "Transfender", "trans", 1034.5165,-1039.7190,31.6651);
-	AddTeleport(6, "Transfender 2", "trans2", -1932.7380,228.3443,34.1563);
-	AddTeleport(6, "Transfender 3", "trans3", 2386.2788,1021.7114,10.8203);
-	AddTeleport(6, "Loco Low", "lw", 2645.5457, -2004.5851,13.3828);
-	AddTeleport(6, "Arch Wheel Angels", "arch", -2689.1001,217.8290,3.9509);
-	AddTeleport(7, "Las Venturas Airport", "lva", 1320.6082,1268.7208,13.5903);
-	AddTeleport(7, "Las Venturas", "lv", 2039.8860,1546.1112,10.4450);
-	AddTeleport(6, "Vehicle Shop", "vs", 1850.7683,-1459.0325,13.3984);
-	AddTeleport(4, "RectAngle", "rect", 742.8961,533.1397,461.9956);
+	AddTeleport(0, "Maze 1", "maze", 2330.3174, 535.1375, 2.9512);
+	AddTeleport(0, "Maze 2", "maze2", 1458.9336, 1854.9144, 54.7362);
+	AddTeleport(0, "Maze 3", "maze3", 836.5298,-2048.2273,12.8672);
+	AddTeleport(0, "Maze 4", "maze4", 983.0536,2691.7898,10.6925);
+	AddTeleport(1, "Tunnel Jump", "bikejump", -494.527, 1600.167, 844.297);
+	AddTeleport(1, "Bike Jump", "bikejump", 641.9279,2222.7144,940.5793);
+	AddTeleport(1, "Globe", "globe", 1954.7849,1915.3772,144.7200);
+	AddTeleport(0, "Quarry Jump", "qjump", 868.278,245.432,587.522);
+	AddTeleport(3, "Skydive", "skydive", 3887.5874,3891.2942,2017.7869);
+	AddTeleport(3, "Skydive 2", "skydive2", -1288.0760,-44.0085,4216.4507);
+	AddTeleport(3, "Skydive 3", "skydive3", 2875,-3233,3268);
+	AddTeleport(3, "Skydive 4", "skydive4", 118.210845,3658.245859,836.183776);
+	AddTeleport(3, "Skydive 5", "skydive5", 239.3282, 3754.8267, 888.9833);
+	AddTeleport(3, "Skydive 6", "skydive6", -1854.9218,-3813.2405,1160.8369);
+	AddTeleport(3, "BMX Parkour", "bmx", 3362.586, -1939.724, 43.027);
+	AddTeleport(3, "Quad Parkour", "qp", -2904.806, 880.312, 5.354);
+	AddTeleport(3, "Quad Parkour 2", "qp2", 2121.9146,2397.7786,51.2586);
+	AddTeleport(5, "Los Santos Beach", "beach", 341.8535, -1852.6327, 8.2618);
+	AddTeleport(5, "Mount Chilliad", "mc", -2330.8264,-1636.1765,485.6543);
+	AddTeleport(8, "Bayside", "bayside", -2227.2446,2326.8723,7.5469);
+	AddTeleport(5, "San Fierro Airport", "sfa", -1196.3280, -17.4523, 15.8281);
+	AddTeleport(8, "Los Santos Airport", "lsa", 2012.4763,-2448.1399,14.6396);
+	AddTeleport(8, "Los Santos", "ls", 2494.7476, -1666.6097, 13.3438);
+	AddTeleport(8, "Los Santos Police Department", "lspd", 1542.5554, -1674.7850, 13.5547);
+	AddTeleport(8, "Las Venturas Police Department", "lvpd", 2290.5759,2421.3708, 10.8203);
+	AddTeleport(8, "San Fierro Police Department", "sfpd", -1624.2128,674.2734,6.9573);
+	AddTeleport(4, "Skyroad", "skyroad", 2999.2258, -1433.3010, 1244.1365);
+	AddTeleport(0, "Tube", "tube", 1254.5294,-2285.2883,1084.8463);
+	AddTeleport(2, "Dune Fun", "dfun",  3638.867, 1179.233, 10.214);
+	AddTeleport(2, "Dune Fun 2", "dfun2", 473.3654,-1883.9589,2.4099);
+	AddTeleport(4, "Skyroad 2", "skyroad2", 2912.3618,-792.8673,10.7623);
+	AddTeleport(4, "Skyroad 3", "skyroad3", 205.0412,2481.6416,16.5166);
+	AddTeleport(4, "Skyroad 4", "skyroad4", 587.9016,1400.4779,1228.1453);
+	AddTeleport(1, "Water Jump", "wj", 341.6029,2008.7330,571.1588);
+	AddTeleport(1, "Jizzy Jump", "jj", -1683.663452, 2010.888916, 1104.387393);
+	AddTeleport(5, "Abandoned Airport", "aa", 386.0204, 2541.1179, 18.0953);
+	AddTeleport(7, "Transfender", "trans", 1034.5165,-1039.7190,31.6651);
+	AddTeleport(7, "Transfender 2", "trans2", -1932.7380,228.3443,34.1563);
+	AddTeleport(7, "Transfender 3", "trans3", 2386.2788,1021.7114,10.8203);
+	AddTeleport(7, "Loco Low", "lw", 2645.5457, -2004.5851,13.3828);
+	AddTeleport(7, "Arch Wheel Angels", "arch", -2689.1001,217.8290,3.9509);
+	AddTeleport(8, "Las Venturas Airport", "lva", 1320.6082,1268.7208,13.5903);
+	AddTeleport(8, "Las Venturas", "lv", 2039.8860,1546.1112,10.4450);
+	AddTeleport(7, "Vehicle Shop", "vs", 1850.7683,-1459.0325,13.3984);
+	AddTeleport(2, "RectAngle", "rect", 742.8961,533.1397,461.9956);
 	AddTeleport(4, "Balloon", "balloon", 295.4890,-1813.5734,52.0518);
-	AddTeleport(0, "Parkour 1", "parkour", 2586.5618,-1346.5614,232.2472);
-	AddTeleport(0, "Parkour 2", "parkour2", -787.3710,-2766.3005,2660.3042);
-	AddTeleport(0, "Parkour 3", "parkour3", -783.9699, -3662.0358, 137.3758);
-	AddTeleport(0, "Parkour 4", "parkour4", -2929.4922,-1876.4229,8.3901);
-	AddTeleport(0, "Parkour 5", "parkour5", 1441.3851318359, -1700.8812255859, 915.390625);
-	AddTeleport(0, "Parkour 6", "parkour6", 2768.4343261719,-2743.7131347656,2460.0815429688);
-	AddTeleport(0, "Parkour 7", "parkour7", 3018.1736,-1879.4410,599.0370);
-	AddTeleport(0, "Parkour 8", "parkour8", 2246,-1276,942);
+	AddTeleport(3, "Parkour 1", "parkour", 2586.5618,-1346.5614,232.2472);
+	AddTeleport(3, "Parkour 2", "parkour2", -787.3710,-2766.3005,2660.3042);
+	AddTeleport(3, "Parkour 3", "parkour3", -783.9699, -3662.0358, 137.3758);
+	AddTeleport(3, "Parkour 4", "parkour4", -2929.4922,-1876.4229,8.3901);
+	AddTeleport(3, "Parkour 5", "parkour5", 1441.3851318359, -1700.8812255859, 915.390625);
+	AddTeleport(3, "Parkour 6", "parkour6", 2768.4343261719,-2743.7131347656,2460.0815429688);
+	AddTeleport(3, "Parkour 7", "parkour7", 3018.1736,-1879.4410,599.0370);
+	AddTeleport(3, "Parkour 8", "parkour8", 2246,-1276,942);
 	AddTeleport(4, "Krusty Krab", "kk", 2521.0232, -1504.3864, 25.5929);
-	AddTeleport(0, "Los Santos Parkour", "lsp", 2505.2646,-1694.4974,17.9575);
-	AddTeleport(5, "Bowl", "bowl", -576.6021,421.7149,75.2376);
-	AddTeleport(7, "San Fierro", "sf", -1990.6650, 136.9297, 27.3110);
-	AddTeleport(5, "Snow Market", "snow", -719.7679,1723.9852,7.0400);
-	AddTeleport(1, "Sherman Dam", "sd", -793.2972,2230.8733,45.0103);
-	AddTeleport(1, "Roller Coaster", "rc", 35.7414,-899.6901,1761.7263);
-	AddTeleport(7, "Quarry", "quarry",  833.0357,851.8098,12.0047);
-	AddTeleport(7, "Area 51", "a51", 307.2482,2050.7505,17.6406);
-	AddTeleport(2, "Base Jump", "bj", 294.3475,-1610.8379,494.6685);
+	AddTeleport(3, "Los Santos Parkour", "lsp", 2505.2646,-1694.4974,17.9575);
+	AddTeleport(0, "Bowl", "bowl", -576.6021,421.7149,75.2376);
+	AddTeleport(8, "San Fierro", "sf", -1990.6650, 136.9297, 27.3110);
+	AddTeleport(6, "Snow Market", "snow", -719.7679,1723.9852,7.0400);
+	AddTeleport(0, "Sherman Dam", "sd", -793.2972,2230.8733,45.0103);
+	AddTeleport(3, "Roller Coaster", "rc", 35.7414,-899.6901,1761.7263);
+	AddTeleport(0, "Quarry", "quarry",  833.0357,851.8098,12.0047);
+	AddTeleport(8, "Area 51", "a51", 307.2482,2050.7505,17.6406);
+	AddTeleport(3, "Base Jump", "bj", 294.3475,-1610.8379,494.6685);
 	AddTeleport(2, "Easter Egg", "ee", -2678.2119,1594.8811,217.2739);
-	AddTeleport(0, "Glory", "glory", 2354.1689, -2067.3284, 22.3832);
-	AddTeleport(2, "Eiffel Tower", "et", 956.2977,2441.0171,205.7626);
-	AddTeleport(2, "Sky", "sky", 1544.1896,-1352.2094,329.4762);
-	AddTeleport(2, "San Fierro Tower Jump", "sftj", -1753.6401,884.9623,295.8750);
-	AddTeleport(2, "Plane", "plane", 1841.8307,-1398.3483,117.0471);
-	AddTeleport(7, "Farm", "farm", -1206.7996,-1056.9430,128.3646);
-	AddTeleport(7, "Docks", "docks", 2714.5000,-2711.2676,2.4919);
-	AddTeleport(7, "Palomino Creek", "palominocreek", 2343.0247,91.6131,26.3281);
-	AddTeleport(7, "Burger Shot", "bs", 1207.7231,-920.2217,43.0507);
-	AddTeleport(7, "Burger Shot 2", "bs2", 810.2364,-1632.6433,13.3906);
-	AddTeleport(7, "Burger Shot 3", "bs3", 2447.1104,2024.7499,10.8203);
-	AddTeleport(7, "Burger Shot 4", "bs4", -2314.1365,-143.7879,35.3203);
-	AddTeleport(7, "Burger Shot 5", "bs5", -1907.5175,834.4271,35.0156);
-	AddTeleport(7, "Film", "film", 909.7761,-1221.2274,16.9766);
+	AddTeleport(3, "Glory", "glory", 2354.1689, -2067.3284, 22.3832);
+	AddTeleport(4, "Eiffel Tower", "et", 956.2977,2441.0171,205.7626);
+	AddTeleport(1, "Sky", "sky", 1544.1896,-1352.2094,329.4762);
+	AddTeleport(4, "San Fierro Tower Jump", "sftj", -1753.6401,884.9623,295.8750);
+	AddTeleport(4, "Plane", "plane", 1841.8307,-1398.3483,117.0471);
+	AddTeleport(8, "Farm", "farm", -1206.7996,-1056.9430,128.3646);
+	AddTeleport(8, "Docks", "docks", 2714.5000,-2711.2676,2.4919);
+	AddTeleport(8, "Palomino Creek", "palominocreek", 2343.0247,91.6131,26.3281);
+	AddTeleport(8, "Burger Shot", "bs", 1207.7231,-920.2217,43.0507);
+	AddTeleport(8, "Burger Shot 2", "bs2", 810.2364,-1632.6433,13.3906);
+	AddTeleport(8, "Burger Shot 3", "bs3", 2447.1104,2024.7499,10.8203);
+	AddTeleport(8, "Burger Shot 4", "bs4", -2314.1365,-143.7879,35.3203);
+	AddTeleport(8, "Burger Shot 5", "bs5", -1907.5175,834.4271,35.0156);
+	AddTeleport(8, "Film", "film", 909.7761,-1221.2274,16.9766);
 	AddTeleport(8, "Bordel", "bordel", -2682.1389,1344.4447,17.0603);
-	AddTeleport(3, "Huge Jump", "hugejump", 863.2654, 2490.4468, 694.3790);
-	AddTeleport(3, "Jubber Jump", "jujump", 1387.8517,-2425.5776,525.6338);
-	AddTeleport(3, "Loop", "loop",  494.7604,4.7474,704.3844);
-	AddTeleport(5, "Dillimore Airport", "da", 788.3009,-471.4969,20.5428);
-	AddTeleport(4, "Pool", "pool", 4155.7158,2426.9578,1.2054);
-	AddTeleport(4, "Restaurant", "restaurant", 370.4659, -1717.2151, 15.0337);
-	AddTeleport(5, "Drag", "drag", -557.0079,-3575.5906,7.0870);
-	AddTeleport(7, "San Fierro Station", "sfs", -1952.5077,137.8305,26.2813);
-	AddTeleport(7, "Los Santos Station", "lss", 1706.4425,-1943.0046,13.5607);
-	AddTeleport(7, "Las Venturas Station", "lvs", 1433.8182,2606.3877,10.6719);
-	AddTeleport(7, "Las Venturas Station 2", "lvs2", 2859.3931,1290.5574,11.3906);
-	AddTeleport(7, "Glen Park", "glen", 1892.7002, -1165.8480, 24.0390);
-	AddTeleport(7, "Market Station", "ms",  800.6712,-1330.6608,13.1061);
-	AddTeleport(5, "NRG", "nrg", 442.4455, 816.6687, 9.6865);
-	AddTeleport(8, "San Fierro Airport", "sfa", -1196.3280, -17.4523, 15.8281);
-	AddTeleport(8, "Mellnik's Island", "mi", -3801.8572, 498.8828, 16.5183);
+	AddTeleport(1, "Huge Jump", "hugejump", 863.2654, 2490.4468, 694.3790);
+	AddTeleport(1, "Jubber Jump", "jujump", 1387.8517,-2425.5776,525.6338);
+	AddTeleport(1, "Loop", "loop",  494.7604,4.7474,704.3844);
+	AddTeleport(8, "Dillimore Airport", "da", 788.3009,-471.4969,20.5428);
+	AddTeleport(2, "Pool", "pool", 4155.7158,2426.9578,1.2054);
+	AddTeleport(8, "Restaurant", "restaurant", 370.4659, -1717.2151, 15.0337);
+	AddTeleport(6, "Drag", "drag", -557.0079,-3575.5906,7.0870);
+	AddTeleport(8, "San Fierro Station", "sfs", -1952.5077,137.8305,26.2813);
+	AddTeleport(8, "Los Santos Station", "lss", 1706.4425,-1943.0046,13.5607);
+	AddTeleport(8, "Las Venturas Station", "lvs", 1433.8182,2606.3877,10.6719);
+	AddTeleport(8, "Las Venturas Station 2", "lvs2", 2859.3931,1290.5574,11.3906);
+	AddTeleport(8, "Glen Park", "glen", 1892.7002, -1165.8480, 24.0390);
+	AddTeleport(8, "Market Station", "ms",  800.6712,-1330.6608,13.1061);
+	AddTeleport(3, "NRG", "nrg", 442.4455, 816.6687, 9.6865);
+	AddTeleport(2, "Mellnik's Island", "mi", -3801.8572, 498.8828, 16.5183);
 	AddTeleport(5, "Racemap", "racemap", -2904.3860, -415.5923, 4.6274);
 	AddTeleport(5, "Racemap 2", "racemap2", 2741.1375,1969.4594,5269.7466);
 	AddTeleport(5, "Concert", "concert", 1477.8225,-1714.1190,14.1400);
@@ -27666,7 +27669,9 @@ function:ShowDialog(playerid, dialogid)
 		}
 		case TELE_DIALOG:
 		{
-			ShowPlayerDialog(playerid, TELE_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Teleports", "Parkours\nStunts\nBasejump/Skydive\nVehicle Jumps\nFun Maps\nSpecials\nVehicle Tuning\nCities\nHotspots\nDrifts", "Select", "Cancel");
+		    ShowPlayerDialog(playerid, TELE_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Teleports", "Stunt Zones\nJumps\nFun Maps\nChallenges\nSpecials\nHotspots\nDrifts\nTune Shops\nCities", "Select", "Cancel");
+		    
+			//ShowPlayerDialog(playerid, TELE_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Teleports", "Parkours\nStunts\nBasejump/Skydive\nVehicle Jumps\nFun Maps\nSpecials\nVehicle Tuning\nCities\nHotspots\nDrifts", "Select", "Cancel");
 		}
 		case VMENU_DIALOG:
 		{
