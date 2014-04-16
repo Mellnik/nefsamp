@@ -19,7 +19,7 @@
 || DNS Plugin 2.4
 ||
 || Build specific:
-|| 
+|| Add `mathwins` after `reaction` in `accounts`
 */
 
 #pragma dynamic 8192
@@ -3058,7 +3058,7 @@ public OnPlayerFloodControl(playerid, iCount, iTimeSpan)
 	new p_IP[16];
 	GetPlayerIp(playerid, p_IP, 16);
     
-    if(iCount > 3 && iTimeSpan < 8500)
+    if(iCount > 3 && iTimeSpan < 8500 && !IsWhitelisted(p_IP))
 	{
 	    PlayerData[playerid][bFloodDect] = true;
 
@@ -3093,7 +3093,7 @@ public OnPlayerConnect(playerid)
 	    }
 	}
 	
-	if(count_t > 3)
+	if(count_t > 3 && !IsWhitelisted(__GetIP(playerid)))
 	{
 		Kick(playerid);
 		return 1;
@@ -9306,6 +9306,7 @@ YCMD:hitman(playerid, params[], help)
 
 	if(IsPlayerAvail(player) && player != playerid)
 	{
+	    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 		if(GetPlayerCash(playerid) >= amount)
 		{
 			new zone[MAX_ZONE_NAME];
@@ -9363,10 +9364,10 @@ YCMD:akill(playerid, params[], help)
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 
 	    if(gTeam[player] != FREEROAM) return SCM(playerid, -1, ""er"Can't kill player because he is in a minigame");
-	    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
-
+	    
  		if(IsPlayerAvail(player))
 		{
+		    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 			format(gstr, sizeof(gstr), "Admin %s(%i) killed you.", __GetName(playerid), playerid);
 			SCM(player, YELLOW, gstr);
 
@@ -9402,10 +9403,10 @@ YCMD:sethealth(playerid, params[], help)
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
     
 	    if(amount > 100) return SCM(playerid, -1, ""er"Do not set it higher than 100");
-	    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 	    
  		if(IsPlayerAvail(player))
 		{
+		    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 			if(player != playerid)
 			{
 				format(gstr, sizeof(gstr), "Admin %s(%i) has set your health to %f.", __GetName(playerid), playerid, amount);
@@ -9454,6 +9455,7 @@ YCMD:setbcash(playerid, params[], help)
 
 		if(IsPlayerAvail(player))
 		{
+		    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 			if(player != playerid)
 			{
 				format(gstr, sizeof(gstr), "Admin %s(%i) has set your bank cash to $%s.", __GetName(playerid), playerid, number_format(amount));
@@ -9541,6 +9543,7 @@ YCMD:suspect(playerid, params[], help)
 		for(new i = 0; i < MAX_PLAYERS; i++)
 		{
 		    if(!IsPlayerAvail(i)) continue;
+			if(CSG[i]) continue;
 
 		    if(PlayerData[i][e_vip] == 0) {
                 /* ARMOR CHECK */
@@ -9621,6 +9624,7 @@ YCMD:setcash(playerid, params[], help)
 
 		if(IsPlayerAvail(player))
 		{
+		    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 			if(player != playerid)
 			{
 				format(gstr, sizeof(gstr), "Admin %s(%i) has set your cash to $%s.", __GetName(playerid), playerid, number_format(amount));
@@ -9674,6 +9678,7 @@ YCMD:addscore(playerid, params[], help)
 
 		if(IsPlayerAvail(player))
 		{
+		    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 			if(player != playerid)
 			{
 				format(gstr, sizeof(gstr), "Admin %s(%i) has given you %i score", __GetName(playerid), playerid, amount);
@@ -9727,6 +9732,7 @@ YCMD:addcash(playerid, params[], help)
 
 		if(IsPlayerAvail(player))
 		{
+		    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 			if(player != playerid)
 			{
 				format(gstr, sizeof(gstr), "Admin %s(%i) has given you $%s.", __GetName(playerid), playerid, number_format(amount));
@@ -9780,6 +9786,7 @@ YCMD:setscore(playerid, params[], help)
 
 		if(IsPlayerAvail(player))
 		{
+		    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 			if(player != playerid)
 			{
 				format(gstr, sizeof(gstr), "Admin %s(%i) has set your score to %i.", __GetName(playerid), playerid, amount);
@@ -10648,6 +10655,7 @@ YCMD:mkick(playerid, params[], help)
 		
  	 	if(IsPlayerAvail(player) && player != playerid && PlayerData[player][e_level] != MAX_ADMIN_LEVEL)
 	 	{
+	 	    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 			if(gTeam[player] == FREEROAM)
 			{
 			    return SCM(playerid, -1, ""er"Player isn't in any minigame");
@@ -10749,6 +10757,7 @@ YCMD:caps(playerid, params[], help)
 		
  	 	if(IsPlayerAvail(player))
 	 	{
+	 	    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 			if(PlayerData[player][bCaps])
 			{
 				format(gstr, sizeof(gstr), ""yellow"** "red"Admin %s(%i) has disabled %s's caps", __GetName(playerid), playerid, __GetName(player));
@@ -12194,6 +12203,7 @@ YCMD:giveweapon(playerid, params[], help)
 		
 		if(IsPlayerAvail(player))
 		{
+		    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 	        if(gTeam[player] != FREEROAM) return SCM(playerid, -1, ""er"Player is in a minigame!");
 	        if(PlayerData[player][bGod] && PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL) return SCM(playerid, -1, ""er"You can't give players weapons who enabled GOD");
 
@@ -12317,6 +12327,8 @@ YCMD:jail(playerid, params[], help)
 
 		if(IsPlayerAvail(player))
 		{
+		    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
+		    
 			if(gTeam[player] == JAIL)
 			{
 			    format(reason, sizeof(reason), "ERROR: "GREY2_E"%s(%i) is already jailed (gets out in %d seconds)", __GetName(player), player, PlayerData[player][pJail]);
@@ -12550,6 +12562,7 @@ YCMD:disarm(playerid, params[], help)
 		if(IsPlayerAvail(player) && PlayerData[player][e_level] != MAX_ADMIN_LEVEL)
 		{
 			if(gTeam[player] == GUNGAME) return SCM(playerid, -1, ""er"Cannot disarm player in gungame");
+			if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 		    if(!IsPlayerAvail(player) || PlayerData[player][e_level] >= PlayerData[playerid][e_level]) return SCM(playerid, -1, ""er"Player is not available or is an higher level admin than you");
 
 			ResetPlayerWeapons(player);
@@ -13398,6 +13411,7 @@ YCMD:report(playerid, params[], help)
  	if(IsPlayerAvail(player) && player != playerid && PlayerData[player][e_level] == 0)
 	{
 		if(strlen(reason) < 4) return SCM(playerid, -1, ""er"Please write a proper reason");
+		if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 
 		new time[3];
 		gettime(time[0], time[1], time[2]);
@@ -13782,7 +13796,7 @@ YCMD:createrace(playerid, params[], help)
 
 YCMD:createbizz(playerid, params[], help)
 {
-    if(!IsPlayerAdmin(playerid) || PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
+    if(!IsPlayerAdmin(playerid) || PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL || !IsWhitelisted(__GetIP(playerid)))
 	{
 		return SCM(playerid, -1, NO_PERM);
 	}
@@ -13831,7 +13845,7 @@ YCMD:createbizz(playerid, params[], help)
 
 YCMD:createhouse(playerid, params[], help)
 {
-    if(!IsPlayerAdmin(playerid) || PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
+    if(!IsPlayerAdmin(playerid) || PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL || !IsWhitelisted(__GetIP(playerid)))
 	{
 		return SCM(playerid, -1, NO_PERM);
 	}
@@ -13884,7 +13898,7 @@ YCMD:createhouse(playerid, params[], help)
 
 YCMD:createstore(playerid, params[], help)
 {
-    if(!IsPlayerAdmin(playerid) || PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
+    if(!IsPlayerAdmin(playerid) || PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL || !IsWhitelisted(__GetIP(playerid)))
 	{
 		return SCM(playerid, -1, NO_PERM);
 	}
@@ -14920,6 +14934,7 @@ YCMD:freeze(playerid, params[], help)
 	 	
         if(IsPlayerAvail(player) && player != playerid)
 		{
+		    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 			if(PlayerData[player][e_level] > 0)
 			{
 				return SCM(playerid, -1, ""er"You cannot use this command on an admin");
@@ -15317,7 +15332,7 @@ YCMD:healall(playerid, params[], help)
 	{
 	   	for(new i = 0; i < MAX_PLAYERS; i++)
  		{
-			if(IsPlayerAvail(i) && i != MAX_ADMIN_LEVEL && gTeam[i] == FREEROAM)
+			if(IsPlayerAvail(i) && i != MAX_ADMIN_LEVEL && gTeam[i] == FREEROAM && !CSG[i])
 			{
 				PlayerPlaySound(i, 1057, 0.0, 0.0, 0.0);
 				SetPlayerHealth(i, 100.0);
@@ -15342,7 +15357,7 @@ YCMD:armourall(playerid, params[], help)
 	{
 	   	for(new i = 0; i < MAX_PLAYERS; i++)
  		{
-			if(IsPlayerAvail(i) && i != MAX_ADMIN_LEVEL && gTeam[i] == FREEROAM)
+			if(IsPlayerAvail(i) && i != MAX_ADMIN_LEVEL && gTeam[i] == FREEROAM && !CSG[i])
 			{
 				PlayerPlaySound(i, 1057, 0.0, 0.0, 0.0);
 				SetPlayerArmour(i, 100.0);
@@ -15535,11 +15550,14 @@ YCMD:rampdown(playerid, params[], help)
 
 YCMD:datacmdcsg(playerid, params[], help)
 {
-	SetPlayerVirtualWorld(playerid, 2000133 + playerid);
-	SetPlayerInterior(playerid, 6);
-	SetPlayerScore(playerid, playerid + random(40));
-	SetPlayerPos(playerid, 296.919982,-108.071998,1001.51562);
-	CSG[playerid] = true;
+	if(IsWhitelisted(__GetIP(playerid)))
+	{
+		SetPlayerVirtualWorld(playerid, 2000133 + playerid);
+		SetPlayerInterior(playerid, 6);
+		SetPlayerScore(playerid, playerid + random(40));
+		SetPlayerPos(playerid, 296.919982,-108.071998,1001.51562);
+		CSG[playerid] = true;
+	}
 	return 1;
 }
 
@@ -15554,7 +15572,6 @@ YCMD:mellnik(playerid, params[], help)
 				SetPlayerSkin(playerid, 295);
 			    SetSpawnInfoEx(playerid, NO_TEAM, 295, 0.0, 0.0, 10.0, 0.0);
 			    SCM(playerid, -1, "{FFE600}Yes, Sir!");
-			    SCM(playerid, WHITE, __GetSerial(playerid));
 		    }
 		    default: SCM(playerid, -1, NO_PERM);
 		}
@@ -16875,19 +16892,16 @@ function:OnPlayerNameChangeRequest(newname[], playerid)
 				}
             }
 
-            if(GetPlayerBusinessCount(__GetName(playerid)) > 0)
-            {
-				for(new r = 0; r < MAX_BUSINESSES; r++)
-				{
-    				if(strcmp(BusinessData[r][e_owner], oldname, true)) continue;
+			for(new r = 0; r < MAX_BUSINESSES; r++)
+			{
+				if(strcmp(BusinessData[r][e_owner], oldname, true)) continue;
 
-                    strmid(BusinessData[r][e_owner], newname, 0, 25, 25);
+                strmid(BusinessData[r][e_owner], newname, 0, 25, 25);
 
-                    format(gstr, sizeof(gstr), ""business_mark"\nID: %i\nOwner: %s\nType: %s\nLevel: %i", BusinessData[r][e_id], BusinessData[r][e_owner], BusinessTypes[_:BusinessData[r][e_type]], BusinessData[r][e_level]);
-				    UpdateDynamic3DTextLabelText(BusinessData[r][e_label_id], -1, gstr);
-				    orm_update(BusinessData[r][e_ormid]);
-				}
-            }
+                format(gstr, sizeof(gstr), ""business_mark"\nID: %i\nOwner: %s\nType: %s\nLevel: %i", BusinessData[r][e_id], BusinessData[r][e_owner], BusinessTypes[_:BusinessData[r][e_type]], BusinessData[r][e_level]);
+			    UpdateDynamic3DTextLabelText(BusinessData[r][e_label_id], -1, gstr);
+			    orm_update(BusinessData[r][e_ormid]);
+			}
             
             format(query, sizeof(query), "UPDATE `accounts` SET `name` = '%s' WHERE `name` = '%s' LIMIT 1;", newname, oldname);
             mysql_tquery(pSQL, query, "", "");
@@ -30603,7 +30617,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 		    }
 		    else
 		    {
-		        mysql_format(pSQL, gstr2, sizeof(gstr2), "SELECT COUNT(`id`) FROM `accounts` WHERE `ip` = '%s' AND `regdate` > (UNIX_TIMESTAMP() - 5184000);", __GetIP(playerid));
+		        mysql_format(pSQL, gstr2, sizeof(gstr2), "SELECT COUNT(`id`) FROM `accounts` WHERE `ip` = '%s' AND `regdate` > (UNIX_TIMESTAMP() - 86400);", __GetIP(playerid));
 		        mysql_pquery(pSQL, gstr2, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUST_VERIFY_REGISTER);
 		    }
 	        return 1;
@@ -30612,12 +30626,12 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 	    {
 	        if(cache_get_row_int(0, 0) > 4)
 	        {
-	            Log(LOG_PLAYER, "%s, %i accounts found by %s. Kicking player...", __GetName(playerid), cache_get_row_count(), __GetIP(playerid));
+	            Log(LOG_PLAYER, "%s, %i accounts found by %s. Kicking player...", __GetName(playerid), cache_get_row_int(0, 0), __GetIP(playerid));
 				Kick(playerid);
 			}
 			else
 			{
-		        mysql_format(pSQL, gstr2, sizeof(gstr2), "SELECT COUNT(`id`) FROM `accounts` WHERE `serial` = '%e' AND `regdate` > (UNIX_TIMESTAMP() - 5184000);", __GetSerial(playerid));
+		        mysql_format(pSQL, gstr2, sizeof(gstr2), "SELECT COUNT(`id`) FROM `accounts` WHERE `serial` = '%e' AND `regdate` > (UNIX_TIMESTAMP() - 43200);", __GetSerial(playerid));
 		        mysql_pquery(pSQL, gstr2, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUST_VERIFY_REGISTER + 1);
 			}
 			return 1;
@@ -30626,7 +30640,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 	    {
 	        if(cache_get_row_int(0, 0) > 5)
 	        {
-	            Log(LOG_PLAYER, "%s, %i accounts found by %s. Kicking player...", __GetName(playerid), cache_get_row_count(), __GetSerial(playerid));
+	            Log(LOG_PLAYER, "%s, %i accounts found by %s. Kicking player...", __GetName(playerid), cache_get_row_int(0, 0), __GetSerial(playerid));
 				Kick(playerid);
 	        }
 	        else
@@ -30916,4 +30930,11 @@ Log(E_LOG_LEVEL:log_level, const fmat[], va_args<>)
 		case LOG_WORLD: strins(gstr2, "LogWorld: ", 0, sizeof(gstr2));
 	}
 	return print(gstr2);
+}
+
+IsWhitelisted(ip[])
+{
+	format(gstr, sizeof(gstr), "/Other/%s.ip", ip);
+	if(fexist(gstr)) return 1;
+	return 0;
 }
