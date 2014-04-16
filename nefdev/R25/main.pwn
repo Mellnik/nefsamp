@@ -1,6 +1,6 @@
 /*======================================================================*\
 || #################################################################### ||
-|| # Project New Evolution Freeroam - Build 24 	        			  # ||
+|| # Project New Evolution Freeroam - Build 25 	        			  # ||
 || # ---------------------------------------------------------------- # ||
 || # Copyright ©2011-2014 New Evolution Freeroam	  				  # ||
 || # Created by Mellnik                                               # ||
@@ -19,7 +19,7 @@
 || DNS Plugin 2.4
 ||
 || Build specific:
-|| Add `mathwins` after `reaction` in `accounts`
+||
 */
 
 #pragma dynamic 8192
@@ -85,9 +85,9 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define SERVER_IP                       "31.204.152.218:7777"
 #define HOSTNAME                        " 	      ..:: NEF ::.. ×Stunt/DM/Race/Minigames×"
 #if IS_RELEASE_BUILD == true
-#define CURRENT_VERSION                 "Build 24"
+#define CURRENT_VERSION                 "Build 25"
 #else
-#define CURRENT_VERSION                 "PTS:Build 24"
+#define CURRENT_VERSION                 "PTS:Build 25"
 #endif
 #define HOTFIX_REV                      "Hotfix #0"
 #define SAMP_VERSION                    "SA-MP 0.3z-R2"
@@ -6749,32 +6749,68 @@ YCMD:treehouse(playerid, params[], help)
 }
 YCMD:trackmania(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid, 1297.3998, -5626.5122, 81.7, 149.0596,1297.3998, -5626.5122, 81.7, 149.0596, "Trackmania", "tm");
+    if(PortPlayerMapVeh(playerid, 1297.3998, -5626.5122, 81.7, 149.0596,1297.3998, -5626.5122, 81.7, 149.0596, "Trackmania", "tm"))
+    {
+		if(GetPlayerState(playerid) == PLAYER_STATE_ONFOOT)
+		{
+			CarSpawner(playerid, 481, -1, false);
+		}
+    }
     return 1;
 }
 YCMD:trackmania2(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid, -1929.1312, 6627.0327, 12.0, 180.0,-1929.1312, 6627.0327, 12.0, 180.0, "Trackmania 2", "tm2");
+    if(PortPlayerMapVeh(playerid, -1929.1312, 6627.0327, 12.0, 180.0,-1929.1312, 6627.0327, 12.0, 180.0, "Trackmania 2", "tm2"))
+    {
+		if(GetPlayerState(playerid) == PLAYER_STATE_ONFOOT)
+		{
+			CarSpawner(playerid, 481, -1, false);
+		}
+    }
     return 1;
 }
 YCMD:trackmania3(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid, -5697.0776,2790.4932,5.6020,359.4344, -5697.0776,2790.4932,5.6020,359.4344, "Trackmania 3", "tm3");
+    if(PortPlayerMapVeh(playerid, -5697.0776,2790.4932,5.6020,359.4344, -5697.0776,2790.4932,5.6020,359.4344, "Trackmania 3", "tm3"))
+    {
+		if(GetPlayerState(playerid) == PLAYER_STATE_ONFOOT)
+		{
+			CarSpawner(playerid, 481, -1, false);
+		}
+    }
     return 1;
 }
 YCMD:ip(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid, -5051.7461, -2237.2556, 10.9, 359.8096,-5051.7461, -2237.2556, 10.9, 359.8096, "Infernus Paradise", "ip");
+    if(PortPlayerMapVeh(playerid, -5051.7461, -2237.2556, 10.9, 359.8096,-5051.7461, -2237.2556, 10.9, 359.8096, "Infernus Paradise", "ip"))
+    {
+		if(GetPlayerState(playerid) == PLAYER_STATE_ONFOOT)
+		{
+			CarSpawner(playerid, 481, -1, false);
+		}
+    }
     return 1;
 }
 YCMD:ip2(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid, -297.6044, 3682.8264, 24.0, 0.0, -297.6044, 3682.8264, 24.0, 0.0, "Infernus Paradise 2", "ip2");
+    if(PortPlayerMapVeh(playerid, -297.6044, 3682.8264, 24.0, 0.0, -297.6044, 3682.8264, 24.0, 0.0, "Infernus Paradise 2", "ip2"))
+    {
+		if(GetPlayerState(playerid) == PLAYER_STATE_ONFOOT)
+		{
+			CarSpawner(playerid, 481, -1, false);
+		}
+    }
     return 1;
 }
 YCMD:ip3(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid, 4546.4175,655.6476,13.4803,0.0375,4546.4175,655.6476,13.4803,0.0375, "Infernus Paradise 3", "ip3");
+    if(PortPlayerMapVeh(playerid, 4546.4175,655.6476,13.4803,0.0375,4546.4175,655.6476,13.4803,0.0375, "Infernus Paradise 3", "ip3"))
+    {
+		if(GetPlayerState(playerid) == PLAYER_STATE_ONFOOT)
+		{
+			CarSpawner(playerid, 481, -1, false);
+		}
+    }
     return 1;
 }
 YCMD:disney(playerid, params[], help)
