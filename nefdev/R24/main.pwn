@@ -637,6 +637,7 @@ enum E_PLAYER_DATA
 	e_skin,
 	e_payday,
 	e_reaction,
+	e_mathwins,
 	e_houses,
 	e_gangid,
 	e_gangrank,
@@ -688,6 +689,7 @@ enum E_PLAYER_DATA
     tickJoin_bmx,
     tickLastBan,
     iKickBanIssued,
+    bool:bHideGC,
 	bool:bAchsLoad,
 	bool:GotVIPLInv,
 	bool:bIsDead,
@@ -799,7 +801,8 @@ enum E_PLAYER_ACH_DATA
     e_ach_deepimpact, // win 10 fallouts
 	e_ach_skydiver, // win /skydive and /skydive2 in a row
 	e_ach_biker, // win /bikec
-	e_ach_bmxmaster // win /bmx
+	e_ach_bmxmaster, // win /bmx
+	e_ach_settled // buy a house
 };
 
 enum e_credits_matrix
@@ -4272,7 +4275,7 @@ public OnPlayerText(playerid, text[])
 		GangMSG(PlayerData[playerid][e_gangid], gstr);
 		
 		format(gstr, sizeof(gstr), "[GC] %s(%i): %s", __GetName(playerid), playerid, text[1]);
-		AdminMSG(GREY, gstr);
+		AdminMSG(GREY, gstr, false, true);
 		return 0;
 	}
 
@@ -8444,7 +8447,12 @@ YCMD:buy(playerid, params[], help)
 	    format(gstr, sizeof(gstr), ""nef" "yellow_e"%s(%i) bought the house %i for $%s!", __GetName(playerid), playerid, HouseInfo[i][iID], number_format(HouseInfo[i][price]));
 	    SCMToAll(-1, gstr);
 	    ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""white"House bought!", ""white"You can now use these commands:\n\n/hmenu\n/lock\n/enter\n/exit\n/sell\n\nCustomize your house's interior by using /hmenu", "OK", "");
-	    break;
+
+	    if(PlayerAchData[playerid][e_ach_settled][0] == 0)
+	    {
+	        GivePlayerAchievement(playerid, e_ach_settled, "Settled", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
+		}
+		break;
 	}
 	if(!found) SCM(playerid, -1, ""er"You aren't near of any house");
 	return 1;
@@ -9055,7 +9063,7 @@ YCMD:adminhelp(playerid, params[], help)
 
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[2][e_rank]);
 		strcat(string, gstr);
-		strcat(string, "/online /offline /onduty /offduty /akill /rv /day\n/burn /move /tban /ban /cuff /uncuff /jail /unjail /unfreeze\n\n");
+		strcat(string, "/online /offline /onduty /offduty /akill /rv /day /togglegc\n/burn /move /tban /ban /cuff /uncuff /jail /unjail /unfreeze\n\n");
 		
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[3][e_rank]);
 		strcat(string, gstr);
@@ -9070,6 +9078,20 @@ YCMD:adminhelp(playerid, params[], help)
 		strcat(string, "/onlinefix /setcash /setbcash /setscore /gdestroy /addcash /addscore\n/resetrc /resethouse /resetbizz /sethouseprice /sethousescore\n/setbizzlevel /createhouse /createbizz /createstore /gzonecreate");
 
         ShowPlayerDialog(playerid, ADMIN_CMD_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" :: Admin Commands", string, "OK", "");
+	}
+  	else
+	{
+  		SCM(playerid, -1, NO_PERM);
+	}
+	return 1;
+}
+
+YCMD:togglegc(playerid, params[], help)
+{
+	if(PlayerData[playerid][e_level] >= 2)
+	{
+		SendInfo(playerid, "Admin GC toggled", "");
+    	PlayerData[playerid][bHideGC] = !PlayerData[playerid][bHideGC];
 	}
   	else
 	{
@@ -10966,7 +10988,7 @@ YCMD:grename(playerid, params[], help)
     if(!islogged(playerid)) return notlogged(playerid);
 
 	if(PlayerData[playerid][e_gangid] == 0) return SCM(playerid, -1, ""er"You are not in any gang");
-	if(PlayerData[playerid][e_gangrank] != 6) return SCM(playerid, -1, ""er"You need to be the gang founder");
+	if(PlayerData[playerid][e_gangrank] != GANG_POS_FOUNDER) return SCM(playerid, -1, ""er"You need to be the gang founder");
 	if(GetPlayerCash(playerid) < 100000) return SCM(playerid, -1, ""er"You need $100,000 to rename your gang");
 	
 	new buff[144], buff2[144];
@@ -15238,10 +15260,11 @@ YCMD:stats(playerid, params[], help)
         	number_format(PlayerData[player1][e_bank]),
 			number_format(PlayerData[player1][e_credits]));
 
-		format(string2, sizeof(string2), ""white"Race wins: "LB_E"%i\n"white"Derby wins: "LB_E"%i\n"white"Reaction wins: "LB_E"%i\n"white"TDM wins: "LB_E"%i\n"white"Fallout wins: "LB_E"%i\n"white"Gungame wins: "LB_E"%i\n"white"Event wins: "LB_E"%i\n"white"Time until PayDay: "LB_E"%i minutes\n",
+		format(string2, sizeof(string2), ""white"Race wins: "LB_E"%i\n"white"Derby wins: "LB_E"%i\n"white"Reaction wins: "LB_E"%i\n"white"Math wins: "LB_E"%i\n"white"TDM wins: "LB_E"%i\n"white"Fallout wins: "LB_E"%i\n"white"Gungame wins: "LB_E"%i\n"white"Event wins: "LB_E"%i\n"white"Time until PayDay: "LB_E"%i minutes\n",
 	   		PlayerData[player1][e_racewins],
 	   		PlayerData[player1][e_derbywins],
 	   		PlayerData[player1][e_reaction],
+	   		PlayerData[player1][e_mathwins],
 	   		PlayerData[player1][e_tdmwins],
 	   		PlayerData[player1][e_falloutwins],
 	   		PlayerData[player1][e_gungamewins],
@@ -16212,6 +16235,7 @@ YCMD:achs(playerid, params[], help)
 		            case 11: format(gstr, sizeof(gstr), ""white"[%s"white"] Skydiver -> %s\n", tmp[e_ach_skydiver], UTConvert(PlayerAchData[player][e_ach_skydiver][1]));
 		            case 12: format(gstr, sizeof(gstr), ""white"[%s"white"] Biker -> %s\n", tmp[e_ach_biker], UTConvert(PlayerAchData[player][e_ach_biker][1]));
 		            case 13: format(gstr, sizeof(gstr), ""white"[%s"white"] BMX Master -> %s\n", tmp[e_ach_bmxmaster], UTConvert(PlayerAchData[player][e_ach_bmxmaster][1]));
+		            case 14: format(gstr, sizeof(gstr), ""white"[%s"white"] Settled -> %s\n", tmp[e_ach_settled], UTConvert(PlayerAchData[player][e_ach_settled][1]));
 				}
 		    }
 		    else
@@ -16234,6 +16258,7 @@ YCMD:achs(playerid, params[], help)
 		            case 11: format(gstr, sizeof(gstr), ""white"[%s"white"] Skydiver -> Win /skydive and /skydive2 in a row\n", tmp[e_ach_skydiver]);
 		            case 12: format(gstr, sizeof(gstr), ""white"[%s"white"] Biker -> Win /bikec\n", tmp[e_ach_biker]);
 		            case 13: format(gstr, sizeof(gstr), ""white"[%s"white"] BMX Master -> Win /bmx\n", tmp[e_ach_bmxmaster]);
+		            case 14: format(gstr, sizeof(gstr), ""white"[%s"white"] Settled -> Purchase a house\n", tmp[e_ach_settled]);
 				}
 		    }
 		    
@@ -21256,13 +21281,15 @@ GangMSG(gGangID, const string[])
 	}
 }
 
-AdminMSG(color, const string[], bool:beep = false)
+AdminMSG(color, const string[], bool:beep = false, bool:gc = false)
 {
 	new count = 0;
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if(IsPlayerAvail(i) && PlayerData[i][e_level] >= 1)
 		{
+		    if(gc && PlayerData[i][bHideGC]) continue;
+		    
 			SCM(i, color, string);
 			if(beep) PlayerPlaySound(i, 1057, 0.0, 0.0, 0.0);
 			count++;
@@ -21481,6 +21508,7 @@ MySQL_RegisterAccount(playerid, password[])
 	orm_addvar_int(ormid, PlayerData[playerid][e_skin], "skin");
 	orm_addvar_int(ormid, PlayerData[playerid][e_payday], "payday");
 	orm_addvar_int(ormid, PlayerData[playerid][e_reaction], "reaction");
+	orm_addvar_int(ormid, PlayerData[playerid][e_mathwins], "mathwins");
 	orm_addvar_int(ormid, PlayerData[playerid][e_houses], "houses");
 	orm_addvar_int(ormid, PlayerData[playerid][e_gangid], "gangid");
 	orm_addvar_int(ormid, PlayerData[playerid][e_gangrank], "gangrank");
@@ -21534,6 +21562,7 @@ MySQL_RegisterAccount2(playerid, password[])
 	orm_addvar_int(ormid, PlayerData[playerid][e_skin], "skin");
 	orm_addvar_int(ormid, PlayerData[playerid][e_payday], "payday");
 	orm_addvar_int(ormid, PlayerData[playerid][e_reaction], "reaction");
+	orm_addvar_int(ormid, PlayerData[playerid][e_mathwins], "mathwins");
 	orm_addvar_int(ormid, PlayerData[playerid][e_houses], "houses");
 	orm_addvar_int(ormid, PlayerData[playerid][e_gangid], "gangid");
 	orm_addvar_int(ormid, PlayerData[playerid][e_gangrank], "gangrank");
@@ -30286,6 +30315,7 @@ PreparePlayerVars(playerid)
 	PlayerData[playerid][fOldPos][2] = 14.6396;
     PlayerData[playerid][e_ormid] = ORM:-1;
     PlayerData[playerid][e_accountid] = 0;
+    PlayerData[playerid][bHideGC] = false;
     PlayerData[playerid][bAchsLoad] = false;
 	PlayerData[playerid][GotVIPLInv] = false;
 	PlayerData[playerid][bIsDead] = false;
@@ -30391,6 +30421,7 @@ PreparePlayerVars(playerid)
     PlayerData[playerid][tickLastBan] = 0,
   	PlayerData[playerid][e_lastlogin] = 0;
 	PlayerData[playerid][e_reaction] = 0;
+	PlayerData[playerid][e_mathwins] = 0;
 	PlayerData[playerid][e_bank] = 0;
 	PlayerData[playerid][e_time] = 0;
 	PlayerData[playerid][e_skin] = 0;
@@ -30684,6 +30715,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 				orm_addvar_int(ormid, PlayerData[playerid][e_skin], "skin");
 				orm_addvar_int(ormid, PlayerData[playerid][e_payday], "payday");
 				orm_addvar_int(ormid, PlayerData[playerid][e_reaction], "reaction");
+				orm_addvar_int(ormid, PlayerData[playerid][e_mathwins], "mathwins");
 				orm_addvar_int(ormid, PlayerData[playerid][e_houses], "houses");
 				orm_addvar_int(ormid, PlayerData[playerid][e_gangid], "gangid");
 				orm_addvar_int(ormid, PlayerData[playerid][e_gangrank], "gangrank");
