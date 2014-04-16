@@ -16323,7 +16323,7 @@ YCMD:anims(playerid, params[], help)
 
 YCMD:stopanims(playerid, params[], help)
 {
-    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
     SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
     ClearAnimations(playerid);
 	return 1;
@@ -16331,7 +16331,7 @@ YCMD:stopanims(playerid, params[], help)
 
 YCMD:handsup(playerid, params[], help)
 {
-    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
     SendInfo(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
     
@@ -16341,7 +16341,7 @@ YCMD:handsup(playerid, params[], help)
 
 YCMD:cigar(playerid, params[], help)
 {
-    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
     SendInfo(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
     
@@ -16351,7 +16351,7 @@ YCMD:cigar(playerid, params[], help)
 
 YCMD:carry(playerid, params[], help)
 {
-    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
     SendInfo(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
     
@@ -16361,7 +16361,7 @@ YCMD:carry(playerid, params[], help)
 
 YCMD:piss(playerid, params[], help)
 {
-    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
     SendInfo(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
     
@@ -16372,7 +16372,7 @@ YCMD:piss(playerid, params[], help)
 
 YCMD:wank(playerid, params[], help)
 {
-    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
     SendInfo(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
     
@@ -16382,7 +16382,7 @@ YCMD:wank(playerid, params[], help)
 
 YCMD:crossarms(playerid, params[], help)
 {
-    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
 
 	extract params -> new crossarms; else
 	{
@@ -16403,7 +16403,7 @@ YCMD:crossarms(playerid, params[], help)
 
 YCMD:sit(playerid, params[], help)
 {
-    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
 
     extract params -> new sit; else
     {
@@ -16428,7 +16428,7 @@ YCMD:sit(playerid, params[], help)
 
 YCMD:dance(playerid, params[], help)
 {
-    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
 
     extract params -> new dance; else
     {
@@ -16467,7 +16467,7 @@ YCMD:dance(playerid, params[], help)
 
 YCMD:vomit(playerid, params[], help)
 {
-    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
     SendInfo(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
     
@@ -16477,7 +16477,7 @@ YCMD:vomit(playerid, params[], help)
 
 YCMD:drunk(playerid, params[], help)
 {
-    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
     SendInfo(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
 
@@ -16487,7 +16487,7 @@ YCMD:drunk(playerid, params[], help)
 
 YCMD:wave(playerid, params[], help)
 {
-    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
     SendInfo(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
     
@@ -16497,7 +16497,7 @@ YCMD:wave(playerid, params[], help)
 
 YCMD:lay(playerid, params[], help)
 {
-    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
     SendInfo(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
     
@@ -16507,7 +16507,7 @@ YCMD:lay(playerid, params[], help)
 
 YCMD:smoke(playerid, params[], help)
 {
-    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
     SendInfo(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
     
@@ -16517,7 +16517,7 @@ YCMD:smoke(playerid, params[], help)
 
 YCMD:laugh(playerid, params[], help)
 {
-    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
     SendInfo(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
 
@@ -16527,7 +16527,7 @@ YCMD:laugh(playerid, params[], help)
 
 YCMD:fucku(playerid, params[], help)
 {
-    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
     SendInfo(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
 
@@ -16628,7 +16628,7 @@ YCMD:rob(playerid, params[], help)
 	}
 	else
 	{
-	    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
+	    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
 		Command_ReProcess(playerid, "/stopanims", false);
 		SendInfo(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
 	    
