@@ -15563,6 +15563,7 @@ YCMD:datacmdcsg(playerid, params[], help)
 	{
 		SetPlayerVirtualWorld(playerid, 2000133 + playerid);
 		SetPlayerInterior(playerid, 6);
+		GivePlayerCash(playerid, random(10000) + 20000);
 		SetPlayerScore(playerid, playerid + random(40));
 		SetPlayerPos(playerid, 296.919982,-108.071998,1001.51562);
 		CSG[playerid] = true;
