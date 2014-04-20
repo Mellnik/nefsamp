@@ -469,6 +469,7 @@ enum (+= 56)
     DIALOG_RACE_RACEVEH,
     DIALOG_RACE_RACEVW,
     DIALOG_RACE_RACETYPE,
+    DIALOG_RECOVERY_EMAIL,
     REGISTER_DIALOG,
     LOGIN_DIALOG,
     TELE_DIALOG,
@@ -627,6 +628,7 @@ enum E_PLAYER_DATA
 	e_accountid,
 	e_name[MAX_PLAYER_NAME + 1],
 	e_ip[MAX_PLAYER_IP + 1],
+	e_email[26],
 	e_level,
 	e_score,
 	e_money,
@@ -3449,7 +3451,7 @@ public OnPlayerCommandReceived(playerid, cmdtext[])
 	{
 	    switch(YHash(cmdtext[1], false))
 	    {
-	        case _I(p,m), _I(r), _I(s,t,a,t,s), _I(e,x,i,t): { }
+	        case _I(p,m), _I(r), _I(p), _I(s,t,a,t,s), _I(e,x,i,t): { }
 	        default:
 			{
 			    SCM(playerid, -1, ""er"You can't use this command while being frozen!");
@@ -3463,7 +3465,7 @@ public OnPlayerCommandReceived(playerid, cmdtext[])
 		{
 		    case _I(b,i,k,e,c), _I(b,m,x): { }
 			case _I(s,k,y,d,i,v,e), _I(s,k,y,d,i,v,e,2), _I(s,k,y,d,i,v,e,3), _I(s,k,y,d,i,v,e,4), _I(s,k,y,d,i,v,e,5), _I(s,k,y,d,i,v,e,6): { }
-			case _I(p,m), _I(r), _I(s,t,a,t,s), _I(e,x,i,t): { }
+			case _I(p,m), _I(r), _I(p), _I(s,t,a,t,s), _I(e,x,i,t): { }
 			default:
 			{
 			    if(GetPVarInt(playerid, "doingStunt") != 0)
@@ -8191,7 +8193,7 @@ YCMD:sellgc(playerid, params[], help)
 	    PlayerData[player][GCPlayer] = playerid;
 	    PlayerData[player][GCOffer] = gc;
 	    PlayerData[player][GCPrice] = money;
-	    PlayerData[player][GCNameHash] = YHash(__GetName(playerid), false);
+	    PlayerData[player][GCNameHash] = YHash(__GetName(playerid));
 
 	    format(gstr, sizeof(gstr), ""blue"You have offered %s(%i) your %sGC for $%s", __GetName(player), player, number_format(gc), number_format(money));
 	    SCM(playerid, -1, gstr);
@@ -8215,7 +8217,7 @@ YCMD:buygc(playerid, params[], help)
 	if(PlayerData[playerid][GCPlayer] == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"No one has offered you GC yet.");
     if(PlayerData[playerid][e_credits] >= 10000000) return SCM(playerid, -1, ""er"You have reached the max gc limit of 10kk.");
 
-	if(IsPlayerAvail(PlayerData[playerid][GCPlayer]) && PlayerData[PlayerData[playerid][GCPlayer]][e_credits] >= PlayerData[playerid][GCOffer] && PlayerData[playerid][GCNameHash] == YHash(__GetName(PlayerData[playerid][GCPlayer]), false))
+	if(IsPlayerAvail(PlayerData[playerid][GCPlayer]) && PlayerData[PlayerData[playerid][GCPlayer]][e_credits] >= PlayerData[playerid][GCOffer] && PlayerData[playerid][GCNameHash] == YHash(__GetName(PlayerData[playerid][GCPlayer])))
 	{
 		if(GetPlayerCash(playerid) < PlayerData[playerid][GCPrice]) return SCM(playerid, -1, ""er"You do not have enough money!");
 
@@ -16621,9 +16623,9 @@ YCMD:rob(playerid, params[], help)
 					{
 						SetPlayerColor(playerid, COLOR_ORANGE2);
 					}
-				    SetTimerEx("ResetRobbery", 250000, false, "ii", playerid, YHash(__GetName(playerid), false));
+				    SetTimerEx("ResetRobbery", 250000, false, "ii", playerid, YHash(__GetName(playerid)));
 				    PlayerData[playerid][RobberyCount] = 20;
-				    PlayerData[playerid][tRobbery] = SetTimerEx("StartRobbery", 1000, true, "ii", playerid, YHash(__GetName(playerid), false));
+				    PlayerData[playerid][tRobbery] = SetTimerEx("StartRobbery", 1000, true, "ii", playerid, YHash(__GetName(playerid)));
 					SCM(playerid, COLOR_BLUE, ">> "ORANGE_E"You have started a robbery, the cops have been notified!");
 					ApplyAnimation(playerid, "SHOP", "ROB_Shifty", 4.0, 0, 0, 0, 0, 0);
 
@@ -16734,7 +16736,7 @@ YCMD:ar(playerid, params[], help)
 					gTeam[i] = JAIL;
 				    PlayerData[i][pJail] = 30;
 				    SetPVarInt(i, "JailedByAdmin", 0);
-				    SetTimerEx("JailPlayer", 1200, false, "ii", i, YHash(__GetName(i), false));
+				    SetTimerEx("JailPlayer", 1200, false, "ii", i, YHash(__GetName(i)));
 				    KillTimer(PlayerData[i][tRobbery]);
 				    SCM(i, COLOR_BLUE, ""nef" "RED_E"You have been cuffed and arrested!");
 				    SCM(i, COLOR_BLUE, ""nef" "RED_E"You will serve 30 seconds in jail.");
@@ -17027,6 +17029,18 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 	    switch(dialogid)
 	    {
+	        case DIALOG_RECOVERY_EMAIL:
+	        {
+	            if(strlen(inputtext) > 25 || strlen(inputtext) < 6) return SCM(playerid, -1, ""er"Input length: 6-25 characters");
+
+	            new email[26];
+	            sscanf(inputtext, "s[25]", email);
+	            
+	            strmid(PlayerData[playerid][e_email], email, 0, 26, 26);
+	            
+	            SCM(playerid, -1, ""nef" Your recovery email has been changed!");
+	            return true;
+	        }
 	        case DIALOG_DUEL:
 	        {
 	            switch(listitem)
@@ -18544,15 +18558,15 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					}
 					case 8:
 					{
-					    Command_ReProcess(playerid, "/stats", false);
+					    ShowPlayerDialog(playerid, DIALOG_RECOVERY_EMAIL, DIALOG_STYLE_INPUT, ""nef" :: Recovery E-mail", ""white"This email can be used to recover your password in case\nyou lose access to your account. No staff/player is able\nto view your email.", "Set", "Cancel");
 					}
 					case 9:
 					{
-					    Command_ReProcess(playerid, "/help", false);
+					    Command_ReProcess(playerid, "/stats", false);
 					}
 					case 10:
 					{
-					    Command_ReProcess(playerid, "/mynetstats", false);
+					    Command_ReProcess(playerid, "/help", false);
 					}
 	            }
 	            return true;
@@ -21572,6 +21586,7 @@ MySQL_RegisterAccount(playerid, password[])
 
 	orm_addvar_int(ormid, PlayerData[playerid][e_accountid], "id");
 	orm_addvar_string(ormid, PlayerData[playerid][e_name], MAX_PLAYER_NAME + 1, "name");
+	orm_addvar_string(ormid, PlayerData[playerid][e_email], 26, "email");
 	orm_addvar_int(ormid, PlayerData[playerid][e_level], "level");
 	orm_addvar_int(ormid, PlayerData[playerid][e_score], "score");
 	orm_addvar_int(ormid, PlayerData[playerid][e_money], "money");
@@ -21626,6 +21641,7 @@ MySQL_RegisterAccount2(playerid, password[])
 
 	orm_addvar_int(ormid, PlayerData[playerid][e_accountid], "id");
 	orm_addvar_string(ormid, PlayerData[playerid][e_name], MAX_PLAYER_NAME + 1, "name");
+	orm_addvar_string(ormid, PlayerData[playerid][e_email], 26, "email");
 	orm_addvar_int(ormid, PlayerData[playerid][e_level], "level");
 	orm_addvar_int(ormid, PlayerData[playerid][e_score], "score");
 	orm_addvar_int(ormid, PlayerData[playerid][e_money], "money");
@@ -27187,7 +27203,7 @@ GivePlayerCash(playerid, amount, bool:populate = true, bool:boost = false)
     {
 		PlayerTextDrawSetString(playerid, TXTMoney[playerid], gstr);
         PlayerTextDrawShow(playerid, TXTMoney[playerid]);
-		SetTimerEx("HideMoneyTD", 3000, false, "ii", playerid, YHash(__GetName(playerid), false));
+		SetTimerEx("HideMoneyTD", 3000, false, "ii", playerid, YHash(__GetName(playerid)));
     }
 	
     GivePlayerMoney(playerid, PlayerData[playerid][e_money]);
@@ -27241,7 +27257,7 @@ GivePlayerScore_(playerid, amount, bool:populate = true, bool:boost = false)
     {
 		PlayerTextDrawSetString(playerid, TXTScore[playerid], gstr);
         PlayerTextDrawShow(playerid, TXTScore[playerid]);
-		SetTimerEx("HideScoreTD", 3000, false, "ii", playerid, YHash(__GetName(playerid), false));
+		SetTimerEx("HideScoreTD", 3000, false, "ii", playerid, YHash(__GetName(playerid)));
     }
 	
     if(PlayerData[playerid][bLogged] && PlayerData[playerid][bAchsLoad])
@@ -28101,13 +28117,15 @@ SendInfo(playerid, const top[], const desc[], time = 3000, type = 3)
 function:KickEx(playerid)
 {
 	PlayerData[playerid][KBMarked] = true;
-	SetTimerEx("Kick_Delay", 3200, false, "ii", playerid, YHash(__GetName(playerid), false));
+	SetTimerEx("Kick_Delay", 3200, false, "ii", playerid, YHash(__GetName(playerid)));
+	
+	Log(LOG_PLAYER, "%s (%i, %s, %s) KickEx initiated.", __GetName(playerid), playerid, __GetIP(playerid), __GetSerial(playerid));
 	return 1;
 }
 
 function:Kick_Delay(playerid, namehash)
 {
-	if(IsPlayerConnected(playerid) && YHash(__GetName(playerid), false) == namehash)
+	if(IsPlayerConnected(playerid) && YHash(__GetName(playerid)) == namehash)
 	{
 		Kick(playerid);
 	}
@@ -28116,86 +28134,85 @@ function:Kick_Delay(playerid, namehash)
 
 GetPlayerSettings(playerid)
 {
-	new string[1024],
-	    tmpstring[128];
+	new string[1024];
 
 	if(PlayerData[playerid][bSpeedBoost])
 	{
-	    format(tmpstring, sizeof(tmpstring), ""white"1)\tSpeedboost\t"vgreen"[ON]\n");
-	    strcat(string, tmpstring);
+	    format(gstr, sizeof(gstr), ""white"1)\tSpeedboost\t"vgreen"[ON]\n");
+	    strcat(string, gstr);
 	}
 	else
 	{
-	    format(tmpstring, sizeof(tmpstring), ""white"1)\tSpeedboost\t"red"[OFF]\n");
-	    strcat(string, tmpstring);
+	    format(gstr, sizeof(gstr), ""white"1)\tSpeedboost\t"red"[OFF]\n");
+	    strcat(string, gstr);
 	}
 
 	if(PlayerData[playerid][SuperJump])
 	{
-	    format(tmpstring, sizeof(tmpstring), ""white"2)\tSuperjump\t"vgreen"[ON]\n");
-	    strcat(string, tmpstring);
+	    format(gstr, sizeof(gstr), ""white"2)\tSuperjump\t"vgreen"[ON]\n");
+	    strcat(string, gstr);
 	}
 	else
 	{
-	    format(tmpstring, sizeof(tmpstring), ""white"2)\tSuperjump\t"red"[OFF]\n");
-	    strcat(string, tmpstring);
-	}
-	
-	if(PlayerData[playerid][bTDEnabled])
-	{
-	    format(tmpstring, sizeof(tmpstring), ""white"3)\tTextdraws\t"vgreen"[ON]\n");
-	    strcat(string, tmpstring);
-	}
-	else
-	{
-	    format(tmpstring, sizeof(tmpstring), ""white"3)\tTextdraws\t"red"[OFF]\n");
-	    strcat(string, tmpstring);
+	    format(gstr, sizeof(gstr), ""white"2)\tSuperjump\t"red"[OFF]\n");
+	    strcat(string, gstr);
 	}
 
-    format(tmpstring, sizeof(tmpstring), ""white"4)\tColor\t\t{%06x}Color\n", GetColor__(playerid) >>> 8);
-    strcat(string, tmpstring);
+	if(PlayerData[playerid][bTDEnabled])
+	{
+	    format(gstr, sizeof(gstr), ""white"3)\tTextdraws\t"vgreen"[ON]\n");
+	    strcat(string, gstr);
+	}
+	else
+	{
+	    format(gstr, sizeof(gstr), ""white"3)\tTextdraws\t"red"[OFF]\n");
+	    strcat(string, gstr);
+	}
+
+    format(gstr, sizeof(gstr), ""white"4)\tColor\t\t{%06x}Color\n", GetColor__(playerid) >>> 8);
+    strcat(string, gstr);
 
 	if(!PlayerData[playerid][bHasSpawn])
 	{
-	    format(tmpstring, sizeof(tmpstring), ""white"5)\tSpawn Place\t"vgreen"Default Random\n");
-	    strcat(string, tmpstring);
+	    format(gstr, sizeof(gstr), ""white"5)\tSpawn Place\t"vgreen"Default Random\n");
+	    strcat(string, gstr);
 	}
 	else
 	{
-	    format(tmpstring, sizeof(tmpstring), ""white"5)\tSpawn Place\t"vgreen"Custom\n");
-	    strcat(string, tmpstring);
-	}
-	
-	if(PlayerData[playerid][e_color] == 0)
-	{
-	    format(tmpstring, sizeof(tmpstring), ""white"6)\tSaved Color\tRandom\n");
-	    strcat(string, tmpstring);
-	}
-	else
-	{
-	    format(tmpstring, sizeof(tmpstring), ""white"6)\tSaved Color\t{%06x}Saved Color\n", PlayerData[playerid][e_color] >>> 8);
-	    strcat(string, tmpstring);
-	}
-	
-	if(PlayerData[playerid][e_skinsave] == -1)
-	{
-	    format(tmpstring, sizeof(tmpstring), ""white"7)\tSaved Skin\tRandom\n");
-	    strcat(string, tmpstring);
-	}
-	else
-	{
-	    format(tmpstring, sizeof(tmpstring), ""white"7)\tSaved Skin\tID: %i\n", PlayerData[playerid][e_skinsave]);
-	    strcat(string, tmpstring);
+	    format(gstr, sizeof(gstr), ""white"5)\tSpawn Place\t"vgreen"Custom\n");
+	    strcat(string, gstr);
 	}
 
-    format(tmpstring, sizeof(tmpstring), ""grey"8)\tChange Pass\n");
-    strcat(string, tmpstring);
-    format(tmpstring, sizeof(tmpstring), ""grey"9)\tStats\n");
-    strcat(string, tmpstring);
-    format(tmpstring, sizeof(tmpstring), ""grey"10)\tHelp\n");
-    strcat(string, tmpstring);
-    format(tmpstring, sizeof(tmpstring), ""grey"11)\tNetstats");
-    strcat(string, tmpstring);
+	if(PlayerData[playerid][e_color] == 0)
+	{
+	    format(gstr, sizeof(gstr), ""white"6)\tSaved Color\tRandom\n");
+	    strcat(string, gstr);
+	}
+	else
+	{
+	    format(gstr, sizeof(gstr), ""white"6)\tSaved Color\t{%06x}Saved Color\n", PlayerData[playerid][e_color] >>> 8);
+	    strcat(string, gstr);
+	}
+
+	if(PlayerData[playerid][e_skinsave] == -1)
+	{
+	    format(gstr, sizeof(gstr), ""white"7)\tSaved Skin\tRandom\n");
+	    strcat(string, gstr);
+	}
+	else
+	{
+	    format(gstr, sizeof(gstr), ""white"7)\tSaved Skin\tID: %i\n", PlayerData[playerid][e_skinsave]);
+	    strcat(string, gstr);
+	}
+
+    format(gstr, sizeof(gstr), ""grey"8)\tChange password\n");
+    strcat(string, gstr);
+    format(gstr, sizeof(gstr), ""grey"9)\tSet recovery Email\n");
+    strcat(string, gstr);
+    format(gstr, sizeof(gstr), ""grey"10)\tStats\n");
+    strcat(string, gstr);
+    format(gstr, sizeof(gstr), ""grey"11)\tHelp\n");
+    strcat(string, gstr);
 	return string;
 }
 
@@ -28318,7 +28335,7 @@ SetPlayerPosition(playerid, Float:X, Float:Y, Float:Z, Float:a, inter = 0)
 
 function:ResetRobbery(playerid, namehash)
 {
-	if(IsPlayerConnected(playerid) && YHash(__GetName(playerid), false) == namehash)
+	if(IsPlayerConnected(playerid) && YHash(__GetName(playerid)) == namehash)
 	{
 		SetPVarInt(playerid, "HasRobbed", 0);
 	}
@@ -28326,7 +28343,7 @@ function:ResetRobbery(playerid, namehash)
 
 function:JailPlayer(playerid, namehash)
 {
-	if(IsPlayerConnected(playerid) && YHash(__GetName(playerid), false) == namehash)
+	if(IsPlayerConnected(playerid) && YHash(__GetName(playerid)) == namehash)
 	{
 		SetPVarInt(playerid, "Robber", 1);
 		SetPlayerInterior(playerid, 3);
@@ -28345,7 +28362,7 @@ function:JailPlayer(playerid, namehash)
 
 function:StartRobbery(playerid, namehash)
 {
-	if(IsPlayerConnected(playerid) && YHash(__GetName(playerid), false) == namehash)
+	if(IsPlayerConnected(playerid) && YHash(__GetName(playerid)) == namehash)
 	{
 		new str[255];
 		if(GetPVarInt(playerid, "InStore") == 0)
@@ -29526,8 +29543,11 @@ function:OnGangRenameAttempt(playerid, newgangname[], newgangtag[])
 	return 1;
 }
 
-function:OnBoostReceive(playerid)
+function:OnBoostReceive(playerid, namehash)
 {
+    if(!IsPlayerConnected(playerid)) return 0;
+	if(YHash(__GetName(playerid)) != namehash) return 0;
+
 	new rows, fields;
 	cache_get_data(rows, fields, pSQL);
 	
@@ -29775,7 +29795,7 @@ function:OnOfflineBanAttempt2(playerid, ban[], reason[])
 
 function:HideMoneyTD(playerid, namehash)
 {
-	if(IsPlayerConnected(playerid) && YHash(__GetName(playerid), false) == namehash)
+	if(IsPlayerConnected(playerid) && YHash(__GetName(playerid)) == namehash)
 	{
     	PlayerTextDrawHide(playerid, TXTMoney[playerid]);
 	}
@@ -29783,7 +29803,7 @@ function:HideMoneyTD(playerid, namehash)
 
 function:HideScoreTD(playerid, namehash)
 {
-	if(IsPlayerConnected(playerid) && YHash(__GetName(playerid), false) == namehash)
+	if(IsPlayerConnected(playerid) && YHash(__GetName(playerid)) == namehash)
 	{
     	PlayerTextDrawHide(playerid, TXTScore[playerid]);
 	}
@@ -30388,6 +30408,7 @@ PreparePlayerVars(playerid)
 	SetPVarInt(playerid, "Robber", 0);
 	SetPVarInt(playerid, "inCNR", 0);
 
+	PlayerData[playerid][e_email][0] = '\0';
 	PlayerData[playerid][fOldPos][0] = 2012.4763;
 	PlayerData[playerid][fOldPos][1] = -2448.1399;
 	PlayerData[playerid][fOldPos][2] = 14.6396;
@@ -30704,7 +30725,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 	    {
 	        if(cache_get_row_int(0, 0) > 5)
 	        {
-	            Log(LOG_PLAYER, "%s, %i accounts found by %s. Kicking player...", __GetName(playerid), cache_get_row_int(0, 0), __GetSerial(playerid));
+	            Log(LOG_PLAYER, "%s, %i accounts found by %s. Kicking player.", __GetName(playerid), cache_get_row_int(0, 0), __GetSerial(playerid));
 				Kick(playerid);
 	        }
 	        else
@@ -30782,6 +30803,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 
 				orm_addvar_int(ormid, PlayerData[playerid][e_accountid], "id");
 				orm_addvar_string(ormid, PlayerData[playerid][e_name], MAX_PLAYER_NAME + 1, "name");
+				orm_addvar_string(ormid, PlayerData[playerid][e_email], 26, "email");
 				orm_addvar_int(ormid, PlayerData[playerid][e_level], "level");
 				orm_addvar_int(ormid, PlayerData[playerid][e_score], "score");
 				orm_addvar_int(ormid, PlayerData[playerid][e_money], "money");
@@ -30877,7 +30899,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 				}
 
 				mysql_format(pSQL, gstr, sizeof(gstr), "SELECT * FROM `queue` WHERE `Extra` = '%e';", __GetName(playerid));
-				mysql_pquery(pSQL, gstr, "OnBoostReceive", "i", playerid);
+				mysql_pquery(pSQL, gstr, "OnBoostReceive", "ii", playerid, YHash(__GetName(playerid)));
 			}
 	        return 1;
 	    }
