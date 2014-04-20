@@ -19,6 +19,7 @@
 || DNS Plugin 2.4
 ||
 || Build specific:
+|| add samp.ban
 ||
 */
 
@@ -802,7 +803,8 @@ enum E_PLAYER_ACH_DATA
 	e_ach_skydiver, // win /skydive and /skydive2 in a row
 	e_ach_biker, // win /bikec
 	e_ach_bmxmaster, // win /bmx
-	e_ach_settled // buy a house
+	e_ach_settled, // buy a house
+	e_ach_biocalc // Solve 40 math question
 };
 
 enum e_credits_matrix
@@ -15781,12 +15783,18 @@ YCMD:answer(playerid, params[], help)
 
 	GivePlayerScore_(playerid, 4, true, true);
 	GivePlayerCash(playerid, mathsAward, true, true);
+	PlayerData[playerid][e_mathwins]++;
+	
+    if(PlayerAchData[playerid][e_ach_biocalc][0] == 0 && PlayerData[playerid][e_mathwins] >= 40)
+    {
+        GivePlayerAchievement(playerid, e_ach_biocalc, "Biocalc", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
+	}
 
 	mathsAnswered = 1;
 	SendInfo(playerid, "~p~Congratulations!", "You gave the right maths answer", 4000);
 
-	format(str, sizeof(str), "Won a math challenge.\n%s", mathsCurrent, answer);
-	SetPlayerChatBubble(playerid, str, NEF_GREEN, 40.0, 12000);
+	format(gstr, sizeof(gstr), "Won a math challenge.\n%s", mathsCurrent, answer);
+	SetPlayerChatBubble(playerid, gstr, NEF_GREEN, 40.0, 12000);
 	return true;
 }
 
@@ -16304,6 +16312,7 @@ YCMD:achs(playerid, params[], help)
 		            case 12: format(gstr, sizeof(gstr), ""white"[%s"white"] Biker -> %s\n", tmp[e_ach_biker], UTConvert(PlayerAchData[player][e_ach_biker][1]));
 		            case 13: format(gstr, sizeof(gstr), ""white"[%s"white"] BMX Master -> %s\n", tmp[e_ach_bmxmaster], UTConvert(PlayerAchData[player][e_ach_bmxmaster][1]));
 		            case 14: format(gstr, sizeof(gstr), ""white"[%s"white"] Settled -> %s\n", tmp[e_ach_settled], UTConvert(PlayerAchData[player][e_ach_settled][1]));
+		            case 15: format(gstr, sizeof(gstr), ""white"[%s"white"] Biocalc -> %s\n", tmp[e_ach_biocalc], UTConvert(PlayerAchData[player][e_ach_biocalc][1]));
 				}
 		    }
 		    else
@@ -16327,6 +16336,7 @@ YCMD:achs(playerid, params[], help)
 		            case 12: format(gstr, sizeof(gstr), ""white"[%s"white"] Biker -> Win /bikec\n", tmp[e_ach_biker]);
 		            case 13: format(gstr, sizeof(gstr), ""white"[%s"white"] BMX Master -> Win /bmx\n", tmp[e_ach_bmxmaster]);
 		            case 14: format(gstr, sizeof(gstr), ""white"[%s"white"] Settled -> Purchase a house\n", tmp[e_ach_settled]);
+		            case 15: format(gstr, sizeof(gstr), ""white"[%s"white"] Biocalc -> Solve 40 math questions\n", tmp[e_ach_biocalc]);
 				}
 		    }
 		    
