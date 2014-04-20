@@ -10,7 +10,7 @@
 \*======================================================================*/
 
 /* Build Dependencies
-|| SA-MP Server 0.3z-R2
+|| SA-MP Server 0.3z-R2-2
 || YSI Library 3.1
 || sscanf Plugin 2.8.1
 || Streamer Plugin v2.7
@@ -90,7 +90,7 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define CURRENT_VERSION                 "PTS:Build 25"
 #endif
 #define HOTFIX_REV                      "Hotfix #0"
-#define SAMP_VERSION                    "SA-MP 0.3z-R2"
+#define SAMP_VERSION                    "SA-MP 0.3z R2-2"
 #define MAX_REPORTS 					(7)
 #define MAX_ADS                         (10)
 #define MAX_GANG_NAME					(20)
@@ -3070,6 +3070,11 @@ public OnPlayerFloodControl(playerid, iCount, iTimeSpan)
 		Kick(playerid);
     }
     return 1;
+}
+
+public OnIncomingConnection(playerid, ip_address[], port)
+{
+	return 1;
 }
 
 public OnPlayerConnect(playerid)
