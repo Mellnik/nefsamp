@@ -3535,7 +3535,7 @@ public OnVehicleMod(playerid, vehicleid, componentid)
 	new vmodel = GetVehicleModel(vehicleid);
 	if(!IsComponentIdCompatible(vmodel, componentid)) // Crasher
 	{
-	    printf("[CHEAT] Bad Vehicle Mod by [%i]%s using vc:%i with cp:%i", playerid, __GetName(playerid), vmodel, componentid);
+	    printf("[SUSPECT] Bad Vehicle Mod by [%i]%s using vc:%i with cp:%i", playerid, __GetName(playerid), vmodel, componentid);
 		return 0;
 	}
 	
