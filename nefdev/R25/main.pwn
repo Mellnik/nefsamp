@@ -3072,6 +3072,8 @@ public OnPlayerFloodControl(playerid, iCount, iTimeSpan)
 		format(sz_BanCmd, sizeof(sz_BanCmd), "banip %s", p_IP);
 		SendRconCommand(sz_BanCmd);
 		
+		Log(LOG_NET, "%i, %i flood detected, kicking (%s, %i)", iCount, iTimeSpan, p_IP, playerid);
+		
 		Kick(playerid);
     }
     return 1;
@@ -3106,6 +3108,7 @@ public OnPlayerConnect(playerid)
 	
 	if(count_t > 3 && !IsWhitelisted(__GetIP(playerid)))
 	{
+	    Log(LOG_NET, "%i connections detected, kicking (%s, %i)", count_t, __GetName(playerid), playerid);
 		Kick(playerid);
 		return 1;
 	}
@@ -3511,10 +3514,12 @@ public OnPlayerCommandPerformed(playerid, cmdtext[], success)
 	{
 	    return GameTextForPlayer(playerid, "~b~~h~stop command spam!", 2000, 3);
 	}
-	else if(PlayerData[playerid][iCoolDownCommand] >= 12 && PlayerData[playerid][e_level] < 2)
+	else if(PlayerData[playerid][iCoolDownCommand] >= 13 && PlayerData[playerid][e_level] < 2)
 	{
-		format(gstr, sizeof(gstr), "Command-Spam detected! %s(%i) has been kicked!", __GetName(playerid), playerid);
+		format(gstr, sizeof(gstr), "[SUSPECT] %i command-spam detected, kicking (%s, %i)", PlayerData[playerid][iCoolDownCommand], __GetName(playerid), playerid);
 		AdminMSG(RED, gstr);
+		Log(LOG_NET, gstr);
+		
 		PlayerData[playerid][iCoolDownCommand] = 0;
 		return Kick(playerid);
 	}
@@ -4147,10 +4152,12 @@ public OnPlayerText(playerid, text[])
 	}
 	else if(PlayerData[playerid][iCoolDownText] >= 15 && PlayerData[playerid][e_level] < 2)
 	{
-		format(gstr, sizeof(gstr), "Chat-Spam detected! %s(%i) has been kicked!", __GetName(playerid), playerid);
+		format(gstr, sizeof(gstr), "Chat-Spam detected! %s(%i) has been muted for 120 seconds!", __GetName(playerid), playerid);
 		AdminMSG(RED, gstr);
+		
 		PlayerData[playerid][iCoolDownText] = 0;
-		Kick(playerid);
+		PlayerData[playerid][tMute] = SetTimerEx("unmute", 120 * 1000, false, "i", playerid);
+		PlayerData[playerid][Muted] = true;
 		return 0;
 	}
 
@@ -4396,8 +4403,12 @@ public OnPlayerDeath(playerid, killerid, reason)
 	PlayerData[playerid][bIsDead] = true;
 	PlayerData[playerid][iCoolDownDeath]++;
 	SetTimerEx("CoolDownDeath", COOLDOWN_DEATH, false, "i", playerid);
-	if(PlayerData[playerid][iCoolDownDeath] >= 3)
+	if(PlayerData[playerid][iCoolDownDeath] >= 4)
 	{
+	    format(gstr, sizeof(gstr), "[SUSPECT] %i fake-death detected, kicking (%s, %i)", PlayerData[playerid][iCoolDownDeath], __GetName(playerid), playerid);
+	    AdminMSG(RED, gstr);
+	    Log(LOG_NET, gstr);
+	    
 		return Kick(playerid);
 	}
 	
@@ -6215,10 +6226,11 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 	    {
 			if((++PlayerData[playerid][VehicleSpamViolation]) >= 3 && !PlayerData[playerid][KBMarked])
 			{
-		        format(gstr, sizeof(gstr), "[AC] Vehicle spam hack detected: %s(%i) has been kicked", __GetName(playerid), playerid);
+		        format(gstr, sizeof(gstr), "[SUSPECT] %i vehicle spam hack detected, kicking (%s, %i)", PlayerData[playerid][VehicleSpamViolation], __GetName(playerid), playerid);
 		        AdminMSG(RED, gstr);
+		        Log(LOG_NET, gstr);
+		        
 			    Kick(playerid);
-			    print(gstr);
 			}
 	    }
 	}
@@ -10976,11 +10988,12 @@ YCMD:mute(playerid, params[], help)
 				return SCM(playerid, -1, ""er"This player is already muted");
 			}
 
-  			PlayerData[player][Muted] = true;
 	    	format(gstr, sizeof(gstr), ""yellow"** "red"%s(%i) has been muted by Admin %s(%i) for %i seconds [Reason: %s]", __GetName(player), player, __GetName(playerid), playerid, time, reason);
             SCMToAll(YELLOW, gstr);
             print(gstr);
+            
 			PlayerData[player][tMute] = SetTimerEx("unmute", time * 1000, false, "i", player);
+			PlayerData[player][Muted] = true;
 
 			format(gstr, sizeof(gstr), "4MUTE:3 %s(%i) has been muted for %i seconds by %s for %s", __GetName(player), player, time, __GetName(playerid), reason);
 			IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
@@ -21168,6 +21181,7 @@ function:SkipLogin(playerid)
 {
 	if((strlen(__GetName(playerid)) + 4) > 20)
 	{
+	    Log(LOG_NET, "Name error, cannot set new name, kicking (%s, %i)", __GetName(playerid), playerid);
 		return Kick(playerid);
 	}
 	
@@ -21210,6 +21224,7 @@ function:SkipLogin(playerid)
 	}
 	else
 	{
+	    Log(LOG_NET, "Name error, kicking (%s, %i)", __GetName(playerid), playerid);
 	    Kick(playerid);
 	}
 	return 1;
@@ -28134,12 +28149,12 @@ SendInfo(playerid, const top[], const desc[], time = 3000, type = 3)
 	return 1;
 }
 
-function:KickEx(playerid)
+KickEx(playerid, delay = 3200)
 {
 	PlayerData[playerid][KBMarked] = true;
-	SetTimerEx("Kick_Delay", 3200, false, "ii", playerid, YHash(__GetName(playerid)));
+	SetTimerEx("Kick_Delay", delay, false, "ii", playerid, YHash(__GetName(playerid)));
 	
-	Log(LOG_PLAYER, "%s (%i, %s, %s) KickEx initiated.", __GetName(playerid), playerid, __GetIP(playerid), __GetSerial(playerid));
+	Log(LOG_PLAYER, "%s (%i, %s, %s, %i) KickEx initiated.", __GetName(playerid), playerid, __GetIP(playerid), __GetSerial(playerid), delay);
 	return 1;
 }
 
@@ -30635,6 +30650,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
     if(!IsPlayerConnected(playerid)) return 0;
 
 	if(YHash(__GetName(playerid)) != namehash) {
+	    Log(LOG_NET, "OnPlayerAccountRequest data race detected, kicking (%s, %i, %i, %i)", __GetName(playerid), playerid, YHash(__GetName(playerid)), namehash);
 	    Kick(playerid);
 		return 0;
 	}
@@ -30731,12 +30747,12 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 	    {
 	        if(cache_get_row_int(0, 0) > 4)
 	        {
-	            Log(LOG_PLAYER, "%s, %i accounts found by %s. Kicking player...", __GetName(playerid), cache_get_row_int(0, 0), __GetIP(playerid));
+	            Log(LOG_PLAYER, "%i, %s IP accounts found, kicking (%s, %i)", cache_get_row_int(0, 0), __GetIP(playerid), __GetName(playerid), playerid);
 				Kick(playerid);
 			}
 			else
 			{
-		        mysql_format(pSQL, gstr2, sizeof(gstr2), "SELECT COUNT(`id`) FROM `accounts` WHERE `serial` = '%e' AND `regdate` > (UNIX_TIMESTAMP() - 43200);", __GetSerial(playerid));
+		        mysql_format(pSQL, gstr2, sizeof(gstr2), "SELECT COUNT(`id`) FROM `accounts` WHERE `serial` = '%e' AND `regdate` > (UNIX_TIMESTAMP() - 1800);", __GetSerial(playerid));
 		        mysql_pquery(pSQL, gstr2, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUST_VERIFY_REGISTER + 1);
 			}
 			return 1;
@@ -30745,7 +30761,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 	    {
 	        if(cache_get_row_int(0, 0) > 5)
 	        {
-	            Log(LOG_PLAYER, "%s, %i accounts found by %s. Kicking player.", __GetName(playerid), cache_get_row_int(0, 0), __GetSerial(playerid));
+	            Log(LOG_PLAYER, "%i, %s serial accounts found, kicking (%s, %i)", cache_get_row_int(0, 0), __GetSerial(playerid), __GetName(playerid), playerid);
 				Kick(playerid);
 	        }
 	        else
