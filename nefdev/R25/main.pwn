@@ -20,12 +20,12 @@
 ||
 || Build specific:
 || add samp.ban
-||
+|| add `email` after `serial` varchar 25 default: NoData
 */
 
 #pragma dynamic 8192
 
-#define IS_RELEASE_BUILD (true)
+#define IS_RELEASE_BUILD (false)
 #define INC_ENVIORMENT (true)
 #define IRC_CONNECT (true)
 #define WINTER_EDITION (false) // Requires ferriswheelfair.amx
@@ -930,6 +930,7 @@ enum e_gzone_data
 	iconid,
 	Text3D:label,
 	Text:E_Txt,
+	e_pickupid,
 	checkid,
 	zoneid,
 	zsphere,
@@ -3078,6 +3079,7 @@ public OnPlayerFloodControl(playerid, iCount, iTimeSpan)
 
 public OnIncomingConnection(playerid, ip_address[], port)
 {
+	Log(LOG_NET, "OnIncomingConnection(%i, %s, %i);", playerid, ip_address, port);
 	return 1;
 }
 
@@ -7032,6 +7034,11 @@ YCMD:quarry(playerid, params[], help)
 YCMD:bordel(playerid, params[], help)
 {
     PortPlayerMapVeh(playerid,-2682.1389,1344.4447,17.0603,244.5469,-2691.2363,1353.6704,16.7702,240.1605, "Bordel", "bordel");
+    return 1;
+}
+YCMD:airc(playerid, params[], help)
+{
+    PortPlayerMapVeh(playerid,-1415.2069,517.7242,18.2427,179.5160,-1415.2069,517.7242,18.2427,179.5160, "Aircraft Carrier", "airc");
     return 1;
 }
 YCMD:bayside(playerid, params[], help)
@@ -25706,9 +25713,10 @@ function:LogoSwitch()
 
 function:ProcessTick()
 {
-	static year, month, day, hour, minute, second;
+	static year, month, day, hour, minute, second, utime;
 	getdate(year, month, day);
 	gettime(hour, minute, second);
+	utime = gettime();
 
 	format(gstr, sizeof(gstr), "worldtime %02i:%02i | %02i.%02i", hour, minute, day, month);
 	SendRconCommand(gstr);
@@ -25992,6 +26000,18 @@ function:ProcessTick()
 
 	for(new i = 0; i < gzoneid; i++)
 	{
+        if(GZoneInfo[i][iLocked] > utime) {
+            if(GZoneInfo[i][e_pickupid] == -1) {
+                GZoneInfo[i][e_pickupid] = CreateDynamicPickup(1314, 1, GZoneInfo[i][E_x], GZoneInfo[i][E_y], GZoneInfo[i][E_z], 0, -1, -1);
+            }
+		} else {
+            if(GZoneInfo[i][e_pickupid] != -1) {
+				if(IsValidDynamicPickup(GZoneInfo[i][e_pickupid])) {
+                	DestroyDynamicPickup(GZoneInfo[i][e_pickupid]);
+				}
+            }
+		}
+	
 		if(GZoneInfo[i][bUnderAttack])
 		{
 			if(GZoneInfo[i][iTimeLeft] > 0)
