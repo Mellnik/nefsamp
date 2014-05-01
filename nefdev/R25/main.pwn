@@ -6061,11 +6061,14 @@ public OnObjectMoved(objectid)
 
 public OnPlayerClickPlayer(playerid, clickedplayerid, source)
 {
-	if(IsPlayerAvail(playerid))
+	if(source == CLICK_SOURCE_SCOREBOARD)
 	{
-		new string[30];
-		format(string, sizeof(string), "/stats %i", clickedplayerid);
-		Command_ReProcess(playerid, string, false);
+	    if(IsPlayerAvail(playerid))
+	    {
+	        new string[16];
+	        format(string, sizeof(string), "/stats %i", clickedplayerid);
+	        Command_ReProcess(playerid, string, false);
+	    }
 	}
 	return 1;
 }
