@@ -1658,6 +1658,7 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
 	g_CPProgress[MAX_PLAYERS],
 	g_RaceVehicle[MAX_PLAYERS],
 	g_RacePosition[MAX_PLAYERS],
+	m_PlayerRecord,
 	gstr[144],
 	gstr2[255],
 	lotto_number,
@@ -2497,6 +2498,7 @@ public OnGameModeInit()
     Server_MapPatches();
 
 	Log(LOG_INIT, "ProcessServerTravel: Loading Modules in OnGameModeInit");
+	ReadServerConfig();
 	ResetElevatorQueue();
 	Elevator_Initialize();
 	LoadServerStaticMeshes();
@@ -2848,6 +2850,10 @@ public OnPlayerSpawn(playerid)
 			GivePlayerWeapon(playerid, 34, 99999);
 			SetPlayerInterior(playerid, 0);
 
+			new rand = random(14);
+			SetPlayerPosEx(playerid, Sniper_Spawns[rand][0], Sniper_Spawns[rand][1], floatadd(Sniper_Spawns[rand][2], 3.5));
+			SetPlayerFacingAngle(playerid, Sniper_Spawns[rand][3]);
+			
             LoadMap(playerid);
 		}
 		case MINIGUN:
@@ -3096,10 +3102,11 @@ public OnPlayerConnect(playerid)
     GetPlayerName(playerid, PlayerData[playerid][e_name], MAX_PLAYER_NAME + 1);
     GetPlayerIp(playerid, PlayerData[playerid][e_ip], MAX_PLAYER_IP + 1);
 
-	new count_t = 0;
+	new count_t = 0, count_r = 0;
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(!IsPlayerConnected(i)) continue;
+		++count_r;
 	    if(!strcmp(__GetIP(i), PlayerData[playerid][e_ip]))
 	    {
 	        ++count_t;
@@ -3143,6 +3150,11 @@ public OnPlayerConnect(playerid)
 	else
 	{
 	    Log(LOG_NET, "%s(%i, %s, %s) connected.", __GetName(playerid), playerid, __GetIP(playerid), __GetSerial(playerid));
+	
+	    if(count_r > m_PlayerRecord) {
+	        m_PlayerRecord = count_r;
+	        SaveServerConfig();
+	    }
 	
 		TextDrawShowForPlayer(playerid, TXTOnJoin[0]);
 		TextDrawShowForPlayer(playerid, TXTOnJoin[1]);
@@ -4811,8 +4823,8 @@ public OnPlayerDeath(playerid, killerid, reason)
 				GivePlayerCash(killerid, 3000, true, true);
 		    }
 		    
-		    new rand = random(14);
-		    SetSpawnInfoEx(playerid, NO_TEAM, GetPlayerSkin(playerid), Sniper_Spawns[rand][0], Sniper_Spawns[rand][1], Sniper_Spawns[rand][2] + 3.5, Sniper_Spawns[rand][3]);
+		    /*new rand = random(14);
+		    SetSpawnInfoEx(playerid, NO_TEAM, GetPlayerSkin(playerid), Sniper_Spawns[rand][0], Sniper_Spawns[rand][1], Sniper_Spawns[rand][2] + 3.5, Sniper_Spawns[rand][3]);*/
 		}
 		case ROCKETDM:
 		{
@@ -9289,6 +9301,7 @@ YCMD:bounties(playerid, params[], help)
 
 YCMD:ff(playerid, params[], help)
 {
+    if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
 	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 	
 	new Float:height;
@@ -15369,7 +15382,7 @@ YCMD:stats(playerid, params[], help)
 			vip,
 			PlayerData[player1][e_medkits],
 			PlayerData[player1][e_houses],
-			GetPlayerBusinessCount(__GetName(playerid)),
+			GetPlayerBusinessCount(__GetName(player1)),
 			PlayerData[player1][e_wanteds],
 			UTConvert(PlayerData[player1][e_lastlogin]));
 			
@@ -27615,11 +27628,11 @@ function:ShowDialog(playerid, dialogid)
 	    }
 	    case SERVERSTATS_DIALOG:
 	    {
-	        new string[650];
+	        new string[680];
 	        format(string, sizeof(string), "%s since %s. During that time...\n\n... "yellow_e"%i "white"commands have been performed\n... "yellow_e"%i "white"chat messages have been sent\n... "yellow_e"%i "white"new players have registered\n... "yellow_e"%i "white"players have been murdered",
 				GetUptime(), UTConvert(StartTime), SrvStat[0], SrvStat[1], SrvStat[2], SrvStat[3]);
 				
-			format(gstr, sizeof(gstr), "\n\nStreamed client objects: %i\nServer FPS: %i", Streamer_CountVisibleItems(playerid, STREAMER_TYPE_OBJECT), GetServerTickRate());
+			format(gstr2, sizeof(gstr2), "\n\nStreamed client objects: %i\nTotal map obejcts: %i\nServer FPS: %i\nConcurrent player record: %i", Streamer_CountVisibleItems(playerid, STREAMER_TYPE_OBJECT), Streamer_CountItems(STREAMER_TYPE_OBJECT), GetServerTickRate(), m_PlayerRecord);
 	        strcat(string, gstr);
 	        strcat(string, "\n\nServer version: "SVRNAME" "CURRENT_VERSION", "HOTFIX_REV" on "SAMP_VERSION"");
 	        
@@ -29571,7 +29584,7 @@ function:OnGangRenameAttempt(playerid, newgangname[], newgangtag[])
 	        }
 	    }
 	    format(gstr2, sizeof(gstr2), "UPDATE `gangs` SET `GangName` = '%s', `GangTag` = '%s' WHERE `ID` = %i LIMIT 1;", newgangname, newgangtag, PlayerData[playerid][e_gangid]);
-	    mysql_tquery(pSQL, gstr2, "", "");
+	    mysql_tquery(pSQL, gstr2);
 	    
 	    format(gstr2, sizeof(gstr2), ""gang_sign" "r_besch"Gang Founder %s(%i) changed the gang's name to [%s]%s", __GetName(playerid), playerid, newgangtag, newgangname);
 		GangMSG(PlayerData[playerid][e_gangid], gstr2);
@@ -31062,4 +31075,15 @@ IsWhitelisted(ip[])
 	format(gstr, sizeof(gstr), "/Other/%s.ip", ip);
 	if(fexist(gstr)) return 1;
 	return 0;
+}
+
+ReadServerConfig()
+{
+    m_PlayerRecord = dini_Int("/Other/server.ini", "m_PlayerRecord");
+}
+
+SaveServerConfig()
+{
+	Log(LOG_ONLINE, "Updating server config");
+	dini_IntSet("/Other/server.ini", "m_PlayerRecord", m_PlayerRecord);
 }
