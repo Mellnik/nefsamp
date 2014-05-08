@@ -91,7 +91,7 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define CURRENT_VERSION                 "PTS:Build 25"
 #endif
 #define HOTFIX_REV                      "Hotfix #0"
-#define SAMP_VERSION                    "SA-MP 0.3z R2-2"
+#define SAMP_VERSION                    "SA-MP 0.3z-R2-2"
 #define MAX_REPORTS 					(7)
 #define MAX_ADS                         (10)
 #define MAX_GANG_NAME					(20)
