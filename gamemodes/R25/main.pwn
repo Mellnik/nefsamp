@@ -21,6 +21,7 @@
 || Build specific:
 || add samp.ban
 || add `email` after `serial` varchar 25 default: NoData
+|| rm `sessions` table
 */
 
 #pragma dynamic 8192
@@ -15215,9 +15216,7 @@ YCMD:cc(playerid, params[], help)
 YCMD:changename(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
-
-	format(gstr, sizeof(gstr), "SELECT `ip` FROM `sessions` WHERE `user_name` = '%s';", __GetName(playerid));
-	mysql_tquery(pSQL, gstr, "OnSessionCheck", "i", playerid);
+    ShowDialog(playerid, NAME_CHANGE_DIALOG);
 	return 1;
 }
 
@@ -29879,23 +29878,6 @@ function:OnIpLookUp(playerid, ip[])
 	else
 	{
   		SCM(playerid, BLUE, "No players found for this ip");
-	}
-	return 1;
-}
-
-function:OnSessionCheck(playerid)
-{
-	new rows, fields;
-	cache_get_data(rows, fields, pSQL);
-
-	if(rows == 0)
-	{
-		//format(gstr, sizeof(gstr), "SELECT COUNT(`ID`) FROM `queue` WHERE `Extra` LIKE '%%s%'
-	    ShowDialog(playerid, NAME_CHANGE_DIALOG);
-	}
-	else
-	{
-	    ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Namechange", ""red"Namechange not possible! You are currently logged into the UCP.\n\n"white"Please log out from the UCP. If you can't do so you have to have up to 30 minutes.", "OK", "");
 	}
 	return 1;
 }
