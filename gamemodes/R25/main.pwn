@@ -6788,68 +6788,32 @@ YCMD:treehouse(playerid, params[], help)
 }
 YCMD:trackmania(playerid, params[], help)
 {
-    if(PortPlayerMapVeh(playerid, 1297.3998, -5626.5122, 81.7, 149.0596,1297.3998, -5626.5122, 81.7, 149.0596, "Trackmania", "tm"))
-    {
-		if(GetPlayerState(playerid) == PLAYER_STATE_ONFOOT)
-		{
-			CarSpawner(playerid, 481, -1, false);
-		}
-    }
+    PortPlayerMapVeh(playerid, 1297.3998, -5626.5122, 81.7, 149.0596,1297.3998, -5626.5122, 81.7, 149.0596, "Trackmania", "tm");
     return 1;
 }
 YCMD:trackmania2(playerid, params[], help)
 {
-    if(PortPlayerMapVeh(playerid, -1929.1312, 6627.0327, 12.0, 180.0,-1929.1312, 6627.0327, 12.0, 180.0, "Trackmania 2", "tm2"))
-    {
-		if(GetPlayerState(playerid) == PLAYER_STATE_ONFOOT)
-		{
-			CarSpawner(playerid, 481, -1, false);
-		}
-    }
+    PortPlayerMapVeh(playerid, -1929.1312, 6627.0327, 12.0, 180.0,-1929.1312, 6627.0327, 12.0, 180.0, "Trackmania 2", "tm2");
     return 1;
 }
 YCMD:trackmania3(playerid, params[], help)
 {
-    if(PortPlayerMapVeh(playerid, -5697.0776,2790.4932,5.6020,359.4344, -5697.0776,2790.4932,5.6020,359.4344, "Trackmania 3", "tm3"))
-    {
-		if(GetPlayerState(playerid) == PLAYER_STATE_ONFOOT)
-		{
-			CarSpawner(playerid, 481, -1, false);
-		}
-    }
+    PortPlayerMapVeh(playerid, -5697.0776,2790.4932,5.6020,359.4344, -5697.0776,2790.4932,5.6020,359.4344, "Trackmania 3", "tm3");
     return 1;
 }
 YCMD:ip(playerid, params[], help)
 {
-    if(PortPlayerMapVeh(playerid, -5051.7461, -2237.2556, 10.9, 359.8096,-5051.7461, -2237.2556, 10.9, 359.8096, "Infernus Paradise", "ip"))
-    {
-		if(GetPlayerState(playerid) == PLAYER_STATE_ONFOOT)
-		{
-			CarSpawner(playerid, 481, -1, false);
-		}
-    }
+    PortPlayerMapVeh(playerid, -5051.7461, -2237.2556, 10.9, 359.8096,-5051.7461, -2237.2556, 10.9, 359.8096, "Infernus Paradise", "ip");
     return 1;
 }
 YCMD:ip2(playerid, params[], help)
 {
-    if(PortPlayerMapVeh(playerid, -297.6044, 3682.8264, 24.0, 0.0, -297.6044, 3682.8264, 24.0, 0.0, "Infernus Paradise 2", "ip2"))
-    {
-		if(GetPlayerState(playerid) == PLAYER_STATE_ONFOOT)
-		{
-			CarSpawner(playerid, 481, -1, false);
-		}
-    }
+   	PortPlayerMapVeh(playerid, -297.6044, 3682.8264, 24.0, 0.0, -297.6044, 3682.8264, 24.0, 0.0, "Infernus Paradise 2", "ip2");
     return 1;
 }
 YCMD:ip3(playerid, params[], help)
 {
-    if(PortPlayerMapVeh(playerid, 4546.4175,655.6476,13.4803,0.0375,4546.4175,655.6476,13.4803,0.0375, "Infernus Paradise 3", "ip3"))
-    {
-		if(GetPlayerState(playerid) == PLAYER_STATE_ONFOOT)
-		{
-			CarSpawner(playerid, 481, -1, false);
-		}
-    }
+    PortPlayerMapVeh(playerid, 4546.4175,655.6476,13.4803,0.0375,4546.4175,655.6476,13.4803,0.0375, "Infernus Paradise 3", "ip3");
     return 1;
 }
 YCMD:disney(playerid, params[], help)
@@ -7066,7 +7030,7 @@ YCMD:bordel(playerid, params[], help)
 }
 YCMD:airc(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid,-1415.2069,517.7242,18.2427,179.5160,-1415.2069,517.7242,18.2427,179.5160, "Aircraft Carrier", "airc");
+    PortPlayerMapVeh(playerid,-1415.2069,517.7242,18.2427,179.5160,-1407.8441,505.6808,18.0025,89.5673, "Aircraft Carrier", "airc");
     return 1;
 }
 YCMD:bayside(playerid, params[], help)
@@ -16380,7 +16344,7 @@ YCMD:achs(playerid, params[], help)
 		    strcat(finstring, gstr);
 		}
 
-		if(player == playerid) strcat(finstring, "\n\n"white"Use /achs <playerid> to see someone else's achievements");
+		if(player == playerid) strcat(finstring, "\n"white"Use /achs <playerid> to see someone else's achievements");
 
 		ShowPlayerDialog(playerid, ACHS_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" :: Achievements", finstring, "OK", "");
 	}
@@ -19268,10 +19232,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				switch(listitem)
 		    	{
-	      			case 0: ShowPlayerDialog(playerid, STREAM_DIALOG+1, DIALOG_STYLE_LIST, ""nef" :: Streams > Streams > Electronic", "#MUSIK.TRANCE - WWW.RAUTEMUSIK.FM\n:: Electro Radio :: all about electromusic", "Select", "Back");
+	      			case 0: ShowPlayerDialog(playerid, STREAM_DIALOG+1, DIALOG_STYLE_LIST, ""nef" :: Streams > Streams > Electro", "#MUSIK.TRANCE - WWW.RAUTEMUSIK.FM\n:: Electro Radio :: all about electromusic", "Select", "Back");
 					case 1: ShowPlayerDialog(playerid, STREAM_DIALOG+2, DIALOG_STYLE_LIST, ""nef" :: Streams > Metal", "RockRadio1.Com - Classic Hard Rock and Heavy\n#MUSIK.METAL - WWW.RAUTEMUSIK.FM", "Select", "Back");
 					case 2: ShowPlayerDialog(playerid, STREAM_DIALOG+3, DIALOG_STYLE_LIST, ""nef" :: Streams > Pop", "idobi Radio: New. Music.\nChartHits.FM - Top 40 Radio", "Select", "Back");
-					case 3: ShowPlayerDialog(playerid, STREAM_DIALOG+4, DIALOG_STYLE_LIST, ""nef" :: Streams > Hip Hop", "HOT 108 JAMZ - #1 FOR HIP HOP\nRadio Traditional Hip Hop", "Select", "Back");
+					case 3: ShowPlayerDialog(playerid, STREAM_DIALOG+4, DIALOG_STYLE_LIST, ""nef" :: Streams > Hip Hop", "HOT 108 JAMZ - #1 FOR HIP HOP\nBlackBeats.FM - finest in blackbeats", "Select", "Back");
 					case 4: ShowPlayerDialog(playerid, STREAM_DIALOG+5, DIALOG_STYLE_LIST, ""nef" :: Streams > Rap", "POWERHITZ.COM - #1 FOR HITZ\nRADIOUP.COM - THE HITLIST", "Select", "Back");
 					case 5: ShowPlayerDialog(playerid, STREAM_DIALOG+6, DIALOG_STYLE_LIST, ""nef" :: Streams > Mainstream/Rock", "#MUSIK.MAIN - WWW.RAUTEMUSIK.FM - 24H\n181.FM - Kickin' Country", "Select", "Back");
 					case 6: ShowPlayerDialog(playerid, STREAM_DIALOG+7, DIALOG_STYLE_LIST, ""nef" :: Streams > Oldies", "181.FM - Good Time Oldies\n#MUSIK.GOLDIES - WWW.RAUTEMUSIK.FM", "Select", "Back");
@@ -19284,7 +19248,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				switch(listitem)
 		    	{
-		        	case 0: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=29555");
+		        	case 0: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=99195090");
 		        	case 1: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=108251");
     			}
 				return true;
@@ -19312,7 +19276,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	  			switch(listitem)
 		    	{
 		        	case 0: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=8318");
-		        	case 1: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=96885");
+		        	case 1: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=7581");
 				}
 				return true;
 			}
@@ -19339,7 +19303,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				switch(listitem)
 		    	{
 		        	case 0: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=19821");
-		        	case 1: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=28831");
+		        	case 1: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=99195102");
 				}
 				return true;
 			}
@@ -19347,7 +19311,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				switch(listitem)
 		    	{
-		        	case 0: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=5415");
+		        	case 0: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=39428");
 		        	case 1: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=50909");
 				}
 				return true;
@@ -21263,17 +21227,25 @@ GetPlayingTimeFormat(playerid)
 
 CarSpawner(playerid, model, respawn_delay = -1, bool:spawnzone_check = true)
 {
-	if(gTeam[playerid] == gDUEL) return SCM(playerid, -1, ""er"You tryin' to abuse? ;)");
+	if(gTeam[playerid] == gDUEL)
+	{
+	    return 0;
+	}
 	
 	if(model == 432 || model == 425 || model == 447 || model == 571 || model == 568 || model == 539 || model == 545 || model == 464)
 	{
 	    if(PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 	    {
-            return SCM(playerid, -1, ""er"Only founders can spawn this");
+	        SCM(playerid, -1, ""er"Only founders can spawn this");
+            return 0;
 		}
 	}
 	
-	if(model == 520 && PlayerData[playerid][e_vip] == 0 && PlayerData[playerid][e_level] == 0) return SCM(playerid, -1, ""er"Only admins can spawn this");
+	if(model == 520 && PlayerData[playerid][e_vip] == 0 && PlayerData[playerid][e_level] == 0)
+	{
+	    SCM(playerid, -1, ""er"Only admins can spawn this");
+		return 0;
+	}
 	
 	if(model == 520 && PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL && PlayerData[playerid][bGWarMode])
 	{
@@ -21286,14 +21258,16 @@ CarSpawner(playerid, model, respawn_delay = -1, bool:spawnzone_check = true)
 		    
 		    if(IsPointInDynamicArea(GZoneInfo[i][zsphere], POS[0], POS[1], POS[2]))
 		    {
-		        return SendInfo(playerid, "Failed to spawn hydra", "Not allowed in the gang zone");
+		        SendInfo(playerid, "Failed to spawn hydra", "Not allowed in the gang zone");
+		        return 0;
 		    }
 		}
 	}
 	
 	if(model == 538 || model == 537 || model == 449)
 	{
-		return SendInfo(playerid, "Failed to spawn vehicle", "not allowed");
+	    SendInfo(playerid, "Failed to spawn vehicle", "not allowed");
+		return 0;
 	}
 	
 	if(spawnzone_check)
@@ -21302,7 +21276,8 @@ CarSpawner(playerid, model, respawn_delay = -1, bool:spawnzone_check = true)
 		{
 		    if(IsPlayerInDynamicArea(playerid, g_SpawnAreas[ii]))
 		    {
-		        return SendInfo(playerid, "No vehicles at spawn point", "");
+		        SendInfo(playerid, "No vehicles at spawn point", "");
+		        return 0;
 		    }
 		}
 	}
@@ -27631,8 +27606,8 @@ function:ShowDialog(playerid, dialogid)
 	        format(string, sizeof(string), "%s since %s. During that time...\n\n... "yellow_e"%i "white"commands have been performed\n... "yellow_e"%i "white"chat messages have been sent\n... "yellow_e"%i "white"new players have registered\n... "yellow_e"%i "white"players have been murdered",
 				GetUptime(), UTConvert(StartTime), SrvStat[0], SrvStat[1], SrvStat[2], SrvStat[3]);
 				
-			format(gstr2, sizeof(gstr2), "\n\nStreamed client objects: %i\nTotal map obejcts: %i\nServer FPS: %i\nConcurrent player record: %i", Streamer_CountVisibleItems(playerid, STREAMER_TYPE_OBJECT), Streamer_CountItems(STREAMER_TYPE_OBJECT), GetServerTickRate(), m_PlayerRecord);
-	        strcat(string, gstr);
+			format(gstr2, sizeof(gstr2), "\n\nStreamed client objects: %i\nTotal map obejcts: %i\nServer FPS: %i\nPlayer record: %i", Streamer_CountVisibleItems(playerid, STREAMER_TYPE_OBJECT), Streamer_CountItems(STREAMER_TYPE_OBJECT), GetServerTickRate(), m_PlayerRecord);
+	        strcat(string, gstr2);
 	        strcat(string, "\n\nServer version: "SVRNAME" "CURRENT_VERSION", "HOTFIX_REV" on "SAMP_VERSION"");
 	        
 	        ShowPlayerDialog(playerid, SERVERSTATS_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" :: Server Stats", string, "OK", "");
