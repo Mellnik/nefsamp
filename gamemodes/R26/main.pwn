@@ -1,6 +1,6 @@
 /*======================================================================*\
 || #################################################################### ||
-|| # Project New Evolution Freeroam - Build 25 	        			  # ||
+|| # Project New Evolution Freeroam - Build 26 	        			  # ||
 || # ---------------------------------------------------------------- # ||
 || # Copyright ©2011-2014 New Evolution Freeroam	  				  # ||
 || # Created by Mellnik                                               # ||
@@ -19,9 +19,7 @@
 || DNS Plugin 2.4
 ||
 || Build specific:
-|| add samp.ban
-|| add `email` after `serial` varchar 25 default: NoData
-|| rm `sessions` table
+|| 
 */
 
 #pragma dynamic 8192
@@ -87,9 +85,9 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define SERVER_IP                       "31.204.152.218:7777"
 #define HOSTNAME                        " 	      ..:: NEF ::.. ×Stunt/DM/Race/Minigames×"
 #if IS_RELEASE_BUILD == true
-#define CURRENT_VERSION                 "Build 25"
+#define CURRENT_VERSION                 "Build 26"
 #else
-#define CURRENT_VERSION                 "PTS:Build 25"
+#define CURRENT_VERSION                 "PTS:Build 26"
 #endif
 #define HOTFIX_REV                      "Hotfix #0"
 #define SAMP_VERSION                    "SA-MP 0.3z-R2-2"
