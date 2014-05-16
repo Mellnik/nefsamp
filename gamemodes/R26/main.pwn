@@ -13,9 +13,9 @@
 || SA-MP Server 0.3z-R2-2
 || YSI Library 3.1
 || sscanf Plugin 2.8.1
-|| Streamer Plugin v2.7
+|| Streamer Plugin v2.7.2
 || MySQL Plugin R38
-|| IRC Plugin 1.4.4
+|| IRC Plugin 1.4.5
 || DNS Plugin 2.4
 ||
 || Build specific:
@@ -143,6 +143,7 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define MAX_TELE_CATEGORYS              (10)
 #define RGBA(%1,%2,%3,%4) (((((%1) & 0xff) << 24) | (((%2) & 0xff) << 16) | (((%3) & 0xff) << 8) | ((%4) & 0xff)))
 #define UpperToLower(%1) for(new ToLowerChar; ToLowerChar < strlen(%1); ToLowerChar++) if(%1[ToLowerChar] > 64 && %1[ToLowerChar] < 91) %1[ToLowerChar] += 32
+#define IRC_PLUGIN_VERSION              "v1.4.5"
 
 // Derby
 #define DERBY_WIHLE_CAM_M1				-3948.2632, 951.8198, 78.4012
@@ -6592,10 +6593,7 @@ public OnPlayerEditAttachedObject(playerid, response, index, modelid, boneid, Fl
     return 1;
 }
 
-// ===
-// commands
-// ===
-
+// Commands
 #if IRC_CONNECT == true
 IRCCMD:say(botid, channel[], user[], host[], params[])
 {
@@ -6603,15 +6601,15 @@ IRCCMD:say(botid, channel[], user[], host[], params[])
 	{
 		if(!isnull(params))
 		{
-			if(IsAd(params)) return 1;
-
-			format(gstr, sizeof(gstr), "02*** %s on IRC: %s", user, params);
-			IRC_GroupSay(IRC_GroupID, channel, gstr);
-			format(gstr, sizeof(gstr), "*** [IRC] %s: %s", user, params);
-			SCMToAll(GREY, gstr);
-			printf("[IRC] (%s)%s(%i): %s", host, user, botid, params);
+			if(!IsAd(params))
+			{
+				format(gstr, sizeof(gstr), "02*** %s on IRC: %s", user, params);
+				IRC_GroupSay(IRC_GroupID, channel, gstr);
+				format(gstr, sizeof(gstr), "*** [IRC] %s: %s", user, params);
+				SCMToAll(GREY, gstr);
+				printf("[IRC] (%s)%s(%i): %s", host, user, botid, params);
+			}
 		}
-		else IRC_ReplyCTCP(botid, user, "7Usage: 2!say <message>");
 	}
 	return 1;
 }
@@ -6625,7 +6623,7 @@ IRCCMD:playerlist(botid, channel[], user[], host[], params[])
 		    if(IsPlayerConnected(i))
 		    {
 		        format(gstr, sizeof(gstr), "2%s(%i)", __GetName(i), i);
-		        IRC_ReplyCTCP(botid, user, gstr);
+		        IRC_Say(botid, user, gstr);
 		    }
 		}
 	}
@@ -6634,16 +6632,18 @@ IRCCMD:playerlist(botid, channel[], user[], host[], params[])
 
 IRCCMD:cc(botid, channel[], user[], host[], params[])
 {
-   	if(!IRC_IsHalfop(botid, channel, user)) return 0;
-
-	for(new i = 0; i < 21; i++)
+   	if(IRC_IsHalfop(botid, channel, user))
 	{
-	    SCMToAll(COLOR_SYSTEM, " ");
+		for(new i = 0; i < 21; i++)
+		{
+		    SCMToAll(COLOR_SYSTEM, " ");
+		}
+		
+		format(gstr, sizeof(gstr), "Administrator %s(IRC) has cleared the chat!", user);
+		SCMToAll(COLOR_STEELBLUE, gstr);
+		format(gstr, sizeof(gstr), "4Server: 2Administrator %s(IRC) cleared the chat", user);
+		IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 	}
-	format(gstr, sizeof(gstr), "Administrator %s(IRC) has cleared the chat!", user);
-	SCMToAll(COLOR_STEELBLUE, gstr);
-	format(gstr, sizeof(gstr), "4Server: 2Administrator %s(IRC) cleared the chat", user);
-	IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 	return 1;
 }
 #endif
@@ -20250,18 +20250,33 @@ public OnDynamicObjectMoved(objectid)
 	return 1;
 }
 
-public IRC_OnConnect(botid)
+#if IRC_CONNECT == true
+public IRC_OnConnect(botid, ip[], port)
 {
+    printf("*** IRC_OnConnect: Bot ID %d connected to %s:%d", botid, ip, port);
     IRC_JoinChannel(botid, IRC_CHANNEL);
     IRC_AddToGroup(IRC_GroupID, botid);
     return 1;
 }
 
-public IRC_OnDisconnect(botid)
+public IRC_OnDisconnect(botid, ip[], port, reason[])
 {
+    printf("*** IRC_OnDisconnect: Bot ID %d disconnected from %s:%d (%s)", botid, ip, port, reason);
 	IRC_RemoveFromGroup(IRC_GroupID, botid);
 	return 1;
 }
+
+public IRC_OnUserRequestCTCP(botid, user[], host[], message[])
+{
+	printf("*** IRC_OnUserRequestCTCP (Bot ID %d): User %s (%s) sent CTCP request: %s", botid, user, host, message);
+	// Someone sent a CTCP VERSION request
+	if (!strcmp(message, "VERSION"))
+	{
+		IRC_ReplyCTCP(botid, user, "VERSION SA-MP IRC Plugin v" #IRC_PLUGIN_VERSION "");
+	}
+	return 1;
+}
+#endif
 
 public OnReverseDNS(ip[], host[], extra)
 {
