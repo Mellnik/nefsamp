@@ -16920,7 +16920,7 @@ public OnVehicleSpawn(vehicleid)
 	return 1;
 }
 
-function:OnPlayerNameChangeRequest(newname[], playerid)
+function:OnPlayerNameChangeRequest(playerid, newname[])
 {
 	new rows, fields;
 	cache_get_data(rows, fields, pSQL);
@@ -18305,7 +18305,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				mysql_escape_string(inputtext, newname, pSQL, MAX_PLAYER_NAME + 1);
 				
                 mysql_format(pSQL, gstr, sizeof(gstr), "SELECT `id` FROM `accounts` WHERE `name` = '%e';", inputtext);
-                mysql_tquery(pSQL, gstr, "OnPlayerNameChangeRequest", "si", newname, playerid);
+                mysql_tquery(pSQL, gstr, "OnPlayerNameChangeRequest", "is", playerid, newname);
 	            return true;
 	        }
 	        case HAREFILL_DIALOG:
@@ -21484,7 +21484,11 @@ MySQL_SaveAccount(playerid, bool:toys = true, bool:pv = true)
     PlayerData[playerid][e_time] = PlayerData[playerid][e_time] + (gettime() - PlayerData[playerid][ConnectTime]);
     PlayerData[playerid][ConnectTime] = gettime();
     
-    orm_update(PlayerData[playerid][e_ormid]);
+    if(PlayerData[playerid][e_ormid] == ORM:-1) {
+    	Log(LOG_PLAYER, "Crit: ORM -1 in SaveAccount %s, %i", name, playerid);
+	} else {
+	    orm_update(PlayerData[playerid][e_ormid]);
+	}
 
     if(toys)
 	{
