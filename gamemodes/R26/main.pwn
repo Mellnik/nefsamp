@@ -7358,7 +7358,7 @@ YCMD:skydive6(playerid, params[], help)
 }
 YCMD:pool(playerid, params[], help)
 {
-    PortPlayerMap(playerid,4155.7158,2426.9578,1.2054,358.2449, "Pool", "pool");
+    PortPlayerMap(playerid,4155.7158,2426.9578,1.4054,358.2449, "Pool", "pool");
     return 1;
 }
 YCMD:docks(playerid, params[], help)
@@ -12647,6 +12647,8 @@ YCMD:getin(playerid, params[], help)
 
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
+		if(gTeam[playerid] != FREEROAM) return SCM(playerid, -1, ""er"Not useable in minigames");
+		if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 		
 		if(IsPlayerAvail(player))
 		{
@@ -21485,7 +21487,7 @@ MySQL_SaveAccount(playerid, bool:toys = true, bool:pv = true)
     PlayerData[playerid][ConnectTime] = gettime();
     
     if(PlayerData[playerid][e_ormid] == ORM:-1) {
-    	Log(LOG_PLAYER, "Crit: ORM -1 in SaveAccount %s, %i", name, playerid);
+    	Log(LOG_PLAYER, "Crit: ORM -1 in SaveAccount %s, %i", __GetName(playerid), playerid);
 	} else {
 	    orm_update(PlayerData[playerid][e_ormid]);
 	}
