@@ -1,6 +1,6 @@
 /*======================================================================*\
 || #################################################################### ||
-|| # Project New Evolution Freeroam - Build 26 	        			  # ||
+|| # Project New Evolution Freeroam - Build 27 	        			  # ||
 || # ---------------------------------------------------------------- # ||
 || # Copyright ©2011-2014 New Evolution Freeroam	  				  # ||
 || # Created by Mellnik                                               # ||
@@ -85,9 +85,9 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define SERVER_IP                       "31.204.152.218:7777"
 #define HOSTNAME                        " 	      ..:: NEF ::.. ×Stunt/DM/Race/Minigames×"
 #if IS_RELEASE_BUILD == true
-#define CURRENT_VERSION                 "Build 26"
+#define CURRENT_VERSION                 "Build 27"
 #else
-#define CURRENT_VERSION                 "PTS:Build 26"
+#define CURRENT_VERSION                 "PTS:Build 27"
 #endif
 #define HOTFIX_REV                      "Hotfix #0"
 #define SAMP_VERSION                    "SA-MP 0.3z-R2-2"
@@ -10148,7 +10148,7 @@ YCMD:iplookup(playerid, params[], help)
 {
 	if(PlayerData[playerid][e_level] >= 3)
 	{
-	    if(sscanf(params, "s[144]", gstr))
+	    if(sscanf(params, "s[143]", gstr))
 	    {
 	        return SCM(playerid, NEF_GREEN, "Usage: /iplookup <ip>");
 	    }
@@ -10621,16 +10621,17 @@ YCMD:ncrecords(playerid, params[], help)
 {
     if(PlayerData[playerid][e_vip] != 1 && PlayerData[playerid][e_level] == 0) return Command_ReProcess(playerid, "/vip", false);
 
-	new name[25];
-	if(sscanf(params, "s[24]", name))
+	if(sscanf(params, "s[143]", gstr))
 	{
 		mysql_tquery(pSQL, "SELECT * FROM `ncrecords` ORDER BY `ID` DESC LIMIT 10;", "OnNCReceive", "i", playerid);
 	}
 	else
 	{
-		new query[255];
-		format(query, sizeof(query), "SELECT * FROM `ncrecords` WHERE `OldName` = '%s' OR `NewName` = '%s';", name, name);
-		mysql_tquery(pSQL, query, "OnNCReceive2", "is", playerid, name);
+		if(strlen(gstr) > MAX_PLAYER_NAME)
+		    return SCM(playerid, -1, ""er"Invalid player name length");
+	
+		format(gstr2, sizeof(gstr2), "SELECT * FROM `ncrecords` WHERE `OldName` = '%s' OR `NewName` = '%s';", gstr, gstr);
+		mysql_tquery(pSQL, gstr2, "OnNCReceive2", "is", playerid, gstr);
 	}
 	return 1;
 }
@@ -10640,7 +10641,7 @@ YCMD:warn(playerid, params[], help)
     if(PlayerData[playerid][e_level] >= 1)
 	{
  		new player, reason[144];
-		if(sscanf(params, "rs[144]", player, reason))
+		if(sscanf(params, "rs[143]", player, reason))
 		{
 			return SCM(playerid, NEF_GREEN, "Usage: /warn <playerid> <reason>");
 		}
@@ -10908,7 +10909,7 @@ YCMD:kick(playerid, params[], help)
 	    }
 	    
  		new player, reason[144];
-		if(sscanf(params, "rs[144]", player, reason))
+		if(sscanf(params, "rs[143]", player, reason))
 		{
 			return SCM(playerid, NEF_GREEN, "Usage: /kick <playerid> <reason>");
 		}
@@ -10949,7 +10950,7 @@ YCMD:mute(playerid, params[], help)
 	if(PlayerData[playerid][e_level] >= 1)
 	{
  		new player, time, reason[144];
-		if(sscanf(params, "ris[144]", player, time, reason))
+		if(sscanf(params, "ris[143]", player, time, reason))
 		{
 			return SCM(playerid, NEF_GREEN, "Usage: /mute <playerid> <seconds> <reason>");
 		}
@@ -11055,7 +11056,7 @@ YCMD:grename(playerid, params[], help)
 	
 	new buff[144], buff2[144];
 	
-	if(sscanf(params, "s[144]s[144]", buff, buff2))
+	if(sscanf(params, "s[143]s[143]", buff, buff2))
 	{
 	    return SCM(playerid, NEF_GREEN, "Usage: /grename <new gang name> <new gang tag>");
 	}
@@ -11198,8 +11199,8 @@ YCMD:gdestroy(playerid, params[], help)
 {
 	if(PlayerData[playerid][e_level] >= MAX_ADMIN_LEVEL)
 	{
-		new to_destroy[22];
-		if(sscanf(params, "s[21]", to_destroy))
+		new to_destroy[80];
+		if(sscanf(params, "s[79]", to_destroy))
 		{
 		    return SCM(playerid, NEF_GREEN, "Usage: /gdestroy <exact gang name>");
 		}
@@ -11242,7 +11243,7 @@ YCMD:gcreate(playerid, params[], help)
 	new ntmp[144],
 	    ttmp[144];
 
-	if(sscanf(params, "s[144]s[144]", ntmp, ttmp))
+	if(sscanf(params, "s[143]s[143]", ntmp, ttmp))
 	{
 	    return SCM(playerid, NEF_GREEN, "Usage: /gcreate <gang-name> <gang-tag>");
 	}
@@ -11851,7 +11852,7 @@ YCMD:gcar(playerid, params[], help)
 		    }
 		    else
 		    {
-				if(!sscanf(params, "s[144]", gstr))
+				if(!sscanf(params, "s[143]", gstr))
 				{
 					new veh = GetVehicleModelID(gstr);
 					if(!IsValidVehicleModel(veh))
@@ -11884,7 +11885,7 @@ YCMD:unban(playerid, params[], help)
 {
 	if(PlayerData[playerid][e_level] >= 4)
 	{
-	    if(sscanf(params, "s[144]", gstr))
+	    if(sscanf(params, "s[143]", gstr))
 	    {
 	        return SCM(playerid, NEF_GREEN, "Usage: /unban <name>");
 	    }
@@ -11915,7 +11916,7 @@ YCMD:oban(playerid, params[], help)
 	if(PlayerData[playerid][e_level] >= 4)
 	{
 	    new player[144], reason[144];
-	    if(sscanf(params, "s[144]s[144]", player, reason))
+	    if(sscanf(params, "s[143]s[143]", player, reason))
 	    {
 	        return SCM(playerid, NEF_GREEN, "Usage: /offlineban <name> <reason>");
 	    }
@@ -11968,7 +11969,7 @@ YCMD:tban(playerid, params[], help)
 	    }
 	    
 	    new player, reason[144], time;
-	    if(sscanf(params, "rs[144]i", player, reason, time))
+	    if(sscanf(params, "rs[143]i", player, reason, time))
 	    {
 	        return SCM(playerid, NEF_GREEN, "Usage: /tban <playerid> <reason> <time>");
 	    }
@@ -12060,7 +12061,7 @@ YCMD:ban(playerid, params[], help)
 	    }
 	    
 	    new player, reason[144];
-	    if(sscanf(params, "rs[144]", player, reason))
+	    if(sscanf(params, "rs[143]", player, reason))
 	    {
 	        return SCM(playerid, NEF_GREEN, "Usage: /ban <playerid> <reason>");
 	    }
@@ -12370,7 +12371,7 @@ YCMD:jail(playerid, params[], help)
 	if(PlayerData[playerid][e_level] >= 2)
 	{
 		new player, time, reason[144];
-		if(sscanf(params, "ris[144]", player, time, reason))
+		if(sscanf(params, "ris[143]", player, time, reason))
 		{
 		    return SCM(playerid, NEF_GREEN, "Usage: /jail <playerid> <seconds> <reason>");
 		}
@@ -12571,8 +12572,8 @@ YCMD:rv(playerid, params[], help)
 {
 	if(PlayerData[playerid][e_level] >= 2)
 	{
-	    new reason[60];
-	    if(sscanf(params, "s[59]", reason))
+	    new reason[80];
+	    if(sscanf(params, "s[79]", reason))
 	    {
 	        SCM(playerid, NEF_GREEN, "Usage: /rv <reason>");
 	        SCM(playerid, NEF_GREEN, "Destroys all unoccupied player vehicles");
@@ -12872,7 +12873,7 @@ YCMD:p(playerid, params[], help)
 {
 	if(PlayerData[playerid][e_vip] != 1 && PlayerData[playerid][e_level] == 0) return Command_ReProcess(playerid, "/vip", false);
 
-	if(sscanf(params, "s[144]", gstr))
+	if(sscanf(params, "s[143]", gstr))
 	{
 	    return SCM(playerid, NEF_GREEN, "Usage: /p <text>");
 	}
@@ -13015,7 +13016,7 @@ YCMD:god(playerid, params[], help)
 	if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
 	if(PlayerData[playerid][bDuty]) return SCM(playerid, -1, ""er"You can't use god command while being on duty");
 	
-	new mode[30], bool:silent = false;
+	new mode[31], bool:silent = false;
 	if(!sscanf(params, "s[30]", mode))
 	{
 	    if(!strcmp(mode, "silent", true))
@@ -13455,7 +13456,7 @@ YCMD:report(playerid, params[], help)
 	}
 
 	new	player, reason[144];
-	if(sscanf(params, "rs[144]", player, reason))
+	if(sscanf(params, "rs[143]", player, reason))
 	{
 		return SCM(playerid, NEF_GREEN, "Usage: /report <playerid> <reason>");
 	}
@@ -15194,7 +15195,7 @@ YCMD:changepass(playerid, params[], help)
     	return SCM(playerid, -1, ""er"Please wait a bit before using this cmd again!");
 	}
 
-	if(sscanf(params, "s[144]", gstr))
+	if(sscanf(params, "s[143]", gstr))
 	{
 		SCM(playerid, NEF_GREEN, "Usage: /changepass <new pass>");
 	    return 1;
@@ -15946,7 +15947,7 @@ YCMD:unignore(playerid, params[], help)
 YCMD:irc(playerid, params[], help)
 {
 	new msg[144];
-	if(sscanf(params, "s[144]", msg))
+	if(sscanf(params, "s[143]", msg))
 	{
 	    SCM(playerid, NEF_GREEN, "Usage: /irc <message>");
         SCM(playerid, NEF_GREEN, "Sends a message to IRC");
@@ -16083,7 +16084,7 @@ YCMD:pm(playerid, params[], help)
 	}
 
 	new player, msg[144];
-	if(sscanf(params, "rs[144]", player, msg))
+	if(sscanf(params, "rs[143]", player, msg))
 	{
 		return SCM(playerid, NEF_GREEN, "Usage: /pm <playerid> <message>");
 	}
@@ -16881,7 +16882,7 @@ YCMD:v(playerid, params[], help)
 	    }
 	    else
 	    {
-			if(!sscanf(params, "s[144]", gstr))
+			if(!sscanf(params, "s[143]", gstr))
 			{
 				new veh = GetVehicleModelID(gstr);
 				if(!IsValidVehicleModel(veh))
@@ -18194,7 +18195,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	            if(strlen(inputtext) > 35 || strlen(inputtext) < 3) return SCM(playerid, -1, ""er"Inputlength: 3-35");
 	            
 	            new text[36];
-	            sscanf(inputtext, "s[36]", text);
+	            sscanf(inputtext, "s[35]", text);
 
 				if(IsAd(text))
 				{
@@ -18220,7 +18221,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	            if(strlen(inputtext) > 35 || strlen(inputtext) < 3) return SCM(playerid, -1, ""er"Inputlength: 3-35");
 
 	            new text[36];
-	            sscanf(inputtext, "s[36]", text);
+	            sscanf(inputtext, "s[35]", text);
 
 				if(IsAd(text))
 				{
@@ -22853,10 +22854,10 @@ LoadServerStaticMeshes()
 		Reports[i] = "<none>";
 	}
 	
-	for(new i = 1; i < MAX_ADS; i++)
+	/*for(new i = 1; i < MAX_ADS; i++)
 	{
 		Adverts[i] = "<none>";
-	}
+	}*/
 	
     g_SpawnAreas[0] = CreateDynamicSphere(341.8535, -1852.6327, 6.8569, 25.0); // <- beach sphere
     g_SpawnAreas[1] = CreateDynamicSphere(385.4325, 2541.2456, 14.5953, 13.5); // <- AA sphere
