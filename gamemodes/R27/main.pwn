@@ -3858,7 +3858,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 					if(++count >= 50) break;
 				}
 				
-				format(finstring, sizeof(finstring), "There are "yellow"%i"white" members in this gang\n"green"Displaying %i members below:"white"", rows, count);
+				format(finstring, sizeof(finstring), "There are "yellow"%i"white" members in this gang\n"green"Showing %i members below:"white"", rows, count);
 				strcat(finstring, tmpstring);
 
 				ShowPlayerDialog(extraid, NO_DIALOG_ID, DIALOG_STYLE_LIST, ""nef" :: Gang Members", finstring, "OK", "");
@@ -11497,7 +11497,11 @@ YCMD:gwar(playerid, params[], help)
 				}
 			}
 
-		    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s(%i) is capturing the zone: '%s' %i members have been tied!", __GetName(playerid), playerid, GZoneInfo[i][sZoneName], count);
+			if(count == 1)
+		    	format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s(%i) is capturing the zone: '%s' %i member has been tied!", __GetName(playerid), playerid, GZoneInfo[i][sZoneName], count);
+			else
+                format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s(%i) is capturing the zone: '%s' %i members have been tied!", __GetName(playerid), playerid, GZoneInfo[i][sZoneName], count);
+                
 			GangMSG(PlayerData[playerid][e_gangid], gstr);
 			
 			format(gstr, sizeof(gstr), ""orange"%s(%i) has started capturing the zone '%s' with %i gang member(s)!", __GetName(playerid), playerid, GZoneInfo[i][sZoneName], count);
@@ -11535,7 +11539,11 @@ YCMD:gwar(playerid, params[], help)
 				}
 			}
 
-		    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s(%i) is capturing the zone: '%s' %i members have been tied!", __GetName(playerid), playerid, GZoneInfo[i][sZoneName], count);
+			if(count == 1)
+		    	format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s(%i) is capturing the zone: '%s' %i member has been tied!", __GetName(playerid), playerid, GZoneInfo[i][sZoneName], count);
+			else
+			    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s(%i) is capturing the zone: '%s' %i members have been tied!", __GetName(playerid), playerid, GZoneInfo[i][sZoneName], count);
+			    
 			GangMSG(PlayerData[playerid][e_gangid], gstr);
 
 		    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"Gang %s started a war against your gang at %s!", GetGangNameByID(PlayerData[playerid][e_gangid]), GZoneInfo[i][sZoneName]);
