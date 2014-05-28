@@ -4591,7 +4591,7 @@ public OnPlayerDeath(playerid, killerid, reason)
                 SetSpawnInfoEx(playerid, NO_TEAM, GetPlayerSkin(playerid), WorldSpawns[rand][0], WorldSpawns[rand][1], WorldSpawns[rand][2] + 3.0, WorldSpawns[rand][3]);
             }
 	    
-	        if(IsPlayerAvail(killerid) && (playerid != killerid) && gTeam[killerid] == FREEROAM)
+	        if(IsPlayerAvail(killerid) && playerid != killerid && gTeam[killerid] == FREEROAM)
      		{
 			    PlayerData[killerid][e_wanteds]++;
 
@@ -14183,7 +14183,7 @@ YCMD:gungames(playerid, params[], help)
 	{
 	    if(gungames[i][E_gungame] != -1)
 	    {
-		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Gungame Wins: %i\n", (GetColor__(gungames[i][E_playerid]) >>> 8), i + 1, __GetName(gungames[i][E_playerid]), gungames[i][E_playerid], gungames[i][E_gungame]);
+		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Gungame Wins: %i\n", GetColor__(gungames[i][E_playerid]) >>> 8, i + 1, __GetName(gungames[i][E_playerid]), gungames[i][E_playerid], gungames[i][E_gungame]);
 		    strcat(finstring, tmpstring);
 		}
 		else
@@ -14223,7 +14223,7 @@ YCMD:fallouts(playerid, params[], help)
 	{
 	    if(fallouts[i][E_fallout] != -1)
 	    {
-		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Fallout Wins: %i\n", (GetColor__(fallouts[i][E_playerid]) >>> 8), i + 1, __GetName(fallouts[i][E_playerid]), fallouts[i][E_playerid], fallouts[i][E_fallout]);
+		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Fallout Wins: %i\n", GetColor__(fallouts[i][E_playerid]) >>> 8, i + 1, __GetName(fallouts[i][E_playerid]), fallouts[i][E_playerid], fallouts[i][E_fallout]);
 		    strcat(finstring, tmpstring);
 		}
 		else
@@ -14263,7 +14263,7 @@ YCMD:derbys(playerid, params[], help)
 	{
 	    if(derbys[i][E_derby] != -1)
 	    {
-		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Derby Wins: %i\n", (GetColor__(derbys[i][E_playerid]) >>> 8), i + 1, __GetName(derbys[i][E_playerid]), derbys[i][E_playerid], derbys[i][E_derby]);
+		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Derby Wins: %i\n", GetColor__(derbys[i][E_playerid]) >>> 8, i + 1, __GetName(derbys[i][E_playerid]), derbys[i][E_playerid], derbys[i][E_derby]);
 		    strcat(finstring, tmpstring);
 		}
 		else
@@ -14303,7 +14303,7 @@ YCMD:races(playerid, params[], help)
 	{
 	    if(races[i][E_race] != -1)
 	    {
-		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Race Wins: %i\n", (GetColor__(races[i][E_playerid]) >>> 8), i + 1, __GetName(races[i][E_playerid]), races[i][E_playerid], races[i][E_race]);
+		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Race Wins: %i\n", GetColor__(races[i][E_playerid]) >>> 8, i + 1, __GetName(races[i][E_playerid]), races[i][E_playerid], races[i][E_race]);
 		    strcat(finstring, tmpstring);
 		}
 		else
@@ -14343,7 +14343,7 @@ YCMD:rtests(playerid, params[], help)
 	{
 	    if(tests[i][E_test] != -1)
 	    {
-		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Reaction Wins: %i\n", (GetColor__(tests[i][E_playerid]) >>> 8), i + 1, __GetName(tests[i][E_playerid]), tests[i][E_playerid], tests[i][E_test]);
+		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Reaction Wins: %i\n", GetColor__(tests[i][E_playerid]) >>> 8, i + 1, __GetName(tests[i][E_playerid]), tests[i][E_playerid], tests[i][E_test]);
 		    strcat(finstring, tmpstring);
 		}
 		else
@@ -14383,7 +14383,7 @@ YCMD:kills(playerid, params[], help)
 	{
 	    if(kills[i][E_kills] != -1)
 	    {
-		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Kills: %i\n", (GetColor__(kills[i][E_playerid]) >>> 8), i + 1, __GetName(kills[i][E_playerid]), kills[i][E_playerid], kills[i][E_kills]);
+		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Kills: %i\n", GetColor__(kills[i][E_playerid]) >>> 8, i + 1, __GetName(kills[i][E_playerid]), kills[i][E_playerid], kills[i][E_kills]);
 		    strcat(finstring, tmpstring);
 		}
 		else
@@ -14423,7 +14423,7 @@ YCMD:deaths(playerid, params[], help)
 	{
 	    if(deaths[i][E_deaths] != -1)
 	    {
-		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Deaths: %i\n", (GetColor__(deaths[i][E_playerid]) >>> 8), i + 1, __GetName(deaths[i][E_playerid]), deaths[i][E_playerid], deaths[i][E_deaths]);
+		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Deaths: %i\n", GetColor__(deaths[i][E_playerid]) >>> 8, i + 1, __GetName(deaths[i][E_playerid]), deaths[i][E_playerid], deaths[i][E_deaths]);
 		    strcat(finstring, tmpstring);
 		}
 		else
@@ -14465,7 +14465,7 @@ YCMD:toptime(playerid, params[], help)
 	{
 	    if(playingtime[i][E_time] != -1)
 	    {
-		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Time: %s\n", (GetColor__(playingtime[i][E_playerid]) >>> 8), i + 1, __GetName(playingtime[i][E_playerid]), playingtime[i][E_playerid], GetPlayingTimeFormat(playingtime[i][E_playerid]));
+		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Time: %s\n", GetColor__(playingtime[i][E_playerid]) >>> 8, i + 1, __GetName(playingtime[i][E_playerid]), playingtime[i][E_playerid], GetPlayingTimeFormat(playingtime[i][E_playerid]));
 		    strcat(finstring, tmpstring);
 		}
 		else
@@ -14505,7 +14505,7 @@ YCMD:richlist(playerid, params[], help)
 	{
 	    if(richlist[i][E_money] != -1)
 	    {
-		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Money: $%s\n", (GetColor__(richlist[i][E_playerid]) >>> 8), i + 1, __GetName(richlist[i][E_playerid]), richlist[i][E_playerid], number_format(richlist[i][E_money]));
+		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Money: $%s\n", GetColor__(richlist[i][E_playerid]) >>> 8, i + 1, __GetName(richlist[i][E_playerid]), richlist[i][E_playerid], number_format(richlist[i][E_money]));
 		    strcat(finstring, tmpstring);
 		}
 		else
@@ -14545,7 +14545,7 @@ YCMD:wanteds(playerid, params[], help)
 	{
 	    if(wanteds[i][E_wanteds] != -1)
 	    {
-		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Wanteds: %i\n", (GetColor__(wanteds[i][E_playerid]) >>> 8), i + 1, __GetName(wanteds[i][E_playerid]), wanteds[i][E_playerid], wanteds[i][E_wanteds]);
+		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Wanteds: %i\n", GetColor__(wanteds[i][E_playerid]) >>> 8, i + 1, __GetName(wanteds[i][E_playerid]), wanteds[i][E_playerid], wanteds[i][E_wanteds]);
 		    strcat(finstring, tmpstring);
 		}
 		else
@@ -14584,7 +14584,7 @@ YCMD:score(playerid, params[], help)
 	{
 	    if(score[i][E_pscore] != -1)
 	    {
-		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Score: %i\n", (GetColor__(score[i][E_playerid]) >>> 8), i + 1, __GetName(score[i][E_playerid]), score[i][E_playerid], score[i][E_pscore]);
+		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Score: %i\n", GetColor__(score[i][E_playerid]) >>> 8, i + 1, __GetName(score[i][E_playerid]), score[i][E_playerid], score[i][E_pscore]);
 		    strcat(finstring, tmpstring);
 		}
 		else
