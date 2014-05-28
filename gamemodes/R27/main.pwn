@@ -806,7 +806,8 @@ enum E_PLAYER_ACH_DATA
 	e_ach_biker, // win /bikec
 	e_ach_bmxmaster, // win /bmx
 	e_ach_settled, // buy a house
-	e_ach_biocalc // Solve 40 math question
+	e_ach_biocalc, // Solve 40 math question
+	e_ach_mademan // rise a bizz to level 20
 };
 
 enum e_credits_matrix
@@ -16323,6 +16324,7 @@ YCMD:achs(playerid, params[], help)
 		            case 13: format(gstr, sizeof(gstr), ""white"[%s"white"] BMX Master -> %s\n", tmp[e_ach_bmxmaster], UTConvert(PlayerAchData[player][e_ach_bmxmaster][1]));
 		            case 14: format(gstr, sizeof(gstr), ""white"[%s"white"] Settled -> %s\n", tmp[e_ach_settled], UTConvert(PlayerAchData[player][e_ach_settled][1]));
 		            case 15: format(gstr, sizeof(gstr), ""white"[%s"white"] Biocalc -> %s\n", tmp[e_ach_biocalc], UTConvert(PlayerAchData[player][e_ach_biocalc][1]));
+		            case 16: format(gstr, sizeof(gstr), ""white"[%s"white"] Made Man -> %s\n", tmp[e_ach_mademan], UTConvert(PlayerAchData[player][e_ach_mademan][1]));
 				}
 		    }
 		    else
@@ -16347,6 +16349,7 @@ YCMD:achs(playerid, params[], help)
 		            case 13: format(gstr, sizeof(gstr), ""white"[%s"white"] BMX Master -> Win /bmx\n", tmp[e_ach_bmxmaster]);
 		            case 14: format(gstr, sizeof(gstr), ""white"[%s"white"] Settled -> Purchase a house\n", tmp[e_ach_settled]);
 		            case 15: format(gstr, sizeof(gstr), ""white"[%s"white"] Biocalc -> Solve 40 math questions\n", tmp[e_ach_biocalc]);
+		            case 16: format(gstr, sizeof(gstr), ""white"[%s"white"] Made Man -> Rise a business to level 20\n", tmp[e_ach_mademan]);
 				}
 		    }
 		    
@@ -17267,6 +17270,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
                     GivePlayerCash(playerid, -BLevelMatrix[BusinessData[r][e_level]][E_bupgradeprice]);
                     BusinessData[r][e_level]++;
+                    
+                    if(PlayerAchData[playerid][e_ach_mademan][0] == 0 && BusinessData[r][e_level] == 20)
+				    {
+				        GivePlayerAchievement(playerid, e_ach_mademan, "Made Man", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
+					}
 
 					gstr2[0] = '\0';
 					strcat(gstr2, ""white"You have successfully upgraded your business's level!\n\nCurrent Business Level: ");
