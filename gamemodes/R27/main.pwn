@@ -19,7 +19,8 @@
 || DNS Plugin 2.4
 ||
 || Build specific:
-|| 
+|| - add toy: 18661, 18659, 18663, 19008, 19019
+|| - UPDATE `accounts` SET `email` = 'NoData';
 */
 
 #pragma dynamic 8192
@@ -557,13 +558,18 @@ enum (+= 10)
 	ACCOUNT_REQUEST_EXIST,
 	ACCOUNT_REQUEST_AUTO_LOGIN,
 	ACCOUNT_REQUST_VERIFY_REGISTER,
-	ACCOUNT_REQUEST_REGISTER,
 	ACCOUNT_REQUEST_LOAD,
 	ACCOUNT_REQUEST_GANG_LOAD,
 	ACCOUNT_REQUEST_ACHS_LOAD,
 	ACCOUNT_REQUEST_TOYS_LOAD,
 	ACCOUNT_REQUEST_PVS_LOAD,
     ACCOUNT_REQUEST_LOGIN
+};
+
+enum
+{
+	REGISTER_CONNECT,
+	REGISTER_ONLINE
 };
 
 // Player Team
@@ -3432,22 +3438,16 @@ public OnPlayerDisconnect(playerid, reason)
 	}
 	
     PreparePlayerVars(playerid);
-
 	PreparePlayerPV(playerid);
  	PreparePlayerToy(playerid);
+ 	
 	SetPlayerScore_(playerid, 0);
 	SetPlayerTeam(playerid, NO_TEAM);
 	
-	new leaveMsg[128], reasonMsg[8];
-	switch(reason)
-	{
-		case 0: reasonMsg = "Timeout";
-		case 1: reasonMsg = "Leaving";
-		case 2: reasonMsg = "Kicked";
-	}
+	static const reasonMsg[3][] = {"Timeout", "Leaving", "Kicked/Banned"};
 	
-	format(leaveMsg, sizeof(leaveMsg), "02[%i] 03*** %s has left the server. (%s)", playerid, __GetName(playerid), reasonMsg);
-	IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, leaveMsg);
+	format(gstr, sizeof(gstr), "02[%i] 03*** %s has left the server. (%s)", playerid, __GetName(playerid), reasonMsg[reason]);
+	IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 	return 1;
 }
 
@@ -18570,17 +18570,21 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					}
 					case 7:
 					{
-					    Command_ReProcess(playerid, "/changepass", false);
+					    PlayerData[playerid][bSpeedo] = !PlayerData[playerid][bSpeedo];
 					}
 					case 8:
 					{
-					    ShowPlayerDialog(playerid, DIALOG_RECOVERY_EMAIL, DIALOG_STYLE_INPUT, ""nef" :: Recovery E-mail", ""white"This email can be used to recover your password in case\nyou lose access to your account. No staff/player is able\nto view your email.", "Set", "Cancel");
+					    Command_ReProcess(playerid, "/changepass", false);
 					}
 					case 9:
 					{
-					    Command_ReProcess(playerid, "/stats", false);
+					    ShowPlayerDialog(playerid, DIALOG_RECOVERY_EMAIL, DIALOG_STYLE_INPUT, ""nef" :: Recovery E-mail", ""white"This email can be used to recover your password in case\nyou lose access to your account. No staff/player is able\nto view your email.", "Set", "Cancel");
 					}
 					case 10:
+					{
+					    Command_ReProcess(playerid, "/stats", false);
+					}
+					case 11:
 					{
 					    Command_ReProcess(playerid, "/help", false);
 					}
@@ -19228,7 +19232,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					return SkipRegistration(playerid);
 				}
-			    MySQL_RegisterAccount(playerid, password);
+			    MySQL_RegisterAccount(playerid, REGISTER_CONNECT, password);
 			    return true;
 			}
 			case REGISTER_DIALOG + 1:
@@ -19242,7 +19246,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					return SCM(playerid, -1, ""er"Wrong input");
 				}
-			    MySQL_RegisterAccount2(playerid, password);
+			    MySQL_RegisterAccount(playerid, REGISTER_ONLINE, password);
 			    return true;
 			}
 			case STREAM_DIALOG:
@@ -21622,17 +21626,17 @@ MySQL_GangRename(playerid, newgangname[], newgangtag[])
 	mysql_tquery(pSQL, gstr2, "OnGangRenameAttempt", "iss", playerid, newgangname, newgangtag);
 }
 
-MySQL_RegisterAccount(playerid, password[])
+MySQL_RegisterAccount(playerid, register, password[])
 {
 	PlayerData[playerid][e_lastlogin] = gettime();
 	PlayerData[playerid][e_lastnc] = 0;
     PlayerData[playerid][e_regdate] = gettime();
     PlayerData[playerid][e_payday] = 60;
     PlayerData[playerid][e_wanteds] = 0;
-
-	new ORM:ormid = PlayerData[playerid][e_ormid] = orm_create("accounts");
-
-	orm_addvar_int(ormid, PlayerData[playerid][e_accountid], "id");
+    
+    new ORM:ormid = PlayerData[playerid][e_ormid] = orm_create("accounts");
+    
+ 	orm_addvar_int(ormid, PlayerData[playerid][e_accountid], "id");
 	orm_addvar_string(ormid, PlayerData[playerid][e_name], MAX_PLAYER_NAME + 1, "name");
 	orm_addvar_string(ormid, PlayerData[playerid][e_email], 26, "email");
 	orm_addvar_int(ormid, PlayerData[playerid][e_level], "level");
@@ -21669,67 +21673,65 @@ MySQL_RegisterAccount(playerid, password[])
 	orm_addvar_int(ormid, PlayerData[playerid][e_lastlogin], "lastlogin");
 	orm_addvar_int(ormid, PlayerData[playerid][e_lastnc], "lastnc");
 	orm_addvar_int(ormid, PlayerData[playerid][e_skinsave], "skinsave");
-
+	
 	orm_setkey(ormid, "id");
-	orm_insert(ormid, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_REGISTER);
-
-	mysql_format(pSQL, gstr2, sizeof(gstr2), "UPDATE `accounts` SET `hash` = SHA1('%e'), `ip` = '%s' WHERE `name` = '%s';", password, __GetIP(playerid), __GetName(playerid));
-	mysql_tquery(pSQL, gstr2);
+	orm_insert(ormid, "OnPlayerRegister", "iiisss", playerid, YHash(__GetName(playerid)), register, password, __GetName(playerid), __GetIP(playerid));
 }
 
-MySQL_RegisterAccount2(playerid, password[])
+function:OnPlayerRegister(playerid, namehash, register, password[], playername[], ip_address[])
 {
-	PlayerData[playerid][e_lastlogin] = gettime();
-	PlayerData[playerid][e_lastnc] = 0;
-    PlayerData[playerid][e_regdate] = gettime();
-    PlayerData[playerid][e_payday] = 60;
-    PlayerData[playerid][e_wanteds] = 0;
-
-	new ORM:ormid = PlayerData[playerid][e_ormid] = orm_create("accounts");
-
-	orm_addvar_int(ormid, PlayerData[playerid][e_accountid], "id");
-	orm_addvar_string(ormid, PlayerData[playerid][e_name], MAX_PLAYER_NAME + 1, "name");
-	orm_addvar_string(ormid, PlayerData[playerid][e_email], 26, "email");
-	orm_addvar_int(ormid, PlayerData[playerid][e_level], "level");
-	orm_addvar_int(ormid, PlayerData[playerid][e_score], "score");
-	orm_addvar_int(ormid, PlayerData[playerid][e_money], "money");
-	orm_addvar_int(ormid, PlayerData[playerid][e_bank], "bank");
-	orm_addvar_int(ormid, PlayerData[playerid][e_color], "color");
-	orm_addvar_int(ormid, PlayerData[playerid][e_kills], "kills");
-	orm_addvar_int(ormid, PlayerData[playerid][e_deaths], "deaths");
-	orm_addvar_int(ormid, PlayerData[playerid][e_time], "time");
-	orm_addvar_int(ormid, PlayerData[playerid][e_skin], "skin");
-	orm_addvar_int(ormid, PlayerData[playerid][e_payday], "payday");
-	orm_addvar_int(ormid, PlayerData[playerid][e_reaction], "reaction");
-	orm_addvar_int(ormid, PlayerData[playerid][e_mathwins], "mathwins");
-	orm_addvar_int(ormid, PlayerData[playerid][e_houses], "houses");
-	orm_addvar_int(ormid, PlayerData[playerid][e_gangid], "gangid");
-	orm_addvar_int(ormid, PlayerData[playerid][e_gangrank], "gangrank");
-	orm_addvar_int(ormid, PlayerData[playerid][e_addpvslots], "addpvslots");
-	orm_addvar_int(ormid, PlayerData[playerid][e_addtoyslots], "addtoyslots");
-	orm_addvar_int(ormid, PlayerData[playerid][e_addhouseslots], "addhouseslots");
-	orm_addvar_int(ormid, PlayerData[playerid][e_addbizzslots], "addbizzslots");
-	orm_addvar_int(ormid, PlayerData[playerid][e_addhouseitemslots], "addhouseitemslots");
-	orm_addvar_int(ormid, PlayerData[playerid][e_derbywins], "derbywins");
-	orm_addvar_int(ormid, PlayerData[playerid][e_racewins], "racewins");
-	orm_addvar_int(ormid, PlayerData[playerid][e_tdmwins], "tdmwins");
-	orm_addvar_int(ormid, PlayerData[playerid][e_falloutwins], "falloutwins");
-	orm_addvar_int(ormid, PlayerData[playerid][e_gungamewins], "gungamewins");
-	orm_addvar_int(ormid, PlayerData[playerid][e_eventwins], "eventwins");
-	orm_addvar_int(ormid, PlayerData[playerid][e_wanteds], "wanteds");
-	orm_addvar_int(ormid, PlayerData[playerid][e_vip], "vip");
-	orm_addvar_int(ormid, PlayerData[playerid][e_credits], "credits");
-	orm_addvar_int(ormid, PlayerData[playerid][e_medkits], "medkits");
-	orm_addvar_int(ormid, PlayerData[playerid][e_regdate], "regdate");
-	orm_addvar_int(ormid, PlayerData[playerid][e_lastlogin], "lastlogin");
-	orm_addvar_int(ormid, PlayerData[playerid][e_lastnc], "lastnc");
-	orm_addvar_int(ormid, PlayerData[playerid][e_skinsave], "skinsave");
-
-	orm_setkey(ormid, "id");
-	orm_insert(ormid, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_REGISTER + 1);
-
-	mysql_format(pSQL, gstr2, sizeof(gstr2), "UPDATE `accounts` SET `hash` = SHA1('%e'), `ip` = '%s' WHERE `name` = '%s';", password, __GetIP(playerid), __GetName(playerid));
+	mysql_format(pSQL, gstr2, sizeof(gstr2), "UPDATE `accounts` SET `hash` = SHA1('%e'), `ip` = '%s' WHERE `name` = '%s';", password, playername, ip_address);
 	mysql_tquery(pSQL, gstr2);
+	
+	if(namehash == YHash(__GetName(playerid)))
+	{
+		if(register == REGISTER_CONNECT)
+		{
+			PlayerData[playerid][ExitType] = EXIT_LOGGED;
+			PlayerData[playerid][ConnectTime] = gettime();
+		    PlayerData[playerid][AllowSpawn] = true;
+		    PlayerData[playerid][bLogged] = true;
+            SrvStat[2]++;
+
+			format(gstr, sizeof gstr, "["SVRSC"] %s(%i) "GREEN_E"has registered, making the server have a total of "LB2_E"%i "GREEN_E"players registered.", __GetName(playerid), playerid, cache_insert_id());
+			SCMToAll(COLOR_PINK, gstr);
+
+			format(gstr, sizeof(gstr), "5,9- RegServ -3,0 %s(%i) has registered making the server have a total of %i players registered.", __GetName(playerid), playerid, cache_insert_id());
+			IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
+
+			format(gstr, sizeof(gstr), "~b~~h~~h~Welcome to "SVRSC", ~r~~h~~h~%s~b~~h~~h~!~n~~b~~h~~h~You have successfully registered and logged in!", __GetName(playerid));
+			InfoTD_MSG(playerid, 5000, gstr);
+
+			format(gstr, sizeof(gstr), "~y~[] ~w~%i", PlayerData[playerid][e_wanteds]);
+			PlayerTextDrawSetString(playerid, TXTWantedsTD[playerid], gstr);
+
+		    GameTextForPlayer(playerid, "Welcome", 3000, 4);
+	  		GivePlayerCash(playerid, 20000, false);
+	    	GameTextForPlayer(playerid, "~n~+$20,000~n~Startcash", 3000, 1);
+			SCM(playerid, -1, ""server_sign" "r_besch"You are now registered, and have been logged in!");
+
+			PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
+
+			MySQL_SaveAccount(playerid, false, false);
+			MySQL_UpdateAccount(playerid);
+		}
+		else if(register == REGISTER_ONLINE)
+		{
+		    PlayerData[playerid][bLogged] = true;
+            SrvStat[2]++;
+
+			format(gstr, sizeof gstr, "["SVRSC"] %s(%i) "GREEN_E"has registered, making the server have a total of "LB2_E"%i "GREEN_E"players registered.", __GetName(playerid), playerid, cache_insert_id());
+			SCMToAll(COLOR_PINK, gstr);
+			format(gstr, sizeof(gstr), "5,9- RegServ -3,0 %s(%i) has registered making the server have a total of %i players registered.", __GetName(playerid), playerid, cache_insert_id());
+			IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
+			format(gstr, sizeof(gstr), "~b~~h~~h~Welcome to "SVRSC", ~r~~h~~h~%s~b~~h~~h~!~n~~b~~h~~h~You have successfully registered and logged in!", __GetName(playerid));
+			InfoTD_MSG(playerid, 5000, gstr);
+
+            MySQL_SaveAccount(playerid, false, false);
+			MySQL_UpdateAccount(playerid);
+		}
+	}
+	return 1;
 }
 
 MySQL_UpdateAccount(playerid)
@@ -28158,13 +28160,24 @@ GetPlayerSettings(playerid)
 	    strcat(string, gstr);
 	}
 
-    format(gstr, sizeof(gstr), ""grey"8)\tChange password\n");
+	if(PlayerData[playerid][bSpeedo])
+	{
+	    format(gstr, sizeof(gstr), ""white"8)\tSpeedometer\t"vgreen"[ON]\n");
+	    strcat(string, gstr);
+	}
+	else
+	{
+	    format(gstr, sizeof(gstr), ""white"8)\tSpeedometer\t"red"[OFF]\n");
+	    strcat(string, gstr);
+	}
+
+    format(gstr, sizeof(gstr), ""grey"9)\tChange password\n");
     strcat(string, gstr);
-    format(gstr, sizeof(gstr), ""grey"9)\tSet recovery Email\n");
+    format(gstr, sizeof(gstr), ""grey"10)\tSet recovery Email\n");
     strcat(string, gstr);
-    format(gstr, sizeof(gstr), ""grey"10)\tStats\n");
+    format(gstr, sizeof(gstr), ""grey"11)\tStats\n");
     strcat(string, gstr);
-    format(gstr, sizeof(gstr), ""grey"11)\tHelp\n");
+    format(gstr, sizeof(gstr), ""grey"12)\tHelp\n");
     strcat(string, gstr);
 	return string;
 }
@@ -28185,10 +28198,10 @@ UTConvert(unixtime)
 	return u_date;
 }
 
-number_format(CCash)
+number_format(num)
 {
     new szStr[16];
-    format(szStr, sizeof(szStr), "%i", CCash);
+    format(szStr, sizeof(szStr), "%i", num);
 
     for(new iLen = strlen(szStr) - 3; iLen > 0; iLen -= 3)
     {
@@ -30344,7 +30357,7 @@ PreparePlayerVars(playerid)
 	SetPVarInt(playerid, "Robber", 0);
 	SetPVarInt(playerid, "inCNR", 0);
 
-	PlayerData[playerid][e_email][0] = '\0';
+	strmid(PlayerData[playerid][e_email], "NoData", 0, 26, 26);
 	PlayerData[playerid][fOldPos][0] = 2012.4763;
 	PlayerData[playerid][fOldPos][1] = -2448.1399;
 	PlayerData[playerid][fOldPos][2] = 14.6396;
@@ -30685,53 +30698,6 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 	        }
 	        return 1;
 	    }
-	    case ACCOUNT_REQUEST_REGISTER:
-	    {
-			PlayerData[playerid][ExitType] = EXIT_LOGGED;
-			PlayerData[playerid][ConnectTime] = gettime();
-		    PlayerData[playerid][AllowSpawn] = true;
-		    PlayerData[playerid][bLogged] = true;
-            SrvStat[2]++;
-
-			format(gstr, sizeof gstr, "["SVRSC"] %s(%i) "GREEN_E"has registered, making the server have a total of "LB2_E"%i "GREEN_E"players registered.", __GetName(playerid), playerid, cache_insert_id());
-			SCMToAll(COLOR_PINK, gstr);
-			
-			format(gstr, sizeof(gstr), "5,9- RegServ -3,0 %s(%i) has registered making the server have a total of %i players registered.", __GetName(playerid), playerid, cache_insert_id());
-			IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
-			
-			format(gstr, sizeof(gstr), "~b~~h~~h~Welcome to "SVRSC", ~r~~h~~h~%s~b~~h~~h~!~n~~b~~h~~h~You have successfully registered and logged in!", __GetName(playerid));
-			InfoTD_MSG(playerid, 5000, gstr);
-
-			format(gstr, sizeof(gstr), "~y~[] ~w~%i", PlayerData[playerid][e_wanteds]);
-			PlayerTextDrawSetString(playerid, TXTWantedsTD[playerid], gstr);
-
-		    GameTextForPlayer(playerid, "Welcome", 3000, 4);
-	  		GivePlayerCash(playerid, 20000, false);
-	    	GameTextForPlayer(playerid, "~n~+$20,000~n~Startcash", 3000, 1);
-			SCM(playerid, -1, ""server_sign" "r_besch"You are now registered, and have been logged in!");
-
-			PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
-
-			MySQL_SaveAccount(playerid, false, false);
-			MySQL_UpdateAccount(playerid);
-	        return 1;
-	    }
-	    case ACCOUNT_REQUEST_REGISTER + 1:
-	    {
-		    PlayerData[playerid][bLogged] = true;
-            SrvStat[2]++;
-
-			format(gstr, sizeof gstr, "["SVRSC"] %s(%i) "GREEN_E"has registered, making the server have a total of "LB2_E"%i "GREEN_E"players registered.", __GetName(playerid), playerid, cache_insert_id());
-			SCMToAll(COLOR_PINK, gstr);
-			format(gstr, sizeof(gstr), "5,9- RegServ -3,0 %s(%i) has registered making the server have a total of %i players registered.", __GetName(playerid), playerid, cache_insert_id());
-			IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
-			format(gstr, sizeof(gstr), "~b~~h~~h~Welcome to "SVRSC", ~r~~h~~h~%s~b~~h~~h~!~n~~b~~h~~h~You have successfully registered and logged in!", __GetName(playerid));
-			InfoTD_MSG(playerid, 5000, gstr);
-
-            MySQL_SaveAccount(playerid, false, false);
-			MySQL_UpdateAccount(playerid);
-			return 1;
-	    }
 	    case ACCOUNT_REQUEST_LOAD:
 	    {
 			if(cache_get_row_count() > 0)
@@ -30910,6 +30876,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 				    PlayerPVData[playerid][r][e_paintjob] = cache_get_row_int(i, 4);
 				    PlayerPVData[playerid][r][e_color1] = cache_get_row_int(i, 5);
 				    PlayerPVData[playerid][r][e_color2] = cache_get_row_int(i, 6);
+				    
 				    for(new m = 0; m < 17; m++)
 				    {
 				        PlayerPVData[playerid][r][e_mods][m] = cache_get_row_int(i, m + 7);
