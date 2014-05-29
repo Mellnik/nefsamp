@@ -3619,15 +3619,29 @@ public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY
 	/* ANTI DRIVEBY SPAWNZONES */
 	if(hittype == BULLET_HIT_TYPE_PLAYER) {
 	    if(hitid != INVALID_PLAYER_ID) {
-			if(GetPlayerVehicleSeat(playerid) == 0) {
-				for(new i = 0; i < sizeof(g_SpawnAreas); i++) {
-				    if(IsPlayerInDynamicArea(playerid, g_SpawnAreas[i])) {
-						return 0;
-				    }
+            if(gTeam[hitid] == FREEROAM) {
+				if(GetPlayerVehicleSeat(playerid) == 0) {
+					for(new i = 0; i < sizeof(g_SpawnAreas); i++) {
+					    if(IsPlayerInDynamicArea(playerid, g_SpawnAreas[i])) {
+							return 0;
+					    }
+					}
 				}
 			}
 	    }
 	}
+	
+	/* ANTI GBUG */
+	if(hittype == BULLET_HIT_TYPE_PLAYER) {
+	    if(hitid != INVALID_PLAYER_ID) {
+			if(GetPlayerState(playerid) == PLAYER_STATE_PASSENGER) {
+				new model = GetVehicleModel(GetPlayerVehicleID(playerid));
+				if(model == 522 || model == 521) {
+				    return 0;
+				}
+			}
+	    }
+ 	}
 	
 	/* LAST HIT */
 	if(hittype == BULLET_HIT_TYPE_PLAYER) {
