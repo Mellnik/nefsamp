@@ -26057,7 +26057,7 @@ function:ProcessTick()
 
 	for(new i = 0; i < gzoneid; i++)
 	{
-        if(GZoneInfo[i][iLocked] > utime) {
+        if(GZoneInfo[i][iLocked] < utime) {
             if(GZoneInfo[i][e_pickupid] == -1) {
                 GZoneInfo[i][e_pickupid] = CreateDynamicPickup(1314, 1, GZoneInfo[i][E_x], GZoneInfo[i][E_y], GZoneInfo[i][E_z], 0, -1, -1);
             }
