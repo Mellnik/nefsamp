@@ -295,13 +295,13 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 
 // IRC
 #if IS_RELEASE_BUILD == true
-#define IRC_SERVER                      "mars.sa-irc.com"
+#define IRC_SERVER                      "exnet.nl.irc.tl"
 #define IRC_PORT                        (6667)
 #define IRC_CHANNEL     				"#nef"
 #define IRC_NICKSERV            		"NickServ"
 #define IRC_MAX_BOTS                    (5)
 #else
-#define IRC_SERVER                      "mars.sa-irc.com"
+#define IRC_SERVER                      "exnet.nl.irc.tl"
 #define IRC_PORT                        (6667)
 #define IRC_CHANNEL     				"#nef.beta"
 #define IRC_NICKSERV            		"NickServ"
@@ -5769,7 +5769,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 			return 1;
   		}
   		
-  		if(pickupid == wangotto[0] || pickupid == wangotto[1] || pickupid == wangotto[2] || pickupid == wangotto[3])
+  		if(pickupid == wangotto[1] || pickupid == wangotto[2] || pickupid == wangotto[3])
   		{
   		    Command_ReProcess(playerid, "/vs", false);
   		    return 1;
@@ -12247,14 +12247,14 @@ YCMD:main(playerid, params[], help)
 {
 	if(PlayerData[playerid][e_level] == MAX_ADMIN_LEVEL && IsPlayerAdmin(playerid))
 	{
-	    SetTimer("mainmode", 60000, false);
+	    SetTimer("mainmode", 30000, false);
 	    GlobalMain = true;
 	    for(new i = 0; i < 20; i++)
 		{
 			SCMToAll(GREEN, " ");
 		}
-		SCMToAll(RED, "The server is going under maintenance in 1 minute. Please logout before that time.");
-	    ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Notice", ""white"_______________________________________________________________________\n\nThe server is going under maintenance in 1 minute. Please logout before that time.\n_______________________________________________________________________", "OK", "");
+		SCMToAll(RED, "The server is going under maintenance in 30 seconds minute. Please logout before that time.");
+	    ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Notice", ""white"_______________________________________________________________________\n\nThe server is going under maintenance in 30 seconds. Please logout before that time.\n_______________________________________________________________________", "OK", "");
  	}
 	return 1;
 }
@@ -23232,14 +23232,14 @@ LoadVisualStaticMeshes()
 
     AdminLC = CreateDynamicPickup(1559, 23, 1805.7494,-1302.6721,120.2656);
     AdminLC2 = CreateDynamicPickup(1559, 23, -794.806396,497.738037,1376.195312);
-   	aussenrein = CreateDynamicPickup(1559, 23, 1795.2469,-1406.5632,13.6531);
+   	//aussenrein = CreateDynamicPickup(1559, 23, 1795.2469,-1406.5632,13.6531);
 	innenraus = CreateDynamicPickup(1559, 23, -1405.4905,985.1736,1049.0078);
 	vehiclebuy = CreateDynamicPickup(1559, 23, -1407.0137,1013.8229,1049.0288);
 	dm1pickup = CreateDynamicPickup(1247, 2, -3954.1172,980.9998,65.6059);
 	dm2pickup = CreateDynamicPickup(1247, 2, -3951.4558,982.3098,36.1859);
 	VIPLpickup = CreateDynamicPickup(1559, 2, -2624.3010,1411.4360,7.2303);
 	VIPLpickup2 = CreateDynamicPickup(1559, 23, -3936.6282,1305.2244,2.4587);
-	wangotto[0] = CreateDynamicPickup(1276, 23, -1973.9249,293.3758,35.1719);
+	aussenrein = CreateDynamicPickup(1276, 23, -1973.9249,293.3758,35.1719);
 	wangotto[1] = CreateDynamicPickup(1276, 23, -1640.6263,1203.1343,7.2387);
 	wangotto[2] = CreateDynamicPickup(1276, 23, 2131.7874,-1148.4611,24.3741);
 	wangotto[3] = CreateDynamicPickup(1276, 23, 2200.7473,1391.4735,10.8203);
