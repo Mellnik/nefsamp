@@ -18736,7 +18736,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		                strcat(cstring, ""yellow"/achs "white"- achievements\n");
 		                strcat(cstring, ""yellow"/changename "white"- change your account's nickname\n");
 		                strcat(cstring, ""yellow"/changepass "white"- change your account's password\n");
-		                strcat(cstring, ""yellow"/sellvip "white"- sell your vip status\n");
 		                strcat(cstring, ""yellow"/sellgc "white"- sell gold credits\n");
 		                strcat(cstring, ""yellow"/stats "white"- stats of a player also /stats <playerid>\n");
 		                strcat(cstring, ""yellow"/savecolor "white"- save a color for you next visit\n");
