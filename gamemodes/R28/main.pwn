@@ -24,7 +24,7 @@
 
 #pragma dynamic 8192
 
-#define IS_RELEASE_BUILD (true)
+#define IS_RELEASE_BUILD (false)
 #define INC_ENVIORMENT (true)
 #define IRC_CONNECT (true)
 #define WINTER_EDITION (false) // Requires ferriswheelfair.amx
@@ -296,15 +296,15 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 
 // IRC
 #if IS_RELEASE_BUILD == true
-#define IRC_SERVER                      "foco.nl.irc.tl"
+#define IRC_SERVER                      "exnet.nl.irc.tl"
 #define IRC_PORT                        (6667)
-#define IRC_CHANNEL     				"#NEF"
+#define IRC_CHANNEL     				"#nef"
 #define IRC_NICKSERV            		"NickServ"
 #define IRC_MAX_BOTS                    (5)
 #else
-#define IRC_SERVER                      "foco.nl.irc.tl"
+#define IRC_SERVER                      "exnet.nl.irc.tl"
 #define IRC_PORT                        (6667)
-#define IRC_CHANNEL     				"#NEF.SAMP.PTS"
+#define IRC_CHANNEL     				"#nef.beta"
 #define IRC_NICKSERV            		"NickServ"
 #define IRC_MAX_BOTS                    (5)
 #endif
@@ -28716,16 +28716,16 @@ IRC_SetUp(bool:restart = false)
 	IRC_SetIntData(IRC_Bots[0], E_IRC_CONNECT_DELAY, 1);
 	
 	IRC_Bots[1] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]Inyaface", "["SVRSC"]Inyaface", "inyaface");
-	IRC_SetIntData(IRC_Bots[1], E_IRC_CONNECT_DELAY, 6);
+	IRC_SetIntData(IRC_Bots[1], E_IRC_CONNECT_DELAY, 7);
 	
 	IRC_Bots[2] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]SS_FatGuy", "["SVRSC"]SS_FatGuy", "ss_fatguy");
-	IRC_SetIntData(IRC_Bots[2], E_IRC_CONNECT_DELAY, 15);
+	IRC_SetIntData(IRC_Bots[2], E_IRC_CONNECT_DELAY, 17);
 	
 	IRC_Bots[3] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]TrainRider", "["SVRSC"]TrainRider", "trainrider");
-	IRC_SetIntData(IRC_Bots[3], E_IRC_CONNECT_DELAY, 26);
+	IRC_SetIntData(IRC_Bots[3], E_IRC_CONNECT_DELAY, 27);
 	
 	IRC_Bots[4] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]CrazyLilMan", "["SVRSC"]CrazyLilMan", "crazylilman");
-	IRC_SetIntData(IRC_Bots[4], E_IRC_CONNECT_DELAY, 40);
+	IRC_SetIntData(IRC_Bots[4], E_IRC_CONNECT_DELAY, 39);
 	
 	#else
 	
@@ -28733,16 +28733,16 @@ IRC_SetUp(bool:restart = false)
 	IRC_SetIntData(IRC_Bots[0], E_IRC_CONNECT_DELAY, 1);
 
 	IRC_Bots[1] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]Inyaface_BETA", "["SVRSC"]Inyaface_BETA", "inyaface_BETA");
-	IRC_SetIntData(IRC_Bots[1], E_IRC_CONNECT_DELAY, 6);
+	IRC_SetIntData(IRC_Bots[1], E_IRC_CONNECT_DELAY, 7);
 
 	IRC_Bots[2] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]SS_FatGuy_BETA", "["SVRSC"]SS_FatGuy_BETA", "ss_fatguy_BETA");
-	IRC_SetIntData(IRC_Bots[2], E_IRC_CONNECT_DELAY, 15);
+	IRC_SetIntData(IRC_Bots[2], E_IRC_CONNECT_DELAY, 17);
 
 	IRC_Bots[3] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]TrainRider_BETA", "["SVRSC"]TrainRider_BETA", "trainrider_BETA");
-	IRC_SetIntData(IRC_Bots[3], E_IRC_CONNECT_DELAY, 26);
+	IRC_SetIntData(IRC_Bots[3], E_IRC_CONNECT_DELAY, 27);
 
 	IRC_Bots[4] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]CrazyLilMan_BETA", "["SVRSC"]CrazyLilMan_BETA", "crazylilman_BETA");
-	IRC_SetIntData(IRC_Bots[4], E_IRC_CONNECT_DELAY, 40);
+	IRC_SetIntData(IRC_Bots[4], E_IRC_CONNECT_DELAY, 39);
 	#endif
 	#else
 	#pragma unused restart
