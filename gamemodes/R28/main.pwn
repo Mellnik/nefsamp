@@ -143,7 +143,6 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define MAX_TELE_CATEGORYS              (10)
 #define RGBA(%1,%2,%3,%4) (((((%1) & 0xff) << 24) | (((%2) & 0xff) << 16) | (((%3) & 0xff) << 8) | ((%4) & 0xff)))
 #define UpperToLower(%1) for(new ToLowerChar; ToLowerChar < strlen(%1); ToLowerChar++) if(%1[ToLowerChar] > 64 && %1[ToLowerChar] < 91) %1[ToLowerChar] += 32
-#define IRC_PLUGIN_VERSION              "v1.4.5"
 
 // Derby
 #define DERBY_WIHLE_CAM_M1				-3948.2632, 951.8198, 78.4012
@@ -296,19 +295,19 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 
 // IRC
 #if IS_RELEASE_BUILD == true
-#define IRC_SERVER                      "exnet.nl.irc.tl"
+#define IRC_SERVER                      "mars.sa-irc.com"
 #define IRC_PORT                        (6667)
 #define IRC_CHANNEL     				"#nef"
 #define IRC_NICKSERV            		"NickServ"
 #define IRC_MAX_BOTS                    (5)
 #else
-#define IRC_SERVER                      "exnet.nl.irc.tl"
+#define IRC_SERVER                      "mars.sa-irc.com"
 #define IRC_PORT                        (6667)
 #define IRC_CHANNEL     				"#nef.beta"
 #define IRC_NICKSERV            		"NickServ"
 #define IRC_MAX_BOTS                    (5)
 #endif
-#define PLUGIN_VERSION 					"1.4.4"
+#define IRC_PLUGIN_VERSION              "v1.4.5"
 
 // Colors
 #define SEMI_TRANS                      (0x0A0A0A55)
@@ -356,6 +355,8 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define nef_green                      	"{2DFF00}"
 #define nef_yellow                      "{FFE600}"
 #define nef_red                         "{FF000F}"
+#define ngs_green                       "{2DFF00}"
+#define ngs_blue                        "{0055FF}"
 
 // old Stunt Evolution Colors
 #define COLOR_WHITE 					0xFFFFFFFF
@@ -2482,7 +2483,7 @@ main()
 // Callbacks
 public OnGameModeInit()
 {
-	Log(LOG_INIT, "NEF Server Copyright ©2011 - 2014 "SVRNAME"");
+	Log(LOG_INIT, "NEF Server Copyright (c)2011 - 2014 "SVRNAME"");
     Log(LOG_INIT, "Version: "CURRENT_VERSION"");
 	#if IS_RELEASE_BUILD == true
 	Log(LOG_INIT, "Build Configuration: Release");
@@ -2503,7 +2504,6 @@ public OnGameModeInit()
     #endif
     Server_MapPatches();
 
-	Log(LOG_INIT, "ProcessServerTravel: Loading Modules in OnGameModeInit");
 	ReadServerConfig();
 	ResetElevatorQueue();
 	Elevator_Initialize();
@@ -2542,28 +2542,24 @@ public OnGameModeInit()
 		if(IsComponentIdCompatible(GetVehicleModel(i), 1010)) AddVehicleComponent(i, 1010);
 		ChangeVehicleColor(i, (random(128) + 127), (random(128) + 127));
 	}
-
-	Log(LOG_INIT, "ProcessServerPostTravel: OnGameModeInit");
 	return 1;
 }
 
 public OnGameModeExit()
 {
-	Log(LOG_EXIT, "ProcessServerTravel: OnGameModeExit");
-
 	Log(LOG_EXIT, "Garbage cleanup");
     MySQL_CleanUp();
     
 	mysql_stat(gstr2, pSQL);
-	print(gstr2);
+	Log(LOG_EXIT, "MySQL: %s", gstr2);
 
-	Log(LOG_EXIT, "IRC: Close");
+	Log(LOG_EXIT, "IRC: Closing");
     IRC_QuitBots();
     IRC_DestroyGroup(IRC_GroupID);
 	
 	DestroyElevator();
 
-	Log(LOG_EXIT, "MySQL: Close");
+	Log(LOG_EXIT, "MySQL: Closing");
  	mysql_close(pSQL);
  	
 	Log(LOG_EXIT, "Now exiting.");
@@ -5840,7 +5836,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 	{
 	    LoadMap(playerid);
 		SetPlayerInterior(playerid, 0);
-	    SetPlayerPosEx(playerid, 1798.0952, -1410.8192, floatadd(13.5458, 3.0));
+	    SetPlayerPosEx(playerid, -1980.9745, 257.5091, 36.1352 + 1.0);
 	    RandomWeapons(playerid);
 		gTeam[playerid] = FREEROAM;
 	}
@@ -7052,7 +7048,7 @@ YCMD:bayside(playerid, params[], help)
 }
 YCMD:vs(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid, 1850.7683,-1459.0325,13.3984,43.7119,1850.7683,-1459.0325,13.3984,43.7119, "Vehicle Shop", "vs");
+    PortPlayerMapVeh(playerid, -1980.9745, 257.5091, 36.1352, 90.0, -1980.9745, 257.5091, 36.1352, 90.0, "Vehicle Shop", "vs");
     return 1;
 }
 YCMD:gc(playerid, params[], help)
@@ -15340,7 +15336,7 @@ YCMD:stats(playerid, params[], help)
 		else strmid(vip, "No", 0, 5, 5);
 
  		format(string1, sizeof(string1), ""nef_green"Stats of the player: "white"%s (%i)\n\n\
-	 	Kills: "LB_E"%i\n"white"Deaths: "LB_E"%i\n"white"K/D: "LB_E"%0.2f\n"white"Score: "LB_E"%i\n"white"Money: "LB_E"$%s\n"white"Bank: "LB_E"$%s\n"white"Gold Credits: "LB_E"%sGC\n",
+	 	Kills:\t\t\t%i\nDeaths:\t\t\t%i\nK/D:\t\t\t%0.2f\nScore:\t\t\t%i\nMoney:\t\t\t$%s\nBank:\t\t\t$%s\nGold Credits:\t\t%sGC\n",
    			__GetName(player1),
    			PlayerData[player1][e_accountid],
 	 		PlayerData[player1][e_kills],
@@ -15351,7 +15347,7 @@ YCMD:stats(playerid, params[], help)
         	number_format(PlayerData[player1][e_bank]),
 			number_format(PlayerData[player1][e_credits]));
 
-		format(string2, sizeof(string2), ""white"Race wins: "LB_E"%i\n"white"Derby wins: "LB_E"%i\n"white"Reaction wins: "LB_E"%i\n"white"Math wins: "LB_E"%i\n"white"TDM wins: "LB_E"%i\n"white"Fallout wins: "LB_E"%i\n"white"Gungame wins: "LB_E"%i\n"white"Event wins: "LB_E"%i\n"white"Time until PayDay: "LB_E"%i minutes\n",
+		format(string2, sizeof(string2), "Race wins:\t\t%i\nDerby wins:\t\t%i\nReaction wins:\t\t%i\nMath wins:\t\t%i\nTDM wins:\t\t%i\nFallout wins:\t\t%i\nGungame wins:\t\t%i\nEvent wins:\t\t%i\nTime until PayDay:\t%i minutes\n",
 	   		PlayerData[player1][e_racewins],
 	   		PlayerData[player1][e_derbywins],
 	   		PlayerData[player1][e_reaction],
@@ -15362,7 +15358,7 @@ YCMD:stats(playerid, params[], help)
 	   		PlayerData[player1][e_eventwins],
 	   		PlayerData[player1][e_payday]);
 
-        format(string3, sizeof(string3), ""white"Playing Time: "LB_E"%s\n"white"Gang: "LB_E"%s\n"white"VIP: "LB_E"%s\n"white"Medkits: "LB_E"%i\n"white"Houses: "LB_E"%i\n"white"Business: "LB_E"%i\n"white"Wanteds: "LB_E"%i\n"white"Last log in: "LB_E"%s",
+        format(string3, sizeof(string3), "Playing Time:\t\t%s\nGang:\t\t\t%s\nVIP:\t\t\t%s\nMedkits:\t\t%i\nHouses:\t\t%i\nBusinesses:\t\t%i\nWanteds:\t\t%i\nLast log in:\t\t%s",
             GetPlayingTimeFormat(player1),
 			gangnam,
 			vip,
@@ -15374,13 +15370,13 @@ YCMD:stats(playerid, params[], help)
 			
 		if(islogged(player1))
 		{
-			strcat(string3, "\n"white"Register Date: "LB_E"");
+			strcat(string3, "\nRegister Date:\t\t");
 			strcat(string3, UTConvert(PlayerData[player1][e_regdate]));
 		}
 			
 		if(PlayerData[player1][BoostDeplete] != 0)
 		{
-		    strcat(string3, "\n"white"Boost will end on: "LB_E"");
+		    strcat(string3, "\nBoost will end on:\t\t");
 		    strcat(string3, UTConvert(PlayerData[player1][BoostDeplete]));
 		}
 			
@@ -18583,7 +18579,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					}
 					case 7:
 					{
-					    PlayerData[playerid][bSpeedo] = !PlayerData[playerid][bSpeedo];
+						ToggleSpeedo(playerid, !PlayerData[playerid][bSpeedo]);
 					}
 					case 8:
 					{
@@ -20288,7 +20284,7 @@ public OnDynamicObjectMoved(objectid)
 #if IRC_CONNECT == true
 public IRC_OnConnect(botid, ip[], port)
 {
-    printf("*** IRC_OnConnect: Bot ID %d connected to %s:%d", botid, ip, port);
+    Log(LOG_ONLINE, "IRC_OnConnect: Bot ID %d connected to %s:%d", botid, ip, port);
     IRC_JoinChannel(botid, IRC_CHANNEL);
     IRC_AddToGroup(IRC_GroupID, botid);
     return 1;
@@ -20296,19 +20292,31 @@ public IRC_OnConnect(botid, ip[], port)
 
 public IRC_OnDisconnect(botid, ip[], port, reason[])
 {
-    printf("*** IRC_OnDisconnect: Bot ID %d disconnected from %s:%d (%s)", botid, ip, port, reason);
+    Log(LOG_ONLINE, "IRC_OnDisconnect: Bot ID %d disconnected from %s:%d (%s)", botid, ip, port, reason);
 	IRC_RemoveFromGroup(IRC_GroupID, botid);
 	return 1;
 }
 
 public IRC_OnUserRequestCTCP(botid, user[], host[], message[])
 {
-	printf("*** IRC_OnUserRequestCTCP (Bot ID %d): User %s (%s) sent CTCP request: %s", botid, user, host, message);
+	Log(LOG_ONLINE, "IRC_OnUserRequestCTCP (Bot ID %d): User %s (%s) sent CTCP request: %s", botid, user, host, message);
 	// Someone sent a CTCP VERSION request
 	if (!strcmp(message, "VERSION"))
 	{
 		IRC_ReplyCTCP(botid, user, "VERSION SA-MP IRC Plugin v" #IRC_PLUGIN_VERSION "");
 	}
+	return 1;
+}
+
+public IRC_OnConnectAttempt(botid, ip[], port)
+{
+	Log(LOG_ONLINE, "IRC_OnConnectAttempt(%i, %s, %i)", botid, ip, port);
+	return 1;
+}
+
+public IRC_OnConnectAttemptFail(botid, ip[], port, reason[])
+{
+	Log(LOG_ONLINE, "IRC_OnConnectAttemptFail(%i, %s, %i, %s)", botid, ip, port, reason);
 	return 1;
 }
 #endif
@@ -23364,7 +23372,7 @@ LoadVisualStaticMeshes()
 	// anti vehicle drop end
 
 	// vehicle shop
-	CreateDynamicMapIcon(1795.2469, -1406.5632, 13.6531, 55, 1, -1, -1, -1, 500.0);
+	CreateDynamicMapIcon(-1973.9249,293.3758,35.1719, 55, 1, -1, -1, -1, 400.0);
 	// vehicle shop end
 
 	// hotspots
@@ -23524,8 +23532,8 @@ LoadVisualStaticMeshes()
 	AddTeleport(5, "Racemap 2", "racemap2", 2741.1375,1969.4594,5269.7466);
 	AddTeleport(5, "Concert", "concert", 1477.8225,-1714.1190,14.1400);
 
-    CreateDynamic3DTextLabel(""white"["nef_green"Private Vehicle Shop"white"]", -1, 1795.2469,-1406.5632,13.6531+0.5, 550.0);
-    CreateDynamic3DTextLabel(""white"["nef_green"Gold Credits"white"]", -1, 1902.1838,-1404.4944,16.3474+0.5, 550.0);
+    CreateDynamic3DTextLabel(""white"["nef_green"Private Vehicle Shop"white"]", -1, -1973.9249,293.3758,35.1719+0.5, 400.0);
+    CreateDynamic3DTextLabel(""white"["nef_green"Gold Credits"white"]", -1, 1902.1838,-1404.4944,16.3474+0.5, 400.0);
     CreateDynamic3DTextLabel(""red">>> SLOW DOWN <<<", RED, 477.7281,1399.4580,735.2565+0.5, 60.0);
     CreateDynamic3DTextLabel(""white"["lila"Mellnik's Office"white"]", -1, 1794.8202,-1311.3057,120.6237+0.5, 35.0);
     CreateDynamic3DTextLabel(""white"["yellow"Admin Liberty City"white"]", -1, 1805.7494,-1302.6721,120.2656+0.5, 35.0);
@@ -28712,36 +28720,36 @@ IRC_SetUp(bool:restart = false)
     if(!restart) IRC_GroupID = IRC_CreateGroup();
     
     #if IS_RELEASE_BUILD == true
-	IRC_Bots[0] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]Floatround", "["SVRSC"]Floatround", "foatround");
+	IRC_Bots[0] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]Floatround", "["SVRSC"]Floatround", "foatround", false, "31.204.152.218", "");
 	IRC_SetIntData(IRC_Bots[0], E_IRC_CONNECT_DELAY, 1);
 	
-	IRC_Bots[1] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]Inyaface", "["SVRSC"]Inyaface", "inyaface");
+	IRC_Bots[1] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]Inyaface", "["SVRSC"]Inyaface", "inyaface", false, "31.204.152.218", "");;
 	IRC_SetIntData(IRC_Bots[1], E_IRC_CONNECT_DELAY, 7);
 	
-	IRC_Bots[2] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]SS_FatGuy", "["SVRSC"]SS_FatGuy", "ss_fatguy");
+	IRC_Bots[2] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]SS_FatGuy", "["SVRSC"]SS_FatGuy", "ss_fatguy", false, "31.204.152.218", "");;
 	IRC_SetIntData(IRC_Bots[2], E_IRC_CONNECT_DELAY, 17);
 	
-	IRC_Bots[3] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]TrainRider", "["SVRSC"]TrainRider", "trainrider");
+	IRC_Bots[3] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]TrainRider", "["SVRSC"]TrainRider", "trainrider", false, "31.204.152.218", "");;
 	IRC_SetIntData(IRC_Bots[3], E_IRC_CONNECT_DELAY, 27);
 	
-	IRC_Bots[4] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]CrazyLilMan", "["SVRSC"]CrazyLilMan", "crazylilman");
+	IRC_Bots[4] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]CrazyLilMan", "["SVRSC"]CrazyLilMan", "crazylilman", false, "31.204.152.218", "");
 	IRC_SetIntData(IRC_Bots[4], E_IRC_CONNECT_DELAY, 39);
 	
 	#else
 	
-	IRC_Bots[0] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]Floatround_BETA", "["SVRSC"]Floatround_BETA", "foatround_BETA");
+	IRC_Bots[0] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]Floatround_BETA", "["SVRSC"]Floatround_BETA", "foatround_BETA", false, "31.204.152.218", "");
 	IRC_SetIntData(IRC_Bots[0], E_IRC_CONNECT_DELAY, 1);
 
-	IRC_Bots[1] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]Inyaface_BETA", "["SVRSC"]Inyaface_BETA", "inyaface_BETA");
+	IRC_Bots[1] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]Inyaface_BETA", "["SVRSC"]Inyaface_BETA", "inyaface_BETA", false, "31.204.152.218", "");
 	IRC_SetIntData(IRC_Bots[1], E_IRC_CONNECT_DELAY, 7);
 
-	IRC_Bots[2] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]SS_FatGuy_BETA", "["SVRSC"]SS_FatGuy_BETA", "ss_fatguy_BETA");
+	IRC_Bots[2] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]SS_FatGuy_BETA", "["SVRSC"]SS_FatGuy_BETA", "ss_fatguy_BETA", false, "31.204.152.218", "");
 	IRC_SetIntData(IRC_Bots[2], E_IRC_CONNECT_DELAY, 17);
 
-	IRC_Bots[3] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]TrainRider_BETA", "["SVRSC"]TrainRider_BETA", "trainrider_BETA");
+	IRC_Bots[3] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]TrainRider_BETA", "["SVRSC"]TrainRider_BETA", "trainrider_BETA", false, "31.204.152.218", "");
 	IRC_SetIntData(IRC_Bots[3], E_IRC_CONNECT_DELAY, 27);
 
-	IRC_Bots[4] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]CrazyLilMan_BETA", "["SVRSC"]CrazyLilMan_BETA", "crazylilman_BETA");
+	IRC_Bots[4] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]CrazyLilMan_BETA", "["SVRSC"]CrazyLilMan_BETA", "crazylilman_BETA", false, "31.204.152.218", "");
 	IRC_SetIntData(IRC_Bots[4], E_IRC_CONNECT_DELAY, 39);
 	#endif
 	#else
