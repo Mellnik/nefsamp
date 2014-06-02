@@ -24,7 +24,7 @@
 
 #pragma dynamic 8192
 
-#define IS_RELEASE_BUILD (false)
+#define IS_RELEASE_BUILD (true)
 #define INC_ENVIORMENT (true)
 #define IRC_CONNECT (true)
 #define WINTER_EDITION (false) // Requires ferriswheelfair.amx
@@ -15335,7 +15335,7 @@ YCMD:stats(playerid, params[], help)
 		}
 		else strmid(vip, "No", 0, 5, 5);
 
- 		format(string1, sizeof(string1), ""nef_green"Stats of the player: "white"%s (%i)\n\n\
+ 		format(string1, sizeof(string1), ""ngs_blue"Stats of the player: "white"%s (%i)\n\n\
 	 	Kills:\t\t\t%i\nDeaths:\t\t\t%i\nK/D:\t\t\t%0.2f\nScore:\t\t\t%i\nMoney:\t\t\t$%s\nBank:\t\t\t$%s\nGold Credits:\t\t%sGC\n",
    			__GetName(player1),
    			PlayerData[player1][e_accountid],
@@ -28723,13 +28723,13 @@ IRC_SetUp(bool:restart = false)
 	IRC_Bots[0] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]Floatround", "["SVRSC"]Floatround", "foatround", false, "31.204.152.218", "");
 	IRC_SetIntData(IRC_Bots[0], E_IRC_CONNECT_DELAY, 1);
 	
-	IRC_Bots[1] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]Inyaface", "["SVRSC"]Inyaface", "inyaface", false, "31.204.152.218", "");;
+	IRC_Bots[1] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]Inyaface", "["SVRSC"]Inyaface", "inyaface", false, "31.204.152.218", "");
 	IRC_SetIntData(IRC_Bots[1], E_IRC_CONNECT_DELAY, 7);
 	
-	IRC_Bots[2] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]SS_FatGuy", "["SVRSC"]SS_FatGuy", "ss_fatguy", false, "31.204.152.218", "");;
+	IRC_Bots[2] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]SS_FatGuy", "["SVRSC"]SS_FatGuy", "ss_fatguy", false, "31.204.152.218", "");
 	IRC_SetIntData(IRC_Bots[2], E_IRC_CONNECT_DELAY, 17);
 	
-	IRC_Bots[3] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]TrainRider", "["SVRSC"]TrainRider", "trainrider", false, "31.204.152.218", "");;
+	IRC_Bots[3] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]TrainRider", "["SVRSC"]TrainRider", "trainrider", false, "31.204.152.218", "");
 	IRC_SetIntData(IRC_Bots[3], E_IRC_CONNECT_DELAY, 27);
 	
 	IRC_Bots[4] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]CrazyLilMan", "["SVRSC"]CrazyLilMan", "crazylilman", false, "31.204.152.218", "");
