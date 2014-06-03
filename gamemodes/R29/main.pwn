@@ -1,6 +1,6 @@
 /*======================================================================*\
 || #################################################################### ||
-|| # Project New Evolution Freeroam - Build 28 	        			  # ||
+|| # Project New Evolution Freeroam - Build 29 	        			  # ||
 || # ---------------------------------------------------------------- # ||
 || # Copyright ©2011-2014 New Evolution Freeroam	  				  # ||
 || # Created by Mellnik                                               # ||
@@ -85,9 +85,9 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define SERVER_IP                       "31.204.152.218:7777"
 #define HOSTNAME                        " 	      ..:: NEF ::.. ×Stunt/DM/Race/Minigames×"
 #if IS_RELEASE_BUILD == true
-#define CURRENT_VERSION                 "Build 28"
+#define CURRENT_VERSION                 "Build 29"
 #else
-#define CURRENT_VERSION                 "PTS:Build 28"
+#define CURRENT_VERSION                 "PTS:Build 29"
 #endif
 #define HOTFIX_REV                      "Hotfix #0"
 #define SAMP_VERSION                    "SA-MP 0.3z-R2-2"
@@ -3630,9 +3630,12 @@ public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY
 	if(hittype == BULLET_HIT_TYPE_PLAYER) {
 	    if(hitid != INVALID_PLAYER_ID) {
 			if(GetPlayerState(playerid) == PLAYER_STATE_PASSENGER) {
-				new model = GetVehicleModel(GetPlayerVehicleID(playerid));
-				if(model == 522 || model == 521) {
-				    return 0;
+				switch(GetVehicleModel(GetPlayerVehicleID(playerid)))
+				{
+				    case 522, 521, 461, 462, 463, 581:
+				    {
+				        return 0;
+				    }
 				}
 			}
 	    }
