@@ -21700,7 +21700,7 @@ MySQL_RegisterAccount(playerid, register, password[])
 
 function:OnPlayerRegister(playerid, namehash, register, password[], playername[], ip_address[])
 {
-	mysql_format(pSQL, gstr2, sizeof(gstr2), "UPDATE `accounts` SET `hash` = SHA1('%e'), `ip` = '%s' WHERE `name` = '%s';", password, playername, ip_address);
+	mysql_format(pSQL, gstr2, sizeof(gstr2), "UPDATE `accounts` SET `hash` = SHA1('%e'), `ip` = '%s' WHERE `name` = '%s';", password, ip_address, playername);
 	mysql_tquery(pSQL, gstr2);
 	
 	if(namehash == YHash(__GetName(playerid)))
