@@ -1,0 +1,175 @@
+html, body
+{
+	background: url('http://ams1.boostlayer.net/static/bg.jpg') no-repeat center center fixed; 
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
+	background-size: cover;
+	font-family: Arial, Helvetica, sans-serif;
+	color: white;
+}
+
+#content 
+{
+    width: 1000px;
+    margin: 0 auto;
+    height: 100%;
+}
+
+#navbar
+{
+	font-family:Oswald;
+	margin-top:-30px;
+	position:absolute;
+	z-index:1000;
+	min-width:980px;
+	left:0;
+	right:0;
+	height:30px;
+	background-color:black;
+}
+
+#navbarInner
+{
+	height:30px;
+	margin:0 auto;
+	position:relative;
+}
+
+#navbarLinks
+{
+	float:left;
+	height:30px;
+	margin-left:13px;
+}
+
+#navbarLinks > a
+{
+	display:inline-block;
+	font-weight:normal;
+	font-size:15px;
+	text-decoration:none;
+	padding:3px 13px 0px 13px;
+	color:white;
+	line-height:25px;
+}
+
+#navbarLinks > a:hover
+{
+	background-color: rgb(16, 158, 208);
+	border-bottom: 2px solid rgb(16, 158, 208);
+}
+
+#navbarButtons
+{
+	height: 30px;
+	float: right;
+}
+
+#navbarButtons > a 
+{
+	line-height:30px;display:inline-block;font-weight:normal;font-size:16px;padding:0px 13px;text-decoration:none;color:black;background-color:white
+}
+
+#navbarButtons > a:hover
+{
+	color: white;
+	background-color: rgb(5, 57, 96);
+	border-bottom: 2px solid rgb(5, 57, 96);
+}
+
+a.neflink
+{
+	border-bottom: 1px dotted;
+	font-weight: bold;
+	text-decoration: none;
+	color: white;
+}
+
+a.neflink:hover
+{
+	color: rgb(246, 75, 76);
+	border-bottom: 1px solid rgb(246, 75, 76);
+}
+
+.copyright
+{
+	position: fixed;
+	bottom: 5px; 
+	left: 5px; 
+	text-align: left; 
+	font-size: 90%;
+}
+
+#box
+{
+	-moz-border-radius: 3px;
+	-webkit-border-radius: 3px;
+	border: 2px solid rgba(120, 120, 120, .5);
+	padding: 5px 10px 5px 5px;
+	border-radius: 3px;
+	background-color: rgba(21, 21, 21, 0.5);
+}
+
+#smallbox
+{
+	-moz-border-radius: 2px;
+	-webkit-border-radius: 2px;
+	border: 2px solid rgba(120, 120, 120, .4);
+	padding: 5px 10px 5px 5px;
+	border-radius: 2px;
+	background-color: rgba(21, 21, 21, 0.4);
+	margin-right: 200px;
+	margin-left: 200px;
+}
+
+.about
+{
+	padding: 20px 30px 20px 30px;
+    display: table;
+}
+
+.about span 
+{
+    vertical-align: middle;
+    display: table-cell;
+}
+
+.about span img
+{
+    vertical-align: middle;
+    display: table-cell;
+    margin-right: 1em;
+}
+
+#aboutprotip
+{
+	padding-left: 30px;
+	padding-bottom: 20px;
+}
+
+.neftable
+{
+	border: 2px rgb(246, 75, 76) solid;
+	border-spacing: 0px;
+}
+
+.neftable tr
+{
+	padding: 1px;
+
+}
+	
+.neftable tr th
+{
+	background-color: rgb(246, 75, 76);
+	font-family: Verdana;
+	font-weight: bold;
+	font-size: 12px;
+	color: white;
+}
+
+.neftable tr td
+{
+	text-align:left;font-family:Verdana,sans-serif,Arial;font-weight:normal;font-size:.8em;color:white;background-color:rgba(21,21,21,0.4);padding-top:4px;padding-bottom:4px;padding-left:8px;padding-right:0px;
+}

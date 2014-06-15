@@ -1,0 +1,13 @@
+<TITLE>New Evolution Freeroam</TITLE><BODY BGCOLOR=rgb(160,160,160) SIZE=4 IMG="2K4Menus.menuBackground">
+<BR>
+<BR>
+<CENTER><FONT SIZE=-6 COLOR=black>RULES<IMG SRC="2K4Menus.DemoHeaderBar" WIDTH=500 HEIGHT=38 HSPACE=-8 ALIGN=CENTER STYLE=STRETCH></CENTER></FONT><BR>
+<TAB X=20><BR><BR>
+1. No cheating!<BR>
+2. No dying!<BR>
+3. No Lying!<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+Visit our <A HREF="http://forums.tripwireinteractive.com">forums</A> for more information. 
