@@ -240,7 +240,7 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define COLOR_CNR_PRO_ROBBER            0xFF3200FF
 
 // GWARS
-#define MAX_GZONES						(100)
+#define MAX_GZONES						(80)
 #define MAX_GZONES_PER_GANG             (15)
 #define GZONE_SIZE                      (70.0)
 #define COLOR_HOSTILE                   (0x95133499)
@@ -282,8 +282,8 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define MAX_PLAYER_PVS	                (8)
 
 #define function:%1(%2) \
-			forward public %1(%2); \
-			public %1(%2)
+	forward public %1(%2); \
+	public %1(%2)
 
 #define ConvertTime(%0,%1,%2,%3,%4) \
 	new \
@@ -1120,6 +1120,7 @@ enum e_gungame_data
 	bool:dead,
 	bool:pw
 };
+
 enum e_GunGame
 {
 	GG_iPlayer,
@@ -1131,6 +1132,7 @@ enum e_race_position
 	RP_iPlayer,
 	RP_iValue
 };
+
 enum e_race_data
 {
 	E_vModel,
@@ -1139,6 +1141,7 @@ enum e_race_data
 	E_rCPs,
 	E_DeployTime
 };
+
 enum
 {
 	RaceStatus_Inactive,
@@ -1460,7 +1463,7 @@ new const PVCategorys[11][] =
  	/*10*/{"Aircraft"}
 };
 
-new const BLevelMatrix[21][e_prop_matrix] =
+new const BusinessLevelMatrix[21][e_prop_matrix] =
 {
 	{1, 0, 1000},
 	{2, 5000, 1250},
@@ -1718,7 +1721,6 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
   	bool:DerbyWinner[MAX_PLAYERS] = {false, ...},
 	bool:CSG[MAX_PLAYERS] = {false, ...},
 	Reports[MAX_REPORTS][144],
-  	//Adverts[MAX_ADS][144],
   	tBGTimer = -1,
   	tBGVoting = -1,
   	BGMapVotes[6] = {0, ...},
@@ -2507,19 +2509,21 @@ public OnGameModeInit()
 	ReadServerConfig();
 	ResetElevatorQueue();
 	Elevator_Initialize();
-	LoadServerStaticMeshes();
-	LoadVisualStaticMeshes();
-	CreateTextdraws();
+	server_initialize();
+	server_load_visuals();
+	server_load_textdraws();
+	ClearDerbyVotes();
     ExecDerbyVotingTimer();
     ExecBGVotingTimer();
     FetchRaces();
-    ClearDerbyVotes();
     IRC_SetUp();
 	LoadStores();
 	LoadGZones();
 	LoadHouses();
 	LoadBusinesses();
+	SollIchDirMaEtWatSagen();
 
+	// Timer init
 	tReactionTimer = SetTimer("xReactionTest", REAC_TIME, true);
 	g_tRaceOpenSelection = SetTimer("OpenNewRace", 40307, false);
 	SetTimer("ProcessTick", 1000, true);
@@ -2530,10 +2534,7 @@ public OnGameModeInit()
 	SetTimer("RandomSvrMsg", SERVERMSGS_TIME, true);
 	SetTimer("DoLotto", 100000, false);
 
-    SollIchDirMaEtWatSagen();
-
     LoadServerVehicles();
-    Log(LOG_INIT, "Server Vehicles loaded");
 
 	for(new i = 0; i < MAX_VEHICLES; i++)
 	{
@@ -2542,6 +2543,7 @@ public OnGameModeInit()
 		if(IsComponentIdCompatible(GetVehicleModel(i), 1010)) AddVehicleComponent(i, 1010);
 		ChangeVehicleColor(i, (random(128) + 127), (random(128) + 127));
 	}
+    Log(LOG_INIT, "Server successfully loaded");
 	return 1;
 }
 
@@ -8270,63 +8272,6 @@ YCMD:buygc(playerid, params[], help)
 	}
 	return 1;
 }
-/*
-YCMD:ad(playerid, params[], help)
-{
-    if(!islogged(playerid)) return notlogged(playerid);
-    if(GetPlayerCash(playerid) < 10000) return SCM(playerid, -1, ""er"You need $10,000 to make an advertisment");
-	if(PlayerData[playerid][Muted]) return SCM(playerid, RED, "You are muted! Please wait until the time is over!");
-    
-	new ad[144];
-	if(sscanf(params, "s[140]", ad))
-	{
-		return SCM(playerid, NEF_GREEN, "Usage: /ad <text>");
-	}
-
-	if(strlen(ad) <= 2 || strlen(ad) > 120) return SCM(playerid, -1, ""er"Invalid text length");
-	if(IsAd(ad)) return SCM(playerid, -1, ""er"You may not post server ips");
-
-	GivePlayerCash(playerid, -10000);
-	
-	for(new i = 1; i < MAX_ADS - 1; i++)
-	{
-		Adverts[i] = Adverts[i + 1];
-	}
-	
-	Adverts[MAX_ADS - 1] = ad;
-	format(gstr, sizeof(gstr), ""nef_green"Advert: %s", ad);
-	SCMToAll(-1, gstr);
-	print(gstr);
-	format(gstr, sizeof(gstr), ""nef_green"Advert by %s(%i), contact ID: /pm %i", __GetName(playerid), playerid, playerid);
-    SCMToAll(-1, gstr);
-    print(gstr);
-	format(gstr, sizeof(gstr), "3,1ADS:4 Advert: %s", ad);
-	IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
-	format(gstr, sizeof(gstr), "3,1ADS:4 Advert by %s(%i), contact ID: /pm %i", __GetName(playerid), playerid, playerid);
-	IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
-	return 1;
-}*/
-/*
-YCMD:ads(playerid, params[], help)
-{
-    new ReportCount, ass[1024];
-	for(new i = 1; i < MAX_ADS; i++)
-	{
-		if(strcmp(Adverts[i], "<none>", true) != 0)
-		{
-			ReportCount++;
-			strcat(ass, Adverts[i]);
-			strcat(ass, "\n");
-		}
-	}
-
-	if(ReportCount == 0)
-	{
-		SCM(playerid, WHITE, "There have been no adverts");
-	}
-	else ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_LIST, "Last Adverts (/ad <text>)", ass, "Close", "");
-	return 1;
-}*/
 
 YCMD:bbuy(playerid, params[], help)
 {
@@ -10712,7 +10657,7 @@ YCMD:mkick(playerid, params[], help)
 		if(sscanf(params, "r", player))
 		{
 	        SCM(playerid, NEF_GREEN, "Usage: /mkick <playerid>");
-	        SCM(playerid, NEF_GREEN, "Kicks someone out of a minigame, specate system, house or shop");
+	        SCM(playerid, NEF_GREEN, "Kicks someone out of a minigame, spectate system, house or shop");
 	        return 1;
 		}
 		
@@ -14933,10 +14878,14 @@ YCMD:spec(playerid, params[], help)
 			gTeam[playerid] = SPEC;
             PlayerData[playerid][SpecID] = player;
 
-			GetPlayerPos(playerid, PlayerData[playerid][SpecX], PlayerData[playerid][SpecY], PlayerData[playerid][SpecZ]);
-			GetPlayerFacingAngle(playerid, PlayerData[playerid][SpecA]);
-			SetPlayerInterior(playerid, GetPlayerInterior(player));
-			SetPlayerVirtualWorld(playerid, GetPlayerVirtualWorld(player));
+			if(GetPlayerState(playerid) != PLAYER_STATE_SPECTATING)
+			{
+				GetPlayerPos(playerid, PlayerData[playerid][SpecX], PlayerData[playerid][SpecY], PlayerData[playerid][SpecZ]);
+				GetPlayerFacingAngle(playerid, PlayerData[playerid][SpecA]);
+				SetPlayerInterior(playerid, GetPlayerInterior(player));
+				SetPlayerVirtualWorld(playerid, GetPlayerVirtualWorld(player));
+   			}
+   			
 			TogglePlayerSpectating(playerid, true);
 
 			if(IsPlayerInAnyVehicle(player))
@@ -17275,12 +17224,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						return 1;
 		            }
                 
-		            if(GetPlayerCash(playerid) < BLevelMatrix[BusinessData[r][e_level]][E_bupgradeprice])
+		            if(GetPlayerCash(playerid) < BusinessLevelMatrix[BusinessData[r][e_level]][E_bupgradeprice])
 		            {
 		                return SCM(playerid, -1, ""er"You don't have enough money!");
 		            }
 
-                    GivePlayerCash(playerid, -BLevelMatrix[BusinessData[r][e_level]][E_bupgradeprice]);
+                    GivePlayerCash(playerid, -BusinessLevelMatrix[BusinessData[r][e_level]][E_bupgradeprice]);
                     BusinessData[r][e_level]++;
                     
                     if(PlayerAchData[playerid][e_ach_mademan][0] == 0 && BusinessData[r][e_level] == 20)
@@ -18740,7 +18689,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		                strcat(cstring, ""yellow"/deletecolor "white"- delete a saved color\n");
 		                strcat(cstring, ""yellow"/saveskin "white"- save a skin for you next visit\n");
 		                strcat(cstring, ""yellow"/deleteskin "white"- delete a saved skin\n");
-		                strcat(cstring, ""yellow"/ad "white"- place a global ad\n");
 		            }
 		            case 2: // Gang
 		            {
@@ -22391,7 +22339,7 @@ RandomWeapons(playerid)
     return 1;
 }
 
-CreateTextdraws()
+server_load_textdraws()
 {
     new count = GetTickCount_();
 	
@@ -22405,6 +22353,18 @@ CreateTextdraws()
 	TextDrawSetProportional(TXTWinterEdition, 1);
 	TextDrawSetSelectable(TXTWinterEdition, 0);
 	#endif
+	
+	for(new i = 0; i < MAX_GZONES; i++)
+	{
+		GZoneInfo[i][E_Txt] = TextDrawCreate(503.000000, 298.000000, "Gang War: %s~n~Defend the Gang Zone!~n~~n~~n~Timeleft: --:--");
+		TextDrawBackgroundColor(GZoneInfo[i][E_Txt], 255);
+		TextDrawFont(GZoneInfo[i][E_Txt], 1);
+		TextDrawLetterSize(GZoneInfo[i][E_Txt], 0.240000, 1.100000);
+		TextDrawColor(GZoneInfo[i][E_Txt], -1);
+		TextDrawSetOutline(GZoneInfo[i][E_Txt], 1);
+		TextDrawSetProportional(GZoneInfo[i][E_Txt], 1);
+		TextDrawSetSelectable(GZoneInfo[i][E_Txt], 0);
+	}
 	
 	TXTSpeedo_Main = TextDrawCreate(126.500000, 333.666687, "KM/H");
 	TextDrawLetterSize(TXTSpeedo_Main, 0.209998, 0.905833);
@@ -22865,15 +22825,15 @@ function:mainmode()
 	return 1;
 }
 
-LoadServerStaticMeshes()
+server_initialize()
 {
-	new string[128], count = GetTickCount_();
-	format(string, sizeof(string), "hostname %s", HOSTNAME);
-
-	SendRconCommand(string);
+	new count = GetTickCount_();
+	
+	// SA_MP Server config
+	format(gstr, sizeof(gstr), "hostname %s", HOSTNAME);
+	SendRconCommand(gstr);
 	SendRconCommand("weburl "SVRURLWWW"");
     SetGameModeText("TdmDerbyRaceCNRFunStuntFreeroam");
-
 	SendRconCommand("mapname "SVRSC" "CURRENT_VERSION"");
 	
 	EnableVehicleFriendlyFire();
@@ -22886,20 +22846,25 @@ LoadServerStaticMeshes()
 	EnableStuntBonusForAll(0);
 	SetWeather(1);
 	SetWorldTime(12);
+	
+	// Variable setting
     CurrentBGMap = BG_VOTING;
 	StartTime = gettime();
 	Iter_Init(PlayerIgnore);
 	
 	for(new i = 1; i < MAX_REPORTS; i++)
-	{
 		Reports[i] = "<none>";
+
+	for(new i = 0; i < sizeof(PVCategorys); i++)
+	{
+	    format(gstr, sizeof(gstr), "%s\n", PVCategorys[i]);
+	    strcat(sPVCategory, gstr);
 	}
 	
-	/*for(new i = 1; i < MAX_ADS; i++)
-	{
-		Adverts[i] = "<none>";
-	}*/
-	
+	for(new i = 0; i < MAX_GZONES; i++)
+		GZoneInfo[i][bUnderAttack] = false;
+		
+	// Other stuff to initialize
     g_SpawnAreas[0] = CreateDynamicSphere(341.8535, -1852.6327, 6.8569, 25.0); // <- beach sphere
     g_SpawnAreas[1] = CreateDynamicSphere(385.4325, 2541.2456, 14.5953, 13.5); // <- AA sphere
     g_SpawnAreas[2] = CreateDynamicSphere(-1203.3666, -27.8846, 15.8403, 15.0); // <- SFA 1 sphere
@@ -22909,26 +22874,6 @@ LoadServerStaticMeshes()
 	toyslist = LoadModelSelectionMenu("Other/toys.txt");
 	hobjslist = LoadModelSelectionMenu("Other/hobjs.txt");
 	skinlist = LoadModelSelectionMenu("Other/skins.txt");
-
-	for(new i = 0; i < sizeof(PVCategorys); i++)
-	{
-	    format(string, sizeof(string), "%s\n", PVCategorys[i]);
-	    strcat(sPVCategory, string);
-	}
-
-	for(new i = 0; i < MAX_GZONES; i++)
-	{
-		GZoneInfo[i][bUnderAttack] = false;
-		
-		GZoneInfo[i][E_Txt] = TextDrawCreate(503.000000, 298.000000, "Gang War: %s~n~Defend the Gang Zone!~n~~n~~n~Timeleft: --:--");
-		TextDrawBackgroundColor(GZoneInfo[i][E_Txt], 255);
-		TextDrawFont(GZoneInfo[i][E_Txt], 1);
-		TextDrawLetterSize(GZoneInfo[i][E_Txt], 0.240000, 1.100000);
-		TextDrawColor(GZoneInfo[i][E_Txt], -1);
-		TextDrawSetOutline(GZoneInfo[i][E_Txt], 1);
-		TextDrawSetProportional(GZoneInfo[i][E_Txt], 1);
-		TextDrawSetSelectable(GZoneInfo[i][E_Txt], 0);
-	}
 
 	#if WINTER_EDITION == true
     Command_AddAltNamed("xmas", "christmas");
@@ -22956,10 +22901,6 @@ LoadServerStaticMeshes()
     Command_AddAltNamed("vs", "vehicleshop");
     Command_AddAltNamed("vs", "ottos");
     Command_AddAltNamed("vs", "otto");
-    //Command_AddAltNamed("ad", "advert");
-    //Command_AddAltNamed("ad", "advertisment");
-    //Command_AddAltNamed("ads", "advertisments");
-    //Command_AddAltNamed("ads", "adverts");
 	Command_AddAltNamed("ls", "grove");
 	Command_AddAltNamed("gc", "cm");
 	Command_AddAltNamed("buy", "buyhouse");
@@ -23177,7 +23118,7 @@ LoadServerStaticMeshes()
 	return 1;
 }
 
-LoadVisualStaticMeshes()
+server_load_visuals()
 {
 	// 3374 heuballen
 	// 2898 grünes rasen ding
@@ -27632,8 +27573,8 @@ function:ShowDialog(playerid, dialogid)
 				    format(tmp, sizeof(tmp), "%i\nCurrent Business Earnings: $%s\nEarnings in next level: $%s\n\nUpgrade now for "yellow_e"$%s"white"!",
 						BusinessData[r][e_level],
 						number_format(GetBusinessEarnings(r)),
-						number_format(BLevelMatrix[BusinessData[r][e_level]][E_bearnings]),
-						number_format(BLevelMatrix[BusinessData[r][e_level]][E_bupgradeprice]));
+						number_format(BusinessLevelMatrix[BusinessData[r][e_level]][E_bearnings]),
+						number_format(BusinessLevelMatrix[BusinessData[r][e_level]][E_bupgradeprice]));
 					strcat(string, tmp);
 				}
 				
@@ -29619,11 +29560,11 @@ GetPlayerBusinessEarnings(playerid)
 GetBusinessEarnings(r)
 {
 	new __int32 = 0;
-	for(new i = 0; i < sizeof(BLevelMatrix); i++)
+	for(new i = 0; i < sizeof(BusinessLevelMatrix); i++)
 	{
 		if(i == (BusinessData[r][e_level] - 1))
 		{
-		    __int32 = BLevelMatrix[i][E_bearnings];
+		    __int32 = BusinessLevelMatrix[i][E_bearnings];
 		    return __int32;
 		}
 	}
