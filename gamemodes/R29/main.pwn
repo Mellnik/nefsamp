@@ -799,7 +799,7 @@ enum E_PLAYER_ACH_DATA
 {
     e_ach_styler, // Buy a toy (/toy)
 	e_ach_grimreaper, // Make 300 Kills
-	e_ach_masskiller, // Get a 25 Killstreak
+	e_ach_masskiller, // Get a 30 Killstreak
 	e_ach_eliteracer, // win 10 races
 	e_ach_toofast, // win 10 reaction tests
 	e_ach_scorewhore, // get 2000 score
@@ -2506,7 +2506,7 @@ public OnGameModeInit()
     #endif
     Server_MapPatches();
 
-	ReadServerConfig();
+	server_read_config();
 	ResetElevatorQueue();
 	Elevator_Initialize();
 	server_initialize();
@@ -3157,7 +3157,7 @@ public OnPlayerConnect(playerid)
 	
 	    if(count_r > m_PlayerRecord) {
 	        m_PlayerRecord = count_r;
-	        SaveServerConfig();
+	        server_save_config();
 	    }
 	
 		TextDrawShowForPlayer(playerid, TXTOnJoin[0]);
@@ -3485,7 +3485,7 @@ public OnPlayerCommandReceived(playerid, cmdtext[])
 			{
 			    if(GetPVarInt(playerid, "doingStunt") != 0)
 			    {
-			        format(gstr, sizeof(gstr), ""er"You can no longer win this challenge because of using %s", cmdtext);
+			        format(gstr, sizeof(gstr), ""RED_E"You can no longer win this challenge because of using %s", cmdtext);
 			        SCM(playerid, -1, gstr);
 			        
 					SetPVarInt(playerid, "doingStunt", 0);
@@ -4617,7 +4617,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 				    case 3:
 				    {
 				        player_notice(killerid, "Triple Kill", "+$2,000");
-        				format(gstr, sizeof(gstr), "* {%06x}%s(%i) "RED_E"is on a kill streak with 3 kills!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
+        				format(gstr, sizeof(gstr), "* {%06x}%s(%i) "red"is on a kill streak with 3 kills!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
 						SCMToAll(COLOR_RED, gstr);
 						GivePlayerScore_(killerid, 1, true, true);
 						GivePlayerCash(killerid, 2000, true, true);
@@ -4625,7 +4625,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 				    case 5:
 					{
 					    player_notice(killerid, "Multi Kill", "+$4,000");
-        				format(gstr, sizeof(gstr), "* {%06x}%s(%i) "RED_E"is on a kill streak with 5 kills!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
+        				format(gstr, sizeof(gstr), "* {%06x}%s(%i) "red"is on a kill streak with 5 kills!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
 						SCMToAll(COLOR_RED, gstr);
 						GivePlayerScore_(killerid, 2, true, true);
 						GivePlayerCash(killerid, 4000, true, true);
@@ -4633,7 +4633,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 					case 10:
   					{
 					    player_notice(killerid, "Ultra Kill", "+$7,000");
-     					format(gstr, sizeof(gstr), "* {%06x}%s(%i) "RED_E"is unstoppable with a 10 streak kill!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
+     					format(gstr, sizeof(gstr), "* {%06x}%s(%i) "red"is unstoppable with a 10 streak kill!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
 						SCMToAll(COLOR_RED, gstr);
 						GivePlayerScore_(killerid, 3, true, true);
 						GivePlayerCash(killerid, 7000, true, true);
@@ -4641,7 +4641,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 					case 15:
   					{
 					    player_notice(killerid, "~r~~h~~h~Monster Kill", "+$10,000");
-   						format(gstr, sizeof(gstr), "* {%06x}%s(%i) "RED_E"can't be stopped with a 15 streak kill!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
+   						format(gstr, sizeof(gstr), "* {%06x}%s(%i) "red"can't be stopped with a 15 streak kill!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
 						SCMToAll(COLOR_RED, gstr);
 						GivePlayerScore_(killerid, 4, true, true);
 						GivePlayerCash(killerid, 10000, true, true);
@@ -4649,28 +4649,28 @@ public OnPlayerDeath(playerid, killerid, reason)
 					case 25:
   					{
   					    player_notice(killerid, "~r~~h~~h~Incredible Kill", "+$15,000");
-          				format(gstr, sizeof(gstr), "* {%06x}%s(%i) "RED_E"can't be stopped with a 25 streak kill!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
+          				format(gstr, sizeof(gstr), "* {%06x}%s(%i) "red"can't be stopped with a 25 streak kill!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
 						SCMToAll(COLOR_RED, gstr);
 						GivePlayerScore_(killerid, 5, true, true);
 						GivePlayerCash(killerid, 15000, true, true);
+					}
+					case 30:
+  					{
+  					    player_notice(killerid, "~r~~h~~h~Fantastic Kill", "+$20,000");
+          				format(gstr, sizeof(gstr), "* {%06x}%s(%i) "red"can't be stopped with a 30 streak kill!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
+						SCMToAll(COLOR_RED, gstr);
+						GivePlayerScore_(killerid, 6, true, true);
+						GivePlayerCash(killerid, 20000, true, true);
 						
 						if(PlayerAchData[killerid][e_ach_masskiller][0] == 0)
 						{
 						    GivePlayerAchievement(killerid, e_ach_masskiller, "Masskiller", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
 						}
 					}
-					case 30:
-  					{
-  					    player_notice(killerid, "~r~~h~~h~Fantastic Kill", "+$20,000");
-          				format(gstr, sizeof(gstr), "* {%06x}%s(%i) "RED_E"can't be stopped with a 30 streak kill!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
-						SCMToAll(COLOR_RED, gstr);
-						GivePlayerScore_(killerid, 6, true, true);
-						GivePlayerCash(killerid, 20000, true, true);
-					}
 					case 40:
   					{
   					    player_notice(killerid, "~r~~h~~h~Mega Kill", "+$25,000");
-          				format(gstr, sizeof(gstr), "* {%06x}%s(%i) "RED_E"is godlike with a 40 streak kill!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
+          				format(gstr, sizeof(gstr), "* {%06x}%s(%i) "red"is godlike with a 40 streak kill!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
 						SCMToAll(COLOR_RED, gstr);
 						GivePlayerScore_(killerid, 7, true, true);
 						GivePlayerCash(killerid, 25000, true, true);
@@ -4678,7 +4678,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 					case 50:
   					{
         				player_notice(killerid, "~r~Unbelievable!!!", "+$30,000");
-                 		format(gstr, sizeof(gstr), "* {%06x}%s(%i) "RED_E"shitting on everyone with a 50 streak kill!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
+                 		format(gstr, sizeof(gstr), "* {%06x}%s(%i) "red"shitting on everyone with a 50 streak kill!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
 						SCMToAll(COLOR_RED, gstr);
 						GivePlayerScore_(killerid, 8, true, true);
 						GivePlayerCash(killerid, 30000, true, true);
@@ -8098,11 +8098,11 @@ YCMD:sb(playerid, params[], help)
 	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 	if(PlayerData[playerid][bSpeedBoost])
     {
-     	SCM(playerid, YELLOW, "SpeedBoost has been disabled!");
+     	player_notice(playerid, "SpeedBoost", "~r~OFF");
 	}
 	else
 	{
-	    SCM(playerid, YELLOW, "SpeedBoost has been enabled!");
+	    player_notice(playerid, "SpeedBoost", "~g~ON");
 	}
 	PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
 	PlayerData[playerid][bSpeedBoost] = !PlayerData[playerid][bSpeedBoost];
@@ -8115,11 +8115,11 @@ YCMD:sj(playerid, params[], help)
 	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 	if(PlayerData[playerid][SuperJump])
     {
-     	SCM(playerid, YELLOW, "SuperJump has been disabled!");
+     	player_notice(playerid, "SuperJump", "~r~OFF");
 	}
 	else
 	{
-	    SCM(playerid, YELLOW, "SuperJump has been enabled!");
+	    player_notice(playerid, "SuperJump", "~g~ON");
 	}
 	PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
 	PlayerData[playerid][SuperJump] = !PlayerData[playerid][SuperJump];
@@ -8149,25 +8149,6 @@ YCMD:enter(playerid, params[], help)
 	{
 	    SCM(playerid, -1, ""er"You aren't near if any house");
 	}
-	return 1;
-}
-/*
-YCMD:charts(playerid, params[], help)
-{
-	mysql_tquery(pSQL, "SELECT `quantity`, `price` FROM `sells` WHERE `item` = 2;", "OnChartRecv", "i", playerid);
-	return 1;
-}*/
-
-function:OnChartRecv(playerid)
-{
-	new items, pric3;
-	for(new i = 0; i < cache_get_row_count(); i++)
-	{
-		items += cache_get_row_int(i, 0, pSQL);
-		pric3 += cache_get_row_int(i, 1, pSQL);
-	}
-	format(gstr, sizeof(gstr), "Average price for 1000GC is $%s, based on %i transactions.", number_format((pric3 / items) * 1000), cache_get_row_count());
-	SCM(playerid, -1, gstr);
 	return 1;
 }
 
@@ -8283,7 +8264,7 @@ YCMD:bbuy(playerid, params[], help)
 	{
 		if((PlayerData[playerid][tickLastPBuy] + COOLDOWN_CMD_PBUY) >= tick)
 		{
-	    	return SCM(playerid, -1, ""er"Please wait a bit before using this cmd again!");
+	    	return player_notice(playerid, "Command is on cooldown!", "");
 		}
 	}
 
@@ -8349,7 +8330,7 @@ YCMD:bsell(playerid, params[], help)
 	{
 		if((PlayerData[playerid][tickLastPSell] + COOLDOWN_CMD_PSELL) >= tick)
 		{
-	    	return SCM(playerid, -1, ""er"Please wait a bit before using this cmd again!");
+	    	return player_notice(playerid, "Command is on cooldown!", "");
 		}
 	}
 
@@ -8405,7 +8386,7 @@ YCMD:buy(playerid, params[], help)
 	{
 		if((PlayerData[playerid][tickLastBuy] + COOLDOWN_CMD_BUY) >= tick)
 		{
-	    	return SCM(playerid, -1, ""er"Please wait a bit before using this cmd again!");
+	    	return player_notice(playerid, "Command is on cooldown!", "");
 		}
 	}
 	
@@ -8477,7 +8458,7 @@ YCMD:sell(playerid, params[], help)
 	{
 		if((PlayerData[playerid][tickLastSell] + COOLDOWN_CMD_SELL) >= tick)
 		{
-	    	return SCM(playerid, -1, ""er"Please wait a bit before using this cmd again!");
+	    	return player_notice(playerid, "Command is on cooldown!", "");
 		}
 	}
 	
@@ -8638,7 +8619,7 @@ YCMD:lock(playerid, params[], help)
 
 		if((PlayerData[playerid][tickLastLocked] + COOLDOWN_CMD_LOCK) >= tick)
 		{
-	    	return SCM(playerid, -1, ""er"Please wait a bit before using this cmd again!");
+	    	return player_notice(playerid, "Command is on cooldown!", "");
 		}
 
 	    new bool:found = false;
@@ -9287,7 +9268,7 @@ YCMD:hitman(playerid, params[], help)
 	new tick = GetTickCount_();
 	if(PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 	{
-		if((PlayerData[playerid][tickLastHitman] + COOLDOWN_CMD_HITMAN) >= tick) return SCM(playerid, -1, ""er"You have to wait a bit before using it again!");
+		if((PlayerData[playerid][tickLastHitman] + COOLDOWN_CMD_HITMAN) >= tick) return player_notice(playerid, "Command is on cooldown!", "");
 	}
 	
 	new amount, player;
@@ -10852,7 +10833,7 @@ YCMD:kick(playerid, params[], help)
 
 			if((PlayerData[playerid][iKickBanIssued] >= 3) && ((PlayerData[playerid][tickLastBan] + COOLDOWN_CMD_BAN) >= tick))
 			{
-				SCM(playerid, -1, ""er"Wait a bit before using this command again");
+			    player_notice(playerid, "Command is on cooldown!", "");
 			    return 0;
 			}
 			else if((PlayerData[playerid][iKickBanIssued] >= 3) && ((PlayerData[playerid][tickLastBan] + COOLDOWN_CMD_BAN) <= tick))
@@ -11186,7 +11167,7 @@ YCMD:gcreate(playerid, params[], help)
 	new tick = GetTickCount_();
 	if((PlayerData[playerid][tickLastGCreate] + COOLDOWN_CMD_GCREATE) >= tick)
 	{
-		return SCM(playerid, -1, ""er"Please wait a bit before using this command again!");
+  		return player_notice(playerid, "Command is on cooldown!", "");
 	}
 
 	if(PlayerData[playerid][e_gangid] != 0) return SCM(playerid, -1, ""er"You are already in a gang");
@@ -11920,7 +11901,7 @@ YCMD:tban(playerid, params[], help)
 
 			if((PlayerData[playerid][iKickBanIssued] >= 3) && ((PlayerData[playerid][tickLastBan] + COOLDOWN_CMD_BAN) >= tick))
 			{
-				SCM(playerid, -1, ""er"Wait a bit before using this command again");
+				player_notice(playerid, "Command is on cooldown!", "");
 			    return 0;
 			}
 			else if((PlayerData[playerid][iKickBanIssued] >= 3) && ((PlayerData[playerid][tickLastBan] + COOLDOWN_CMD_BAN) <= tick))
@@ -12012,7 +11993,7 @@ YCMD:ban(playerid, params[], help)
 
 			if((PlayerData[playerid][iKickBanIssued] >= 3) && ((PlayerData[playerid][tickLastBan] + COOLDOWN_CMD_BAN) >= tick))
 			{
-				SCM(playerid, -1, ""er"Wait a bit before using this command again");
+				player_notice(playerid, "Command is on cooldown!", "");
 			    return 0;
 			}
 			else if((PlayerData[playerid][iKickBanIssued] >= 3) && ((PlayerData[playerid][tickLastBan] + COOLDOWN_CMD_BAN) <= tick))
@@ -12872,7 +12853,7 @@ YCMD:vipli(playerid, params[], help)
 		{
 			if((PlayerData[playerid][tickLastVIPLInv] + COOLDOWN_CMD_VIPLI) >= tick)
 			{
-			    return SCM(playerid, -1, ""nef" Please wait before using this command again again");
+			    return player_notice(playerid, "Command is on cooldown!", "");
 			}
 		}
 		
@@ -13418,7 +13399,7 @@ YCMD:report(playerid, params[], help)
 	new tick = GetTickCount_();
 	if((PlayerData[playerid][tickLastReport] + COOLDOWN_CMD_REPORT) >= tick)
 	{
-    	return SCM(playerid, -1, ""er"Please wait a bit before using this cmd again!");
+    	return player_notice(playerid, "Command is on cooldown!", "");
 	}
 
 	new	player, reason[144];
@@ -14650,7 +14631,7 @@ YCMD:vcontrol(playerid, params[], help)
 
 		if(GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
 		{
-		    return SCM(playerid, -1, ""er"You must be a driver in a vehicle to use vehicle control!");
+		    return player_notice(playerid, "You must be driving a vehicle", "");
 		}
 
 		ShowDialog(playerid, VCONTROL_DIALOG);
@@ -14672,7 +14653,7 @@ YCMD:label(playerid, params[], help)
 	    }
 	    else
 	    {
-			SCM(playerid, -1, ""er"You already got a label. Type /elabel to edit or /dlabel to detach it.");
+			player_notice(playerid, "Label already attached", "/elabel to edit");
 		}
 	}
 	else
@@ -14692,7 +14673,7 @@ YCMD:elabel(playerid, params[], help)
 	    }
 	    else
 	    {
-		    SCM(playerid, -1, ""er"No label attached");
+		    player_notice(playerid, "No label attached", "");
 		}
 	}
 	else
@@ -15162,7 +15143,7 @@ YCMD:changepass(playerid, params[], help)
     new tick = GetTickCount_();
 	if((PlayerData[playerid][tickLastPW] + COOLDOWN_CMD_CHANGEPASS) >= tick)
 	{
-    	return SCM(playerid, -1, ""er"Please wait a bit before using this cmd again!");
+    	return player_notice(playerid, "Command is on cooldown!", "");
 	}
 
 	if(sscanf(params, "s[143]", gstr))
@@ -15195,11 +15176,11 @@ YCMD:mk(playerid, params[], help)
 	new tick = GetTickCount_();
 	if((PlayerData[playerid][tickLastMedkit] + COOLDOWN_CMD_MEDKIT) >= tick)
 	{
-    	return SCM(playerid, -1, ""er"Please wait a bit before using this cmd again!");
+    	return player_notice(playerid, "Command is on cooldown!", "");
 	}
 	if(PlayerData[playerid][e_medkits] <= 0)
 	{
-	    return SCM(playerid, -1, ""er"You don't own any medkits!");
+	    return player_notice(playerid, "You don't own any medkits", "");
 	}
 	if(PlayerData[playerid][bGod]) return SCM(playerid, -1, ""er"You can't use medkits with godmode!");
 	
@@ -15622,11 +15603,11 @@ YCMD:saveskin(playerid, params[], help)
 	}
 	new skin = GetPlayerSkin(playerid);
 	
-	if(IsValidSkin(skin))
-	{
+	if(IsValidSkin(skin)) {
     	PlayerData[playerid][e_skinsave] = skin;
+	} else {
+		player_notice(playerid, "Invalid skin id", "");
 	}
-	else SCM(playerid, -1, ""er"Invalid skin ID");
 	return 1;
 }
 
@@ -15636,11 +15617,11 @@ YCMD:deleteskin(playerid, params[], help)
 
 	if(PlayerData[playerid][e_skinsave] == -1)
 	{
-	    SCM(playerid, COLOR_GREY, ""nef" "GREY2_E"You have no saved skin yet!");
+	    player_notice(playerid, "You have no saved skin", "");
 	}
 	else
 	{
-	    SCM(playerid, COLOR_GREY, ""nef" "GREY2_E"Skin has been deleted!");
+	    player_notice(playerid, "Saved skin has been deleted", "");
 	}
     PlayerData[playerid][e_skinsave] = -1;
 	return 1;
@@ -15707,8 +15688,8 @@ YCMD:lotto(playerid, params[], help)
 	
 	GivePlayerCash(playerid, -500);
 	
-	format(gstr, sizeof(gstr), "~w~Your lotto number: ~y~%i", PlayerData[playerid][DrawnNumber]);
-	player_notice(playerid, gstr, "", 5000);
+	format(gstr, sizeof(gstr), "~y~%i", PlayerData[playerid][DrawnNumber]);
+	player_notice(playerid, "Your lotto number:", gstr, 5000);
 	return 1;
 }
 
@@ -15795,17 +15776,19 @@ YCMD:cashfall(playerid, params[], help)
 		}
 
 		if(PlayerData[playerid][e_level] == MAX_ADMIN_LEVEL) {
-			if(money > 25000 || money < 1) return SCM(playerid, -1, ""er"Cash: $1 - $25,000");
+			if(money > 30000 || money < 1) return SCM(playerid, -1, ""er"Cash: $1 - $30,000");
 		} else {
 		    if(money > 10000 || money < 1) return SCM(playerid, -1, ""er"Cash: $1 - $10,000");
 		}
 
+        format(gstr, sizeof(gstr), "~g~+$%i USD", money);
 		for(new i = 0; i < MAX_PLAYERS; i++)
 		{
 			if(IsPlayerAvail(i))
 			{
 				PlayerPlaySound(i, 1057, 0.0, 0.0, 0.0);
-				GivePlayerCash(i, money, true, true);
+				GivePlayerCash(i, money, false, true);
+				player_notice(i, "CASHFALL", gstr, 4000);
 			}
 		}
 
@@ -15835,16 +15818,17 @@ YCMD:scorefall(playerid, params[], help)
 		    if(score > 100 || score < 1) return SCM(playerid, -1, ""er"Score: 1 - 25");
 		}
 
+        format(gstr, sizeof(gstr), "~y~+%i score", score);
 		for(new i = 0; i < MAX_PLAYERS; i++)
 		{
 			if(IsPlayerAvail(i))
 			{
 				PlayerPlaySound(i, 1057, 0.0, 0.0, 0.0);
 				GivePlayerScore_(i, score, true, true);
+				player_notice(i, "SCOREFALL", gstr, 4000);
 			}
 		}
-		format(gstr, sizeof(gstr), "~g~~h~%i Score ~w~for all!", score);
-		GameTextForAll(gstr, 5000, 0);
+		
 		format(gstr, sizeof(gstr), "Admin %s(%i) has given all players %i Score", __GetName(playerid), playerid, score);
 		SCMToAll(YELLOW, gstr);
 		print(gstr);
@@ -15992,11 +15976,11 @@ YCMD:givecash(playerid, params[], help)
 	{
 		if((PlayerData[playerid][tickLastGiveCash] + COOLDOWN_CMD_GIVECASH) >= tick)
 		{
-	    	return SCM(playerid, -1, ""er"Please wait a bit before using this cmd again!");
+	    	return player_notice(playerid, "Command is on cooldown!", "");
 		}
 	}
 	
-	if(GetPlayerScore(playerid) < 500) return SCM(playerid, -1, ""er"You need at least 500 score to share cash.");
+	if(GetPlayerScore(playerid) < 500) return player_notice(playerid, "Command requires 500 score!", "");
 	
 	new player, cash, reason[100];
 	if(sscanf(params, "ris[99]", player, cash, reason))
@@ -16195,15 +16179,16 @@ YCMD:toggletoys(playerid, params[], help)
 	if(!islogged(playerid)) return notlogged(playerid);
 	
     PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
-	SCM(playerid, -1, ""LB2_E"Toggled toys!");
 
 	if(PlayerData[playerid][bShowToys])
 	{
 	    RemovePlayerToy(playerid);
+	    player_notice(playerid, "Toys:", "~r~OFF");
 	}
 	else if(!PlayerData[playerid][bShowToys])
 	{
 	    AttachPlayerToy(playerid);
+	    player_notice(playerid, "Toys:", "~r~ON");
 	}
 
 	PlayerData[playerid][bShowToys] = !PlayerData[playerid][bShowToys];
@@ -16296,7 +16281,7 @@ YCMD:achs(playerid, params[], help)
 		        {
 		            case 0: format(gstr, sizeof(gstr), ""white"[%s"white"] Styler -> Buy a toy\n", tmp[e_ach_styler]);
 		            case 1: format(gstr, sizeof(gstr), ""white"[%s"white"] Grim Reaper -> Make 300 kills\n", tmp[e_ach_grimreaper]);
-		            case 2: format(gstr, sizeof(gstr), ""white"[%s"white"] Mass Killer -> Do a 25 Kill Streak\n", tmp[e_ach_masskiller]);
+		            case 2: format(gstr, sizeof(gstr), ""white"[%s"white"] Mass Killer -> Do a 30 Kill Streak\n", tmp[e_ach_masskiller]);
 		            case 3: format(gstr, sizeof(gstr), ""white"[%s"white"] Elite Racer -> Win 10 races\n", tmp[e_ach_eliteracer]);
 		            case 4: format(gstr, sizeof(gstr), ""white"[%s"white"] Too Fast -> Win 10 Reaction Test\n", tmp[e_ach_toofast]);
 		            case 5: format(gstr, sizeof(gstr), ""white"[%s"white"] Score Whore -> Get 2000 score\n", tmp[e_ach_scorewhore]);
@@ -16575,7 +16560,7 @@ YCMD:rob(playerid, params[], help)
 		{
 			if((PlayerData[playerid][tickLastRob] + COOLDOWN_CMD_ROB) >= tick)
 			{
-		    	return SCM(playerid, -1, ""er"Please wait a bit before using this cmd again!");
+		    	return player_notice(playerid, "Command is on cooldown!", "");
 			}
 		}
 		
@@ -16675,7 +16660,7 @@ YCMD:ar(playerid, params[], help)
 	{
 		if((PlayerData[playerid][tickLastAr] + COOLDOWN_CMD_AR) >= tick)
 		{
-	    	return SCM(playerid, -1, ""er"Please wait a bit before using this cmd again!");
+	    	return player_notice(playerid, "Command is on cooldown!", "");
 		}
 	}
 	
@@ -27694,7 +27679,7 @@ function:ShowDialog(playerid, dialogid)
 		 	new tick = GetTickCount_();
 			if((PlayerData[playerid][tickLastRefill] + COOLDOWN_CMD_HAREFILL) >= tick)
 			{
-				return SCM(playerid, -1, ""er"Please wait a bit before using this command again!");
+			    return player_notice(playerid, "Command is on cooldown!", "");
 			}
 		    ShowPlayerDialog(playerid, HAREFILL_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Health & Armor Refill", "Health\t\t"grey"[$5,000]\nArmor\t\t"grey"[$2,500]", "Select", "Cancel");
 		}
@@ -30893,12 +30878,12 @@ IsWhitelisted(ip[])
 	return 0;
 }
 
-ReadServerConfig()
+server_read_config()
 {
     m_PlayerRecord = dini_Int("/Other/server.ini", "m_PlayerRecord");
 }
 
-SaveServerConfig()
+server_save_config()
 {
 	Log(LOG_ONLINE, "Updating server config");
 	dini_IntSet("/Other/server.ini", "m_PlayerRecord", m_PlayerRecord);
