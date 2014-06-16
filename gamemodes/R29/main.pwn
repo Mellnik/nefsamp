@@ -10318,7 +10318,7 @@ YCMD:jetpack(playerid, params[], help)
 
 		    if(IsPointInDynamicArea(GZoneInfo[i][zsphere], POS[0], POS[1], POS[2]))
 		    {
-		        return player_notice(playerid, "Failed to spawn jetpack", "Not allowed in the gang zone");
+		        return player_notice(playerid, "Failed to spawn jetpack", "Not allowed in gang zone");
 		    }
 		}
 	}
@@ -14859,7 +14859,7 @@ YCMD:spec(playerid, params[], help)
 			gTeam[playerid] = SPEC;
             PlayerData[playerid][SpecID] = player;
 
-			if(GetPlayerState(playerid) != PLAYER_STATE_SPECTATING)
+			if(GetPlayerState(playerid) != PLAYER_STATE_SPECTATING || gTeam[playerid] == SPEC)
 			{
 				GetPlayerPos(playerid, PlayerData[playerid][SpecX], PlayerData[playerid][SpecY], PlayerData[playerid][SpecZ]);
 				GetPlayerFacingAngle(playerid, PlayerData[playerid][SpecA]);
@@ -15499,7 +15499,7 @@ YCMD:m(playerid, params[], help)
 	    
 	strcat(string, gstr2);
 	
-	ShowPlayerDialog(playerid, HELP_DIALOG + 3, DIALOG_STYLE_LIST, ""nef" :: Minigames", string, "Select", "");
+	ShowPlayerDialog(playerid, HELP_DIALOG + 3, DIALOG_STYLE_LIST, ""nef" :: Minigames", string, "Select", "Cancel");
 	return 1;
 }
 
