@@ -27970,29 +27970,6 @@ function:InitSession(playerid)
 	PreloadAnimLib(playerid, "DANCING");
     PreloadAnimLib(playerid, "DANCING");
 
-	// quarry
-	RemoveBuildingForPlayer(playerid, 16078, 662.8125, 833.6875, -39.3672, 0.25);
-	RemoveBuildingForPlayer(playerid, 16079, 625.9141, 838.4141, -35.3359, 0.25);
-	RemoveBuildingForPlayer(playerid, 16085, 627.8672, 850.2734, -42.7734, 0.25);
-	RemoveBuildingForPlayer(playerid, 16071, 674.7734, 854.5156, -39.3672, 0.25);
-	RemoveBuildingForPlayer(playerid, 3214, 676.5859, 827.3281, -35.3672, 0.25);
-	RemoveBuildingForPlayer(playerid, 3398, 668.3672, 815.2422, -30.1172, 0.25);
-	RemoveBuildingForPlayer(playerid, 3214, 687.6250, 847.1094, -35.3828, 0.25);
-	RemoveBuildingForPlayer(playerid, 3398, 684.2031, 835.6563, -30.8984, 0.25);
-	RemoveBuildingForPlayer(playerid, 16075, 568.5234, 916.3438, -35.3359, 0.25);
-	RemoveBuildingForPlayer(playerid, 16309, 566.6484, 874.4844, -39.5313, 0.25);
-	RemoveBuildingForPlayer(playerid, 3398, 576.1563, 934.9219, -30.0938, 0.25);
-	RemoveBuildingForPlayer(playerid, 16310, 581.3750, 875.6094, -43.9609, 0.25);
-	RemoveBuildingForPlayer(playerid, 16311, 585.8438, 869.6328, -39.3672, 0.25);
-	RemoveBuildingForPlayer(playerid, 16325, 590.2969, 870.2734, -44.2656, 0.25);
-	RemoveBuildingForPlayer(playerid, 16073, 610.1641, 908.4766, -39.3672, 0.25);
-	RemoveBuildingForPlayer(playerid, 16074, 605.0859, 902.1563, -39.3672, 0.25);
-	RemoveBuildingForPlayer(playerid, 16077, 594.9297, 926.4141, -41.1953, 0.25);
-	RemoveBuildingForPlayer(playerid, 16076, 623.3047, 893.7734, -39.7656, 0.25);
-	RemoveBuildingForPlayer(playerid, 3398, 620.8359, 884.2422, -29.5156, 0.25);
-	RemoveBuildingForPlayer(playerid, 16072, 640.3125, 874.7891, -35.3359, 0.25);
-	// quarry end
-
 	// Gold Credits
 	RemoveBuildingForPlayer(playerid, 5575, 1919.5234, -1400.8984, 16.1719, 0.25);
 	RemoveBuildingForPlayer(playerid, 1266, 1978.1484, -1371.1484, 31.9531, 0.25);
