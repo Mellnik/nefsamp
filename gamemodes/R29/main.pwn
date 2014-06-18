@@ -3634,10 +3634,7 @@ public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY
 			if(GetPlayerState(playerid) == PLAYER_STATE_PASSENGER) {
 				switch(GetVehicleModel(GetPlayerVehicleID(playerid)))
 				{
-				    case 522, 521, 461, 462, 463, 581:
-				    {
-				        return 0;
-				    }
+				    case 522, 521, 461, 462, 463, 581: return 0;
 				}
 			}
 	    }
@@ -21706,7 +21703,7 @@ MySQL_BanPlayer(PlayerName[], AdminName[], Reason[], lift = 0)
 	mysql_escape_string(AdminName, aescape, pSQL, 25);
 	mysql_escape_string(PlayerName, pescape, pSQL, 25);
     format(query, sizeof(query), "INSERT INTO `bans` VALUES (NULL, '%s', '%s', '%s', %i, %i);", pescape, aescape, rescape, lift, gettime());
-    mysql_tquery(pSQL, query, "", "");
+    mysql_tquery(pSQL, query);
 }
 
 MySQL_SaveGangZone(id)
