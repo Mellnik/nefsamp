@@ -27,7 +27,7 @@
 #define IS_RELEASE_BUILD (true)
 #define INC_ENVIORMENT (true)
 #define IRC_CONNECT (true)
-#define WINTER_EDITION (false) // Requires ferriswheelfair.amx
+#define WINTER_EDITION (false) // Requires FS ferriswheelfair.amx
 #define YSI_IS_SERVER
 
 #include <a_samp>   		
@@ -12169,18 +12169,20 @@ YCMD:raceforcemap(playerid, params[], help)
 	return 1;
 }
 
-YCMD:main(playerid, params[], help)
+YCMD:shutdown(playerid, params[], help)
 {
 	if(PlayerData[playerid][e_level] == MAX_ADMIN_LEVEL && IsPlayerAdmin(playerid))
 	{
-	    SetTimer("mainmode", 30000, false);
+	    SetTimer("mainmode", 2000, false);
 	    GlobalMain = true;
+	    
 	    for(new i = 0; i < 20; i++)
-		{
 			SCMToAll(GREEN, " ");
-		}
-		SCMToAll(RED, "The server is going under maintenance in 30 seconds minute. Please logout before that time.");
-	    ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Notice", ""white"_______________________________________________________________________\n\nThe server is going under maintenance in 30 seconds. Please logout before that time.\n_______________________________________________________________________", "OK", "");
+
+		SCMToAll(RED, "The server is going under maintenance.");
+		SCMToAll(RED, "Please check back in a couple minutes. Server IP: "SERVER_IP"");
+		
+	    ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Maintenance", ""white"The server is going under maintenance.\n\nPlease check back in a couple minutes. Server IP: "SERVER_IP"", "OK", "");
  	}
 	return 1;
 }
