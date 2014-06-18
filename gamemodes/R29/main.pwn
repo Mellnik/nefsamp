@@ -24,7 +24,7 @@
 
 #pragma dynamic 8192
 
-#define IS_RELEASE_BUILD (true)
+#define IS_RELEASE_BUILD (false)
 #define INC_ENVIORMENT (true)
 #define IRC_CONNECT (true)
 #define WINTER_EDITION (false) // Requires FS ferriswheelfair.amx
@@ -2129,7 +2129,7 @@ new const Float:DM_MAP_4[2][4] =
 	{2553.1912, 2824.4099, 10.8203, 283.9544}
 };
 
-new PlayerColors[511] =
+new const szPlayerColors[511] =
 {
 	0x000022FF, 0x000044FF, 0x000066FF, 0x000088FF, 0x0000AAFF, 0x0000CCFF, 0x0000EEFF,
 	0x002200FF, 0x002222FF, 0x002244FF, 0x002266FF, 0x002288FF, 0x0022AAFF, 0x0022CCFF, 0x0022EEFF,
@@ -3129,14 +3129,7 @@ public OnPlayerConnect(playerid)
 
 	SetPlayerScore_(playerid, 0);
 	SetPlayerTeam(playerid, NO_TEAM);
-	SetPlayerColor(playerid, PlayerColors[random(sizeof(PlayerColors))]);
-    ToggleSpeedo(playerid, false);
-
-	HidePlayerFalloutTextdraws(playerid);
-	HidePlayerDerbyTextdraws(playerid);
-	HidePlayerBGTextdraws(playerid);
-	HidePlayerInfoTextdraws(playerid);
-	HidePlayerRaceTextdraws(playerid);
+	SetPlayerColor(playerid, szPlayerColors[random(sizeof(szPlayerColors))]);
 
     Streamer_ToggleItemUpdate(playerid, STREAMER_TYPE_OBJECT, 1);
     Streamer_ToggleItemUpdate(playerid, STREAMER_TYPE_PICKUP, 1);
@@ -3160,11 +3153,11 @@ public OnPlayerConnect(playerid)
 	        server_save_config();
 	    }
 	
+	    InitSession(playerid);
+	
 		TextDrawShowForPlayer(playerid, TXTOnJoin[0]);
 		TextDrawShowForPlayer(playerid, TXTOnJoin[1]);
 		TextDrawHideForPlayer(playerid, TXTTeleportInfo);
-
-        InitSession(playerid);
 
 		PreloadAnimLib(playerid, "BOMBER");
 		PreloadAnimLib(playerid, "RAPPING");
@@ -3592,6 +3585,16 @@ public OnVehicleRespray(playerid, vehicleid, color1, color2)
 }
 
 /* AUTHORITATIVE SERVER */
+public OnPlayerTakeDamage(playerid, issuerid, Float:amount, weaponid, bodypart)
+{
+	return 1;
+}
+
+public OnPlayerGiveDamage(playerid, damagedid, Float:amount, weaponid, bodypart)
+{
+	return 1;
+}
+
 public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY, Float:fZ)
 {
 	/* PLAYER QUEUED FOR KICK */
@@ -3677,11 +3680,6 @@ public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY
 			}
 		}
 	}
-	return 1;
-}
-
-public OnPlayerGiveDamage(playerid, damagedid, Float:amount, weaponid, bodypart)
-{
 	return 1;
 }
 
@@ -7940,8 +7938,8 @@ YCMD:random(playerid, params[], help)
 	{
 	    return SCM(playerid, -1, ""er"You can't use this command while being in TDM or CNR!");
 	}
-	new rand = random(sizeof(PlayerColors));
-	SetPlayerColor(playerid, PlayerColors[rand]);
+	new rand = random(sizeof(szPlayerColors));
+	SetPlayerColor(playerid, szPlayerColors[rand]);
 	format(gstr, sizeof(gstr), "Color set! Your new color: {%06x}Color", GetColor__(playerid) >>> 8);
 	SCM(playerid, BLUE, gstr);
 	return 1;
@@ -13002,6 +13000,7 @@ YCMD:god(playerid, params[], help)
 	        TextDrawShowForPlayer(playerid, TXTGodTD);
 	        ResetPlayerWeapons(playerid);
 	        SetPlayerHealth(playerid, 999999.0);
+	        PlayerData[playerid][e_wanteds] = 0;
 	        PlayerData[playerid][bGod] = true;
 	    }
 	}
@@ -29114,7 +29113,7 @@ ExitPlayer(playerid)
 		case gBG_VOTING:
 		{
 		    HidePlayerBGTextdraws(playerid);
-		    SetPlayerColor(playerid, PlayerColors[random(sizeof(PlayerColors))]);
+		    SetPlayerColor(playerid, szPlayerColors[random(sizeof(szPlayerColors))]);
 		    SetPlayerTeam(playerid, NO_TEAM);
 		    gTeam[playerid] = FREEROAM;
 			SetCameraBehindPlayer(playerid);
@@ -29133,7 +29132,7 @@ ExitPlayer(playerid)
 		case gBG_TEAM1:
 		{
 		    HidePlayerBGTextdraws(playerid);
-		    SetPlayerColor(playerid, PlayerColors[random(sizeof(PlayerColors))]);
+		    SetPlayerColor(playerid, szPlayerColors[random(sizeof(szPlayerColors))]);
 			SetPlayerTeam(playerid, NO_TEAM);
 		    BGTeam1Players--;
 		    gTeam[playerid] = FREEROAM;
@@ -29151,7 +29150,7 @@ ExitPlayer(playerid)
 		case gBG_TEAM2:
 		{
 		    HidePlayerBGTextdraws(playerid);
-		    SetPlayerColor(playerid, PlayerColors[random(sizeof(PlayerColors))]);
+		    SetPlayerColor(playerid, szPlayerColors[random(sizeof(szPlayerColors))]);
 		    SetPlayerTeam(playerid, NO_TEAM);
 		    BGTeam2Players--;
 		    gTeam[playerid] = FREEROAM;
@@ -30864,3 +30863,5 @@ server_save_config()
 	Log(LOG_ONLINE, "Updating server config");
 	dini_IntSet("/Other/server.ini", "m_PlayerRecord", m_PlayerRecord);
 }
+
+#include <net>
