@@ -13001,6 +13001,7 @@ YCMD:god(playerid, params[], help)
 	        ResetPlayerWeapons(playerid);
 	        SetPlayerHealth(playerid, 999999.0);
 	        PlayerData[playerid][e_wanteds] = 0;
+			PlayerTextDrawSetString(playerid, TXTWantedsTD[playerid], "~y~[] ~w~0");
 	        PlayerData[playerid][bGod] = true;
 	    }
 	}
@@ -30864,4 +30865,4 @@ server_save_config()
 	dini_IntSet("/Other/server.ini", "m_PlayerRecord", m_PlayerRecord);
 }
 
-#include <net>
+//#include <net>
