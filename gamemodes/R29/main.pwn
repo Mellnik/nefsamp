@@ -16676,13 +16676,13 @@ YCMD:ar(playerid, params[], help)
 		{
 	    	if(i == playerid) continue;
       		if(IsPlayerInAnyVehicle(i)) continue;
-			if(PlayerData[i][bIsDead]) return SCM(playerid, -1, ""er"The selected criminal is not alive.");
       		if(gTeam[i] != CNR) continue;
 			GetPlayerPos(i, POS[0], POS[1], POS[2]);
    		 	if(IsPlayerInRangeOfPoint(playerid, 3.8, POS[0], POS[1], POS[2]) && GetPlayerInterior(playerid) == GetPlayerInterior(i) && GetPlayerVirtualWorld(playerid) == GetPlayerVirtualWorld(i))
     		{
     			if(GetPVarInt(i, "Robber") == 1 && GetPVarInt(i, "Cop") == 0)
 				{
+					if(PlayerData[i][bIsDead]) { SCM(playerid, -1, ""er"The selected criminal is not alive."); continue; }
 					rangepass++;
 					pArrests[playerid]++;
     				SetPlayerSpecialAction(i, SPECIAL_ACTION_CUFFED);
