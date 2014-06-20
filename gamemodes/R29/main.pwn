@@ -3462,7 +3462,7 @@ public OnPlayerCommandReceived(playerid, cmdtext[])
 	        case _I(p,m), _I(r), _I(p), _I(s,t,a,t,s), _I(e,x,i,t): { }
 	        default:
 			{
-			    SCM(playerid, -1, ""er"You can't use this command while being frozen!");
+			    SCM(playerid, -1, ""er"You can't use this command while you are frozen!");
 				return 0;
    			}
 	    }
@@ -3515,7 +3515,7 @@ public OnPlayerCommandPerformed(playerid, cmdtext[], success)
 	SetTimerEx("CoolDownCommand", COOLDOWN_CMD, false, "i", playerid);
 	if(PlayerData[playerid][iCoolDownCommand] == 8)
 	{
-	    return GameTextForPlayer(playerid, "~b~~h~stop command spam!", 2000, 3);
+	    return GameTextForPlayer(playerid, "~b~~h~Do NOT spam commands!", 2000, 3);
 	}
 	else if(PlayerData[playerid][iCoolDownCommand] >= 13 && PlayerData[playerid][e_level] < 2)
 	{
@@ -3787,7 +3787,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 	            cache_get_row(0, 1, gangname, pSQL, sizeof(gangname));
 	            gangid = cache_get_row_int(0, 0, pSQL);
 	            
-				if(Iter_Contains(iterGangWar, gangid)) return SCM(extraid, -1, ""er"You can't close this gang as they are involved in a Gang War.");
+				if(Iter_Contains(iterGangWar, gangid)) return SCM(extraid, -1, ""er"You can't close this gang as they are involved in a gang war.");
 
 				format(gstr, sizeof(gstr), "UPDATE `accounts` SET `gangrank` = 0, `gangid` = 0 WHERE `gangid` = %i;", gangid);
 				mysql_tquery(pSQL, gstr);
@@ -3941,7 +3941,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
             SCMToAll(-1, gstr);
             print(gstr);
 
-            ShowPlayerDialog(extraid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""white"Gang created!", ""white"You can now use these commands:\n\n/gmenu\n/gcapture\n/gzones\n/ginvite\n/gkick\n/gwar\n/gclose\n\nPut "nef_yellow"! "white" before your msg to talk in gang chat", "OK", "");
+            ShowPlayerDialog(extraid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""white"Gang created!", ""white"You have the access to use the following:\n\n/gmenu\n/gcapture\n/gzones\n/ginvite\n/gkick\n/gwar\n/gclose\n\nPut "nef_yellow"! "white" before your msg to talk in gang chat", "OK", "");
 
 			format(gstr, sizeof(gstr), ""nef_yellow"Gang:"white" %s", PlayerData[extraid][GangName]);
 
@@ -4009,7 +4009,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		    {
 				if(cache_get_row_int(0, 0, pSQL) == GANG_POS_FOUNDER)
 				{
-				    SCM(extraid, -1, ""er"You cannot kick other the Founder!");
+				    SCM(extraid, -1, ""er"You cannot kick another founder.");
 				}
 				else
 		        {
@@ -4024,7 +4024,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		}
 		case THREAD_KICK_FROM_GANG_2:
 		{
-		    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s kicked %s out of the gang", __GetName(extraid), PlayerData[extraid][GangKickMem]);
+		    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s has kicked %s from the gang.", __GetName(extraid), PlayerData[extraid][GangKickMem]);
 			GangMSG(PlayerData[extraid][e_gangid], gstr);
 
             PlayerData[extraid][GangKickMem][0] = '\0';
