@@ -13000,6 +13000,7 @@ YCMD:god(playerid, params[], help)
 	        TextDrawShowForPlayer(playerid, TXTGodTD);
 	        ResetPlayerWeapons(playerid);
 	        SetPlayerHealth(playerid, 999999.0);
+			PlayerTextDrawSetString(playerid, TXTWantedsTD[playerid], "~y~[] ~w~0");
 	        PlayerData[playerid][e_wanteds] = 0;
 	        PlayerData[playerid][bGod] = true;
 	    }
