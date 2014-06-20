@@ -16659,7 +16659,7 @@ YCMD:ar(playerid, params[], help)
 	{
 		if((PlayerData[playerid][tickLastAr] + COOLDOWN_CMD_AR) >= tick)
 		{
-	    	return player_notice(playerid, "Command is on cooldown!", "");
+	    	return player_notice(playerid, "Command cooldown in progress", "");
 		}
 	}
 	
@@ -16676,6 +16676,7 @@ YCMD:ar(playerid, params[], help)
 		{
 	    	if(i == playerid) continue;
       		if(IsPlayerInAnyVehicle(i)) continue;
+			if(PlayerData[i][bIsDead]) return SCM(playerid, -1, ""er"The selected criminal is not alive.");
       		if(gTeam[i] != CNR) continue;
 			GetPlayerPos(i, POS[0], POS[1], POS[2]);
    		 	if(IsPlayerInRangeOfPoint(playerid, 3.8, POS[0], POS[1], POS[2]) && GetPlayerInterior(playerid) == GetPlayerInterior(i) && GetPlayerVirtualWorld(playerid) == GetPlayerVirtualWorld(i))

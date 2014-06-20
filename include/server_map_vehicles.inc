@@ -112,7 +112,7 @@ LoadServerVehicles()
 	veh_War[4] = AddStaticVehicleEx(432, 124.917, 1807.932, 17.740, 298.0, randomColors[random(23)], randomColors[random(23)], 100);
 	veh_War[5] = AddStaticVehicleEx(432, 103.167, 1932.212, 18.555, 215.0, randomColors[random(23)], randomColors[random(23)], 100);
 	veh_War[6] = AddStaticVehicleEx(432, 274.210, 1872.511, 17.747, 139.0, randomColors[random(23)], randomColors[random(23)], 100);
-	veh_War[7] = AddStaticVehicleEx(425, 273.064, 1934.610, 17.740, 270.0, randomColors[random(23)], randomColors[random(23)], 100);
+	veh_War[7] = AddStaticVehicleEx(425, 269.784, 1932.144, 18.189, 270.0, randomColors[random(23)], randomColors[random(23)], 100);
 	veh_War[8] = AddStaticVehicleEx(425, 367.779, 2028.651, 23.484, 0.0, randomColors[random(23)], randomColors[random(23)], 100);
 	veh_War[9] = AddStaticVehicleEx(425, 180.722, 1835.501, 24.093, 0.0, randomColors[random(23)], randomColors[random(23)], 100);
 	veh_War[10] = AddStaticVehicleEx(425, 251.342, 1881.802, 21.492, 0.0, randomColors[random(23)], randomColors[random(23)], 100);
