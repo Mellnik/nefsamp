@@ -4009,7 +4009,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		    {
 				if(cache_get_row_int(0, 0, pSQL) == GANG_POS_FOUNDER)
 				{
-				    SCM(extraid, -1, ""er"You cannot kick another founder.");
+				    SCM(extraid, -1, ""er"You cannot kick the founder.");
 				}
 				else
 		        {
