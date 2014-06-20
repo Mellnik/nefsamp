@@ -16682,7 +16682,11 @@ YCMD:ar(playerid, params[], help)
     		{
     			if(GetPVarInt(i, "Robber") == 1 && GetPVarInt(i, "Cop") == 0)
 				{
-					if(PlayerData[i][bIsDead]) { SCM(playerid, -1, ""er"The selected criminal is not alive."); continue; }
+					if(PlayerData[i][bIsDead]) 
+					{ 
+						SCM(playerid, -1, ""er"The selected criminal is not alive."); 
+						continue; 
+					}
 					rangepass++;
 					pArrests[playerid]++;
     				SetPlayerSpecialAction(i, SPECIAL_ACTION_CUFFED);
@@ -16706,6 +16710,7 @@ YCMD:ar(playerid, params[], help)
 				 	if(PlayerData[i][e_gangrank] > 0 && PlayerData[i][e_gangid] != PlayerData[playerid][e_gangid])
 					{
 					  	MySQL_UpdateGangScore(PlayerData[playerid][e_gangid], 1);
+						}
 				 	}
 	    		}
     		}
