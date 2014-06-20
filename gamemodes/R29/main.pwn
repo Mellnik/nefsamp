@@ -16678,6 +16678,7 @@ YCMD:ar(playerid, params[], help)
       		if(IsPlayerInAnyVehicle(i)) continue;
       		if(gTeam[i] != CNR) continue;
 			GetPlayerPos(i, POS[0], POS[1], POS[2]);
+			
    		 	if(IsPlayerInRangeOfPoint(playerid, 3.8, POS[0], POS[1], POS[2]) && GetPlayerInterior(playerid) == GetPlayerInterior(i) && GetPlayerVirtualWorld(playerid) == GetPlayerVirtualWorld(i))
     		{
     			if(GetPVarInt(i, "Robber") == 1 && GetPVarInt(i, "Cop") == 0)
@@ -16710,16 +16711,15 @@ YCMD:ar(playerid, params[], help)
 				 	if(PlayerData[i][e_gangrank] > 0 && PlayerData[i][e_gangid] != PlayerData[playerid][e_gangid])
 					{
 					  	MySQL_UpdateGangScore(PlayerData[playerid][e_gangid], 1);
-						}
 				 	}
 	    		}
     		}
   		}
+  		
   		if(rangepass == 0)
-		{
 			SCM(playerid, COLOR_RED, "Server: "GREY2_E"No criminals nearby.");
-		}
-		else PlayerData[playerid][tickLastAr] = tick;
+		else
+			PlayerData[playerid][tickLastAr] = tick;
 	}
 	else
 	{
