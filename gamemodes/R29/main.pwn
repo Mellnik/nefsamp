@@ -122,7 +122,7 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define er                              "{FF000F}[INFO] {FF000F}" // D2D2D2
 #define Error(%1,%2) 					SendClientMessage(%1, -1, "{F42626}[INFO] "GREY2_E""%2)
 #define dl                              "{FFE600}• {F0F0F0}"
-#define notlogged(%1)                   ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef"", ""white"You need to be logged in to use this feature.\n\n"nef_yellow"Type /register to create an account for you current name.", "OK", "")
+#define notlogged(%1)                   ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef"", ""white"You need to be logged in to use this feature.\n\n"nef_yellow"Type /register to create an new account for you current name.", "OK", "")
 #define MAX_ADMIN_LEVEL         		(5)
 #define MAX_WARNINGS 					(3)
 #define ELEVATOR_SPEED      			(5.0)
