@@ -1195,7 +1195,7 @@ new const ServerMSGS[15][] =
 {
 	""yellow_e"- Server - "LB2_E"Visit our site: "SVRURLWWW"",
 	""yellow_e"- Server - "LB2_E"Join Minigames for money and score - /help",
-	""yellow_e"- Server - "LB2_E"Player Control: /settings",
+	""yellow_e"- Server - "LB2_E"Access your player preferences: /settings",
 	""yellow_e"- Server - "LB2_E"Get VIP (/vip) today! "SVRURLWWW"/vip",
 	""yellow_e"- Server - "LB2_E"Get VIP (/vip) today! "SVRURLWWW"/vip",
 	""yellow_e"- Server - "LB2_E"Get "SVRSC" Credits (/credits) today! "SVRURLWWW"/gc/",
@@ -1604,11 +1604,11 @@ new const CreditsProductMatrix[14][e_credits_matrix] =
     {"Instant Name Change Access", 1000, 1, "Usable 1 time", "This item grants you instant access to /changename."},
     {"20 Medits", 1000, 20, "Usable 20 times", "This item is usable in minigames only. Use /mk to consume 1 medkit.\nHeals you by 50hp in 10 seconds."},
     {"100 Medits", 2500, 100, "Usable 100 times", "This item is usable in minigames only. Use /mk to consume 1 medkit.\nHeals you by 50hp in 10 seconds."},
-    {"Money Boost x2", 1000, 1, "24 Hours", "This item gives an addtitional double money.\nAfter purchase the boost remains active for 24 hours. You can\nonly have 1 of the 5 available boost active at the same time!"},
-    {"Money Boost x3", 1500, 1, "24 Hours", "This item gives an addtitional triple money.\nAfter purchase the boost remains active for 24 hours. You can\nonly have 1 of the 5 available boost active at the same time!"},
-    {"Score Boost x2", 1000, 1, "24 Hours", "This item gives an addtitional double score.\nAfter purchase the boost remains active for 24 hours. You can\nonly have 1 of the 5 available boost active at the same time!"},
-    {"Score Boost x3", 1500, 1, "24 Hours", "This item gives an addtitional triple score.\nAfter purchase the boost remains active for 24 hours. You can\nonly have 1 of the 5 available boost active at the same time!"},
-    {"Master Boost", 2500, 1, "24 Hours", "The Master Boost gives you an addtitional triple score and money!\nAfter purchase the boost remains active for 24 hours. You can\nonly have 1 of the 5 available boost active at the same time!"},
+    {"Money Boost x2", 1000, 1, "24 Hours", "This item gives an additional double money.\nAfter purchase the boost remains active for 24 hours. You can\nonly have 1 of the 5 available boost active at the same time!"},
+    {"Money Boost x3", 1500, 1, "24 Hours", "This item gives an additional triple money.\nAfter purchase the boost remains active for 24 hours. You can\nonly have 1 of the 5 available boost active at the same time!"},
+    {"Score Boost x2", 1000, 1, "24 Hours", "This item gives an additional double score.\nAfter purchase the boost remains active for 24 hours. You can\nonly have 1 of the 5 available boost active at the same time!"},
+    {"Score Boost x3", 1500, 1, "24 Hours", "This item gives an additional triple score.\nAfter purchase the boost remains active for 24 hours. You can\nonly have 1 of the 5 available boost active at the same time!"},
+    {"Master Boost", 2500, 1, "24 Hours", "The Master Boost gives you an additional triple score and money!\nAfter purchase the boost remains active for 24 hours. You can\nonly have 1 of the 5 available boost active at the same time!"},
 	{"Reset K/D", 3500, 1, "Permanent", "This item sets your kills and deaths to 0. Be careful you can't undo it."}
 };
 
@@ -9786,7 +9786,7 @@ YCMD:setscore(playerid, params[], help)
 				SCM(playerid, YELLOW, gstr);
 			}
 			
-			format(gstr, sizeof(gstr), ""red"Adm: %s(%i) has set %s(%i) score to %i", __GetName(playerid), playerid, __GetName(playerid), playerid, amount);
+			format(gstr, sizeof(gstr), ""red"Adm: %s(%i) has set %s(%i) score to %i", __GetName(playerid), playerid, __GetName(player), player, amount);
 			AdminMSG(-1, gstr);
 			print(gstr);
 			
@@ -18647,7 +18647,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		            case 0: // General
 		            {
 		                strcat(cstring, ""yellow"/toys "white"- player toys\n");
-		                strcat(cstring, ""yellow"/help "white"- small usefull explanations\n");
+		                strcat(cstring, ""yellow"/help "white"- small useful explanations\n");
 		                strcat(cstring, ""yellow"/god "white"- infinite health\n");
 						strcat(cstring, ""yellow"/pm "white"- write a personal message to a player\n");
 						strcat(cstring, ""yellow"/r "white"- reply to your last pm\n");
@@ -22588,7 +22588,7 @@ server_load_textdraws()
 	TextDrawSetProportional(TXTWelcome[1], 1);
 	TextDrawSetSelectable(TXTWelcome[1], 0);
 
-	TXTWelcome[2] = TextDrawCreate(438.000000, 172.000000, "Welcome on "SVRSC" server. Check out these~n~commands:~n~~n~  ~g~~h~~h~/rules~n~  ~r~~h~~h~/cmds~n~  ~p~/help~n~~n~~w~How do I earn money and score?");
+	TXTWelcome[2] = TextDrawCreate(438.000000, 172.000000, "Welcome to "SVRSC" Check out these~n~commands:~n~~n~  ~g~~h~~h~/rules~n~  ~r~~h~~h~/cmds~n~  ~p~/help~n~~n~~w~How do I earn money and score?");
 	TextDrawBackgroundColor(TXTWelcome[2], 168430202);
 	TextDrawFont(TXTWelcome[2], 1);
 	TextDrawLetterSize(TXTWelcome[2], 0.229999, 1.099997);
