@@ -14087,7 +14087,7 @@ YCMD:rules(playerid, params[], help)
 	new rules[700];
 
 	strcat(rules, ""white"- No cheating of any kind\n- Do not ask others to gift you money\n- No mods that affect other player's gameplay\n- No insults\n- No advertising of any kind\n- No (command)spamming\n");
-	strcat(rules, "- No abusing bugs/glitches/commands\n- Do not share your account\n- No AFK in minigames\n- Do not ask for an unban ingame\n- Do not ask for an admin level/free VIP\n- Do not use Vortex to driveby players\n- Do not driveby at Hotspots/Spawnareas");
+	strcat(rules, "- No abusing bugs/glitches/commands\n- Do not share your account\n- No AFK in minigames\n- Do not ask for an unban ingame\n- Do not ask to be an administrator /free VIP\n- Do not use Vortex to driveby players\n- Do not driveby at Hotspots/Spawnareas");
 	strcat(rules, "\n- No score/money farming\n- Do not use joypad\n- No impersonating\n\nNever tell your password to anyone!");
 
     ShowPlayerDialog(playerid, RULES_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" :: Rules", rules, "OK", "");
@@ -14879,7 +14879,7 @@ YCMD:spec(playerid, params[], help)
 
 			if(count == 1)
 			{
-				format(gstr, sizeof(gstr), ""nef" "GREY_E"%s(%i) is also spectated by another admin/VIP (/spectators)", __GetName(player), player);
+				format(gstr, sizeof(gstr), ""nef" "GREY_E"%s(%i) is also being spectated by another admin/VIP (/spectators)", __GetName(player), player);
                 SCM(playerid, -1, gstr);
 			}
 			else if(count > 1)
@@ -15214,7 +15214,7 @@ YCMD:info(playerid, params[], help)
 	strcat(string, ""white"Foundation\t"grey"Mellnik\n\t\tEpixel\n\n"white"Scripting\t"grey"Mellnik");
 	strcat(string, "\n\n"white"Mapping\t"grey"Tuoppi\n\t\tMellnik\n\t\tAventator\n\t\tMicka\n\t\tLuggi\n\t\tImpulse");
 	strcat(string, "\n\n"white"Web Dev.\t"grey"Epixel\n\t\tMellnik");
-	strcat(string, "\n\n"white"Special Thanks\t"grey"Goldkiller");
+	strcat(string, "\n\n"white"Special Thanks\t"grey"Goldkiller Chris"); // Yeah nigga ^^
 	ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Credits/Info", string, "OK", "");
 	return 1;
 }
@@ -15267,7 +15267,7 @@ YCMD:stats(playerid, params[], help)
 		}
 		else strmid(vip, "No", 0, 5, 5);
 
- 		format(string1, sizeof(string1), ""ngs_blue"Stats of the player: "white"%s (%i)\n\n\
+ 		format(string1, sizeof(string1), ""ngs_blue"Statistics of member -"white"%s (%i)\n\n\
 	 	Kills:\t\t\t%i\nDeaths:\t\t\t%i\nK/D:\t\t\t%0.2f\nScore:\t\t\t%i\nMoney:\t\t\t$%s\nBank:\t\t\t$%s\nGold Credits:\t\t%sGC\n",
    			__GetName(player1),
    			PlayerData[player1][e_accountid],
@@ -15743,7 +15743,7 @@ YCMD:answer(playerid, params[], help)
 	}
 
 	mathsAnswered = 1;
-	player_notice(playerid, "~p~Congratulations!", "You gave the right maths answer", 4000);
+	player_notice(playerid, "~p~Congratulations!", "You have answered the maths question correctly!, 4000);
 
 	format(gstr, sizeof(gstr), "Won a math challenge.\n%s", mathsCurrent, answer);
 	SetPlayerChatBubble(playerid, gstr, NEF_GREEN, 40.0, 12000);
@@ -15761,7 +15761,7 @@ YCMD:weather(playerid, params[], help)
 
 	format(gstr, sizeof(gstr), "You've set your weather to '%i'", weather);
 	SCM(playerid, BLUE, gstr);
-    SCM(playerid, NEF_GREEN, "-> "PINK_E"Time set! Use /rtime to reset your time!");
+    SCM(playerid, NEF_GREEN, "-> "PINK_E"Weather set! Use /rtime to reset your time and or weather!");
 	return 1;
 }
 
@@ -15775,7 +15775,7 @@ YCMD:cashfall(playerid, params[], help)
 		}
 
 		if(PlayerData[playerid][e_level] == MAX_ADMIN_LEVEL) {
-			if(money > 30000 || money < 1) return SCM(playerid, -1, ""er"Cash: $1 - $30,000");
+			if(money > 50000 || money < 1) return SCM(playerid, -1, ""er"Cash: $1 - $50,000"); // Needs to be increased for eventful requirements. 
 		} else {
 		    if(money > 10000 || money < 1) return SCM(playerid, -1, ""er"Cash: $1 - $10,000");
 		}
