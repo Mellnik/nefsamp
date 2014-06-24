@@ -1173,7 +1173,7 @@ new const szRandomInfoTXTs[14][] =
 	"~w~Get some ~y~Gold Credits ~w~at "SVRURLWWW"/gc/",
 	"~w~Try our ~y~Cops and Robbers ~w~Minigame! ~y~/cnr",
 	"~w~Type ~g~~h~~h~/c ~b~~h~~h~/t~w~ for ~y~commands ~w~and ~y~teleports!",
-	"~w~Go to ~g~~h~~h~/vs ~w~and get a private vehicle which you can tune!",
+	"~w~Go to ~g~~h~~h~/vs ~w~and get your own car which you can tune!",
     "~w~Join minigames to earn money and score! ~g~~h~~h~/m",
 	"~w~Spawn vehicles using ~r~~h~/v ~w~or ~r~~h~/car",
 	"~w~Edit your server preferences and features using ~r~/settings~w~!",
@@ -1204,8 +1204,8 @@ new const ServerMSGS[15][] =
 	""yellow_e"- Server - "LB2_E"Get "SVRSC" Credits (/credits) today! "SVRURLWWW"/gc/",
 	""yellow_e"- Server - "LB2_E"Add "SVRSC" to your favlist! samp."SVRURL":7777",
 	""yellow_e"- Server - "LB2_E"Get VIP (/vip) today! "SVRURLWWW"/vip/",
-	""yellow_e"- Server - "LB2_E"Get a private vehicle which you can tune! (/vs)",
-	""yellow_e"- Server - "LB2_E"Get a private vehicle which you can tune! (/vs)"
+	""yellow_e"- Server - "LB2_E"Get your own car at /vs which you can tune!",
+	""yellow_e"- Server - "LB2_E"Get your own car at /vs which you can tune!"
 };
 
 new Derby_Map1Spawns[MAX_DERBY_PLAYERS][e_derby_map1_data] =
@@ -1594,12 +1594,12 @@ new const PVMatrix[101][e_pv_matrix] =
 // Toy slots, pvs slots, house slots, house obj slots, business slot, instant namechange, medkit x20, medkit x100, money boost x2, money boost x3, scoreboost x2, scoreboost x3
 new const CreditsProductMatrix[14][e_credits_matrix] =
 {
-	{"Toy Slot", 1000, 1, "Permanent", "This item expands your toy slots by 1.You can have 10 toy slots at most."},
-    {"Private Vehicle Slot", 1500, 1, "Permanent", "This item expands your private vehicle slots by 1.\nYou can have 8 pv slots at most."},
-    {"House Slot", 2000, 1, "Permanent", "This item expands your house slots by 1. You can have 5 house slots at most."},
-    {"House Item Slot", 1000, 1, "Permanent", "This item expands your house item slots by 1. You can have 10 house item slots at most."},
-    {"Business Slot", 2000, 1, "Permanent", "This item expands your business slots by 1. You can have 5 business slots at most."},
-    {"Instant Name Change Access", 1000, 1, "Usable 1 time", "This item grants you instant access to /changename."},
+	{"Toy slot", 1000, 1, "Permanent", "This item expands your toy slots by 1.You can have 10 toy slots at most."},
+    {"Custom car slot", 1500, 1, "Permanent", "This item expands your private vehicle slots by 1.\nYou can have 8 pv slots at most."},
+    {"House slot", 2000, 1, "Permanent", "This item expands your house slots by 1. You can have 5 house slots at most."},
+    {"House item slot", 1000, 1, "Permanent", "This item expands your house item slots by 1. You can have 10 house item slots at most."},
+    {"Business slot", 2000, 1, "Permanent", "This item expands your business slots by 1. You can have 5 business slots at most."},
+    {"Instant name change access", 1000, 1, "Usable 1 time", "This item grants you instant access to /changename."},
     {"20 Medits", 1000, 20, "Usable 20 times", "This item is usable in minigames only. Use /mk to consume 1 medkit.\nHeals you by 50hp in 10 seconds."},
     {"100 Medits", 2500, 100, "Usable 100 times", "This item is usable in minigames only. Use /mk to consume 1 medkit.\nHeals you by 50hp in 10 seconds."},
     {"Money Boost x2", 1000, 1, "24 Hours", "This item gives an additional double money.\nAfter purchase the boost remains active for 24 hours. You can\nonly have 1 of the 5 available boost active at the same time!"},
@@ -7029,7 +7029,7 @@ YCMD:bayside(playerid, params[], help)
 }
 YCMD:vs(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid, -1980.9745, 257.5091, 36.1352, 90.0, -1980.9745, 257.5091, 36.1352, 90.0, "Vehicle Shop", "vs");
+    PortPlayerMapVeh(playerid, -1980.9745, 257.5091, 36.1352, 90.0, -1980.9745, 257.5091, 36.1352, 90.0, "Custom car shop", "vs");
     return 1;
 }
 YCMD:gc(playerid, params[], help)
@@ -8513,9 +8513,9 @@ YCMD:unlock(playerid, params[], help)
 				    }
 				    return player_notice(playerid, "~r~Unlocked", "");
 			    }
-			    else SCM(playerid, -1, ""er"You are not in your private vehicle");
+			    else SCM(playerid, -1, ""er"You have to be in one of your private cars");
 			}
-			else SCM(playerid, -1, ""er"You are not in your private vehicle");
+			else SCM(playerid, -1, ""er"You have to be in one of your private cars");
 		}
     }
     else
@@ -15195,7 +15195,7 @@ YCMD:info(playerid, params[], help)
 	strcat(string, ""white"Foundation\t"grey"Mellnik\n\t\tEpixel\n\n"white"Scripting\t"grey"Mellnik");
 	strcat(string, "\n\n"white"Mapping\t"grey"Tuoppi\n\t\tMellnik\n\t\tAventator\n\t\tMicka\n\t\tLuggi\n\t\tImpulse");
 	strcat(string, "\n\n"white"Web Dev.\t"grey"Epixel\n\t\tMellnik");
-	strcat(string, "\n\n"white"Special Thanks\t"grey"Goldkiller Chris"); // Yeah nigga ^^
+	strcat(string, "\n\n"white"Special Thanks\t"grey"Goldkiller\n\t\tChris"); // Yeah nigga ^^
 	ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Credits/Info", string, "OK", "");
 	return 1;
 }
@@ -15724,7 +15724,7 @@ YCMD:answer(playerid, params[], help)
 	}
 
 	mathsAnswered = 1;
-	player_notice(playerid, "~p~Congratulations!", "You have answered the maths question correctly!, 4000);
+	player_notice(playerid, "~p~Congratulations!", "You have answered the maths question correctly!", 4000);
 
 	format(gstr, sizeof(gstr), "Won a math challenge.\n%s", mathsCurrent, answer);
 	SetPlayerChatBubble(playerid, gstr, NEF_GREEN, 40.0, 12000);
@@ -16791,7 +16791,7 @@ YCMD:nos(playerid, params[], help)
     {
 		if(PVSelect[playerid] != -1)
 		{
-		    if(GetPlayerVehicleID(playerid) == PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid]) return SCM(playerid, -1, ""er"Not useable in private vehicles");
+		    if(GetPlayerVehicleID(playerid) == PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid]) return SCM(playerid, -1, ""er"Not useable in private cars");
 		}
 
         PlayerPlaySound(playerid, 1133, 0.0, 0.0, 0.0);
@@ -17283,7 +17283,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				if(PlayerData[playerid][e_addpvslots] >= 7)
 				{
-				    SCM(playerid, -1, ""er"You already have 7 additional private vehicle slots!");
+				    SCM(playerid, -1, ""er"You already have 7 additional car slots!");
 				    ShowDialog(playerid, CM_DIALOG);
 				    return 1;
 				}
@@ -18695,7 +18695,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		            }
 		            case 4: // Private Vehicle
 		            {
-                        strcat(cstring, ""yellow"/pv "white"- private vehicle control\n");
+                        strcat(cstring, ""yellow"/pv "white"- vehicle control\n");
                         strcat(cstring, ""yellow"/lock "white"- lock your vehicle\n");
                         strcat(cstring, ""yellow"/unlock "white"- unlock your vehicle\n");
                         strcat(cstring, ""yellow"/vcolor "white"- dye your vehicle\n");
@@ -19586,7 +19586,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
                 if(listitem > PlayerData[playerid][e_addpvslots])
 			    {
-					format(gstr, sizeof(gstr), ""nef" :: Private Vehicle Menu > Slot: %i", listitem + 1);
+					format(gstr, sizeof(gstr), ""nef" :: Private vehicle menu > Slot: %i", listitem + 1);
 			        ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, gstr, ""nef_green"This vehicle slot is locked.\n\n"white"You may unlock it by purchasing an extra slot at Gold Credits (/gc)", "OK", "");
 			    }
 			    else
@@ -19599,7 +19599,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					    return 1;
 					}
 
-					format(gstr, sizeof(gstr), ""nef" :: Private Vehicle Menu > Slot: %i", listitem + 1);
+					format(gstr, sizeof(gstr), ""nef" :: Private vehicle menu > Slot: %i", listitem + 1);
 				    ShowPlayerDialog(playerid, VMENU_DIALOG + 1, DIALOG_STYLE_LIST, gstr, "Spawn Vehicle\nAttach Neon\nChange Number Plate\nChange Vehicle Color\n"grey"Sell vehicle", "Select", "Back");
 			    }
 				return true;
@@ -19614,16 +19614,15 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
                         PVSelect[playerid] = PVVMenuSel[playerid];
 
-						new Float:POS[4],
-						    vlabel[128];
+						new Float:POS[4];
 
-                        format(vlabel, sizeof(vlabel), ""nef_yellow"%s's \n"white"private vehicle", __GetName(playerid));
+                        format(gstr, sizeof(gstr), ""nef_yellow"%s's\n"white"custom car", __GetName(playerid));
 
 						GetPlayerPos(playerid, POS[0], POS[1], POS[2]);
 						GetPlayerFacingAngle(playerid, POS[3]);
 
 						PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid] = CreateVehicle_(PlayerPVData[playerid][PVSelect[playerid]][e_model], POS[0], POS[1], POS[2], POS[3], 0, 0, -1);
-						PlayerPVData[playerid][PVSelect[playerid]][e_labelid] = CreateDynamic3DTextLabel(vlabel, -1, 0.0, 0.0, 0.0, 30.0, INVALID_PLAYER_ID, PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], 1, -1, -1, -1, 30.0);
+						PlayerPVData[playerid][PVSelect[playerid]][e_labelid] = CreateDynamic3DTextLabel(gstr, -1, 0.0, 0.0, 0.0, 30.0, INVALID_PLAYER_ID, PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], 1, -1, -1, -1, 30.0);
 
 						SetVehicleVirtualWorld(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], GetPlayerVirtualWorld(playerid));
 						LinkVehicleToInterior(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], GetPlayerInterior(playerid));
@@ -19632,7 +19631,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 						PutPlayerInVehicle(playerid, PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], 0);
 
-						player_notice(playerid, "Private Vehicle Spawned", "");
+						player_notice(playerid, "Custom car spawned", "");
 					}
 					case 1:
 					{
@@ -19715,7 +19714,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			    
 			    PVCatSel[playerid] = listitem;
 			    
-			    format(gstr, sizeof(gstr), ""nef" :: Private Vehicles > %s", PVCategorys[listitem]);
+			    format(gstr, sizeof(gstr), ""nef" :: Custom cars > %s", PVCategorys[listitem]);
 			    ShowPlayerDialog(playerid, CARBUY_DIALOG + 1, DIALOG_STYLE_LIST, gstr, string, "Select", "Back");
 			    return true;
 			}
@@ -19759,7 +19758,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				new Float:POS[4],
 				    vlabel[128];
 
-                format(vlabel, sizeof(vlabel), ""nef_yellow"%s's \n"white"private vehicle", __GetName(playerid));
+                format(vlabel, sizeof(vlabel), ""nef_yellow"%s's\n"white"custom car", __GetName(playerid));
 
 				GetPlayerPos(playerid, POS[0], POS[1], POS[2]);
 				GetPlayerFacingAngle(playerid, POS[3]);
@@ -19935,7 +19934,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				new Float:POS[4],
 				    vlabel[128];
 
-                format(vlabel, sizeof(vlabel), ""nef_yellow"%s's \n"white"private vehicle", __GetName(playerid));
+                format(vlabel, sizeof(vlabel), ""nef_yellow"%s's\n"white"custom car", __GetName(playerid));
 
 				GetPlayerPos(playerid, POS[0], POS[1], POS[2]);
 				GetPlayerFacingAngle(playerid, POS[3]);
@@ -20102,13 +20101,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			}
 			case NEON_DIALOG:
 			{
-				format(gstr, sizeof(gstr), ""nef" :: Private Vehicle Menu > Slot: %i", PVVMenuSel[playerid] + 1);
+				format(gstr, sizeof(gstr), ""nef" :: Custom car menu > Slot: %i", PVVMenuSel[playerid] + 1);
 			    ShowPlayerDialog(playerid, VMENU_DIALOG + 1, DIALOG_STYLE_LIST, gstr, "Spawn Vehicle\nAttach Neon\nChange Number Plate\nChange Vehicle Color\n"grey"Sell vehicle", "Select", "Back");
 			    return true;
 			}
 			case CUSTOM_PLATE_DIALOG:
 			{
-				format(gstr, sizeof(gstr), ""nef" :: Private Vehicle Menu > Slot: %i", PVVMenuSel[playerid] + 1);
+				format(gstr, sizeof(gstr), ""nef" :: Custom car menu > Slot: %i", PVVMenuSel[playerid] + 1);
 			    ShowPlayerDialog(playerid, VMENU_DIALOG + 1, DIALOG_STYLE_LIST, gstr, "Spawn Vehicle\nAttach Neon\nChange Number Plate\nChange Vehicle Color\n"grey"Sell vehicle", "Select", "Back");
 				return true;
 			}
@@ -23286,9 +23285,9 @@ server_load_visuals()
 	CreateDynamicObject(8558, 1541.62708, -1843.84485, 17.14610,   1.80000, -88.90002, -89.69999);
 	// anti vehicle drop end
 
-	// vehicle shop
+	// car shop
 	CreateDynamicMapIcon(-1973.9249,293.3758,35.1719, 55, 1, -1, -1, -1, 400.0);
-	// vehicle shop end
+	// car shop end
 
 	// hotspots
 	CreateDynamicMapIcon(-1196.1506, -17.3470, 15.8281, 23, 1, -1, -1, -1, 300.0); // SFA
@@ -23391,7 +23390,7 @@ server_load_visuals()
 	AddTeleport(7, "Arch Wheel Angels", "arch", -2689.1001,217.8290,3.9509);
 	AddTeleport(8, "Las Venturas Airport", "lva", 1320.6082,1268.7208,13.5903);
 	AddTeleport(8, "Las Venturas", "lv", 2039.8860,1546.1112,10.4450);
-	AddTeleport(7, "Vehicle Shop", "vs", 1850.7683,-1459.0325,13.3984);
+	AddTeleport(7, "Custom car shop", "vs", 1850.7683,-1459.0325,13.3984);
 	AddTeleport(2, "RectAngle", "rect", 742.8961,533.1397,461.9956);
 	AddTeleport(4, "Balloon", "balloon", 295.4890,-1813.5734,52.0518);
 	AddTeleport(3, "Parkour 1", "parkour", 2586.5618,-1346.5614,232.2472);
@@ -23447,12 +23446,12 @@ server_load_visuals()
 	AddTeleport(5, "Racemap 2", "racemap2", 2741.1375,1969.4594,5269.7466);
 	AddTeleport(5, "Concert", "concert", 1477.8225,-1714.1190,14.1400);
 
-    CreateDynamic3DTextLabel(""white"["nef_green"Private Vehicle Shop"white"]", -1, -1973.9249,293.3758,35.1719+0.5, 400.0);
+    CreateDynamic3DTextLabel(""white"["nef_green"Custom car shop"white"]", -1, -1973.9249,293.3758,35.1719+0.5, 400.0);
     CreateDynamic3DTextLabel(""white"["nef_green"Gold Credits"white"]", -1, 1902.1838,-1404.4944,16.3474+0.5, 400.0);
     CreateDynamic3DTextLabel(""red">>> SLOW DOWN <<<", RED, 477.7281,1399.4580,735.2565+0.5, 60.0);
     CreateDynamic3DTextLabel(""white"["lila"Mellnik's Office"white"]", -1, 1794.8202,-1311.3057,120.6237+0.5, 35.0);
     CreateDynamic3DTextLabel(""white"["yellow"Admin Liberty City"white"]", -1, 1805.7494,-1302.6721,120.2656+0.5, 35.0);
-    CreateDynamic3DTextLabel(""white"["nef_green"Private Vehicle Shop"white"]", -1, -1407.0137,1013.8229,1049.0288+0.5, 500.0);
+    CreateDynamic3DTextLabel(""white"["nef_green"Custom car shop"white"]", -1, -1407.0137,1013.8229,1049.0288+0.5, 500.0);
     CreateDynamic3DTextLabel(""white"["nef_yellow"VIP"white"]\nLounge Entrance", -1, -2624.3010,1411.4360,7.2303+0.5, 35.0);
     CreateDynamic3DTextLabel(""white"["nef_green"Mellnik's Ramp"white"]\n"light_yellow"/rampdown to move it down", -1, -153.74190, -2210.68457, 27.16690+0.5, 20.0);
     CreateDynamic3DTextLabel(""white"["nef_green"Mellnik's Ramp"white"]\n"light_yellow"/rampup to move it up", -1, -153.74190, -2210.68457, 2.17288+0.5, 20.0);
@@ -24076,7 +24075,7 @@ PVSlotSelect(playerid)
 		}
     }
 
-	ShowPlayerDialog(playerid, PV_SLOT_SELECT_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Private Vehicle Shop", string, "Select", "Back");
+	ShowPlayerDialog(playerid, PV_SLOT_SELECT_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Custom car shop", string, "Select", "Back");
 	return 1;
 }
 
@@ -24110,7 +24109,7 @@ CreateFinalCar(playerid, pv_slot)
     
 	new vlabel[100];
 
-	format(vlabel, sizeof(vlabel), ""nef_yellow"%s's \n"white"private vehicle", __GetName(playerid));
+	format(vlabel, sizeof(vlabel), ""nef_yellow"%s's\n"white"custom car", __GetName(playerid));
 
 	PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid] = CreateVehicle_(PlayerPVData[playerid][PVSelect[playerid]][e_model], 1826.9821, -1383.8724, 25.3348, 180.0407, 0, 0, -1);
 	PlayerPVData[playerid][PVSelect[playerid]][e_labelid] = CreateDynamic3DTextLabel(vlabel, -1, 0.0, 0.0, 0.0, 30.0, INVALID_PLAYER_ID, PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], 1, -1, -1, -1, 30.0);
@@ -24126,7 +24125,7 @@ CreateFinalCar(playerid, pv_slot)
 
     TogglePlayerControllable(playerid, true);
     PutPlayerInVehicle(playerid, PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], 0);
-    player_notice(playerid, "Private vehicle purchased", "");
+    player_notice(playerid, "Custom car purchased", "");
     gTeam[playerid] = FREEROAM;
 
     RandomWeapons(playerid);
@@ -27564,7 +27563,7 @@ function:ShowDialog(playerid, dialogid)
 	    {
 	        new string[1024];
 
-	        strcat(string, ""red"How to get Gold Credits\nToy Slots\nPrivate Vehicle Slots\nHouse Slots\nHouse Item Slots\nBusiness Slots\nInstant Namechange Access");
+	        strcat(string, ""red"How to get Gold Credits\nToy Slots\nCustom car slot\nHouse Slots\nHouse Item Slots\nBusiness Slots\nInstant Namechange Access");
 	        strcat(string, "\nMedkit x20\nMedkit x100\nMoney Boost x2\nMoney Boost x3\nScore Boost x2\nScore Boost x3\nMaster Boost\nReset K/D");
 
 	        ShowPlayerDialog(playerid, CM_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Gold Credits", string, "Select", "Cancel");
@@ -27699,7 +27698,7 @@ function:ShowDialog(playerid, dialogid)
 	    }
 	    case CMDS_DIALOG:
 	    {
-        	ShowPlayerDialog(playerid, CMDS_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Commands", "General\nAccount\nGang\nHouse/Business\nPrivate Vehicle\nOther\nVIP\nGold Credits", "Select", "Cancel");
+        	ShowPlayerDialog(playerid, CMDS_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Commands", "General\nAccount\nGang\nHouse/Business\nCustom cars\nOther\nVIP\nGold Credits", "Select", "Cancel");
 		}
 	    case HOUSE_UPGRADE_DIALOG:
 	    {
@@ -27718,16 +27717,16 @@ function:ShowDialog(playerid, dialogid)
 		}
 		case VEHICLE_PLATE_DIALOG:
   		{
-			ShowPlayerDialog(playerid, VEHICLE_PLATE_DIALOG, DIALOG_STYLE_INPUT, ""nef" :: Private Vehicle Shop", ""white"Please enter something for your number plate:\nYou can change it later.\nLength: 2 - 12 characters", "Next", "Back");
+			ShowPlayerDialog(playerid, VEHICLE_PLATE_DIALOG, DIALOG_STYLE_INPUT, ""nef" :: Custom car shop", ""white"Please enter something for your number plate:\nYou can change it later.\nLength: 2 - 12 characters", "Next", "Back");
   		}
 		case NEON_DIALOG:
 		{
-			format(gstr, sizeof(gstr), ""nef" :: Private Vehicle Menu > Slot: %i > Neon Menu", PVVMenuSel[playerid] + 1);
+			format(gstr, sizeof(gstr), ""nef" :: Custom car menu > Slot: %i > Neon Menu", PVVMenuSel[playerid] + 1);
 		    ShowPlayerDialog(playerid, NEON_DIALOG, DIALOG_STYLE_LIST, gstr, "Red\nGreen\nBlue\nYellow\nWhite\nPink\n"grey"Remove", "Select", "Back");
 		}
 		case CUSTOM_PLATE_DIALOG:
 		{
-			format(gstr, sizeof(gstr), ""nef" :: Private Vehicle Menu > Slot: %i > Plate", PVVMenuSel[playerid] + 1);
+			format(gstr, sizeof(gstr), ""nef" :: Custom car menu > Slot: %i > Plate", PVVMenuSel[playerid] + 1);
 		    ShowPlayerDialog(playerid, CUSTOM_PLATE_DIALOG, DIALOG_STYLE_INPUT, gstr, ""white"Please enter something for your number plate:\nLength: 2 - 12 characters", "Change", "Back");
 		}
 		case VEHICLE_DIALOG:
@@ -27772,7 +27771,7 @@ function:ShowDialog(playerid, dialogid)
 				}
 		    }
 		    
-			ShowPlayerDialog(playerid, VMENU_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Private Vehicle Menu", string, "Select", "Cancel");
+			ShowPlayerDialog(playerid, VMENU_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Custom car shop", string, "Select", "Cancel");
 		}
 		case WEAPON_DIALOG:
 		{
@@ -27780,7 +27779,7 @@ function:ShowDialog(playerid, dialogid)
 		}
 		case CARBUY_DIALOG:
 		{
-  			ShowPlayerDialog(playerid, CARBUY_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Private Vehicle Shop", sPVCategory, "Select", "Cancel");
+  			ShowPlayerDialog(playerid, CARBUY_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Custom car shop", sPVCategory, "Select", "Cancel");
 		}
 		case GMENU_DIALOG:
 		{
