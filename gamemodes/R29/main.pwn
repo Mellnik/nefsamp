@@ -45,7 +45,6 @@
 #include <irc>
 #include <dns>
 #include <a_zones>          // V2.0
-#include <floodcontrol>     // 28/06/2012
 #include <mSelection>       // 1.1 R3
 #include <Dini>         	// 1.6
 #include <md-sort>      	// 13/02/2014
@@ -724,7 +723,6 @@ enum E_PLAYER_DATA
 	bool:bGWarMode,
 	bool:bLoadMap,
 	bool:KBMarked,
-	bool:bFloodDect,
 	bool:bLogged,
 	bool:bSpeedo,
 	bool:bDerbyAFK,
@@ -3066,63 +3064,39 @@ public OnPlayerSpawn(playerid)
 	return 1;
 }
 
-public OnPlayerFloodControl(playerid, iCount, iTimeSpan)
-{
-    PlayerData[playerid][bFloodDect] = false;
-
-	new p_IP[16];
-	GetPlayerIp(playerid, p_IP, 16);
-    
-    if(iCount > 3 && iTimeSpan < 8500 && !IsWhitelisted(p_IP))
-	{
-	    PlayerData[playerid][bFloodDect] = true;
-
-		new sz_BanCmd[30];
-		
-		format(sz_BanCmd, sizeof(sz_BanCmd), "banip %s", p_IP);
-		SendRconCommand(sz_BanCmd);
-		
-		Log(LOG_NET, "%i, %i flood detected, kicking (%s, %i)", iCount, iTimeSpan, p_IP, playerid);
-		
-		Kick(playerid);
-    }
-    return 1;
-}
-
 public OnIncomingConnection(playerid, ip_address[], port)
 {
-	Log(LOG_NET, "OnIncomingConnection(%i, %s, %i);", playerid, ip_address, port);
+	Log(LOG_NET, "OnIncomingConnection(%i, %s, %i)", playerid, ip_address, port);
+	
+	new connections = 0, buffer[16];
+	for(new i = 0; i < MAX_PLAYERS; i++)
+	{
+	    if(!IsPlayerConnected(i) || i == playerid)
+	        continue;
+	        
+	    GetPlayerIp(i, buffer, sizeof(buffer)); // Not save to use __GetIP here
+	    
+	    if(!strcmp(buffer, ip_address))
+			connections++;
+	}
+	
+	if(connections >= 4 && !IsWhitelisted(ip_address))
+	{
+	    BlockIpAddress(ip_address, 120000);
+	    Log(LOG_NET, "%i connections detected by (%i, %s, %i), hard ipban issued for 2 minutes", connections, playerid, ip_address, port);
+	    Kick(playerid);
+	}
 	return 1;
 }
 
 public OnPlayerConnect(playerid)
 {
-    if(PlayerData[playerid][bFloodDect]) return 1;
-    
     PreparePlayerVars(playerid);
 	PreparePlayerPV(playerid);
     PreparePlayerToy(playerid);
 
     GetPlayerName(playerid, PlayerData[playerid][e_name], MAX_PLAYER_NAME + 1);
     GetPlayerIp(playerid, PlayerData[playerid][e_ip], MAX_PLAYER_IP + 1);
-
-	new count_t = 0, count_r = 0;
-	for(new i = 0; i < MAX_PLAYERS; i++)
-	{
-	    if(!IsPlayerConnected(i)) continue;
-		++count_r;
-	    if(!strcmp(__GetIP(i), PlayerData[playerid][e_ip]))
-	    {
-	        ++count_t;
-	    }
-	}
-	
-	if(count_t > 3 && !IsWhitelisted(__GetIP(playerid)))
-	{
-	    Log(LOG_NET, "%i connections detected, kicking (%s, %i)", count_t, __GetName(playerid), playerid);
-		Kick(playerid);
-		return 1;
-	}
 
 	mysql_format(pSQL, gstr, sizeof(gstr), "DELETE FROM `online` WHERE `name` = '%e';", __GetName(playerid));
 	mysql_tquery(pSQL, gstr);
@@ -3148,6 +3122,13 @@ public OnPlayerConnect(playerid)
 	{
 	    Log(LOG_NET, "%s(%i, %s, %s) connected.", __GetName(playerid), playerid, __GetIP(playerid), __GetSerial(playerid));
 	
+	    new count_r = 0;
+	    for(new i = 0; i < MAX_PLAYERS; i++)
+	    {
+	        if(IsPlayerConnected(i))
+	            count_r++;
+	    }
+	    
 	    if(count_r > m_PlayerRecord) {
 	        m_PlayerRecord = count_r;
 	        server_save_config();
@@ -30320,7 +30301,6 @@ PreparePlayerVars(playerid)
 	PlayerData[playerid][bGWarMode] = false;
 	PlayerData[playerid][bLoadMap] = false;
 	PlayerData[playerid][KBMarked] = false;
-	PlayerData[playerid][bFloodDect] = false;
 	PlayerData[playerid][bLogged] = false;
 	PlayerData[playerid][bSpeedo] = false;
 	PlayerData[playerid][bDerbyAFK] = false;
