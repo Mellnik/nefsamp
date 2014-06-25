@@ -9033,11 +9033,11 @@ YCMD:adminhelp(playerid, params[], help)
 		
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[3][e_rank]);
 		strcat(string, gstr);
-		strcat(string, "/freeze /eject /go /getip /get /mkick /clearchat /iplookup /dawn\n/night /giveweapon /announce /connectbots /raceforcemap /deleterecord /nstats\n\n");
+		strcat(string, "/freeze /eject /go /getip /get /mkick /clearchat /iplookup /dawn\n/night /giveweapon /connectbots /raceforcemap /deleterecord /nstats\n\n");
 		
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[4][e_rank]);
 		strcat(string, gstr);
-		strcat(string, "/unban /oban /sethealth /healall /armorall /cashfall\n/scorefall /announce2\n\n");
+		strcat(string, "/unban /oban /sethealth /healall /announce /armorall /cashfall\n/scorefall /announce2\n\n");
 		
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[5][e_rank]);
 		strcat(string, gstr);
@@ -10192,7 +10192,7 @@ YCMD:asay(playerid, params[], help)
 
 YCMD:announce(playerid, params[], help)
 {
-    if(PlayerData[playerid][e_level] >= 3 || IsPlayerAdmin(playerid))
+    if(PlayerData[playerid][e_level] >= 4 || IsPlayerAdmin(playerid))
 	{
 	    extract params -> new string:text[144]; else
 	    {
@@ -10204,7 +10204,7 @@ YCMD:announce(playerid, params[], help)
 	    if(strfind(text, "%", true) != -1) return SCM(playerid, -1, ""er"'%' is not allowed in announce.");
 	    if(strlen(text) > 50 || strlen(text) < 1) return SCM(playerid, -1, ""er"Length 1-50");
 
-		format(gstr, sizeof(gstr), "%s: %s", __GetName(playerid), text);
+		format(gstr, sizeof(gstr), "%s", text);
 		GameTextForAll(gstr, 4000, 3);
     }
 	else
