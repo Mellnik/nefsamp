@@ -270,8 +270,6 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define RACE_MAX_CHECKPOINTS            (75)
 #define RACE_MAX_PLAYERS 				(12)
 #define Key(%0) 						(((newkeys & (%0)) == (%0)) && ((oldkeys & (%0)) != (%0)))
-#define HOLDING(%0) 					((newkeys & (%0)) == (%0))
-#define RELEASED(%0) 					(((newkeys & (%0)) != (%0)) && ((oldkeys & (%0)) == (%0)))
 #define PreloadAnimLib(%1,%2)			ApplyAnimation(%1,%2,"NULL",0.0,0,0,0,0,0)
 #define MINIGUN_WORLD                   (1268565)
 #define MINIGUN2_WORLD                  (168566)
@@ -1779,7 +1777,6 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
     Text:AchTD[6],
 	Text:TXTWelcome[5],
 	Text:JailTD,
-	Text:TXTCommandsTop,
 	#if WINTER_EDITION == true
 	Text:TXTWinterEdition,
 	#endif
@@ -2507,11 +2504,11 @@ public OnGameModeInit()
     Server_MapPatches();
 
 	server_read_config();
-	ResetElevatorQueue();
-	Elevator_Initialize();
 	server_initialize();
 	server_load_visuals();
 	server_load_textdraws();
+	ResetElevatorQueue();
+	Elevator_Initialize();
 	ClearDerbyVotes();
     ExecDerbyVotingTimer();
     ExecBGVotingTimer();
@@ -2596,7 +2593,6 @@ public OnPlayerRequestClass(playerid, classid)
 	TextDrawShowForPlayer(playerid, NEFLOGO[1]);
 	TextDrawShowForPlayer(playerid, NEFLOGO[2]);
 	TextDrawShowForPlayer(playerid, TXTRandomInfo);
-	//TextDrawShowForPlayer(playerid, TXTCommandsTop);
 	#if WINTER_EDITION == true
 	TextDrawShowForPlayer(playerid, TXTWinterEdition);
 	#endif
@@ -2653,22 +2649,17 @@ public OnPlayerSpawn(playerid)
     {
         PlayerData[playerid][bFirstSpawn] = false;
 		PlayerData[playerid][AllowSpawn] = false;
-		RemovePlayerAttachedObject(playerid, 0);
-		RemovePlayerAttachedObject(playerid, 1);
 		AttachPlayerToy(playerid);
-		StopAudioStreamForPlayer(playerid);
 		ResetPlayerWorld(playerid);
 		PlayerData[playerid][ExitType] = EXIT_FIRST_SPAWNED;
 		SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
 		SetCameraBehindPlayer(playerid);
-		StopAudioStreamForPlayer(playerid);
 		StopAudioStreamForPlayer(playerid);
 		RandomWeapons(playerid);
 		HidePlayerWelcomeTextdraws(playerid);
 		ShowPlayerInfoTextdraws(playerid);
 		SavePos(playerid);
 		SyncGangZones(playerid);
-		SetPlayerHealth(playerid, 100.0);
 		
 		if(PlayerData[playerid][e_vip] == 1)
 		{
@@ -3084,8 +3075,8 @@ public OnIncomingConnection(playerid, ip_address[], port)
 	
 	if(connections >= 3 && !IsWhitelisted(ip_address))
 	{
-	    BlockIpAddress(ip_address, 120000);
-	    Log(LOG_NET, "%i connections detected by (%i, %s, %i), hard ipban issued for 2 minutes", connections, playerid, ip_address, port);
+	    BlockIpAddress(ip_address, 60000);
+	    Log(LOG_NET, "%i connections detected by (%s, %i, %i), hard ipban issued for 60 seconds", connections, ip_address, port, playerid);
 	    Kick(playerid);
 	}
 	return 1;
@@ -3140,7 +3131,6 @@ public OnPlayerConnect(playerid)
 	
 		TextDrawShowForPlayer(playerid, TXTOnJoin[0]);
 		TextDrawShowForPlayer(playerid, TXTOnJoin[1]);
-		TextDrawHideForPlayer(playerid, TXTTeleportInfo);
 
 		PreloadAnimLib(playerid, "BOMBER");
 		PreloadAnimLib(playerid, "RAPPING");
@@ -4405,7 +4395,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 	SetTimerEx("CoolDownDeath", COOLDOWN_DEATH, false, "i", playerid);
 	if(PlayerData[playerid][iCoolDownDeath] >= 4)
 	{
-	    format(gstr, sizeof(gstr), "[SUSPECT] %i fake-death detected, kicking (%s, %i)", PlayerData[playerid][iCoolDownDeath], __GetName(playerid), playerid);
+	    format(gstr, sizeof(gstr), "[SUSPECT] %i fake deaths detected, kicking (%s, %i)", PlayerData[playerid][iCoolDownDeath], __GetName(playerid), playerid);
 	    AdminMSG(RED, gstr);
 	    Log(LOG_NET, gstr);
 	    
@@ -7759,7 +7749,6 @@ YCMD:hidef(playerid, params[], help)
 {
     PlayerData[playerid][bTDEnabled] = false;
 	TextDrawHideForPlayer(playerid, TXTTeleportInfo);
-    //TextDrawHideForPlayer(playerid, TXTCommandsTop);
     TextDrawHideForPlayer(playerid, TXTFooterBlack);
 	TextDrawHideForPlayer(playerid, TXTFooter);
 	TextDrawHideForPlayer(playerid, NEFLOGO[0]);
@@ -7778,7 +7767,6 @@ YCMD:showf(playerid, params[], help)
 {
     PlayerData[playerid][bTDEnabled] = true;
 	TextDrawShowForPlayer(playerid, TXTTeleportInfo);
-	//TextDrawShowForPlayer(playerid, TXTCommandsTop);
 	TextDrawShowForPlayer(playerid, TXTFooterBlack);
 	TextDrawShowForPlayer(playerid, TXTFooter);
 	TextDrawShowForPlayer(playerid, NEFLOGO[0]);
@@ -22381,15 +22369,6 @@ server_load_textdraws()
 	TextDrawColor(JailTD, -1);
 	TextDrawFont(JailTD, 4);
 
-	TXTCommandsTop = TextDrawCreate(392.000000, 2.000000, "~w~Commands: ~y~/c ~w~Teleports: ~y~/t ~w~Vehicles: ~y~/v ~w~Weapons: ~y~/w ~w~Minigames: ~y~/m ~w~Toys: ~y~/o");
-	TextDrawBackgroundColor(TXTCommandsTop, 255);
-	TextDrawFont(TXTCommandsTop, 3);
-	TextDrawLetterSize(TXTCommandsTop, 0.169999, 0.899999);
-	TextDrawColor(TXTCommandsTop, -1);
-	TextDrawSetOutline(TXTCommandsTop, 1);
-	TextDrawSetProportional(TXTCommandsTop, 1);
-	TextDrawSetSelectable(TXTCommandsTop, 0);
-
 	TXTFooterBlack = TextDrawCreate(319.000000, 427.000000, "~n~~n~~n~~n~");
 	TextDrawAlignment(TXTFooterBlack, 2);
 	TextDrawBackgroundColor(TXTFooterBlack, 255);
@@ -22802,12 +22781,19 @@ server_initialize()
 	SendRconCommand("weburl "SVRURLWWW"");
     SetGameModeText("TdmDerbyRaceCNRFunStuntFreeroam");
 	SendRconCommand("mapname "SVRSC" "CURRENT_VERSION"");
+	SendRconCommand("playertimeout 7000");
+	SendRconCommand("ackslimit 4000");
+	SendRconCommand("messageslimit 500");
+	SendRconCommand("messageholelimit 1800");
+	SendRconCommand("rcon 0");
+	SendRconCommand("maxnpc 0");
 	
 	EnableVehicleFriendlyFire();
 	ShowPlayerMarkers(1);
 	DisableInteriorEnterExits();
 	ShowNameTags(1);
-	SetNameTagDrawDistance(40.0);
+	ShowPlayerMarkers(PLAYER_MARKERS_MODE_GLOBAL);
+	SetNameTagDrawDistance(50.0);
 	AllowInteriorWeapons(1);
 	UsePlayerPedAnims();
 	EnableStuntBonusForAll(0);
@@ -22831,7 +22817,7 @@ server_initialize()
 	for(new i = 0; i < MAX_GZONES; i++)
 		GZoneInfo[i][bUnderAttack] = false;
 		
-	// Other stuff to initialize
+	// Other stuff to initialize TODO: Overhaul spawns using polygons
     g_SpawnAreas[0] = CreateDynamicSphere(341.8535, -1852.6327, 6.8569, 25.0); // <- beach sphere
     g_SpawnAreas[1] = CreateDynamicSphere(385.4325, 2541.2456, 14.5953, 13.5); // <- AA sphere
     g_SpawnAreas[2] = CreateDynamicSphere(-1203.3666, -27.8846, 15.8403, 15.0); // <- SFA 1 sphere
@@ -30693,6 +30679,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 				{
                     format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"VIP %s(%i) logged in!", __GetName(playerid), playerid);
                     SCMToAll(-1, gstr2);
+                    
 					format(gstr2, sizeof(gstr2), "02[%i] 03*** VIP %s has joined the server.", playerid, __GetName(playerid));
 					IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr2);
 				}
