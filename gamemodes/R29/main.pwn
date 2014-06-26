@@ -14,7 +14,7 @@
 || YSI Library 3.1
 || sscanf Plugin 2.8.1
 || Streamer Plugin v2.7.2
-|| MySQL Plugin R38
+|| MySQL Plugin R39-2
 || IRC Plugin 1.4.5
 || DNS Plugin 2.4
 ||
@@ -41,7 +41,7 @@
 #include <YSI\y_va>
 #include <sscanf2>
 #include <streamer>
-#include <a_mysql_R38>
+#include <a_mysql_R39-2>
 #include <irc>
 #include <dns>
 #include <a_zones>          // V2.0
@@ -426,7 +426,7 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define COOLDOWN_CMD_GKICK              (8000)
 #define COOLDOWN_CMD_GCREATE            (5000)
 #define COOLDOWN_DEATH                  (3000)
-#define COOLDOWN_CMD                  	(5000)
+#define COOLDOWN_CMD                  	(1000)
 #define COOLDOWN_TEXT                   (5000)
 #define COOLDOWN_CMD_HAREFILL           (120000)
 #define COOLDOWN_CMD_VIPLI              (15000)
@@ -450,7 +450,9 @@ enum E_LOG_LEVEL
 	LOG_ONLINE,
 	LOG_NET,
 	LOG_PLAYER,
-	LOG_WORLD
+	LOG_WORLD,
+	LOG_FAIL,
+	LOG_SUSPECT
 };
 
 // Dialogs
@@ -3071,7 +3073,7 @@ public OnIncomingConnection(playerid, ip_address[], port)
 	new connections = 0, buffer[16];
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-	    if(!IsPlayerConnected(i) || i == playerid)
+	    if(i == playerid || !IsPlayerConnected(i))
 	        continue;
 	        
 	    GetPlayerIp(i, buffer, sizeof(buffer)); // Not save to use __GetIP here
@@ -3080,7 +3082,7 @@ public OnIncomingConnection(playerid, ip_address[], port)
 			connections++;
 	}
 	
-	if(connections >= 4 && !IsWhitelisted(ip_address))
+	if(connections >= 3 && !IsWhitelisted(ip_address))
 	{
 	    BlockIpAddress(ip_address, 120000);
 	    Log(LOG_NET, "%i connections detected by (%i, %s, %i), hard ipban issued for 2 minutes", connections, playerid, ip_address, port);
@@ -3431,11 +3433,19 @@ public OnPlayerCommandReceived(playerid, cmdtext[])
 	    SCM(playerid, -1, ""er"You can't use commands while being dead!");
 	    return 0;
 	}
+	
 	if(PlayerData[playerid][ExitType] != EXIT_FIRST_SPAWNED)
 	{
 	    SCM(playerid, -1, ""er"You need to spawn to use commands!");
 	    return 0;
 	}
+	
+	if(PlayerData[playerid][iCoolDownCommand] < COOLDOWN_CMD)
+	{
+		player_notice(playerid, "1 command every second", "");
+	    return 0;
+	}
+	
 	if(PlayerData[playerid][Frozen])
 	{
 	    switch(YHash(cmdtext[1], false))
@@ -3471,7 +3481,7 @@ public OnPlayerCommandReceived(playerid, cmdtext[])
 	
 	if(PlayerData[playerid][bLoadMap])
 	{
-	    SCM(playerid, -1, ""er"You can't use commands now!");
+	    player_notice(playerid, "Please wait for the map to load", "");
 	    return 0;
 	}
 	
@@ -3488,28 +3498,14 @@ public OnPlayerCommandPerformed(playerid, cmdtext[], success)
 
     gettime(time[0], time[1], time[2]);
 
-    format(gstr2, sizeof(gstr2), "[%02d:%02d:%02d] [%i]%s USED %s SUCCESS: %i\r\n", time[0], time[1], time[2], playerid, __GetName(playerid), cmdtext, success);
+    format(gstr2, sizeof(gstr2), "[%02d:%02d:%02d] [%i]%s used %s with success: %i\r\n", time[0], time[1], time[2], playerid, __GetName(playerid), cmdtext, success);
     fwrite(lFile, gstr2);
     fclose(lFile);
 
-	PlayerData[playerid][iCoolDownCommand]++;
-	SetTimerEx("CoolDownCommand", COOLDOWN_CMD, false, "i", playerid);
-	if(PlayerData[playerid][iCoolDownCommand] == 8)
-	{
-	    return GameTextForPlayer(playerid, "~b~~h~Do NOT spam commands!", 2000, 3);
-	}
-	else if(PlayerData[playerid][iCoolDownCommand] >= 13 && PlayerData[playerid][e_level] < 2)
-	{
-		format(gstr, sizeof(gstr), "[SUSPECT] %i command-spam detected, kicking (%s, %i)", PlayerData[playerid][iCoolDownCommand], __GetName(playerid), playerid);
-		AdminMSG(RED, gstr);
-		Log(LOG_NET, gstr);
-		
-		PlayerData[playerid][iCoolDownCommand] = 0;
-		return Kick(playerid);
-	}
+    PlayerData[playerid][iCoolDownCommand] = GetTickCount_();
 
 	if(!success) {
-	    player_notice(playerid, "Unknown Command", "Type ~y~/c ~w~for all commands");
+	    player_notice(playerid, "Unknown command", "Type ~y~/c ~w~for all commands");
 	} else {
 	    SrvStat[0]++;
 	}
@@ -3520,13 +3516,14 @@ public OnVehicleMod(playerid, vehicleid, componentid)
 {
     if(GetPlayerInterior(playerid) == 0) // Crasher
     {
+        Log(LOG_SUSPECT, "OnVehicleMod(%i, %i, %i) triggered by %s with world interior 0", playerid, vehicleid, componentid, __GetName(playerid));
         return 0;
     }
 
-	new vmodel = GetVehicleModel(vehicleid);
-	if(!IsComponentIdCompatible(vmodel, componentid)) // Crasher
+	new model = GetVehicleModel(vehicleid);
+	if(!IsComponentIdCompatible(model, componentid)) // Crasher
 	{
-	    printf("[SUSPECT] Bad Vehicle Mod by [%i]%s using vc:%i with cp:%i", playerid, __GetName(playerid), vmodel, componentid);
+	    Log(LOG_SUSPECT, "OnVehicleMod(%i, %i, %i) triggered by %s with invalid componentid using model %i", playerid, vehicleid, componentid, __GetName(playerid), model);
 		return 0;
 	}
 	
@@ -4031,7 +4028,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 
 public OnQueryError(errorid, error[], callback[], query[], connectionHandle)
 {
-	printf("[MYSQL ERROR]: %i, %s, %s, %s, %i", errorid, error, callback, query, connectionHandle);
+	Log(LOG_FAIL, "OnQueryError(%i, %s, %s, %s, %i)", errorid, error, callback, query, connectionHandle);
 	return 1;
 }
 
@@ -16958,7 +16955,7 @@ function:OnPlayerNameChangeRequest(playerid, newname[])
 public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 {
 	// Fixing dialog exploit
-	for(new i = 0; i < strlen(inputtext); i++)
+	for(new i = 0, l = strlen(inputtext); i < l; i++)
 	{
 		if(inputtext[i] == '%')
 		{
@@ -16981,7 +16978,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	            
 	            strmid(PlayerData[playerid][e_email], email, 0, 26, 26);
 	            
-	            SCM(playerid, -1, ""nef" Your recovery email has been changed!");
+	            player_notice(playerid, "New email set", "");
 	            return true;
 	        }
 	        case DIALOG_DUEL:
@@ -27318,13 +27315,13 @@ IsValidSkin(skinid)
     return 1;
 }
 
-__GetPlayerID(const PlayerName[])
+__GetPlayerID(const playername[])
 {
 	for(new i = 0; i < MAX_PLAYERS; i++)
     {
     	if(IsPlayerConnected(i))
       	{
-        	if(!strcmp(PlayerName, __GetName(i), true))
+        	if(!strcmp(playername, __GetName(i), true))
         	{
           		return i;
         	}
@@ -27820,12 +27817,6 @@ function:ShowDialog(playerid, dialogid)
 function:CoolDownDeath(playerid)
 {
 	PlayerData[playerid][iCoolDownDeath]--;
-	return 1;
-}
-
-function:CoolDownCommand(playerid)
-{
-	PlayerData[playerid][iCoolDownCommand]--;
 	return 1;
 }
 
@@ -30828,6 +30819,8 @@ Log(E_LOG_LEVEL:log_level, const fmat[], va_args<>)
 		case LOG_NET: strins(gstr2, "LogNet: ", 0, sizeof(gstr2));
 		case LOG_PLAYER: strins(gstr2, "LogPlayer: ", 0, sizeof(gstr2));
 		case LOG_WORLD: strins(gstr2, "LogWorld: ", 0, sizeof(gstr2));
+		case LOG_FAIL: strins(gstr2, "LogError: ", 0, sizeof(gstr2));
+		case LOG_SUSPECT: strins(gstr2, "LogSuspect: ", 0, sizeof(gstr2));
 	}
 	return print(gstr2);
 }
@@ -30849,5 +30842,3 @@ server_save_config()
 	Log(LOG_ONLINE, "Updating server config");
 	dini_IntSet("/Other/server.ini", "m_PlayerRecord", m_PlayerRecord);
 }
-
-#include <net>
