@@ -28091,7 +28091,7 @@ number_format(num)
     new szStr[16];
     format(szStr, sizeof(szStr), "%i", num);
 
-    for(new iLen = strlen(szStr) - 3; iLen > 0; iLen -= 3)
+    for(new iLen = strlen(szStr) - (num < 0 ? 4 : 3); iLen > 0; iLen -= 3)
     {
         strins(szStr, ",", iLen);
     }
