@@ -1831,7 +1831,7 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
   	ElevatorQueue[21],
   	FloorRequestedBy[21],
   	ElevatorBoostTimer,
-  	bool:GlobalMain = false,
+  	bool:bGlobalShutdown = false,
   	xChars[16] = "",
   	tReactionTimer = -1,
 	xCash,
@@ -2567,7 +2567,8 @@ public OnGameModeExit()
 
 public OnPlayerRequestClass(playerid, classid)
 {
-    if(GlobalMain) return 0;
+    if(bGlobalShutdown)
+		return 0;
 
 	if(PlayerData[playerid][ExitType] == EXIT_FIRST_SPAWNED)
 	{/*
@@ -3106,10 +3107,9 @@ public OnPlayerConnect(playerid)
 
     DisablePlayerRaceCheckpoint(playerid);
 
-	if(GlobalMain)
+	if(bGlobalShutdown)
 	{
-	    SCM(playerid, RED, "Server is in going in maintenance mode, please try again later.");
-  		KickEx(playerid);
+  		Kick(playerid);
 	}
 	else
 	{
@@ -4163,11 +4163,8 @@ public OnPlayerText(playerid, text[])
 	    return 0;
 	}
 
-	if(GlobalMain)
-	{
-	    SCM(playerid, -1, ""er"Please log out now!");
+	if(bGlobalShutdown)
 	    return 0;
-	}
 
 	if(!strcmp(text, LastPlayerText[playerid], true))
 	{
@@ -12137,16 +12134,14 @@ YCMD:shutdown(playerid, params[], help)
 {
 	if(PlayerData[playerid][e_level] == MAX_ADMIN_LEVEL && IsPlayerAdmin(playerid))
 	{
-	    SetTimer("mainmode", 2000, false);
-	    GlobalMain = true;
+	    bGlobalShutdown = true;
 	    
-	    for(new i = 0; i < 20; i++)
-			SCMToAll(GREEN, " ");
-
-		SCMToAll(RED, "The server is going under maintenance.");
-		SCMToAll(RED, "Please check back in a couple minutes. Server IP: "SERVER_IP"");
-		
-	    ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Maintenance", ""white"The server is going under maintenance.\n\nPlease check back in a couple minutes. Server IP: "SERVER_IP"", "OK", "");
+	    for(new i = 0; i < MAX_PLAYERS; i++)
+	    {
+	        SCM(i, -1, "Server restart! Restart your game. IP: samp.nefserver.net:7777");
+	    }
+	    
+	    SetTimer("server_init_shutdown", 3000, false);
  	}
 	return 1;
 }
@@ -22756,18 +22751,23 @@ function:Elevator_TurnToIdle()
 	return 1;
 }
 
-function:mainmode()
+function:server_init_shutdown()
 {
-    SCMToAll(-1, ""server_sign" "r_besch"Maintenance initiated...");
-
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(IsPlayerConnected(i))
 	    {
-			SCM(i, -1, "Your account has been saved and you have been disconnected");
-			KickEx(i);
+			Kick(i);
 		}
 	}
+	SetTimer("_server_shutdown", 2000, false);
+	return 1;
+}
+
+function:_server_shutdown()
+{
+	Log(LOG_EXIT, "server_shutdown called");
+	SendRconCommand("exit");
 	return 1;
 }
 
