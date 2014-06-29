@@ -624,6 +624,12 @@ enum BOOST:(<<= 1)
 	BOOST_MASTER
 };
 
+enum SUSPECT:(<<= 1)
+{
+	SUSPECT_VALID_ARMOR = 1,
+	SUSPECT_IMMUNE
+};
+
 enum E_PLAYER_DATA
 {
 	/* ORM */
@@ -733,6 +739,7 @@ enum E_PLAYER_DATA
 	tRobbery,
 	tLoadMap,
 	BOOST:Boost,
+	SUSPECT:ACSettings,
 	BoostDeplete,
 	Float:fOldPos[4],
 	HouseSlotSelected,
@@ -5788,6 +5795,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 		            {
 		                player_notice(playerid, "+10 Armor", "");
 		            	SetPlayerArmour(playerid, ar + 10.0);
+		            	PlayerData[playerid][ACSettings] |= SUSPECT_VALID_ARMOR;
 					}
 					return 1;
 				}
@@ -9533,7 +9541,7 @@ YCMD:suspect(playerid, params[], help)
 				new Float:tmp;
 				GetPlayerArmour(i, tmp);
 
-				if(tmp >= 1.0) {
+				if(tmp >= 1.0 && !(PlayerData[i][ACSettings] & SUSPECT_VALID_ARMOR)) {
 	                format(tmpstring, sizeof(tmpstring), "- %s(%i) :: AC_SUSPECT_ARMOR\n", __GetName(i), i);
 	                strcat(finstring, tmpstring);
 	                ++count;
@@ -15398,6 +15406,7 @@ YCMD:armourall(playerid, params[], help)
 			{
 				PlayerPlaySound(i, 1057, 0.0, 0.0, 0.0);
 				SetPlayerArmour(i, 100.0);
+				PlayerData[i][ACSettings] |= SUSPECT_VALID_ARMOR;
 				
 				player_notice(i, "Armor for all!", "");
 			}
@@ -30386,6 +30395,7 @@ PreparePlayerVars(playerid)
 	PlayerData[playerid][tRobbery] = -1;
 	PlayerData[playerid][tLoadMap] = -1;
 	PlayerData[playerid][Boost] = BOOST:0;
+	PlayerData[playerid][ACSettings] = SUSPECT:0;
 	PlayerData[playerid][BoostDeplete] = 0;
 	PlayerData[playerid][e_color] = 0;
 	PlayerData[playerid][e_skinsave] = -1;
