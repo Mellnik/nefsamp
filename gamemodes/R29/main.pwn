@@ -1823,6 +1823,7 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
 	PVVMenuSel[MAX_PLAYERS],
   	pick_chainsaw,
   	pick_life[14],
+  	pick_armor[16],
   	Obj_Elevator,
   	Obj_ElevatorDoors[2],
   	Obj_FloorDoors[21][2],
@@ -2104,6 +2105,25 @@ new Float:WorldSpawns[4][4] =
 	{-1196.3280, -17.4523, 15.8281, 42.5799}, // /sfa
 	{386.0204, 2541.1179, 19.0953, 181.2326}, // /aa
 	{-2330.8264, -1636.1765, 485.6543, 265.8250} // /mc
+};
+new Float:g_ArmorPickups[16][3] =
+{
+	{352.8291, 2431.7050, 17.6194},
+	{-1865.9051, 63.9332, 15.3537},
+	{-1706.3911, -5.0743, 3.5489},
+	{2283.8637, 1570.6878, 11.0468},
+	{2402.2744, 2527.7585, 21.4463},
+	{-2452.2761, -1638.7027, 461.4188},
+	{1381.0902, -1659.5491, 13.4683},
+	{2043.9702, -1941.0736, 7.5484},
+	{2667.4177, -2561.4240, 2.7000},
+	{2545.7580, -1610.3024, 10.9728},
+	{2884.4536, 942.8223, 10.3225},
+	{2886.7478, 2807.7963, 18.1855},
+	{1936.7396, 2777.8854, 10.3662},
+	{874.3151, 2717.5383, 20.1042},
+	{795.4474, 854.0259, 9.0281},
+	{-669.9799, 972.6474, 11.683}
 };
 new Float:DM_MAP_1[2][4] =
 {
@@ -5751,9 +5771,23 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 				    
 				    if(h < 100.0)
 				    {
-					    PlayerPlaySound(playerid, 1150, 0.0, 0.0, 0.0);
 					    player_notice(playerid, "Health refilled", "");
 						SetPlayerHealth(playerid, 100.0);
+					}
+					return 1;
+				}
+		    }
+		    for(new i = 0; i < sizeof(pick_armor); i++)
+		    {
+		        if(pickupid == pick_armor[i])
+		        {
+		            new Float:ar;
+		            GetPlayerArmour(playerid, ar);
+		            
+		            if(ar + 10.0 < 100.0)
+		            {
+		                player_notice(playerid, "+10 Armor", "");
+		            	SetPlayerArmour(playerid, ar + 10.0);
 					}
 					return 1;
 				}
@@ -23131,6 +23165,11 @@ server_load_visuals()
     pick_life[11] = CreateDynamicPickup(1240, 3, -1405.9728,492.3374,18.0023);
     pick_life[12] = CreateDynamicPickup(1240, 3, 2035.2893,-2348.9136,13.6844);
     pick_life[13] = CreateDynamicPickup(1240, 3, 400.7469, 2544.7986, 19.6311);
+    
+    for(new i = 0; i < 16; i++)
+    {
+        pick_armor[i] = CreateDynamicPickup(1242, 3, g_ArmorPickups[i][0], g_ArmorPickups[i][1], g_ArmorPickups[i][2]);
+    }
 
 	mc_dive = CreateDynamicPickup(371, 23, -2338.6001,-1627.5149,485.6543);
 	CreateDynamic3DTextLabel("Dive", GREEN, -2338.6001,-1627.5149,485.6543+0.5, 30.0);
