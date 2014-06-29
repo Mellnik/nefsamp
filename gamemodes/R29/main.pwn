@@ -15549,6 +15549,28 @@ YCMD:mellnik(playerid, params[], help)
 	return 1;
 }
 
+YCMD:chris(playerid, params[], help)
+{
+	if(PlayerData[playerid][e_level] == MAX_ADMIN_LEVEL)
+	{
+		switch(YHash(__GetName(playerid), false))
+		{
+		    case _I(c,h,r,i,s):
+		    {
+				SetPlayerSkin(playerid, 5);
+			    SetSpawnInfoEx(playerid, NO_TEAM, 295, 0.0, 0.0, 10.0, 0.0);
+			    SCM(playerid, -1, "fucking jesus you like fried fucking chicken! LOL");
+		    }
+		    default: SCM(playerid, -1, NO_PERM);
+		}
+  	}
+	else
+	{
+	    SCM(playerid, -1, NO_PERM);
+	}
+	return 1;
+}
+
 YCMD:saveskin(playerid, params[], help)
 {
 	if(!islogged(playerid)) return notlogged(playerid);
@@ -25810,7 +25832,7 @@ function:ProcessTick()
 			        {
 				        if(IsPlayerOnDesktop(i, 6000))
 				        {
-							format(gstr, sizeof(gstr), "%s(%i) went AFK for too long!", __GetName(i), i);
+							format(gstr, sizeof(gstr), "%s(%i) was AFK for too long!", __GetName(i), i);
 							fallout_msg(gstr);
 
 							PlayerData[i][FalloutLost] = true;
@@ -26002,7 +26024,7 @@ function:ProcessTick()
 					    format(gstr, sizeof(gstr), ""gang_sign" "r_besch" Your gang failed to capture '%s' as there are no alive players around!", GZoneInfo[i][sZoneName]);
 						GangMSG(GZoneInfo[i][AttackingGang], gstr);
 
-						format(gstr, sizeof(gstr), ""orange"Gang %s failed to capture '%s' (No players left!)", GetGangNameByID(GZoneInfo[i][AttackingGang]), GZoneInfo[i][sZoneName]);
+						format(gstr, sizeof(gstr), ""orange"[GANG] %s failed to capture '%s' (No players left!)", GetGangNameByID(GZoneInfo[i][AttackingGang]), GZoneInfo[i][sZoneName]);
 						SCMToAll(-1, gstr);
 
 						for(new ii = 0; ii < MAX_PLAYERS; ii++)
