@@ -9045,7 +9045,7 @@ YCMD:adminhelp(playerid, params[], help)
 
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[2][e_rank]);
 		strcat(string, gstr);
-		strcat(string, "/online /offline /onduty /offduty /akill /rv /day /togglegc\n/burn /move /tban /ban /cuff /uncuff /jail /unjail /unfreeze\n\n");
+		strcat(string, "/online /offline /onduty /offduty /akill /rv /day /togglegc\n/burn /move /tban /ban /cuff /uncuff /jail /unjail /unfreeze /readrules\n\n");
 		
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[3][e_rank]);
 		strcat(string, gstr);
@@ -12531,6 +12531,44 @@ YCMD:rv(playerid, params[], help)
 		format(gstr, sizeof(gstr), ""yellow"** "red"Admin %s(%i) destroyed all unoccupied player vehicles [Reason: %s]", __GetName(playerid), playerid, reason);
 		SCMToAll(YELLOW, gstr);
 		print(gstr);
+	}
+	else
+	{
+		SCM(playerid, -1, NO_PERM);
+	}
+	return 1;
+}
+
+YCMD:readrules(playerid, params[], help)
+{
+	if(PlayerData[playerid][e_level] >= 2)
+	{
+	    new player;
+		if(sscanf(params, "r", player))
+		{
+		    return SCM(playerid, NEF_GREEN, "Usage: /readrules <playerid>");
+		}
+
+	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
+		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
+
+		if(IsPlayerAvail(player) && PlayerData[player][e_level] != MAX_ADMIN_LEVEL)
+		{
+		    if(!IsPlayerAvail(player) || PlayerData[player][e_level] >= PlayerData[playerid][e_level]) return SCM(playerid, -1, ""er"Player is not available or is an higher level admin than you");
+
+			Command_ReProcess(player, "/rules", false);
+			player_notice(player, "READ THE RULES!", "");
+			format(gstr, sizeof(gstr), ""yellow"** "red"Admin %s(%i) has forced you to read the rules. Take note.", __GetName(playerid), playerid);
+			SCM(player, -1, gstr);
+			print(gstr);
+
+			format(gstr, sizeof(gstr), ""red"Adm: %s(%i) has been forced to read the rules by admin %s(%i)", __GetName(player), player, __GetName(playerid), playerid);
+			AdminMSG(-1, gstr);
+		}
+		else
+		{
+			SCM(playerid, -1, ""er"Player is not connected or is the highest level admin");
+		}
 	}
 	else
 	{
