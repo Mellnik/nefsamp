@@ -15558,7 +15558,7 @@ YCMD:chris(playerid, params[], help)
 		    case _I(c,h,r,i,s):
 		    {
 				SetPlayerSkin(playerid, 5);
-			    SetSpawnInfoEx(playerid, NO_TEAM, 295, 0.0, 0.0, 10.0, 0.0);
+			    SetSpawnInfoEx(playerid, NO_TEAM, 5, 0.0, 0.0, 10.0, 0.0);
 			    SCM(playerid, -1, "fucking jesus you like fried fucking chicken! LOL");
 		    }
 		    default: SCM(playerid, -1, NO_PERM);
