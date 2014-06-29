@@ -9658,7 +9658,7 @@ YCMD:adminhelp(playerid, params[], help)
 
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[1][e_rank]);
 		strcat(string, gstr);
-		strcat(string, "/rplayers /dplayers /asay /warn /slap /reports /spec /specoff /disarm\n/pweaps /getin /gotoxyza /spectators /caps /day /night /dawn\n/kick /mute /unmute /adminhq /ncrecords\n\n");
+		strcat(string, "/readrules /rplayers /dplayers /asay /warn /slap /reports /spec /specoff /disarm\n/pweaps /getin /gotoxyza /spectators /caps /day /night /dawn\n/kick /mute /unmute /adminhq /ncrecords\n\n");
 
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[2][e_rank]);
 		strcat(string, gstr);
@@ -13140,6 +13140,44 @@ YCMD:rv(playerid, params[], help)
 		format(gstr, sizeof(gstr), ""yellow"** "red"Admin %s(%i) destroyed all unoccupied player vehicles [Reason: %s]", __GetName(playerid), playerid, reason);
 		SCMToAll(YELLOW, gstr);
 		print(gstr);
+	}
+	else
+	{
+		SCM(playerid, -1, NO_PERM);
+	}
+	return 1;
+}
+
+YCMD:readrules(playerid, params[], help)
+{
+	if(PlayerInfo[playerid][Level] >= 1)
+	{
+	    new player;
+		if(sscanf(params, "r", player))
+		{
+		    return SCM(playerid, NEF_GREEN, "Usage: /readrules <playerid>");
+		}
+		
+	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
+		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
+		
+		if(IsPlayerAvail(player) && PlayerInfo[player][Level] != MAX_ADMIN_LEVEL)
+		{
+		    if(!IsPlayerAvail(player) || PlayerInfo[player][Level] >= PlayerInfo[playerid][Level]) return SCM(playerid, -1, ""er"Player is not available or is an higher level admin than you");
+
+			Command_ReProcess(player, "/rules", false);
+			SendInfo(player, "~y~~h~YOU ARE FORCED TO READ RULES.", 2500);
+			format(gstr, sizeof(gstr), ""yellow"** "red"Admin %s(%i) has forced you to read the rules. Take note.", __GetName(playerid), playerid);
+			SCM(player, YELLOW, gstr);
+			print(gstr);
+			
+			format(gstr, sizeof(gstr), ""red"Adm: %s(%i) has been forced to read the rules by admin %s(%i)", __GetName(player), player, __GetName(playerid), playerid);
+			AdminMSG(-1, gstr);
+		}
+		else
+		{
+			SCM(playerid, -1, ""er"Player is not connected or is the highest level admin");
+		}
 	}
 	else
 	{
