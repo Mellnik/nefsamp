@@ -14,7 +14,7 @@
 || YSI Library 3.1
 || sscanf Plugin 2.8.1
 || Streamer Plugin v2.7.2
-|| MySQL Plugin R39-2
+|| MySQL Plugin R38
 || IRC Plugin 1.4.5
 || DNS Plugin 2.4
 ||
@@ -41,7 +41,7 @@
 #include <YSI\y_va>
 #include <sscanf2>
 #include <streamer>
-#include <a_mysql_R39-2>
+#include <a_mysql_R38>
 #include <irc>
 #include <dns>
 #include <a_zones>          // V2.0
@@ -424,8 +424,8 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define COOLDOWN_CMD_GKICK              (8000)
 #define COOLDOWN_CMD_GCREATE            (5000)
 #define COOLDOWN_DEATH                  (3000)
-#define COOLDOWN_CMD                  	(1000)
-#define COOLDOWN_CHAT                   (500)
+#define COOLDOWN_CMD                  	(1100)
+#define COOLDOWN_CHAT                   (1000)
 #define COOLDOWN_CMD_HAREFILL           (120000)
 #define COOLDOWN_CMD_VIPLI              (15000)
 #define COOLDOWN_CMD_CD                 (60000)
@@ -1748,6 +1748,7 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
   	PreviewTmpVeh[MAX_PLAYERS],
   	gTeam[MAX_PLAYERS],
   	g_CarShopDialogPickup,
+  	g_CarShopInteriorPickup,
   	pSQL,
   	mc_dive,
   	mc_tp,
@@ -3469,7 +3470,7 @@ public OnPlayerCommandReceived(playerid, cmdtext[])
 	    return 0;
 	}
 	
-	if(PlayerData[playerid][iCoolDownCommand] < COOLDOWN_CMD)
+	if((PlayerData[playerid][iCoolDownCommand] + COOLDOWN_CMD) >= GetTickCountEx())
 	{
 		player_notice(playerid, "1 command every second", "");
 	    return 0;
@@ -3514,6 +3515,8 @@ public OnPlayerCommandReceived(playerid, cmdtext[])
 	    return 0;
 	}
 	
+	PlayerData[playerid][iCoolDownCommand] = GetTickCountEx();
+	
 	CancelEdit(playerid);
 	// Closing open dialogs in order to avoid some exploits.
 	ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
@@ -3530,8 +3533,6 @@ public OnPlayerCommandPerformed(playerid, cmdtext[], success)
     format(gstr2, sizeof(gstr2), "[%02d:%02d:%02d] [%i]%s used %s with success: %i\r\n", time[0], time[1], time[2], playerid, __GetName(playerid), cmdtext, success);
     fwrite(lFile, gstr2);
     fclose(lFile);
-
-    PlayerData[playerid][iCoolDownCommand] = GetTickCountEx();
 
 	if(!success) {
 	    player_notice(playerid, "Unknown command", "Type ~y~/c ~w~for all commands");
@@ -4195,9 +4196,9 @@ public OnPlayerText(playerid, text[])
 	}
 	strmid(LastPlayerText[playerid], text, 0, 144, 144);
 
-	if(PlayerData[playerid][iCoolDownChat] < COOLDOWN_CHAT)
+	if((PlayerData[playerid][iCoolDownChat] + COOLDOWN_CHAT) >= GetTickCountEx())
 	{
-		player_notice(playerid, "2 messages every second", "");
+		player_notice(playerid, "1 message every second", "");
 	    return 0;
 	}
 
@@ -5821,18 +5822,21 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 		}
 		case BUYCAR:
 		{
-		    for(new i = 0; i < CAR_SHOPS; i++)
+		    if(pickupid == g_CarShopInteriorPickup)
 		    {
-		        if(gLastMap[playerid] == g_CarShops[i][e_pickup])
-		        {
-					SetPlayerInterior(playerid, 0);
-				    SetPlayerPos(playerid, g_CarShopLocations[i][0] - 2.0, g_CarShopLocations[i][1] - 2.0, g_CarShopLocations[i][2] + 0.5);
-				    RandomWeapons(playerid);
-					gTeam[playerid] = FREEROAM;
-					gLastMap[playerid] = 0;
-		            return 1;
-		        }
-		    }
+			    for(new i = 0; i < CAR_SHOPS; i++)
+			    {
+			        if(gLastMap[playerid] == g_CarShops[i][e_pickup])
+			        {
+						SetPlayerInterior(playerid, 0);
+					    SetPlayerPos(playerid, g_CarShopLocations[i][0] - 2.0, g_CarShopLocations[i][1] - 2.0, g_CarShopLocations[i][2] + 0.5);
+					    RandomWeapons(playerid);
+						gTeam[playerid] = FREEROAM;
+						gLastMap[playerid] = 0;
+			            return 1;
+			        }
+			    }
+			}
 		}
 	}
 	
@@ -20506,7 +20510,7 @@ function:OnGangZoneLoadEx(gindex)
         format(gstr2, sizeof(gstr2), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: ---\n"orange"Type /gwar to start an attack!", GZoneInfo[gindex][e_id], GZoneInfo[gindex][sZoneName]);
 
         GZoneInfo[gindex][label] = CreateDynamic3DTextLabel(gstr2, WHITE, GZoneInfo[gindex][E_x], GZoneInfo[gindex][E_y], GZoneInfo[gindex][E_z] + 0.3, 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 50.0);
-        GZoneInfo[gindex][iconid] = CreateDynamicMapIcon(GZoneInfo[gindex][E_x], GZoneInfo[gindex][E_y], GZoneInfo[gindex][E_z], 19, 1, 0, -1, -1, 300.0);
+        GZoneInfo[gindex][iconid] = CreateDynamicMapIcon(GZoneInfo[gindex][E_x], GZoneInfo[gindex][E_y], GZoneInfo[gindex][E_z], 19, 1, 0, -1, -1, 250.0);
         GZoneInfo[gindex][zoneid] = GangZoneCreate(GZoneInfo[gindex][E_x] - GZONE_SIZE, GZoneInfo[gindex][E_y] - GZONE_SIZE, GZoneInfo[gindex][E_x] + GZONE_SIZE, GZoneInfo[gindex][E_y] + GZONE_SIZE);
         GZoneInfo[gindex][checkid] = CreateDynamicCP(GZoneInfo[gindex][E_x], GZoneInfo[gindex][E_y], GZoneInfo[gindex][E_z], 7.0, 0, -1, -1, 60.0);
 		GZoneInfo[gindex][zsphere] = CreateDynamicSphere(GZoneInfo[gindex][E_x], GZoneInfo[gindex][E_y], GZoneInfo[gindex][E_z], GZONE_SIZE, 0, -1, -1);
@@ -20553,7 +20557,7 @@ function:OnGangZoneLoad()
 	        }
 	        
 	        GZoneInfo[gzoneid][label] = CreateDynamic3DTextLabel(gstr2, WHITE, GZoneInfo[gzoneid][E_x], GZoneInfo[gzoneid][E_y], GZoneInfo[gzoneid][E_z] + 0.3, 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 50.0);
-	        GZoneInfo[gzoneid][iconid] = CreateDynamicMapIcon(GZoneInfo[gzoneid][E_x], GZoneInfo[gzoneid][E_y], GZoneInfo[gzoneid][E_z], 19, 1, 0, -1, -1, 300.0);
+	        GZoneInfo[gzoneid][iconid] = CreateDynamicMapIcon(GZoneInfo[gzoneid][E_x], GZoneInfo[gzoneid][E_y], GZoneInfo[gzoneid][E_z], 19, 1, 0, -1, -1, 250.0);
 			GZoneInfo[gzoneid][zoneid] = GangZoneCreate(GZoneInfo[gzoneid][E_x] - GZONE_SIZE, GZoneInfo[gzoneid][E_y] - GZONE_SIZE, GZoneInfo[gzoneid][E_x] + GZONE_SIZE, GZoneInfo[gzoneid][E_y] + GZONE_SIZE);
             GZoneInfo[gzoneid][checkid] = CreateDynamicCP(GZoneInfo[gzoneid][E_x], GZoneInfo[gzoneid][E_y], GZoneInfo[gzoneid][E_z], 7.0, 0, -1, -1, 60.0);
             GZoneInfo[gzoneid][zsphere] = CreateDynamicSphere(GZoneInfo[gzoneid][E_x], GZoneInfo[gzoneid][E_y], GZoneInfo[gzoneid][E_z], GZONE_SIZE, 0, -1, -1);
@@ -23228,14 +23232,15 @@ server_load_visuals()
 
 	for(new i = 0; i < CAR_SHOPS; i++)
 	{
-		g_CarShops[i][e_pickup] = CreateDynamicPickup(1559, 23, g_CarShopLocations[i][0], g_CarShopLocations[i][1], g_CarShopLocations[i][2], 0, 0, -1, 200.0);
-		g_CarShops[i][e_mapicon] = CreateDynamicMapIcon(g_CarShopLocations[i][0], g_CarShopLocations[i][1], g_CarShopLocations[i][2], 55, 1, 0, 0, -1, 400.0);
+		g_CarShops[i][e_pickup] = CreateDynamicPickup(1559, 23, g_CarShopLocations[i][0], g_CarShopLocations[i][1], g_CarShopLocations[i][2], 0, -1, -1, 200.0);
+		g_CarShops[i][e_mapicon] = CreateDynamicMapIcon(g_CarShopLocations[i][0], g_CarShopLocations[i][1], g_CarShopLocations[i][2], 55, 1, 0, -1, -1, 200.0);
 		g_CarShops[i][e_3dlabel] = CreateDynamic3DTextLabel(""white"["nef_green"Custom car shop"white"]", 1, g_CarShopLocations[i][0], g_CarShopLocations[i][1], g_CarShopLocations[i][2] + 0.5, 300.0);
 	}
 
     g_AdminLCTo = CreateDynamicPickup(1559, 23, 1805.7494,-1302.6721,120.2656);
     g_AdminLCBack = CreateDynamicPickup(1559, 23, -794.806396,497.738037,1376.195312);
 	g_CarShopDialogPickup = CreateDynamicPickup(1559, 23, -1407.0137,1013.8229,1049.0288);
+    g_CarShopInteriorPickup = CreateDynamicPickup(1559, 23, -1405.4905,985.1736,1049.0078);
 	dm1pickup = CreateDynamicPickup(1247, 2, -3954.1172,980.9998,65.6059);
 	dm2pickup = CreateDynamicPickup(1247, 2, -3951.4558,982.3098,36.1859);
 	VIPLpickup = CreateDynamicPickup(1559, 2, -2624.3010,1411.4360,7.2303);
@@ -23316,25 +23321,25 @@ server_load_visuals()
 	CreateDynamicCP(-1839.5253, -3856.7036, 16.9936, 12.0, 0, -1, -1, 100.0); // skydive6 checkpoint
 
 	//Stores
-	CreateDynamicMapIcon(2539.3477,2081.2295,10.8203, 6, 0, CNR_WORLD, -1, -1); //Ammunation 1
-	CreateDynamicMapIcon(2159.0449,943.1320,10.8203, 6, 0, CNR_WORLD, -1, -1); //Ammunation 2
-	CreateDynamicMapIcon(2097.5847,2224.0974,11.0234, 49, 0, CNR_WORLD, -1, -1); //24/7 1
-	CreateDynamicMapIcon(2194.4106,1990.7670,12.2969, 49, 0, CNR_WORLD, -1, -1); //24/7 2
-	CreateDynamicMapIcon(2196.8345,1677.1240,12.3672, 25, 0, CNR_WORLD, -1, -1); //Caligulas
-	CreateDynamicMapIcon(2019.7651,1007.6656,10.8203, 25, 0, CNR_WORLD, -1, -1); //4D
-	CreateDynamicMapIcon(2167.2432,2114.3831,10.8203, 25, 0, CNR_WORLD, -1, -1); //Other Casino
-	CreateDynamicMapIcon(2271.0574,2293.2908,10.8203, 52, 0, CNR_WORLD, -1, -1); //Bank
-	CreateDynamicMapIcon(2355.3020,1544.3804,10.8203, 52, 0, CNR_WORLD, -1, -1); //Bank 2
-	CreateDynamicMapIcon(-1550.4073,1168.7106,7.1875, 52, 0, CNR_WORLD, -1, -1); //Bank
-	CreateDynamicMapIcon(-2455.3555,503.9716,30.0781, 52, 0, CNR_WORLD, -1, -1); //Bank
-	CreateDynamicMapIcon(1877.7257,-1737.5585,13.3501, 52, 0, CNR_WORLD, -1, -1); //Bank
-	CreateDynamicMapIcon(1550.1409,-1790.7477,15.2916, 52, 0, CNR_WORLD, -1, -1); //Bank
-	CreateDynamicMapIcon(1462.5692,-1010.9126,26.8438, 52, 0, CNR_WORLD, -1, -1); //Bank
-	CreateDynamicMapIcon(1498.3008,-1581.9375,13.5498, 52, 0, CNR_WORLD, -1, -1); //Bank
-	CreateDynamicMapIcon(368.8708,2580.0532,16.9099, 52, 0, CNR_WORLD, -1, -1); //Bank
-	CreateDynamicMapIcon(2225.7664,1838.6151,10.8203, 48, 0, CNR_WORLD, -1, -1); // RPC 1
-	CreateDynamicMapIcon(-26.1917,2531.7217,17.4203, 48, 0, CNR_WORLD, -1, -1); // RPC 2
-	CreateDynamicMapIcon(-2624.0850,1411.7439,7.0938, 48, 0, CNR_WORLD, -1, -1); // RPC 3
+	CreateDynamicMapIcon(2539.3477,2081.2295,10.8203, 6, 0, CNR_WORLD); //Ammunation 1
+	CreateDynamicMapIcon(2159.0449,943.1320,10.8203, 6, 0, CNR_WORLD); //Ammunation 2
+	CreateDynamicMapIcon(2097.5847,2224.0974,11.0234, 49, 0, CNR_WORLD); //24/7 1
+	CreateDynamicMapIcon(2194.4106,1990.7670,12.2969, 49, 0, CNR_WORLD); //24/7 2
+	CreateDynamicMapIcon(2196.8345,1677.1240,12.3672, 25, 0, CNR_WORLD); //Caligulas
+	CreateDynamicMapIcon(2019.7651,1007.6656,10.8203, 25, 0, CNR_WORLD); //4D
+	CreateDynamicMapIcon(2167.2432,2114.3831,10.8203, 25, 0, CNR_WORLD); //Other Casino
+	CreateDynamicMapIcon(2271.0574,2293.2908,10.8203, 52, 0, CNR_WORLD); //Bank
+	CreateDynamicMapIcon(2355.3020,1544.3804,10.8203, 52, 0, CNR_WORLD); //Bank 2
+	CreateDynamicMapIcon(-1550.4073,1168.7106,7.1875, 52, 0, CNR_WORLD); //Bank
+	CreateDynamicMapIcon(-2455.3555,503.9716,30.0781, 52, 0, CNR_WORLD); //Bank
+	CreateDynamicMapIcon(1877.7257,-1737.5585,13.3501, 52, 0, CNR_WORLD); //Bank
+	CreateDynamicMapIcon(1550.1409,-1790.7477,15.2916, 52, 0, CNR_WORLD); //Bank
+	CreateDynamicMapIcon(1462.5692,-1010.9126,26.8438, 52, 0, CNR_WORLD); //Bank
+	CreateDynamicMapIcon(1498.3008,-1581.9375,13.5498, 52, 0, CNR_WORLD); //Bank
+	CreateDynamicMapIcon(368.8708,2580.0532,16.9099, 52, 0, CNR_WORLD); //Bank
+	CreateDynamicMapIcon(2225.7664,1838.6151,10.8203, 48, 0, CNR_WORLD); // RPC 1
+	CreateDynamicMapIcon(-26.1917,2531.7217,17.4203, 48, 0, CNR_WORLD); // RPC 2
+	CreateDynamicMapIcon(-2624.0850,1411.7439,7.0938, 48, 0, CNR_WORLD); // RPC 3
 	// CNR END
     
 	// anti vehile drop
@@ -23386,9 +23391,9 @@ server_load_visuals()
 	// anti vehicle drop end
 
 	// hotspots
-	CreateDynamicMapIcon(-1196.1506, -17.3470, 15.8281, 23, 1, -1, -1, -1, 300.0); // SFA
-	CreateDynamicMapIcon(385.4325, 2541.2456, 14.5953, 23, 1, -1, -1, -1, 300.0); // AA
-	CreateDynamicMapIcon(341.5075, -1852.6332, 8.2612, 23, 1, -1, -1, -1, 300.0); // BEACH
+	CreateDynamicMapIcon(-1196.1506, -17.3470, 15.8281, 23, 1, -1, -1, -1, 250.0); // SFA
+	CreateDynamicMapIcon(385.4325, 2541.2456, 14.5953, 23, 1, -1, -1, -1, 250.0); // AA
+	CreateDynamicMapIcon(341.5075, -1852.6332, 8.2612, 23, 1, -1, -1, -1, 250.0); // BEACH
 	// hotspots end
 
 	// login obj (beach ?)
