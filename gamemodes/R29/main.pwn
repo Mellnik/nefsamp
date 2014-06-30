@@ -140,6 +140,7 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define SCM SendClientMessage
 #define SCMToAll SendClientMessageToAll
 #define MAX_TELE_CATEGORYS              (10)
+#define CAR_SHOPS                       (3)
 #define RGBA(%1,%2,%3,%4) (((((%1) & 0xff) << 24) | (((%2) & 0xff) << 16) | (((%3) & 0xff) << 8) | ((%4) & 0xff)))
 #define UpperToLower(%1) for(new ToLowerChar; ToLowerChar < strlen(%1); ToLowerChar++) if(%1[ToLowerChar] > 64 && %1[ToLowerChar] < 91) %1[ToLowerChar] += 32
 
@@ -928,7 +929,14 @@ enum E_PV_DATA
 };
 
 // Server related
-enum e_gzone_data
+enum E_CAR_SHOP
+{
+    e_pickup,
+    e_mapicon,
+    Text3D:e_3dlabel
+};
+
+enum E_GZONE_DATA
 {
 	iID,
 	sZoneName[41],
@@ -1673,6 +1681,7 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
 	g_RaceVehicle[MAX_PLAYERS],
 	g_RacePosition[MAX_PLAYERS],
 	m_PlayerRecord,
+	g_CarShops[CAR_SHOPS][E_CAR_SHOP],
 	gstr[144],
 	gstr2[255],
 	lotto_number,
@@ -1681,7 +1690,6 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
 	Teleports[MAX_TELE_CATEGORYS][50][26],
 	Teleport_Index[MAX_TELE_CATEGORYS],
 	TeleportDialogString[MAX_TELE_CATEGORYS][2048],
-	wangotto[4],
 	SrvStat[4],
 	sPVCategory[512],
 	mathsAnswered = -1,
@@ -1739,9 +1747,7 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
   	VIPLpickup2,
   	PreviewTmpVeh[MAX_PLAYERS],
   	gTeam[MAX_PLAYERS],
-  	vehiclebuy,
- 	aussenrein,
- 	innenraus,
+  	g_CarShopDialogPickup,
   	pSQL,
   	mc_dive,
   	mc_tp,
@@ -1814,15 +1820,15 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
   	PizzaMIcon[MAX_PIZZASTACKS],
   	TFSMIcon[MAX_TFS],
   	bool:ReactionOn,
-  	AdminLC,
-  	AdminLC2,
+  	g_AdminLCTo,
+  	g_AdminLCBack,
   	gLastMap[MAX_PLAYERS],
   	PlayerData[MAX_PLAYERS][E_PLAYER_DATA],
   	PlayerAchData[MAX_PLAYERS][E_PLAYER_ACH_DATA][2],
   	PlayerToyData[MAX_PLAYERS][MAX_PLAYER_ATTACHED_OBJECTS][E_TOY_DATA],
   	PlayerPVData[MAX_PLAYERS][MAX_PLAYER_PVS][E_PV_DATA],
   	HouseInfo[MAX_HOUSES][e_house_data],
-  	GZoneInfo[MAX_GZONES][e_gzone_data],
+  	GZoneInfo[MAX_GZONES][E_GZONE_DATA],
   	BusinessData[MAX_BUSINESSES][E_BUSINESS_DATA],
   	PVSelect[MAX_PLAYERS],
 	PVCatSel[MAX_PLAYERS],
@@ -2130,6 +2136,12 @@ new Float:g_ArmorPickups[16][3] =
 	{874.3151, 2717.5383, 20.1042},
 	{795.4474, 854.0259, 9.0281},
 	{-669.9799, 972.6474, 11.683}
+};
+new Float:g_CarShopLocations[CAR_SHOPS][4] =
+{
+	{2131.2915, -1144.3942, 24.7986, 291.9600},
+	{-1639.0990, 1202.4598, 7.2247, 68.4220},
+	{2106.9548, 1403.5167, 11.1395, 89.2744}
 };
 new Float:DM_MAP_1[2][4] =
 {
@@ -5690,139 +5702,157 @@ public OnPlayerEnterRaceCheckpoint(playerid)
 
 public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 {
-	if(gTeam[playerid] == FREEROAM)
+	switch(gTeam[playerid])
 	{
-	    if(pickupid == mc_tp || pickupid == beach_tp)
+	    case FREEROAM:
 	    {
-	        Command_ReProcess(playerid, "/tele", false);
-	        return 1;
-	    }
-	    if(pickupid == mc_dive || pickupid == beach_dive)
-	    {
-	        Command_ReProcess(playerid, "/dive", false);
-	        PlayerPlaySound(playerid, 1039, 0.0, 0.0, 0.0);
-	        return 1;
-	    }
-	    if(pickupid == mc_weps || pickupid == beach_weps)
-	    {
-            if(PlayerData[playerid][bGod]) ResetPlayerWeapons(playerid);
-            
-	        Command_ReProcess(playerid, "/w", false);
-	        return 1;
-	    }
-	    if(pickupid == beach_m)
-	    {
-	        Command_ReProcess(playerid, "/m", false);
-	        return 1;
-	    }
-	    
-  		if(pickupid == VIPLpickup)
-  		{
-  		    if(PlayerData[playerid][e_vip] == 1 || PlayerData[playerid][e_level] > 0)
-  		    {
-  		        LoadMap(playerid);
-	    		SetPlayerPosition(playerid, -3939.1855, 1308.7438, 3.4587, 86.1611, 3);
-	  		    gTeam[playerid] = VIPL;
-	  		    PlayerPlaySound(playerid, 1068, 0, 0, 0);
-	  		    ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
-			}
-			else
-			{
-			    SCM(playerid, -1, ""er"You need to be VIP or have an invite. See /vip");
-			}
-			return 1;
-  		}
-  		
-  		if(pickupid == wangotto[1] || pickupid == wangotto[2] || pickupid == wangotto[3])
-  		{
-  		    Command_ReProcess(playerid, "/vs", false);
-  		    return 1;
-  		}
-  		
-	    if(!PlayerData[playerid][bGod])
-		{
-		    for(new i = 0; i < sizeof(pick_life); i++)
+		    if(pickupid == mc_tp || pickupid == beach_tp)
 		    {
-				if(pickupid == pick_life[i])
+		        Command_ReProcess(playerid, "/tele", false);
+		        return 1;
+		    }
+
+		    if(pickupid == mc_dive || pickupid == beach_dive)
+		    {
+		        Command_ReProcess(playerid, "/dive", false);
+		        PlayerPlaySound(playerid, 1039, 0.0, 0.0, 0.0);
+		        return 1;
+		    }
+
+		    if(pickupid == mc_weps || pickupid == beach_weps)
+		    {
+	            if(PlayerData[playerid][bGod]) ResetPlayerWeapons(playerid);
+
+		        Command_ReProcess(playerid, "/w", false);
+		        return 1;
+		    }
+
+		    if(pickupid == beach_m)
+		    {
+		        Command_ReProcess(playerid, "/m", false);
+		        return 1;
+		    }
+
+	  		if(pickupid == VIPLpickup)
+	  		{
+	  		    if(PlayerData[playerid][e_vip] == 1 || PlayerData[playerid][e_level] > 0)
+	  		    {
+	  		        LoadMap(playerid);
+		    		SetPlayerPosition(playerid, -3939.1855, 1308.7438, 3.4587, 86.1611, 3);
+		  		    gTeam[playerid] = VIPL;
+		  		    PlayerPlaySound(playerid, 1068, 0, 0, 0);
+		  		    ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
+				}
+				else
 				{
-				    new Float:h;
-				    GetPlayerHealth(playerid, h);
-				    
-				    if(h < 100.0)
-				    {
-					    player_notice(playerid, "Health refilled", "");
-						SetPlayerHealth(playerid, 100.0);
-					}
-					return 1;
+				    SCM(playerid, -1, ""er"You need to be VIP or have an invite. See /vip");
 				}
-		    }
-		    for(new i = 0; i < sizeof(pick_armor); i++)
-		    {
-		        if(pickupid == pick_armor[i])
-		        {
-		            new Float:ar;
-		            GetPlayerArmour(playerid, ar);
-		            
-		            if(ar + 10.0 < 100.0)
-		            {
-		                player_notice(playerid, "+10 Armor", "");
-		            	SetPlayerArmour(playerid, ar + 10.0);
-		            	PlayerData[playerid][ACSettings] |= SUSPECT_VALID_ARMOR;
-					}
-					return 1;
-				}
-		    }
-			if(pickupid == pick_chainsaw)
-			{
-			    PlayerPlaySound(playerid, 1150, 0.0, 0.0, 0.0);
-				GivePlayerWeapon(playerid, 9, 1);
 				return 1;
 	  		}
+
+		    if(!PlayerData[playerid][bGod])
+			{
+			    for(new i = 0; i < sizeof(pick_life); i++)
+			    {
+					if(pickupid == pick_life[i])
+					{
+					    new Float:h;
+					    GetPlayerHealth(playerid, h);
+
+					    if(h < 100.0)
+					    {
+						    player_notice(playerid, "Health refilled", "");
+							SetPlayerHealth(playerid, 100.0);
+						}
+						return 1;
+					}
+			    }
+
+			    for(new i = 0; i < sizeof(pick_armor); i++)
+			    {
+			        if(pickupid == pick_armor[i])
+			        {
+			            new Float:ar;
+			            GetPlayerArmour(playerid, ar);
+
+			            if(ar + 10.0 < 100.0)
+			            {
+			                player_notice(playerid, "+10 Armor", "");
+			            	SetPlayerArmour(playerid, ar + 10.0);
+			            	PlayerData[playerid][ACSettings] |= SUSPECT_VALID_ARMOR;
+						}
+						return 1;
+					}
+			    }
+
+				if(pickupid == pick_chainsaw)
+				{
+				    PlayerPlaySound(playerid, 1150, 0.0, 0.0, 0.0);
+					GivePlayerWeapon(playerid, 9, 1);
+					return 1;
+		  		}
+			}
+
+			for(new i = 0; i < CAR_SHOPS; i++)
+			{
+			    if(pickupid == g_CarShops[i][e_pickup])
+			    {
+			        LoadMap(playerid);
+			        SetPlayerInterior(playerid, 15);
+			        SetPlayerPosEx(playerid, -1405.5538, 989.1526, floatadd(1049.0078, 3.0));
+			        ResetPlayerWeapons(playerid);
+			        gTeam[playerid] = BUYCAR;
+			        gLastMap[playerid] = g_CarShops[i][e_pickup];
+			        return 1;
+			    }
+			}
 		}
-	}
-	else if(gTeam[playerid] == VIPL)
-	{
-		if(pickupid == VIPLpickup2)
+		case VIPL:
 		{
-		    ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
-		    SetPlayerPosition(playerid, -2622.6589,1406.2648,7.1016,178.5571);
-		    ResetPlayerWorld(playerid);
-		    PlayerPlaySound(playerid, 1069, 0, 0, 0);
-		    gTeam[playerid] = FREEROAM;
-		    return 1;
+			if(pickupid == VIPLpickup2)
+			{
+			    ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
+			    SetPlayerPosition(playerid, -2622.6589,1406.2648,7.1016,178.5571);
+			    ResetPlayerWorld(playerid);
+			    PlayerPlaySound(playerid, 1069, 0, 0, 0);
+			    gTeam[playerid] = FREEROAM;
+			    return 1;
+			}
+		}
+		case BUYCAR:
+		{
+		    for(new i = 0; i < CAR_SHOPS; i++)
+		    {
+		        if(gLastMap[playerid] == g_CarShops[i][e_pickup])
+		        {
+					SetPlayerInterior(playerid, 0);
+				    SetPlayerPos(playerid, g_CarShopLocations[i][0] - 2.0, g_CarShopLocations[i][1] - 2.0, g_CarShopLocations[i][2] + 0.5);
+				    RandomWeapons(playerid);
+					gTeam[playerid] = FREEROAM;
+					gLastMap[playerid] = 0;
+		            return 1;
+		        }
+		    }
 		}
 	}
 	
-	if(pickupid == AdminLC2)
+	if(pickupid == g_AdminLCBack)
 	{
-		SetPlayerPos(playerid, 1803.2450,-1303.0396,120.2659);
+		SetPlayerPos(playerid, 1803.2450, -1303.0396, 120.2659);
 		SetPlayerInterior(playerid, 0);
+		return 1;
 	}
-	else if(pickupid == AdminLC)
+	
+	if(pickupid == g_AdminLCTo)
 	{
-	    SetPlayerPos(playerid,-791.0734,497.6924,1376.1953);
+	    SetPlayerPos(playerid, -791.0734, 497.6924, 1376.1953);
 	    SetPlayerInterior(playerid, 1);
+	    return 1;
 	}
-	else if(pickupid == aussenrein)
-	{
-	    LoadMap(playerid);
-	    SetPlayerInterior(playerid, 15);
-	    SetPlayerPosEx(playerid, -1405.5538, 989.1526, floatadd(1049.0078, 3.0));
-		ResetPlayerWeapons(playerid);
-		gTeam[playerid] = BUYCAR;
-	}
-	else if(pickupid == innenraus)
-	{
-	    LoadMap(playerid);
-		SetPlayerInterior(playerid, 0);
-	    SetPlayerPosEx(playerid, -1980.9745, 257.5091, 36.1352 + 1.0);
-	    RandomWeapons(playerid);
-		gTeam[playerid] = FREEROAM;
-	}
-	else if(pickupid == vehiclebuy)
+	
+	if(pickupid == g_CarShopDialogPickup)
 	{
 	    if(!islogged(playerid)) return notlogged(playerid);
-		ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
 		SetPlayerVirtualWorld(playerid, playerid + 101);
 		SetPlayerCameraPos(playerid,-1407.6005,1021.9415,1051.4486);
 		SetPlayerCameraLookAt(playerid, -1407.9410,1022.4058,1051.1681);
@@ -5830,23 +5860,29 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 		TogglePlayerControllable(playerid, false);
 		ShowDialog(playerid, CARBUY_DIALOG);
 	}
-	else if(pickupid == dm1pickup)
+
+	if(pickupid == dm1pickup)
 	{
+		new veh = GetPlayerVehicleID(playerid),
+			Float:angle;
+			
 	    ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
-		new currentveh, Float:angle;
-	  	currentveh = GetPlayerVehicleID(playerid);
-	  	SetVehiclePos(currentveh, -3945.3562,963.2668,36.3281);
-		GetVehicleZAngle(currentveh, angle);
-		SetVehicleZAngle(currentveh, angle);
+	  	SetVehiclePos(veh, -3945.3562,963.2668,36.3281);
+		GetVehicleZAngle(veh, angle);
+		SetVehicleZAngle(veh, angle);
+		return 1;
 	}
-	else if(pickupid == dm2pickup)
+	
+	if(pickupid == dm2pickup)
 	{
+		new veh = GetPlayerVehicleID(playerid),
+			Float:angle;
+			
 	    ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
-		new currentveh, Float:angle;
-	  	currentveh = GetPlayerVehicleID(playerid);
-	  	SetVehiclePos(currentveh, -3951.6909,968.0073,65.6281);
-		GetVehicleZAngle(currentveh, angle);
-		SetVehicleZAngle(currentveh, angle);
+	  	SetVehiclePos(veh, -3951.6909,968.0073,65.6281);
+		GetVehicleZAngle(veh, angle);
+		SetVehicleZAngle(veh, angle);
+		return 1;
 	}
 
  	if(!IsPlayerInAnyVehicle(playerid) && GetPlayerState(playerid) != PLAYER_STATE_SPECTATING)
@@ -7027,7 +7063,9 @@ YCMD:bayside(playerid, params[], help)
 }
 YCMD:vs(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid, -1980.9745, 257.5091, 36.1352, 90.0, -1980.9745, 257.5091, 36.1352, 90.0, "Custom car shop", "vs");
+	new rand = random(CAR_SHOPS);
+
+    PortPlayerMap(playerid, g_CarShopLocations[rand][0] - 2.0, g_CarShopLocations[rand][1] - 2.0, g_CarShopLocations[rand][2] + 0.5, g_CarShopLocations[rand][3], "Car Shop", "vs");
     return 1;
 }
 YCMD:gc(playerid, params[], help)
@@ -23188,6 +23226,21 @@ server_load_visuals()
         pick_armor[i] = CreateDynamicPickup(1242, 3, g_ArmorPickups[i][0], g_ArmorPickups[i][1], g_ArmorPickups[i][2]);
     }
 
+	for(new i = 0; i < CAR_SHOPS; i++)
+	{
+		g_CarShops[i][e_pickup] = CreateDynamicPickup(1559, 23, g_CarShopLocations[i][0], g_CarShopLocations[i][1], g_CarShopLocations[i][2], 0, 0, -1, 200.0);
+		g_CarShops[i][e_mapicon] = CreateDynamicMapIcon(g_CarShopLocations[i][0], g_CarShopLocations[i][1], g_CarShopLocations[i][2], 55, 1, 0, 0, -1, 400.0);
+		g_CarShops[i][e_3dlabel] = CreateDynamic3DTextLabel(""white"["nef_green"Custom car shop"white"]", 1, g_CarShopLocations[i][0], g_CarShopLocations[i][1], g_CarShopLocations[i][2] + 0.5, 300.0);
+	}
+
+    g_AdminLCTo = CreateDynamicPickup(1559, 23, 1805.7494,-1302.6721,120.2656);
+    g_AdminLCBack = CreateDynamicPickup(1559, 23, -794.806396,497.738037,1376.195312);
+	g_CarShopDialogPickup = CreateDynamicPickup(1559, 23, -1407.0137,1013.8229,1049.0288);
+	dm1pickup = CreateDynamicPickup(1247, 2, -3954.1172,980.9998,65.6059);
+	dm2pickup = CreateDynamicPickup(1247, 2, -3951.4558,982.3098,36.1859);
+	VIPLpickup = CreateDynamicPickup(1559, 2, -2624.3010,1411.4360,7.2303);
+	VIPLpickup2 = CreateDynamicPickup(1559, 23, -3936.6282,1305.2244,2.4587);
+
 	mc_dive = CreateDynamicPickup(371, 23, -2338.6001,-1627.5149,485.6543);
 	CreateDynamic3DTextLabel("Dive", GREEN, -2338.6001,-1627.5149,485.6543+0.5, 30.0);
 	mc_tp = CreateDynamicPickup(19130, 2, -2330.7739,-1644.0229,485.6543);
@@ -23204,20 +23257,6 @@ server_load_visuals()
 	CreateDynamic3DTextLabel("Weapons "green"(/w)", RED, 327.7540,-1843.1305,8.2481+0.5, 30.0);
 	beach_m = CreateDynamicPickup(1254, 2, 346.7035,-1867.6292,8.2481);
 	CreateDynamic3DTextLabel("Minigames "green"(/m)", RED, 346.7035,-1867.6292,8.2481+0.5, 30.0);
-
-    AdminLC = CreateDynamicPickup(1559, 23, 1805.7494,-1302.6721,120.2656);
-    AdminLC2 = CreateDynamicPickup(1559, 23, -794.806396,497.738037,1376.195312);
-   	//aussenrein = CreateDynamicPickup(1559, 23, 1795.2469,-1406.5632,13.6531);
-	innenraus = CreateDynamicPickup(1559, 23, -1405.4905,985.1736,1049.0078);
-	vehiclebuy = CreateDynamicPickup(1559, 23, -1407.0137,1013.8229,1049.0288);
-	dm1pickup = CreateDynamicPickup(1247, 2, -3954.1172,980.9998,65.6059);
-	dm2pickup = CreateDynamicPickup(1247, 2, -3951.4558,982.3098,36.1859);
-	VIPLpickup = CreateDynamicPickup(1559, 2, -2624.3010,1411.4360,7.2303);
-	VIPLpickup2 = CreateDynamicPickup(1559, 23, -3936.6282,1305.2244,2.4587);
-	aussenrein = CreateDynamicPickup(1276, 23, -1973.9249,293.3758,35.1719);
-	wangotto[1] = CreateDynamicPickup(1276, 23, -1640.6263,1203.1343,7.2387);
-	wangotto[2] = CreateDynamicPickup(1276, 23, 2131.7874,-1148.4611,24.3741);
-	wangotto[3] = CreateDynamicPickup(1276, 23, 2200.7473,1391.4735,10.8203);
 
 	// old map icons
 	CreateDynamicMapIcon(822.6, -1590.3, 13.5, 7, 1, -1, -1, -1);
@@ -23345,10 +23384,6 @@ server_load_visuals()
 	CreateDynamicObject(8558, 1544.65198, -1843.98779, 17.14610,   1.80000, -88.90002, -89.69999);
 	CreateDynamicObject(8558, 1541.62708, -1843.84485, 17.14610,   1.80000, -88.90002, -89.69999);
 	// anti vehicle drop end
-
-	// car shop
-	CreateDynamicMapIcon(-1973.9249,293.3758,35.1719, 55, 1, -1, -1, -1, 400.0);
-	// car shop end
 
 	// hotspots
 	CreateDynamicMapIcon(-1196.1506, -17.3470, 15.8281, 23, 1, -1, -1, -1, 300.0); // SFA
@@ -23507,8 +23542,8 @@ server_load_visuals()
 	AddTeleport(5, "Racemap 2", "racemap2", 2741.1375,1969.4594,5269.7466);
 	AddTeleport(5, "Concert", "concert", 1477.8225,-1714.1190,14.1400);
 
-    CreateDynamic3DTextLabel(""white"["nef_green"Custom car shop"white"]", -1, -1973.9249,293.3758,35.1719+0.5, 400.0);
     CreateDynamic3DTextLabel(""white"["nef_green"Gold Credits"white"]", -1, 1902.1838,-1404.4944,16.3474+0.5, 400.0);
+    
     CreateDynamic3DTextLabel(""red">>> SLOW DOWN <<<", RED, 477.7281,1399.4580,735.2565+0.5, 60.0);
     CreateDynamic3DTextLabel(""white"["lila"Mellnik's Office"white"]", -1, 1794.8202,-1311.3057,120.6237+0.5, 35.0);
     CreateDynamic3DTextLabel(""white"["yellow"Admin Liberty City"white"]", -1, 1805.7494,-1302.6721,120.2656+0.5, 35.0);
