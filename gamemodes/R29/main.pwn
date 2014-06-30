@@ -6916,6 +6916,11 @@ YCMD:rc(playerid, params[], help)
     PortPlayerMapVeh(playerid, 35.7414,-899.6901,1761.7263,178.9152,35.7414,-899.6901,1761.7263,178.9152, "Roller Coaster", "rc");
     return 1;
 }
+YCMD:rc2(playerid, params[], help)
+{
+    PortPlayerMapVeh(playerid, 2047.4742,-478.6809,1520.4766,90,2047.4742,-478.6809,1520.4766,90, "Roller Coaster 2", "rc2");
+    return 1;
+}
 YCMD:a51(playerid, params[], help)
 {
     PortPlayerMapVeh(playerid, 307.2482,2050.7505,17.6406,180.8353,307.2482,2050.7505,17.6406,180.8353, "Area 51", "a51");
@@ -7074,7 +7079,7 @@ YCMD:vs(playerid, params[], help)
 }
 YCMD:gc(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid, 1858.1874,-1466.7080,13.3981,322.7839,1858.1874,-1466.7080,13.3981,322.7839, "Gold Credits", "gc");
+    PortPlayerMap(playerid, 654.5861, -1867.3845, 5.5861, 90.0, "Gold Credits", "gc");
     return 1;
 }
 YCMD:ms(playerid, params[], help)
@@ -23315,7 +23320,7 @@ server_load_visuals()
 	CreateDynamicCP(2234.1003,1714.3649,1012.3828, 2.0, CNR_WORLD, -1, -1, 75.0); // Caligulas Exit
 	CreateDynamicCP(1391.6522,2693.8896,10.8203, 1.5, CNR_WORLD, -1, -1, 75.0); // Robbers Gate
 	CreateDynamicCP(1400.9669,2685.9114,10.8203, 1.5, CNR_WORLD, -1, -1, 75.0); // Robbers Gate
-	CreateDynamicCP(1902.1838,-1404.4944,14.3474, 3.0, 0, -1, -1, 100.0); // Gold Credits
+	CreateDynamicCP(666.4440, -1866.7815, 4.9608, 3.0, 0, -1, -1, 100.0); // Gold Credits
 	CreateDynamicCP(3360.8054,-1934.1283,43.3184, 3.5, 0, -1, -1, 50.0); // bmx bike spawn
 	CreateDynamicCP(249.9905, 3772.1204, 18.3780, 12.0, 0, -1, -1, 100.0); // skydive5 checkpoint
 	CreateDynamicCP(-1839.5253, -3856.7036, 16.9936, 12.0, 0, -1, -1, 100.0); // skydive6 checkpoint
@@ -23509,6 +23514,7 @@ server_load_visuals()
 	AddTeleport(6, "Snow Market", "snow", -719.7679,1723.9852,7.0400);
 	AddTeleport(0, "Sherman Dam", "sd", -793.2972,2230.8733,45.0103);
 	AddTeleport(0, "Roller Coaster", "rc", 35.7414,-899.6901,1761.7263);
+	AddTeleport(0, "Roller Coaster 2", "rc2", 2047.4742,-478.6809,1520.4766);
 	AddTeleport(0, "Quarry", "quarry",  833.0357,851.8098,12.0047);
 	AddTeleport(8, "Area 51", "a51", 307.2482,2050.7505,17.6406);
 	AddTeleport(3, "Base Jump", "bj", 294.3475,-1610.8379,494.6685);
@@ -23547,8 +23553,7 @@ server_load_visuals()
 	AddTeleport(5, "Racemap 2", "racemap2", 2741.1375,1969.4594,5269.7466);
 	AddTeleport(5, "Concert", "concert", 1477.8225,-1714.1190,14.1400);
 
-    CreateDynamic3DTextLabel(""white"["nef_green"Gold Credits"white"]", -1, 1902.1838,-1404.4944,16.3474+0.5, 400.0);
-    
+    CreateDynamic3DTextLabel(""white"["nef_green"Gold Credits"white"]", -1, 666.4440, -1866.7815, 4.9608+0.5, 300.0);
     CreateDynamic3DTextLabel(""red">>> SLOW DOWN <<<", RED, 477.7281,1399.4580,735.2565+0.5, 60.0);
     CreateDynamic3DTextLabel(""white"["lila"Mellnik's Office"white"]", -1, 1794.8202,-1311.3057,120.6237+0.5, 35.0);
     CreateDynamic3DTextLabel(""white"["yellow"Admin Liberty City"white"]", -1, 1805.7494,-1302.6721,120.2656+0.5, 35.0);
