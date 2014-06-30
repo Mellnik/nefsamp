@@ -728,7 +728,7 @@ enum E_PLAYER_DATA
 	bool:bGod,
 	bool:bGWarMode,
 	bool:bLoadMap,
-	bool:KBMarked,
+	bool:bOpenSeason,
 	bool:bLogged,
 	bool:bSpeedo,
 	bool:bDerbyAFK,
@@ -766,7 +766,7 @@ enum E_PLAYER_DATA
 	Vehicle,
 	Text3D:AdminDutyLabel,
 	Text3D:VIPLabel,
-	ChatWrote,
+	iLastChat,
 	tMute,
  	TmpGangID,
 	Text3D:GangLabel,
@@ -3443,7 +3443,7 @@ public OnPlayerDisconnect(playerid, reason)
 
 public OnPlayerCommandReceived(playerid, cmdtext[])
 {
-	if(PlayerData[playerid][KBMarked]) return 0;
+	if(PlayerData[playerid][bOpenSeason]) return 0;
 	
 	if(PlayerData[playerid][bIsDead])
 	{
@@ -3519,7 +3519,7 @@ public OnPlayerCommandPerformed(playerid, cmdtext[], success)
     fwrite(lFile, gstr2);
     fclose(lFile);
 
-    PlayerData[playerid][iCoolDownCommand] = GetTickCount_();
+    PlayerData[playerid][iCoolDownCommand] = GetTickCountEx();
 
 	if(!success) {
 	    player_notice(playerid, "Unknown command", "Type ~y~/c ~w~for all commands");
@@ -3595,7 +3595,7 @@ public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY
 	/* PLAYER QUEUED FOR KICK */
 	if(hittype == BULLET_HIT_TYPE_PLAYER) {
 	    if(hitid != INVALID_PLAYER_ID) {
-		    if(PlayerData[playerid][KBMarked] || PlayerData[hitid][KBMarked]) {
+		    if(PlayerData[playerid][bOpenSeason] || PlayerData[hitid][bOpenSeason]) {
 		        return 0;
 		    }
 		}
@@ -3642,7 +3642,7 @@ public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY
 	if(hittype == BULLET_HIT_TYPE_PLAYER) {
 	    if(hitid != INVALID_PLAYER_ID) {
 	        if(gTeam[hitid] == FREEROAM) {
-	        	PlayerData[hitid][tickLastShot] = GetTickCount_();
+	        	PlayerData[hitid][tickLastShot] = GetTickCountEx();
 			}
 		}
 	}
@@ -4069,7 +4069,7 @@ public OnRconLoginAttempt(ip[], password[], success)
 
 public OnPlayerUpdate(playerid)
 {
-    PlayerData[playerid][tickPlayerUpdate] = GetTickCount_();
+    PlayerData[playerid][tickPlayerUpdate] = GetTickCountEx();
 
 	switch(gTeam[playerid])
 	{
@@ -4130,7 +4130,7 @@ public OnPlayerUpdate(playerid)
 public OnUnoccupiedVehicleUpdate(vehicleid, playerid, passenger_seat, Float:new_x, Float:new_y, Float:new_z)
 {
 	if(playerid != INVALID_PLAYER_ID) {
-	    if(PlayerData[playerid][KBMarked]) {
+	    if(PlayerData[playerid][bOpenSeason]) {
 	        return 0;
 	    }
 	}
@@ -4158,7 +4158,7 @@ public OnPlayerExitVehicle(playerid, vehicleid)
 
 public OnPlayerText(playerid, text[])
 {
-    if(PlayerData[playerid][KBMarked]) return 0;
+    if(PlayerData[playerid][bOpenSeason]) return 0;
     
 	PlayerData[playerid][iCoolDownText]++;
 	SetTimerEx("CoolDownText", COOLDOWN_TEXT, false, "i", playerid);
@@ -4229,7 +4229,7 @@ public OnPlayerText(playerid, text[])
 		{
             ReactionOn = false;
 
-		    new rtime = GetTickCount_() - tickReactionStart,
+		    new rtime = GetTickCountEx() - tickReactionStart,
 		        second = rtime / 1000;
 
 			rtime = rtime - second * 1000;
@@ -4284,21 +4284,21 @@ public OnPlayerText(playerid, text[])
 		return 0;
 	}
 
-    new tick = GetTickCount_();
+    new tick = GetTickCountEx();
 
-	if((PlayerData[playerid][ChatWrote] >= 2) && ((PlayerData[playerid][tickLastChat] + COOLDOWN_CHAT) >= tick))
+	if((PlayerData[playerid][iLastChat] >= 2) && ((PlayerData[playerid][tickLastChat] + COOLDOWN_CHAT) >= tick))
 	{
 		SCM(playerid, -1, ""er"Wait a bit before chatting again");
 	    return 0;
 	}
-	else if((PlayerData[playerid][ChatWrote] >= 2) && ((PlayerData[playerid][tickLastChat] + COOLDOWN_CHAT) <= tick))
+	else if((PlayerData[playerid][iLastChat] >= 2) && ((PlayerData[playerid][tickLastChat] + COOLDOWN_CHAT) <= tick))
 	{
-        PlayerData[playerid][ChatWrote] = 0;
+        PlayerData[playerid][iLastChat] = 0;
         PlayerData[playerid][tickLastChat] = tick;
 	}
 	else
 	{
-	    PlayerData[playerid][ChatWrote]++;
+	    PlayerData[playerid][iLastChat]++;
 	}
 
 	if(text[0] == '!' && PlayerData[playerid][e_gangrank] != 0)
@@ -5150,7 +5150,7 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 	  		{
 	  		    if(GetVehicleModel(GetPlayerVehicleID(playerid)) != 522) return 1;
 
-     			new tick = GetTickCount_();
+     			new tick = GetTickCountEx();
 				if((PlayerData[playerid][tickLastBIKEC] + COOLDOWN_BIKEC) >= tick)
 				{
 				    return GameTextForPlayer(playerid, "~r~~h~Please wait before doing this stunt again", 6000, 5);
@@ -5280,7 +5280,7 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 	 	}
  		case 6: //bmx Prize
 		{
-			if(GetPVarInt(playerid, "doingStunt") == 3 && GetPlayerState(playerid) == PLAYER_STATE_DRIVER && ((PlayerData[playerid][tickJoin_bmx] + 60000) < GetTickCount_()))
+			if(GetPVarInt(playerid, "doingStunt") == 3 && GetPlayerState(playerid) == PLAYER_STATE_DRIVER && ((PlayerData[playerid][tickJoin_bmx] + 60000) < GetTickCountEx()))
 	  		{
 	  		    if(GetVehicleModel(GetPlayerVehicleID(playerid)) != 481) return 1;
 
@@ -5594,7 +5594,7 @@ public OnPlayerEnterRaceCheckpoint(playerid)
 				rTime[3],
 				Prize[2];
 
-			TimeStamp = GetTickCount_();
+			TimeStamp = GetTickCountEx();
 			TotalRaceTime = TimeStamp - g_RaceTick;
 			ConvertTime(var, TotalRaceTime, rTime[0], rTime[1], rTime[2]);
 
@@ -6250,13 +6250,13 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 	
 	if(newstate == PLAYER_STATE_DRIVER)
 	{
-	    PlayerData[playerid][tickVehicleEnterTime] = GetTickCount_();
+	    PlayerData[playerid][tickVehicleEnterTime] = GetTickCountEx();
 	}
 	else if(oldstate == PLAYER_STATE_DRIVER)
 	{
-	    if((GetTickCount_() - PlayerData[playerid][tickVehicleEnterTime]) < COOLDOWN_VEHICLE)
+	    if((GetTickCountEx() - PlayerData[playerid][tickVehicleEnterTime]) < COOLDOWN_VEHICLE)
 	    {
-			if((++PlayerData[playerid][VehicleSpamViolation]) >= 3 && !PlayerData[playerid][KBMarked])
+			if((++PlayerData[playerid][VehicleSpamViolation]) >= 3 && !PlayerData[playerid][bOpenSeason])
 			{
 		        format(gstr, sizeof(gstr), "[SUSPECT] %i vehicle spam hack detected, kicking (%s, %i)", PlayerData[playerid][VehicleSpamViolation], __GetName(playerid), playerid);
 		        AdminMSG(RED, gstr);
@@ -7012,7 +7012,7 @@ YCMD:bmx(playerid, params[], help)
         
 		DestroyPlayerVehicles(playerid);
 		
-		PlayerData[playerid][tickJoin_bmx] = GetTickCount_();
+		PlayerData[playerid][tickJoin_bmx] = GetTickCountEx();
 		
 		SetPVarInt(playerid, "doingStunt", 3);
     }
@@ -8259,7 +8259,7 @@ YCMD:bbuy(playerid, params[], help)
 	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
     if(!islogged(playerid)) return notlogged(playerid);
 
-	new tick = GetTickCount_();
+	new tick = GetTickCountEx();
 	if(PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 	{
 		if((PlayerData[playerid][tickLastPBuy] + COOLDOWN_CMD_PBUY) >= tick)
@@ -8325,7 +8325,7 @@ YCMD:bsell(playerid, params[], help)
 	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
     if(!islogged(playerid)) return notlogged(playerid);
 
-	new tick = GetTickCount_();
+	new tick = GetTickCountEx();
 	if(PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 	{
 		if((PlayerData[playerid][tickLastPSell] + COOLDOWN_CMD_PSELL) >= tick)
@@ -8381,7 +8381,7 @@ YCMD:buy(playerid, params[], help)
 	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
     if(!islogged(playerid)) return notlogged(playerid);
     
-	new tick = GetTickCount_();
+	new tick = GetTickCountEx();
 	if(PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 	{
 		if((PlayerData[playerid][tickLastBuy] + COOLDOWN_CMD_BUY) >= tick)
@@ -8453,7 +8453,7 @@ YCMD:sell(playerid, params[], help)
 	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
     if(!islogged(playerid)) return notlogged(playerid);
     
-	new tick = GetTickCount_();
+	new tick = GetTickCountEx();
 	if(PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 	{
 		if((PlayerData[playerid][tickLastSell] + COOLDOWN_CMD_SELL) >= tick)
@@ -8615,7 +8615,7 @@ YCMD:lock(playerid, params[], help)
 
 	if(gTeam[playerid] == FREEROAM || gTeam[playerid] == HOUSE)
 	{
-		new tick = GetTickCount_();
+		new tick = GetTickCountEx();
 
 		if((PlayerData[playerid][tickLastLocked] + COOLDOWN_CMD_LOCK) >= tick)
 		{
@@ -9265,7 +9265,7 @@ YCMD:hitman(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
     
-	new tick = GetTickCount_();
+	new tick = GetTickCountEx();
 	if(PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 	{
 		if((PlayerData[playerid][tickLastHitman] + COOLDOWN_CMD_HITMAN) >= tick) return player_notice(playerid, "Command is on cooldown!", "");
@@ -10595,7 +10595,7 @@ YCMD:warn(playerid, params[], help)
 		
 	 	if(IsPlayerAvail(player) && player != playerid)
 	 	{
-	 	    if(PlayerData[player][KBMarked]) return SCM(playerid, -1, ""er"Can't warn this player!");
+	 	    if(PlayerData[player][bOpenSeason]) return SCM(playerid, -1, ""er"Can't warn this player!");
 	 	    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 	 	
 			PlayerData[player][Warnings]++;
@@ -10829,7 +10829,7 @@ YCMD:kick(playerid, params[], help)
 	{
 	    if(PlayerData[playerid][e_level] <= 2)
 	    {
-		    new tick = GetTickCount_();
+		    new tick = GetTickCountEx();
 
 			if((PlayerData[playerid][iKickBanIssued] >= 3) && ((PlayerData[playerid][tickLastBan] + COOLDOWN_CMD_BAN) >= tick))
 			{
@@ -10858,7 +10858,7 @@ YCMD:kick(playerid, params[], help)
 		
 		if(isnull(reason)) return SCM(playerid, NEF_GREEN, "Usage: /kick <playerid> <reason>");
 		
-		if(PlayerData[player][KBMarked]) return SCM(playerid, -1, ""er"Can't kick this player!");
+		if(PlayerData[player][bOpenSeason]) return SCM(playerid, -1, ""er"Can't kick this player!");
 		if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 		
 		if(IsPlayerAvail(player) && player != playerid && PlayerData[player][e_level] != MAX_ADMIN_LEVEL)
@@ -11164,7 +11164,7 @@ YCMD:gcreate(playerid, params[], help)
     
 	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 
-	new tick = GetTickCount_();
+	new tick = GetTickCountEx();
 	if((PlayerData[playerid][tickLastGCreate] + COOLDOWN_CMD_GCREATE) >= tick)
 	{
   		return player_notice(playerid, "Command is on cooldown!", "");
@@ -11539,7 +11539,7 @@ YCMD:ginvite(playerid, params[], help)
     
     if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 
-	new tick = GetTickCount_();
+	new tick = GetTickCountEx();
 	if(PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 	{
 		if((PlayerData[playerid][tickLastGInvite] + COOLDOWN_CMD_GINVITE) >= tick) return SCM(playerid, -1, ""er"Please wait a bit before inviting again!");
@@ -11703,7 +11703,7 @@ YCMD:gkick(playerid, params[], help)
 
     if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 
-	new tick = GetTickCount_();
+	new tick = GetTickCountEx();
 	if((PlayerData[playerid][tickLastGKick] + COOLDOWN_CMD_GKICK) >= tick) return SCM(playerid, -1, ""er"Please wait a bit before kicking again!");
 
     if(PlayerData[playerid][e_gangid] == 0) return SCM(playerid, -1, ""er"You aren't in any gang");
@@ -11897,7 +11897,7 @@ YCMD:tban(playerid, params[], help)
 	{
 	    if(PlayerData[playerid][e_level] <= 2)
 	    {
-		    new tick = GetTickCount_();
+		    new tick = GetTickCountEx();
 
 			if((PlayerData[playerid][iKickBanIssued] >= 3) && ((PlayerData[playerid][tickLastBan] + COOLDOWN_CMD_BAN) >= tick))
 			{
@@ -11926,7 +11926,7 @@ YCMD:tban(playerid, params[], help)
 
 		if(strlen(reason) > 50 || isnull(reason) || strlen(reason) < 2) return SCM(playerid, -1, ""er"Ban reason length: 2-50");
 	    if(player == playerid) return SCM(playerid, -1, ""er"You can not ban yourself");
-        if(PlayerData[player][KBMarked]) return SCM(playerid, -1, ""er"This player is flagged for disconnect");
+        if(PlayerData[player][bOpenSeason]) return SCM(playerid, -1, ""er"This player is flagged for disconnect");
         if(time < 5 || time > 10080) return SCM(playerid, -1, ""er"5-10080 minutes");
         if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 
@@ -11989,7 +11989,7 @@ YCMD:ban(playerid, params[], help)
 	{
 	    if(PlayerData[playerid][e_level] <= 2)
 	    {
-		    new tick = GetTickCount_();
+		    new tick = GetTickCountEx();
 
 			if((PlayerData[playerid][iKickBanIssued] >= 3) && ((PlayerData[playerid][tickLastBan] + COOLDOWN_CMD_BAN) >= tick))
 			{
@@ -12018,7 +12018,7 @@ YCMD:ban(playerid, params[], help)
 	    
 		if(strlen(reason) > 50 || isnull(reason) || strlen(reason) < 2) return SCM(playerid, -1, ""er"Ban reason length: 2-50");
 	    if(player == playerid) return SCM(playerid, -1, ""er"You can not ban yourself");
-        if(PlayerData[player][KBMarked]) return SCM(playerid, -1, ""er"This player is flagged for disconnect");
+        if(PlayerData[player][bOpenSeason]) return SCM(playerid, -1, ""er"This player is flagged for disconnect");
         if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
         
 		if(badsql(reason, false) != 0)
@@ -12886,7 +12886,7 @@ YCMD:vipli(playerid, params[], help)
 {
 	if(PlayerData[playerid][e_vip] == 1)
 	{
-		new tick = GetTickCount_();
+		new tick = GetTickCountEx();
 	 	if(PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 		{
 			if((PlayerData[playerid][tickLastVIPLInv] + COOLDOWN_CMD_VIPLI) >= tick)
@@ -13026,7 +13026,7 @@ YCMD:god(playerid, params[], help)
 	    {
 	        if(!silent)
 	        {
-				if(((PlayerData[playerid][tickLastShot] + 5000) > GetTickCount_()))
+				if(((PlayerData[playerid][tickLastShot] + 5000) > GetTickCountEx()))
 				{
 				    return player_notice(playerid, "You were shot", "in the last 5 seconds");
 				}
@@ -13279,7 +13279,7 @@ YCMD:cd(playerid, params[], help)
 {
     if(PlayerData[playerid][e_vip] == 0) return Command_ReProcess(playerid, "/vip", false);
     
-   	new tick = GetTickCount_();
+   	new tick = GetTickCountEx();
 	if((PlayerData[playerid][tickLastCD] + COOLDOWN_CMD_CD) >= tick)
 	{
 	    return SCM(playerid, -1, ""nef" Please wait before sending a message again");
@@ -13436,7 +13436,7 @@ YCMD:setadminlevel(playerid, params[], help)
 
 YCMD:report(playerid, params[], help)
 {
-	new tick = GetTickCount_();
+	new tick = GetTickCountEx();
 	if((PlayerData[playerid][tickLastReport] + COOLDOWN_CMD_REPORT) >= tick)
 	{
     	return player_notice(playerid, "Command is on cooldown!", "");
@@ -15180,7 +15180,7 @@ YCMD:changepass(playerid, params[], help)
 {
 	if(!islogged(playerid)) return notlogged(playerid);
 	
-    new tick = GetTickCount_();
+    new tick = GetTickCountEx();
 	if((PlayerData[playerid][tickLastPW] + COOLDOWN_CMD_CHANGEPASS) >= tick)
 	{
     	return player_notice(playerid, "Command is on cooldown!", "");
@@ -15213,7 +15213,7 @@ YCMD:serverstats(playerid, params[], help)
 
 YCMD:mk(playerid, params[], help)
 {
-	new tick = GetTickCount_();
+	new tick = GetTickCountEx();
 	if((PlayerData[playerid][tickLastMedkit] + COOLDOWN_CMD_MEDKIT) >= tick)
 	{
     	return player_notice(playerid, "Command is on cooldown!", "");
@@ -16034,7 +16034,7 @@ YCMD:tpm(playerid, params[], help)
 
 YCMD:givecash(playerid, params[], help)
 {
-	new tick = GetTickCount_();
+	new tick = GetTickCountEx();
 	if(PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 	{
 		if((PlayerData[playerid][tickLastGiveCash] + COOLDOWN_CMD_GIVECASH) >= tick)
@@ -16109,7 +16109,7 @@ YCMD:pm(playerid, params[], help)
     if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 	if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 	
-	new tick = GetTickCount_();
+	new tick = GetTickCountEx();
 	if((PlayerData[playerid][tickLastPM] + COOLDOWN_CMD_PM) >= tick)
 	{
 	    return SCM(playerid, -1, ""nef" Please wait before sending a message again");
@@ -16618,7 +16618,7 @@ YCMD:rob(playerid, params[], help)
 {
 	if(gTeam[playerid] == CNR)
 	{
-		new tick = GetTickCount_();
+		new tick = GetTickCountEx();
 		if(PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 		{
 			if((PlayerData[playerid][tickLastRob] + COOLDOWN_CMD_ROB) >= tick)
@@ -16718,7 +16718,7 @@ YCMD:rob(playerid, params[], help)
 
 YCMD:ar(playerid, params[], help)
 {
-	new tick = GetTickCount_();
+	new tick = GetTickCountEx();
 	if(PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 	{
 		if((PlayerData[playerid][tickLastAr] + COOLDOWN_CMD_AR) >= tick)
@@ -18358,7 +18358,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					player_notice(playerid, "Armor refilled", "");
 	    			GivePlayerCash(playerid, -2500);
 	            }
-				PlayerData[playerid][tickLastRefill] = GetTickCount_();
+				PlayerData[playerid][tickLastRefill] = GetTickCountEx();
 	            return 1;
 	        }
 	        case GANG_SET_RANK_DIALOG:
@@ -20669,7 +20669,7 @@ function:LoadGZones()
 
 IsPlayerOnDesktop(playerid, afktimems = 5000)
 {
-	if((PlayerData[playerid][tickPlayerUpdate] + afktimems) < GetTickCount_()) return 1;
+	if((PlayerData[playerid][tickPlayerUpdate] + afktimems) < GetTickCountEx()) return 1;
 	return 0;
 }
 
@@ -21868,7 +21868,7 @@ MySQL_Connect()
 LoadStores()
 {
 	new file[50],
-		count = GetTickCount_();
+		count = GetTickCountEx();
 
 	for(new b = 0; b < MAX_BANKS; b++)
 	{
@@ -21944,7 +21944,7 @@ LoadStores()
 		}
 	}
 
- 	Log(LOG_INIT, "Stores loaded in %i ms", GetTickCount_() - count);
+ 	Log(LOG_INIT, "Stores loaded in %i ms", GetTickCountEx() - count);
  	return 1;
 }
 
@@ -22394,7 +22394,7 @@ RandomWeapons(playerid)
 
 server_load_textdraws()
 {
-    new count = GetTickCount_();
+    new count = GetTickCountEx();
 	
 	#if WINTER_EDITION == true
 	TXTWinterEdition = TextDrawCreate(545.000000, 405.000000, "Winter Edition");
@@ -22797,7 +22797,7 @@ server_load_textdraws()
 	TextDrawBoxColor(TXTLoading, 170);
 	TextDrawTextSize(TXTLoading, -9.000000, -152.000000);
 	
-	Log(LOG_INIT, "TextDraws loaded in %i ms", GetTickCount_() - count);
+	Log(LOG_INIT, "TextDraws loaded in %i ms", GetTickCountEx() - count);
 	return 1;
 }
 
@@ -22832,7 +22832,7 @@ function:xReactionTest()
 	}
 	format(gstr, sizeof(gstr), "["vlila"REACTION"white"]: The first who types '"vlila"%s"white"' wins $%s + %i score", xChars, number_format(xCash), xScore);
 	SCMToAll(WHITE, gstr);
-	tickReactionStart = GetTickCount_();
+	tickReactionStart = GetTickCountEx();
 	KillTimer(tReactionTimer);
 	xTestBusy = true;
 	SetTimer("xReactionProgress", 70000, false);
@@ -22876,7 +22876,7 @@ function:_server_shutdown()
 
 server_initialize()
 {
-	new count = GetTickCount_();
+	new count = GetTickCountEx();
 	
 	// SA_MP Server config
 	format(gstr, sizeof(gstr), "hostname %s", HOSTNAME);
@@ -23170,7 +23170,7 @@ server_initialize()
 	AddPlayerClass(285, 1958.3783, 1343.1572, 15.3746, 270.1425, 0, 0, 0, 0, 0, 0);
 	AddPlayerClass(283, 1958.3783, 1343.1572, 15.3746, 270.1425, 0, 0, 0, 0, 0, 0);
 
-	Log(LOG_INIT, "Server Modules loaded in %i ms", GetTickCount_() - count);
+	Log(LOG_INIT, "Server Modules loaded in %i ms", GetTickCountEx() - count);
 	return 1;
 }
 
@@ -23179,7 +23179,7 @@ server_load_visuals()
 	// 3374 heuballen
 	// 2898 grünes rasen ding
 	
-    new count = GetTickCount_();
+    new count = GetTickCountEx();
     
 	bb_mcc = CreateDynamicObject(8323, -2322.76880, -1704.56067, 499.98999,   0.00000, 0.00000, 69.30000);
 	SetDynamicObjectMaterialText(bb_mcc, 0, "Welcome to New Evolution Freeroam!\nServer Realtime: \n"green"Players online: ", OBJECT_MATERIAL_SIZE_256x128, "Calibri", 0, 0, -32256, -16777216, OBJECT_MATERIAL_TEXT_ALIGN_LEFT);
@@ -24134,7 +24134,7 @@ server_load_visuals()
 	CreateDynamicObject(19056, 1066.84094, -1760.02844, 12.77734,   0.00000, 0.00000, 0.00000);
 	#endif
 
-	Log(LOG_INIT, "Static Meshes loaded in %i ms", GetTickCount_() - count);
+	Log(LOG_INIT, "Static Meshes loaded in %i ms", GetTickCountEx() - count);
 	return 1;
 }
 
@@ -27752,7 +27752,7 @@ function:ShowDialog(playerid, dialogid)
 		}
 		case HAREFILL_DIALOG:
 		{
-		 	new tick = GetTickCount_();
+		 	new tick = GetTickCountEx();
 			if((PlayerData[playerid][tickLastRefill] + COOLDOWN_CMD_HAREFILL) >= tick)
 			{
 			    return player_notice(playerid, "Command is on cooldown!", "");
@@ -28067,7 +28067,7 @@ player_notice(playerid, const top[], const desc[], time = 3000, type = 3)
 
 KickEx(playerid, delay = 3200)
 {
-	PlayerData[playerid][KBMarked] = true;
+	PlayerData[playerid][bOpenSeason] = true;
 	SetTimerEx("Kick_Delay", delay, false, "ii", playerid, YHash(__GetName(playerid)));
 	
 	Log(LOG_PLAYER, "%s (%i, %s, %s, %i) KickEx initiated.", __GetName(playerid), playerid, __GetIP(playerid), __GetSerial(playerid), delay);
@@ -29977,7 +29977,7 @@ function:CountTillRace()
 StartRace()
 {
     g_RaceStatus = RaceStatus_Active;
-    g_RaceTick = GetTickCount_();
+    g_RaceTick = GetTickCountEx();
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -30384,7 +30384,7 @@ PreparePlayerVars(playerid)
 	PlayerData[playerid][bGod] = false;
 	PlayerData[playerid][bGWarMode] = false;
 	PlayerData[playerid][bLoadMap] = false;
-	PlayerData[playerid][KBMarked] = false;
+	PlayerData[playerid][bOpenSeason] = false;
 	PlayerData[playerid][bLogged] = false;
 	PlayerData[playerid][bSpeedo] = false;
 	PlayerData[playerid][bDerbyAFK] = false;
@@ -30479,7 +30479,7 @@ PreparePlayerVars(playerid)
 	PlayerData[playerid][Vehicle] = -1;
 	PlayerData[playerid][AdminDutyLabel] = Text3D:-1;
 	PlayerData[playerid][VIPLabel] = Text3D:-1;
-	PlayerData[playerid][ChatWrote] = 0;
+	PlayerData[playerid][iLastChat] = 0;
 	PlayerData[playerid][tMute] = -1;
  	PlayerData[playerid][e_gangrank] = GANG_POS_NONE;
  	PlayerData[playerid][TmpGangID] = 0;
@@ -30544,7 +30544,7 @@ GunGamePlayers()
 	return count;
 }
 
-GetTickCount_()
+GetTickCountEx()
 {
 	return (GetTickCount() + 3600000);
 }
