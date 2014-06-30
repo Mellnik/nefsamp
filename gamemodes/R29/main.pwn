@@ -3928,7 +3928,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 			PlayerData[extraid][e_gangrank] = GANG_POS_FOUNDER;
 			PlayerData[extraid][e_gangid] = cache_insert_id();
 
-            GivePlayerCash(extraid, -500000);
+            GivePlayerMoneyEx(extraid, -500000);
 
 			MySQL_SaveAccount(extraid, false, false);
 
@@ -4233,7 +4233,7 @@ public OnPlayerText(playerid, text[])
 			format(gstr, sizeof(gstr), "Won the Reaction Test in %2i.%03i seconds!", second, rtime);
 			SetPlayerChatBubble(playerid, gstr, NEF_YELLOW, 40.0, 5000);
 
-			GivePlayerCash(playerid, xCash, true, true);
+			GivePlayerMoneyEx(playerid, xCash, true, true);
 
 		    PlayerData[playerid][e_reaction]++;
 		    
@@ -4242,7 +4242,7 @@ public OnPlayerText(playerid, text[])
 		        GivePlayerAchievement(playerid, e_ach_toofast, "Too Fast", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
 			}
 		    
-			GivePlayerScore_(playerid, xScore, true, true);
+			GivePlayerScoreEx(playerid, xScore, true, true);
 			tReactionTimer = SetTimer("xReactionTest", REAC_TIME, true);
 		    xTestBusy = false;
 		    return 0;
@@ -4416,7 +4416,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 		{
 			format(gstr, sizeof(gstr), "%s(%i) killed %s(%i) and received $%s for a completed hit!", __GetName(killerid), killerid, __GetName(playerid), playerid, number_format(PlayerData[playerid][HitmanHit]));
 			SCMToAll(YELLOW, gstr);
-			GivePlayerCash(killerid, PlayerData[playerid][HitmanHit]);
+			GivePlayerMoneyEx(killerid, PlayerData[playerid][HitmanHit]);
 			PlayerData[playerid][HitmanHit] = 0;
 		}
 	}
@@ -4425,7 +4425,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 	{
 	    SrvStat[3]++;
 		PlayerData[killerid][e_kills]++;
- 		GivePlayerCash(playerid, -250);
+ 		GivePlayerMoneyEx(playerid, -250);
 
  		player_notice(playerid, "Killed By", __GetName(killerid));
 		player_notice(killerid, "You Killed", __GetName(playerid));
@@ -4578,48 +4578,48 @@ public OnPlayerDeath(playerid, killerid, reason)
 				        player_notice(killerid, "Triple Kill", "+$2,000");
         				format(gstr, sizeof(gstr), "* {%06x}%s(%i) "red"is on a kill streak with 3 kills!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
 						SCMToAll(COLOR_RED, gstr);
-						GivePlayerScore_(killerid, 1, true, true);
-						GivePlayerCash(killerid, 2000, true, true);
+						GivePlayerScoreEx(killerid, 1, true, true);
+						GivePlayerMoneyEx(killerid, 2000, true, true);
 				    }
 				    case 5:
 					{
 					    player_notice(killerid, "Multi Kill", "+$4,000");
         				format(gstr, sizeof(gstr), "* {%06x}%s(%i) "red"is on a kill streak with 5 kills!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
 						SCMToAll(COLOR_RED, gstr);
-						GivePlayerScore_(killerid, 2, true, true);
-						GivePlayerCash(killerid, 4000, true, true);
+						GivePlayerScoreEx(killerid, 2, true, true);
+						GivePlayerMoneyEx(killerid, 4000, true, true);
 					}
 					case 10:
   					{
 					    player_notice(killerid, "Ultra Kill", "+$7,000");
      					format(gstr, sizeof(gstr), "* {%06x}%s(%i) "red"is unstoppable with a 10 streak kill!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
 						SCMToAll(COLOR_RED, gstr);
-						GivePlayerScore_(killerid, 3, true, true);
-						GivePlayerCash(killerid, 7000, true, true);
+						GivePlayerScoreEx(killerid, 3, true, true);
+						GivePlayerMoneyEx(killerid, 7000, true, true);
 					}
 					case 15:
   					{
 					    player_notice(killerid, "~r~~h~~h~Monster Kill", "+$10,000");
    						format(gstr, sizeof(gstr), "* {%06x}%s(%i) "red"can't be stopped with a 15 streak kill!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
 						SCMToAll(COLOR_RED, gstr);
-						GivePlayerScore_(killerid, 4, true, true);
-						GivePlayerCash(killerid, 10000, true, true);
+						GivePlayerScoreEx(killerid, 4, true, true);
+						GivePlayerMoneyEx(killerid, 10000, true, true);
 					}
 					case 25:
   					{
   					    player_notice(killerid, "~r~~h~~h~Incredible Kill", "+$15,000");
           				format(gstr, sizeof(gstr), "* {%06x}%s(%i) "red"can't be stopped with a 25 streak kill!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
 						SCMToAll(COLOR_RED, gstr);
-						GivePlayerScore_(killerid, 5, true, true);
-						GivePlayerCash(killerid, 15000, true, true);
+						GivePlayerScoreEx(killerid, 5, true, true);
+						GivePlayerMoneyEx(killerid, 15000, true, true);
 					}
 					case 30:
   					{
   					    player_notice(killerid, "~r~~h~~h~Fantastic Kill", "+$20,000");
           				format(gstr, sizeof(gstr), "* {%06x}%s(%i) "red"can't be stopped with a 30 streak kill!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
 						SCMToAll(COLOR_RED, gstr);
-						GivePlayerScore_(killerid, 6, true, true);
-						GivePlayerCash(killerid, 20000, true, true);
+						GivePlayerScoreEx(killerid, 6, true, true);
+						GivePlayerMoneyEx(killerid, 20000, true, true);
 						
 						if(PlayerAchData[killerid][e_ach_masskiller][0] == 0)
 						{
@@ -4631,16 +4631,16 @@ public OnPlayerDeath(playerid, killerid, reason)
   					    player_notice(killerid, "~r~~h~~h~Mega Kill", "+$25,000");
           				format(gstr, sizeof(gstr), "* {%06x}%s(%i) "red"is godlike with a 40 streak kill!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
 						SCMToAll(COLOR_RED, gstr);
-						GivePlayerScore_(killerid, 7, true, true);
-						GivePlayerCash(killerid, 25000, true, true);
+						GivePlayerScoreEx(killerid, 7, true, true);
+						GivePlayerMoneyEx(killerid, 25000, true, true);
 					}
 					case 50:
   					{
         				player_notice(killerid, "~r~Unbelievable!!!", "+$30,000");
                  		format(gstr, sizeof(gstr), "* {%06x}%s(%i) "red"shitting on everyone with a 50 streak kill!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
 						SCMToAll(COLOR_RED, gstr);
-						GivePlayerScore_(killerid, 8, true, true);
-						GivePlayerCash(killerid, 30000, true, true);
+						GivePlayerScoreEx(killerid, 8, true, true);
+						GivePlayerMoneyEx(killerid, 30000, true, true);
 					}
 				}
 
@@ -4649,13 +4649,13 @@ public OnPlayerDeath(playerid, killerid, reason)
 					new money = floatround((1400 * PlayerData[playerid][e_wanteds]) / 2.6),
 						score = floatround((2 * PlayerData[playerid][e_wanteds]) / 2.5);
 
-					GivePlayerScore_(killerid, score, true, true);
-					GivePlayerCash(killerid, money, true, true);
+					GivePlayerScoreEx(killerid, score, true, true);
+					GivePlayerMoneyEx(killerid, money, true, true);
 				}
 				else
 				{
-					GivePlayerScore_(killerid, 1, true, true);
-					GivePlayerCash(killerid, 1100, true, true);
+					GivePlayerScoreEx(killerid, 1, true, true);
+					GivePlayerMoneyEx(killerid, 1100, true, true);
 				}
 
 				if(PlayerData[playerid][e_wanteds] >= 3)
@@ -4785,16 +4785,16 @@ public OnPlayerDeath(playerid, killerid, reason)
 		{
 		    if(IsPlayerAvail(killerid))
 		    {
-				GivePlayerScore_(killerid, 1, true, true);
-				GivePlayerCash(killerid, 2000, true, true);
+				GivePlayerScoreEx(killerid, 1, true, true);
+				GivePlayerMoneyEx(killerid, 2000, true, true);
 		    }
 		}
 		case SNIPER:
 		{
 		    if(IsPlayerAvail(killerid))
 		    {
-				GivePlayerScore_(killerid, 2, true, true);
-				GivePlayerCash(killerid, 3000, true, true);
+				GivePlayerScoreEx(killerid, 2, true, true);
+				GivePlayerMoneyEx(killerid, 3000, true, true);
 		    }
 		    
 		    /*new rand = random(14);
@@ -4804,8 +4804,8 @@ public OnPlayerDeath(playerid, killerid, reason)
 		{
 		    if(IsPlayerAvail(killerid))
 		    {
-				GivePlayerScore_(killerid, 1, true, true);
-				GivePlayerCash(killerid, 2000, true, true);
+				GivePlayerScoreEx(killerid, 1, true, true);
+				GivePlayerMoneyEx(killerid, 2000, true, true);
 		    }
 		}
 		case gBG_TEAM1:
@@ -4813,8 +4813,8 @@ public OnPlayerDeath(playerid, killerid, reason)
   		    if(IsPlayerAvail(killerid))
 		    {
 		        BGTeam2Kills++;
-		        GivePlayerScore_(killerid, 1, true, true);
-				GivePlayerCash(killerid, 2500, true, true);
+		        GivePlayerScoreEx(killerid, 1, true, true);
+				GivePlayerMoneyEx(killerid, 2500, true, true);
 		    }
 		}
 		case gBG_TEAM2:
@@ -4822,16 +4822,16 @@ public OnPlayerDeath(playerid, killerid, reason)
   		    if(IsPlayerAvail(killerid))
 		    {
 		        BGTeam1Kills++;
-		        GivePlayerScore_(killerid, 1, true, true);
-				GivePlayerCash(killerid, 2500, true, true);
+		        GivePlayerScoreEx(killerid, 1, true, true);
+				GivePlayerMoneyEx(killerid, 2500, true, true);
 		    }
 		}
 		case DM, WAR:
 		{
   		    if(IsPlayerAvail(killerid))
 		    {
-		        GivePlayerScore_(killerid, 1, true, true);
-				GivePlayerCash(killerid, 2500, true, true);
+		        GivePlayerScoreEx(killerid, 1, true, true);
+				GivePlayerMoneyEx(killerid, 2500, true, true);
 				
 				new Float:health;
 				GetPlayerHealth(killerid, health);
@@ -4848,8 +4848,8 @@ public OnPlayerDeath(playerid, killerid, reason)
 		{
   		    if(IsPlayerAvail(killerid))
 		    {
-		        GivePlayerScore_(killerid, 2, true, true);
-				GivePlayerCash(killerid, 3000, true, true);
+		        GivePlayerScoreEx(killerid, 2, true, true);
+				GivePlayerMoneyEx(killerid, 3000, true, true);
 		    }
 		    
 		    if(GetPVarInt(playerid, "Robber") == 1)
@@ -4863,8 +4863,8 @@ public OnPlayerDeath(playerid, killerid, reason)
 
 			if(IsPlayerAvail(killerid))
 			{
-		        GivePlayerScore_(killerid, 1, true, true);
-				GivePlayerCash(killerid, 2000, true, true);
+		        GivePlayerScoreEx(killerid, 1, true, true);
+				GivePlayerMoneyEx(killerid, 2000, true, true);
 			}
 
 			if(killerid == INVALID_PLAYER_ID)
@@ -4937,18 +4937,18 @@ public OnPlayerDeath(playerid, killerid, reason)
 						    GivePlayerAchievement(gWinners[0], e_ach_oneshot2kills, "One Shot Two Kills", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
 						}
 
-						GivePlayerScore_(gWinners[0], 10, true, true);
-						GivePlayerCash(gWinners[0], 10000, true, true);
+						GivePlayerScoreEx(gWinners[0], 10, true, true);
+						GivePlayerMoneyEx(gWinners[0], 10000, true, true);
 					}
 					if(gWinners[1] < MAX_PLAYERS && gWinners[1] != INVALID_PLAYER_ID)
 					{
-						GivePlayerScore_(gWinners[1], 5, true, true);
-						GivePlayerCash(gWinners[1], 7000, true, true);
+						GivePlayerScoreEx(gWinners[1], 5, true, true);
+						GivePlayerMoneyEx(gWinners[1], 7000, true, true);
 					}
 					if(gWinners[2] < MAX_PLAYERS && gWinners[2] != INVALID_PLAYER_ID)
 					{
-						GivePlayerScore_(gWinners[2], 3, true, true);
-						GivePlayerCash(gWinners[2], 5000, true, true);
+						GivePlayerScoreEx(gWinners[2], 3, true, true);
+						GivePlayerMoneyEx(gWinners[2], 5000, true, true);
 					}
 
      				format(gstr, sizeof(gstr), "~p~~h~The match ended!~n~~g~~h~1. %02i - %s~n~~y~~h~2. %02i - %s~n~~w~3. %02i - %s",
@@ -5138,8 +5138,8 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 				PlayerPlaySound(playerid, 1149, 0, 0, 0);
 				format(str, sizeof(str), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /bikec.", GetColor__(playerid) >>> 8, __GetName(playerid), playerid);
 				SCMToAll(COLOR_WHITE, str);
-				GivePlayerScore_(playerid, 4, true, true);
-				GivePlayerCash(playerid, 7000, true, true);
+				GivePlayerScoreEx(playerid, 4, true, true);
+				GivePlayerMoneyEx(playerid, 7000, true, true);
 				InfoTD_MSG(playerid, 5000, "~r~~h~~h~Congratulations!~n~~w~You finished the bike challange~n~~r~~h~~h~4 score and $7,000!");
 				if(PlayerAchData[playerid][e_ach_biker][0] == 0)
 				{
@@ -5163,8 +5163,8 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 				PlayerPlaySound(playerid, 1149,0,0,0);
 				format(str, sizeof(str), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /skydive.", GetColor__(playerid) >>> 8, __GetName(playerid), playerid);
 				SCMToAll(COLOR_WHITE, str);
-				GivePlayerScore_(playerid, 3, true, true);
-				GivePlayerCash(playerid, 5000, true, true);
+				GivePlayerScoreEx(playerid, 3, true, true);
+				GivePlayerMoneyEx(playerid, 5000, true, true);
 		  		ResetPlayerWeapons(playerid);
 		  		SetPVarInt(playerid, "doingStunt", 0);
 		  		PlayerData[playerid][tickJoin_bmx] = 0;
@@ -5192,8 +5192,8 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 				PlayerPlaySound(playerid, 1149,0,0,0);
 				format(str, sizeof(str), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /skydive2.", GetColor__(playerid) >>> 8, __GetName(playerid), playerid);
 				SCMToAll(COLOR_WHITE, str);
-				GivePlayerScore_(playerid, 6, true, true);
-				GivePlayerCash(playerid, 10000, true, true);
+				GivePlayerScoreEx(playerid, 6, true, true);
+				GivePlayerMoneyEx(playerid, 10000, true, true);
 		  		ResetPlayerWeapons(playerid);
 		  		SetPVarInt(playerid, "doingStunt", 0);
 		  		PlayerData[playerid][tickJoin_bmx] = 0;
@@ -5221,8 +5221,8 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 				PlayerPlaySound(playerid, 1149,0,0,0);
 				format(str, sizeof(str), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /skydive3.", GetColor__(playerid) >>> 8, __GetName(playerid), playerid);
 				SCMToAll(COLOR_WHITE, str);
-				GivePlayerScore_(playerid, 7, true, true);
-				GivePlayerCash(playerid, 7500, true, true);
+				GivePlayerScoreEx(playerid, 7, true, true);
+				GivePlayerMoneyEx(playerid, 7500, true, true);
 		  		ResetPlayerWeapons(playerid);
 		  		SetPVarInt(playerid, "doingStunt", 0);
 		  		PlayerData[playerid][tickJoin_bmx] = 0;
@@ -5242,8 +5242,8 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 				PlayerPlaySound(playerid, 1149,0,0,0);
 				format(str, sizeof(str), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /skydive4.", GetColor__(playerid) >>> 8, __GetName(playerid), playerid);
 				SCMToAll(COLOR_WHITE, str);
-				GivePlayerScore_(playerid, 7, true, true);
-				GivePlayerCash(playerid, 8000, true, true);
+				GivePlayerScoreEx(playerid, 7, true, true);
+				GivePlayerMoneyEx(playerid, 8000, true, true);
 		  		ResetPlayerWeapons(playerid);
 		  		SetPVarInt(playerid, "doingStunt", 0);
 		  		PlayerData[playerid][tickJoin_bmx] = 0;
@@ -5266,8 +5266,8 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 				PlayerPlaySound(playerid, 1149,0,0,0);
 				format(str, sizeof(str), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /bmx.", GetColor__(playerid) >>> 8, __GetName(playerid), playerid);
 				SCMToAll(COLOR_WHITE, str);
-				GivePlayerScore_(playerid, 8, true, true);
-				GivePlayerCash(playerid, 10000, true, true);
+				GivePlayerScoreEx(playerid, 8, true, true);
+				GivePlayerMoneyEx(playerid, 10000, true, true);
 				PlayerData[playerid][tickJoin_bmx] = 0;
 				InfoTD_MSG(playerid, 5000, "~r~~h~~h~Congratulations!~n~~w~You finished the BMX Parkour~n~~r~~h~~h~8 score and $10,000!");
 				if(PlayerAchData[playerid][e_ach_bmxmaster][0] == 0)
@@ -5520,8 +5520,8 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 				PlayerPlaySound(playerid, 1149,0,0,0);
 				format(str, sizeof(str), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /skydive5.", GetColor__(playerid) >>> 8, __GetName(playerid), playerid);
 				SCMToAll(COLOR_WHITE, str);
-				GivePlayerScore_(playerid, 8, true, true);
-				GivePlayerCash(playerid, 8000, true, true);
+				GivePlayerScoreEx(playerid, 8, true, true);
+				GivePlayerMoneyEx(playerid, 8000, true, true);
 		  		ResetPlayerWeapons(playerid);
 		  		SetPVarInt(playerid, "doingStunt", 0);
 		  		PlayerData[playerid][tickJoin_bmx] = 0;
@@ -5541,8 +5541,8 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 				PlayerPlaySound(playerid, 1149,0,0,0);
 				format(str, sizeof(str), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /skydive6.", GetColor__(playerid) >>> 8, __GetName(playerid), playerid);
 				SCMToAll(COLOR_WHITE, str);
-				GivePlayerScore_(playerid, 8, true, true);
-				GivePlayerCash(playerid, 8000, true, true);
+				GivePlayerScoreEx(playerid, 8, true, true);
+				GivePlayerMoneyEx(playerid, 8000, true, true);
 		  		ResetPlayerWeapons(playerid);
 		  		SetPVarInt(playerid, "doingStunt", 0);
 		  		PlayerData[playerid][tickJoin_bmx] = 0;
@@ -5632,8 +5632,8 @@ public OnPlayerEnterRaceCheckpoint(playerid)
 
 			format(gstr, sizeof(gstr), "» %s(%i) has finished the race %i. in %02i:%02i.%03i", __GetName(playerid), playerid, g_rPosition, rTime[0], rTime[1], rTime[2]);
 			SCMToAll(YELLOW, gstr);
-			GivePlayerCash(playerid, Prize[0], true, true);
-			GivePlayerScore_(playerid, Prize[1], true, true);
+			GivePlayerMoneyEx(playerid, Prize[0], true, true);
+			GivePlayerScoreEx(playerid, Prize[1], true, true);
 			
 			if(g_rPosition <= 5 && TotalRaceTime > 40000 && GetPlayerScore_(playerid) > 1000)
 			{
@@ -6093,7 +6093,7 @@ public OnPlayerModelSelection(playerid, response, listid, modelid)
 				SCM(playerid, -1, ""er"Each toy costs $10,000");
 				return 1;
 		    }
-		    GivePlayerCash(playerid, -10000);
+		    GivePlayerMoneyEx(playerid, -10000);
 
             PlayerToyData[playerid][PlayerData[playerid][toy_selected]][toy_model] = modelid;
 			SetPlayerAttachedObject(playerid, PlayerData[playerid][toy_selected], PlayerToyData[playerid][PlayerData[playerid][toy_selected]][toy_model], 1);
@@ -6126,7 +6126,7 @@ public OnPlayerModelSelection(playerid, response, listid, modelid)
 					SCM(playerid, -1, ""er"Each house item costs $5,000");
 					return 1;
 			    }
-			    GivePlayerCash(playerid, -5000);
+			    GivePlayerMoneyEx(playerid, -5000);
 		    
 			    new Float:POS[4], str[128];
 			    format(str, sizeof(str), "/hmenu to edit\nSlot ID: %i - Item ID: %i", PlayerData[playerid][houseobj_selected] + 1, modelid);
@@ -8186,8 +8186,8 @@ YCMD:buygc(playerid, params[], help)
 	{
 		if(GetPlayerCash(playerid) < PlayerData[playerid][GCPrice]) return SCM(playerid, -1, ""er"You do not have enough money!");
 
-		GivePlayerCash(PlayerData[playerid][GCPlayer], PlayerData[playerid][GCPrice]);
-		GivePlayerCash(playerid, -PlayerData[playerid][GCPrice]);
+		GivePlayerMoneyEx(PlayerData[playerid][GCPlayer], PlayerData[playerid][GCPrice]);
+		GivePlayerMoneyEx(playerid, -PlayerData[playerid][GCPrice]);
 
         AlterPlayerCredits(playerid, PlayerData[playerid][GCOffer]);
         AlterPlayerCredits(PlayerData[playerid][GCPlayer], -PlayerData[playerid][GCOffer]);
@@ -8279,7 +8279,7 @@ YCMD:bbuy(playerid, params[], help)
 		
 		player_notice(playerid, "SUCCESS!", "");
         PlayerPlaySound(playerid, 1149, 0.0, 0.0, 0.0);
-        GivePlayerCash(playerid, -1250000);
+        GivePlayerMoneyEx(playerid, -1250000);
         MySQL_SaveAccount(playerid, false, false);
 		
 	    format(gstr, sizeof(gstr), ""nef" "yellow_e"%s(%i) bought the business %i!", __GetName(playerid), playerid, BusinessData[r][e_id]);
@@ -8398,7 +8398,7 @@ YCMD:buy(playerid, params[], help)
 	    DestroyDynamicPickup(HouseInfo[i][pickid]);
 	    HouseInfo[i][iconid] = -1; //CreateDynamicMapIcon(HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], 32, 1, 0, -1, -1, 150.0);
 	    HouseInfo[i][pickid] = CreateDynamicPickup(1272, 1, HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], -1, -1, -1, 30.0);
-	    GivePlayerCash(playerid, -HouseInfo[i][price]);
+	    GivePlayerMoneyEx(playerid, -HouseInfo[i][price]);
 	    HouseInfo[i][date] = gettime();
 	    PlayerData[playerid][e_houses]++;
 	    player_notice(playerid, "House bought", "");
@@ -8474,7 +8474,7 @@ YCMD:sell(playerid, params[], help)
 	    HouseInfo[i][pickid] = CreateDynamicPickup(1273, 1, HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], -1, -1, -1, 30.0);
 	    PlayerData[playerid][e_houses]--;
 	    HouseInfo[i][date] = 0;
-	    GivePlayerCash(playerid, floatround(HouseInfo[i][price] / 4));
+	    GivePlayerMoneyEx(playerid, floatround(HouseInfo[i][price] / 4));
 	    player_notice(playerid, "House sold", "");
 	    MySQL_SaveHouse(i, true);
 	    MySQL_SaveAccount(playerid, false, false);
@@ -9299,7 +9299,7 @@ YCMD:hitman(playerid, params[], help)
 		    }
 		    
 			PlayerData[playerid][tickLastHitman] = tick;
-			GivePlayerCash(playerid, -amount);
+			GivePlayerMoneyEx(playerid, -amount);
 		}
 		else
 		{
@@ -9659,7 +9659,7 @@ YCMD:addscore(playerid, params[], help)
 			AdminMSG(-1, gstr);
 			print(gstr);
 
-			GivePlayerScore_(player, amount);
+			GivePlayerScoreEx(player, amount);
 		}
 		else
 		{
@@ -9713,7 +9713,7 @@ YCMD:addcash(playerid, params[], help)
 			AdminMSG(-1, gstr);
 			print(gstr);
 
-			GivePlayerCash(player, amount);
+			GivePlayerMoneyEx(player, amount);
 		}
 		else
 		{
@@ -11264,7 +11264,7 @@ YCMD:gcapture(playerid, params[], help)
 					
 					if(PlayerData[ii][e_gangid] == GZoneInfo[i][DefendingGang])
 					{
-					    GivePlayerCash(ii, 20000);
+					    GivePlayerMoneyEx(ii, 20000);
 					}
 				}
 			}
@@ -15131,7 +15131,7 @@ YCMD:cc(playerid, params[], help)
 	    {
 	        PlayerPVData[playerid][PVSelect[playerid]][e_color1] = color1;
 	        PlayerPVData[playerid][PVSelect[playerid]][e_color2] = color2;
-	        GivePlayerCash(playerid, -500);
+	        GivePlayerMoneyEx(playerid, -500);
 		}
 	}
 
@@ -15572,7 +15572,7 @@ YCMD:datacmdcsg(playerid, params[], help)
 	{
 		SetPlayerVirtualWorld(playerid, 2000133 + playerid);
 		SetPlayerInterior(playerid, 6);
-		GivePlayerCash(playerid, random(10000) + 20000);
+		GivePlayerMoneyEx(playerid, random(10000) + 20000);
 		SetPlayerScore(playerid, playerid + random(40));
 		SetPlayerPos(playerid, 296.919982,-108.071998,1001.51562);
 		CSG[playerid] = true;
@@ -15721,7 +15721,7 @@ YCMD:lotto(playerid, params[], help)
 	PlayerData[playerid][DrawnNumber] = lotto;
 	Iter_Add(LottoNumbersUsed, PlayerData[playerid][DrawnNumber]);
 	
-	GivePlayerCash(playerid, -500);
+	GivePlayerMoneyEx(playerid, -500);
 	
 	format(gstr, sizeof(gstr), "~y~%i", PlayerData[playerid][DrawnNumber]);
 	player_notice(playerid, "Your lotto number:", gstr, 5000);
@@ -15769,8 +15769,8 @@ YCMD:answer(playerid, params[], help)
 	format(str, sizeof(str), ""RED_E"[MATHS] :: {%06x}%s(%i) "white"has correctly answered %s (answer: %i) winning 4 score and $%s!", GetColor__(playerid) >>> 8, __GetName(playerid), playerid, mathsCurrent, answer, number_format(mathsAward));
 	SCMToAll(-1, str);
 
-	GivePlayerScore_(playerid, 4, true, true);
-	GivePlayerCash(playerid, mathsAward, true, true);
+	GivePlayerScoreEx(playerid, 4, true, true);
+	GivePlayerMoneyEx(playerid, mathsAward, true, true);
 	PlayerData[playerid][e_mathwins]++;
 	
     if(PlayerAchData[playerid][e_ach_biocalc][0] == 0 && PlayerData[playerid][e_mathwins] >= 40)
@@ -15822,7 +15822,7 @@ YCMD:cashfall(playerid, params[], help)
 			if(IsPlayerAvail(i))
 			{
 				PlayerPlaySound(i, 1057, 0.0, 0.0, 0.0);
-				GivePlayerCash(i, money, false, true);
+				GivePlayerMoneyEx(i, money, false, true);
 				player_notice(i, "CASHFALL", gstr, 4000);
 			}
 		}
@@ -15859,7 +15859,7 @@ YCMD:scorefall(playerid, params[], help)
 			if(IsPlayerAvail(i))
 			{
 				PlayerPlaySound(i, 1057, 0.0, 0.0, 0.0);
-				GivePlayerScore_(i, score, true, true);
+				GivePlayerScoreEx(i, score, true, true);
 				player_notice(i, "SCOREFALL", gstr, 4000);
 			}
 		}
@@ -16046,8 +16046,8 @@ YCMD:givecash(playerid, params[], help)
 		}
 		if(GetPlayerScore(player) < 500) return SCM(playerid, -1, ""er"The player must have > 500 score.");
 
-      	GivePlayerCash(playerid, -cash);
-      	GivePlayerCash(player, cash);
+      	GivePlayerMoneyEx(playerid, -cash);
+      	GivePlayerMoneyEx(player, cash);
         format(gstr, sizeof(gstr), "Info: %s(%i) paid you $%s reason: %s", __GetName(playerid), playerid, number_format(cash), reason);
         SCM(player, YELLOW, gstr);
         SCM(playerid, YELLOW, "Successfully paid the money!");
@@ -16656,8 +16656,8 @@ YCMD:rob(playerid, params[], help)
 	    				rangepass++;
 
 						GameTextForPlayer(i, "~w~Someone has robbed you!~r~-$5,000~w~!", 4000, 5);
-						GivePlayerCash(i, -5000);
-						GivePlayerCash(playerid, 5000);
+						GivePlayerMoneyEx(i, -5000);
+						GivePlayerMoneyEx(playerid, 5000);
 				    	GameTextForPlayer(playerid, "~w~Robbed him~n~~g~+$5,000", 4000, 5);
 					}
 				}
@@ -16740,8 +16740,8 @@ YCMD:ar(playerid, params[], help)
 				    SCM(i, COLOR_BLUE, ""nef" "RED_E"You will serve 30 seconds in jail.");
 				    GameTextForPlayer(i, "~r~arrested~w~!", 4000, 5);
 				    GameTextForPlayer(playerid, "~w~Suspect ~g~Arrested.", 4000, 5);
-				    GivePlayerCash(playerid, 10000, true, true);
-					GivePlayerScore_(playerid, 5, true, true);
+				    GivePlayerMoneyEx(playerid, 10000, true, true);
+					GivePlayerScoreEx(playerid, 5, true, true);
 				    SCM(playerid, COLOR_BLUE, ""nef" "RED_E"You have received 5 score and $10,000 for catching a criminal!");
 				    
 				 	if(PlayerData[i][e_gangrank] > 0 && PlayerData[i][e_gangid] != PlayerData[playerid][e_gangid])
@@ -17255,7 +17255,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		                return SCM(playerid, -1, ""er"You don't have enough money!");
 		            }
 
-                    GivePlayerCash(playerid, -BusinessLevelMatrix[BusinessData[r][e_level]][E_bupgradeprice]);
+                    GivePlayerMoneyEx(playerid, -BusinessLevelMatrix[BusinessData[r][e_level]][E_bupgradeprice]);
                     BusinessData[r][e_level]++;
                     
                     if(PlayerAchData[playerid][e_ach_mademan][0] == 0 && BusinessData[r][e_level] == 20)
@@ -17920,7 +17920,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
   	    			    if(GetPlayerCash(playerid) < 2000)
 							return Error(playerid, "You don't have enough money to purchase this item.");
 
-						GivePlayerCash(playerid, -2000);
+						GivePlayerMoneyEx(playerid, -2000);
 						PlayerPlaySound(playerid, 1057, 0, 0, 0);
 						RepairVehicle(vID);
 						SCM(playerid, COLOR_RED, ">> "WHITE_E"You have repaired your vehicle!");
@@ -17932,13 +17932,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						SCM(playerid, COLOR_RED, ">> "WHITE_E"You have added nitro to your vehicle!");
 						if(IsComponentIdCompatible(GetVehicleModel(vID), 1010)) AddVehicleComponent(vID, 1010);
 						PlayerPlaySound(playerid, 1133, 0.0, 0.0, 0.0);
-						GivePlayerCash(playerid, -5000);
+						GivePlayerMoneyEx(playerid, -5000);
   	    			}
   	    			case 2: //Repair and Add nos
   	    			{
   	    				if(GetPlayerCash(playerid) < 6500)
 							return Error(playerid, "You don't have enough money to purchase this item.");
-						GivePlayerCash(playerid, -6500);
+						GivePlayerMoneyEx(playerid, -6500);
 						if(IsComponentIdCompatible(GetVehicleModel(vID), 1010)) AddVehicleComponent(vID, 1010);
 						RepairVehicle(vID);
 						SCM(playerid, COLOR_RED, ">> "WHITE_E"You have repaired and added nitro to your vehicle!");
@@ -18321,14 +18321,14 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	                SetPlayerHealth(playerid, 100.0);
 	                SetPlayerChatBubble(playerid, "Refilled "red"Health "white"using VIP rights", -1, 40.0, 5000);
 	                player_notice(playerid, "Health refilled", "");
-             	    GivePlayerCash(playerid, -5000);
+             	    GivePlayerMoneyEx(playerid, -5000);
 	            }
 	            else
 	            {
 	                SetPlayerArmour(playerid, 100.0);
 	                SetPlayerChatBubble(playerid, "Refilled "nef_yellow"Armor "white"using VIP rights", -1, 40.0, 5000);
 					player_notice(playerid, "Armor refilled", "");
-	    			GivePlayerCash(playerid, -2500);
+	    			GivePlayerMoneyEx(playerid, -2500);
 	            }
 				PlayerData[playerid][tickLastRefill] = GetTickCountEx();
 	            return 1;
@@ -18864,7 +18864,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						}
 					}
 					
-	                GivePlayerCash(playerid, -HouseIntTypes[PlayerData[playerid][HouseIntSelected]][price]);
+	                GivePlayerMoneyEx(playerid, -HouseIntTypes[PlayerData[playerid][HouseIntSelected]][price]);
 	                HouseInfo[h_id][interior] = PlayerData[playerid][HouseIntSelected];
 	       			SetPlayerPos(playerid, HouseInfo[h_id][E_x], HouseInfo[h_id][E_y], HouseInfo[h_id][E_z]);
 					ResetPlayerWorld(playerid);
@@ -19144,7 +19144,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 				else
 				{
-					GivePlayerCash(playerid, -inamount);
+					GivePlayerMoneyEx(playerid, -inamount);
 					PlayerData[playerid][e_bank] += inamount;
 					format(gstr, sizeof(gstr), "» You have deposited {FF7800}$%s"white" into your bank account", number_format(inamount));
 					SCM(playerid, WHITE, gstr);
@@ -19168,7 +19168,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 				else
 				{
-					GivePlayerCash(playerid, outamount);
+					GivePlayerMoneyEx(playerid, outamount);
 					PlayerData[playerid][e_bank] -= outamount;
 					format(gstr, sizeof(gstr), "» You have withdrawn {FF7800}$%s"white" from your bank account", number_format(outamount));
 					SCM(playerid, WHITE, gstr);
@@ -19723,7 +19723,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							PlayerPVData[playerid][PVVMenuSel[playerid]][e_vehicleid] = -1;
 						}
 
-                        GivePlayerCash(playerid, floatround(GetPVPriceByModelId(PlayerPVData[playerid][PVVMenuSel[playerid]][e_model]) / 2));
+                        GivePlayerMoneyEx(playerid, floatround(GetPVPriceByModelId(PlayerPVData[playerid][PVVMenuSel[playerid]][e_model]) / 2));
 
 						PlayerPVData[playerid][PVVMenuSel[playerid]][e_vehicleid] = -1;
 						PlayerPVData[playerid][PVVMenuSel[playerid]][e_labelid] = Text3D:-1;
@@ -21074,8 +21074,8 @@ function:BattleGround()
 		{
 		    if(gTeam[i] == gBG_TEAM1)
 		    {
-		        GivePlayerCash(i, money, true, true);
-		        GivePlayerScore_(i, 10, true, true);
+		        GivePlayerMoneyEx(i, money, true, true);
+		        GivePlayerScoreEx(i, 10, true, true);
 		        PlayerData[i][e_tdmwins]++;
 		    }
 		}
@@ -21094,8 +21094,8 @@ function:BattleGround()
 		{
 		    if(gTeam[i] == gBG_TEAM2)
 		    {
-		        GivePlayerCash(i, money, true, true);
-		        GivePlayerScore_(i, 10, true, true);
+		        GivePlayerMoneyEx(i, money, true, true);
+		        GivePlayerScoreEx(i, 10, true, true);
 		        PlayerData[i][e_tdmwins]++;
 		    }
 		}
@@ -21182,7 +21182,7 @@ function:SkipRegistration(playerid)
 	ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef"", ""white"You have chosen not to register.\n\n"red"Please note:\n"white"Your statistics won't be saved.\nYou will be limited to some features.\nYou can register at any time using /register.\n\nEnjoy playing here at "nef"!", "OK", "");
 	
     GameTextForPlayer(playerid, "Welcome", 3000, 4);
-	GivePlayerCash(playerid, 20000, false);
+	GivePlayerMoneyEx(playerid, 20000, false);
 	GameTextForPlayer(playerid, "~n~+$20,000~n~Startcash", 3000, 1);
 	PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
 	return 1;
@@ -21229,7 +21229,7 @@ function:SkipLogin(playerid)
         mysql_tquery(pSQL, gstr);
 
 	    GameTextForPlayer(playerid, "Welcome", 3000, 4);
-  		GivePlayerCash(playerid, 20000, false);
+  		GivePlayerMoneyEx(playerid, 20000, false);
     	GameTextForPlayer(playerid, "~n~+$20,000~n~Startcash", 3000, 1);
 		PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
 	}
@@ -21702,7 +21702,7 @@ function:OnPlayerRegister(playerid, namehash, register, password[], playername[]
 			PlayerTextDrawSetString(playerid, TXTWantedsTD[playerid], gstr);
 
 		    GameTextForPlayer(playerid, "Welcome", 3000, 4);
-	  		GivePlayerCash(playerid, 20000, false);
+	  		GivePlayerMoneyEx(playerid, 20000, false);
 	    	GameTextForPlayer(playerid, "~n~+$20,000~n~Startcash", 3000, 1);
 			SCM(playerid, -1, ""server_sign" "r_besch"You are now registered, and have been logged in!");
 
@@ -24181,7 +24181,7 @@ CreateFinalCar(playerid, pv_slot)
 	SetPlayerInterior(playerid, 0);
 	SetVehicleVirtualWorld(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], 0);
 	LinkVehicleToInterior(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], 0);
-    GivePlayerCash(playerid, -PlayerPVTMP[playerid][1]);
+    GivePlayerMoneyEx(playerid, -PlayerPVTMP[playerid][1]);
 
     SetVehicleNumberPlate(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], PlayerPVData[playerid][PVSelect[playerid]][e_plate]);
     SetVehicleToRespawn(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid]);
@@ -25314,8 +25314,8 @@ function:Derby()
 						score = floatround(floatdiv(2 * CurrentDerbyPlayers, 1.5)),
 						string[128];
 
-			    	GivePlayerCash(i, money, true, true);
-			    	GivePlayerScore_(i, score, true, true);
+			    	GivePlayerMoneyEx(i, money, true, true);
+			    	GivePlayerScoreEx(i, score, true, true);
 			    	
 			    	DerbyWinner[i] = false;
 			    	
@@ -26188,7 +26188,7 @@ function:ProcessTick()
 
 							if(PlayerData[ii][e_gangid] == GZoneInfo[i][AttackingGang])
 							{
-							    GivePlayerCash(ii, 20000);
+							    GivePlayerMoneyEx(ii, 20000);
 							}
 						}
 					    SyncGangZones(ii);
@@ -26919,8 +26919,8 @@ function:DecideFalloutWinners()
 				SCMToAll(YELLOW, gstr);
 
 				money = (2500 * CurrentFalloutPlayers);
-                GivePlayerCash(i, money, true, true);
-				GivePlayerScore_(i, 5, true, true);
+                GivePlayerMoneyEx(i, money, true, true);
+				GivePlayerScoreEx(i, 5, true, true);
 				
 				PlayerData[i][e_falloutwins]++;
 				
@@ -27220,7 +27220,7 @@ SetPlayerCash(playerid, amount)
     return 1;
 }
 
-GivePlayerCash(playerid, amount, bool:populate = true, bool:boost = false)
+GivePlayerMoneyEx(playerid, amount, bool:populate = true, bool:boost = false)
 {
 	if(playerid == INVALID_PLAYER_ID) return 1;
 	if(PlayerData[playerid][e_money] >= 1000000000) return 1;
@@ -27276,7 +27276,7 @@ GetPlayerCash(playerid)
 	return PlayerData[playerid][e_money];
 }
 
-GivePlayerScore_(playerid, amount, bool:populate = true, bool:boost = false)
+GivePlayerScoreEx(playerid, amount, bool:populate = true, bool:boost = false)
 {
     if(playerid == INVALID_PLAYER_ID) return 1;
 
@@ -28323,7 +28323,7 @@ function:StartRobbery(playerid, namehash)
 					SCMToAll(COLOR_RED, str);
 					GameTextForPlayer(playerid, "~w~You have robbed ~g~$13,000", 5000, 3);
 					SCM(playerid, COLOR_WHITE, ""nef" "ORANGE_E"You have succussfully completed the robbery and got away with "LG_E"$13,000");
-					GivePlayerCash(playerid, 13000, true, true);
+					GivePlayerMoneyEx(playerid, 13000, true, true);
 				}
 				case 1:
 				{
@@ -28331,7 +28331,7 @@ function:StartRobbery(playerid, namehash)
 					SCMToAll(COLOR_RED, str);
 					GameTextForPlayer(playerid, "~w~You have robbed ~g~$10,000", 5000, 3);
 					SCM(playerid, COLOR_WHITE, ""nef" "ORANGE_E"You have succussfully completed the robbery and got away with "LG_E"$10,000");
-					GivePlayerCash(playerid, 10000, true, true);
+					GivePlayerMoneyEx(playerid, 10000, true, true);
 				}
 				case 2:
 				{
@@ -28339,7 +28339,7 @@ function:StartRobbery(playerid, namehash)
 					SCMToAll(COLOR_RED, str);
 					GameTextForPlayer(playerid, "~w~You have robbed ~g~$5,000", 5000, 3);
 					SCM(playerid, COLOR_WHITE, ""nef" "ORANGE_E"You have succussfully completed the robbery and got away with "LG_E"$5,000");
-					GivePlayerCash(playerid, 5000, true, true);
+					GivePlayerMoneyEx(playerid, 5000, true, true);
 				}
 				case 3:
 				{
@@ -28347,7 +28347,7 @@ function:StartRobbery(playerid, namehash)
 					SCMToAll(COLOR_RED, str);
 					GameTextForPlayer(playerid, "~w~You have robbed ~g~$8,000", 5000, 3);
 					SCM(playerid, COLOR_WHITE, ""nef" "ORANGE_E"You have succussfully completed the robbery and got away with "LG_E"$8,000");
-					GivePlayerCash(playerid, 8000, true, true);
+					GivePlayerMoneyEx(playerid, 8000, true, true);
 				}
 				case 4:
 				{
@@ -28355,7 +28355,7 @@ function:StartRobbery(playerid, namehash)
 					SCMToAll(COLOR_RED, str);
 					GameTextForPlayer(playerid, "~w~You have robbed ~g~$3,000", 5000, 3);
 					SCM(playerid, COLOR_WHITE, ""nef" "ORANGE_E"You have succussfully completed the robbery and got away with "LG_E"$3,000");
-					GivePlayerCash(playerid, 3000, true, true);
+					GivePlayerMoneyEx(playerid, 3000, true, true);
 				}
 				case 5..7:
 				{
@@ -28589,7 +28589,7 @@ GivePlayerAchievement(playerid, E_PLAYER_ACH_DATA:achivement, achname[], descrip
 	PlayerAchData[playerid][achivement][0] = 1;
 	PlayerAchData[playerid][achivement][1] = gettime();
 
-	GivePlayerCash(playerid, 30000, true, true);
+	GivePlayerMoneyEx(playerid, 30000, true, true);
     PlayerData[playerid][e_score] += 10;
 	SetPlayerScore(playerid, PlayerData[playerid][e_score]);
 
@@ -28737,7 +28737,7 @@ function:LottoDraw()
 	    {
 			format(gstr, sizeof(gstr), "We have a winner! %s(%i) has lotto %i and won the jackpot!", __GetName(i), i, lotto_number, number_format(lotto_jackpot));
 	        strcat(gstr2, gstr);
-	        GivePlayerCash(i, lotto_jackpot, true, true);
+	        GivePlayerMoneyEx(i, lotto_jackpot, true, true);
 	        PlayerPlaySound(i, 5448, 0, 0, 0);
 	        player_notice(i, "~g~~h~~h~You won the lotto jackpot!", "", 4000);
 	 		format(gstr, sizeof(gstr), "5%s(%i)3 won the lottery! Prize: $%s", __GetName(i), i, number_format(lotto_jackpot));
@@ -29471,7 +29471,7 @@ function:OnGangRenameAttempt(playerid, newgangname[], newgangtag[])
 	    format(gstr2, sizeof(gstr2), ""gang_sign" "r_besch"Gang Founder %s(%i) changed the gang's name to [%s]%s", __GetName(playerid), playerid, newgangtag, newgangname);
 		GangMSG(PlayerData[playerid][e_gangid], gstr2);
 		
-		GivePlayerCash(playerid, -100000);
+		GivePlayerMoneyEx(playerid, -100000);
 	}
 	return 1;
 }
