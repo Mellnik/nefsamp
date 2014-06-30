@@ -24247,6 +24247,7 @@ PortPlayerMapVeh(playerid, Float:X, Float:Y, Float:Z, Float:Angle, Float:XVeh, F
 	    SetVehiclePos(veh, XVeh, YVeh, floatadd(ZVeh, 4.5));
 	    SetVehicleVirtualWorld(veh, 0);
    		SetVehicleZAngle(veh, AngleVeh);
+   		LinkVehicleToInterior(veh, 0);
 		PutPlayerInVehicle(playerid, veh,0);
 	}
 	else
