@@ -716,7 +716,7 @@ enum E_PLAYER_DATA
 	bool:AOnline,
  	bool:gInvite,
  	bool:FalloutLost,
-	bool:SavedPos,
+	bool:bStateSaved,
 	bool:bHasSpawn,
 	bool:bFirstSpawn,
 	bool:bTDEnabled,
@@ -4751,7 +4751,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 		    ResetPlayerWorld(playerid);
 		    CurrentFalloutPlayers--;
             PlayerData[playerid][FalloutLost] = true;
-            GameTextForPlayer(playerid, "~p~You lost the Fallout!", 3000, 1);
+            player_notice(playerid, "You lost this fallout match", "");
             gTeam[playerid] = FREEROAM;
 
 		    new count = 0;
@@ -5125,7 +5125,7 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
      			new tick = GetTickCountEx();
 				if((PlayerData[playerid][tickLastBIKEC] + COOLDOWN_BIKEC) >= tick)
 				{
-				    return GameTextForPlayer(playerid, "~r~~h~Please wait before doing this stunt again", 6000, 5);
+				    return player_notice(playerid, "Stunt is on cooldown,", "please wait");
 				}
 
    				RemovePlayerFromVehicle(playerid);
@@ -7796,10 +7796,11 @@ YCMD:flip(playerid, params[], help)
 {
 	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 	if(GetPlayerState(playerid) != PLAYER_STATE_DRIVER) return SCM(playerid, -1, ""er"You must be a driver in a vehicle to flip it!");
-	new currentveh, Float:angle;
-  	currentveh = GetPlayerVehicleID(playerid);
-	GetVehicleZAngle(currentveh, angle);
-	SetVehicleZAngle(currentveh, angle);
+	
+	new veh, Float:angle;
+  	veh = GetPlayerVehicleID(playerid);
+	GetVehicleZAngle(veh, angle);
+	SetVehicleZAngle(veh, angle);
 	SCM(playerid, NEF_YELLOW, "You can also press '2' to flip you vehicle");
 	return 1;
 }
@@ -7809,6 +7810,7 @@ YCMD:s(playerid, params[], help)
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
     if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
     if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't save your position now");
+    
 	if(IsPlayerInAnyVehicle(playerid))
 	{
 		GetVehiclePos(GetPlayerVehicleID(playerid), PlayerData[playerid][sX], PlayerData[playerid][sY], PlayerData[playerid][sZ]);
@@ -7819,7 +7821,7 @@ YCMD:s(playerid, params[], help)
 	   GetPlayerPos(playerid, PlayerData[playerid][sX], PlayerData[playerid][sY], PlayerData[playerid][sZ]);
 	   GetPlayerFacingAngle(playerid, PlayerData[playerid][sA]);
 	}
-	PlayerData[playerid][SavedPos] = true;
+	PlayerData[playerid][bStateSaved] = true;
 	PlayerPlaySound(playerid, 1132, 0.0, 0.0, 0.0);
 	SCM(playerid, -1, ""vgreen"Position saved! Load Position with "white"/l");
 	return 1;
@@ -7830,9 +7832,9 @@ YCMD:l(playerid, params[], help)
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
 	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
     if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't load your position now");
-	if(!PlayerData[playerid][SavedPos])
+	if(!PlayerData[playerid][bStateSaved])
 	{
-		SCM(playerid, -1, ""er"No position saved. Use /s first.");
+	    player_notice(playerid, "Use /s first", "");
 		return 1;
 	}
 	
@@ -8623,13 +8625,13 @@ YCMD:lock(playerid, params[], help)
 					SCM(playerid, -1, ""er"This isn't your House!");
 					break;
 				}
+				
 				if(!HouseInfo[i][locked])
-				{
 					GameTextForPlayer(playerid, "~b~House ~r~locked", 2000, 3);
-				}
-				else GameTextForPlayer(playerid, "~b~House ~g~unlocked", 2000, 3);
+				else
+					GameTextForPlayer(playerid, "~b~House ~g~unlocked", 2000, 3);
 
-	            HouseInfo[i][locked] = (HouseInfo[i][locked]) ? (0) : (1);
+	            HouseInfo[i][locked] = HouseInfo[i][locked] ? 0 : 1;
 	            PlayerPlaySound(playerid, 1027, 0.0, 0.0, 0.0);
 	            MySQL_SaveHouse(i);
 			}
@@ -13378,13 +13380,9 @@ YCMD:setadminlevel(playerid, params[], help)
 			SCM(player, BLUE, gstr);
 
 			if(alevel > PlayerData[player][e_level])
-			{
 				GameTextForPlayer(player, "Promoted", 5000, 3);
-			}
 			else
-			{
 				GameTextForPlayer(player, "Demoted", 5000, 3);
-			}
 			
 			MySQL_SaveAccount(playerid, false, false);
 			format(gstr, sizeof(gstr), "You have made %s Level %i at %i:%i:%i", __GetName(player), alevel, time[0], time[1], time[2]);
@@ -14806,7 +14804,7 @@ YCMD:vmenu(playerid, params[], help)
 	{
 	    if(IsPlayerInDynamicArea(playerid, g_SpawnAreas[ii]))
 	    {
-	        return GameTextForPlayer(playerid, "~w~No vehicles at spawn point!", 4000, 4);
+	        return player_notice(playerid, "Don't spawn vehicles here!", "");
 	    }
 	}
     
@@ -21308,7 +21306,7 @@ CarSpawner(playerid, model, respawn_delay = -1, bool:spawnzone_check = true)
 		{
 		    if(IsPlayerInDynamicArea(playerid, g_SpawnAreas[ii]))
 		    {
-		        player_notice(playerid, "No vehicles at spawn point", "");
+		        player_notice(playerid, "Don't spawn vehicles here!", "");
 		        return 0;
 		    }
 		}
@@ -30348,7 +30346,7 @@ PreparePlayerVars(playerid)
 	PlayerData[playerid][AOnline] = true;
  	PlayerData[playerid][gInvite] = false;
  	PlayerData[playerid][FalloutLost] = true;
-	PlayerData[playerid][SavedPos] = false;
+	PlayerData[playerid][bStateSaved] = false;
 	PlayerData[playerid][bHasSpawn] = false;
 	PlayerData[playerid][bFirstSpawn] = false;
 	PlayerData[playerid][bTDEnabled] = true;
