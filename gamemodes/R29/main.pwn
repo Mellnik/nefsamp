@@ -407,7 +407,6 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define MAX_PLAYER_MONEY                (1000000000)
 #define MAX_PLAYER_IP                   (45)
 #define COOLDOWN_CMD_BAN                (125000)
-#define COOLDOWN_CHAT                   (5500)
 #define COOLDOWN_CMD_AR                 (1000)
 #define COOLDOWN_CMD_ROB                (10000)
 #define COOLDOWN_CMD_BUY                (2000)
@@ -425,7 +424,7 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define COOLDOWN_CMD_GCREATE            (5000)
 #define COOLDOWN_DEATH                  (3000)
 #define COOLDOWN_CMD                  	(1000)
-#define COOLDOWN_TEXT                   (5000)
+#define COOLDOWN_CHAT                   (500)
 #define COOLDOWN_CMD_HAREFILL           (120000)
 #define COOLDOWN_CMD_VIPLI              (15000)
 #define COOLDOWN_CMD_CD                 (60000)
@@ -792,7 +791,7 @@ enum E_PLAYER_DATA
 	toy_selected,
 	houseobj_selected,
 	iCoolDownCommand,
-	iCoolDownText,
+	iCoolDownChat,
 	iCoolDownDeath,
 	DuelWeapon,
 	DuelLocation,
@@ -2555,7 +2554,7 @@ public OnGameModeInit()
 	SetTimer("RandomTXTInfo", 30000, true);
     SetTimer("QueueProcess", 60000, true);
 	SetTimer("Maths", 980000, true);
-	SetTimer("RandomSvrMsg", SERVERMSGS_TIME, true);
+	SetTimer("server_random_broadcast", SERVERMSGS_TIME, true);
 	SetTimer("DoLotto", 100000, false);
 
     LoadServerVehicles();
@@ -3443,7 +3442,8 @@ public OnPlayerDisconnect(playerid, reason)
 
 public OnPlayerCommandReceived(playerid, cmdtext[])
 {
-	if(PlayerData[playerid][bOpenSeason]) return 0;
+	if(PlayerData[playerid][bOpenSeason])
+		return 0;
 	
 	if(PlayerData[playerid][bIsDead])
 	{
@@ -4158,25 +4158,8 @@ public OnPlayerExitVehicle(playerid, vehicleid)
 
 public OnPlayerText(playerid, text[])
 {
-    if(PlayerData[playerid][bOpenSeason]) return 0;
-    
-	PlayerData[playerid][iCoolDownText]++;
-	SetTimerEx("CoolDownText", COOLDOWN_TEXT, false, "i", playerid);
-	if(PlayerData[playerid][iCoolDownText] == 6)
-	{
-	    GameTextForPlayer(playerid, "~b~~h~Do not spam!", 2000, 3);
-	    return 0;
-	}
-	else if(PlayerData[playerid][iCoolDownText] >= 15 && PlayerData[playerid][e_level] < 2)
-	{
-		format(gstr, sizeof(gstr), "Chat-Spam detected! %s(%i) has been muted for 120 seconds!", __GetName(playerid), playerid);
-		AdminMSG(RED, gstr);
-		
-		PlayerData[playerid][iCoolDownText] = 0;
-		PlayerData[playerid][tMute] = SetTimerEx("unmute", 120 * 1000, false, "i", playerid);
-		PlayerData[playerid][Muted] = true;
+    if(PlayerData[playerid][bOpenSeason])
 		return 0;
-	}
 
 	if(PlayerData[playerid][ExitType] != EXIT_FIRST_SPAWNED)
 	{
@@ -4195,15 +4178,19 @@ public OnPlayerText(playerid, text[])
 
 	if(!strcmp(text, LastPlayerText[playerid], true))
 	{
-	    GameTextForPlayer(playerid, "~g~Do not repeat yourself!", 2000, 5);
+	    player_notice(playerid, "Do not repeat yourself", "");
 	    return 0;
 	}
 	strmid(LastPlayerText[playerid], text, 0, 144, 144);
 
-	if(strfind(text, "/q", true) != -1 || strfind(text, "/ q", true) != -1 || strfind(text, "/quit", true) != -1 || strfind(text, "/ quit", true) != -1)
+	if(PlayerData[playerid][iCoolDownChat] < COOLDOWN_CHAT)
 	{
+		player_notice(playerid, "2 messages every second", "");
+	    return 0;
+	}
+
+	if(strfind(text, "/q", true) != -1 || strfind(text, "/ q", true) != -1 || strfind(text, "/quit", true) != -1 || strfind(text, "/ quit", true) != -1)
   		return 0;
-  	}
 
     new File:lFile = fopen("/Log/chatlog.txt", io_append),
         time[3];
@@ -4284,23 +4271,6 @@ public OnPlayerText(playerid, text[])
 		return 0;
 	}
 
-    new tick = GetTickCountEx();
-
-	if((PlayerData[playerid][iLastChat] >= 2) && ((PlayerData[playerid][tickLastChat] + COOLDOWN_CHAT) >= tick))
-	{
-		SCM(playerid, -1, ""er"Wait a bit before chatting again");
-	    return 0;
-	}
-	else if((PlayerData[playerid][iLastChat] >= 2) && ((PlayerData[playerid][tickLastChat] + COOLDOWN_CHAT) <= tick))
-	{
-        PlayerData[playerid][iLastChat] = 0;
-        PlayerData[playerid][tickLastChat] = tick;
-	}
-	else
-	{
-	    PlayerData[playerid][iLastChat]++;
-	}
-
 	if(text[0] == '!' && PlayerData[playerid][e_gangrank] != 0)
 	{
 	    format(gstr, sizeof(gstr), ""gang_sign" {%06x}%s(%i)"r_besch": %s", GetColor__(playerid) >>> 8, __GetName(playerid), playerid, text[1]);
@@ -4315,6 +4285,8 @@ public OnPlayerText(playerid, text[])
 	{
 	    UpperToLower(text);
 	}
+
+    PlayerData[playerid][iCoolDownChat] = GetTickCountEx();
 
 	format(gstr, sizeof(gstr), "%s", text);
 	SetPlayerChatBubble(playerid, gstr, WHITE, 50.0, 7000);
@@ -12368,7 +12340,7 @@ YCMD:jail(playerid, params[], help)
 			SetPVarInt(player, "JailedByAdmin", 1);
 
 			TextDrawShowForPlayer(player, JailTD);
-			SetTimerEx("hideJailTD", 5000, false, "i", player);
+			SetTimerEx("HideJailTextdraw", 4000, false, "ii", player, YHash(__GetName(player)));
 
 			format(gstr, sizeof(gstr), ""yellow"** "red"%s(%i) has been jailed by Admin %s(%i) for %i seconds [Reason: %s]", __GetName(player), player, __GetName(playerid), playerid, time, reason);
 			SCMToAll(-1, gstr);
@@ -27914,19 +27886,13 @@ function:CoolDownDeath(playerid)
 	return 1;
 }
 
-function:CoolDownText(playerid)
-{
-	PlayerData[playerid][iCoolDownText]--;
-	return 1;
-}
-
-function:SetPlayerPosEx(playerid, Float:X, Float:Y, Float:Z)
+SetPlayerPosEx(playerid, Float:X, Float:Y, Float:Z)
 {
     Streamer_UpdateEx(playerid, X, Y, Z);
 	SetPlayerPos(playerid, X, Y, Z);
 }
 
-function:RandomSvrMsg()
+function:server_random_broadcast()
 {
     SCMToAll(WHITE, ServerMSGS[random(sizeof(ServerMSGS))]);
 	return 1;
@@ -28317,7 +28283,7 @@ function:JailPlayer(playerid, namehash)
 		ResetPlayerWeapons(playerid);
 		PlayerPlaySound(playerid, 1186, 0, 0, 0);
 		TextDrawShowForPlayer(playerid, JailTD);
-		SetTimerEx("hideJailTD", 4000, false, "i", playerid);
+		SetTimerEx("HideJailTextdraw", 4000, false, "ii", playerid, YHash(__GetName(playerid)));
 	}
 	return true;
 }
@@ -28467,11 +28433,16 @@ function:MoveGate(playerid)
 	// Return gate back to Original pos.
 	MoveObject(Gate[0], 1397.24, 2694.51, 9.91, 3);
 	MoveObject(Gate[1], 1397.24, 2693.86, 9.91, 3);
+	return 1;
 }
 
-function:hideJailTD(playerid)
+function:HideJailTextdraw(playerid, namehash)
 {
-    TextDrawHideForPlayer(playerid, JailTD);
+	if(namehash == YHash(__GetName(playerid)))
+	{
+    	TextDrawHideForPlayer(playerid, JailTD);
+	}
+	return 1;
 }
 
 function:Maths()
@@ -29507,8 +29478,11 @@ function:OnGangRenameAttempt(playerid, newgangname[], newgangtag[])
 
 function:OnBoostReceive(playerid, namehash)
 {
-    if(!IsPlayerConnected(playerid)) return 0;
-	if(YHash(__GetName(playerid)) != namehash) return 0;
+    if(!IsPlayerConnected(playerid))
+		return 0;
+		
+	if(YHash(__GetName(playerid)) != namehash)
+		return 0;
 
 	new rows, fields;
 	cache_get_data(rows, fields, pSQL);
@@ -30496,7 +30470,7 @@ PreparePlayerVars(playerid)
 	PlayerData[playerid][toy_selected] = 0;
 	PlayerData[playerid][houseobj_selected] = 0;
 	PlayerData[playerid][iCoolDownCommand] = 0;
-	PlayerData[playerid][iCoolDownText] = 0;
+	PlayerData[playerid][iCoolDownChat] = 0;
 	PlayerData[playerid][iCoolDownDeath] = 0;
 	PlayerData[playerid][DuelWeapon] = 0;
 	PlayerData[playerid][DuelLocation] = 0;
@@ -30557,7 +30531,8 @@ function:ForceClassSpawn(playerid)
 
 function:OnPlayerAccountRequest(playerid, namehash, request)
 {
-    if(!IsPlayerConnected(playerid)) return 0;
+    if(!IsPlayerConnected(playerid))
+		return 0;
 
 	if(YHash(__GetName(playerid)) != namehash) {
 	    Log(LOG_NET, "OnPlayerAccountRequest data race detected, kicking (%s, %i, %i, %i)", __GetName(playerid), playerid, YHash(__GetName(playerid)), namehash);
