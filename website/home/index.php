@@ -69,7 +69,17 @@ include("inc/function.inc.php");
 						array(
 						'id' => 'kf5',
 						'type' => 'killingfloor',
-						'host' => '31.204.152.246:7708',
+						'host' => '213.163.74.22:7708',
+						),
+						array(
+						'id' => 'kf6',
+						'type' => 'killingfloor',
+						'host' => '213.163.74.23:7708',
+						),
+						array(
+						'id' => 'kf7',
+						'type' => 'killingfloor',
+						'host' => '213.163.74.41:7708',
 						)
 					);
 					
