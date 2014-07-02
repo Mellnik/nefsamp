@@ -88,7 +88,7 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #else
 #define CURRENT_VERSION                 "PTS:Build 29"
 #endif
-#define HOTFIX_REV                      "Hotfix #0"
+#define HOTFIX_REV                      "Hotfix #1"
 #define SAMP_VERSION                    "SA-MP 0.3z-R2-2"
 #define MAX_REPORTS 					(7)
 #define MAX_ADS                         (10)
@@ -21721,7 +21721,7 @@ MySQL_RegisterAccount(playerid, register, password[])
 
 function:OnPlayerRegister(playerid, namehash, register, password[], playername[], ip_address[])
 {
-	mysql_format(pSQL, gstr2, sizeof(gstr2), "UPDATE `accounts` SET `hash` = SHA1('%e'), `ip` = '%s' WHERE `name` = '%s';", password, playername, ip_address);
+	mysql_format(pSQL, gstr2, sizeof(gstr2), "UPDATE `accounts` SET `hash` = SHA1('%e'), `ip` = '%s' WHERE `name` = '%s';", password, ip_address, playername);
 	mysql_tquery(pSQL, gstr2);
 	
 	if(namehash == YHash(__GetName(playerid)))

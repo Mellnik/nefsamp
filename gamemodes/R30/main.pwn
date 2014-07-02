@@ -3914,7 +3914,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				    if(count <= 20)
 				    {
 				        new tmp[MAX_PLAYER_NAME + 1 + 16];
-				        format(tmp, sizeof(tmp), "\n{%06x}%s(%i)", GetColor__(i) >>> 8, __GetName(i), i);
+				        format(tmp, sizeof(tmp), "\n{%06x}%s(%i)", GetColorEx(i) >>> 8, __GetName(i), i);
 				        strcat(members, tmp);
 				    }
 				    count++;
@@ -4234,7 +4234,7 @@ public OnPlayerText(playerid, text[])
 
 			rtime = rtime - second * 1000;
 
-			format(gstr, sizeof(gstr), "["vlila"REACTION"white"]: {%06x}%s(%i) "white"has won the reaction test in %2i.%03i seconds!", GetColor__(playerid) >>> 8, __GetName(playerid), playerid, second, rtime);
+			format(gstr, sizeof(gstr), "["vlila"REACTION"white"]: {%06x}%s(%i) "white"has won the reaction test in %2i.%03i seconds!", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, second, rtime);
 		    SCMToAll(WHITE, gstr);
 
 			format(gstr, sizeof(gstr), "3,1ReactionTest:4 %s(%i) has won the reaction test in %2i.%03i seconds!", __GetName(playerid), playerid, second, rtime);
@@ -4286,7 +4286,7 @@ public OnPlayerText(playerid, text[])
 
 	if(text[0] == '!' && PlayerData[playerid][e_gangrank] != 0)
 	{
-	    format(gstr, sizeof(gstr), ""gang_sign" {%06x}%s(%i)"r_besch": %s", GetColor__(playerid) >>> 8, __GetName(playerid), playerid, text[1]);
+	    format(gstr, sizeof(gstr), ""gang_sign" {%06x}%s(%i)"r_besch": %s", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, text[1]);
 		GangMSG(PlayerData[playerid][e_gangid], gstr);
 		
 		format(gstr, sizeof(gstr), "[GC] %s(%i): %s", __GetName(playerid), playerid, text[1]);
@@ -4325,13 +4325,13 @@ public OnPlayerText(playerid, text[])
 
 			if(PlayerData[playerid][e_level] == 0)
 			{
-				format(gstr, sizeof(gstr), "{%06x}[%s] %s"white"(%i): %s", GetColor__(playerid) >>> 8, PlayerData[playerid][GangTag], __GetName(playerid), playerid, text);
+				format(gstr, sizeof(gstr), "{%06x}[%s] %s"white"(%i): %s", GetColorEx(playerid) >>> 8, PlayerData[playerid][GangTag], __GetName(playerid), playerid, text);
 				SCMToAll(-1, gstr);
 				SCMToAll(-1, tmp);
 	   		}
 			else
 			{
-				format(gstr, sizeof(gstr), "{%06x}[%s] %s"white"(%i): {A8DBFF}%s", GetColor__(playerid) >>> 8, PlayerData[playerid][GangTag], __GetName(playerid), playerid, text);
+				format(gstr, sizeof(gstr), "{%06x}[%s] %s"white"(%i): {A8DBFF}%s", GetColorEx(playerid) >>> 8, PlayerData[playerid][GangTag], __GetName(playerid), playerid, text);
 				SCMToAll(-1, gstr);
 				SCMToAll(-1, tmp);
 			}
@@ -4340,12 +4340,12 @@ public OnPlayerText(playerid, text[])
 		{
 			if(PlayerData[playerid][e_level] == 0)
 			{
-				format(gstr, sizeof(gstr), "{%06x}[%s] %s"white"(%i): %s", GetColor__(playerid) >>> 8, PlayerData[playerid][GangTag], __GetName(playerid), playerid, text);
+				format(gstr, sizeof(gstr), "{%06x}[%s] %s"white"(%i): %s", GetColorEx(playerid) >>> 8, PlayerData[playerid][GangTag], __GetName(playerid), playerid, text);
 				SCMToAll(-1, gstr);
 	   		}
 			else
 			{
-				format(gstr, sizeof(gstr), "{%06x}[%s] %s"white"(%i): {A8DBFF}%s", GetColor__(playerid) >>> 8, PlayerData[playerid][GangTag], __GetName(playerid), playerid, text);
+				format(gstr, sizeof(gstr), "{%06x}[%s] %s"white"(%i): {A8DBFF}%s", GetColorEx(playerid) >>> 8, PlayerData[playerid][GangTag], __GetName(playerid), playerid, text);
 				SCMToAll(-1, gstr);
 			}
 		}
@@ -4367,13 +4367,13 @@ public OnPlayerText(playerid, text[])
 		text[pos] = EOS;
 		if(PlayerData[playerid][e_level] == 0)
 		{
-			format(gstr, sizeof(gstr), "{%06x}%s"white"(%i): %s", GetColor__(playerid) >>> 8, __GetName(playerid), playerid, text);
+			format(gstr, sizeof(gstr), "{%06x}%s"white"(%i): %s", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, text);
 			SCMToAll(-1, gstr);
 			SCMToAll(-1, tmp);
 		}
 		else
 		{
-			format(gstr, sizeof(gstr), "{%06x}%s"white"(%i): {A8DBFF}%s", GetColor__(playerid) >>> 8, __GetName(playerid), playerid, text);
+			format(gstr, sizeof(gstr), "{%06x}%s"white"(%i): {A8DBFF}%s", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, text);
 			SCMToAll(-1, gstr);
 			SCMToAll(-1, tmp);
 		}
@@ -4382,12 +4382,12 @@ public OnPlayerText(playerid, text[])
 	{
 		if(PlayerData[playerid][e_level] == 0)
 		{
-	 		format(gstr, sizeof(gstr), "{%06x}%s"white"(%i): %s", GetColor__(playerid) >>> 8, __GetName(playerid), playerid, text);
+	 		format(gstr, sizeof(gstr), "{%06x}%s"white"(%i): %s", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, text);
 			SCMToAll(-1, gstr);
   		}
 		else if(PlayerData[playerid][AOnline] && PlayerData[playerid][e_level] > 0)
 		{
- 	 		format(gstr, sizeof(gstr), "{%06x}%s"white"(%i): {A8DBFF}%s", GetColor__(playerid) >>> 8, __GetName(playerid), playerid, text);
+ 	 		format(gstr, sizeof(gstr), "{%06x}%s"white"(%i): {A8DBFF}%s", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, text);
 			SCMToAll(-1, gstr);
 		}
 	}
@@ -4589,7 +4589,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 				    case 3:
 				    {
 				        player_notice(killerid, "Triple Kill", "+$2,000");
-        				format(gstr, sizeof(gstr), "* {%06x}%s(%i) "red"is on a kill streak with 3 kills!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
+        				format(gstr, sizeof(gstr), "* {%06x}%s(%i) "red"is on a kill streak with 3 kills!", GetColorEx(killerid) >>> 8, __GetName(killerid), killerid);
 						SCMToAll(COLOR_RED, gstr);
 						GivePlayerScoreEx(killerid, 1, true, true);
 						GivePlayerMoneyEx(killerid, 2000, true, true);
@@ -4597,7 +4597,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 				    case 5:
 					{
 					    player_notice(killerid, "Multi Kill", "+$4,000");
-        				format(gstr, sizeof(gstr), "* {%06x}%s(%i) "red"is on a kill streak with 5 kills!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
+        				format(gstr, sizeof(gstr), "* {%06x}%s(%i) "red"is on a kill streak with 5 kills!", GetColorEx(killerid) >>> 8, __GetName(killerid), killerid);
 						SCMToAll(COLOR_RED, gstr);
 						GivePlayerScoreEx(killerid, 2, true, true);
 						GivePlayerMoneyEx(killerid, 4000, true, true);
@@ -4605,7 +4605,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 					case 10:
   					{
 					    player_notice(killerid, "Ultra Kill", "+$7,000");
-     					format(gstr, sizeof(gstr), "* {%06x}%s(%i) "red"is unstoppable with a 10 streak kill!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
+     					format(gstr, sizeof(gstr), "* {%06x}%s(%i) "red"is unstoppable with a 10 streak kill!", GetColorEx(killerid) >>> 8, __GetName(killerid), killerid);
 						SCMToAll(COLOR_RED, gstr);
 						GivePlayerScoreEx(killerid, 3, true, true);
 						GivePlayerMoneyEx(killerid, 7000, true, true);
@@ -4613,7 +4613,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 					case 15:
   					{
 					    player_notice(killerid, "~r~~h~~h~Monster Kill", "+$10,000");
-   						format(gstr, sizeof(gstr), "* {%06x}%s(%i) "red"can't be stopped with a 15 streak kill!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
+   						format(gstr, sizeof(gstr), "* {%06x}%s(%i) "red"can't be stopped with a 15 streak kill!", GetColorEx(killerid) >>> 8, __GetName(killerid), killerid);
 						SCMToAll(COLOR_RED, gstr);
 						GivePlayerScoreEx(killerid, 4, true, true);
 						GivePlayerMoneyEx(killerid, 10000, true, true);
@@ -4621,7 +4621,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 					case 25:
   					{
   					    player_notice(killerid, "~r~~h~~h~Incredible Kill", "+$15,000");
-          				format(gstr, sizeof(gstr), "* {%06x}%s(%i) "red"can't be stopped with a 25 streak kill!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
+          				format(gstr, sizeof(gstr), "* {%06x}%s(%i) "red"can't be stopped with a 25 streak kill!", GetColorEx(killerid) >>> 8, __GetName(killerid), killerid);
 						SCMToAll(COLOR_RED, gstr);
 						GivePlayerScoreEx(killerid, 5, true, true);
 						GivePlayerMoneyEx(killerid, 15000, true, true);
@@ -4629,7 +4629,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 					case 30:
   					{
   					    player_notice(killerid, "~r~~h~~h~Fantastic Kill", "+$20,000");
-          				format(gstr, sizeof(gstr), "* {%06x}%s(%i) "red"can't be stopped with a 30 streak kill!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
+          				format(gstr, sizeof(gstr), "* {%06x}%s(%i) "red"can't be stopped with a 30 streak kill!", GetColorEx(killerid) >>> 8, __GetName(killerid), killerid);
 						SCMToAll(COLOR_RED, gstr);
 						GivePlayerScoreEx(killerid, 6, true, true);
 						GivePlayerMoneyEx(killerid, 20000, true, true);
@@ -4642,7 +4642,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 					case 40:
   					{
   					    player_notice(killerid, "~r~~h~~h~Mega Kill", "+$25,000");
-          				format(gstr, sizeof(gstr), "* {%06x}%s(%i) "red"is godlike with a 40 streak kill!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
+          				format(gstr, sizeof(gstr), "* {%06x}%s(%i) "red"is godlike with a 40 streak kill!", GetColorEx(killerid) >>> 8, __GetName(killerid), killerid);
 						SCMToAll(COLOR_RED, gstr);
 						GivePlayerScoreEx(killerid, 7, true, true);
 						GivePlayerMoneyEx(killerid, 25000, true, true);
@@ -4650,7 +4650,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 					case 50:
   					{
         				player_notice(killerid, "~r~Unbelievable!!!", "+$30,000");
-                 		format(gstr, sizeof(gstr), "* {%06x}%s(%i) "red"shitting on everyone with a 50 streak kill!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid);
+                 		format(gstr, sizeof(gstr), "* {%06x}%s(%i) "red"shitting on everyone with a 50 streak kill!", GetColorEx(killerid) >>> 8, __GetName(killerid), killerid);
 						SCMToAll(COLOR_RED, gstr);
 						GivePlayerScoreEx(killerid, 8, true, true);
 						GivePlayerMoneyEx(killerid, 30000, true, true);
@@ -4673,7 +4673,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 
 				if(PlayerData[playerid][e_wanteds] >= 3)
 				{
-				    format(gstr, sizeof(gstr), "* {%06x}%s(%i) "x_red_l"ended %s's(%i) killstreak of %i kills!", GetColor__(killerid) >>> 8, __GetName(killerid), killerid, __GetName(playerid), playerid, PlayerData[playerid][e_wanteds]);
+				    format(gstr, sizeof(gstr), "* {%06x}%s(%i) "x_red_l"ended %s's(%i) killstreak of %i kills!", GetColorEx(killerid) >>> 8, __GetName(killerid), killerid, __GetName(playerid), playerid, PlayerData[playerid][e_wanteds]);
 				    SCMToAll(COLOR_RED, gstr);
 				}
 
@@ -5149,7 +5149,7 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 
 				GameTextForPlayer(playerid,"~r~~h~Congrats!~n~~w~You finished the bike challenge.", 6000, 5);
 				PlayerPlaySound(playerid, 1149, 0, 0, 0);
-				format(str, sizeof(str), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /bikec.", GetColor__(playerid) >>> 8, __GetName(playerid), playerid);
+				format(str, sizeof(str), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /bikec.", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid);
 				SCMToAll(COLOR_WHITE, str);
 				GivePlayerScoreEx(playerid, 4, true, true);
 				GivePlayerMoneyEx(playerid, 7000, true, true);
@@ -5174,7 +5174,7 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 	  			}
 				GameTextForPlayer(playerid, "~r~~h~Congrats!~n~~w~You finished the skydive challenge.",6000,5);
 				PlayerPlaySound(playerid, 1149,0,0,0);
-				format(str, sizeof(str), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /skydive.", GetColor__(playerid) >>> 8, __GetName(playerid), playerid);
+				format(str, sizeof(str), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /skydive.", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid);
 				SCMToAll(COLOR_WHITE, str);
 				GivePlayerScoreEx(playerid, 3, true, true);
 				GivePlayerMoneyEx(playerid, 5000, true, true);
@@ -5203,7 +5203,7 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 	  			}
 				GameTextForPlayer(playerid, "~r~~h~Congrats!~n~~w~You finished the skydive2 challenge.",6000,5);
 				PlayerPlaySound(playerid, 1149,0,0,0);
-				format(str, sizeof(str), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /skydive2.", GetColor__(playerid) >>> 8, __GetName(playerid), playerid);
+				format(str, sizeof(str), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /skydive2.", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid);
 				SCMToAll(COLOR_WHITE, str);
 				GivePlayerScoreEx(playerid, 6, true, true);
 				GivePlayerMoneyEx(playerid, 10000, true, true);
@@ -5232,7 +5232,7 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 	  			}
 				GameTextForPlayer(playerid, "~r~~h~Congrats!~n~~w~You finished the skydive3 challenge.",6000,5);
 				PlayerPlaySound(playerid, 1149,0,0,0);
-				format(str, sizeof(str), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /skydive3.", GetColor__(playerid) >>> 8, __GetName(playerid), playerid);
+				format(str, sizeof(str), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /skydive3.", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid);
 				SCMToAll(COLOR_WHITE, str);
 				GivePlayerScoreEx(playerid, 7, true, true);
 				GivePlayerMoneyEx(playerid, 7500, true, true);
@@ -5253,7 +5253,7 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 	  			}
 				GameTextForPlayer(playerid, "~r~~h~Congrats!~n~~w~You finished the skydive4 challenge.",6000,5);
 				PlayerPlaySound(playerid, 1149,0,0,0);
-				format(str, sizeof(str), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /skydive4.", GetColor__(playerid) >>> 8, __GetName(playerid), playerid);
+				format(str, sizeof(str), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /skydive4.", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid);
 				SCMToAll(COLOR_WHITE, str);
 				GivePlayerScoreEx(playerid, 7, true, true);
 				GivePlayerMoneyEx(playerid, 8000, true, true);
@@ -5277,7 +5277,7 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 
 				GameTextForPlayer(playerid, "~r~~h~Congrats!~n~~w~You finished the BMX Parkour.", 6000, 5);
 				PlayerPlaySound(playerid, 1149,0,0,0);
-				format(str, sizeof(str), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /bmx.", GetColor__(playerid) >>> 8, __GetName(playerid), playerid);
+				format(str, sizeof(str), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /bmx.", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid);
 				SCMToAll(COLOR_WHITE, str);
 				GivePlayerScoreEx(playerid, 8, true, true);
 				GivePlayerMoneyEx(playerid, 10000, true, true);
@@ -5531,7 +5531,7 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 	  			}
 				GameTextForPlayer(playerid, "~r~~h~Congrats!~n~~w~You finished the skydive5 challenge.",6000,5);
 				PlayerPlaySound(playerid, 1149,0,0,0);
-				format(str, sizeof(str), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /skydive5.", GetColor__(playerid) >>> 8, __GetName(playerid), playerid);
+				format(str, sizeof(str), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /skydive5.", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid);
 				SCMToAll(COLOR_WHITE, str);
 				GivePlayerScoreEx(playerid, 8, true, true);
 				GivePlayerMoneyEx(playerid, 8000, true, true);
@@ -5552,7 +5552,7 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 	  			}
 				GameTextForPlayer(playerid, "~r~~h~Congrats!~n~~w~You finished the skydive6 challenge.",6000,5);
 				PlayerPlaySound(playerid, 1149,0,0,0);
-				format(str, sizeof(str), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /skydive6.", GetColor__(playerid) >>> 8, __GetName(playerid), playerid);
+				format(str, sizeof(str), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /skydive6.", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid);
 				SCMToAll(COLOR_WHITE, str);
 				GivePlayerScoreEx(playerid, 8, true, true);
 				GivePlayerMoneyEx(playerid, 8000, true, true);
@@ -7966,7 +7966,7 @@ YCMD:random(playerid, params[], help)
 	}
 	new rand = random(sizeof(szPlayerColors));
 	SetPlayerColor(playerid, szPlayerColors[rand]);
-	format(gstr, sizeof(gstr), "Color set! Your new color: {%06x}Color", GetColor__(playerid) >>> 8);
+	format(gstr, sizeof(gstr), "Color set! Your new color: {%06x}Color", GetColorEx(playerid) >>> 8);
 	SCM(playerid, BLUE, gstr);
 	return 1;
 }
@@ -10802,7 +10802,7 @@ YCMD:day(playerid, params[], help)
 	{
 	    SetWorldTime(12);
 	    SetWeather(1);
-	    format(gstr, sizeof(gstr), ""LB_E"Administrator {%06x}%s(%i) "LB_E"has changed the time to: "YELLOW_E"day time", GetColor__(playerid) >>> 8, __GetName(playerid), playerid);
+	    format(gstr, sizeof(gstr), ""LB_E"Administrator {%06x}%s(%i) "LB_E"has changed the time to: "YELLOW_E"day time", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid);
 		SCMToAll(COLOR_STEELBLUE, gstr);
 	}
 	else
@@ -10818,7 +10818,7 @@ YCMD:dawn(playerid, params[], help)
 	{
 		SetWorldTime(6);
 		SetWeather(1);
-		format(gstr, sizeof(gstr), ""LB_E"Administrator {%06x}%s(%i) "LB_E"has changed the time to: "YELLOW_E"Dawn", GetColor__(playerid) >>> 8, __GetName(playerid), playerid);
+		format(gstr, sizeof(gstr), ""LB_E"Administrator {%06x}%s(%i) "LB_E"has changed the time to: "YELLOW_E"Dawn", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid);
 		SCMToAll(COLOR_STEELBLUE, gstr);
  	}
 	else
@@ -10834,7 +10834,7 @@ YCMD:night(playerid, params[], help)
 	{
 	    SetWorldTime(0);
 	    SetWeather(17);
-	    format(gstr, sizeof(gstr), ""LB_E"Administrator {%06x}%s(%i) "LB_E"has changed the time to: "YELLOW_E"night time", GetColor__(playerid) >>> 8, __GetName(playerid), playerid);
+	    format(gstr, sizeof(gstr), ""LB_E"Administrator {%06x}%s(%i) "LB_E"has changed the time to: "YELLOW_E"night time", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid);
 		SCMToAll(COLOR_STEELBLUE, gstr);
  	}
 	else
@@ -12279,7 +12279,7 @@ YCMD:dplayers(playerid, params[], help)
 		{
 		    if(IsPlayerAvail(i) && gTeam[i] == DERBY)
 		    {
-				format(tmp, sizeof(tmp), "{%06x}(%i)%s\n", GetColor__(i) >>> 8, i, __GetName(i));
+				format(tmp, sizeof(tmp), "{%06x}(%i)%s\n", GetColorEx(i) >>> 8, i, __GetName(i));
 				strcat(string, tmp);
 		    }
 		}
@@ -12301,7 +12301,7 @@ YCMD:rplayers(playerid, params[], help)
 		{
 		    if(IsPlayerAvail(i) && gTeam[i] == gRACE)
 		    {
-				format(tmp, sizeof(tmp), "{%06x}(%i)%s\n", GetColor__(i) >>> 8, i, __GetName(i));
+				format(tmp, sizeof(tmp), "{%06x}(%i)%s\n", GetColorEx(i) >>> 8, i, __GetName(i));
 				strcat(string, tmp);
 				count++;
 			}
@@ -12898,7 +12898,7 @@ YCMD:p(playerid, params[], help)
 	    UpperToLower(gstr);
 	}
 
-	format(gstr, sizeof(gstr), ""white"["lb_e"VIP CHAT"white"] {%06x}%s"lb_e"(%i): %s", GetColor__(playerid) >>> 8, __GetName(playerid), playerid, gstr);
+	format(gstr, sizeof(gstr), ""white"["lb_e"VIP CHAT"white"] {%06x}%s"lb_e"(%i): %s", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, gstr);
 	VIPMSG(-1, gstr);
 	return 1;
 }
@@ -13313,7 +13313,7 @@ YCMD:cd(playerid, params[], help)
     tVIPCountdown = SetTimer("CountdownVIP", 1000, true);
     
     new str[255];
-   	format(str, sizeof(str), ""nef" VIP {%06x}%s(%i) "white"has started a countdown!", GetColor__(playerid) >>> 8, __GetName(playerid), playerid);
+   	format(str, sizeof(str), ""nef" VIP {%06x}%s(%i) "white"has started a countdown!", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid);
 	SCMToAll(-1, str);
 	
 	PlayerData[playerid][tickLastCD] = tick;
@@ -14178,7 +14178,7 @@ YCMD:gungames(playerid, params[], help)
 	{
 	    if(gungames[i][E_gungame] != -1)
 	    {
-		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Gungame Wins: %i\n", GetColor__(gungames[i][E_playerid]) >>> 8, i + 1, __GetName(gungames[i][E_playerid]), gungames[i][E_playerid], gungames[i][E_gungame]);
+		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Gungame Wins: %i\n", GetColorEx(gungames[i][E_playerid]) >>> 8, i + 1, __GetName(gungames[i][E_playerid]), gungames[i][E_playerid], gungames[i][E_gungame]);
 		    strcat(finstring, tmpstring);
 		}
 		else
@@ -14218,7 +14218,7 @@ YCMD:fallouts(playerid, params[], help)
 	{
 	    if(fallouts[i][E_fallout] != -1)
 	    {
-		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Fallout Wins: %i\n", GetColor__(fallouts[i][E_playerid]) >>> 8, i + 1, __GetName(fallouts[i][E_playerid]), fallouts[i][E_playerid], fallouts[i][E_fallout]);
+		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Fallout Wins: %i\n", GetColorEx(fallouts[i][E_playerid]) >>> 8, i + 1, __GetName(fallouts[i][E_playerid]), fallouts[i][E_playerid], fallouts[i][E_fallout]);
 		    strcat(finstring, tmpstring);
 		}
 		else
@@ -14258,7 +14258,7 @@ YCMD:derbys(playerid, params[], help)
 	{
 	    if(derbys[i][E_derby] != -1)
 	    {
-		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Derby Wins: %i\n", GetColor__(derbys[i][E_playerid]) >>> 8, i + 1, __GetName(derbys[i][E_playerid]), derbys[i][E_playerid], derbys[i][E_derby]);
+		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Derby Wins: %i\n", GetColorEx(derbys[i][E_playerid]) >>> 8, i + 1, __GetName(derbys[i][E_playerid]), derbys[i][E_playerid], derbys[i][E_derby]);
 		    strcat(finstring, tmpstring);
 		}
 		else
@@ -14298,7 +14298,7 @@ YCMD:races(playerid, params[], help)
 	{
 	    if(races[i][E_race] != -1)
 	    {
-		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Race Wins: %i\n", GetColor__(races[i][E_playerid]) >>> 8, i + 1, __GetName(races[i][E_playerid]), races[i][E_playerid], races[i][E_race]);
+		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Race Wins: %i\n", GetColorEx(races[i][E_playerid]) >>> 8, i + 1, __GetName(races[i][E_playerid]), races[i][E_playerid], races[i][E_race]);
 		    strcat(finstring, tmpstring);
 		}
 		else
@@ -14338,7 +14338,7 @@ YCMD:rtests(playerid, params[], help)
 	{
 	    if(tests[i][E_test] != -1)
 	    {
-		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Reaction Wins: %i\n", GetColor__(tests[i][E_playerid]) >>> 8, i + 1, __GetName(tests[i][E_playerid]), tests[i][E_playerid], tests[i][E_test]);
+		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Reaction Wins: %i\n", GetColorEx(tests[i][E_playerid]) >>> 8, i + 1, __GetName(tests[i][E_playerid]), tests[i][E_playerid], tests[i][E_test]);
 		    strcat(finstring, tmpstring);
 		}
 		else
@@ -14378,7 +14378,7 @@ YCMD:kills(playerid, params[], help)
 	{
 	    if(kills[i][E_kills] != -1)
 	    {
-		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Kills: %i\n", GetColor__(kills[i][E_playerid]) >>> 8, i + 1, __GetName(kills[i][E_playerid]), kills[i][E_playerid], kills[i][E_kills]);
+		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Kills: %i\n", GetColorEx(kills[i][E_playerid]) >>> 8, i + 1, __GetName(kills[i][E_playerid]), kills[i][E_playerid], kills[i][E_kills]);
 		    strcat(finstring, tmpstring);
 		}
 		else
@@ -14418,7 +14418,7 @@ YCMD:deaths(playerid, params[], help)
 	{
 	    if(deaths[i][E_deaths] != -1)
 	    {
-		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Deaths: %i\n", GetColor__(deaths[i][E_playerid]) >>> 8, i + 1, __GetName(deaths[i][E_playerid]), deaths[i][E_playerid], deaths[i][E_deaths]);
+		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Deaths: %i\n", GetColorEx(deaths[i][E_playerid]) >>> 8, i + 1, __GetName(deaths[i][E_playerid]), deaths[i][E_playerid], deaths[i][E_deaths]);
 		    strcat(finstring, tmpstring);
 		}
 		else
@@ -14460,7 +14460,7 @@ YCMD:toptime(playerid, params[], help)
 	{
 	    if(playingtime[i][E_time] != -1)
 	    {
-		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Time: %s\n", GetColor__(playingtime[i][E_playerid]) >>> 8, i + 1, __GetName(playingtime[i][E_playerid]), playingtime[i][E_playerid], GetPlayingTimeFormat(playingtime[i][E_playerid]));
+		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Time: %s\n", GetColorEx(playingtime[i][E_playerid]) >>> 8, i + 1, __GetName(playingtime[i][E_playerid]), playingtime[i][E_playerid], GetPlayingTimeFormat(playingtime[i][E_playerid]));
 		    strcat(finstring, tmpstring);
 		}
 		else
@@ -14500,7 +14500,7 @@ YCMD:richlist(playerid, params[], help)
 	{
 	    if(richlist[i][E_money] != -1)
 	    {
-		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Money: $%s\n", GetColor__(richlist[i][E_playerid]) >>> 8, i + 1, __GetName(richlist[i][E_playerid]), richlist[i][E_playerid], number_format(richlist[i][E_money]));
+		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Money: $%s\n", GetColorEx(richlist[i][E_playerid]) >>> 8, i + 1, __GetName(richlist[i][E_playerid]), richlist[i][E_playerid], number_format(richlist[i][E_money]));
 		    strcat(finstring, tmpstring);
 		}
 		else
@@ -14540,7 +14540,7 @@ YCMD:wanteds(playerid, params[], help)
 	{
 	    if(wanteds[i][E_wanteds] != -1)
 	    {
-		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Wanteds: %i\n", GetColor__(wanteds[i][E_playerid]) >>> 8, i + 1, __GetName(wanteds[i][E_playerid]), wanteds[i][E_playerid], wanteds[i][E_wanteds]);
+		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Wanteds: %i\n", GetColorEx(wanteds[i][E_playerid]) >>> 8, i + 1, __GetName(wanteds[i][E_playerid]), wanteds[i][E_playerid], wanteds[i][E_wanteds]);
 		    strcat(finstring, tmpstring);
 		}
 		else
@@ -14579,7 +14579,7 @@ YCMD:score(playerid, params[], help)
 	{
 	    if(score[i][E_pscore] != -1)
 	    {
-		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Score: %i\n", GetColor__(score[i][E_playerid]) >>> 8, i + 1, __GetName(score[i][E_playerid]), score[i][E_playerid], score[i][E_pscore]);
+		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Score: %i\n", GetColorEx(score[i][E_playerid]) >>> 8, i + 1, __GetName(score[i][E_playerid]), score[i][E_playerid], score[i][E_pscore]);
 		    strcat(finstring, tmpstring);
 		}
 		else
@@ -15811,7 +15811,7 @@ YCMD:answer(playerid, params[], help)
 		return true;
 	}
 
-	format(str, sizeof(str), ""RED_E"[MATHS] :: {%06x}%s(%i) "white"has correctly answered %s (answer: %i) winning 4 score and $%s!", GetColor__(playerid) >>> 8, __GetName(playerid), playerid, mathsCurrent, answer, number_format(mathsAward));
+	format(str, sizeof(str), ""RED_E"[MATHS] :: {%06x}%s(%i) "white"has correctly answered %s (answer: %i) winning 4 score and $%s!", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, mathsCurrent, answer, number_format(mathsAward));
 	SCMToAll(-1, str);
 
 	GivePlayerScoreEx(playerid, 4, true, true);
@@ -17734,7 +17734,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        {
 	            SetPVarInt(playerid, "dSkin", GetPlayerSkin(playerid));
 	            new string[255];
-	            SetPVarInt(playerid, "oldColor", GetColor__(playerid));
+	            SetPVarInt(playerid, "oldColor", GetColorEx(playerid));
 				switch(listitem)
   				{
   					case 0: // Cops
@@ -21721,7 +21721,7 @@ MySQL_RegisterAccount(playerid, register, password[])
 
 function:OnPlayerRegister(playerid, namehash, register, password[], playername[], ip_address[])
 {
-	mysql_format(pSQL, gstr2, sizeof(gstr2), "UPDATE `accounts` SET `hash` = SHA1('%e'), `ip` = '%s' WHERE `name` = '%s';", password, playername, ip_address);
+	mysql_format(pSQL, gstr2, sizeof(gstr2), "UPDATE `accounts` SET `hash` = SHA1('%e'), `ip` = '%s' WHERE `name` = '%s';", password, ip_address, playername);
 	mysql_tquery(pSQL, gstr2);
 	
 	if(namehash == YHash(__GetName(playerid)))
@@ -27464,7 +27464,7 @@ __GetSerial(playerid)
     return tmp;
 }
 
-GetColor__(playerid)
+GetColorEx(playerid)
 {
 	new color = GetPlayerColor(playerid);
 	return color;
@@ -27638,11 +27638,11 @@ function:ShowDialog(playerid, dialogid)
 	        new r = GetBusinessSlotBySelection(playerid);
 	        
 			if(r != -1) {
-			    strcat(string, ""white"The higher the level the higher the earnings. Upgrade your business\nlevel to receive more money each payday! Max. Level: 20\n\nCurrent Business Level: ");
+			    strcat(string, ""white"The higher the level the higher the earnings. Upgrade your business\nlevel to receive more money each payday! Max. level: 20\n\nCurrent Business Level: ");
 			    
 			    if(BusinessData[r][e_level] >= MAX_BUSINESS_LEVEL)
 			    {
-				    format(tmp, sizeof(tmp), "%i\nCurrent Business Earnings: $%s\n\nThis business reached its max. level!", BusinessData[r][e_level], number_format(GetBusinessEarnings(r)));
+				    format(tmp, sizeof(tmp), "%i\nCurrent Business Earnings: $%s\n\nThis business reached it's max. level!", BusinessData[r][e_level], number_format(GetBusinessEarnings(r)));
 					strcat(string, tmp);
 			    }
 			    else
@@ -28130,7 +28130,7 @@ GetPlayerSettings(playerid)
 	    strcat(string, gstr);
 	}
 
-    format(gstr, sizeof(gstr), ""white"4)\tColor\t\t{%06x}Color\n", GetColor__(playerid) >>> 8);
+    format(gstr, sizeof(gstr), ""white"4)\tColor\t\t{%06x}Color\n", GetColorEx(playerid) >>> 8);
     strcat(string, gstr);
 
 	if(!PlayerData[playerid][bHasSpawn])
@@ -28363,7 +28363,7 @@ function:StartRobbery(playerid, namehash)
 			{
 				case 0:
 				{
-					format(str, sizeof(str), "Server: {%06x}%s(%i) "LB_E"has robbed the %s and got away with "LG_E"$13,000", GetColor__(playerid) >>> 8, __GetName(playerid), playerid, GetStoreName(playerid));
+					format(str, sizeof(str), "Server: {%06x}%s(%i) "LB_E"has robbed the %s and got away with "LG_E"$13,000", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, GetStoreName(playerid));
 					SCMToAll(COLOR_RED, str);
 					GameTextForPlayer(playerid, "~w~You have robbed ~g~$13,000", 5000, 3);
 					SCM(playerid, COLOR_WHITE, ""nef" "ORANGE_E"You have succussfully completed the robbery and got away with "LG_E"$13,000");
@@ -28371,7 +28371,7 @@ function:StartRobbery(playerid, namehash)
 				}
 				case 1:
 				{
-					format(str, sizeof(str), "Server: {%06x}%s(%i) "LB_E"has robbed the %s and got away with "LG_E"$10,000", GetColor__(playerid) >>> 8, __GetName(playerid), playerid, GetStoreName(playerid));
+					format(str, sizeof(str), "Server: {%06x}%s(%i) "LB_E"has robbed the %s and got away with "LG_E"$10,000", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, GetStoreName(playerid));
 					SCMToAll(COLOR_RED, str);
 					GameTextForPlayer(playerid, "~w~You have robbed ~g~$10,000", 5000, 3);
 					SCM(playerid, COLOR_WHITE, ""nef" "ORANGE_E"You have succussfully completed the robbery and got away with "LG_E"$10,000");
@@ -28379,7 +28379,7 @@ function:StartRobbery(playerid, namehash)
 				}
 				case 2:
 				{
-					format(str, sizeof(str), "Server: {%06x}%s(%i) "LB_E"has robbed the %s and got away with "LG_E"$5,000", GetColor__(playerid) >>> 8, __GetName(playerid), playerid, GetStoreName(playerid));
+					format(str, sizeof(str), "Server: {%06x}%s(%i) "LB_E"has robbed the %s and got away with "LG_E"$5,000", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, GetStoreName(playerid));
 					SCMToAll(COLOR_RED, str);
 					GameTextForPlayer(playerid, "~w~You have robbed ~g~$5,000", 5000, 3);
 					SCM(playerid, COLOR_WHITE, ""nef" "ORANGE_E"You have succussfully completed the robbery and got away with "LG_E"$5,000");
@@ -28387,7 +28387,7 @@ function:StartRobbery(playerid, namehash)
 				}
 				case 3:
 				{
-					format(str, sizeof(str), "Server: {%06x}%s(%i) "LB_E"has robbed the %s and got away with "LG_E"$8,000", GetColor__(playerid) >>> 8, __GetName(playerid), playerid, GetStoreName(playerid));
+					format(str, sizeof(str), "Server: {%06x}%s(%i) "LB_E"has robbed the %s and got away with "LG_E"$8,000", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, GetStoreName(playerid));
 					SCMToAll(COLOR_RED, str);
 					GameTextForPlayer(playerid, "~w~You have robbed ~g~$8,000", 5000, 3);
 					SCM(playerid, COLOR_WHITE, ""nef" "ORANGE_E"You have succussfully completed the robbery and got away with "LG_E"$8,000");
@@ -28395,7 +28395,7 @@ function:StartRobbery(playerid, namehash)
 				}
 				case 4:
 				{
-					format(str, sizeof(str), "Server: {%06x}%s(%i) "LB_E"has robbed the %s and got away with "LG_E"$3,000", GetColor__(playerid) >>> 8, __GetName(playerid), playerid, GetStoreName(playerid));
+					format(str, sizeof(str), "Server: {%06x}%s(%i) "LB_E"has robbed the %s and got away with "LG_E"$3,000", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, GetStoreName(playerid));
 					SCMToAll(COLOR_RED, str);
 					GameTextForPlayer(playerid, "~w~You have robbed ~g~$3,000", 5000, 3);
 					SCM(playerid, COLOR_WHITE, ""nef" "ORANGE_E"You have succussfully completed the robbery and got away with "LG_E"$3,000");
@@ -28637,7 +28637,7 @@ GivePlayerAchievement(playerid, E_PLAYER_ACH_DATA:achivement, achname[], descrip
     PlayerData[playerid][e_score] += 10;
 	SetPlayerScore(playerid, PlayerData[playerid][e_score]);
 
-	format(gstr, sizeof(gstr), ""nef" {%06x}%s(%i) "GREEN_E"has unlocked the achievement '%s'!", GetColor__(playerid) >>> 8, __GetName(playerid), playerid, achname);
+	format(gstr, sizeof(gstr), ""nef" {%06x}%s(%i) "GREEN_E"has unlocked the achievement '%s'!", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, achname);
 	SCMToAll(-1, gstr);
 
 	ShowPlayerAchievement(playerid, achname, description);
