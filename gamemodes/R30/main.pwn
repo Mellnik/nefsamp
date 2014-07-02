@@ -18058,30 +18058,30 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						{
                             if(GetPlayerVirtualWorld(playerid) != (HouseInfo[h_id][e_id] + 1000)) return SCM(playerid, -1, ""er"You need to be in the house you selected!");
                             
-							new string[128], string2[1024], tmp[128];
-							format(string, sizeof(string), ""nef" :: House Menu > Slot: %i > House Items", PlayerData[playerid][HouseSlotSelected] + 1);
+							new string[1024];
+							format(gstr2, sizeof(gstr2), ""nef" :: House Menu > Slot: %i > House Items", PlayerData[playerid][HouseSlotSelected] + 1);
 
 							for(new i = 0; i < MAX_HOUSE_OBJECTS; i++)
 							{
 								if(i > PlayerData[playerid][e_addhouseitemslots] + 2)
 								{
-								    format(tmp, sizeof(tmp), "House Item Slot %i "red"(Locked)\n", i + 1);
+								    format(gstr, sizeof(gstr), "House Item Slot %i "red"(Locked)\n", i + 1);
 								}
 							    else
 							    {
 								    if(HouseInfo[h_id][E_Obj_Model][i] == 0)
 									{
-									    format(tmp, sizeof(tmp), "House Item Slot %i\n", i + 1);
+									    format(gstr, sizeof(gstr), "House Item Slot %i\n", i + 1);
 									}
 									else
 									{
-									    format(tmp, sizeof(tmp), "House Item Slot %i "green2"(Used)\n", i + 1);
+									    format(gstr, sizeof(gstr), "House Item Slot %i "green2"(Used)\n", i + 1);
 									}
 								}
-								strcat(string2, tmp);
+								strcat(string, gstr);
 							}
 
-							ShowPlayerDialog(playerid, HOUSE_MENU_DIALOG + 2, DIALOG_STYLE_LIST, string, string2, "Select", "Cancel");
+							ShowPlayerDialog(playerid, HOUSE_MENU_DIALOG + 2, DIALOG_STYLE_LIST, gstr2, string, "Select", "Cancel");
 						}
 						else player_notice(playerid, "Couldn't find the house in that slot", "Report on forums", 5000);
 				    }
@@ -25727,49 +25727,6 @@ function:OnQueueReceived()
 	}
 	return 1;
 }
-/*
-task LogoColUpdate[333]()
-{
-	static LogoRed, LogoGreen, LogoBlue, LogoPhase;
-	
-	if(LogoPhase == 0)
-	{
-		LogoRed += 5;
-		if(LogoRed >= 255) LogoPhase = 1;
-	}
-	else if(LogoPhase == 1)
-	{
-		LogoRed -= 5;
-		LogoBlue += 5;
-		if(LogoBlue >= 255) LogoBlue = 2;
-	}
-	else if(LogoPhase == 2)
-	{
-		LogoGreen += 5;
-		LogoBlue -= 5;
-		if(LogoGreen >= 255) LogoBlue = 3;
-	}
-	else if(LogoPhase == 3)
-	{
-	    LogoRed += 5;
-	    LogoGreen -= 5;
-	    if(LogoRed >= 255) LogoBlue = 1;
-	}
-	
-	TextDrawColor(NEFLOGO[1], RGBA2(LogoRed, LogoGreen, LogoBlue, 255));
-	TextDrawSetOutline(NEFLOGO[1], 1);
-	
-	for(new i = 0; i < MAX_PLAYERS; i++)
-	{
-	    if(PlayerData[i][bTDEnabled])
-	    {
-	        if(IsPlayerConnected(i)) TextDrawShowForPlayer(i, NEFLOGO[1]);
-		}
-	}
-	
-	printf("%i, %i, %i, %i", LogoPhase, LogoRed, LogoGreen, LogoBlue);
-	return 1;
-}*/
 
 function:LogoSwitch()
 {
