@@ -3,6 +3,3 @@
 <a href="http://www.gametracker.com/server_info/92.222.11.187:7707/" target="_blank"><img src="http://cache.www.gametracker.com/server_info/92.222.11.187:7707/b_560_95_1.png" border="0" width="560" height="95" alt=""/></a>
 <a href="http://www.gametracker.com/server_info/31.204.152.218:7707/" target="_blank"><img src="http://cache.www.gametracker.com/server_info/31.204.152.218:7707/b_560_95_1.png" border="0" width="560" height="95" alt=""/></a>
 <a href="http://www.gametracker.com/server_info/31.204.152.219:7707/" target="_blank"><img src="http://cache.www.gametracker.com/server_info/31.204.152.219:7707/b_560_95_1.png" border="0" width="560" height="95" alt=""/></a>
-<a href="http://www.gametracker.com/server_info/216.52.143.28:7707/" target="_blank"><img src="http://cache.www.gametracker.com/server_info/216.52.143.28:7707/b_560_95_1.png" border="0" width="560" height="95" alt=""/></a>
-<a href="http://www.gametracker.com/server_info/216.52.143.33:7707/" target="_blank"><img src="http://cache.www.gametracker.com/server_info/216.52.143.33:7707/b_560_95_1.png" border="0" width="560" height="95" alt=""/></a>
-<a href="http://www.gametracker.com/server_info/216.52.143.119:7707/" target="_blank"><img src="http://cache.www.gametracker.com/server_info/216.52.143.119:7707/b_560_95_1.png" border="0" width="560" height="95" alt=""/></a>

@@ -27443,24 +27443,25 @@ __GetPlayerID(const playername[])
 __GetName(playerid)
 {
 	new tmp[MAX_PLAYER_NAME + 1];
+	
 	strcat(tmp, PlayerData[playerid][e_name], MAX_PLAYER_NAME + 1);
-
 	return tmp;
 }
 
 __GetIP(playerid)
 {
 	new tmp[MAX_PLAYER_IP + 1];
+	
 	strcat(tmp, PlayerData[playerid][e_ip], MAX_PLAYER_IP + 1);
-
 	return tmp;
 }
 
 __GetSerial(playerid)
 {
 	new tmp[64];
+	
     gpci(playerid, tmp, sizeof(tmp));
-    
+   
     return tmp;
 }
 
