@@ -1106,7 +1106,7 @@ enum e_derby_map9_data
 	bool:m9sUsed
 };
 
-enum e_fallout_data
+enum E_FALLOUT_DATA
 {
 	I_iShaketimer[101],
 	I_iNumberout[101],
@@ -1710,7 +1710,7 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
 	LastPlayerText[MAX_PLAYERS][144],
 	StartTime,
 	hVIPVehObj[MAX_PLAYERS][13],
-  	FalloutInfo[e_fallout_data],
+  	FalloutData[E_FALLOUT_DATA],
   	g_FalloutStatus,
   	PlayerPVTMP[MAX_PLAYERS][2],
   	PlayerPVTMPPlate[MAX_PLAYERS][13],
@@ -1781,7 +1781,7 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
   	Text:TXTTdmSign,
  	Text:TXTTdmInfo,
  	Text:TXTFalloutSign,
-	Text:TXTFalloutInfo,
+	Text:TXTFalloutData,
 	Text:TXTToyBox,
 	Text:TXTToyInfo,
 	Text:TXTGodTD,
@@ -3134,7 +3134,7 @@ public OnPlayerConnect(playerid)
 	mysql_format(pSQL, gstr, sizeof(gstr), "DELETE FROM `online` WHERE `name` = '%e';", __GetName(playerid));
 	mysql_tquery(pSQL, gstr);
 
-	SetPlayerScore_(playerid, 0);
+	SetPlayerScoreEx(playerid, 0);
 	SetPlayerTeam(playerid, NO_TEAM);
 	SetPlayerColor(playerid, szPlayerColors[random(sizeof(szPlayerColors))]);
 
@@ -3323,7 +3323,7 @@ public OnPlayerDisconnect(playerid, reason)
 
 				if(count < 2)
 				{
-				    KillTimer(FalloutInfo[I_iTimer][1]);
+				    KillTimer(FalloutData[I_iTimer][1]);
 
 					for(new i = 0; i < MAX_PLAYERS; i++)
 					{
@@ -3443,7 +3443,7 @@ public OnPlayerDisconnect(playerid, reason)
 	PreparePlayerPV(playerid);
  	PreparePlayerToy(playerid);
  	
-	SetPlayerScore_(playerid, 0);
+	SetPlayerScoreEx(playerid, 0);
 	SetPlayerTeam(playerid, NO_TEAM);
 	
 	static const reasonMsg[3][] = {"Timeout", "Leaving", "Kicked/Banned"};
@@ -4776,7 +4776,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 
 			if(count < 2)
 			{
-			    KillTimer(FalloutInfo[I_iTimer][1]);
+			    KillTimer(FalloutData[I_iTimer][1]);
 
 				for(new i = 0; i < MAX_PLAYERS; i++)
 				{
@@ -5648,7 +5648,7 @@ public OnPlayerEnterRaceCheckpoint(playerid)
 			GivePlayerMoneyEx(playerid, Prize[0], true, true);
 			GivePlayerScoreEx(playerid, Prize[1], true, true);
 			
-			if(g_rPosition <= 5 && TotalRaceTime > 40000 && GetPlayerScore_(playerid) > 1000)
+			if(g_rPosition <= 5 && TotalRaceTime > 40000 && GetPlayerScoreEx(playerid) > 1000)
 			{
 			    // Wenn eh nicht unter den TOP 5,wird seine Zeit eh nicht relevant sein.
 			    if(islogged(playerid))
@@ -6128,7 +6128,7 @@ public OnPlayerModelSelection(playerid, response, listid, modelid)
 	{
 	    if(response)
 	    {
-		    if(GetPlayerCash(playerid) < 10000)
+		    if(GetPlayerMoneyEx(playerid) < 10000)
 		    {
 				SCM(playerid, -1, ""er"Each toy costs $10,000");
 				return 1;
@@ -6161,7 +6161,7 @@ public OnPlayerModelSelection(playerid, response, listid, modelid)
 			{
 			    if(GetPlayerVirtualWorld(playerid) != (HouseInfo[h_id][e_id] + 1000)) return SCM(playerid, -1, ""er"You need to be in the house you selected!");
 			    
-			    if(GetPlayerCash(playerid) < 5000)
+			    if(GetPlayerMoneyEx(playerid) < 5000)
 			    {
 					SCM(playerid, -1, ""er"Each house item costs $5,000");
 					return 1;
@@ -8233,7 +8233,7 @@ YCMD:buygc(playerid, params[], help)
 
 	if(IsPlayerAvail(PlayerData[playerid][GCPlayer]) && PlayerData[PlayerData[playerid][GCPlayer]][e_credits] >= PlayerData[playerid][GCOffer] && PlayerData[playerid][GCNameHash] == YHash(__GetName(PlayerData[playerid][GCPlayer])))
 	{
-		if(GetPlayerCash(playerid) < PlayerData[playerid][GCPrice]) return SCM(playerid, -1, ""er"You do not have enough money!");
+		if(GetPlayerMoneyEx(playerid) < PlayerData[playerid][GCPrice]) return SCM(playerid, -1, ""er"You do not have enough money!");
 
 		GivePlayerMoneyEx(PlayerData[playerid][GCPlayer], PlayerData[playerid][GCPrice]);
 		GivePlayerMoneyEx(playerid, -PlayerData[playerid][GCPrice]);
@@ -8304,11 +8304,11 @@ YCMD:bbuy(playerid, params[], help)
 			SCM(playerid, -1, ""er"You do not have any free business slots");
 			break;
 		}
-	    if(GetPlayerScore_(playerid) < 1000) {
+	    if(GetPlayerScoreEx(playerid) < 1000) {
 			SCM(playerid, -1, ""er"You need at least 1000 score to start a business");
 			break;
 		}
-		if(GetPlayerCash(playerid) < 1250000) {
+		if(GetPlayerMoneyEx(playerid) < 1250000) {
 			SCM(playerid, -1, ""er"You need at least $1,250,000 to start a business");
 			break;
 		}
@@ -8427,12 +8427,12 @@ YCMD:buy(playerid, params[], help)
 			SCM(playerid, -1, ""er"You have no free house slot!");
 			break;
 		}
-	    if(GetPlayerScore_(playerid) < HouseInfo[i][E_score])
+	    if(GetPlayerScoreEx(playerid) < HouseInfo[i][E_score])
 		{
 			SCM(playerid, -1, ""er"You need more score for this House!");
 			break;
 		}
-		if(GetPlayerCash(playerid) < HouseInfo[i][price])
+		if(GetPlayerMoneyEx(playerid) < HouseInfo[i][price])
 		{
 			SCM(playerid, -1, ""er"You need more money to buy this House!");
 			break;
@@ -9319,7 +9319,7 @@ YCMD:hitman(playerid, params[], help)
 	if(IsPlayerAvail(player) && player != playerid)
 	{
 	    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
-		if(GetPlayerCash(playerid) >= amount)
+		if(GetPlayerMoneyEx(playerid) >= amount)
 		{
 			new zone[MAX_ZONE_NAME];
 		    GetPlayer2DZone(player, zone, sizeof(zone));
@@ -9654,7 +9654,7 @@ YCMD:setcash(playerid, params[], help)
 			AdminMSG(-1, gstr);
 			print(gstr);
 			
-			SetPlayerCash(player, amount);
+			SetPlayerMoneyEx(player, amount);
 		}
 		else
 		{
@@ -9816,7 +9816,7 @@ YCMD:setscore(playerid, params[], help)
 			AdminMSG(-1, gstr);
 			print(gstr);
 			
-			SetPlayerScore_(player, amount);
+			SetPlayerScoreEx(player, amount);
 		}
 	 	else
 	 	{
@@ -10932,7 +10932,7 @@ YCMD:mute(playerid, params[], help)
             SCMToAll(YELLOW, gstr);
             print(gstr);
             
-			PlayerData[player][tMute] = SetTimerEx("unmute", time * 1000, false, "i", player);
+			PlayerData[player][tMute] = SetTimerEx("player_unmute", time * 1000, false, "ii", player, YHash(__GetName(player)));
 			PlayerData[player][Muted] = true;
 
 			format(gstr, sizeof(gstr), "4MUTE:3 %s(%i) has been muted for %i seconds by %s for %s", __GetName(player), player, time, __GetName(playerid), reason);
@@ -11012,7 +11012,7 @@ YCMD:grename(playerid, params[], help)
 
 	if(PlayerData[playerid][e_gangid] == 0) return SCM(playerid, -1, ""er"You are not in any gang");
 	if(PlayerData[playerid][e_gangrank] != GANG_POS_FOUNDER) return SCM(playerid, -1, ""er"You need to be the gang founder");
-	if(GetPlayerCash(playerid) < 100000) return SCM(playerid, -1, ""er"You need $100,000 to rename your gang");
+	if(GetPlayerMoneyEx(playerid) < 100000) return SCM(playerid, -1, ""er"You need $100,000 to rename your gang");
 	
 	new buff[144], buff2[144];
 	
@@ -11192,8 +11192,8 @@ YCMD:gcreate(playerid, params[], help)
 	}
 
 	if(PlayerData[playerid][e_gangid] != 0) return SCM(playerid, -1, ""er"You are already in a gang");
-	if(GetPlayerCash(playerid) < 500000) return SCM(playerid, -1, ""er"You need at least "nef_green"$500,000 "nef_red"for creating a gang!");
- 	if(GetPlayerScore_(playerid) < 500) return SCM(playerid, -1, ""er"You need at least "nef_green"500 Score "nef_red"for creating a gang!");
+	if(GetPlayerMoneyEx(playerid) < 500000) return SCM(playerid, -1, ""er"You need at least "nef_green"$500,000 "nef_red"for creating a gang!");
+ 	if(GetPlayerScoreEx(playerid) < 500) return SCM(playerid, -1, ""er"You need at least "nef_green"500 Score "nef_red"for creating a gang!");
  	
     PlayerData[playerid][e_time] = PlayerData[playerid][e_time] + (gettime() - PlayerData[playerid][ConnectTime]);
     PlayerData[playerid][ConnectTime] = gettime();
@@ -11587,7 +11587,7 @@ YCMD:ginvite(playerid, params[], help)
     if(!islogged(player)) return SCM(playerid, -1, ""er"This player is not registered!");
     if(player == playerid) return SCM(playerid, -1, ""er"You can't invite yourself");
     if(PlayerData[player][e_gangid] != 0) return SCM(playerid, -1, ""er"Player is already in a gang");
-	if(GetPlayerScore_(player) < 100) return SCM(playerid, -1, ""er"Player needs at least 100 score");
+	if(GetPlayerScoreEx(player) < 100) return SCM(playerid, -1, ""er"Player needs at least 100 score");
     if(PlayerData[player][gInvite]) return SCM(playerid, -1, ""er"Player has been already invited by someone else!");
     if(!IsPlayerAvail(player)) return SCM(playerid, -1, ""er"Player is not available!");
 
@@ -14564,7 +14564,7 @@ YCMD:score(playerid, params[], help)
 	    if(IsPlayerAvail(i))
 	    {
 	        score[i][E_playerid] = i;
-	        score[i][E_pscore] = GetPlayerScore_(i);
+	        score[i][E_pscore] = GetPlayerScoreEx(i);
 	    }
 	    else
 	    {
@@ -15332,8 +15332,8 @@ YCMD:stats(playerid, params[], help)
 	 		PlayerData[player1][e_kills],
         	PlayerData[player1][e_deaths],
         	Float:PlayerData[player1][e_kills] / Float:pDeaths,
-        	GetPlayerScore_(player1),
-        	number_format(GetPlayerCash(player1)),
+        	GetPlayerScoreEx(player1),
+        	number_format(GetPlayerMoneyEx(player1)),
         	number_format(PlayerData[player1][e_bank]),
 			number_format(PlayerData[player1][e_credits]));
 
@@ -15752,7 +15752,7 @@ YCMD:lotto(playerid, params[], help)
 	if(!lotto_active) return SCM(playerid, -1, ""er"No lottery active!");
 	if(GetPlayerInterior(playerid) != 17) return SCM(playerid, -1, ""er"You need to be in a 24/7 shop!");
 	if(PlayerData[playerid][DrawnNumber] != -1) return SCM(playerid, -1, ""er"You already got a lotto!");
-	if(GetPlayerCash(playerid) < 500) return SCM(playerid, -1, ""er"A lotto costs $500!");
+	if(GetPlayerMoneyEx(playerid) < 500) return SCM(playerid, -1, ""er"A lotto costs $500!");
 	
 	new lotto;
 	if(sscanf(params, "i", lotto))
@@ -16073,7 +16073,7 @@ YCMD:givecash(playerid, params[], help)
 
 	if(IsPlayerAvail(player))
 	{
-    	if(GetPlayerCash(playerid) < cash)
+    	if(GetPlayerMoneyEx(playerid) < cash)
 		{
 			return SCM(playerid, RED, "You don't have that much!");
 		}
@@ -17295,7 +17295,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						return 1;
 		            }
                 
-		            if(GetPlayerCash(playerid) < BusinessLevelMatrix[BusinessData[r][e_level]][E_bupgradeprice])
+		            if(GetPlayerMoneyEx(playerid) < BusinessLevelMatrix[BusinessData[r][e_level]][E_bupgradeprice])
 		            {
 		                return SCM(playerid, -1, ""er"You don't have enough money!");
 		            }
@@ -17823,7 +17823,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					}
 					case 2: // Professional Robbers
   	    			{
-  	    				if(GetPlayerScore_(playerid) < 500)
+  	    				if(GetPlayerScoreEx(playerid) < 500)
 						{
 							SCM(playerid, COLOR_GREY, "Server: "RED_E"You need at least 500 score to choose this class!");
 							Command_ReProcess(playerid, "/cnr", false);
@@ -17867,7 +17867,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
   	    			}
  					case 3: // Army
   	    			{
-           				if(GetPlayerScore_(playerid) < 500)
+           				if(GetPlayerScoreEx(playerid) < 500)
 						{
 							SCM(playerid, COLOR_GREY, "Server: "PURPLE_E"You need at least 500 score to choose this class!");
 							Command_ReProcess(playerid, "/cnr", false);
@@ -17962,7 +17962,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
   				{
    					case 0: //Repair Car
   	    			{
-  	    			    if(GetPlayerCash(playerid) < 2000)
+  	    			    if(GetPlayerMoneyEx(playerid) < 2000)
 							return Error(playerid, "You don't have enough money to purchase this item.");
 
 						GivePlayerMoneyEx(playerid, -2000);
@@ -17972,7 +17972,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
   	    			}
   	    			case 1: //Add Nos
   	    			{
-  	    				if(GetPlayerCash(playerid) < 5000)
+  	    				if(GetPlayerMoneyEx(playerid) < 5000)
 							return Error(playerid, "You don't have enough money to purchase this item.");
 						SCM(playerid, COLOR_RED, ">> "WHITE_E"You have added nitro to your vehicle!");
 						if(IsComponentIdCompatible(GetVehicleModel(vID), 1010)) AddVehicleComponent(vID, 1010);
@@ -17981,7 +17981,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
   	    			}
   	    			case 2: //Repair and Add nos
   	    			{
-  	    				if(GetPlayerCash(playerid) < 6500)
+  	    				if(GetPlayerMoneyEx(playerid) < 6500)
 							return Error(playerid, "You don't have enough money to purchase this item.");
 						GivePlayerMoneyEx(playerid, -6500);
 						if(IsComponentIdCompatible(GetVehicleModel(vID), 1010)) AddVehicleComponent(vID, 1010);
@@ -18871,7 +18871,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					player_notice(playerid, "Get out to upgrade the house", "");
 					return 1;
 				}
-	            if(GetPlayerCash(playerid) < HouseIntTypes[PlayerData[playerid][HouseIntSelected]][price])
+	            if(GetPlayerMoneyEx(playerid) < HouseIntTypes[PlayerData[playerid][HouseIntSelected]][price])
 	            {
 	                return SCM(playerid, -1, ""er"You can't afford that interior");
 	            }
@@ -19179,7 +19179,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				    return SCM(playerid, WHITE, ""er"Invalid amount");
 				}
 
-				if(inamount > GetPlayerCash(playerid))
+				if(inamount > GetPlayerMoneyEx(playerid))
 				{
 					SCM(playerid, WHITE, ""er"You don't have that much money!");
 				}
@@ -19835,7 +19835,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				    }
 				}
 
-				if(GetPlayerCash(playerid) < PlayerPVTMP[playerid][1])
+				if(GetPlayerMoneyEx(playerid) < PlayerPVTMP[playerid][1])
 				{
 					SCM(playerid, -1, ""er"You can't afford that vehicle");
 					ShowDialog(playerid, CARBUY_DIALOG);
@@ -22736,17 +22736,17 @@ server_load_textdraws()
 	TextDrawSetProportional(TXTTeleportInfo, 1);
 	TextDrawSetSelectable(TXTTeleportInfo, 0);
 
-    TXTFalloutInfo = TextDrawCreate(513.000000, 344.000000, "Timeleft: ~r~~h~~h~--:--~n~~w~Players: ~b~~h~~h~0~n~~w~Status: ~g~~h~~h~Waiting");
-	TextDrawBackgroundColor(TXTFalloutInfo, 168430202);
-	TextDrawFont(TXTFalloutInfo, 1);
-	TextDrawLetterSize(TXTFalloutInfo, 0.270000, 1.099997);
-	TextDrawColor(TXTFalloutInfo, -1);
-	TextDrawSetOutline(TXTFalloutInfo, 1);
-	TextDrawSetProportional(TXTFalloutInfo, 1);
-	TextDrawUseBox(TXTFalloutInfo, 1);
-	TextDrawBoxColor(TXTFalloutInfo, 168430165);
-	TextDrawTextSize(TXTFalloutInfo, 640.000000, -7.000000);
-	TextDrawSetSelectable(TXTFalloutInfo, 0);
+    TXTFalloutData = TextDrawCreate(513.000000, 344.000000, "Timeleft: ~r~~h~~h~--:--~n~~w~Players: ~b~~h~~h~0~n~~w~Status: ~g~~h~~h~Waiting");
+	TextDrawBackgroundColor(TXTFalloutData, 168430202);
+	TextDrawFont(TXTFalloutData, 1);
+	TextDrawLetterSize(TXTFalloutData, 0.270000, 1.099997);
+	TextDrawColor(TXTFalloutData, -1);
+	TextDrawSetOutline(TXTFalloutData, 1);
+	TextDrawSetProportional(TXTFalloutData, 1);
+	TextDrawUseBox(TXTFalloutData, 1);
+	TextDrawBoxColor(TXTFalloutData, 168430165);
+	TextDrawTextSize(TXTFalloutData, 640.000000, -7.000000);
+	TextDrawSetSelectable(TXTFalloutData, 0);
 
     TXTFalloutSign = TextDrawCreate(77.000000, 315.000000, "~<~~y~~h~Fallout~>~");
 	TextDrawAlignment(TXTFalloutSign, 2);
@@ -25866,7 +25866,7 @@ function:ProcessTick()
 							PlayerData[i][SpecID],
 							hp,
 							ar,
-							number_format((GetPlayerCash(PlayerData[i][SpecID]) + PlayerData[PlayerData[i][SpecID]][e_bank])),
+							number_format((GetPlayerMoneyEx(PlayerData[i][SpecID]) + PlayerData[PlayerData[i][SpecID]][e_bank])),
 							PlayerData[PlayerData[i][SpecID]][bGod] ? ("Yes") : ("No"));
 							
 						GameTextForPlayer(i, gstr, 30000, 3);
@@ -26037,7 +26037,7 @@ function:ProcessTick()
 				format(gstr2, sizeof(gstr2), "Timeleft: ~r~~h~~h~%s~n~~w~Players: ~b~~h~~h~%i~n~~w~Status: ~g~~h~~h~Playing", GameTimeConvert(FalloutGameTime), CurrentFalloutPlayers);
     		}
 		}
-		TextDrawSetString(TXTFalloutInfo, gstr2);
+		TextDrawSetString(TXTFalloutData, gstr2);
 	}
 
 	if(CurrentBGMap != BG_VOTING)
@@ -26599,7 +26599,7 @@ HidePlayerBGTextdraws(playerid)
 ShowPlayerFalloutTextdraws(playerid)
 {
     TextDrawHideForPlayer(playerid, TXTTeleportInfo);
-	TextDrawShowForPlayer(playerid, TXTFalloutInfo);
+	TextDrawShowForPlayer(playerid, TXTFalloutData);
 	TextDrawShowForPlayer(playerid, TXTFalloutSign);
 	PlayerTextDrawHide(playerid, TXTWantedsTD[playerid]);
 }
@@ -26607,7 +26607,7 @@ ShowPlayerFalloutTextdraws(playerid)
 HidePlayerFalloutTextdraws(playerid)
 {
     TextDrawShowForPlayer(playerid, TXTTeleportInfo);
-	TextDrawHideForPlayer(playerid, TXTFalloutInfo);
+	TextDrawHideForPlayer(playerid, TXTFalloutData);
 	TextDrawHideForPlayer(playerid, TXTFalloutSign);
 	PlayerTextDrawShow(playerid, TXTWantedsTD[playerid]);
 }
@@ -26646,115 +26646,115 @@ Fallout_BuildMap()
 {
 	for(new i = 0; i < 101; i++)
 	{
-		DestroyDynamicObject(FalloutInfo[I_iObject][i]);
-		FalloutInfo[I_iNumberout][i] = -1;
-		KillTimer(FalloutInfo[I_iShaketimer][i]);
-		KillTimer(FalloutInfo[I_iTimer][0]);
-		FalloutInfo[I_iShake][i] = 0;
+		DestroyDynamicObject(FalloutData[I_iObject][i]);
+		FalloutData[I_iNumberout][i] = -1;
+		KillTimer(FalloutData[I_iShaketimer][i]);
+		KillTimer(FalloutData[I_iTimer][0]);
+		FalloutData[I_iShake][i] = 0;
 	}
 
 	new j;
-	FalloutInfo[I_iCount] = 15;
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
-	FalloutInfo[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iCount] = 15;
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1655.1112, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1649.7442, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1644.3772, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1639.0102, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1633.6432, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1628.2762, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1622.9092, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1617.5422, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2468.8343, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2464.3817, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2459.9291, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2455.4765, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2451.0239, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2446.5713, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
+	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2442.1187, -1612.1752, 160.0000, 31.8000, 0.0000, 0.0000);
 	return 1;
 }
 
@@ -26769,7 +26769,7 @@ Fallout_StartGame()
 	    }
 	}
 
-	FalloutInfo[I_iTimer][1] = SetTimer("FalloutCountDown", 1000, true);
+	FalloutData[I_iTimer][1] = SetTimer("FalloutCountDown", 1000, true);
 
 	fallout_msg("A new game has started!");
 	return 1;
@@ -26793,13 +26793,13 @@ fallout_cancel()
 	g_FalloutStatus = e_Fallout_Inactive;
 	for(new i = 0; i < 101; i++)
 	{
-		DestroyDynamicObject(FalloutInfo[I_iObject][i]);
-		FalloutInfo[I_iNumberout][i] = -1;
-		KillTimer(FalloutInfo[I_iShaketimer][i]);
-		FalloutInfo[I_iShake][i] = 0;
+		DestroyDynamicObject(FalloutData[I_iObject][i]);
+		FalloutData[I_iNumberout][i] = -1;
+		KillTimer(FalloutData[I_iShaketimer][i]);
+		FalloutData[I_iShake][i] = 0;
 	}
-	KillTimer(FalloutInfo[I_iTimer][0]);
-	KillTimer(FalloutInfo[I_tLoseGame]);
+	KillTimer(FalloutData[I_iTimer][0]);
+	KillTimer(FalloutData[I_tLoseGame]);
 	return 1;
 }
 
@@ -26848,13 +26848,13 @@ function:FalloutCountDown()
 {
 	new player;
 
-	if(--FalloutInfo[I_iCount] == 0)
+	if(--FalloutData[I_iCount] == 0)
 	{
 		format(gstr, sizeof(gstr), "~b~Start!");
 	}
 	else
 	{
-		format(gstr, sizeof(gstr), "~y~FALLOUT STARTING IN~n~~p~- %i -~n~~y~SECONDS", FalloutInfo[I_iCount]);
+		format(gstr, sizeof(gstr), "~y~FALLOUT STARTING IN~n~~p~- %i -~n~~y~SECONDS", FalloutData[I_iCount]);
 	}
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
@@ -26865,9 +26865,9 @@ function:FalloutCountDown()
 	    }
 	}
 
-	if(FalloutInfo[I_iCount] <= 0)
+	if(FalloutData[I_iCount] <= 0)
 	{
-		KillTimer(FalloutInfo[I_iTimer][1]);
+		KillTimer(FalloutData[I_iTimer][1]);
 		for(new i = 0; i < MAX_PLAYERS; i++)
 		{
 		    if(gTeam[i] == FALLOUT)
@@ -26908,7 +26908,7 @@ function:FalloutCountDown()
 function:SolarFall()
 {
 	new objectid, go;
-	for(new i = 0; i < 101; i++) if(FalloutInfo[I_iNumberout][i] == -1) go++;
+	for(new i = 0; i < 101; i++) if(FalloutData[I_iNumberout][i] == -1) go++;
 
 	if(go == 3)
 	{
@@ -26917,25 +26917,25 @@ function:SolarFall()
 			g_FalloutStatus = e_Fallout_Finish;
 			SetTimer("DecideFalloutWinners", 200, false);
 		}
-		KillTimer(FalloutInfo[I_iTimer][0]);
+		KillTimer(FalloutData[I_iTimer][0]);
 		return 1;
 	}
 
 	start:
 	objectid = random(101);
 
-	if(FalloutInfo[I_iNumberout][objectid] != -1) goto start;
+	if(FalloutData[I_iNumberout][objectid] != -1) goto start;
 
-	FalloutInfo[I_iNumberout][objectid] = 0;
+	FalloutData[I_iNumberout][objectid] = 0;
 
-	FalloutInfo[I_iShaketimer][objectid] = SetTimerEx("SquareShake", 100, true, "i", objectid);
+	FalloutData[I_iShaketimer][objectid] = SetTimerEx("SquareShake", 100, true, "i", objectid);
 	return 1;
 }
 
 function:StartFalling()
 {
-	FalloutInfo[I_iTimer][0] = SetTimer("SolarFall", 500, true);
-	FalloutInfo[I_tLoseGame] = SetTimer("Fallout_LoseGame", 500, true);
+	FalloutData[I_iTimer][0] = SetTimer("SolarFall", 500, true);
+	FalloutData[I_tLoseGame] = SetTimer("Fallout_LoseGame", 500, true);
 	return 1;
 }
 
@@ -26990,50 +26990,50 @@ function:SquareShake(objectid)
 {
 	if(objectid == 0)
 	{
-		return KillTimer(FalloutInfo[I_iShaketimer][objectid]);
+		return KillTimer(FalloutData[I_iShaketimer][objectid]);
 	}
 
-	switch(FalloutInfo[I_iShake][objectid])
+	switch(FalloutData[I_iShake][objectid])
 	{
 		case 0, 5:
 		{
-			SetDynamicObjectRot(FalloutInfo[I_iObject][objectid], 31.8, 2, 0);
+			SetDynamicObjectRot(FalloutData[I_iObject][objectid], 31.8, 2, 0);
 		}
 		case 1, 6:
 		{
-			SetDynamicObjectRot(FalloutInfo[I_iObject][objectid], 33.8, 0, 0);
+			SetDynamicObjectRot(FalloutData[I_iObject][objectid], 33.8, 0, 0);
 		}
 		case 2, 7:
 		{
-			SetDynamicObjectRot(FalloutInfo[I_iObject][objectid], 31.8, -2, 0);
+			SetDynamicObjectRot(FalloutData[I_iObject][objectid], 31.8, -2, 0);
 		}
 		case 3, 8:
 		{
-			SetDynamicObjectRot(FalloutInfo[I_iObject][objectid], 29.8, 0, 0);
+			SetDynamicObjectRot(FalloutData[I_iObject][objectid], 29.8, 0, 0);
 		}
 		case 4, 9:
 		{
-			SetDynamicObjectRot(FalloutInfo[I_iObject][objectid], 31.8, 0, 0);
+			SetDynamicObjectRot(FalloutData[I_iObject][objectid], 31.8, 0, 0);
 		}
 		case 10:
 		{
 			new Float:patPOS[3];
-			GetDynamicObjectPos(FalloutInfo[I_iObject][objectid], patPOS[0], patPOS[1], patPOS[2]);
-			MoveDynamicObject(FalloutInfo[I_iObject][objectid], patPOS[0], patPOS[1], floatsub(patPOS[2], 100.0), 4);
+			GetDynamicObjectPos(FalloutData[I_iObject][objectid], patPOS[0], patPOS[1], patPOS[2]);
+			MoveDynamicObject(FalloutData[I_iObject][objectid], patPOS[0], patPOS[1], floatsub(patPOS[2], 100.0), 4);
 		}
 		case 11..99:
 		{
-  			SetDynamicObjectPos(FalloutInfo[I_iObject][objectid], floatsub(31.8, floatsub((FalloutInfo[I_iShake][objectid] * 2), 20)), 0, 0);
+  			SetDynamicObjectPos(FalloutData[I_iObject][objectid], floatsub(31.8, floatsub((FalloutData[I_iShake][objectid] * 2), 20)), 0, 0);
 		}
 		case 100:
 		{
-			DestroyDynamicObject(FalloutInfo[I_iObject][objectid]);
+			DestroyDynamicObject(FalloutData[I_iObject][objectid]);
 
-			KillTimer(FalloutInfo[I_iShaketimer][objectid]);
+			KillTimer(FalloutData[I_iShaketimer][objectid]);
 		}
 	}
 
-	FalloutInfo[I_iShake][objectid]++;
+	FalloutData[I_iShake][objectid]++;
 	return 1;
 }
 
@@ -27210,386 +27210,14 @@ function:SaveVehComponets(playerid, componentid)
 	return 1;
 }
 
-function:unmute(playerid)
+function:player_unmute(playerid, namehash)
 {
-    PlayerData[playerid][Muted] = false;
-    PlayerData[playerid][tMute] = -1;
-    return 1;
-}
-
-ResetPlayerWorld(playerid)
-{
-	SetPlayerInterior(playerid, 0);
-	SetPlayerVirtualWorld(playerid, 0);
-	SetPlayerWorldBounds(playerid, 20000.0000, -20000.0000, 20000.0000, -20000.0000);
-}
-
-function:IsPlayerAvail(playerid)
-{
-	if(playerid == INVALID_PLAYER_ID) return 0;
-	
-	if(IsPlayerConnected(playerid) && PlayerData[playerid][ExitType] == EXIT_FIRST_SPAWNED)
+	if(namehash == YHash(__GetName(playerid)))
 	{
-	    return 1;
-	}
-	return 0;
-}
-
-stock SollIchDirMaEtWatSagen()
-{
-	new a[][] =
-	{
-		"Unarmed (Fist)",
-		"Brass K"
-	};
-	#pragma unused a
-}
-
-GameTimeConvert(seconds)
-{
-	new tmp[16];
- 	new minutes = floatround(seconds / 60);
-  	seconds -= minutes * 60;
-   	format(tmp, sizeof(tmp), "%02i:%02i", minutes, seconds);
-   	return tmp;
-}
-
-SetPlayerCash(playerid, amount)
-{
-	if(playerid == INVALID_PLAYER_ID) return 1;
-	if(PlayerData[playerid][e_money] >= 1000000000) return 1;
-    ResetPlayerMoney(playerid);
-	PlayerData[playerid][e_money] = amount;
-    GivePlayerMoney(playerid, PlayerData[playerid][e_money]);
-    return 1;
-}
-
-GivePlayerMoneyEx(playerid, amount, bool:populate = true, bool:boost = false)
-{
-	if(playerid == INVALID_PLAYER_ID) return 1;
-	if(PlayerData[playerid][e_money] >= 1000000000) return 1;
-
-    ResetPlayerMoney(playerid);
-    
-    if(amount < 0)
-    {
-        PlayerData[playerid][e_money] += amount;
-        format(gstr, sizeof(gstr), "~r~~h~~h~-$%s", number_format(amount * -1));
-	}
-	else
-	{
-		if(boost)
-		{
-			if(PlayerData[playerid][Boost] & BOOST_MONEY_x2)
-			{
-			    PlayerData[playerid][e_money] += amount * 2;
-			    format(gstr, sizeof(gstr), "~g~~h~~h~+$%s (x2 Boost)", number_format(amount * 2));
-			}
-			else if(PlayerData[playerid][Boost] & BOOST_MONEY_x3 || PlayerData[playerid][Boost] & BOOST_MASTER)
-			{
-			    PlayerData[playerid][e_money] += amount * 3;
-			    format(gstr, sizeof(gstr), "~g~~h~~h~+$%s (x3 Boost)", number_format(amount * 3));
-			}
-			else
-			{
-		    	PlayerData[playerid][e_money] += amount;
-		    	format(gstr, sizeof(gstr), "~g~~h~~h~+$%s", number_format(amount));
-			}
-		}
-		else
-		{
-		    PlayerData[playerid][e_money] += amount;
-		    format(gstr, sizeof(gstr), "~g~~h~~h~+$%s", number_format(amount));
-		}
-	}
-	
-    if(populate)
-    {
-		PlayerTextDrawSetString(playerid, TXTMoney[playerid], gstr);
-        PlayerTextDrawShow(playerid, TXTMoney[playerid]);
-		SetTimerEx("HideMoneyTD", 3000, false, "ii", playerid, YHash(__GetName(playerid)));
-    }
-	
-    GivePlayerMoney(playerid, PlayerData[playerid][e_money]);
-	return 1;
-}
-
-GetPlayerCash(playerid)
-{
-    if(playerid == INVALID_PLAYER_ID) return 1;
-	return PlayerData[playerid][e_money];
-}
-
-GivePlayerScoreEx(playerid, amount, bool:populate = true, bool:boost = false)
-{
-    if(playerid == INVALID_PLAYER_ID) return 1;
-
-    if(amount < 0)
-    {
-        format(gstr, sizeof(gstr), "~r~~h~~h~-%i Score", amount * -1);
-    }
-    else
-    {
-		if(boost)
-		{
-			if(PlayerData[playerid][Boost] & BOOST_SCORE_x2)
-			{
-			    PlayerData[playerid][e_score] += amount * 2;
-			    format(gstr, sizeof(gstr), "~y~~h~+%s Score (x2 Boost)", number_format(amount * 2));
-			}
-			else if(PlayerData[playerid][Boost] & BOOST_SCORE_x3 || PlayerData[playerid][Boost] & BOOST_MASTER)
-			{
-			    PlayerData[playerid][e_score] += amount * 3;
-			    format(gstr, sizeof(gstr), "~y~~h~+%s Score (x3 Boost)", number_format(amount * 3));
-			}
-			else
-			{
-			    PlayerData[playerid][e_score] += amount;
-			    format(gstr, sizeof(gstr), "~y~~h~+%s Score", number_format(amount));
-			}
-		}
-		else
-		{
-		    PlayerData[playerid][e_score] += amount;
-		    format(gstr, sizeof(gstr), "~y~~h~+%s Score", number_format(amount));
-		}
-	}
-
-	SetPlayerScore(playerid, PlayerData[playerid][e_score]);
-	
-    if(populate)
-    {
-		PlayerTextDrawSetString(playerid, TXTScore[playerid], gstr);
-        PlayerTextDrawShow(playerid, TXTScore[playerid]);
-		SetTimerEx("HideScoreTD", 3000, false, "ii", playerid, YHash(__GetName(playerid)));
-    }
-	
-    if(PlayerData[playerid][bLogged] && PlayerData[playerid][bAchsLoad])
-    {
-		if(PlayerAchData[playerid][e_ach_scorewhore][0] == 0 && PlayerData[playerid][e_score] >= 2000)
-		{
-		    GivePlayerAchievement(playerid, e_ach_scorewhore, "Score Whore", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
-		}
-	}
-	return 1;
-}
-
-SetPlayerScore_(playerid, amount)
-{
-    if(playerid == INVALID_PLAYER_ID) return 1;
-	PlayerData[playerid][e_score] = amount;
-    SetPlayerScore(playerid, PlayerData[playerid][e_score]);
-
-    if(PlayerData[playerid][bLogged] && PlayerData[playerid][bAchsLoad])
-    {
-	 	if(PlayerAchData[playerid][e_ach_scorewhore][0] == 0 && PlayerData[playerid][e_score] >= 2000)
-		{
-		    GivePlayerAchievement(playerid, e_ach_scorewhore, "Score Whore", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
-		}
-	}
-	return 1;
-}
-
-GetPlayerScore_(playerid)
-{
-    if(playerid == INVALID_PLAYER_ID) return -1;
-	return PlayerData[playerid][e_score];
-}
-
-NewMinigameJoin(playerid, const minigame[], const cmd[])
-{
-	format(gstr, sizeof(gstr), ""r_besch"[JOIN] {D2D2AB}%s(%i) just joined %s [/%s]", __GetName(playerid), playerid, minigame, cmd);
-	SCMToAll(-1, gstr);
-	format(gstr, sizeof(gstr), "3,1JOIN:4 %s(%i) just joined %s [/%s]", __GetName(playerid), playerid, minigame, cmd);
-	IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
-}
-
-NewMapEvent(playerid, const cmd[])
-{
-	format(gstr, sizeof(gstr), "~g~~h~~h~%s ~w~has gone to ~b~~h~~h~/%s", __GetName(playerid), cmd);
-    TextDrawSetString(TXTTeleportInfo, gstr);
-}
-
-IsValidVehicleModel(vmodel)
-{
-	if(vmodel < 400 || vmodel > 611) return 0;
-	return 1;
-}
-
-IsValidSkin(skinid)
-{
-    if(skinid == 74 || skinid > 299 || skinid < 0)
-    {
-        return 0;
+	    PlayerData[playerid][Muted] = false;
+	    PlayerData[playerid][tMute] = -1;
 	}
     return 1;
-}
-
-__GetPlayerID(const playername[])
-{
-	for(new i = 0; i < MAX_PLAYERS; i++)
-    {
-    	if(IsPlayerConnected(i))
-      	{
-        	if(!strcmp(playername, __GetName(i), true))
-        	{
-          		return i;
-        	}
-      	}
-    }
-    return INVALID_PLAYER_ID;
-}
-
-__GetName(playerid)
-{
-	new tmp[MAX_PLAYER_NAME + 1];
-	
-	strcat(tmp, PlayerData[playerid][e_name], MAX_PLAYER_NAME + 1);
-	return tmp;
-}
-
-__GetIP(playerid)
-{
-	new tmp[MAX_PLAYER_IP + 1];
-	
-	strcat(tmp, PlayerData[playerid][e_ip], MAX_PLAYER_IP + 1);
-	return tmp;
-}
-
-__GetSerial(playerid)
-{
-	new tmp[64];
-	
-    gpci(playerid, tmp, sizeof(tmp));
-   
-    return tmp;
-}
-
-GetColorEx(playerid)
-{
-	new color = GetPlayerColor(playerid);
-	return color;
-}
-
-GetUptime()
-{
-    new Result[128],
-        Remaining = gettime() - StartTime,
-        Time[4];
-
-    Time[0] = Remaining % 60;
-    Remaining /= 60;
-    Time[1] = Remaining % 60;
-    Remaining /= 60;
-    Time[2] = Remaining % 24;
-    Remaining /= 24;
-    Time[3] = Remaining;
-
-    if(Time[3])
-    {
-        format(Result, sizeof(Result), ""white"Server is up for %i days, %i hours, %i minutes and %i seconds", Time[3], Time[2], Time[1], Time[0]);
-	}
-    else if(Time[2])
-    {
-        format(Result, sizeof(Result), ""white"Server is up for %i hours, %i minutes and %i seconds", Time[2], Time[1], Time[0]);
-	}
-    else if(Time[1])
-    {
-        format(Result, sizeof(Result), ""white"Server is up for %i minutes and %i seconds", Time[1], Time[0]);
-	}
-    else
-    {
-        format(Result, sizeof(Result), ""white"Server is up for %i seconds", Time[0]);
-	}
-    return Result;
-}
-
-GetVehicleNameById(vehicleid)
-{
-	new	string[57];
-
-	if(IsValidVehicleModel(GetVehicleModel(vehicleid)))
-	{
-	    format(string, sizeof(string), VehicleNames[GetVehicleModel(vehicleid) - 400]);
-	}
-	else
-	{
-        format(string, sizeof(string), "---");
-	}
-    return string;
-}
-
-PreparePlayerPV(playerid)
-{
-    PVSelect[playerid] = -1;
-	for(new i = 0; i < MAX_PLAYER_PVS; i++)
-	{
-		PlayerPVData[playerid][i][e_vehicleid] = -1;
-		PlayerPVData[playerid][i][e_labelid] = Text3D:-1;
-	    PlayerPVData[playerid][i][e_model] = 0;
-	    PlayerPVData[playerid][i][e_paintjob] = -1;
-	    PlayerPVData[playerid][i][e_color1] = 0;
-	    PlayerPVData[playerid][i][e_color2] = 0;
- 	    PlayerPVData[playerid][i][e_neon1] = -1;
-	    PlayerPVData[playerid][i][e_neon2] = -1;
-		for(new r = 0; r < 17; r++)
-	    {
-            PlayerPVData[playerid][i][e_mods][r] = 0;
-	    }
-	    strmid(PlayerPVData[playerid][i][e_plate], "Plate", 0, 13, 13);
-	}
-}
-
-PreparePlayerToy(playerid)
-{
-	for(new i = 0; i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
-	{
-		PlayerToyData[playerid][i][toy_model] = 0;
-		PlayerToyData[playerid][i][toy_bone] = 1;
-		PlayerToyData[playerid][i][toy_x] = 0.0;
-		PlayerToyData[playerid][i][toy_y] = 0.0;
-		PlayerToyData[playerid][i][toy_z] = 0.0;
-		PlayerToyData[playerid][i][toy_rx] = 0.0;
-		PlayerToyData[playerid][i][toy_ry] = 0.0;
-		PlayerToyData[playerid][i][toy_rz] = 0.0;
-		PlayerToyData[playerid][i][toy_sx] = 1.0;
-		PlayerToyData[playerid][i][toy_sy] = 1.0;
-		PlayerToyData[playerid][i][toy_sz] = 1.0;
-	}
-}
-
-RemovePlayerToy(playerid)
-{
-	for(new i = 0; i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
-	{
-	    if(IsPlayerAttachedObjectSlotUsed(playerid, i))
-	    {
-			RemovePlayerAttachedObject(playerid, i);
-	    }
-	}
-}
-
-AttachPlayerToy(playerid)
-{
-	for(new i = 0; i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
-	{
-	    if(PlayerToyData[playerid][i][toy_model] != 0)
-	    {
-	        SetPlayerAttachedObject(playerid,
-	            i,
-	            PlayerToyData[playerid][i][toy_model],
-	            PlayerToyData[playerid][i][toy_bone],
-	            PlayerToyData[playerid][i][toy_x],
-	            PlayerToyData[playerid][i][toy_y],
-	            PlayerToyData[playerid][i][toy_z],
-	            PlayerToyData[playerid][i][toy_rx],
-	            PlayerToyData[playerid][i][toy_ry],
-	            PlayerToyData[playerid][i][toy_rz],
-	            PlayerToyData[playerid][i][toy_sx],
-	            PlayerToyData[playerid][i][toy_sy],
-	            PlayerToyData[playerid][i][toy_sz]);
-		 }
-	}
 }
 
 function:ShowDialog(playerid, dialogid)
@@ -27929,12 +27557,6 @@ function:CoolDownDeath(playerid)
 {
 	PlayerData[playerid][iCoolDownDeath]--;
 	return 1;
-}
-
-SetPlayerPosEx(playerid, Float:X, Float:Y, Float:Z)
-{
-    Streamer_UpdateEx(playerid, X, Y, Z);
-	SetPlayerPos(playerid, X, Y, Z);
 }
 
 function:server_random_broadcast()
@@ -29381,7 +29003,7 @@ ExitPlayer(playerid)
 
 			if(count < 2)
 			{
-			    KillTimer(FalloutInfo[I_iTimer][1]);
+			    KillTimer(FalloutData[I_iTimer][1]);
 
 				for(new i = 0; i < MAX_PLAYERS; i++)
 				{
@@ -29430,26 +29052,27 @@ LoadMap(playerid)
 	Streamer_Update(playerid);
 	PlayerData[playerid][bLoadMap] = true;
 	TextDrawShowForPlayer(playerid, TXTLoading);
+	
 	new ping = GetPlayerPing(playerid);
 	if(ping < 65)
 	{
-		PlayerData[playerid][tLoadMap] = SetTimerEx("FreePlayer", 1550, false, "i", playerid);
+		PlayerData[playerid][tLoadMap] = SetTimerEx("player_free", 1550, false, "i", playerid);
 	}
 	else if(ping < 110)
 	{
-	    PlayerData[playerid][tLoadMap] = SetTimerEx("FreePlayer", 2050, false, "i", playerid);
+	    PlayerData[playerid][tLoadMap] = SetTimerEx("player_free", 2050, false, "i", playerid);
 	}
 	else if(ping < 200)
 	{
-	    PlayerData[playerid][tLoadMap] = SetTimerEx("FreePlayer", 3050, false, "i", playerid);
+	    PlayerData[playerid][tLoadMap] = SetTimerEx("player_free", 3050, false, "i", playerid);
 	}
 	else
 	{
-		PlayerData[playerid][tLoadMap] = SetTimerEx("FreePlayer", 3550, false, "i", playerid);
+		PlayerData[playerid][tLoadMap] = SetTimerEx("player_free", 3550, false, "i", playerid);
 	}
 }
 
-function:FreePlayer(playerid)
+function:player_free(playerid)
 {
 	if(PlayerData[playerid][bLoadMap])
 	{
@@ -30775,8 +30398,8 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 				MySQL_LoadPlayerToys(playerid);
 				MySQL_LoadPlayerPVs(playerid);
 
-  			 	SetPlayerScore_(playerid, PlayerData[playerid][e_score]);
-			 	SetPlayerCash(playerid, PlayerData[playerid][e_money]);
+  			 	SetPlayerScoreEx(playerid, PlayerData[playerid][e_score]);
+			 	SetPlayerMoneyEx(playerid, PlayerData[playerid][e_money]);
 				format(gstr, sizeof(gstr), "~y~[] ~w~%i", PlayerData[playerid][e_wanteds]);
 				PlayerTextDrawSetString(playerid, TXTWantedsTD[playerid], gstr);
 
@@ -30957,4 +30580,384 @@ server_save_config()
 {
 	Log(LOG_ONLINE, "Updating server config");
 	dini_IntSet("/Other/server.ini", "m_PlayerRecord", m_PlayerRecord);
+}
+
+ResetPlayerWorld(playerid)
+{
+	SetPlayerInterior(playerid, 0);
+	SetPlayerVirtualWorld(playerid, 0);
+	SetPlayerWorldBounds(playerid, 20000.0000, -20000.0000, 20000.0000, -20000.0000);
+}
+
+IsPlayerAvail(playerid)
+{
+	if(playerid == INVALID_PLAYER_ID) return 0;
+
+	if(IsPlayerConnected(playerid) && PlayerData[playerid][ExitType] == EXIT_FIRST_SPAWNED)
+	{
+	    return 1;
+	}
+	return 0;
+}
+
+SollIchDirMaEtWatSagen()
+{
+	new a[][] =
+	{
+		"Unarmed (Fist)",
+		"Brass K"
+	};
+	#pragma unused a
+}
+
+GameTimeConvert(seconds)
+{
+	new tmp[16];
+ 	new minutes = floatround(seconds / 60);
+  	seconds -= minutes * 60;
+   	format(tmp, sizeof(tmp), "%02i:%02i", minutes, seconds);
+   	return tmp;
+}
+
+SetPlayerMoneyEx(playerid, amount)
+{
+	if(playerid == INVALID_PLAYER_ID) return 1;
+	if(PlayerData[playerid][e_money] >= 1000000000) return 1;
+    ResetPlayerMoney(playerid);
+	PlayerData[playerid][e_money] = amount;
+    GivePlayerMoney(playerid, PlayerData[playerid][e_money]);
+    return 1;
+}
+
+GivePlayerMoneyEx(playerid, amount, bool:populate = true, bool:boost = false)
+{
+	if(playerid == INVALID_PLAYER_ID) return 1;
+	if(PlayerData[playerid][e_money] >= 1000000000) return 1;
+
+    ResetPlayerMoney(playerid);
+
+    if(amount < 0)
+    {
+        PlayerData[playerid][e_money] += amount;
+        format(gstr, sizeof(gstr), "~r~~h~~h~-$%s", number_format(amount * -1));
+	}
+	else
+	{
+		if(boost)
+		{
+			if(PlayerData[playerid][Boost] & BOOST_MONEY_x2)
+			{
+			    PlayerData[playerid][e_money] += amount * 2;
+			    format(gstr, sizeof(gstr), "~g~~h~~h~+$%s (x2 Boost)", number_format(amount * 2));
+			}
+			else if(PlayerData[playerid][Boost] & BOOST_MONEY_x3 || PlayerData[playerid][Boost] & BOOST_MASTER)
+			{
+			    PlayerData[playerid][e_money] += amount * 3;
+			    format(gstr, sizeof(gstr), "~g~~h~~h~+$%s (x3 Boost)", number_format(amount * 3));
+			}
+			else
+			{
+		    	PlayerData[playerid][e_money] += amount;
+		    	format(gstr, sizeof(gstr), "~g~~h~~h~+$%s", number_format(amount));
+			}
+		}
+		else
+		{
+		    PlayerData[playerid][e_money] += amount;
+		    format(gstr, sizeof(gstr), "~g~~h~~h~+$%s", number_format(amount));
+		}
+	}
+
+    if(populate)
+    {
+		PlayerTextDrawSetString(playerid, TXTMoney[playerid], gstr);
+        PlayerTextDrawShow(playerid, TXTMoney[playerid]);
+		SetTimerEx("HideMoneyTD", 3000, false, "ii", playerid, YHash(__GetName(playerid)));
+    }
+
+    GivePlayerMoney(playerid, PlayerData[playerid][e_money]);
+	return 1;
+}
+
+GetPlayerMoneyEx(playerid)
+{
+    if(playerid == INVALID_PLAYER_ID) return 1;
+	return PlayerData[playerid][e_money];
+}
+
+GivePlayerScoreEx(playerid, amount, bool:populate = true, bool:boost = false)
+{
+    if(playerid == INVALID_PLAYER_ID) return 1;
+
+    if(amount < 0)
+    {
+        format(gstr, sizeof(gstr), "~r~~h~~h~-%i Score", amount * -1);
+    }
+    else
+    {
+		if(boost)
+		{
+			if(PlayerData[playerid][Boost] & BOOST_SCORE_x2)
+			{
+			    PlayerData[playerid][e_score] += amount * 2;
+			    format(gstr, sizeof(gstr), "~y~~h~+%s Score (x2 Boost)", number_format(amount * 2));
+			}
+			else if(PlayerData[playerid][Boost] & BOOST_SCORE_x3 || PlayerData[playerid][Boost] & BOOST_MASTER)
+			{
+			    PlayerData[playerid][e_score] += amount * 3;
+			    format(gstr, sizeof(gstr), "~y~~h~+%s Score (x3 Boost)", number_format(amount * 3));
+			}
+			else
+			{
+			    PlayerData[playerid][e_score] += amount;
+			    format(gstr, sizeof(gstr), "~y~~h~+%s Score", number_format(amount));
+			}
+		}
+		else
+		{
+		    PlayerData[playerid][e_score] += amount;
+		    format(gstr, sizeof(gstr), "~y~~h~+%s Score", number_format(amount));
+		}
+	}
+
+	SetPlayerScore(playerid, PlayerData[playerid][e_score]);
+
+    if(populate)
+    {
+		PlayerTextDrawSetString(playerid, TXTScore[playerid], gstr);
+        PlayerTextDrawShow(playerid, TXTScore[playerid]);
+		SetTimerEx("HideScoreTD", 3000, false, "ii", playerid, YHash(__GetName(playerid)));
+    }
+
+    if(PlayerData[playerid][bLogged] && PlayerData[playerid][bAchsLoad])
+    {
+		if(PlayerAchData[playerid][e_ach_scorewhore][0] == 0 && PlayerData[playerid][e_score] >= 2000)
+		{
+		    GivePlayerAchievement(playerid, e_ach_scorewhore, "Score Whore", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
+		}
+	}
+	return 1;
+}
+
+SetPlayerScoreEx(playerid, amount)
+{
+    if(playerid == INVALID_PLAYER_ID) return 1;
+	PlayerData[playerid][e_score] = amount;
+    SetPlayerScore(playerid, PlayerData[playerid][e_score]);
+
+    if(PlayerData[playerid][bLogged] && PlayerData[playerid][bAchsLoad])
+    {
+	 	if(PlayerAchData[playerid][e_ach_scorewhore][0] == 0 && PlayerData[playerid][e_score] >= 2000)
+		{
+		    GivePlayerAchievement(playerid, e_ach_scorewhore, "Score Whore", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
+		}
+	}
+	return 1;
+}
+
+GetPlayerScoreEx(playerid)
+{
+    if(playerid == INVALID_PLAYER_ID) return -1;
+	return PlayerData[playerid][e_score];
+}
+
+NewMinigameJoin(playerid, const minigame[], const cmd[])
+{
+	format(gstr, sizeof(gstr), ""r_besch"[JOIN] {D2D2AB}%s(%i) just joined %s [/%s]", __GetName(playerid), playerid, minigame, cmd);
+	SCMToAll(-1, gstr);
+	format(gstr, sizeof(gstr), "3,1JOIN:4 %s(%i) just joined %s [/%s]", __GetName(playerid), playerid, minigame, cmd);
+	IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
+}
+
+NewMapEvent(playerid, const cmd[])
+{
+	format(gstr, sizeof(gstr), "~g~~h~~h~%s ~w~has gone to ~b~~h~~h~/%s", __GetName(playerid), cmd);
+    TextDrawSetString(TXTTeleportInfo, gstr);
+}
+
+IsValidVehicleModel(vmodel)
+{
+	if(vmodel < 400 || vmodel > 611) return 0;
+	return 1;
+}
+
+IsValidSkin(skinid)
+{
+    if(skinid == 74 || skinid > 299 || skinid < 0)
+    {
+        return 0;
+	}
+    return 1;
+}
+
+__GetPlayerID(const playername[])
+{
+	for(new i = 0; i < MAX_PLAYERS; i++)
+    {
+    	if(IsPlayerConnected(i))
+      	{
+        	if(!strcmp(playername, __GetName(i), true))
+        	{
+          		return i;
+        	}
+      	}
+    }
+    return INVALID_PLAYER_ID;
+}
+
+__GetName(playerid)
+{
+	new tmp[MAX_PLAYER_NAME + 1];
+
+	strcat(tmp, PlayerData[playerid][e_name], MAX_PLAYER_NAME + 1);
+	return tmp;
+}
+
+__GetIP(playerid)
+{
+	new tmp[MAX_PLAYER_IP + 1];
+
+	strcat(tmp, PlayerData[playerid][e_ip], MAX_PLAYER_IP + 1);
+	return tmp;
+}
+
+__GetSerial(playerid)
+{
+	new tmp[64];
+
+    gpci(playerid, tmp, sizeof(tmp));
+    return tmp;
+}
+
+GetColorEx(playerid)
+{
+	new color = GetPlayerColor(playerid);
+	return color;
+}
+
+GetUptime()
+{
+    new Result[128],
+        Remaining = gettime() - StartTime,
+        Time[4];
+
+    Time[0] = Remaining % 60;
+    Remaining /= 60;
+    Time[1] = Remaining % 60;
+    Remaining /= 60;
+    Time[2] = Remaining % 24;
+    Remaining /= 24;
+    Time[3] = Remaining;
+
+    if(Time[3])
+    {
+        format(Result, sizeof(Result), ""white"Server is up for %i days, %i hours, %i minutes and %i seconds", Time[3], Time[2], Time[1], Time[0]);
+	}
+    else if(Time[2])
+    {
+        format(Result, sizeof(Result), ""white"Server is up for %i hours, %i minutes and %i seconds", Time[2], Time[1], Time[0]);
+	}
+    else if(Time[1])
+    {
+        format(Result, sizeof(Result), ""white"Server is up for %i minutes and %i seconds", Time[1], Time[0]);
+	}
+    else
+    {
+        format(Result, sizeof(Result), ""white"Server is up for %i seconds", Time[0]);
+	}
+    return Result;
+}
+
+GetVehicleNameById(vehicleid)
+{
+	new	string[57];
+
+	if(IsValidVehicleModel(GetVehicleModel(vehicleid)))
+	{
+	    format(string, sizeof(string), VehicleNames[GetVehicleModel(vehicleid) - 400]);
+	}
+	else
+	{
+        format(string, sizeof(string), "---");
+	}
+    return string;
+}
+
+PreparePlayerPV(playerid)
+{
+    PVSelect[playerid] = -1;
+	for(new i = 0; i < MAX_PLAYER_PVS; i++)
+	{
+		PlayerPVData[playerid][i][e_vehicleid] = -1;
+		PlayerPVData[playerid][i][e_labelid] = Text3D:-1;
+	    PlayerPVData[playerid][i][e_model] = 0;
+	    PlayerPVData[playerid][i][e_paintjob] = -1;
+	    PlayerPVData[playerid][i][e_color1] = 0;
+	    PlayerPVData[playerid][i][e_color2] = 0;
+ 	    PlayerPVData[playerid][i][e_neon1] = -1;
+	    PlayerPVData[playerid][i][e_neon2] = -1;
+		for(new r = 0; r < 17; r++)
+	    {
+            PlayerPVData[playerid][i][e_mods][r] = 0;
+	    }
+	    strmid(PlayerPVData[playerid][i][e_plate], "Plate", 0, 13, 13);
+	}
+}
+
+PreparePlayerToy(playerid)
+{
+	for(new i = 0; i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
+	{
+		PlayerToyData[playerid][i][toy_model] = 0;
+		PlayerToyData[playerid][i][toy_bone] = 1;
+		PlayerToyData[playerid][i][toy_x] = 0.0;
+		PlayerToyData[playerid][i][toy_y] = 0.0;
+		PlayerToyData[playerid][i][toy_z] = 0.0;
+		PlayerToyData[playerid][i][toy_rx] = 0.0;
+		PlayerToyData[playerid][i][toy_ry] = 0.0;
+		PlayerToyData[playerid][i][toy_rz] = 0.0;
+		PlayerToyData[playerid][i][toy_sx] = 1.0;
+		PlayerToyData[playerid][i][toy_sy] = 1.0;
+		PlayerToyData[playerid][i][toy_sz] = 1.0;
+	}
+}
+
+RemovePlayerToy(playerid)
+{
+	for(new i = 0; i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
+	{
+	    if(IsPlayerAttachedObjectSlotUsed(playerid, i))
+	    {
+			RemovePlayerAttachedObject(playerid, i);
+	    }
+	}
+}
+
+AttachPlayerToy(playerid)
+{
+	for(new i = 0; i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
+	{
+	    if(PlayerToyData[playerid][i][toy_model] != 0)
+	    {
+	        SetPlayerAttachedObject(playerid,
+	            i,
+	            PlayerToyData[playerid][i][toy_model],
+	            PlayerToyData[playerid][i][toy_bone],
+	            PlayerToyData[playerid][i][toy_x],
+	            PlayerToyData[playerid][i][toy_y],
+	            PlayerToyData[playerid][i][toy_z],
+	            PlayerToyData[playerid][i][toy_rx],
+	            PlayerToyData[playerid][i][toy_ry],
+	            PlayerToyData[playerid][i][toy_rz],
+	            PlayerToyData[playerid][i][toy_sx],
+	            PlayerToyData[playerid][i][toy_sy],
+	            PlayerToyData[playerid][i][toy_sz]);
+		 }
+	}
+}
+
+SetPlayerPosEx(playerid, Float:X, Float:Y, Float:Z)
+{
+    Streamer_UpdateEx(playerid, X, Y, Z);
+	SetPlayerPos(playerid, X, Y, Z);
 }
