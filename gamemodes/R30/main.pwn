@@ -10,7 +10,7 @@
 \*======================================================================*/
 
 /* Build Dependencies
-|| SA-MP Server 0.3z-R2-2
+|| SA-MP Server 0.3z-R3
 || YSI Library 3.1
 || sscanf Plugin 2.8.1
 || Streamer Plugin v2.7.2
@@ -89,7 +89,7 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define CURRENT_VERSION                 "PTS:Build 30"
 #endif
 #define HOTFIX_REV                      "Hotfix #0"
-#define SAMP_VERSION                    "SA-MP 0.3z-R2-2"
+#define SAMP_VERSION                    "SA-MP 0.3z-R3"
 #define MAX_REPORTS 					(7)
 #define MAX_ADS                         (10)
 #define MAX_GANG_NAME					(20)
@@ -191,6 +191,7 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define DERBY_FREEZE_INTERVAL 			(70)
 
 // TDM
+#define BG_WORLD                        (5048)
 #define DEFAULT_BG_TIME                 (240)
 #define BG_MAP1_WHILECAM                -512.8727, -121.8333, 97.8991
 #define BG_MAP2_WHILECAM                623.2424,-2418.4194,9.4857
@@ -210,7 +211,6 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define BG_MAP4_CAMLA                   726.3855, -2301.5107, 118.2781
 #define BG_MAP5_CAMLA                   1784.7314, -2997.8691, 30.3122
 #define BG_MAP6_CAMLA                   2004.3510, 4064.7246, 95.0798
-#define BG_WORLD                        (5048)
 #define BG_TEAM1                        (1)
 #define BG_TEAM2                        (2)
 #define BG_VOTING                       (0)
@@ -224,8 +224,8 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define BG_VOTING_TIME                  (15000)
 
 // Fallout
-#define DEFAULT_FALLOUT_TIME            (240)
 #define FALLOUT_WORLD                   (121212)
+#define DEFAULT_FALLOUT_TIME            (240)
 
 // Deathmatch
 #define DM_WORLD                        (100000)
@@ -702,19 +702,18 @@ enum E_PLAYER_DATA
   	tickLastCD,
     tickJoin_bmx,
     tickLastBan,
-    iKickBanIssued,
     bool:bHideGC,
 	bool:bAchsLoad,
-	bool:GotVIPLInv,
+	bool:bVIPLInv,
 	bool:bIsDead,
 	bool:bShowToys,
-	bool:Frozen,
-	bool:AllowSpawn,
+	bool:bFrozen,
+	bool:bAllowSpawn,
  	bool:bDuty,
-	bool:Muted,
+	bool:bMuted,
  	bool:bSpeedBoost,
- 	bool:SuperJump,
-	bool:AOnline,
+ 	bool:bSuperJump,
+	bool:bOnlineAdmin,
  	bool:gInvite,
  	bool:FalloutLost,
 	bool:bStateSaved,
@@ -722,8 +721,8 @@ enum E_PLAYER_DATA
 	bool:bFirstSpawn,
 	bool:bTDEnabled,
 	bool:bRainbow,
-	bool:vTDShown,
-	bool:RampActive,
+	bool:bVehicleInfo,
+	bool:bRampActive,
 	bool:bCaps,
 	bool:bGod,
 	bool:bGWarMode,
@@ -732,6 +731,7 @@ enum E_PLAYER_DATA
 	bool:bLogged,
 	bool:bSpeedo,
 	bool:bDerbyAFK,
+	iKickBanIssued,
 	PlayerText3D:DerbyVehLabel,
 	pDerbyCar,
 	pJail,
@@ -2612,7 +2612,7 @@ public OnPlayerRequestClass(playerid, classid)
 	if(PlayerData[playerid][ExitType] == EXIT_FIRST_SPAWNED)
 	{/*
 		SCM(playerid, -1, ""er"You are bugged in class selection. Please reconnect. "SERVER_IP"");
-		PlayerData[playerid][AllowSpawn] = false;
+		PlayerData[playerid][bAllowSpawn] = false;
 		KickEx(playerid);*/
 	    new rand = random(4);
 	    SetSpawnInfoEx(playerid, NO_TEAM, PlayerData[playerid][e_skinsave] != -1 ? PlayerData[playerid][e_skinsave] : GetPlayerSkin(playerid), WorldSpawns[rand][0], WorldSpawns[rand][1], WorldSpawns[rand][2] + 3.0, WorldSpawns[rand][3]);
@@ -2673,7 +2673,7 @@ public OnPlayerRequestClass(playerid, classid)
 
 public OnPlayerRequestSpawn(playerid)
 {
-	if(!PlayerData[playerid][AllowSpawn])
+	if(!PlayerData[playerid][bAllowSpawn])
 	{
 	    //SCM(playerid, -1, ""er"You are not logged in!");
 	    return 0;
@@ -2688,7 +2688,7 @@ public OnPlayerSpawn(playerid)
     if(PlayerData[playerid][bFirstSpawn])
     {
         PlayerData[playerid][bFirstSpawn] = false;
-		PlayerData[playerid][AllowSpawn] = false;
+		PlayerData[playerid][bAllowSpawn] = false;
 		AttachPlayerToy(playerid);
 		ResetPlayerWorld(playerid);
 		PlayerData[playerid][ExitType] = EXIT_FIRST_SPAWNED;
@@ -3382,7 +3382,7 @@ public OnPlayerDisconnect(playerid, reason)
 		}
 	}
 	
-    if(PlayerData[playerid][Muted]) KillTimer(PlayerData[playerid][tMute]);
+    if(PlayerData[playerid][bMuted]) KillTimer(PlayerData[playerid][tMute]);
 
 	if(PlayerData[playerid][AdminDutyLabel] != Text3D:-1)
 	{
@@ -3476,7 +3476,7 @@ public OnPlayerCommandReceived(playerid, cmdtext[])
 	    return 0;
 	}
 	
-	if(PlayerData[playerid][Frozen])
+	if(PlayerData[playerid][bFrozen])
 	{
 	    switch(YHash(cmdtext[1], false))
 	    {
@@ -4180,7 +4180,7 @@ public OnPlayerText(playerid, text[])
 	    return 0;
 	}
 
-	if(PlayerData[playerid][Muted])
+	if(PlayerData[playerid][bMuted])
 	{
 	    SCM(playerid, RED, "You are muted! Please wait until the time is over!");
 	    return 0;
@@ -4385,7 +4385,7 @@ public OnPlayerText(playerid, text[])
 	 		format(gstr, sizeof(gstr), "{%06x}%s"white"(%i): %s", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, text);
 			SCMToAll(-1, gstr);
   		}
-		else if(PlayerData[playerid][AOnline] && PlayerData[playerid][e_level] > 0)
+		else if(PlayerData[playerid][bOnlineAdmin] && PlayerData[playerid][e_level] > 0)
 		{
  	 		format(gstr, sizeof(gstr), "{%06x}%s"white"(%i): {A8DBFF}%s", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, text);
 			SCMToAll(-1, gstr);
@@ -4485,10 +4485,10 @@ public OnPlayerDeath(playerid, killerid, reason)
 		case 6: GameTextForPlayer(playerid, "~n~~n~~n~~n~~n~~n~~b~L~h~O~h~L ~w~U ~b~~h~~h~~h~D~b~~h~I~h~E~b~~h~D", 6000, 3);
 	}
 
-	if(PlayerData[playerid][Frozen])
+	if(PlayerData[playerid][bFrozen])
 	{
     	TogglePlayerControllable(playerid, true);
-		PlayerData[playerid][Frozen] = false;
+		PlayerData[playerid][bFrozen] = false;
 	}
 	
 	switch(gTeam[playerid])
@@ -6283,7 +6283,7 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 	{
 	    new vID = GetPlayerVehicleID(playerid);
 	    
-		if(PlayerData[playerid][vTDShown])
+		if(PlayerData[playerid][bVehicleInfo])
 		{
 		    KillTimer(PlayerData[playerid][tTDhandle]);
 		}
@@ -6355,7 +6355,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 
 			if(Key(KEY_FIRE) && GetPVarInt(playerid, "Ramped") == 1)
 			{
-			    if(!PlayerData[playerid][RampActive])
+			    if(!PlayerData[playerid][bRampActive])
 			    {
 				    new vehIDr = GetPlayerVehicleID(playerid), Float:vPOS[4], Float:salttmp;
 					GetVehiclePos(vehIDr, vPOS[0], vPOS[1], vPOS[2]);
@@ -6364,7 +6364,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 					vPOS[0] += (floatsin(-vPOS[3], degrees) * salttmp);
 					vPOS[1] += (floatcos(-vPOS[3], degrees) * salttmp);
 					SetTimerEx("DestroyRampObject", 3000, false, "ii", CreateDynamicObject(1632, vPOS[0], vPOS[1], vPOS[2], 0, 0, vPOS[3]), playerid);
-					PlayerData[playerid][RampActive] = true;
+					PlayerData[playerid][bRampActive] = true;
 				}
 			    return 1;
 			}
@@ -6418,7 +6418,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 		    }
 		}
 
-		if(PlayerData[playerid][SuperJump] && GetPlayerState(playerid) == PLAYER_STATE_ONFOOT && Key(KEY_JUMP))
+		if(PlayerData[playerid][bSuperJump] && GetPlayerState(playerid) == PLAYER_STATE_ONFOOT && Key(KEY_JUMP))
 		{
 		    if(!PlayerData[playerid][bGWarMode])
 		    {
@@ -8135,16 +8135,16 @@ YCMD:sj(playerid, params[], help)
 {
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
 	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
-	if(PlayerData[playerid][SuperJump])
+	if(PlayerData[playerid][bSuperJump])
     {
-     	player_notice(playerid, "SuperJump", "~r~OFF");
+     	player_notice(playerid, "bSuperJump", "~r~OFF");
 	}
 	else
 	{
-	    player_notice(playerid, "SuperJump", "~g~ON");
+	    player_notice(playerid, "bSuperJump", "~g~ON");
 	}
 	PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
-	PlayerData[playerid][SuperJump] = !PlayerData[playerid][SuperJump];
+	PlayerData[playerid][bSuperJump] = !PlayerData[playerid][bSuperJump];
 	return 1;
 }
 
@@ -8742,10 +8742,16 @@ YCMD:gungame(playerid, params[], help)
 
 YCMD:cnr(playerid, params[], help)
 {
-    if(gTeam[playerid] == CNR) return SCM(playerid, -1, ""er"You are already in this minigame!");
-    if(gTeam[playerid] != FREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
+    if(gTeam[playerid] == CNR)
+		return SCM(playerid, -1, ""er"You are already in this minigame!");
+
+	if(gTeam[playerid] != FREEROAM)
+		return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 	
-	ShowPlayerDialog(playerid, CNR_DIALOG, DIALOG_STYLE_LIST, ""YELLOW_E"Choose your side", ""LB_E"Cops\t\t"GREY_E"LVPD\n"ORANGE_E"Robbers\t"GREY_E"LV Mafia\n"RED_E"Pro Robbers\t"GREY_E"Mafia Commanders\n"PURPLE_E"Army\t\t"GREY_E"Army Task Force\n"BLUE_E"Swat\t\t"GREY_E"LVPD Commanders", "Select", "Cancel");
+	new string[512];
+	format(string, sizeof(string), ""YELLOW_E"Choose your side", ""LB_E"Cops\t\t"GREY_E"LVPD\t\t(Players: %i)\n"ORANGE_E"Robbers\t"GREY_E"LV Mafia\t\t(Players: %i)\n"RED_E"Pro Robbers\t"GREY_E"Mafia Commanders\n"PURPLE_E"Army\t\t"GREY_E"Army Task Force\n"BLUE_E"Swat\t\t"GREY_E"LVPD Commanders", iCopCount, iRobberCount);
+	
+	ShowPlayerDialog(playerid, CNR_DIALOG, DIALOG_STYLE_LIST, string, "Select", "Cancel");
 	return 1;
 }
 
@@ -9102,8 +9108,12 @@ YCMD:togglegc(playerid, params[], help)
 {
 	if(PlayerData[playerid][e_level] >= 2)
 	{
-		player_notice(playerid, "Admin GC toggled", "");
-    	PlayerData[playerid][bHideGC] = !PlayerData[playerid][bHideGC];
+	    if(!PlayerData[playerid][bHideGC])
+			player_notice(playerid, "You have been detached from [GC] channel", "");
+		else
+		    player_notice(playerid, "You have been added from [GC] channel", "");
+		    
+		PlayerData[playerid][bHideGC] = !PlayerData[playerid][bHideGC];
 	}
   	else
 	{
@@ -9836,7 +9846,7 @@ YCMD:online(playerid, params[], help)
 	if(PlayerData[playerid][e_level] >= 2)
 	{
 	    player_notice(playerid, "~w~Adminlist: ~g~Online", "");
-		PlayerData[playerid][AOnline] = true;
+		PlayerData[playerid][bOnlineAdmin] = true;
  	}
 	else
 	{
@@ -9850,7 +9860,7 @@ YCMD:offline(playerid, params[], help)
 	if(PlayerData[playerid][e_level] >= 2)
 	{
 	    player_notice(playerid, "~w~Adminlist: ~r~Offline", "");
-		PlayerData[playerid][AOnline] = false;
+		PlayerData[playerid][bOnlineAdmin] = false;
  	}
 	else
 	{
@@ -10193,7 +10203,7 @@ YCMD:id(playerid, params[], help)
 	
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(IsPlayerAvail(i) && PlayerData[playerid][AOnline])
+		if(IsPlayerAvail(i) && PlayerData[playerid][bOnlineAdmin])
 		{
 	  		GetPlayerName(i, playername, MAX_PLAYER_NAME+1);
 			new namelen = strlen(playername), bool:searched = false;
@@ -10924,7 +10934,7 @@ YCMD:mute(playerid, params[], help)
 
 		if(IsPlayerAvail(player) && player != playerid && PlayerData[player][e_level] != MAX_ADMIN_LEVEL)
 		{
-			if(PlayerData[player][Muted])
+			if(PlayerData[player][bMuted])
 			{
 				return SCM(playerid, -1, ""er"This player is already muted");
 			}
@@ -10934,7 +10944,7 @@ YCMD:mute(playerid, params[], help)
             print(gstr);
             
 			PlayerData[player][tMute] = SetTimerEx("player_unmute", time * 1000, false, "ii", player, YHash(__GetName(player)));
-			PlayerData[player][Muted] = true;
+			PlayerData[player][bMuted] = true;
 
 			format(gstr, sizeof(gstr), "4MUTE:3 %s(%i) has been muted for %i seconds by %s for %s", __GetName(player), player, time, __GetName(playerid), reason);
 			IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
@@ -10966,11 +10976,11 @@ YCMD:unmute(playerid, params[], help)
         
 		if(IsPlayerAvail(player) && player != playerid)
 		{
-			if(!PlayerData[player][Muted])
+			if(!PlayerData[player][bMuted])
 			{
 				return SCM(playerid, -1, ""er"This player is not muted");
 			}
-			PlayerData[player][Muted] = false;
+			PlayerData[player][bMuted] = false;
 			KillTimer(PlayerData[player][tMute]);
 			SCM(player, NEF_YELLOW, "You have been unmuted!");
 
@@ -11537,7 +11547,7 @@ SetPlayerGWarMode(playerid)
 	}
 	
 	PlayerData[playerid][bSpeedBoost] = false;
-    PlayerData[playerid][SuperJump] = false;
+    PlayerData[playerid][bSuperJump] = false;
     PlayerData[playerid][bGWarMode] = true;
 }
 
@@ -11552,7 +11562,7 @@ ResetPlayerGWarMode(playerid, bool:msg = true)
     
     PlayerData[playerid][bGWarMode] = false;
 	PlayerData[playerid][bSpeedBoost] = true;
-    PlayerData[playerid][SuperJump] = false;
+    PlayerData[playerid][bSuperJump] = false;
 }
 
 YCMD:ginvite(playerid, params[], help)
@@ -12780,7 +12790,7 @@ YCMD:admins(playerid, params[], help)
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(!IsPlayerAvail(i)) continue;
-	    if(PlayerData[i][e_level] > 0 && PlayerData[i][AOnline])
+	    if(PlayerData[i][e_level] > 0 && PlayerData[i][bOnlineAdmin])
 	    {
 	        if(IsPlayerOnDesktop(i))
 	        {
@@ -12931,7 +12941,7 @@ YCMD:vipli(playerid, params[], help)
 			if(PlayerData[player][e_vip] == 1) return SCM(playerid, -1, ""er"You cannot invite this player");
 			if(PlayerData[player][e_level] > 0) return SCM(playerid, -1, ""er"You cannot invite this player");
 
-			PlayerData[player][GotVIPLInv] = true;
+			PlayerData[player][bVIPLInv] = true;
 
 			format(gstr, sizeof(gstr), ""yellow_e"%s(%i) invited you to the VIP Lounge. Type /accept to join.", __GetName(playerid), playerid);
 			SCM(player, -1, gstr);
@@ -12957,7 +12967,7 @@ YCMD:accept(playerid, params[], help)
 {
     if(PlayerData[playerid][e_vip] == 1) return SCM(playerid, -1, ""er"You can't use this command as VIP");
     
-	if(!PlayerData[playerid][GotVIPLInv])
+	if(!PlayerData[playerid][bVIPLInv])
 	{
 	    return SCM(playerid, -1, ""er"You got no invitation");
 	}
@@ -12974,7 +12984,7 @@ YCMD:accept(playerid, params[], help)
 
 	SCM(playerid, -1, ""yellow_e"You've used your invitation");
 
-	PlayerData[playerid][GotVIPLInv] = false;
+	PlayerData[playerid][bVIPLInv] = false;
 	return 1;
 }
 
@@ -15009,7 +15019,7 @@ YCMD:freeze(playerid, params[], help)
 			SCM(player, RED, "You have been frozen by an admin");
 			SCM(playerid, RED, "Player has been frozen");
 			TogglePlayerControllable(player, false);
-			PlayerData[player][Frozen] = true;
+			PlayerData[player][bFrozen] = true;
 			
 			format(gstr, sizeof(gstr), ""red"Adm: %s(%i) has been frozen by %s(%i)", __GetName(player), player, __GetName(playerid), playerid);
 			AdminMSG(-1, gstr);
@@ -15043,10 +15053,10 @@ YCMD:unfreeze(playerid, params[], help)
 	 	
    		if(IsPlayerAvail(player))
 		{
-		 	if(PlayerData[player][Frozen])
+		 	if(PlayerData[player][bFrozen])
 	 		{
 				TogglePlayerControllable(player, true);
-				PlayerData[player][Frozen] = false;
+				PlayerData[player][bFrozen] = false;
 				SCM(player, GREEN, "You have been unfrozen by an admin");
 				SCM(playerid, RED, "Player has been unfrozen");
 			}
@@ -16112,7 +16122,7 @@ YCMD:givecash(playerid, params[], help)
 
 YCMD:pm(playerid, params[], help)
 {
-	if(PlayerData[playerid][Muted])
+	if(PlayerData[playerid][bMuted])
 	{
 	    SCM(playerid, RED, "You are muted! Please wait until the time is over!");
 	    return 0;
@@ -21182,7 +21192,7 @@ ClearBGVotes()
 
 AutoLogin(playerid)
 {
-    PlayerData[playerid][AllowSpawn] = true;
+    PlayerData[playerid][bAllowSpawn] = true;
     PlayerData[playerid][bLogged] = true;
     PlayerData[playerid][ExitType] = EXIT_LOGGED;
     
@@ -21213,7 +21223,7 @@ RequestLogin(playerid)
 
 SkipRegistration(playerid)
 {
-    PlayerData[playerid][AllowSpawn] = true;
+    PlayerData[playerid][bAllowSpawn] = true;
 	
     PlayerData[playerid][e_regdate] = gettime();
 	PlayerData[playerid][e_payday] = 60;
@@ -21250,7 +21260,7 @@ SkipLogin(playerid)
 	format(newname, sizeof(newname), "%s_%i", __GetName(playerid), number);
 	format(oldname, sizeof(oldname), "%s", __GetName(playerid));
 	    
-    PlayerData[playerid][AllowSpawn] = true;
+    PlayerData[playerid][bAllowSpawn] = true;
 	    
 	if(SetPlayerName(playerid, newname) == 1)
 	{
@@ -21731,7 +21741,7 @@ function:OnPlayerRegister(playerid, namehash, register, password[], playername[]
 		{
 			PlayerData[playerid][ExitType] = EXIT_LOGGED;
 			PlayerData[playerid][ConnectTime] = gettime();
-		    PlayerData[playerid][AllowSpawn] = true;
+		    PlayerData[playerid][bAllowSpawn] = true;
 		    PlayerData[playerid][bLogged] = true;
             SrvStat[2]++;
 
@@ -27172,7 +27182,7 @@ function:player_unmute(playerid, namehash)
 {
 	if(namehash == YHash(__GetName(playerid)))
 	{
-	    PlayerData[playerid][Muted] = false;
+	    PlayerData[playerid][bMuted] = false;
 	    PlayerData[playerid][tMute] = -1;
 	}
     return 1;
@@ -27689,7 +27699,7 @@ GetPlayerSettings(playerid)
 	    strcat(string, gstr);
 	}
 
-	if(PlayerData[playerid][SuperJump])
+	if(PlayerData[playerid][bSuperJump])
 	{
 	    format(gstr, sizeof(gstr), ""white"2)\tSuperjump\t"vgreen"[ON]\n");
 	    strcat(string, gstr);
@@ -27831,7 +27841,7 @@ function:ChangeColors(playerid)
 function:DestroyRampObject(objid, playerid)
 {
 	DestroyDynamicObject(objid);
-	PlayerData[playerid][RampActive] = false;
+	PlayerData[playerid][bRampActive] = false;
 }
 
 GetVehicleModelSeats(modelid)
@@ -27875,7 +27885,7 @@ PushTeleportIntput(playerid, teleport_category, input)
 function:hidevTD(playerid)
 {
 	PlayerTextDrawHide(playerid, vTD[playerid]);
-	PlayerData[playerid][vTDShown] = false;
+	PlayerData[playerid][bVehicleInfo] = false;
 }
 
 SetPlayerPosition(playerid, Float:X, Float:Y, Float:Z, Float:a, inter = 0)
@@ -29961,16 +29971,16 @@ PreparePlayerVars(playerid)
     PlayerData[playerid][e_accountid] = 0;
     PlayerData[playerid][bHideGC] = false;
     PlayerData[playerid][bAchsLoad] = false;
-	PlayerData[playerid][GotVIPLInv] = false;
+	PlayerData[playerid][bVIPLInv] = false;
 	PlayerData[playerid][bIsDead] = false;
 	PlayerData[playerid][bShowToys] = true;
-	PlayerData[playerid][Frozen] = false;
-	PlayerData[playerid][AllowSpawn] = false;
+	PlayerData[playerid][bFrozen] = false;
+	PlayerData[playerid][bAllowSpawn] = false;
  	PlayerData[playerid][bDuty] = false;
-	PlayerData[playerid][Muted] = false;
+	PlayerData[playerid][bMuted] = false;
  	PlayerData[playerid][bSpeedBoost] = true;
- 	PlayerData[playerid][SuperJump] = false;
-	PlayerData[playerid][AOnline] = true;
+ 	PlayerData[playerid][bSuperJump] = false;
+	PlayerData[playerid][bOnlineAdmin] = true;
  	PlayerData[playerid][gInvite] = false;
  	PlayerData[playerid][FalloutLost] = true;
 	PlayerData[playerid][bStateSaved] = false;
@@ -29978,8 +29988,8 @@ PreparePlayerVars(playerid)
 	PlayerData[playerid][bFirstSpawn] = false;
 	PlayerData[playerid][bTDEnabled] = true;
 	PlayerData[playerid][bRainbow] = false;
-	PlayerData[playerid][vTDShown] = false;
-	PlayerData[playerid][RampActive] = false;
+	PlayerData[playerid][bVehicleInfo] = false;
+	PlayerData[playerid][bRampActive] = false;
 	PlayerData[playerid][bCaps] = true;
 	PlayerData[playerid][bGod] = false;
 	PlayerData[playerid][bGWarMode] = false;
@@ -30487,7 +30497,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 	    {
 	  		if(cache_get_row_count() != 0) // Correct password
 		    {
-		        PlayerData[playerid][AllowSpawn] = true;
+		        PlayerData[playerid][bAllowSpawn] = true;
 				PlayerData[playerid][bLogged] = true;
                 PlayerData[playerid][ExitType] = EXIT_LOGGED;
 
