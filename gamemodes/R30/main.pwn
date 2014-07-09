@@ -7879,7 +7879,6 @@ YCMD:l(playerid, params[], help)
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in gang war, use /exit");
 	if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't use this command while in bike challenge, use /exit.");
 	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
-    if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't load your position now");
 	if(!PlayerData[playerid][bStateSaved])
 	{
 	    player_notice(playerid, "Use /s first", "");
