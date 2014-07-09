@@ -7490,8 +7490,8 @@ YCMD:station(playerid, params[], help)
 
 YCMD:myskin(playerid, params[], help)
 {
-    if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
-    if(IsPlayerInAnyVehicle(playerid)) return SCM(playerid, -1, ""er"Please exit your vehicle first.");
+    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
+    if(IsPlayerInAnyVehicle(playerid)) return player_notice(playerid, "Exit your vehicle", "");
 
 	extract params -> new skin; else
 	{
@@ -7506,8 +7506,8 @@ YCMD:myskin(playerid, params[], help)
 
 YCMD:skins(playerid, params[], help)
 {
-    if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
-    if(IsPlayerInAnyVehicle(playerid)) return SCM(playerid, -1, ""er"Please exit your vehicle first.");
+    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
+    if(IsPlayerInAnyVehicle(playerid)) return player_notice(playerid, "Exit your vehicle", "");
 
     ShowModelSelectionMenu(playerid, skinlist, "Select Skin", 0x0500009C, 0x050000FF, 0xFAFAFA4D);
 	return 1;
