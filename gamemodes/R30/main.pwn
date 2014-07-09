@@ -630,7 +630,7 @@ enum SUSPECT:(<<= 1)
 	SUSPECT_IMMUNE
 };
 
-enum E_PLAYER_DATA
+enum E_PLAYER_DATA // Prefixes: i = Integer, s = String, b = bool, f = Float, p = Pointer, t3d = 3DTextLabel, g_ = Global, tick = tickcounts, t = Timer
 {
 	/* ORM */
 	ORM:e_ormid,
@@ -714,12 +714,12 @@ enum E_PLAYER_DATA
  	bool:bSpeedBoost,
  	bool:bSuperJump,
 	bool:bOnlineAdmin,
- 	bool:gInvite,
+ 	bool:bGangInvite,
  	bool:FalloutLost,
 	bool:bStateSaved,
 	bool:bHasSpawn,
 	bool:bFirstSpawn,
-	bool:bTDEnabled,
+	bool:bTextdraws,
 	bool:bRainbow,
 	bool:bVehicleInfo,
 	bool:bRampActive,
@@ -732,12 +732,21 @@ enum E_PLAYER_DATA
 	bool:bSpeedo,
 	bool:bDerbyAFK,
 	iKickBanIssued,
-	PlayerText3D:DerbyVehLabel,
-	pDerbyCar,
-	pJail,
-	RobberyCount,
+	iCoolDownCommand,
+	iCoolDownChat,
+	iCoolDownDeath,
+	PlayerText3D:t3dDerbyVehicleLabel,
+	pDerbyVehicle,
+	pTrailerVehicle,
+	pVehicle,
+	iJailTime,
+	iRobberyCount,
 	tRobbery,
 	tLoadMap,
+	tTimerHP,
+	tRainbow,
+	tTDhandle,
+	tMedkit,
 	BOOST:Boost,
 	SUSPECT:ACSettings,
 	BoostDeplete,
@@ -745,11 +754,7 @@ enum E_PLAYER_DATA
 	HouseSlotSelected,
 	BusinessIdSelected,
 	DrawnNumber,
-	TrailerVid,
-	tRainbow,
-	tTDhandle,
 	ExitType,
-	tMedkit,
 	MedkitTime,
 	GCPlayer,
 	GCNameHash,
@@ -763,7 +768,6 @@ enum E_PLAYER_DATA
 	Warnings,
 	RankSelected,
 	HitmanHit,
-	Vehicle,
 	Text3D:AdminDutyLabel,
 	Text3D:VIPLabel,
 	iLastChat,
@@ -788,12 +792,8 @@ enum E_PLAYER_DATA
 	Float:CSpawnY,
 	Float:CSpawnZ,
 	Float:CSpawnA,
-	tTimerHP,
 	toy_selected,
 	houseobj_selected,
-	iCoolDownCommand,
-	iCoolDownChat,
-	iCoolDownDeath,
 	DuelWeapon,
 	DuelLocation,
 	DuelRequest,
@@ -3091,7 +3091,7 @@ public OnPlayerSpawn(playerid)
 	}
 	
 	if(gTeam[playerid] == FREEROAM) PlayerTextDrawShow(playerid, TXTWantedsTD[playerid]);
-    if(!PlayerData[playerid][bTDEnabled]) Command_ReProcess(playerid, "/hidef", false);
+    if(!PlayerData[playerid][bTextdraws]) Command_ReProcess(playerid, "/hidef", false);
 
     PlayerData[playerid][bIsDead] = false;
 	return 1;
@@ -3344,10 +3344,10 @@ public OnPlayerDisconnect(playerid, reason)
 			case DERBY:
 			{
 			    //OPDisc
-			    if(PlayerData[playerid][DerbyVehLabel] != PlayerText3D:-1)
+			    if(PlayerData[playerid][t3dDerbyVehicleLabel] != PlayerText3D:-1)
 			    {
-			    	DeletePlayer3DTextLabel(playerid, PlayerData[playerid][DerbyVehLabel]);
-			    	PlayerData[playerid][DerbyVehLabel] = PlayerText3D:-1;
+			    	DeletePlayer3DTextLabel(playerid, PlayerData[playerid][t3dDerbyVehicleLabel]);
+			    	PlayerData[playerid][t3dDerbyVehicleLabel] = PlayerText3D:-1;
 			    }
 
 			    if(!PlayerData[playerid][bDerbyAFK])
@@ -3364,10 +3364,10 @@ public OnPlayerDisconnect(playerid, reason)
 					}
 					else if(IsDerbyRunning && DerbyWinner[playerid])
 					{
-					    if(PlayerData[playerid][pDerbyCar] != -1)
+					    if(PlayerData[playerid][pDerbyVehicle] != -1)
 					    {
-					    	DestroyVehicle_(PlayerData[playerid][pDerbyCar]);
-					    	PlayerData[playerid][pDerbyCar] = -1;
+					    	DestroyVehicle_(PlayerData[playerid][pDerbyVehicle]);
+					    	PlayerData[playerid][pDerbyVehicle] = -1;
 						}
 					    DerbyWinner[playerid] = false;
 	        			DerbyPlayers--;
@@ -3824,7 +3824,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				    {
 				        if(PlayerData[i][e_gangid] == gangid || PlayerData[i][TmpGangID] == gangid)
 				        {
-					        PlayerData[i][gInvite] = false;
+					        PlayerData[i][bGangInvite] = false;
 					        PlayerData[i][e_gangid] = 0;
 					        PlayerData[i][TmpGangID] = 0;
 					        PlayerData[i][e_gangrank] = GANG_POS_NONE;
@@ -4736,15 +4736,15 @@ public OnPlayerDeath(playerid, killerid, reason)
 
 		    	DerbyPlayers--;
 		    	DerbyWinner[playerid] = false;
-			    if(PlayerData[playerid][pDerbyCar] != -1)
+			    if(PlayerData[playerid][pDerbyVehicle] != -1)
 			    {
-			    	DestroyVehicle_(PlayerData[playerid][pDerbyCar]);
-			    	PlayerData[playerid][pDerbyCar] = -1;
+			    	DestroyVehicle_(PlayerData[playerid][pDerbyVehicle]);
+			    	PlayerData[playerid][pDerbyVehicle] = -1;
 				}
-			    if(PlayerData[playerid][DerbyVehLabel] != PlayerText3D:-1)
+			    if(PlayerData[playerid][t3dDerbyVehicleLabel] != PlayerText3D:-1)
 			    {
-			    	DeletePlayer3DTextLabel(playerid, PlayerData[playerid][DerbyVehLabel]);
-			    	PlayerData[playerid][DerbyVehLabel] = PlayerText3D:-1;
+			    	DeletePlayer3DTextLabel(playerid, PlayerData[playerid][t3dDerbyVehicleLabel]);
+			    	PlayerData[playerid][t3dDerbyVehicleLabel] = PlayerText3D:-1;
 			    }
 
 		    	if(DerbyPlayers == 1) Derby();
@@ -6226,7 +6226,7 @@ public OnVehicleDamageStatusUpdate(vehicleid, playerid)
 					format(texts, sizeof(texts), "{ffd800}-%.0f\n%s",OldDamage[playerid],UpdateString(HP));
 					PlayerData[playerid][tTimerHP] = SetTimerEx("DeleteDerbyText", 2000, false, "i", playerid);
 				}
-				UpdatePlayer3DTextLabelText(playerid, PlayerData[playerid][DerbyVehLabel], -1, texts);
+				UpdatePlayer3DTextLabelText(playerid, PlayerData[playerid][t3dDerbyVehicleLabel], -1, texts);
 			}
 		}
 	}
@@ -6298,18 +6298,18 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 	{
 		if(newstate == PLAYER_STATE_DRIVER)
 		{
-		    if(PlayerData[playerid][DerbyVehLabel] != PlayerText3D:-1)
+		    if(PlayerData[playerid][t3dDerbyVehicleLabel] != PlayerText3D:-1)
 		    {
-		    	DeletePlayer3DTextLabel(playerid, PlayerData[playerid][DerbyVehLabel]);
-		    	PlayerData[playerid][DerbyVehLabel] = PlayerText3D:-1;
+		    	DeletePlayer3DTextLabel(playerid, PlayerData[playerid][t3dDerbyVehicleLabel]);
+		    	PlayerData[playerid][t3dDerbyVehicleLabel] = PlayerText3D:-1;
 		    }
-			PlayerData[playerid][DerbyVehLabel] = CreatePlayer3DTextLabel(playerid, " ", -1, 0, 0, 0.9, 10.0, INVALID_PLAYER_ID, GetPlayerVehicleID(playerid), 1);
+			PlayerData[playerid][t3dDerbyVehicleLabel] = CreatePlayer3DTextLabel(playerid, " ", -1, 0, 0, 0.9, 10.0, INVALID_PLAYER_ID, GetPlayerVehicleID(playerid), 1);
 			UpdateBar(playerid);
 		}
-		else if(PlayerData[playerid][DerbyVehLabel] != PlayerText3D:-1)
+		else if(PlayerData[playerid][t3dDerbyVehicleLabel] != PlayerText3D:-1)
 	    {
-	    	DeletePlayer3DTextLabel(playerid, PlayerData[playerid][DerbyVehLabel]);
-	    	PlayerData[playerid][DerbyVehLabel] = PlayerText3D:-1;
+	    	DeletePlayer3DTextLabel(playerid, PlayerData[playerid][t3dDerbyVehicleLabel]);
+	    	PlayerData[playerid][t3dDerbyVehicleLabel] = PlayerText3D:-1;
 	    }
 	}
 	return 1;
@@ -7795,7 +7795,7 @@ YCMD:dm4(playerid, params[], help)
 
 YCMD:textdraws(playerid, params[], help)
 {
-	if(PlayerData[playerid][bTDEnabled])
+	if(PlayerData[playerid][bTextdraws])
 	{
 	    Command_ReProcess(playerid, "/hidef", false);
 	}
@@ -7805,7 +7805,7 @@ YCMD:textdraws(playerid, params[], help)
 
 YCMD:hidef(playerid, params[], help)
 {
-    PlayerData[playerid][bTDEnabled] = false;
+    PlayerData[playerid][bTextdraws] = false;
 	TextDrawHideForPlayer(playerid, TXTTeleportInfo);
     TextDrawHideForPlayer(playerid, TXTFooterBlack);
 	TextDrawHideForPlayer(playerid, TXTFooter);
@@ -7823,7 +7823,7 @@ YCMD:hidef(playerid, params[], help)
 
 YCMD:showf(playerid, params[], help)
 {
-    PlayerData[playerid][bTDEnabled] = true;
+    PlayerData[playerid][bTextdraws] = true;
 	TextDrawShowForPlayer(playerid, TXTTeleportInfo);
 	TextDrawShowForPlayer(playerid, TXTFooterBlack);
 	TextDrawShowForPlayer(playerid, TXTFooter);
@@ -7876,8 +7876,7 @@ YCMD:s(playerid, params[], help)
 
 YCMD:l(playerid, params[], help)
 {
-    if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in gang war, use /exit");
-	if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't use this command while in bike challenge, use /exit.");
+    if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
 	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 	if(!PlayerData[playerid][bStateSaved])
 	{
@@ -11598,11 +11597,11 @@ YCMD:ginvite(playerid, params[], help)
     if(player == playerid) return SCM(playerid, -1, ""er"You can't invite yourself");
     if(PlayerData[player][e_gangid] != 0) return SCM(playerid, -1, ""er"Player is already in a gang");
 	if(GetPlayerScoreEx(player) < 100) return SCM(playerid, -1, ""er"Player needs at least 100 score");
-    if(PlayerData[player][gInvite]) return SCM(playerid, -1, ""er"Player has been already invited by someone else!");
+    if(PlayerData[player][bGangInvite]) return SCM(playerid, -1, ""er"Player has been already invited by someone else!");
     if(!IsPlayerAvail(player)) return SCM(playerid, -1, ""er"Player is not available!");
 
     PlayerData[player][TmpGangID] = PlayerData[playerid][e_gangid];
-    PlayerData[player][gInvite] = true;
+    PlayerData[player][bGangInvite] = true;
     PlayerData[player][e_gangid] = 0;
     PlayerData[player][e_gangrank] = GANG_POS_NONE;
     strmid(PlayerData[player][GangName], PlayerData[playerid][GangName], 0, 21, 21);
@@ -11623,11 +11622,11 @@ YCMD:gdeny(playerid, params[], help)
     if(!islogged(playerid)) return notlogged(playerid);
     
     if(PlayerData[playerid][e_gangid] != 0) return SCM(playerid, -1, ""er"You are already in a gang!");
-    if(!PlayerData[playerid][gInvite]) return SCM(playerid, -1, ""er"You haven't been invited!");
+    if(!PlayerData[playerid][bGangInvite]) return SCM(playerid, -1, ""er"You haven't been invited!");
     PlayerData[playerid][TmpGangID] = 0;
     PlayerData[playerid][e_gangid] = 0;
     PlayerData[playerid][e_gangrank] = GANG_POS_NONE;
-    PlayerData[playerid][gInvite] = false;
+    PlayerData[playerid][bGangInvite] = false;
     PlayerData[playerid][GangName][0] = '\0';
     PlayerData[playerid][GangTag][0] = '\0';
     SCM(playerid, GREEN, "The invitation has been rejected");
@@ -11651,9 +11650,9 @@ YCMD:gjoin(playerid, params[], help)
     if(!islogged(playerid)) return notlogged(playerid);
     
     if(PlayerData[playerid][e_gangid] != 0) return SCM(playerid, -1, ""er"You are already in a gang!");
-    if(!PlayerData[playerid][gInvite]) return SCM(playerid, -1, ""er"You did not get any invitations!");
+    if(!PlayerData[playerid][bGangInvite]) return SCM(playerid, -1, ""er"You did not get any invitations!");
     
-	PlayerData[playerid][gInvite] = false;
+	PlayerData[playerid][bGangInvite] = false;
 	PlayerData[playerid][e_gangrank] = GANG_POS_JUNIOR_MEMBER;
 	PlayerData[playerid][e_gangid] = PlayerData[playerid][TmpGangID];
 	PlayerData[playerid][TmpGangID] = 0;
@@ -12363,7 +12362,7 @@ YCMD:jail(playerid, params[], help)
 		    
 			if(gTeam[player] == JAIL)
 			{
-			    format(reason, sizeof(reason), "ERROR: "GREY2_E"%s(%i) is already jailed (gets out in %d seconds)", __GetName(player), player, PlayerData[player][pJail]);
+			    format(reason, sizeof(reason), "ERROR: "GREY2_E"%s(%i) is already jailed (gets out in %d seconds)", __GetName(player), player, PlayerData[player][iJailTime]);
 			    SCM(playerid, COLOR_RED, reason);
 			    SCM(playerid, COLOR_WHITE, "HINT: /unjail <playerid> to unjail.");
 			    return 1;
@@ -12390,7 +12389,7 @@ YCMD:jail(playerid, params[], help)
 			}
 
 			gTeam[player] = JAIL;
-			PlayerData[player][pJail] = time;
+			PlayerData[player][iJailTime] = time;
 			SetPlayerInterior(player, 3);
 			SetPlayerVirtualWorld(player, 10);
 			SetPlayerFacingAngle(player, 360.0);
@@ -12445,7 +12444,7 @@ YCMD:unjail(playerid, params[], help)
 			    return Error(playerid, "Cannot unjail CNR players");
 			}
 
-			PlayerData[player][pJail] = 0;
+			PlayerData[player][iJailTime] = 0;
 			gTeam[player] = FREEROAM;
 			ResetPlayerWorld(player);
 			SpawnPlayer(player);
@@ -14788,11 +14787,11 @@ YCMD:trailer(playerid, params[], help)
 		
 		if(model == 403 || model == 514 || model == 515)
 		{
-			if(PlayerData[playerid][TrailerVid] != -1)
+			if(PlayerData[playerid][pTrailerVehicle] != -1)
 			{
-			    DetachTrailerFromVehicle(PlayerData[playerid][TrailerVid]);
-				DestroyVehicle_(PlayerData[playerid][TrailerVid]);
-				PlayerData[playerid][TrailerVid] = -1;
+			    DetachTrailerFromVehicle(PlayerData[playerid][pTrailerVehicle]);
+				DestroyVehicle_(PlayerData[playerid][pTrailerVehicle]);
+				PlayerData[playerid][pTrailerVehicle] = -1;
 			}
 		
 		    new Float:p[4];
@@ -14803,9 +14802,9 @@ YCMD:trailer(playerid, params[], help)
 			p[0] += (floatsin(-p[3], degrees) * -9);
 			p[1] += (floatcos(-p[3], degrees) * -9);
 			
-			PlayerData[playerid][TrailerVid] = CreateVehicle_(435, p[0], p[1], p[2], p[3], 0, 0, -1);
+			PlayerData[playerid][pTrailerVehicle] = CreateVehicle_(435, p[0], p[1], p[2], p[3], 0, 0, -1);
 			
-			AttachTrailerToVehicle(PlayerData[playerid][TrailerVid], vid);
+			AttachTrailerToVehicle(PlayerData[playerid][pTrailerVehicle], vid);
 			
 			player_notice(playerid, "Trailer attached", "");
 		}
@@ -16671,7 +16670,7 @@ YCMD:rob(playerid, params[], help)
 						SetPlayerColor(playerid, COLOR_ORANGE2);
 					}
 				    SetTimerEx("ResetRobbery", 250000, false, "ii", playerid, YHash(__GetName(playerid)));
-				    PlayerData[playerid][RobberyCount] = 20;
+				    PlayerData[playerid][iRobberyCount] = 20;
 				    PlayerData[playerid][tRobbery] = SetTimerEx("StartRobbery", 1000, true, "ii", playerid, YHash(__GetName(playerid)));
 					SCM(playerid, COLOR_BLUE, ">> "ORANGE_E"You have started a robbery, the cops have been notified!");
 					ApplyAnimation(playerid, "SHOP", "ROB_Shifty", 4.0, 0, 0, 0, 0, 0);
@@ -16787,7 +16786,7 @@ YCMD:ar(playerid, params[], help)
 				    format(gstr2, sizeof(gstr2), "Server: "GREY2_E"Suspect %s(%d) has been arrested by Officer %s(%d).", __GetName(i), i, __GetName(playerid), playerid);
 					SCMToAll(COLOR_RED, gstr2);
 					gTeam[i] = JAIL;
-				    PlayerData[i][pJail] = 30;
+				    PlayerData[i][iJailTime] = 30;
 				    SetPVarInt(i, "JailedByAdmin", 0);
 				    SetTimerEx("JailPlayer", 1200, false, "ii", i, YHash(__GetName(i)));
 				    KillTimer(PlayerData[i][tRobbery]);
@@ -16827,7 +16826,7 @@ YCMD:escape(playerid, params[], help)
 	if(GetPVarInt(playerid, "JailedByAdmin") == 1)
  		return Error(playerid, "You can't attempt to escape as you've been jailed by an admin.");
 
-	if(PlayerData[playerid][pJail] == 0 || gTeam[playerid] != JAIL)
+	if(PlayerData[playerid][iJailTime] == 0 || gTeam[playerid] != JAIL)
 		return Error(playerid, "You are not in jail");
 
 	SetPVarInt(playerid, "HasEscaped", 1);
@@ -16836,7 +16835,7 @@ YCMD:escape(playerid, params[], help)
 	{
 	    case 0, 1:
 		{
-			PlayerData[playerid][pJail] = 0;
+			PlayerData[playerid][iJailTime] = 0;
 			GameTextForPlayer(playerid, "~b~escaped", 5000, 3);
 			SCM(playerid, COLOR_ORANGE, "*** "RED_E"You have escaped from jail, the cops have been notified!");
 			SetPlayerPosition(playerid, 2290.6777,2423.7139,10.8203,181.2573);
@@ -16864,7 +16863,7 @@ YCMD:escape(playerid, params[], help)
 		}
 		case 2..4:
 		{
-			PlayerData[playerid][pJail] += 20;
+			PlayerData[playerid][iJailTime] += 20;
 			GameTextForPlayer(playerid, "~r~escaped failed", 5000, 3);
 			SCM(playerid, COLOR_WHITE, "*** "RED_E"Your escape has failed, 20 seconds added to your jail sentence!");
 
@@ -17801,7 +17800,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
   						format(string, sizeof(string), "4CNR3 %s(%i) has joined the Robbers in the cops and robbers minigame.", __GetName(playerid), playerid);
 						IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, string);
-  	    				format(string, sizeof(string), ""cnr_sign" "ORANGE_E"%s(%i) has joined the "RED_E"Robbers "ORANGE_E"in the /CNR minigame.", __GetName(playerid), playerid);
+  	    				format(string, sizeof(string), ""cnr_sign" "ORANGE_E"%s(%i) has joined the "LB_E"Robbers "ORANGE_E"in the /CNR minigame.", __GetName(playerid), playerid);
   	    				SCMToAll(-1, string);
 						PreloadAnimLib(playerid, "SHOP");
 			    		SCM(playerid, COLOR_GREY, ""nef" You have joined the Robbers!");
@@ -18465,7 +18464,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				    {
 				        if(PlayerData[i][e_gangid] == PlayerData[playerid][e_gangid] || PlayerData[i][TmpGangID] == PlayerData[playerid][e_gangid])
 				        {
-					        PlayerData[i][gInvite] = false;
+					        PlayerData[i][bGangInvite] = false;
 					        PlayerData[i][e_gangid] = 0;
 					        PlayerData[i][TmpGangID] = 0;
 					        PlayerData[i][e_gangrank] = GANG_POS_NONE;
@@ -18486,7 +18485,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				format(gstr, sizeof(gstr), "DELETE FROM `gangs` WHERE `ID` = %i LIMIT 1;", PlayerData[playerid][e_gangid]);
 				mysql_tquery(pSQL, gstr);
 
-			    PlayerData[playerid][gInvite] = false;
+			    PlayerData[playerid][bGangInvite] = false;
 			    PlayerData[playerid][e_gangid] = 0;
 			    PlayerData[playerid][TmpGangID] = 0;
 			    PlayerData[playerid][e_gangrank] = GANG_POS_NONE;
@@ -18565,7 +18564,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					}
 					case 2:
 					{
-					    if(PlayerData[playerid][bTDEnabled]) Command_ReProcess(playerid, "/hidef", false);
+					    if(PlayerData[playerid][bTextdraws]) Command_ReProcess(playerid, "/hidef", false);
 					    else Command_ReProcess(playerid, "/showf", false);
 					    ShowDialog(playerid, SETTINGS_DIALOG);
 					}
@@ -21378,18 +21377,18 @@ CarSpawner(playerid, model, respawn_delay = -1, bool:spawnzone_check = true)
 	GetPlayerPos(playerid, POS[0], POS[1], POS[2]);
 	GetPlayerFacingAngle(playerid, POS[3]);
 
-	PlayerData[playerid][Vehicle] = CreateVehicle_(model, POS[0], POS[1], POS[2], POS[3], color1, color2, respawn_delay);
+	PlayerData[playerid][pVehicle] = CreateVehicle_(model, POS[0], POS[1], POS[2], POS[3], color1, color2, respawn_delay);
 
-	SetVehicleZAngle(PlayerData[playerid][Vehicle], POS[3]);
+	SetVehicleZAngle(PlayerData[playerid][pVehicle], POS[3]);
 	SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
 	ClearAnimations(playerid);
 	ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
-	SetVehicleVirtualWorld(PlayerData[playerid][Vehicle], GetPlayerVirtualWorld(playerid));
-	LinkVehicleToInterior(PlayerData[playerid][Vehicle], GetPlayerInterior(playerid));
-	SetVehicleNumberPlate(PlayerData[playerid][Vehicle], "{F81414}NEF");
-	SetVehicleToRespawn(PlayerData[playerid][Vehicle]);
-	if(IsComponentIdCompatible(GetVehicleModel(PlayerData[playerid][Vehicle]), 1010)) AddVehicleComponent(PlayerData[playerid][Vehicle], 1010);
-	PutPlayerInVehicle(playerid, PlayerData[playerid][Vehicle], 0);
+	SetVehicleVirtualWorld(PlayerData[playerid][pVehicle], GetPlayerVirtualWorld(playerid));
+	LinkVehicleToInterior(PlayerData[playerid][pVehicle], GetPlayerInterior(playerid));
+	SetVehicleNumberPlate(PlayerData[playerid][pVehicle], "{F81414}NEF");
+	SetVehicleToRespawn(PlayerData[playerid][pVehicle]);
+	if(IsComponentIdCompatible(GetVehicleModel(PlayerData[playerid][pVehicle]), 1010)) AddVehicleComponent(PlayerData[playerid][pVehicle], 1010);
+	PutPlayerInVehicle(playerid, PlayerData[playerid][pVehicle], 0);
 	player_notice(playerid, "Vehicle spawned", "");
 	
 	if(PlayerData[playerid][bGod])
@@ -24569,20 +24568,20 @@ function:StartDerbyMap1()
 						case 4: vid = 573;
 						case 5: vid = 402;
 					}
-					PlayerData[i][pDerbyCar] = CreateVehicle_(vid, Derby_Map1Spawns[m1s][m1sX], Derby_Map1Spawns[m1s][m1sY], floatadd(Derby_Map1Spawns[m1s][m1sZ], 6.0), Derby_Map1Spawns[m1s][m1sA], (random(128) + 127), (random(128) + 127), 60);
-                    SetVehicleNumberPlate(PlayerData[i][pDerbyCar], "{3399ff}D{FFFFFF}erb{F81414}Y");
-                    SetVehicleToRespawn(PlayerData[i][pDerbyCar]);
-					SetVehicleVirtualWorld(PlayerData[i][pDerbyCar], GetPlayerVirtualWorld(i));
+					PlayerData[i][pDerbyVehicle] = CreateVehicle_(vid, Derby_Map1Spawns[m1s][m1sX], Derby_Map1Spawns[m1s][m1sY], floatadd(Derby_Map1Spawns[m1s][m1sZ], 6.0), Derby_Map1Spawns[m1s][m1sA], (random(128) + 127), (random(128) + 127), 60);
+                    SetVehicleNumberPlate(PlayerData[i][pDerbyVehicle], "{3399ff}D{FFFFFF}erb{F81414}Y");
+                    SetVehicleToRespawn(PlayerData[i][pDerbyVehicle]);
+					SetVehicleVirtualWorld(PlayerData[i][pDerbyVehicle], GetPlayerVirtualWorld(i));
 					TogglePlayerControllable(i, true);
  					SetPlayerSpecialAction(i, SPECIAL_ACTION_NONE);
 					ClearAnimations(i);
-					PutPlayerInVehicle(i, PlayerData[i][pDerbyCar], 0);
-					RepairVehicle(PlayerData[i][pDerbyCar]);
+					PutPlayerInVehicle(i, PlayerData[i][pDerbyVehicle], 0);
+					RepairVehicle(PlayerData[i][pDerbyVehicle]);
 					SetCameraBehindPlayer(i);
 					
 					new Float:POS[3];
-					GetVehicleVelocity(PlayerData[i][pDerbyCar], POS[0], POS[1], POS[2]);
-					SetVehicleVelocity(PlayerData[i][pDerbyCar], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
+					GetVehicleVelocity(PlayerData[i][pDerbyVehicle], POS[0], POS[1], POS[2]);
+					SetVehicleVelocity(PlayerData[i][pDerbyVehicle], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
 					
 					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby is starting!", 3000, 5);
 					Derby_Map1Spawns[m1s][m1sUsed] = true;
@@ -24664,20 +24663,20 @@ function:StartDerbyMap2()
 						case 4: vid = 573;
 						case 5: vid = 402;
 					}
-					PlayerData[i][pDerbyCar] = CreateVehicle_(vid, Derby_Map2Spawns[m2s][m2sX], Derby_Map2Spawns[m2s][m2sY], floatadd(Derby_Map2Spawns[m2s][m2sZ], 6.0), Derby_Map2Spawns[m2s][m2sA], (random(128) + 127), (random(128) + 127), 60);
-                    SetVehicleNumberPlate(PlayerData[i][pDerbyCar], "{3399ff}D{FFFFFF}erb{F81414}Y");
-                    SetVehicleToRespawn(PlayerData[i][pDerbyCar]);
-					SetVehicleVirtualWorld(PlayerData[i][pDerbyCar], GetPlayerVirtualWorld(i));
+					PlayerData[i][pDerbyVehicle] = CreateVehicle_(vid, Derby_Map2Spawns[m2s][m2sX], Derby_Map2Spawns[m2s][m2sY], floatadd(Derby_Map2Spawns[m2s][m2sZ], 6.0), Derby_Map2Spawns[m2s][m2sA], (random(128) + 127), (random(128) + 127), 60);
+                    SetVehicleNumberPlate(PlayerData[i][pDerbyVehicle], "{3399ff}D{FFFFFF}erb{F81414}Y");
+                    SetVehicleToRespawn(PlayerData[i][pDerbyVehicle]);
+					SetVehicleVirtualWorld(PlayerData[i][pDerbyVehicle], GetPlayerVirtualWorld(i));
 					TogglePlayerControllable(i, true);
  					SetPlayerSpecialAction(i, SPECIAL_ACTION_NONE);
 					ClearAnimations(i);
-					PutPlayerInVehicle(i, PlayerData[i][pDerbyCar], 0);
-					RepairVehicle(PlayerData[i][pDerbyCar]);
+					PutPlayerInVehicle(i, PlayerData[i][pDerbyVehicle], 0);
+					RepairVehicle(PlayerData[i][pDerbyVehicle]);
 					SetCameraBehindPlayer(i);
 					
 					new Float:POS[3];
-					GetVehicleVelocity(PlayerData[i][pDerbyCar], POS[0], POS[1], POS[2]);
-					SetVehicleVelocity(PlayerData[i][pDerbyCar], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
+					GetVehicleVelocity(PlayerData[i][pDerbyVehicle], POS[0], POS[1], POS[2]);
+					SetVehicleVelocity(PlayerData[i][pDerbyVehicle], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
 					
 					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby is starting!", 3000, 5);
 					Derby_Map2Spawns[m2s][m2sUsed] = true;
@@ -24759,20 +24758,20 @@ function:StartDerbyMap3()
 						case 4: vid = 573;
 						case 5: vid = 402;
 					}
-					PlayerData[i][pDerbyCar] = CreateVehicle_(vid, Derby_Map3Spawns[m3s][m3sX], Derby_Map3Spawns[m3s][m3sY], floatadd(Derby_Map3Spawns[m3s][m3sZ], 6.0), Derby_Map3Spawns[m3s][m3sA], (random(128) + 127), (random(128) + 127), 60);
-                    SetVehicleNumberPlate(PlayerData[i][pDerbyCar], "{3399ff}D{FFFFFF}erb{F81414}Y");
-                    SetVehicleToRespawn(PlayerData[i][pDerbyCar]);
-					SetVehicleVirtualWorld(PlayerData[i][pDerbyCar], GetPlayerVirtualWorld(i));
+					PlayerData[i][pDerbyVehicle] = CreateVehicle_(vid, Derby_Map3Spawns[m3s][m3sX], Derby_Map3Spawns[m3s][m3sY], floatadd(Derby_Map3Spawns[m3s][m3sZ], 6.0), Derby_Map3Spawns[m3s][m3sA], (random(128) + 127), (random(128) + 127), 60);
+                    SetVehicleNumberPlate(PlayerData[i][pDerbyVehicle], "{3399ff}D{FFFFFF}erb{F81414}Y");
+                    SetVehicleToRespawn(PlayerData[i][pDerbyVehicle]);
+					SetVehicleVirtualWorld(PlayerData[i][pDerbyVehicle], GetPlayerVirtualWorld(i));
 					TogglePlayerControllable(i, true);
 					SetPlayerSpecialAction(i, SPECIAL_ACTION_NONE);
 					ClearAnimations(i);
-					PutPlayerInVehicle(i, PlayerData[i][pDerbyCar], 0);
-					RepairVehicle(PlayerData[i][pDerbyCar]);
+					PutPlayerInVehicle(i, PlayerData[i][pDerbyVehicle], 0);
+					RepairVehicle(PlayerData[i][pDerbyVehicle]);
 					SetCameraBehindPlayer(i);
 					
 					new Float:POS[3];
-					GetVehicleVelocity(PlayerData[i][pDerbyCar], POS[0], POS[1], POS[2]);
-					SetVehicleVelocity(PlayerData[i][pDerbyCar], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
+					GetVehicleVelocity(PlayerData[i][pDerbyVehicle], POS[0], POS[1], POS[2]);
+					SetVehicleVelocity(PlayerData[i][pDerbyVehicle], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
 					
 					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby is starting!", 3000, 5);
 					Derby_Map3Spawns[m3s][m3sUsed] = true;
@@ -24854,20 +24853,20 @@ function:StartDerbyMap4()
 						case 4: vid = 573;
 						case 5: vid = 402;
 					}
-					PlayerData[i][pDerbyCar] = CreateVehicle_(vid, Derby_Map4Spawns[m4s][m4sX], Derby_Map4Spawns[m4s][m4sY], floatadd(Derby_Map4Spawns[m4s][m4sZ], 6.0), Derby_Map4Spawns[m4s][m4sA], (random(128) + 127), (random(128) + 127), 60);
-                    SetVehicleNumberPlate(PlayerData[i][pDerbyCar], "{3399ff}D{FFFFFF}erb{F81414}Y");
-                    SetVehicleToRespawn(PlayerData[i][pDerbyCar]);
-					SetVehicleVirtualWorld(PlayerData[i][pDerbyCar], GetPlayerVirtualWorld(i));
+					PlayerData[i][pDerbyVehicle] = CreateVehicle_(vid, Derby_Map4Spawns[m4s][m4sX], Derby_Map4Spawns[m4s][m4sY], floatadd(Derby_Map4Spawns[m4s][m4sZ], 6.0), Derby_Map4Spawns[m4s][m4sA], (random(128) + 127), (random(128) + 127), 60);
+                    SetVehicleNumberPlate(PlayerData[i][pDerbyVehicle], "{3399ff}D{FFFFFF}erb{F81414}Y");
+                    SetVehicleToRespawn(PlayerData[i][pDerbyVehicle]);
+					SetVehicleVirtualWorld(PlayerData[i][pDerbyVehicle], GetPlayerVirtualWorld(i));
 					TogglePlayerControllable(i, true);
 					SetPlayerSpecialAction(i, SPECIAL_ACTION_NONE);
 					ClearAnimations(i);
-					PutPlayerInVehicle(i, PlayerData[i][pDerbyCar], 0);
-					RepairVehicle(PlayerData[i][pDerbyCar]);
+					PutPlayerInVehicle(i, PlayerData[i][pDerbyVehicle], 0);
+					RepairVehicle(PlayerData[i][pDerbyVehicle]);
 					SetCameraBehindPlayer(i);
 					
 					new Float:POS[3];
-					GetVehicleVelocity(PlayerData[i][pDerbyCar], POS[0], POS[1], POS[2]);
-					SetVehicleVelocity(PlayerData[i][pDerbyCar], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
+					GetVehicleVelocity(PlayerData[i][pDerbyVehicle], POS[0], POS[1], POS[2]);
+					SetVehicleVelocity(PlayerData[i][pDerbyVehicle], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
 					
 					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby is starting!", 3000, 5);
 					Derby_Map4Spawns[m4s][m4sUsed] = true;
@@ -24949,20 +24948,20 @@ function:StartDerbyMap5()
 						case 4: vid = 573;
 						case 5: vid = 402;
 					}
-					PlayerData[i][pDerbyCar] = CreateVehicle_(vid, Derby_Map5Spawns[m5s][m5sX], Derby_Map5Spawns[m5s][m5sY], floatadd(Derby_Map5Spawns[m5s][m5sZ], 6.0), Derby_Map5Spawns[m5s][m5sA], (random(128) + 127), (random(128) + 127), 60);
-                    SetVehicleNumberPlate(PlayerData[i][pDerbyCar], "{3399ff}D{FFFFFF}erb{F81414}Y");
-                    SetVehicleToRespawn(PlayerData[i][pDerbyCar]);
-					SetVehicleVirtualWorld(PlayerData[i][pDerbyCar], GetPlayerVirtualWorld(i));
+					PlayerData[i][pDerbyVehicle] = CreateVehicle_(vid, Derby_Map5Spawns[m5s][m5sX], Derby_Map5Spawns[m5s][m5sY], floatadd(Derby_Map5Spawns[m5s][m5sZ], 6.0), Derby_Map5Spawns[m5s][m5sA], (random(128) + 127), (random(128) + 127), 60);
+                    SetVehicleNumberPlate(PlayerData[i][pDerbyVehicle], "{3399ff}D{FFFFFF}erb{F81414}Y");
+                    SetVehicleToRespawn(PlayerData[i][pDerbyVehicle]);
+					SetVehicleVirtualWorld(PlayerData[i][pDerbyVehicle], GetPlayerVirtualWorld(i));
 					TogglePlayerControllable(i, true);
 					SetPlayerSpecialAction(i, SPECIAL_ACTION_NONE);
 					ClearAnimations(i);
-					PutPlayerInVehicle(i, PlayerData[i][pDerbyCar], 0);
-					RepairVehicle(PlayerData[i][pDerbyCar]);
+					PutPlayerInVehicle(i, PlayerData[i][pDerbyVehicle], 0);
+					RepairVehicle(PlayerData[i][pDerbyVehicle]);
 					SetCameraBehindPlayer(i);
 					
 					new Float:POS[3];
-					GetVehicleVelocity(PlayerData[i][pDerbyCar], POS[0], POS[1], POS[2]);
-					SetVehicleVelocity(PlayerData[i][pDerbyCar], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
+					GetVehicleVelocity(PlayerData[i][pDerbyVehicle], POS[0], POS[1], POS[2]);
+					SetVehicleVelocity(PlayerData[i][pDerbyVehicle], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
 					
 					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby is starting!", 3000, 5);
 					Derby_Map5Spawns[m5s][m5sUsed] = true;
@@ -25034,20 +25033,20 @@ function:StartDerbyMap6()
 	    		    ResetPlayerWeapons(i);
 	    		    ShowPlayerDialog(i, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
 
-					PlayerData[i][pDerbyCar] = CreateVehicle_(573, Derby_Map6Spawns[m6s][m6sX], Derby_Map6Spawns[m6s][m6sY], floatadd(Derby_Map6Spawns[m6s][m6sZ], 6.0), Derby_Map6Spawns[m6s][m6sA], (random(128) + 127), (random(128) + 127), 60);
-                    SetVehicleNumberPlate(PlayerData[i][pDerbyCar], "{3399ff}D{FFFFFF}erb{F81414}Y");
-                    SetVehicleToRespawn(PlayerData[i][pDerbyCar]);
-					SetVehicleVirtualWorld(PlayerData[i][pDerbyCar], GetPlayerVirtualWorld(i));
+					PlayerData[i][pDerbyVehicle] = CreateVehicle_(573, Derby_Map6Spawns[m6s][m6sX], Derby_Map6Spawns[m6s][m6sY], floatadd(Derby_Map6Spawns[m6s][m6sZ], 6.0), Derby_Map6Spawns[m6s][m6sA], (random(128) + 127), (random(128) + 127), 60);
+                    SetVehicleNumberPlate(PlayerData[i][pDerbyVehicle], "{3399ff}D{FFFFFF}erb{F81414}Y");
+                    SetVehicleToRespawn(PlayerData[i][pDerbyVehicle]);
+					SetVehicleVirtualWorld(PlayerData[i][pDerbyVehicle], GetPlayerVirtualWorld(i));
 					TogglePlayerControllable(i, true);
 					SetPlayerSpecialAction(i, SPECIAL_ACTION_NONE);
 					ClearAnimations(i);
-					PutPlayerInVehicle(i, PlayerData[i][pDerbyCar], 0);
-					RepairVehicle(PlayerData[i][pDerbyCar]);
+					PutPlayerInVehicle(i, PlayerData[i][pDerbyVehicle], 0);
+					RepairVehicle(PlayerData[i][pDerbyVehicle]);
 					SetCameraBehindPlayer(i);
 					
 					new Float:POS[3];
-					GetVehicleVelocity(PlayerData[i][pDerbyCar], POS[0], POS[1], POS[2]);
-					SetVehicleVelocity(PlayerData[i][pDerbyCar], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
+					GetVehicleVelocity(PlayerData[i][pDerbyVehicle], POS[0], POS[1], POS[2]);
+					SetVehicleVelocity(PlayerData[i][pDerbyVehicle], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
 					
 					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby is starting!", 3000, 5);
 					Derby_Map6Spawns[m6s][m6sUsed] = true;
@@ -25119,20 +25118,20 @@ function:StartDerbyMap7()
 	    		    ResetPlayerWeapons(i);
 	    		    ShowPlayerDialog(i, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
 
-					PlayerData[i][pDerbyCar] = CreateVehicle_(415, Derby_Map7Spawns[m7s][m7sX], Derby_Map7Spawns[m7s][m7sY], floatadd(Derby_Map7Spawns[m7s][m7sZ], 6.0), Derby_Map7Spawns[m7s][m7sA], (random(128) + 127), (random(128) + 127), 60);
-                    SetVehicleNumberPlate(PlayerData[i][pDerbyCar], "{3399ff}D{FFFFFF}erb{F81414}Y");
-                    SetVehicleToRespawn(PlayerData[i][pDerbyCar]);
-					SetVehicleVirtualWorld(PlayerData[i][pDerbyCar], GetPlayerVirtualWorld(i));
+					PlayerData[i][pDerbyVehicle] = CreateVehicle_(415, Derby_Map7Spawns[m7s][m7sX], Derby_Map7Spawns[m7s][m7sY], floatadd(Derby_Map7Spawns[m7s][m7sZ], 6.0), Derby_Map7Spawns[m7s][m7sA], (random(128) + 127), (random(128) + 127), 60);
+                    SetVehicleNumberPlate(PlayerData[i][pDerbyVehicle], "{3399ff}D{FFFFFF}erb{F81414}Y");
+                    SetVehicleToRespawn(PlayerData[i][pDerbyVehicle]);
+					SetVehicleVirtualWorld(PlayerData[i][pDerbyVehicle], GetPlayerVirtualWorld(i));
 					TogglePlayerControllable(i, true);
 					SetPlayerSpecialAction(i, SPECIAL_ACTION_NONE);
 					ClearAnimations(i);
-					PutPlayerInVehicle(i, PlayerData[i][pDerbyCar], 0);
-					RepairVehicle(PlayerData[i][pDerbyCar]);
+					PutPlayerInVehicle(i, PlayerData[i][pDerbyVehicle], 0);
+					RepairVehicle(PlayerData[i][pDerbyVehicle]);
 					SetCameraBehindPlayer(i);
 					
 					new Float:POS[3];
-					GetVehicleVelocity(PlayerData[i][pDerbyCar], POS[0], POS[1], POS[2]);
-					SetVehicleVelocity(PlayerData[i][pDerbyCar], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
+					GetVehicleVelocity(PlayerData[i][pDerbyVehicle], POS[0], POS[1], POS[2]);
+					SetVehicleVelocity(PlayerData[i][pDerbyVehicle], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
 					
 					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby is starting!", 3000, 5);
 					Derby_Map7Spawns[m7s][m7sUsed] = true;
@@ -25204,20 +25203,20 @@ function:StartDerbyMap8()
 	    		    ResetPlayerWeapons(i);
 	    		    ShowPlayerDialog(i, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
 
-					PlayerData[i][pDerbyCar] = CreateVehicle_(415, Derby_Map8Spawns[m8s][m8sX], Derby_Map8Spawns[m8s][m8sY], floatadd(Derby_Map8Spawns[m8s][m8sZ], 6.0), Derby_Map8Spawns[m8s][m8sA], (random(128) + 127), (random(128) + 127), 60);
-                    SetVehicleNumberPlate(PlayerData[i][pDerbyCar], "{3399ff}D{FFFFFF}erb{F81414}Y");
-                    SetVehicleToRespawn(PlayerData[i][pDerbyCar]);
-					SetVehicleVirtualWorld(PlayerData[i][pDerbyCar], GetPlayerVirtualWorld(i));
+					PlayerData[i][pDerbyVehicle] = CreateVehicle_(415, Derby_Map8Spawns[m8s][m8sX], Derby_Map8Spawns[m8s][m8sY], floatadd(Derby_Map8Spawns[m8s][m8sZ], 6.0), Derby_Map8Spawns[m8s][m8sA], (random(128) + 127), (random(128) + 127), 60);
+                    SetVehicleNumberPlate(PlayerData[i][pDerbyVehicle], "{3399ff}D{FFFFFF}erb{F81414}Y");
+                    SetVehicleToRespawn(PlayerData[i][pDerbyVehicle]);
+					SetVehicleVirtualWorld(PlayerData[i][pDerbyVehicle], GetPlayerVirtualWorld(i));
 					TogglePlayerControllable(i, true);
 					SetPlayerSpecialAction(i, SPECIAL_ACTION_NONE);
 					ClearAnimations(i);
-					PutPlayerInVehicle(i, PlayerData[i][pDerbyCar], 0);
-					RepairVehicle(PlayerData[i][pDerbyCar]);
+					PutPlayerInVehicle(i, PlayerData[i][pDerbyVehicle], 0);
+					RepairVehicle(PlayerData[i][pDerbyVehicle]);
 					SetCameraBehindPlayer(i);
 					
 					new Float:POS[3];
-					GetVehicleVelocity(PlayerData[i][pDerbyCar], POS[0], POS[1], POS[2]);
-					SetVehicleVelocity(PlayerData[i][pDerbyCar], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
+					GetVehicleVelocity(PlayerData[i][pDerbyVehicle], POS[0], POS[1], POS[2]);
+					SetVehicleVelocity(PlayerData[i][pDerbyVehicle], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
 					
 					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby is starting!", 3000, 5);
 					Derby_Map8Spawns[m8s][m8sUsed] = true;
@@ -25289,20 +25288,20 @@ function:StartDerbyMap9()
 	    		    ResetPlayerWeapons(i);
 	    		    ShowPlayerDialog(i, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
 
-					PlayerData[i][pDerbyCar] = CreateVehicle_(415, Derby_Map9Spawns[m9s][m9sX], Derby_Map9Spawns[m9s][m9sY], floatadd(Derby_Map9Spawns[m9s][m9sZ], 6.0), Derby_Map9Spawns[m9s][m9sA], (random(128) + 127), (random(128) + 127), 60);
-                    SetVehicleNumberPlate(PlayerData[i][pDerbyCar], "{3399ff}D{FFFFFF}erb{F81414}Y");
-                    SetVehicleToRespawn(PlayerData[i][pDerbyCar]);
-					SetVehicleVirtualWorld(PlayerData[i][pDerbyCar], GetPlayerVirtualWorld(i));
+					PlayerData[i][pDerbyVehicle] = CreateVehicle_(415, Derby_Map9Spawns[m9s][m9sX], Derby_Map9Spawns[m9s][m9sY], floatadd(Derby_Map9Spawns[m9s][m9sZ], 6.0), Derby_Map9Spawns[m9s][m9sA], (random(128) + 127), (random(128) + 127), 60);
+                    SetVehicleNumberPlate(PlayerData[i][pDerbyVehicle], "{3399ff}D{FFFFFF}erb{F81414}Y");
+                    SetVehicleToRespawn(PlayerData[i][pDerbyVehicle]);
+					SetVehicleVirtualWorld(PlayerData[i][pDerbyVehicle], GetPlayerVirtualWorld(i));
 					TogglePlayerControllable(i, true);
 					SetPlayerSpecialAction(i, SPECIAL_ACTION_NONE);
 					ClearAnimations(i);
-					PutPlayerInVehicle(i, PlayerData[i][pDerbyCar], 0);
-					RepairVehicle(PlayerData[i][pDerbyCar]);
+					PutPlayerInVehicle(i, PlayerData[i][pDerbyVehicle], 0);
+					RepairVehicle(PlayerData[i][pDerbyVehicle]);
 					SetCameraBehindPlayer(i);
 					
 					new Float:POS[3];
-					GetVehicleVelocity(PlayerData[i][pDerbyCar], POS[0], POS[1], POS[2]);
-					SetVehicleVelocity(PlayerData[i][pDerbyCar], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
+					GetVehicleVelocity(PlayerData[i][pDerbyVehicle], POS[0], POS[1], POS[2]);
+					SetVehicleVelocity(PlayerData[i][pDerbyVehicle], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
 					
 					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby is starting!", 3000, 5);
 					Derby_Map9Spawns[m9s][m9sUsed] = true;
@@ -25329,10 +25328,10 @@ function:Derby()
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-	    if(PlayerData[i][pDerbyCar] != -1)
+	    if(PlayerData[i][pDerbyVehicle] != -1)
 	    {
-	    	DestroyVehicle_(PlayerData[i][pDerbyCar]);
-	    	PlayerData[i][pDerbyCar] = -1;
+	    	DestroyVehicle_(PlayerData[i][pDerbyVehicle]);
+	    	PlayerData[i][pDerbyVehicle] = -1;
 		}
 	}
 
@@ -25428,12 +25427,12 @@ function:DerbyFallOver()
 		    if(IsPlayerOnDesktop(i, 4000))
 			{
 	   			TogglePlayerControllable(i, true);
-			    if(PlayerData[i][pDerbyCar] != -1)
+			    if(PlayerData[i][pDerbyVehicle] != -1)
 			    {
-			        SetVehiclePos(PlayerData[i][pDerbyCar], 0.0, 0.0, 20.0);
+			        SetVehiclePos(PlayerData[i][pDerbyVehicle], 0.0, 0.0, 20.0);
 					RemovePlayerFromVehicle(i);
-					DestroyVehicle_(PlayerData[i][pDerbyCar]);
-			    	PlayerData[i][pDerbyCar] = -1;
+					DestroyVehicle_(PlayerData[i][pDerbyVehicle]);
+			    	PlayerData[i][pDerbyVehicle] = -1;
 				}
 				format(string, sizeof(string), "%s(%i) was kicked out of derby (AFK)", __GetName(i), i);
                 DerbyMSG(string);
@@ -25455,10 +25454,10 @@ function:DerbyFallOver()
 					format(string, sizeof(string), "%s(%i) fell over the map!", __GetName(i), i);
 					DerbyMSG(string);
 		 			DerbyPlayers--;
-     			    if(PlayerData[i][pDerbyCar] != -1)
+     			    if(PlayerData[i][pDerbyVehicle] != -1)
 				    {
-						DestroyVehicle_(PlayerData[i][pDerbyCar]);
-				    	PlayerData[i][pDerbyCar] = -1;
+						DestroyVehicle_(PlayerData[i][pDerbyVehicle]);
+				    	PlayerData[i][pDerbyVehicle] = -1;
 					}
 		 			DerbyWinner[i] = false;
 					SetPlayerDerbyStaticMeshes(i);
@@ -25944,15 +25943,15 @@ function:ProcessTick()
 			    }
 			    case JAIL:
 			    {
-					if(PlayerData[i][pJail] > 0)
+					if(PlayerData[i][iJailTime] > 0)
 					{
-					    --PlayerData[i][pJail];
-					    format(gstr2, sizeof(gstr2), "~b~~h~~h~You will be released in %d seconds.~n~Type /escape to attempt to escape [CNR Only]", PlayerData[i][pJail]);
+					    --PlayerData[i][iJailTime];
+					    format(gstr2, sizeof(gstr2), "~b~~h~~h~You will be released in %d seconds.~n~Type /escape to attempt to escape [CNR Only]", PlayerData[i][iJailTime]);
 						InfoTD_MSG(i, 1000, gstr2);
 						continue;
 					}
 
-				    if(PlayerData[i][pJail] <= 0)
+				    if(PlayerData[i][iJailTime] <= 0)
 				    {
 				        if(GetPVarInt(i, "JailedByAdmin") == 1)
 				        {
@@ -26395,7 +26394,7 @@ UpdateBar(playerid)
 {
 	new Float:HP;
 	GetVehicleHealth(GetPlayerVehicleID(playerid), HP);
-	UpdatePlayer3DTextLabelText(playerid, PlayerData[playerid][DerbyVehLabel], -1, UpdateString(HP));
+	UpdatePlayer3DTextLabelText(playerid, PlayerData[playerid][t3dDerbyVehicleLabel], -1, UpdateString(HP));
 	return 1;
 }
 
@@ -27709,7 +27708,7 @@ GetPlayerSettings(playerid)
 	    strcat(string, gstr);
 	}
 
-	if(PlayerData[playerid][bTDEnabled])
+	if(PlayerData[playerid][bTextdraws])
 	{
 	    format(gstr, sizeof(gstr), ""white"3)\tTextdraws\t"vgreen"[ON]\n");
 	    strcat(string, gstr);
@@ -27933,11 +27932,11 @@ function:StartRobbery(playerid, namehash)
 			GameTextForPlayer(playerid, " ", 1000, 3);
 			RemovePlayerAttachedObject(playerid, 4);
 			SCM(playerid, COLOR_RED, "Server: "GREY_E"Robbery Failed.");
-			PlayerData[playerid][RobberyCount] = 0;
+			PlayerData[playerid][iRobberyCount] = 0;
 			return true;
 		}
-	 	PlayerData[playerid][RobberyCount]--;
-	  	if(PlayerData[playerid][RobberyCount] == 0)
+	 	PlayerData[playerid][iRobberyCount]--;
+	  	if(PlayerData[playerid][iRobberyCount] == 0)
 		{
 			KillTimer(PlayerData[playerid][tRobbery]);
 			RemovePlayerAttachedObject(playerid, 4);
@@ -28001,14 +28000,14 @@ function:StartRobbery(playerid, namehash)
 		}
 		else
 		{
-			format(str, sizeof(str),"~w~~b~robbery in progress~n~~w~stay in the store~n~~r~%i ~w~seconds left.", PlayerData[playerid][RobberyCount]);
+			format(str, sizeof(str),"~w~~b~robbery in progress~n~~w~stay in the store~n~~r~%i ~w~seconds left.", PlayerData[playerid][iRobberyCount]);
 			GameTextForPlayer(playerid, str, 2000, 3);
 		}
 	}
 	else
 	{
 	    KillTimer(PlayerData[playerid][tRobbery]);
-	    PlayerData[playerid][RobberyCount] = 0;
+	    PlayerData[playerid][iRobberyCount] = 0;
 	}
 	return 1;
 }
@@ -28912,10 +28911,10 @@ ExitPlayer(playerid)
 		    Streamer_ToggleItemUpdate(playerid, STREAMER_TYPE_CP, 1);
 		    Streamer_Update(playerid);
             
-		    if(PlayerData[playerid][DerbyVehLabel] != PlayerText3D:-1)
+		    if(PlayerData[playerid][t3dDerbyVehicleLabel] != PlayerText3D:-1)
 		    {
-		    	DeletePlayer3DTextLabel(playerid, PlayerData[playerid][DerbyVehLabel]);
-		    	PlayerData[playerid][DerbyVehLabel] = PlayerText3D:-1;
+		    	DeletePlayer3DTextLabel(playerid, PlayerData[playerid][t3dDerbyVehicleLabel]);
+		    	PlayerData[playerid][t3dDerbyVehicleLabel] = PlayerText3D:-1;
 		    }
 
 		    if(PlayerData[playerid][bDerbyAFK])
@@ -28935,10 +28934,10 @@ ExitPlayer(playerid)
 			}
 			else if(IsDerbyRunning && DerbyWinner[playerid])
 			{
-			    if(PlayerData[playerid][pDerbyCar] != -1)
+			    if(PlayerData[playerid][pDerbyVehicle] != -1)
 			    {
-			    	DestroyVehicle_(PlayerData[playerid][pDerbyCar]);
-			    	PlayerData[playerid][pDerbyCar] = -1;
+			    	DestroyVehicle_(PlayerData[playerid][pDerbyVehicle]);
+			    	PlayerData[playerid][pDerbyVehicle] = -1;
 				}
 				DerbyPlayers--;
 				DerbyWinner[playerid] = false;
@@ -29812,10 +29811,10 @@ DestroyPlayerVehicles(playerid, bool:minigames = false)
 	    hVIPVehObj[playerid][obj] = -1;
 	}
 	
-	if(PlayerData[playerid][Vehicle] != -1)
+	if(PlayerData[playerid][pVehicle] != -1)
 	{
-		DestroyVehicle_(PlayerData[playerid][Vehicle]);
-		PlayerData[playerid][Vehicle] = -1;
+		DestroyVehicle_(PlayerData[playerid][pVehicle]);
+		PlayerData[playerid][pVehicle] = -1;
 	}
 
 	if(PVSelect[playerid] != -1)
@@ -29842,10 +29841,10 @@ DestroyPlayerVehicles(playerid, bool:minigames = false)
 		}
 	}
 	
-	if(PlayerData[playerid][TrailerVid] != -1)
+	if(PlayerData[playerid][pTrailerVehicle] != -1)
 	{
-		DestroyVehicle_(PlayerData[playerid][TrailerVid]);
-		PlayerData[playerid][TrailerVid] = -1;
+		DestroyVehicle_(PlayerData[playerid][pTrailerVehicle]);
+		PlayerData[playerid][pTrailerVehicle] = -1;
 	}
 	
 	if(minigames)
@@ -29856,10 +29855,10 @@ DestroyPlayerVehicles(playerid, bool:minigames = false)
 			g_RaceVehicle[playerid] = -1;
 		}
 		
-	    if(PlayerData[playerid][pDerbyCar] != -1)
+	    if(PlayerData[playerid][pDerbyVehicle] != -1)
 	    {
-	    	DestroyVehicle_(PlayerData[playerid][pDerbyCar]);
-	    	PlayerData[playerid][pDerbyCar] = -1;
+	    	DestroyVehicle_(PlayerData[playerid][pDerbyVehicle]);
+	    	PlayerData[playerid][pDerbyVehicle] = -1;
 		}
 	}
 	return 1;
@@ -29980,12 +29979,12 @@ PreparePlayerVars(playerid)
  	PlayerData[playerid][bSpeedBoost] = true;
  	PlayerData[playerid][bSuperJump] = false;
 	PlayerData[playerid][bOnlineAdmin] = true;
- 	PlayerData[playerid][gInvite] = false;
+ 	PlayerData[playerid][bGangInvite] = false;
  	PlayerData[playerid][FalloutLost] = true;
 	PlayerData[playerid][bStateSaved] = false;
 	PlayerData[playerid][bHasSpawn] = false;
 	PlayerData[playerid][bFirstSpawn] = false;
-	PlayerData[playerid][bTDEnabled] = true;
+	PlayerData[playerid][bTextdraws] = true;
 	PlayerData[playerid][bRainbow] = false;
 	PlayerData[playerid][bVehicleInfo] = false;
 	PlayerData[playerid][bRampActive] = false;
@@ -29997,10 +29996,10 @@ PreparePlayerVars(playerid)
 	PlayerData[playerid][bLogged] = false;
 	PlayerData[playerid][bSpeedo] = false;
 	PlayerData[playerid][bDerbyAFK] = false;
-	PlayerData[playerid][DerbyVehLabel] = PlayerText3D:-1;
-	PlayerData[playerid][pDerbyCar] = -1;
-	PlayerData[playerid][pJail] = 0;
-	PlayerData[playerid][RobberyCount] = 0;
+	PlayerData[playerid][t3dDerbyVehicleLabel] = PlayerText3D:-1;
+	PlayerData[playerid][pDerbyVehicle] = -1;
+	PlayerData[playerid][iJailTime] = 0;
+	PlayerData[playerid][iRobberyCount] = 0;
 	PlayerData[playerid][tRobbery] = -1;
 	PlayerData[playerid][tLoadMap] = -1;
 	PlayerData[playerid][Boost] = BOOST:0;
@@ -30016,7 +30015,7 @@ PreparePlayerVars(playerid)
 	PlayerData[playerid][HouseSlotSelected] = 0;
 	PlayerData[playerid][BusinessIdSelected] = 0;
 	PlayerData[playerid][DrawnNumber] = -1;
-	PlayerData[playerid][TrailerVid] = -1;
+	PlayerData[playerid][pTrailerVehicle] = -1;
 	PlayerData[playerid][tRainbow] = -1;
 	PlayerData[playerid][tTDhandle] = -1;
 	PlayerData[playerid][ExitType] = EXIT_NONE;
@@ -30085,7 +30084,7 @@ PreparePlayerVars(playerid)
 	PlayerData[playerid][RankSelected] = 0;
 	PlayerData[playerid][e_wanteds] = 0;
 	PlayerData[playerid][HitmanHit] = 0;
-	PlayerData[playerid][Vehicle] = -1;
+	PlayerData[playerid][pVehicle] = -1;
 	PlayerData[playerid][AdminDutyLabel] = Text3D:-1;
 	PlayerData[playerid][VIPLabel] = Text3D:-1;
 	PlayerData[playerid][iLastChat] = 0;
