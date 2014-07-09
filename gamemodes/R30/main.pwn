@@ -3486,12 +3486,13 @@ public OnPlayerCommandReceived(playerid, cmdtext[])
 		player_notice(playerid, "1 command every second", "");
 	    return 0;
 	}
-	
+
 	if(PlayerData[playerid][bFrozen])
 	{
-	    switch(YHash(cmdtext[1], false))
+	    switch(YHash(GetCommandName(cmdtext), false))
 	    {
-	        case _I(p,m), _I(r), _I(p), _I(s,t,a,t,s), _I(e,x,i,t): { }
+			case _I(p,m), _I(r), _I(p), _I(s,t,a,t,s), _I(e,x,i,t), _I(h,e,l,p), _I(c), _I(c,m,d,s): {}
+			case _I(f,s), _I(i,d), _I(t,o,p), _I(r,e,p,o,r,t), _I(a,c,h,s), _I(s,t,r,e,a,m,s), _I(r,a,d,i,o): { }
 	        default:
 			{
 			    SCM(playerid, -1, ""er"You can't use this command while you are frozen!");
@@ -3501,11 +3502,12 @@ public OnPlayerCommandReceived(playerid, cmdtext[])
 	}
 	else
 	{
-		switch(YHash(cmdtext[1], false))
+		switch(YHash(GetCommandName(cmdtext), false))
 		{
 		    case _I(b,i,k,e,c), _I(b,m,x): { }
 			case _I(s,k,y,d,i,v,e), _I(s,k,y,d,i,v,e,2), _I(s,k,y,d,i,v,e,3), _I(s,k,y,d,i,v,e,4), _I(s,k,y,d,i,v,e,5), _I(s,k,y,d,i,v,e,6): { }
-			case _I(e,x,i,t): { }
+			case _I(p,m), _I(r), _I(p), _I(s,t,a,t,s), _I(e,x,i,t), _I(h,e,l,p), _I(c), _I(c,m,d,s): {}
+			case _I(f,s), _I(i,d), _I(t,o,p), _I(r,e,p,o,r,t), _I(a,c,h,s), _I(s,t,r,e,a,m,s), _I(r,a,d,i,o): { }
 			default:
 			{
 			    if(GetPVarInt(playerid, "doingStunt") != 0)
@@ -30949,4 +30951,26 @@ SetPlayerPosEx(playerid, Float:X, Float:Y, Float:Z)
 {
     Streamer_UpdateEx(playerid, X, Y, Z);
 	SetPlayerPos(playerid, X, Y, Z);
+}
+
+GetCommandName(cmdtext[])
+{
+	new space = -1;
+	for(new i, l = strlen(cmdtext); i < l; i++)
+	{
+	    if(cmdtext[i] == ' ')
+	    {
+	        space = i;
+	        break;
+	    }
+	}
+
+    gstr[0] = '\0';
+	if(space == -1)
+	{
+	    strcat(gstr, cmdtext[1], sizeof(gstr));
+		return gstr;
+	}
+	strmid(gstr, cmdtext, 1, space, sizeof(gstr));
+	return gstr;
 }
