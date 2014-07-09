@@ -7876,7 +7876,8 @@ YCMD:s(playerid, params[], help)
 
 YCMD:l(playerid, params[], help)
 {
-    if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
+    if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in gang war, use /exit");
+	if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't use this command while in bike challenge, use /exit.");
 	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
     if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't load your position now");
 	if(!PlayerData[playerid][bStateSaved])
@@ -17791,7 +17792,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
   						format(string, sizeof(string), "4CNR3 %s(%i) has joined the Robbers in the cops and robbers minigame.", __GetName(playerid), playerid);
 						IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, string);
-  	    				format(string, sizeof(string), ""cnr_sign" "ORANGE_E"%s(%i) has joined the "LB_E"Robbers "ORANGE_E"in the /CNR minigame.", __GetName(playerid), playerid);
+  	    				format(string, sizeof(string), ""cnr_sign" "ORANGE_E"%s(%i) has joined the "RED_E"Robbers "ORANGE_E"in the /CNR minigame.", __GetName(playerid), playerid);
   	    				SCMToAll(-1, string);
 						PreloadAnimLib(playerid, "SHOP");
 			    		SCM(playerid, COLOR_GREY, ""nef" You have joined the Robbers!");
