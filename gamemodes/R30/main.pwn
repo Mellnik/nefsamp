@@ -607,7 +607,7 @@ enum e_gang_pos
 	E_gang_pos_name[16]
 };
 
-enum E_staff_levels
+enum E_STAFF_LEVELS
 {
 	e_level,
 	e_rank[32],
@@ -630,7 +630,17 @@ enum SUSPECT:(<<= 1)
 	SUSPECT_IMMUNE
 };
 
-enum E_PLAYER_DATA // Prefixes: i = Integer, s = String, b = bool, f = Float, p = Pointer, t3d = 3DTextLabel, g_ = Global, tick = tickcounts, t = Timer
+enum CNR_FRACTION (<<= 1)
+{
+	CNR_NONE,
+	CNR_COP = 1,
+	CNR_ROBBER,
+	CNR_PRO_ROBBER,
+	CNR_ARMY,
+	CNR_SWAT
+};
+
+enum E_PLAYER_DATA // Prefixes: i = Integer, s = String, b = bool, f = Float, p = Pointer, t3d = 3DTextLabel, g_ = Global, tick = tickcounts, t = Timer, bw = bitwise
 {
 	/* ORM */
 	ORM:e_ormid,
@@ -740,6 +750,7 @@ enum E_PLAYER_DATA // Prefixes: i = Integer, s = String, b = bool, f = Float, p 
 	pTrailerVehicle,
 	pVehicle,
 	iJailTime,
+	CNR_FRACTION:bwCNRFraction,
 	iRobberyCount,
 	tRobbery,
 	tLoadMap,
@@ -779,10 +790,6 @@ enum E_PLAYER_DATA // Prefixes: i = Integer, s = String, b = bool, f = Float, p 
  	GangName[21],
  	GangTag[5],
  	HouseIntSelected,
-	Float:sX,
-	Float:sY,
-	Float:sZ,
-	Float:sA,
 	SpecID,
 	Float:SpecX,
 	Float:SpecY,
@@ -792,6 +799,10 @@ enum E_PLAYER_DATA // Prefixes: i = Integer, s = String, b = bool, f = Float, p 
 	Float:CSpawnY,
 	Float:CSpawnZ,
 	Float:CSpawnA,
+	Float:sX,
+	Float:sY,
+	Float:sZ,
+	Float:sA,
 	toy_selected,
 	houseobj_selected,
 	DuelWeapon,
@@ -1450,7 +1461,7 @@ new const GangPositions[8][e_gang_pos] =
 	{"Gang Founder"}
 };
 
-new const StaffLevels[MAX_ADMIN_LEVEL + 1][E_staff_levels] =
+new const StaffLevels[MAX_ADMIN_LEVEL + 1][E_STAFF_LEVELS] =
 {
 	{0, "Player", "Players", "{FFFFFF}"},
 	{1, "Junior Administrator", "Junior Administration", "{1607a1}"},
@@ -7878,6 +7889,7 @@ YCMD:l(playerid, params[], help)
 {
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
 	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
+    if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't load your position now");
 	if(!PlayerData[playerid][bStateSaved])
 	{
 	    player_notice(playerid, "Use /s first", "");
@@ -8746,10 +8758,20 @@ YCMD:cnr(playerid, params[], help)
 	if(gTeam[playerid] != FREEROAM)
 		return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 	
-	new string[512];
-	format(string, sizeof(string), ""YELLOW_E"Choose your side", ""LB_E"Cops\t\t"GREY_E"LVPD\t\t(Players: %i)\n"ORANGE_E"Robbers\t"GREY_E"LV Mafia\t\t(Players: %i)\n"RED_E"Pro Robbers\t"GREY_E"Mafia Commanders\n"PURPLE_E"Army\t\t"GREY_E"Army Task Force\n"BLUE_E"Swat\t\t"GREY_E"LVPD Commanders", iCopCount, iRobberCount);
+	new robbers = 0, cops = 0;
 	
-	ShowPlayerDialog(playerid, CNR_DIALOG, DIALOG_STYLE_LIST, string, "Select", "Cancel");
+	for(new i = 0; i < MAX_PLAYERS; i++)
+	{
+	    if(PlayerData[i][bwCNRFraction] & CNR_COP || PlayerData[i][bwCNRFraction] & CNR_SWAT || PlayerData[i][bwCNRFraction] & CNR_ARMY)
+			cops++;
+		else if(PlayerData[i][bwCNRFraction] & CNR_ROBBER || PlayerData[i][bwCNRFraction] & CNR_PRO_ROBBER)
+		    robbers++;
+	}
+
+	new string[512];
+	format(string, sizeof(string), ""YELLOW_E"Choose your side", ""LB_E"Cops\t\t"GREY_E"LVPD\t\t(Players: %i)\n"ORANGE_E"Robbers\t"GREY_E"LV Mafia\t\t(Players: %i)\n"RED_E"Pro Robbers\t"GREY_E"Mafia Commanders\n"PURPLE_E"Army\t\t"GREY_E"Army Task Force\n"BLUE_E"Swat\t\t"GREY_E"LVPD Commanders", cops, robbers);
+	
+	ShowPlayerDialog(playerid, CNR_DIALOG, DIALOG_STYLE_LIST, ""YELLOW_E"Choose your side", string, "Select", "Cancel");
 	return 1;
 }
 
@@ -29999,6 +30021,7 @@ PreparePlayerVars(playerid)
 	PlayerData[playerid][t3dDerbyVehicleLabel] = PlayerText3D:-1;
 	PlayerData[playerid][pDerbyVehicle] = -1;
 	PlayerData[playerid][iJailTime] = 0;
+	PlayerData[playerid][bwCNRFraction] = CNR_NONE;
 	PlayerData[playerid][iRobberyCount] = 0;
 	PlayerData[playerid][tRobbery] = -1;
 	PlayerData[playerid][tLoadMap] = -1;
