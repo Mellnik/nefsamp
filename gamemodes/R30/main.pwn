@@ -3505,7 +3505,7 @@ public OnPlayerCommandReceived(playerid, cmdtext[])
 		{
 		    case _I(b,i,k,e,c), _I(b,m,x): { }
 			case _I(s,k,y,d,i,v,e), _I(s,k,y,d,i,v,e,2), _I(s,k,y,d,i,v,e,3), _I(s,k,y,d,i,v,e,4), _I(s,k,y,d,i,v,e,5), _I(s,k,y,d,i,v,e,6): { }
-			case _I(p,m), _I(r), _I(p), _I(s,t,a,t,s), _I(e,x,i,t): { }
+			case _I(e,x,i,t): { }
 			default:
 			{
 			    if(GetPVarInt(playerid, "doingStunt") != 0)
