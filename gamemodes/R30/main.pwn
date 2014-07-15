@@ -5137,40 +5137,50 @@ public OnPlayerLeaveDynamicArea(playerid, areaid)
 
 public OnPlayerEnterDynamicCP(playerid, checkpointid)
 {
-	if(GetPlayerState(playerid) == PLAYER_STATE_SPECTATING) return 1;
+	if(GetPlayerState(playerid) == PLAYER_STATE_SPECTATING)
+		return 1;
 
-	new str[255];
 	switch(checkpointid)
 	{
- 		case 1: //BikeChallenge Prize
+ 		case 1: // BikeChallenge Prize (/bikec)
 		{
 			if(GetPVarInt(playerid, "doingStunt") == 1 && GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
 	  		{
-	  		    if(GetVehicleModel(GetPlayerVehicleID(playerid)) != 522) return 1;
+	  		    if(GetVehicleModel(GetPlayerVehicleID(playerid)) != 522)
+				  	return 1;
 
      			new tick = GetTickCountEx();
 				if((PlayerData[playerid][tickLastBIKEC] + COOLDOWN_BIKEC) >= tick)
 				{
 				    return player_notice(playerid, "Stunt is on cooldown,", "please wait");
 				}
+				
+				new vehicle = 0;
+				
+				if((vehicle = GetPlayerVehicleID(playerid)) != 0)
+				{
+					new Float:POS[3];
+		   			GetPlayerPos(playerid, POS[0], POS[1], POS[2]);
+					SetPlayerPos(playerid, POS[0], POS[1], POS[2] + 10.0);
 
-   				RemovePlayerFromVehicle(playerid);
-				new Float:POS[3];
-	   			GetPlayerPos(playerid, POS[0], POS[1], POS[2]);
-				SetPlayerPos(playerid, POS[0], POS[1], floatadd(POS[2], 10.0));
-				SetVehicleToRespawn(GetPlayerVehicleID(playerid));
+                    SetVehicleToRespawn(vehicle);
+				}
 
-				GameTextForPlayer(playerid,"~r~~h~Congrats!~n~~w~You finished the bike challenge.", 6000, 5);
+				GameTextForPlayer(playerid, "~r~~h~Congrats!~n~~w~You finished the bike challenge.", 6000, 5);
 				PlayerPlaySound(playerid, 1149, 0, 0, 0);
-				format(str, sizeof(str), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /bikec.", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid);
-				SCMToAll(COLOR_WHITE, str);
+				
+				format(gstr, sizeof(gstr), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /bikec.", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid);
+				SCMToAll(COLOR_WHITE, gstr);
+				
 				GivePlayerScoreEx(playerid, 4, true, true);
 				GivePlayerMoneyEx(playerid, 7000, true, true);
+				
 				InfoTD_MSG(playerid, 5000, "~r~~h~~h~Congratulations!~n~~w~You finished the bike challange~n~~r~~h~~h~4 score and $7,000!");
 				if(PlayerAchData[playerid][e_ach_biker][0] == 0)
 				{
   					GivePlayerAchievement(playerid, e_ach_biker, "Biker", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
 				}
+				
 				SetPVarInt(playerid, "doingStunt", 0);
 				PlayerData[playerid][tickJoin_bmx] = 0;
 				PlayerData[playerid][tickLastBIKEC] = tick;
@@ -5187,8 +5197,8 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 	  			}
 				GameTextForPlayer(playerid, "~r~~h~Congrats!~n~~w~You finished the skydive challenge.",6000,5);
 				PlayerPlaySound(playerid, 1149,0,0,0);
-				format(str, sizeof(str), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /skydive.", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid);
-				SCMToAll(COLOR_WHITE, str);
+				format(gstr, sizeof(gstr), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /skydive.", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid);
+				SCMToAll(COLOR_WHITE, gstr);
 				GivePlayerScoreEx(playerid, 3, true, true);
 				GivePlayerMoneyEx(playerid, 5000, true, true);
 		  		ResetPlayerWeapons(playerid);
@@ -5216,8 +5226,8 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 	  			}
 				GameTextForPlayer(playerid, "~r~~h~Congrats!~n~~w~You finished the skydive2 challenge.",6000,5);
 				PlayerPlaySound(playerid, 1149,0,0,0);
-				format(str, sizeof(str), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /skydive2.", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid);
-				SCMToAll(COLOR_WHITE, str);
+				format(gstr, sizeof(gstr), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /skydive2.", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid);
+				SCMToAll(COLOR_WHITE, gstr);
 				GivePlayerScoreEx(playerid, 6, true, true);
 				GivePlayerMoneyEx(playerid, 10000, true, true);
 		  		ResetPlayerWeapons(playerid);
@@ -5245,8 +5255,8 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 	  			}
 				GameTextForPlayer(playerid, "~r~~h~Congrats!~n~~w~You finished the skydive3 challenge.",6000,5);
 				PlayerPlaySound(playerid, 1149,0,0,0);
-				format(str, sizeof(str), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /skydive3.", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid);
-				SCMToAll(COLOR_WHITE, str);
+				format(gstr, sizeof(gstr), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /skydive3.", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid);
+				SCMToAll(COLOR_WHITE, gstr);
 				GivePlayerScoreEx(playerid, 7, true, true);
 				GivePlayerMoneyEx(playerid, 7500, true, true);
 		  		ResetPlayerWeapons(playerid);
@@ -5266,8 +5276,8 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 	  			}
 				GameTextForPlayer(playerid, "~r~~h~Congrats!~n~~w~You finished the skydive4 challenge.",6000,5);
 				PlayerPlaySound(playerid, 1149,0,0,0);
-				format(str, sizeof(str), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /skydive4.", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid);
-				SCMToAll(COLOR_WHITE, str);
+				format(gstr, sizeof(gstr), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /skydive4.", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid);
+				SCMToAll(COLOR_WHITE, gstr);
 				GivePlayerScoreEx(playerid, 7, true, true);
 				GivePlayerMoneyEx(playerid, 8000, true, true);
 		  		ResetPlayerWeapons(playerid);
@@ -5290,8 +5300,8 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 
 				GameTextForPlayer(playerid, "~r~~h~Congrats!~n~~w~You finished the BMX Parkour.", 6000, 5);
 				PlayerPlaySound(playerid, 1149,0,0,0);
-				format(str, sizeof(str), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /bmx.", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid);
-				SCMToAll(COLOR_WHITE, str);
+				format(gstr, sizeof(gstr), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /bmx.", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid);
+				SCMToAll(COLOR_WHITE, gstr);
 				GivePlayerScoreEx(playerid, 8, true, true);
 				GivePlayerMoneyEx(playerid, 10000, true, true);
 				PlayerData[playerid][tickJoin_bmx] = 0;
@@ -5544,8 +5554,8 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 	  			}
 				GameTextForPlayer(playerid, "~r~~h~Congrats!~n~~w~You finished the skydive5 challenge.",6000,5);
 				PlayerPlaySound(playerid, 1149,0,0,0);
-				format(str, sizeof(str), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /skydive5.", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid);
-				SCMToAll(COLOR_WHITE, str);
+				format(gstr, sizeof(gstr), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /skydive5.", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid);
+				SCMToAll(COLOR_WHITE, gstr);
 				GivePlayerScoreEx(playerid, 8, true, true);
 				GivePlayerMoneyEx(playerid, 8000, true, true);
 		  		ResetPlayerWeapons(playerid);
@@ -5565,8 +5575,8 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 	  			}
 				GameTextForPlayer(playerid, "~r~~h~Congrats!~n~~w~You finished the skydive6 challenge.",6000,5);
 				PlayerPlaySound(playerid, 1149,0,0,0);
-				format(str, sizeof(str), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /skydive6.", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid);
-				SCMToAll(COLOR_WHITE, str);
+				format(gstr, sizeof(gstr), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /skydive6.", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid);
+				SCMToAll(COLOR_WHITE, gstr);
 				GivePlayerScoreEx(playerid, 8, true, true);
 				GivePlayerMoneyEx(playerid, 8000, true, true);
 		  		ResetPlayerWeapons(playerid);
