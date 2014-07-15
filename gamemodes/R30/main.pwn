@@ -4399,9 +4399,9 @@ public OnPlayerText(playerid, text[])
 	 		format(gstr, sizeof(gstr), "{%06x}%s"white"(%i): %s", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, text);
 			SCMToAll(-1, gstr);
   		}
-		else if(PlayerData[playerid][bOnlineAdmin] && PlayerData[playerid][e_level] > 0)
+		else if(PlayerData[playerid][e_level] > 0)
 		{
- 	 		format(gstr, sizeof(gstr), "{%06x}%s"white"(%i): {A8DBFF}%s", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, text);
+ 	 		format(gstr, sizeof(gstr), "{%06x}%s"white"(%i): %s%s", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, PlayerData[playerid][bOnlineAdmin] ? ("{A8DBFF}") : (""), text);
 			SCMToAll(-1, gstr);
 		}
 	}
@@ -9912,7 +9912,7 @@ YCMD:onduty(playerid, params[], help)
 			PlayerData[playerid][bDuty] = true;
 			PlayerData[playerid][AdminDutyLabel] = CreateDynamic3DTextLabel("Admin On Duty", ADMIN, 0.0, 0.0, 0.35, 20.0, playerid, INVALID_VEHICLE_ID, 0, -1, -1, -1, 20.0);
 
-	        format(gstr, sizeof(gstr), ""yellow"** "red"Admin %s(%i) is now onduty!", __GetName(playerid), playerid);
+	        format(gstr, sizeof(gstr), ""yellow"** "red"Admin %s(%i) is now onduty", __GetName(playerid), playerid);
 	        SCMToAll(RED, gstr);
         	SetPlayerHealth(playerid, 99999.0);
 		}
