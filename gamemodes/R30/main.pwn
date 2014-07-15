@@ -23259,24 +23259,24 @@ server_load_visuals()
 	SetDynamicObjectMaterialText(beach_text, 0, ""orange""SVRURLWWW"\n"red""CURRENT_VERSION"", OBJECT_MATERIAL_SIZE_256x128, "Arial", 30, 1, -32256, 0, OBJECT_MATERIAL_TEXT_ALIGN_CENTER);
 
     pick_chainsaw = CreateDynamicPickup(341, 23, 1219.1809,-924.6318,42.9045);
-    pick_life[0] = CreateDynamicPickup(1240, 3, -1987.6259,274.7049,34.9564);
-    pick_life[1] = CreateDynamicPickup(1240, 3, 2463.1362,-1683.0521,13.3142);
-    pick_life[2] = CreateDynamicPickup(1240, 3, 1184.9302,-1325.9720,13.3399);
-    pick_life[3] = CreateDynamicPickup(1240, 3, 241.4559,-1754.1686,4.2808);
-    pick_life[4] = CreateDynamicPickup(1240, 3, 333.7505,-1520.1478,35.6370);
-    pick_life[5] = CreateDynamicPickup(1240, 3, 800.4719,-1629.9167,13.1530);
-    pick_life[6] = CreateDynamicPickup(1240, 3, 2458.5137,2019.7380,10.8325);
-    pick_life[7] = CreateDynamicPickup(1240, 3, -588.3522,-3579.2637,3.4029);
-    pick_life[8] = CreateDynamicPickup(1240, 3, 2271.3765,1518.1755,42.5862);
-    pick_life[9] = CreateDynamicPickup(1240, 3, 2316.5967,1792.5190,10.5918);
-    pick_life[10] = CreateDynamicPickup(1240, 3, -2383.1816,-587.0456,131.8897);
-    pick_life[11] = CreateDynamicPickup(1240, 3, -1405.9728,492.3374,18.0023);
-    pick_life[12] = CreateDynamicPickup(1240, 3, 2035.2893,-2348.9136,13.6844);
-    pick_life[13] = CreateDynamicPickup(1240, 3, 400.7469, 2544.7986, 19.6311);
+    pick_life[0] = CreateDynamicPickup(1240, 23, -1987.6259,274.7049,34.9564);
+    pick_life[1] = CreateDynamicPickup(1240, 23, 2463.1362,-1683.0521,13.3142);
+    pick_life[2] = CreateDynamicPickup(1240, 23, 1184.9302,-1325.9720,13.3399);
+    pick_life[3] = CreateDynamicPickup(1240, 23, 241.4559,-1754.1686,4.2808);
+    pick_life[4] = CreateDynamicPickup(1240, 23, 333.7505,-1520.1478,35.6370);
+    pick_life[5] = CreateDynamicPickup(1240, 23, 800.4719,-1629.9167,13.1530);
+    pick_life[6] = CreateDynamicPickup(1240, 23, 2458.5137,2019.7380,10.8325);
+    pick_life[7] = CreateDynamicPickup(1240, 23, -588.3522,-3579.2637,3.4029);
+    pick_life[8] = CreateDynamicPickup(1240, 23, 2271.3765,1518.1755,42.5862);
+    pick_life[9] = CreateDynamicPickup(1240, 23, 2316.5967,1792.5190,10.5918);
+    pick_life[10] = CreateDynamicPickup(1240, 23, -2383.1816,-587.0456,131.8897);
+    pick_life[11] = CreateDynamicPickup(1240, 23, -1405.9728,492.3374,18.0023);
+    pick_life[12] = CreateDynamicPickup(1240, 23, 2035.2893,-2348.9136,13.6844);
+    pick_life[13] = CreateDynamicPickup(1240, 23, 400.7469, 2544.7986, 19.6311);
     
     for(new i = 0; i < 16; i++)
     {
-        pick_armor[i] = CreateDynamicPickup(1242, 3, g_ArmorPickups[i][0], g_ArmorPickups[i][1], g_ArmorPickups[i][2]);
+        pick_armor[i] = CreateDynamicPickup(1242, 23, g_ArmorPickups[i][0], g_ArmorPickups[i][1], g_ArmorPickups[i][2]);
     }
 
 	for(new i = 0; i < CAR_SHOPS; i++)
