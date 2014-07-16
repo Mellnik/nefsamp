@@ -741,6 +741,10 @@ enum E_PLAYER_DATA // Prefixes: i = Integer, s = String, b = bool, f = Float, p 
 	bool:bLogged,
 	bool:bSpeedo,
 	bool:bDerbyAFK,
+	bool:bDerbyHealthBarShowing,
+	Float:fDerbyVehicleHealth,
+	Float:fDerbyVehicleDamage,
+	Float:fDerbyCDamage,
 	iKickBanIssued,
 	iCoolDownCommand,
 	iCoolDownChat,
@@ -754,7 +758,7 @@ enum E_PLAYER_DATA // Prefixes: i = Integer, s = String, b = bool, f = Float, p 
 	iRobberyCount,
 	tRobbery,
 	tLoadMap,
-	tTimerHP,
+	tDerbyHealthBar,
 	tRainbow,
 	tTDhandle,
 	tMedkit,
@@ -1726,11 +1730,7 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
   	PlayerPVTMP[MAX_PLAYERS][2],
   	PlayerPVTMPPlate[MAX_PLAYERS][13],
  	GunGame_Player[MAX_PLAYERS][e_gungame_data],
-  	bool:LabelActive[MAX_PLAYERS],
   	bool:PlayerHit[MAX_PLAYERS] = {false, ...},
- 	Float:OldHealth[MAX_PLAYERS],
-  	Float:OldDamage[MAX_PLAYERS],
- 	Float:CDamage[MAX_PLAYERS],
   	DerbyMapVotes[9],
   	CurrentDerbyMap = 1,
   	BGGameTime = DEFAULT_BG_TIME,
@@ -6229,32 +6229,31 @@ public OnVehicleDamageStatusUpdate(vehicleid, playerid)
 	else if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER && gTeam[playerid] == DERBY)
 	{
 		new Float:HP,
-			veh = GetPlayerVehicleID(playerid);
+			vehicle = GetPlayerVehicleID(playerid);
 
-		GetVehicleHealth(veh, HP);
+		GetVehicleHealth(vehicle, HP);
 
-		if(HP != OldHealth[playerid])
+		if(HP != PlayerData[playerid][fDerbyVehicleHealth])
 		{
-			OldDamage[playerid] = OldHealth[playerid] - HP;
-			OldHealth[playerid] = HP;
+			PlayerData[playerid][fDerbyVehicleDamage] = PlayerData[playerid][fDerbyVehicleHealth]- HP;
+			PlayerData[playerid][fDerbyVehicleHealth] = HP;
 
-			if(OldDamage[playerid] > 0)
+			if(PlayerData[playerid][fDerbyVehicleDamage] > 0)
 			{
-				new texts[128];
-				if(LabelActive[playerid])
+				if(PlayerData[playerid][bDerbyHealthBarShowing])
 				{
-					CDamage[playerid] += OldDamage[playerid];
-					format(texts, sizeof(texts), "{ffd800}-%.0f\n%s", CDamage[playerid], UpdateString(HP));
-					KillTimer(PlayerData[playerid][tTimerHP]);
-					PlayerData[playerid][tTimerHP] = SetTimerEx("DeleteDerbyText", 2000, false, "i", playerid);
+					PlayerData[playerid][fDerbyCDamage] += PlayerData[playerid][fDerbyVehicleDamage];
+					format(gstr, sizeof(gstr), "{ffd800}-%.0f\n%s", PlayerData[playerid][fDerbyCDamage], derby_healthbar_format(HP));
+					KillTimer(PlayerData[playerid][tDerbyHealthBar]);
+					PlayerData[playerid][tDerbyHealthBar] = SetTimerEx("derby_healthbar_reset", 2000, false, "ii", playerid, YHash(__GetName(playerid)));
 				}
 				else
 				{
-					LabelActive[playerid] = true;
-					format(texts, sizeof(texts), "{ffd800}-%.0f\n%s",OldDamage[playerid],UpdateString(HP));
-					PlayerData[playerid][tTimerHP] = SetTimerEx("DeleteDerbyText", 2000, false, "i", playerid);
-				}
-				UpdatePlayer3DTextLabelText(playerid, PlayerData[playerid][t3dDerbyVehicleLabel], -1, texts);
+					PlayerData[playerid][bDerbyHealthBarShowing] = true;
+					format(gstr, sizeof(gstr), "{ffd800}-%.0f\n%s", PlayerData[playerid][fDerbyVehicleDamage], derby_healthbar_format(HP));
+					PlayerData[playerid][tDerbyHealthBar] = SetTimerEx("derby_healthbar_reset", 2000, false, "ii", playerid, YHash(__GetName(playerid)));
+    			}
+				UpdatePlayer3DTextLabelText(playerid, PlayerData[playerid][t3dDerbyVehicleLabel], -1, gstr);
 			}
 		}
 	}
@@ -6332,7 +6331,7 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 		    	PlayerData[playerid][t3dDerbyVehicleLabel] = PlayerText3D:-1;
 		    }
 			PlayerData[playerid][t3dDerbyVehicleLabel] = CreatePlayer3DTextLabel(playerid, " ", -1, 0, 0, 0.9, 10.0, INVALID_PLAYER_ID, GetPlayerVehicleID(playerid), 1);
-			UpdateBar(playerid);
+			derby_healthbar_update(playerid);
 		}
 		else if(PlayerData[playerid][t3dDerbyVehicleLabel] != PlayerText3D:-1)
 	    {
@@ -26416,15 +26415,15 @@ function:SetPlayerDerbyStaticMeshes(playerid)
 	TogglePlayerControllable(playerid, false);
 }
 
-UpdateBar(playerid)
+derby_healthbar_update(playerid)
 {
 	new Float:HP;
 	GetVehicleHealth(GetPlayerVehicleID(playerid), HP);
-	UpdatePlayer3DTextLabelText(playerid, PlayerData[playerid][t3dDerbyVehicleLabel], -1, UpdateString(HP));
+	UpdatePlayer3DTextLabelText(playerid, PlayerData[playerid][t3dDerbyVehicleLabel], -1, derby_healthbar_format(HP));
 	return 1;
 }
 
-UpdateString(Float:HP)
+derby_healthbar_format(Float:HP)
 {
 	new str[30];
 	if(HP == 1000) format(str, sizeof(str), "{00ff00}••••••••••");
@@ -26440,12 +26439,17 @@ UpdateString(Float:HP)
 	return str;
 }
 
-function:DeleteDerbyText(playerid)
+function:derby_healthbar_reset(playerid, namehash)
 {
-	KillTimer(PlayerData[playerid][tTimerHP]);
-	LabelActive[playerid] = false;
-	UpdateBar(playerid);
-	CDamage[playerid] = 0;
+	if(namehash != YHash(__GetName(playerid)))
+	    return 0;
+
+	PlayerData[playerid][bDerbyHealthBarShowing] = false;
+	PlayerData[playerid][tDerbyHealthBar] = -1;
+	PlayerData[playerid][fDerbyCDamage] = 0;
+	
+	derby_healthbar_update(playerid);
+	return 1;
 }
 
 SetPlayerBGTeam1(playerid)
@@ -29983,7 +29987,6 @@ PreparePlayerVars(playerid)
 	gTeam[playerid] = FREEROAM;
 	CSG[playerid] = false;
 	DerbyWinner[playerid] = false;
-    LabelActive[playerid] = false;
     PlayerHit[playerid] = false;
     g_RaceVehicle[playerid] = -1;
     PreviewTmpVeh[playerid] = -1;
@@ -30040,6 +30043,7 @@ PreparePlayerVars(playerid)
 	PlayerData[playerid][bLogged] = false;
 	PlayerData[playerid][bSpeedo] = false;
 	PlayerData[playerid][bDerbyAFK] = false;
+	PlayerData[playerid][bDerbyHealthBarShowing] = false;
 	PlayerData[playerid][t3dDerbyVehicleLabel] = PlayerText3D:-1;
 	PlayerData[playerid][pDerbyVehicle] = -1;
 	PlayerData[playerid][iJailTime] = 0;
@@ -30145,7 +30149,7 @@ PreparePlayerVars(playerid)
 	PlayerData[playerid][e_regdate] = 0;
  	PlayerData[playerid][HouseIntSelected] = 0;
 	PlayerData[playerid][SpecID] = INVALID_PLAYER_ID;
-	PlayerData[playerid][tTimerHP] = -1;
+	PlayerData[playerid][tDerbyHealthBar] = -1;
 	PlayerData[playerid][toy_selected] = 0;
 	PlayerData[playerid][houseobj_selected] = 0;
 	PlayerData[playerid][iCoolDownCommand] = 0;
