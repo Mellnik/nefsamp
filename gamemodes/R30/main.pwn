@@ -2123,6 +2123,10 @@ new Float:DuelMaps[3][2][4] =
 	    {29.7761, 1375.0975, 10.6471, 0.0}
 	}
 };
+new const DuelWeapons[15] =
+{
+    4, 9, 16, 22, 24, 25, 26, 27, 28, 29, 30, 31, 32, 34, 35
+};
 new Float:WorldSpawns[4][4] =
 {
 	{341.8535, -1852.6327, 8.2618, 90.2136}, // /beach
@@ -8824,7 +8828,6 @@ YCMD:duel(playerid, params[], help)
         }
         else
         {
-            if(PlayerData[playerid][DuelRequestRecv] == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Player is not available");
             if(!IsPlayerAvail(PlayerData[playerid][DuelRequestRecv])) return SCM(playerid, -1, ""er"Player is not available");
             if(gTeam[PlayerData[playerid][DuelRequestRecv]] != FREEROAM) return SCM(playerid, -1, ""er"Player is not in freeroam world");
             if(IsPlayerOnDesktop(PlayerData[playerid][DuelRequestRecv], 1500)) return SCM(playerid, -1, ""er"Player is on desktop");
@@ -8838,6 +8841,13 @@ YCMD:duel(playerid, params[], help)
 		        	SCM(i, NEF_RED, gstr);
 
 		        	PlayerData[i][DuelRequestRecv] = INVALID_PLAYER_ID;
+			    }
+			    if(PlayerData[i][DuelRequest] == playerid && i != PlayerData[playerid][DuelRequestRecv])
+			    {
+		        	format(gstr, sizeof(gstr), ">> %s(%i) cancelled the duel request!", __GetName(playerid), playerid);
+		        	SCM(i, NEF_RED, gstr);
+
+		        	PlayerData[i][DuelRequest] = INVALID_PLAYER_ID;
 			    }
 			}
 
@@ -17130,24 +17140,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        }
 	        case DIALOG_DUEL:
 	        {
-	            switch(listitem)
-	            {
-	                case 0: PlayerData[playerid][DuelWeapon] = 4;
-	                case 1: PlayerData[playerid][DuelWeapon] = 9;
-	                case 2: PlayerData[playerid][DuelWeapon] = 16;
-	                case 3: PlayerData[playerid][DuelWeapon] = 22;
-	                case 4: PlayerData[playerid][DuelWeapon] = 24;
-	                case 5: PlayerData[playerid][DuelWeapon] = 25;
-	                case 6: PlayerData[playerid][DuelWeapon] = 26;
-	                case 7: PlayerData[playerid][DuelWeapon] = 27;
-	                case 8: PlayerData[playerid][DuelWeapon] = 28;
-	                case 9: PlayerData[playerid][DuelWeapon] = 29;
-	                case 10: PlayerData[playerid][DuelWeapon] = 30;
-	                case 11: PlayerData[playerid][DuelWeapon] = 31;
-	                case 12: PlayerData[playerid][DuelWeapon] = 32;
-	                case 13: PlayerData[playerid][DuelWeapon] = 34;
-	                case 14: PlayerData[playerid][DuelWeapon] = 35;
-	            }
+	            PlayerData[playerid][DuelWeapon] = DuelWeapons[listitem];
+	            
 	            ShowDialog(playerid, DIALOG_DUEL + 1);
 	            return true;
 	        }
@@ -17187,11 +17181,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        }
 	 	    case DIALOG_RACE_RACETYPE:
 		    {
-		        switch(listitem)
-		        {
-		        	case 0: g_BuildRaceType = 1;
-		        	case 1: g_BuildRaceType = 2;
-				}
+		        g_BuildRaceType = listitem + 1;
+
 				ShowDialog(playerid, DIALOG_RACE_RACEVW);
 				return true;
 		    }
