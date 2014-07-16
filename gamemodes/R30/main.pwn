@@ -2,7 +2,7 @@
 || #################################################################### ||
 || # Project New Evolution Freeroam - Build 30 	        			  # ||
 || # ---------------------------------------------------------------- # ||
-|| # Copyright ©2011-2014 New Evolution Freeroam	  				  # ||
+|| # Copyright Â©2011-2014 New Evolution Freeroam	  				  # ||
 || # Created by Mellnik                                               # ||
 || # ---------------------------------------------------------------- # ||
 || # http://www.nefserver.net	    	                      		  # ||
@@ -77,12 +77,12 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 // Server
 #define SVRNAME                      	"New Evolution Freeroam"
 #define SVRSC	                    	"NEF"
-#define SVRLOGO                         "{646464}«(-|-|"nef_yellow"New "nef_green"Evolution "nef_red"Freeroam{F0F0F0}™{646464}|-|-)»"
+#define SVRLOGO                         "{646464}Â«(-|-|"nef_yellow"New "nef_green"Evolution "nef_red"Freeroam{F0F0F0}â„¢{646464}|-|-)Â»"
 #define SVRURL                          "nefserver.net"
 #define SVRURLWWW                       "www.nefserver.net"
 #define SVRFORUM                        "forum.nefserver.net"
 #define SERVER_IP                       "31.204.152.218:7777"
-#define HOSTNAME                        " 	      ..:: NEF ::.. ×Stunt/DM/Race/Minigames×"
+#define HOSTNAME                        " 	      ..:: NEF ::.. Ã—Stunt/DM/Race/MinigamesÃ—"
 #if IS_RELEASE_BUILD == true
 #define CURRENT_VERSION                 "Build 30"
 #else
@@ -120,7 +120,7 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define NOT_AVAIL                       "{FF000F}[INFO] {FF000F}You can't use this command now! Use /exit to leave."
 #define er                              "{FF000F}[INFO] {FF000F}" // D2D2D2
 #define Error(%1,%2) 					SendClientMessage(%1, -1, "{F42626}[INFO] "GREY2_E""%2)
-#define dl                              "{FFE600}• {F0F0F0}"
+#define dl                              "{FFE600}â€¢ {F0F0F0}"
 #define notlogged(%1)                   ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef"", ""white"You need to be logged in to use this feature.\n\n"nef_yellow"Type /register to create an new account for you current name.", "OK", "")
 #define MAX_ADMIN_LEVEL         		(5)
 #define MAX_WARNINGS 					(3)
@@ -1645,7 +1645,7 @@ new const HouseIntTypes[15][e_house_type] =
     {4, 302.180999, 300.722991, 999.148437, "Underground", 500000}, 	//5			// 10, nette bude
     {2, 271.884979, 306.631988, 999.148437, "Nice Small Hotel Room", 600000},//6 			// 8, nice one /white
 	{3, 2496.049804, -1695.238159, 1014.742187, "CJs House", 750000}, //7			// 4, muss raus exec // jetzt ist CJ drinne
-	{3, 235.508994, 1189.169897, 1080.339966, "Luxury House", 900000}, //8			// 0,  schönes haus mit roten boden pic 429
+	{3, 235.508994, 1189.169897, 1080.339966, "Luxury House", 900000}, //8			// 0,  schÃ¶nes haus mit roten boden pic 429
 	{2, 1204.809936, -11.586799, 1000.921875, "Strip Club", 1000000}, //9			// 6, mus raus exec // jetzt ist strip club drinne
 	{15,2215.454833, -1147.475585, 1025.796875, "Entire Motel", 1200000}, //10					// 12, muss raus // jetzt ist jeff motel drinne
 	{12,2324.419921, -1145.568359, 1050.710083, "Small Villa", 1500000}, 	//11			// 11, muss raus // jetzt ist small villa drinne
@@ -3713,7 +3713,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		{
 			new maxid = cache_insert_id();
 
-			format(gstr2, sizeof(gstr2), "SELECT `id`, `name`, `time` FROM `race_records` WHERE `track` = %i ORDER BY `time` ASC LIMIT 6;", g_NextRace); // 6 , da vllt Platz 5 belegt und somit 6 verdrängt // versteh ich nicht // ah warte jetzt hab ichs kapiert
+			format(gstr2, sizeof(gstr2), "SELECT `id`, `name`, `time` FROM `race_records` WHERE `track` = %i ORDER BY `time` ASC LIMIT 6;", g_NextRace); // 6 , da vllt Platz 5 belegt und somit 6 verdrÃ¤ngt // versteh ich nicht // ah warte jetzt hab ichs kapiert
 			mysql_tquery(pSQL, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_RACE_LATEST, maxid, extraid);
 		}
 		case THREAD_RACE_LATEST:
@@ -3795,7 +3795,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		    }
 		    else
 		    {
-		        SCM(extraid, -1, ""vgreen"» No race records available");
+		        SCM(extraid, -1, ""vgreen"Â» No race records available");
 		    }
 		}
 	    case THREAD_GANG_DESTROY:
@@ -4254,7 +4254,7 @@ public OnPlayerText(playerid, text[])
 			format(gstr, sizeof(gstr), "3,1ReactionTest:4 %s(%i) has won the reaction test in %2i.%03i seconds!", __GetName(playerid), playerid, second, rtime);
 			IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 
-		    format(gstr, sizeof(gstr), "» You have earned $%s + %i score.", number_format(xCash), xScore);
+		    format(gstr, sizeof(gstr), "Â» You have earned $%s + %i score.", number_format(xCash), xScore);
 		    SCM(playerid, GREEN, gstr);
 
 			format(gstr, sizeof(gstr), "Won the Reaction Test in %2i.%03i seconds!", second, rtime);
@@ -4696,7 +4696,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 				format(gstr, sizeof(gstr), "~y~[] ~w~%i", PlayerData[playerid][e_wanteds]);
 				PlayerTextDrawSetString(playerid, TXTWantedsTD[playerid], gstr);
 				
-			  	// Nur Kills bei FREEROAM werten für GangScore
+			  	// Nur Kills bei FREEROAM werten fÃ¼r GangScore
 			 	if(PlayerData[killerid][e_gangrank] > 0 && PlayerData[playerid][e_gangid] != PlayerData[killerid][e_gangid])
 				{
 				  	MySQL_UpdateGangScore(PlayerData[killerid][e_gangid], 1);
@@ -5667,7 +5667,7 @@ public OnPlayerEnterRaceCheckpoint(playerid)
 				}
 			}
 
-			format(gstr, sizeof(gstr), "» %s(%i) has finished the race %i. in %02i:%02i.%03i", __GetName(playerid), playerid, g_rPosition, rTime[0], rTime[1], rTime[2]);
+			format(gstr, sizeof(gstr), "Â» %s(%i) has finished the race %i. in %02i:%02i.%03i", __GetName(playerid), playerid, g_rPosition, rTime[0], rTime[1], rTime[2]);
 			SCMToAll(YELLOW, gstr);
 			GivePlayerMoneyEx(playerid, Prize[0], true, true);
 			GivePlayerScoreEx(playerid, Prize[1], true, true);
@@ -5693,7 +5693,7 @@ public OnPlayerEnterRaceCheckpoint(playerid)
 		    ++g_RaceFinishCount;
 			++g_CPProgress[playerid];
 			
-			if(g_RacePlayerCount == 1) // Wenn er alleine race fährt
+			if(g_RacePlayerCount == 1) // Wenn er alleine race fÃ¤hrt
 			{
 				return StopRace();
 			}
@@ -11645,7 +11645,7 @@ YCMD:ginvite(playerid, params[], help)
 	format(gstr, sizeof(gstr), ""gang_sign" "RED_E"%s(%i) "r_besch"invited you to: %s", __GetName(playerid), playerid, PlayerData[playerid][GangName]);
 	SCM(player, GREY, gstr);
 
-	format(gstr, sizeof(gstr), ""r_besch"» Invitation has been sent to "yellow"%s(%i)", __GetName(player), player);
+	format(gstr, sizeof(gstr), ""r_besch"Â» Invitation has been sent to "yellow"%s(%i)", __GetName(player), player);
 	SCM(playerid, GREEN, gstr);
 
 	PlayerData[playerid][tickLastGInvite] = tick;
@@ -18675,20 +18675,20 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	                {
 						new cstring[2048];
 
-						strcat(cstring, ""red"» "nef_yellow"Commands:\n");
+						strcat(cstring, ""red"Â» "nef_yellow"Commands:\n");
 						strcat(cstring, ""white"There are many commands, to get an overview use "yellow"/cmds\n\n");
 
-						strcat(cstring, ""red"» "nef_yellow"Minigames\n");
+						strcat(cstring, ""red"Â» "nef_yellow"Minigames\n");
 						strcat(cstring, ""white"Available minigames:\n");
 						strcat(cstring, ""yellow"Type /m to get an overview\n\n");
 
-						strcat(cstring, ""red"» "nef_yellow"Admins\n");
+						strcat(cstring, ""red"Â» "nef_yellow"Admins\n");
 						strcat(cstring, ""white"Admins are here to help, use "yellow"/report "white"if you want to report a player or if you have a question\n\n");
 
-						strcat(cstring, ""red"» "nef_yellow"Gangs\n");
+						strcat(cstring, ""red"Â» "nef_yellow"Gangs\n");
 						strcat(cstring, ""white"Gangs are groups which have been created by players\n\n");
 
-						strcat(cstring, ""red"» "nef_yellow"Houses/Business\n");
+						strcat(cstring, ""red"Â» "nef_yellow"Houses/Business\n");
 						strcat(cstring, ""white"Houses and business are for sale around San Andreas. Use "yellow"/cmds "white"for more infos");
 
 						ShowPlayerDialog(playerid, HELP_DIALOG + 1, DIALOG_STYLE_MSGBOX, ""nef" :: General Help", cstring, "OK", "Back");
@@ -18701,13 +18701,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	                {
 						new cstring[512];
 
-						strcat(cstring, ""red"» "nef_yellow"LMB (Left Mouse Button)\n");
+						strcat(cstring, ""red"Â» "nef_yellow"LMB (Left Mouse Button)\n");
 						strcat(cstring, ""white"Speedboost for vehicles\n\n");
 
-						strcat(cstring, ""red"» "nef_yellow"2\n");
+						strcat(cstring, ""red"Â» "nef_yellow"2\n");
 						strcat(cstring, ""white"Flip your vehicle\n\n");
 
-						strcat(cstring, ""red"» "nef_yellow"H\n");
+						strcat(cstring, ""red"Â» "nef_yellow"H\n");
 						strcat(cstring, ""white"Jump with your vehicle\n\n");
 
 						ShowPlayerDialog(playerid, HELP_DIALOG + 2, DIALOG_STYLE_MSGBOX, ""nef" :: Shortcuts", cstring, "OK", "Back");
@@ -19200,17 +19200,17 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			    {
 				    case 0: // Deposit
 				    {
-				        format(gstr, sizeof(gstr), ""white"» You got "yellow"$%s"white" in your bank account.\n\nType in the amount you want to deposit below:", number_format(PlayerData[playerid][e_bank]));
+				        format(gstr, sizeof(gstr), ""white"Â» You got "yellow"$%s"white" in your bank account.\n\nType in the amount you want to deposit below:", number_format(PlayerData[playerid][e_bank]));
 				        ShowPlayerDialog(playerid, BANK_DIALOG+1, DIALOG_STYLE_INPUT, ""nef" :: Bank > Deposit", gstr, "Deposit", "Cancel");
 				    }
 				    case 1: // Withdraw
 				    {
-				        format(gstr, sizeof(gstr), ""white"» You got "yellow"$%s"white" in your bank account.\n\nType in the amount you want to withdraw below:", number_format(PlayerData[playerid][e_bank]));
+				        format(gstr, sizeof(gstr), ""white"Â» You got "yellow"$%s"white" in your bank account.\n\nType in the amount you want to withdraw below:", number_format(PlayerData[playerid][e_bank]));
 				        ShowPlayerDialog(playerid, BANK_DIALOG+2, DIALOG_STYLE_INPUT, ""nef" :: Bank > Withdraw", gstr, "Withdraw", "Cancel");
 				    }
 				    case 2: // Show Credit
 				    {
-				        format(gstr, sizeof(gstr), ""white"» You got "yellow"$%s"white" in your bank account.", number_format(PlayerData[playerid][e_bank]));
+				        format(gstr, sizeof(gstr), ""white"Â» You got "yellow"$%s"white" in your bank account.", number_format(PlayerData[playerid][e_bank]));
 				        ShowPlayerDialog(playerid, 11231, DIALOG_STYLE_MSGBOX, ""nef" :: Bank > Balance", gstr, "OK", "");
 				    }
 			    }
@@ -19235,7 +19235,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					GivePlayerMoneyEx(playerid, -inamount);
 					PlayerData[playerid][e_bank] += inamount;
-					format(gstr, sizeof(gstr), "» You have deposited {FF7800}$%s"white" into your bank account", number_format(inamount));
+					format(gstr, sizeof(gstr), "Â» You have deposited {FF7800}$%s"white" into your bank account", number_format(inamount));
 					SCM(playerid, WHITE, gstr);
 				}
 				return true;
@@ -19259,7 +19259,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					GivePlayerMoneyEx(playerid, outamount);
 					PlayerData[playerid][e_bank] -= outamount;
-					format(gstr, sizeof(gstr), "» You have withdrawn {FF7800}$%s"white" from your bank account", number_format(outamount));
+					format(gstr, sizeof(gstr), "Â» You have withdrawn {FF7800}$%s"white" from your bank account", number_format(outamount));
 					SCM(playerid, WHITE, gstr);
 				}
 				return true;
@@ -19287,7 +19287,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return SkipLogin(playerid);
 				}
 				if(isnull(inputtext)) return SkipLogin(playerid);
-				extract inputtext -> new string:password[33]; else // früher war das auch ohne dem makro
+				extract inputtext -> new string:password[33]; else // frÃ¼her war das auch ohne dem makro
 				{
 					return SkipLogin(playerid);
 				}
@@ -23238,7 +23238,7 @@ server_initialize()
 server_load_visuals()
 {
 	// 3374 heuballen
-	// 2898 grünes rasen ding
+	// 2898 grÃ¼nes rasen ding
 	
     new count = GetTickCountEx();
     
@@ -23253,7 +23253,7 @@ server_load_visuals()
 	MellnikRamp = CreateDynamicObject(3115, -153.74190, -2210.68457, 27.16690,   0.00000, 0.00000, -145.55995);
 
 	new mc_text = CreateDynamicObject(19479, -2331.787841, -1635.757690, 484.685546, 0.099999, -90.299964, 178.450790);
-	SetDynamicObjectMaterialText(mc_text, 0, ""nef_yellow"New "nef_green"Evolution "nef_red"Freeroam{F0F0F0}™\n"CURRENT_VERSION"\n"SVRURLWWW"", OBJECT_MATERIAL_SIZE_256x128, "Arial", 20, 1, -32256, 0, OBJECT_MATERIAL_TEXT_ALIGN_CENTER);
+	SetDynamicObjectMaterialText(mc_text, 0, ""nef_yellow"New "nef_green"Evolution "nef_red"Freeroam{F0F0F0}â„¢\n"CURRENT_VERSION"\n"SVRURLWWW"", OBJECT_MATERIAL_SIZE_256x128, "Arial", 20, 1, -32256, 0, OBJECT_MATERIAL_TEXT_ALIGN_CENTER);
 
 	new beach_text = CreateDynamicObject(19479, 309.903930, -1934.953369, 12.736993, 0.000000, 0.000000, 39.940856);
 	SetDynamicObjectMaterialText(beach_text, 0, ""orange""SVRURLWWW"\n"red""CURRENT_VERSION"", OBJECT_MATERIAL_SIZE_256x128, "Arial", 30, 1, -32256, 0, OBJECT_MATERIAL_TEXT_ALIGN_CENTER);
@@ -23455,7 +23455,7 @@ server_load_visuals()
 	Gate[0] = CreateObject(976, 1397.24, 2694.51, 9.91,   0.00, 0.00, 269.23);
 	Gate[1] = CreateObject(976, 1397.24, 2693.86, 9.91,   0.00, 0.00, 90.07);
 
-	/*// gehört zu beach
+	/*// gehÃ¶rt zu beach
 	CreateDynamicObject(10771, 224.30000, -2004.00000, 4.10000,   0.00000, 0.00000, 220.00000);
 	CreateDynamicObject(11145, 274.20001, -1962.30005, 3.20000,   0.00000, 0.00000, 220.00000);
 	CreateDynamicObject(10770, 217.70000, -1999.59998, 37.30000,   0.00000, 0.00000, 220.00000);
@@ -24362,11 +24362,11 @@ PortPlayerMapVeh(playerid, Float:X, Float:Y, Float:Z, Float:Angle, Float:XVeh, F
 SendWelcomeMSG(playerid)
 {
 	SCM(playerid, GREY, "===================="white""CURRENT_VERSION""grey"=======================");
-	SCM(playerid, RED, "» Welcome to "SVRLOGO"");
-	SCM(playerid, NEF_GREEN, "» Type /help for further information");
-	SCM(playerid, BLUE, "» You can show/hide the textdraws with /textdraws");
-	SCM(playerid, YELLOW, "» Visit our forum at http://"SVRFORUM"");
-	SCM(playerid, NEF_YELLOW, "» You can use /radio or /streams for music streams");
+	SCM(playerid, RED, "Â» Welcome to "SVRLOGO"");
+	SCM(playerid, NEF_GREEN, "Â» Type /help for further information");
+	SCM(playerid, BLUE, "Â» You can show/hide the textdraws with /textdraws");
+	SCM(playerid, YELLOW, "Â» Visit our forum at http://"SVRFORUM"");
+	SCM(playerid, NEF_YELLOW, "Â» You can use /radio or /streams for music streams");
 	SCM(playerid, GREY, "===================="white""CURRENT_VERSION""grey"=======================");
 	return 1;
 }
@@ -24504,7 +24504,7 @@ function:DerbyVoting()
 	}
 	if(active_db_players < 2)
 	{
-	    // Wir können nicht starten
+	    // Wir kÃ¶nnen nicht starten
 		DerbyMSG("Couldn't start Derby! Too many AFK players");
         ExecDerbyVotingTimer();
         ClearDerbyVotes();
@@ -26436,15 +26436,15 @@ UpdateBar(playerid)
 UpdateString(Float:HP)
 {
 	new str[30];
-	if(HP == 1000) format(str, sizeof(str), "{00ff00}••••••••••");
-	else if(HP >= 900) format(str, sizeof(str), "{66ff00}•••••••••{ffffff}•");
-	else if(HP >= 800) format(str, sizeof(str), "{7fff00}••••••••{ffffff}••");
-	else if(HP >= 700) format(str, sizeof(str), "{ccff00}•••••••{ffffff}•••");
-	else if(HP >= 600) format(str, sizeof(str), "{f7f21a}••••••{ffffff}••••");
-	else if(HP >= 500) format(str, sizeof(str), "{f4c430}•••••{ffffff}•••••");
-	else if(HP >= 400) format(str, sizeof(str), "{e49b0f}••••{ffffff}••••••");
-	else if(HP >= 300) format(str, sizeof(str), "{e4650e}•••{ffffff}•••••••");
-	else if(HP >= 250) format(str, sizeof(str), "{ff2400}••{ffffff}••••••••");
+	if(HP == 1000) format(str, sizeof(str), "{00ff00}â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢");
+	else if(HP >= 900) format(str, sizeof(str), "{66ff00}â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢{ffffff}â€¢");
+	else if(HP >= 800) format(str, sizeof(str), "{7fff00}â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢{ffffff}â€¢â€¢");
+	else if(HP >= 700) format(str, sizeof(str), "{ccff00}â€¢â€¢â€¢â€¢â€¢â€¢â€¢{ffffff}â€¢â€¢â€¢");
+	else if(HP >= 600) format(str, sizeof(str), "{f7f21a}â€¢â€¢â€¢â€¢â€¢â€¢{ffffff}â€¢â€¢â€¢â€¢");
+	else if(HP >= 500) format(str, sizeof(str), "{f4c430}â€¢â€¢â€¢â€¢â€¢{ffffff}â€¢â€¢â€¢â€¢â€¢");
+	else if(HP >= 400) format(str, sizeof(str), "{e49b0f}â€¢â€¢â€¢â€¢{ffffff}â€¢â€¢â€¢â€¢â€¢â€¢");
+	else if(HP >= 300) format(str, sizeof(str), "{e4650e}â€¢â€¢â€¢{ffffff}â€¢â€¢â€¢â€¢â€¢â€¢â€¢");
+	else if(HP >= 250) format(str, sizeof(str), "{ff2400}â€¢â€¢{ffffff}â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢");
 	else format(str, sizeof(str), "{ff2400}Boom!");
 	return str;
 }
@@ -30162,7 +30162,7 @@ badsql(const string[], bool:strict = true)
 	if(strfind(string, "'", true) != -1) return 1;
 	if(strfind(string, "/", true) != -1) return 1;
 	if(strfind(string, "\\", true) != -1) return 1;
-	if(strfind(string, "´", true) != -1) return 1;
+	if(strfind(string, "Â´", true) != -1) return 1;
 	if(strfind(string, "`", true) != -1) return 1;
 	if(strfind(string, "~", true) != -1) return 1;
 	if(strfind(string, "#", true) != -1) return 1;
