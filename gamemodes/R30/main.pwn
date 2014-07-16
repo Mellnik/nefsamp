@@ -2,7 +2,7 @@
 || #################################################################### ||
 || # Project New Evolution Freeroam - Build 30 	        			  # ||
 || # ---------------------------------------------------------------- # ||
-|| # Copyright Â©2011-2014 New Evolution Freeroam	  				  # ||
+|| # Copyright (c)2011-2014 New Evolution Freeroam	  				  # ||
 || # Created by Mellnik                                               # ||
 || # ---------------------------------------------------------------- # ||
 || # http://www.nefserver.net	    	                      		  # ||
@@ -24,20 +24,20 @@
 
 #pragma dynamic 8192
 
-#define IS_RELEASE_BUILD (true)
-#define INC_ENVIORMENT (true)
+#define IS_RELEASE_BUILD (false)
+#define INC_ENVIRONMENT (false)
 #define IRC_CONNECT (true)
 #define WINTER_EDITION (false) // Requires FS ferriswheelfair.amx
 #define YSI_IS_SERVER
 
-#include <a_samp>   		
+#include <a_samp>
 #include <a_http>           // API Requests
 #undef MAX_PLAYERS
 #define MAX_PLAYERS (400)
-#include <YSI\y_iterate>	
-#include <YSI\y_commands>   
-#include <YSI\y_master>    
-#include <YSI\y_stringhash> 
+#include <YSI\y_iterate>
+#include <YSI\y_commands>
+#include <YSI\y_master>
+#include <YSI\y_stringhash>
 #include <YSI\y_va>
 #include <sscanf2>
 #include <streamer>
@@ -49,7 +49,7 @@
 #include <Dini>         	// 1.6
 #include <md-sort>      	// 13/02/2014
 #include <unixtimetodate> 	// 2.0
-#if INC_ENVIORMENT == true
+#if INC_ENVIRONMENT == true
 #include <server_maps>
 #include <server_maps_2>
 #include <server_maps_3>
@@ -77,12 +77,12 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 // Server
 #define SVRNAME                      	"New Evolution Freeroam"
 #define SVRSC	                    	"NEF"
-#define SVRLOGO                         "{646464}Â«(-|-|"nef_yellow"New "nef_green"Evolution "nef_red"Freeroam{F0F0F0}â„¢{646464}|-|-)Â»"
+#define SVRLOGO                         "{646464}«(-|-|"nef_yellow"New "nef_green"Evolution "nef_red"Freeroam{F0F0F0}™{646464}|-|-)»"
 #define SVRURL                          "nefserver.net"
 #define SVRURLWWW                       "www.nefserver.net"
 #define SVRFORUM                        "forum.nefserver.net"
 #define SERVER_IP                       "31.204.152.218:7777"
-#define HOSTNAME                        " 	      ..:: NEF ::.. Ã—Stunt/DM/Race/MinigamesÃ—"
+#define HOSTNAME                        " 	      ..:: NEF ::.. ×Stunt/DM/Race/Minigames×"
 #if IS_RELEASE_BUILD == true
 #define CURRENT_VERSION                 "Build 30"
 #else
@@ -120,7 +120,7 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define NOT_AVAIL                       "{FF000F}[INFO] {FF000F}You can't use this command now! Use /exit to leave."
 #define er                              "{FF000F}[INFO] {FF000F}" // D2D2D2
 #define Error(%1,%2) 					SendClientMessage(%1, -1, "{F42626}[INFO] "GREY2_E""%2)
-#define dl                              "{FFE600}â€¢ {F0F0F0}"
+#define dl                              "{FFE600}• {F0F0F0}"
 #define notlogged(%1)                   ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef"", ""white"You need to be logged in to use this feature.\n\n"nef_yellow"Type /register to create an new account for you current name.", "OK", "")
 #define MAX_ADMIN_LEVEL         		(5)
 #define MAX_WARNINGS 					(3)
@@ -644,7 +644,7 @@ enum E_PLAYER_DATA // Prefixes: i = Integer, s = String, b = bool, f = Float, p 
 {
 	/* ORM */
 	ORM:e_ormid,
-	
+
 	/* PLAYER DATA */
 	e_accountid,
 	e_name[MAX_PLAYER_NAME + 1],
@@ -931,7 +931,7 @@ enum E_PV_DATA
 	e_color1,
 	e_color2,
 	e_mods[17],
-	
+
 	/* INTERNAL */
 	e_vehicleid,
 	Text3D:e_labelid,
@@ -1003,7 +1003,7 @@ enum E_BUSINESS_DATA
 {
 	/* ORM */
 	ORM:e_ormid,
-	
+
 	/* DATA */
 	e_id,
 	e_owner[MAX_PLAYER_NAME + 1],
@@ -1012,7 +1012,7 @@ enum E_BUSINESS_DATA
 	e_level,
 	e_sold,
 	e_date,
-	
+
 	/* INTERNAL */
 	Text3D:e_label_id,
 	e_icon_id,
@@ -1645,7 +1645,7 @@ new const HouseIntTypes[15][e_house_type] =
     {4, 302.180999, 300.722991, 999.148437, "Underground", 500000}, 	//5			// 10, nette bude
     {2, 271.884979, 306.631988, 999.148437, "Nice Small Hotel Room", 600000},//6 			// 8, nice one /white
 	{3, 2496.049804, -1695.238159, 1014.742187, "CJs House", 750000}, //7			// 4, muss raus exec // jetzt ist CJ drinne
-	{3, 235.508994, 1189.169897, 1080.339966, "Luxury House", 900000}, //8			// 0,  schÃ¶nes haus mit roten boden pic 429
+	{3, 235.508994, 1189.169897, 1080.339966, "Luxury House", 900000}, //8			// 0,  schönes haus mit roten boden pic 429
 	{2, 1204.809936, -11.586799, 1000.921875, "Strip Club", 1000000}, //9			// 6, mus raus exec // jetzt ist strip club drinne
 	{15,2215.454833, -1147.475585, 1025.796875, "Entire Motel", 1200000}, //10					// 12, muss raus // jetzt ist jeff motel drinne
 	{12,2324.419921, -1145.568359, 1050.710083, "Small Villa", 1500000}, 	//11			// 11, muss raus // jetzt ist small villa drinne
@@ -1885,7 +1885,7 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
 	T_ServerPlayers = 0,
 	IRC_Bots[IRC_MAX_BOTS],
 	IRC_GroupID;
-	
+
 new const Float:FloorZOffsets[21] =
 {
     0.0,
@@ -2542,11 +2542,11 @@ public OnGameModeInit()
 	#endif
 	Log(LOG_INIT, "MySQL: Logging: LOG_ERROR | LOG_WARNING");
 	mysql_log(LOG_ERROR | LOG_WARNING, LOG_TYPE_TEXT);
-	
+
     MySQL_Connect();
 	MySQL_CleanUp();
 
-	#if INC_ENVIORMENT == true
+	#if INC_ENVIRONMENT == true
     BuildServerMap();
     BuildServerMap2();
     BuildServerMap3();
@@ -2599,19 +2599,19 @@ public OnGameModeExit()
 {
 	Log(LOG_EXIT, "Garbage cleanup");
     MySQL_CleanUp();
-    
+
 	mysql_stat(gstr2, pSQL, sizeof(gstr2));
 	Log(LOG_EXIT, "MySQL: %s", gstr2);
 
 	Log(LOG_EXIT, "IRC: Closing");
     IRC_QuitBots();
     IRC_DestroyGroup(IRC_GroupID);
-	
+
 	DestroyElevator();
 
 	Log(LOG_EXIT, "MySQL: Closing");
  	mysql_close(pSQL);
- 	
+
 	Log(LOG_EXIT, "Now exiting.");
 	return 1;
 }
@@ -2631,7 +2631,7 @@ public OnPlayerRequestClass(playerid, classid)
         SetTimerEx("ForceClassSpawn", 10, 0, "i", playerid);
 		return 0;
 	}
-		
+
     PlayerData[playerid][bFirstSpawn] = true;
 
     new rand = random(4);
@@ -2696,7 +2696,7 @@ public OnPlayerRequestSpawn(playerid)
 public OnPlayerSpawn(playerid)
 {
     if(PlayerData[playerid][bShowToys] && !PlayerData[playerid][bFirstSpawn]) AttachPlayerToy(playerid);
-    
+
     if(PlayerData[playerid][bFirstSpawn])
     {
         PlayerData[playerid][bFirstSpawn] = false;
@@ -2712,7 +2712,7 @@ public OnPlayerSpawn(playerid)
 		ShowPlayerInfoTextdraws(playerid);
 		SavePos(playerid);
 		SyncGangZones(playerid);
-		
+
 		if(PlayerData[playerid][e_vip] == 1)
 		{
 		    SetPlayerArmour(playerid, 100.0);
@@ -2723,7 +2723,7 @@ public OnPlayerSpawn(playerid)
         case FREEROAM:
         {
             ResetPlayerWorld(playerid);
-            
+
             /*if(PlayerData[playerid][bHasSpawn]) Moved to OPD system
             {
         		SetPlayerPos(playerid, PlayerData[playerid][CSpawnX], PlayerData[playerid][CSpawnY], PlayerData[playerid][CSpawnZ]);
@@ -2787,7 +2787,7 @@ public OnPlayerSpawn(playerid)
 			SetPlayerFacingAngle(playerid, PlayerData[playerid][SpecA]);
 			RandomWeapons(playerid);
 			gTeam[playerid] = FREEROAM;
-			
+
 			player_notice(playerid, "No longer spectating", "");
 
 			if(GetPVarInt(playerid, "HadGod") == 1) Command_ReProcess(playerid, "/god silent", false);
@@ -2882,7 +2882,7 @@ public OnPlayerSpawn(playerid)
 		{
   			ResetPlayerWeapons(playerid);
   			GivePlayerWeapon(playerid, 35, 99999);
-  			
+
 			SetPlayerVirtualWorld(playerid, ROCKETDM_WORLD);
    			SetPlayerInterior(playerid, 0);
 
@@ -2900,7 +2900,7 @@ public OnPlayerSpawn(playerid)
 			new rand = random(14);
 			SetPlayerPosEx(playerid, Sniper_Spawns[rand][0], Sniper_Spawns[rand][1], floatadd(Sniper_Spawns[rand][2], 3.5));
 			SetPlayerFacingAngle(playerid, Sniper_Spawns[rand][3]);
-			
+
             LoadMap(playerid);
 		}
 		case MINIGUN:
@@ -2946,7 +2946,7 @@ public OnPlayerSpawn(playerid)
 
 			GunGame_Player[playerid][dead] = false;
 			GunGame_Player[playerid][pw] = true;
-			
+
 			if(GunGamePlayers() >= 16) SetPlayerHealth(playerid, 100.0);
 			else SetPlayerHealth(playerid, (25 + 5 * GunGamePlayers()));
 		}
@@ -3096,12 +3096,12 @@ public OnPlayerSpawn(playerid)
 			SetPVarInt(playerid, "HasEscaped", 0);
         }
     }
-    
+
 	if(PlayerData[playerid][bDuty])
 	{
 		SetPlayerHealth(playerid, 99999.0);
 	}
-	
+
 	if(gTeam[playerid] == FREEROAM) PlayerTextDrawShow(playerid, TXTWantedsTD[playerid]);
     if(!PlayerData[playerid][bTextdraws]) Command_ReProcess(playerid, "/hidef", false);
 
@@ -3112,19 +3112,19 @@ public OnPlayerSpawn(playerid)
 public OnIncomingConnection(playerid, ip_address[], port)
 {
 	Log(LOG_NET, "OnIncomingConnection(%i, %s, %i)", playerid, ip_address, port);
-	
+
 	new connections = 0, buffer[16];
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(i == playerid || !IsPlayerConnected(i))
 	        continue;
-	        
+
 	    GetPlayerIp(i, buffer, sizeof(buffer)); // Not save to use __GetIP here
-	    
+
 	    if(!strcmp(buffer, ip_address))
 			connections++;
 	}
-	
+
 	if(connections >= 3 && !IsWhitelisted(ip_address))
 	{
 	    BlockIpAddress(ip_address, 60000);
@@ -3165,21 +3165,21 @@ public OnPlayerConnect(playerid)
 	else
 	{
 	    Log(LOG_NET, "%s(%i, %s, %s) connected.", __GetName(playerid), playerid, __GetIP(playerid), __GetSerial(playerid));
-	
+
 	    new count_r = 0;
 	    for(new i = 0; i < MAX_PLAYERS; i++)
 	    {
 	        if(IsPlayerConnected(i))
 	            count_r++;
 	    }
-	    
+
 	    if(count_r > m_PlayerRecord) {
 	        m_PlayerRecord = count_r;
 	        server_save_config();
 	    }
-	
+
 	    InitSession(playerid);
-	
+
 		TextDrawShowForPlayer(playerid, TXTOnJoin[0]);
 		TextDrawShowForPlayer(playerid, TXTOnJoin[1]);
 
@@ -3200,7 +3200,7 @@ public OnPlayerConnect(playerid)
 		PreloadAnimLib(playerid, "FOOD");
 		PreloadAnimLib(playerid, "PED");
         ApplyAnimation(playerid, "DANCING", "DNCE_M_B", 4.0, 1, 0, 0, 0, -1);
-        
+
 		PlayAudioStreamForPlayer(playerid, "http://www.nefserver.net/s/NEFLogin.mp3");
 
 		mysql_format(pSQL, gstr, sizeof(gstr), "SELECT * FROM `bans` WHERE `PlayerName` = '%e' LIMIT 1;", __GetName(playerid));
@@ -3219,13 +3219,13 @@ public OnPlayerDisconnect(playerid, reason)
    	if(PlayerData[playerid][ExitType] == EXIT_FIRST_SPAWNED && PlayerData[playerid][bLogged])
 	{
 	    MySQL_SaveAccount(playerid);
-	    
+
 		switch(gTeam[playerid])
 		{
 		    case gDUEL:
 		    {
 				new bool:found = false;
-				
+
 		        for(new i = 0; i < MAX_PLAYERS; i++)
 		        {
 		            if(PlayerData[i][DuelRequestRecv] == playerid && gTeam[i] == gDUEL)
@@ -3238,14 +3238,14 @@ public OnPlayerDisconnect(playerid, reason)
 		                RandomSpawn(i, true);
 		                ResetPlayerWeapons(i);
 		                RandomWeapons(i);
-		                
+
 		                PlayerData[i][DuelRequestRecv] = INVALID_PLAYER_ID;
 		                PlayerData[i][DuelRequest] = INVALID_PLAYER_ID;
-		                
+
 		                found = true;
 		            }
 		        }
-		        
+
 				if(!found)
 				{
 				    for(new i = 0; i < MAX_PLAYERS; i++)
@@ -3285,13 +3285,13 @@ public OnPlayerDisconnect(playerid, reason)
 		        --g_RacePlayerCount;
 
 				gTeam[playerid] = FREEROAM;
-				
+
 				if(g_RaceVehicle[playerid] != -1)
 				{
 					DestroyVehicle_(g_RaceVehicle[playerid]);
 					g_RaceVehicle[playerid] = -1;
 				}
-				
+
 				TogglePlayerControllable(playerid, true);
                 SetPlayerVirtualWorld(playerid, 0);
                 DisablePlayerRaceCheckpoint(playerid);
@@ -3386,14 +3386,14 @@ public OnPlayerDisconnect(playerid, reason)
 					    if(DerbyPlayers == 1) Derby();
 					}
 			    }
-			    
+
 			    Streamer_ToggleItemUpdate(playerid, STREAMER_TYPE_MAP_ICON, 1);
 			    Streamer_ToggleItemUpdate(playerid, STREAMER_TYPE_CP, 1);
 			    Streamer_Update(playerid);
 			}
 		}
 	}
-	
+
     if(PlayerData[playerid][bMuted]) KillTimer(PlayerData[playerid][tMute]);
 
 	if(PlayerData[playerid][AdminDutyLabel] != Text3D:-1)
@@ -3432,7 +3432,7 @@ public OnPlayerDisconnect(playerid, reason)
 	    {
 	        Iter_Remove(PlayerIgnore[i], playerid);
 	    }
-	    
+
         if(PlayerData[i][DuelRequestRecv] == playerid)
         {
             if(gTeam[i] != gDUEL)
@@ -3444,22 +3444,22 @@ public OnPlayerDisconnect(playerid, reason)
 			}
         }
 	}
-	
+
     DestroyPlayerVehicles(playerid, true);
 
 	if(PlayerData[playerid][e_ormid] != ORM:-1) {
 		orm_destroy(PlayerData[playerid][e_ormid]);
 	}
-	
+
     PreparePlayerVars(playerid);
 	PreparePlayerPV(playerid);
  	PreparePlayerToy(playerid);
- 	
+
 	SetPlayerScoreEx(playerid, 0);
 	SetPlayerTeam(playerid, NO_TEAM);
-	
+
 	static const reasonMsg[3][] = {"Timeout", "Leaving", "Kicked/Banned"};
-	
+
 	format(gstr, sizeof(gstr), "02[%i] 03*** %s has left the server. (%s)", playerid, __GetName(playerid), reasonMsg[reason]);
 	IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 	return 1;
@@ -3469,19 +3469,19 @@ public OnPlayerCommandReceived(playerid, cmdtext[])
 {
 	if(PlayerData[playerid][bOpenSeason])
 		return 0;
-	
+
 	if(PlayerData[playerid][bIsDead])
 	{
 	    SCM(playerid, -1, ""er"You can't use commands while being dead!");
 	    return 0;
 	}
-	
+
 	if(PlayerData[playerid][ExitType] != EXIT_FIRST_SPAWNED)
 	{
 	    SCM(playerid, -1, ""er"You need to spawn to use commands!");
 	    return 0;
 	}
-	
+
 	if((PlayerData[playerid][iCoolDownCommand] + COOLDOWN_CMD) >= GetTickCountEx())
 	{
 		player_notice(playerid, "1 command every second", "");
@@ -3515,22 +3515,22 @@ public OnPlayerCommandReceived(playerid, cmdtext[])
 			    {
 			        format(gstr, sizeof(gstr), ""RED_E"You can no longer win this challenge because of using %s", cmdtext);
 			        SCM(playerid, -1, gstr);
-			        
+
 					SetPVarInt(playerid, "doingStunt", 0);
 					PlayerData[playerid][tickJoin_bmx] = 0;
 				}
 			}
 		}
 	}
-	
+
 	if(PlayerData[playerid][bLoadMap])
 	{
 	    player_notice(playerid, "Please wait for the map to load", "");
 	    return 0;
 	}
-	
+
 	PlayerData[playerid][iCoolDownCommand] = GetTickCountEx();
-	
+
 	CancelEdit(playerid);
 	// Closing open dialogs in order to avoid some exploits.
 	ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
@@ -3570,7 +3570,7 @@ public OnVehicleMod(playerid, vehicleid, componentid)
 	    Log(LOG_SUSPECT, "OnVehicleMod(%i, %i, %i) triggered by %s with invalid componentid using model %i", playerid, vehicleid, componentid, __GetName(playerid), model);
 		return 0;
 	}
-	
+
 	if(PVSelect[playerid] != -1)
 	{
 	    if(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid] == vehicleid)
@@ -3627,7 +3627,7 @@ public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY
 		    }
 		}
 	}
-	
+
 	/* GOD CONTROL */
 	if(hittype == BULLET_HIT_TYPE_PLAYER) {
 	    if(hitid != INVALID_PLAYER_ID) {
@@ -3637,7 +3637,7 @@ public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY
 	        }
 	    }
 	}
-	
+
 	/* ANTI DRIVEBY SPAWNZONES */
 	if(hittype == BULLET_HIT_TYPE_PLAYER) {
 	    if(hitid != INVALID_PLAYER_ID) {
@@ -3652,7 +3652,7 @@ public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY
 			}
 	    }
 	}
-	
+
 	/* ANTI GBUG */
 	if(hittype == BULLET_HIT_TYPE_PLAYER) {
 	    if(hitid != INVALID_PLAYER_ID) {
@@ -3664,7 +3664,7 @@ public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY
 			}
 	    }
  	}
-	
+
 	/* LAST HIT */
 	if(hittype == BULLET_HIT_TYPE_PLAYER) {
 	    if(hitid != INVALID_PLAYER_ID) {
@@ -3673,7 +3673,7 @@ public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY
 			}
 		}
 	}
-	
+
 	/* HITSOUND */
 	if(hittype == BULLET_HIT_TYPE_PLAYER) {
 		if(weaponid >= 22) {
@@ -3688,15 +3688,15 @@ public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY
 		if(weaponid == 35) {
 		    GivePlayerWeapon(playerid, 37, 1);
 		    GivePlayerWeapon(playerid, 35, 0);
-		
+
 		    new p_Weapons[13][2];
 			for(new i = 0; i < 13; i++) {
 			    GetPlayerWeaponData(playerid, i, p_Weapons[i][0], p_Weapons[i][1]);
 			}
 			p_Weapons[7][0] = 0; // RPG
-			
+
 			ResetPlayerWeapons(playerid);
-			
+
 			for(new i = 0; i < 13; i++) {
 			    GivePlayerWeapon(playerid, p_Weapons[i][0], p_Weapons[i][1]);
 			}
@@ -3713,30 +3713,30 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		{
 			new maxid = cache_insert_id();
 
-			format(gstr2, sizeof(gstr2), "SELECT `id`, `name`, `time` FROM `race_records` WHERE `track` = %i ORDER BY `time` ASC LIMIT 6;", g_NextRace); // 6 , da vllt Platz 5 belegt und somit 6 verdrÃ¤ngt // versteh ich nicht // ah warte jetzt hab ichs kapiert
+			format(gstr2, sizeof(gstr2), "SELECT `id`, `name`, `time` FROM `race_records` WHERE `track` = %i ORDER BY `time` ASC LIMIT 6;", g_NextRace); // 6 , da vllt Platz 5 belegt und somit 6 verdrängt // versteh ich nicht // ah warte jetzt hab ichs kapiert
 			mysql_tquery(pSQL, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_RACE_LATEST, maxid, extraid);
 		}
 		case THREAD_RACE_LATEST:
 		{
 			new rows, fields;
 			cache_get_data(rows, fields, pSQL);
-			
+
 			if(rows > 0)
 			{
 			    new name[25], time, id,
 			        minute, sec, msec;
-			    
+
 				for(new i = 0; i < rows; i++)
 				{
 				    name[0] = '\0';
 					id = cache_get_row_int(i, 0, pSQL);
 					time = cache_get_row_int(i, 2, pSQL);
 					cache_get_row(i, 1, name, pSQL, sizeof(name));
-					
+
 					if(extraid == id)
 					{
 					    ConvertTime(var0, time, minute, sec, msec);
-					    
+
 					    if(connectionHandle == 1)
 					    {
 					        format(gstr, sizeof(gstr), ""race_sign" %s hit a new record on %03i with %02i:%02i.%03i", name, g_NextRace, minute, sec, msec);
@@ -3747,7 +3747,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 					 	    format(gstr, sizeof(gstr), ""race_sign" %s reached on %03i place %i with %02i:%02i.%03i", name, g_NextRace, connectionHandle, minute, sec, msec);
 							SCMToAll(-1, gstr);
 					    }
-					    
+
 						if(rows > i + 1)
 						{
 						    new record_sec,
@@ -3795,20 +3795,20 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		    }
 		    else
 		    {
-		        SCM(extraid, -1, ""vgreen"Â» No race records available");
+		        SCM(extraid, -1, ""vgreen"» No race records available");
 		    }
 		}
 	    case THREAD_GANG_DESTROY:
 	    {
      		new rows, fields;
 	        cache_get_data(rows, fields, pSQL);
-	        
+
 	        if(rows == 1)
 	        {
 	            new gangname[21], gangid;
 	            cache_get_row(0, 1, gangname, pSQL, sizeof(gangname));
 	            gangid = cache_get_row_int(0, 0, pSQL);
-	            
+
 				if(Iter_Contains(iterGangWar, gangid)) return SCM(extraid, -1, ""er"You can't close this gang as they are involved in a gang war.");
 
 				format(gstr, sizeof(gstr), "UPDATE `accounts` SET `gangrank` = 0, `gangid` = 0 WHERE `gangid` = %i;", gangid);
@@ -3851,7 +3851,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 					 			PlayerData[i][GangLabel] = Text3D:-1;
 							}
 						}
-						
+
 						SyncGangZones(i);
 				    }
 				}
@@ -3889,7 +3889,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 
 					if(++count >= 50) break;
 				}
-				
+
 				format(finstring, sizeof(finstring), "There are "yellow"%i"white" members in this gang\n"green"Showing %i members below:"white"", rows, count);
 				strcat(finstring, tmpstring);
 
@@ -3984,14 +3984,14 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 	  		if(rows > 0)
 		    {
 				rows = cache_get_row_int(0, 0, pSQL);
-				
+
 				if(PlayerData[extraid][e_gangrank] == GANG_POS_LEADER || PlayerData[extraid][e_gangrank] == GANG_POS_FOUNDER || PlayerData[extraid][e_gangrank] == GANG_POS_CO_FOUNDER)
 				{
 					if(PlayerData[extraid][e_gangrank] == GANG_POS_LEADER && rows >= GANG_POS_LEADER)
 					{
 					    return SCM(extraid, -1, ""er"Cannot assign as this player has the same or a greater rank than you!");
 					}
-					
+
 					if(PlayerData[extraid][e_gangrank] == GANG_POS_CO_FOUNDER && rows >= GANG_POS_CO_FOUNDER)
 					{
 					    return SCM(extraid, -1, ""er"Cannot assign as this player has the same or a greater rank than you!");
@@ -4138,7 +4138,7 @@ public OnPlayerUpdate(playerid)
 			}
 	    }
 	}
-	
+
     if(PlayerData[playerid][bSpeedo])
     {
         if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
@@ -4254,7 +4254,7 @@ public OnPlayerText(playerid, text[])
 			format(gstr, sizeof(gstr), "3,1ReactionTest:4 %s(%i) has won the reaction test in %2i.%03i seconds!", __GetName(playerid), playerid, second, rtime);
 			IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 
-		    format(gstr, sizeof(gstr), "Â» You have earned $%s + %i score.", number_format(xCash), xScore);
+		    format(gstr, sizeof(gstr), "» You have earned $%s + %i score.", number_format(xCash), xScore);
 		    SCM(playerid, GREEN, gstr);
 
 			format(gstr, sizeof(gstr), "Won the Reaction Test in %2i.%03i seconds!", second, rtime);
@@ -4263,12 +4263,12 @@ public OnPlayerText(playerid, text[])
 			GivePlayerMoneyEx(playerid, xCash, true, true);
 
 		    PlayerData[playerid][e_reaction]++;
-		    
+
 		    if(PlayerAchData[playerid][e_ach_toofast][0] == 0 && PlayerData[playerid][e_reaction] >= 10)
 		    {
 		        GivePlayerAchievement(playerid, e_ach_toofast, "Too Fast", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
 			}
-		    
+
 			GivePlayerScoreEx(playerid, xScore, true, true);
 			tReactionTimer = SetTimer("xReactionTest", REAC_TIME, true);
 		    xTestBusy = false;
@@ -4302,7 +4302,7 @@ public OnPlayerText(playerid, text[])
 	{
 	    format(gstr, sizeof(gstr), ""gang_sign" {%06x}%s(%i)"r_besch": %s", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, text[1]);
 		GangMSG(PlayerData[playerid][e_gangid], gstr);
-		
+
 		format(gstr, sizeof(gstr), "[GC] %s(%i): %s", __GetName(playerid), playerid, text[1]);
 		AdminMSG(GREY, gstr, false, true);
 		return 0;
@@ -4412,7 +4412,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 {
 	// Closing open dialogs in order to avoid some exploits.
 	ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
-	
+
 	PlayerData[playerid][bIsDead] = true;
 	PlayerData[playerid][iCoolDownDeath]++;
 	SetTimerEx("CoolDownDeath", COOLDOWN_DEATH, false, "i", playerid);
@@ -4421,10 +4421,10 @@ public OnPlayerDeath(playerid, killerid, reason)
 	    format(gstr, sizeof(gstr), "[SUSPECT] %i fake deaths detected, kicking (%s, %i)", PlayerData[playerid][iCoolDownDeath], __GetName(playerid), playerid);
 	    AdminMSG(RED, gstr);
 	    Log(LOG_NET, gstr);
-	    
+
 		return Kick(playerid);
 	}
-	
+
 	if(PlayerData[playerid][bLoadMap])
 	{
 		KillTimer(PlayerData[playerid][tLoadMap]);
@@ -4456,12 +4456,12 @@ public OnPlayerDeath(playerid, killerid, reason)
 
  		player_notice(playerid, "Killed By", __GetName(killerid));
 		player_notice(killerid, "You Killed", __GetName(playerid));
-		
+
 		if(PlayerAchData[killerid][e_ach_grimreaper][0] == 0 && PlayerData[killerid][e_kills] >= 300)
 		{
 		    GivePlayerAchievement(killerid, e_ach_grimreaper, "Grimreaper", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
 		}
-		
+
 	 	if(reason == 4 && PlayerAchData[killerid][e_ach_silentkiller][0] == 0)
 		{
 		    GivePlayerAchievement(killerid, e_ach_silentkiller, "Silent Killer", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
@@ -4481,7 +4481,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 	        player_notice(i, "Spectated player died", "");
 		}
 	}
-	
+
 	SetPVarInt(playerid, "doingStunt", 0);
 	PlayerData[playerid][tickJoin_bmx] = 0;
 
@@ -4504,13 +4504,13 @@ public OnPlayerDeath(playerid, killerid, reason)
     	TogglePlayerControllable(playerid, true);
 		PlayerData[playerid][bFrozen] = false;
 	}
-	
+
 	switch(gTeam[playerid])
 	{
 	    case gDUEL:
 	    {
 	        new bool:found = false;
-	    
+
 			for(new i = 0; i < MAX_PLAYERS; i++)
 			{
 			    if(PlayerData[i][DuelRequestRecv] == playerid && gTeam[i] == gDUEL) // Sender lost
@@ -4519,26 +4519,26 @@ public OnPlayerDeath(playerid, killerid, reason)
 		            GetPlayerHealth(i, HP);
 		            format(gstr, sizeof(gstr), ">> DUEL: %s won the duel against %s and has %.2f HP left!", __GetName(i), __GetName(playerid), HP);
 		            SCMToAll(NEF_RED, gstr);
-		            
+
  		            gTeam[i] = FREEROAM;
 		            gTeam[playerid] = FREEROAM;
-		            
+
 		            PlayerData[i][DuelRequestRecv] = INVALID_PLAYER_ID;
 		            PlayerData[playerid][DuelRequestRecv] = INVALID_PLAYER_ID;
-		            
+
 		            PlayerData[i][DuelRequest] = INVALID_PLAYER_ID;
 		            PlayerData[playerid][DuelRequest] = INVALID_PLAYER_ID;
-		            
+
 					ResetPlayerWorld(i);
 					RandomSpawn(i, true);
 		            ResetPlayerWeapons(i);
 		            RandomWeapons(i);
-		            
+
 		            found = true;
 		            break;
 			    }
 			}
-			
+
 			if(!found)
 			{
 			    for(new i = 0; i < MAX_PLAYERS; i++)
@@ -4590,7 +4590,7 @@ public OnPlayerDeath(playerid, killerid, reason)
                 new rand = random(4);
                 SetSpawnInfoEx(playerid, NO_TEAM, GetPlayerSkin(playerid), WorldSpawns[rand][0], WorldSpawns[rand][1], WorldSpawns[rand][2] + 3.0, WorldSpawns[rand][3]);
             }
-	    
+
 	        if(IsPlayerAvail(killerid) && playerid != killerid && gTeam[killerid] == FREEROAM)
      		{
 			    PlayerData[killerid][e_wanteds]++;
@@ -4647,7 +4647,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 						SCMToAll(COLOR_RED, gstr);
 						GivePlayerScoreEx(killerid, 6, true, true);
 						GivePlayerMoneyEx(killerid, 20000, true, true);
-						
+
 						if(PlayerAchData[killerid][e_ach_masskiller][0] == 0)
 						{
 						    GivePlayerAchievement(killerid, e_ach_masskiller, "Masskiller", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
@@ -4692,11 +4692,11 @@ public OnPlayerDeath(playerid, killerid, reason)
 				}
 
 				PlayerData[playerid][e_wanteds] = 0;
-				
+
 				format(gstr, sizeof(gstr), "~y~[] ~w~%i", PlayerData[playerid][e_wanteds]);
 				PlayerTextDrawSetString(playerid, TXTWantedsTD[playerid], gstr);
-				
-			  	// Nur Kills bei FREEROAM werten fÃ¼r GangScore
+
+			  	// Nur Kills bei FREEROAM werten für GangScore
 			 	if(PlayerData[killerid][e_gangrank] > 0 && PlayerData[playerid][e_gangid] != PlayerData[killerid][e_gangid])
 				{
 				  	MySQL_UpdateGangScore(PlayerData[killerid][e_gangid], 1);
@@ -4823,7 +4823,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 				GivePlayerScoreEx(killerid, 2, true, true);
 				GivePlayerMoneyEx(killerid, 3000, true, true);
 		    }
-		    
+
 		    /*new rand = random(14);
 		    SetSpawnInfoEx(playerid, NO_TEAM, GetPlayerSkin(playerid), Sniper_Spawns[rand][0], Sniper_Spawns[rand][1], Sniper_Spawns[rand][2] + 3.5, Sniper_Spawns[rand][3]);*/
 		}
@@ -4859,10 +4859,10 @@ public OnPlayerDeath(playerid, killerid, reason)
 		    {
 		        GivePlayerScoreEx(killerid, 1, true, true);
 				GivePlayerMoneyEx(killerid, 2500, true, true);
-				
+
 				new Float:health;
 				GetPlayerHealth(killerid, health);
-				
+
 				if(health < 90)
 				{
 				    SetPlayerHealth(killerid, health + 5);
@@ -4878,7 +4878,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 		        GivePlayerScoreEx(killerid, 2, true, true);
 				GivePlayerMoneyEx(killerid, 3000, true, true);
 		    }
-		    
+
 		    if(GetPVarInt(playerid, "Robber") == 1)
 		    {
 		        SetPlayerWantedLevel(playerid, GetPlayerWantedLevel(playerid) + 1);
@@ -5027,7 +5027,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 			}
 		}
 	}
-	
+
 	new reasonMsg[32];
 	if(killerid != INVALID_PLAYER_ID)
 	{
@@ -5089,7 +5089,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 public OnPlayerEnterDynamicArea(playerid, areaid)
 {
 	if(gTeam[playerid] != FREEROAM) return 1;
-	
+
 	for(new i = 0; i < gzoneid; i++)
 	{
 	    if(GZoneInfo[i][localGang] == PlayerData[playerid][e_gangid] && GZoneInfo[i][bUnderAttack] && areaid == GZoneInfo[i][zsphere])
@@ -5155,9 +5155,9 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 				{
 				    return player_notice(playerid, "Stunt is on cooldown,", "please wait");
 				}
-				
+
 				new vehicle = 0;
-				
+
 				if((vehicle = GetPlayerVehicleID(playerid)) != 0)
 				{
 					new Float:POS[3];
@@ -5169,19 +5169,19 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 
 				GameTextForPlayer(playerid, "~r~~h~Congrats!~n~~w~You finished the bike challenge.", 6000, 5);
 				PlayerPlaySound(playerid, 1149, 0, 0, 0);
-				
+
 				format(gstr, sizeof(gstr), ""nef" {%06x}%s(%i) "PINK_E"has successfully completed /bikec.", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid);
 				SCMToAll(COLOR_WHITE, gstr);
-				
+
 				GivePlayerScoreEx(playerid, 4, true, true);
 				GivePlayerMoneyEx(playerid, 7000, true, true);
-				
+
 				InfoTD_MSG(playerid, 5000, "~r~~h~~h~Congratulations!~n~~w~You finished the bike challange~n~~r~~h~~h~4 score and $7,000!");
 				if(PlayerAchData[playerid][e_ach_biker][0] == 0)
 				{
   					GivePlayerAchievement(playerid, e_ach_biker, "Biker", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
 				}
-				
+
 				SetPVarInt(playerid, "doingStunt", 0);
 				PlayerData[playerid][tickJoin_bmx] = 0;
 				PlayerData[playerid][tickLastBIKEC] = tick;
@@ -5538,7 +5538,7 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 		case 36:
 		{
 		    if(GetPVarInt(playerid, "doingStunt") == 0) return SCM(playerid, -1, ""er"You can't use this now");
-		    
+
 			if(GetPlayerState(playerid) == PLAYER_STATE_ONFOOT)
 			{
 				CarSpawner(playerid, 481, -1, false);
@@ -5667,11 +5667,11 @@ public OnPlayerEnterRaceCheckpoint(playerid)
 				}
 			}
 
-			format(gstr, sizeof(gstr), "Â» %s(%i) has finished the race %i. in %02i:%02i.%03i", __GetName(playerid), playerid, g_rPosition, rTime[0], rTime[1], rTime[2]);
+			format(gstr, sizeof(gstr), "» %s(%i) has finished the race %i. in %02i:%02i.%03i", __GetName(playerid), playerid, g_rPosition, rTime[0], rTime[1], rTime[2]);
 			SCMToAll(YELLOW, gstr);
 			GivePlayerMoneyEx(playerid, Prize[0], true, true);
 			GivePlayerScoreEx(playerid, Prize[1], true, true);
-			
+
 			if(g_rPosition <= 5 && TotalRaceTime > 40000 && GetPlayerScoreEx(playerid) > 1000)
 			{
 			    // Wenn eh nicht unter den TOP 5,wird seine Zeit eh nicht relevant sein.
@@ -5692,8 +5692,8 @@ public OnPlayerEnterRaceCheckpoint(playerid)
 
 		    ++g_RaceFinishCount;
 			++g_CPProgress[playerid];
-			
-			if(g_RacePlayerCount == 1) // Wenn er alleine race fÃ¤hrt
+
+			if(g_RacePlayerCount == 1) // Wenn er alleine race fährt
 			{
 				return StopRace();
 			}
@@ -5863,21 +5863,21 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 			}
 		}
 	}
-	
+
 	if(pickupid == g_AdminLCBack)
 	{
 		SetPlayerPos(playerid, 1803.2450, -1303.0396, 120.2659);
 		SetPlayerInterior(playerid, 0);
 		return 1;
 	}
-	
+
 	if(pickupid == g_AdminLCTo)
 	{
 	    SetPlayerPos(playerid, -791.0734, 497.6924, 1376.1953);
 	    SetPlayerInterior(playerid, 1);
 	    return 1;
 	}
-	
+
 	if(pickupid == g_CarShopDialogPickup)
 	{
 	    if(!islogged(playerid)) return notlogged(playerid);
@@ -5893,19 +5893,19 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 	{
 		new veh = GetPlayerVehicleID(playerid),
 			Float:angle;
-			
+
 	    ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
 	  	SetVehiclePos(veh, -3945.3562,963.2668,36.3281);
 		GetVehicleZAngle(veh, angle);
 		SetVehicleZAngle(veh, angle);
 		return 1;
 	}
-	
+
 	if(pickupid == dm2pickup)
 	{
 		new veh = GetPlayerVehicleID(playerid),
 			Float:angle;
-			
+
 	    ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
 	  	SetVehiclePos(veh, -3951.6909,968.0073,65.6281);
 		GetVehicleZAngle(veh, angle);
@@ -6091,7 +6091,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 public OnObjectMoved(objectid)
 {
     new Float:POS[3];
-    
+
 	for(new i = 0; i < sizeof(Obj_FloorDoors); i++)
 	{
 		if(objectid == Obj_FloorDoors[i][0])
@@ -6165,7 +6165,7 @@ public OnPlayerModelSelection(playerid, response, listid, modelid)
 			EditAttachedObject(playerid, PlayerData[playerid][toy_selected]);
 		    ShowPlayerToyTextdraws(playerid);
 		    SCM(playerid, GREEN, "Successfully bought the toy for $10,000!");
-		    
+
 		    if(PlayerAchData[playerid][e_ach_styler][0] == 0)
 		    {
 		        GivePlayerAchievement(playerid, e_ach_styler, "Styler", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
@@ -6178,32 +6178,32 @@ public OnPlayerModelSelection(playerid, response, listid, modelid)
 	    {
 	        if(IsPlayerInAnyVehicle(playerid)) return SCM(playerid, -1, ""er"You can not be in a vehicle!");
 	        if(gTeam[playerid] != HOUSE) return SCM(playerid, -1, ""er"You need to be in your house!");
-	        
+
 			new h_id = GetHouseIdByPlayerSlotSel(playerid);
 
 			if(h_id != -1)
 			{
 			    if(GetPlayerVirtualWorld(playerid) != (HouseInfo[h_id][e_id] + 1000)) return SCM(playerid, -1, ""er"You need to be in the house you selected!");
-			    
+
 			    if(GetPlayerMoneyEx(playerid) < 5000)
 			    {
 					SCM(playerid, -1, ""er"Each house item costs $5,000");
 					return 1;
 			    }
 			    GivePlayerMoneyEx(playerid, -5000);
-		    
+
 			    new Float:POS[4], str[128];
 			    format(str, sizeof(str), "/hmenu to edit\nSlot ID: %i - Item ID: %i", PlayerData[playerid][houseobj_selected] + 1, modelid);
 				GetPlayerPos(playerid, POS[0], POS[1], POS[2]);
 				GetPlayerFacingAngle(playerid, POS[3]);
-				
+
 				POS[0] += (1.2 * floatsin(-POS[3], degrees));
 				POS[1] += (1.2 * floatcos(-POS[3], degrees));
-			    
+
 			    HouseInfo[h_id][E_Obj_Model][PlayerData[playerid][houseobj_selected]] = modelid;
 				HouseInfo[h_id][E_Obj_ObjectID][PlayerData[playerid][houseobj_selected]] = CreateDynamicObject(modelid, POS[0], POS[1], POS[2], 0.0, 0.0, 0.0, HouseInfo[h_id][e_id] + 1000, -1, -1);
 				HouseInfo[h_id][E_Obj_Label][PlayerData[playerid][houseobj_selected]] = CreateDynamic3DTextLabel(str, LIGHT_YELLOW, POS[0], POS[1], POS[2]+0.5, 3.5, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, HouseInfo[h_id][e_id] + 1000);
-				
+
 				EditDynamicObject(playerid, HouseInfo[h_id][E_Obj_ObjectID][PlayerData[playerid][houseobj_selected]]);
 
 				SCM(playerid, GREEN, "Successfully bought the house item for $5,000!");
@@ -6283,7 +6283,7 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 			}
 		}
 	}
-	
+
 	if(newstate == PLAYER_STATE_DRIVER)
 	{
 	    PlayerData[playerid][tickVehicleEnterTime] = GetTickCountEx();
@@ -6297,27 +6297,27 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 		        format(gstr, sizeof(gstr), "[SUSPECT] %i vehicle spam hack detected, kicking (%s, %i)", PlayerData[playerid][VehicleSpamViolation], __GetName(playerid), playerid);
 		        AdminMSG(RED, gstr);
 		        Log(LOG_NET, gstr);
-		        
+
 			    Kick(playerid);
 			}
 	    }
 	}
-	
+
 	if(newstate == PLAYER_STATE_DRIVER || newstate == PLAYER_STATE_PASSENGER)
 	{
 	    new vID = GetPlayerVehicleID(playerid);
-	    
+
 		if(PlayerData[playerid][bVehicleInfo])
 		{
 		    KillTimer(PlayerData[playerid][tTDhandle]);
 		}
-		
+
 		format(gstr, sizeof(gstr), "%s", GetVehicleNameById(vID));
 		PlayerTextDrawSetString(playerid, vTD[playerid], gstr);
 		PlayerTextDrawShow(playerid, vTD[playerid]);
 		PlayerData[playerid][tTDhandle] = SetTimerEx("hidevTD", 3000, false, "i", playerid);
 	}
-	
+
     if(gTeam[playerid] == DERBY)
 	{
 		if(newstate == PLAYER_STATE_DRIVER)
@@ -6392,7 +6392,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 				}
 			    return 1;
 			}
-			
+
 			if(PlayerData[playerid][bSpeedBoost])
 			{
 				if(Key(KEY_FIRE))
@@ -6403,7 +6403,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 					if(IsComponentIdCompatible(GetVehicleModel(vid), 1010)) AddVehicleComponent(vid, 1010);
 					return 1;
 		   		}
-		   		
+
 				if(Key(KEY_CROUCH))
 				{
 					new Float:POS[3], vid = GetPlayerVehicleID(playerid);
@@ -6447,7 +6447,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 		    if(!PlayerData[playerid][bGWarMode])
 		    {
 		        new cammode = GetPlayerCameraMode(playerid);
-		        
+
 		        if(cammode != 7 && cammode != 46 && cammode != 51 && cammode != 53)
 		        {
 					new Float:POS[3];
@@ -6494,7 +6494,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 	{
 	    new Float:vPos[4],
 	        rFile[32];
-	        
+
 	    if(Key(KEY_FIRE))
 	    {
 		    if(g_BuildTakeVehPos)
@@ -6553,7 +6553,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 
 				format(gstr, sizeof(gstr), "/Race/Index/Index.ini");
 				dini_IntSet(gstr, "TotalRaces", ++g_RaceCount);
-				
+
 		        ShowDialog(playerid, DIALOG_RACE_RACERDY);
 
 				RemoveFromRaceBuilder(playerid);
@@ -6594,12 +6594,12 @@ public OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y,
 
 	        player_notice(playerid, "House item position saved", "");
 	        MoveDynamicObject(objectid, x, y, z, 5.0, rx, ry, rz);
-	        
+
 	        new str[64];
 	        format(str, sizeof(str), "/hmenu to edit\nSlot ID: %i - Item ID: %i", PlayerData[playerid][houseobj_selected] + 1, HouseInfo[h_id][E_Obj_Model][PlayerData[playerid][houseobj_selected]]);
 	        DestroyDynamic3DTextLabel(HouseInfo[h_id][E_Obj_Label][PlayerData[playerid][houseobj_selected]]);
 	        HouseInfo[h_id][E_Obj_Label][PlayerData[playerid][houseobj_selected]] = CreateDynamic3DTextLabel(str, LIGHT_YELLOW, x, y, z+0.5, 3.5, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, HouseInfo[h_id][e_id] + 1000);
-	        
+
 			MySQL_SaveHouse(h_id, true);
 		}
 		else player_notice(playerid, "Couldn't find the house in that slot", "Report on forums", 5000);
@@ -6610,7 +6610,7 @@ public OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y,
 public OnPlayerEditAttachedObject(playerid, response, index, modelid, boneid, Float:fOffsetX, Float:fOffsetY, Float:fOffsetZ, Float:fRotX, Float:fRotY, Float:fRotZ, Float:fScaleX, Float:fScaleY, Float:fScaleZ)
 {
     HidePlayerToyTextdraws(playerid);
-    
+
     if(response)
     {
         player_notice(playerid, "Toy position saved", "");
@@ -6691,7 +6691,7 @@ IRCCMD:cc(botid, channel[], user[], host[], params[])
 		{
 		    SCMToAll(COLOR_SYSTEM, " ");
 		}
-		
+
 		format(gstr, sizeof(gstr), "Administrator %s(IRC) has cleared the chat!", user);
 		SCMToAll(COLOR_STEELBLUE, gstr);
 		format(gstr, sizeof(gstr), "4Server: 2Administrator %s(IRC) cleared the chat", user);
@@ -6825,9 +6825,9 @@ YCMD:bikec(playerid, params[], help)
     if(PortPlayerMap(playerid, 1102.3887,1355.4951,10.8203,276.7901, "Bike Challange", "bikec"))
     {
         CheckPlayerGod(playerid);
-        
+
 		DestroyPlayerVehicles(playerid);
-		
+
 		SetPVarInt(playerid, "doingStunt", 1);
     }
     return 1;
@@ -7050,11 +7050,11 @@ YCMD:bmx(playerid, params[], help)
     if(PortPlayerMap(playerid, 3362.586, -1939.724, 43.027, 37.0, "BMX Parkour", "bmx"))
     {
         CheckPlayerGod(playerid);
-        
+
 		DestroyPlayerVehicles(playerid);
-		
+
 		PlayerData[playerid][tickJoin_bmx] = GetTickCountEx();
-		
+
 		SetPVarInt(playerid, "doingStunt", 3);
     }
     return 1;
@@ -7545,12 +7545,12 @@ YCMD:netstats(playerid, params[], help)
 YCMD:fallout(playerid, params[], help)
 {
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't join minigames while being in a Gang War, type /exit");
-    
+
 	switch(gTeam[playerid])
 	{
 	    case STORE, BUYCAR, SPEC, VIPL, gBUILDRACE, HOUSE, JAIL: return SCM(playerid, RED, NOT_AVAIL);
 	}
-	
+
     if(gTeam[playerid] == FALLOUT) return SCM(playerid, -1, ""er"You are already in this minigame!");
     if(gTeam[playerid] != FREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
@@ -7591,15 +7591,15 @@ YCMD:fallout(playerid, params[], help)
 YCMD:derby(playerid, params[], help)
 {
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't join minigames while being in a Gang War, type /exit");
-    
+
 	switch(gTeam[playerid])
 	{
 	    case STORE, BUYCAR, SPEC, VIPL, gBUILDRACE, HOUSE, JAIL: return SCM(playerid, RED, NOT_AVAIL);
 	}
-	
+
     if(gTeam[playerid] == DERBY) return SCM(playerid, -1, ""er"You are already in this minigame!");
     if(gTeam[playerid] != FREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
-	
+
 	if(CurrentDerbyPlayers == MAX_DERBY_PLAYERS) return SCM(playerid, -1, ""er"Derby reached it's max Players!");
 
     CheckPlayerGod(playerid);
@@ -7625,7 +7625,7 @@ YCMD:derby(playerid, params[], help)
 	CurrentDerbyPlayers++;
 	SetPlayerVirtualWorld(playerid, DERBY_WORLD);
 	SetPlayerInterior(playerid, 0);
-	
+
     Streamer_ToggleItemUpdate(playerid, STREAMER_TYPE_MAP_ICON, 0);
     Streamer_ToggleItemUpdate(playerid, STREAMER_TYPE_CP, 0);
     Streamer_DestroyAllVisibleItems(playerid, STREAMER_TYPE_MAP_ICON);
@@ -7638,19 +7638,19 @@ YCMD:derby(playerid, params[], help)
 YCMD:war(playerid, params[], help)
 {
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't join minigames while being in a Gang War, type /exit");
-    
+
 	switch(gTeam[playerid])
 	{
 	    case STORE, BUYCAR, SPEC, VIPL, gBUILDRACE, HOUSE, JAIL: return SCM(playerid, RED, NOT_AVAIL);
 	}
-	
+
     if(gTeam[playerid] == WAR) return SCM(playerid, -1, ""er"You are already in this minigame!");
     if(gTeam[playerid] != FREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
     CheckPlayerGod(playerid);
-	
+
 	ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
-	
+
 	ResetPlayerWeapons(playerid);
 	switch(random(4))
 	{
@@ -7660,7 +7660,7 @@ YCMD:war(playerid, params[], help)
 	    case 3: SetPlayerPosition(playerid, 236.5930, 1918.7386, 17.6446 + 1, 145.6778);
 	}
 	ShowPlayerDMTextdraws(playerid);
-	
+
 	GivePlayerWeapon(playerid, 3, 1);
 	GivePlayerWeapon(playerid, 24, 9999999);
 	GivePlayerWeapon(playerid, 25, 9999999);
@@ -7669,15 +7669,15 @@ YCMD:war(playerid, params[], help)
 	GivePlayerWeapon(playerid, 33, 9999999);
 	GivePlayerWeapon(playerid, 17, 10);
 	GivePlayerWeapon(playerid, 10, 1);
-	
+
 	Command_ReProcess(playerid, "/stopanims", false);
 	gTeam[playerid] = WAR;
-	
+
 	SetPlayerVirtualWorld(playerid, 5);
 	SetCameraBehindPlayer(playerid);
 	SetPlayerInterior(playerid, 0);
 	SetPlayerWorldBounds(playerid, 432.0814, -81.74512, 2125.373, 1646.58);
-	
+
 	NewMinigameJoin(playerid, "WAR", "war");
 	return 1;
 }
@@ -7685,7 +7685,7 @@ YCMD:war(playerid, params[], help)
 YCMD:dm(playerid, params[], help)
 {
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't join minigames while being in a Gang War, type /exit");
-    
+
 	switch(gTeam[playerid])
 	{
 	    case STORE, BUYCAR, SPEC, VIPL, gBUILDRACE, HOUSE, JAIL: return SCM(playerid, RED, NOT_AVAIL);
@@ -7711,7 +7711,7 @@ YCMD:dm(playerid, params[], help)
 	SetPlayerFacingAngle(playerid, DM_MAP_1[rand][3]);
 	SetCameraBehindPlayer(playerid);
 	SetPlayerInterior(playerid, 0);
-	
+
 	NewMinigameJoin(playerid, "Deathmatch", "dm");
 	return 1;
 }
@@ -7723,7 +7723,7 @@ YCMD:dm2(playerid, params[], help)
 	{
 	    case STORE, BUYCAR, SPEC, VIPL, gBUILDRACE, HOUSE, JAIL: return SCM(playerid, RED, NOT_AVAIL);
 	}
-	
+
     if(gTeam[playerid] == DM && gLastMap[playerid] == DM_1) return SCM(playerid, -1, ""er"You are already in this minigame!");
     if(gTeam[playerid] != FREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
@@ -7757,7 +7757,7 @@ YCMD:dm3(playerid, params[], help)
 	{
 	    case STORE, BUYCAR, SPEC, VIPL, gBUILDRACE, HOUSE, JAIL: return SCM(playerid, RED, NOT_AVAIL);
 	}
-	
+
     if(gTeam[playerid] == DM && gLastMap[playerid] == DM_1) return SCM(playerid, -1, ""er"You are already in this minigame!");
     if(gTeam[playerid] != FREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
@@ -7778,7 +7778,7 @@ YCMD:dm3(playerid, params[], help)
 	SetPlayerFacingAngle(playerid, DM_MAP_3[rand][3]);
 	SetCameraBehindPlayer(playerid);
 	SetPlayerInterior(playerid, 0);
-	
+
 	NewMinigameJoin(playerid, "Deathmatch 3", "dm3");
 	return 1;
 }
@@ -7790,7 +7790,7 @@ YCMD:dm4(playerid, params[], help)
 	{
 	    case STORE, BUYCAR, SPEC, VIPL, gBUILDRACE, HOUSE, JAIL: return SCM(playerid, RED, NOT_AVAIL);
 	}
-	
+
     if(gTeam[playerid] == DM && gLastMap[playerid] == DM_1) return SCM(playerid, -1, ""er"You are already in this minigame!");
     if(gTeam[playerid] != FREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
@@ -7812,7 +7812,7 @@ YCMD:dm4(playerid, params[], help)
 	SetPlayerFacingAngle(playerid, DM_MAP_4[rand][3]);
 	SetCameraBehindPlayer(playerid);
 	SetPlayerInterior(playerid, 0);
-	
+
 	NewMinigameJoin(playerid, "Deathmatch 4", "dm4");
 	return 1;
 }
@@ -7867,7 +7867,7 @@ YCMD:flip(playerid, params[], help)
 {
 	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 	if(GetPlayerState(playerid) != PLAYER_STATE_DRIVER) return SCM(playerid, -1, ""er"You must be a driver in a vehicle to flip it!");
-	
+
 	new veh, Float:angle;
   	veh = GetPlayerVehicleID(playerid);
 	GetVehicleZAngle(veh, angle);
@@ -7881,7 +7881,7 @@ YCMD:s(playerid, params[], help)
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
     if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
     if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't save your position now");
-    
+
 	if(IsPlayerInAnyVehicle(playerid))
 	{
 		GetVehiclePos(GetPlayerVehicleID(playerid), PlayerData[playerid][sX], PlayerData[playerid][sY], PlayerData[playerid][sZ]);
@@ -7908,7 +7908,7 @@ YCMD:l(playerid, params[], help)
 	    player_notice(playerid, "Use /s first", "");
 		return 1;
 	}
-	
+
 	for(new i = 0; i < gzoneid; i++)
 	{
 	    if(GZoneInfo[i][bUnderAttack] && (GZoneInfo[i][localGang] == PlayerData[playerid][e_gangid] || GZoneInfo[i][AttackingGang] == PlayerData[playerid][e_gangid]))
@@ -7919,9 +7919,9 @@ YCMD:l(playerid, params[], help)
 	        }
 		}
 	}
-	
+
 	SetPlayerInterior(playerid, 0);
-	
+
 	if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
 	{
 		SetVehiclePos(GetPlayerVehicleID(playerid), PlayerData[playerid][sX], PlayerData[playerid][sY], PlayerData[playerid][sZ]+0.2);
@@ -7932,7 +7932,7 @@ YCMD:l(playerid, params[], help)
   		SetPlayerPos(playerid, PlayerData[playerid][sX], PlayerData[playerid][sY], PlayerData[playerid][sZ]+2);
 		SetPlayerFacingAngle(playerid, PlayerData[playerid][sA]);
 	}
-	
+
 	SCM(playerid, -1, ""vgreen"Saved position loaded");
 	PlayerPlaySound(playerid, 1057,0.0,0.0,0.0);
 	SetCameraBehindPlayer(playerid);
@@ -8182,7 +8182,7 @@ YCMD:enter(playerid, params[], help)
 		{
 			return SCM(playerid, -1, ""er"This house is locked");
 		}
-		
+
 	    SetPlayerInterior(playerid, HouseIntTypes[HouseInfo[i][interior]][interior]);
 		SetPlayerVirtualWorld(playerid, HouseInfo[i][e_id] + 1000);
   		SetPlayerPos(playerid, HouseIntTypes[HouseInfo[i][interior]][house_x], HouseIntTypes[HouseInfo[i][interior]][house_y], HouseIntTypes[HouseInfo[i][interior]][house_z]);
@@ -8215,12 +8215,12 @@ YCMD:sellgc(playerid, params[], help)
 	{
 	    return SCM(playerid, -1, ""er"$10,000 - $100,000,000!");
 	}
-	
+
 	if(gc < 10 || gc > 1000000)
 	{
 	    return SCM(playerid, -1, ""er"GC: 10 - $1,000,000!");
 	}
-	
+
 	if(gc > PlayerData[playerid][e_credits]) return SCM(playerid, -1, ""er"You don't have that much GC.");
 
 	if(IsPlayerAvail(player) && player != playerid)
@@ -8237,7 +8237,7 @@ YCMD:sellgc(playerid, params[], help)
 	    SCM(playerid, -1, gstr);
 	    format(gstr, sizeof(gstr), ""blue"%s(%i) is offering you their %sGC for $%s, type /buygc to accept", __GetName(playerid), playerid, number_format(gc), number_format(money));
 	    SCM(player, -1, gstr);
-	    
+
 		PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
 		PlayerPlaySound(player, 1057, 0.0, 0.0, 0.0);
 	}
@@ -8251,7 +8251,7 @@ YCMD:sellgc(playerid, params[], help)
 YCMD:buygc(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
-    
+
 	if(PlayerData[playerid][GCPlayer] == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"No one has offered you GC yet.");
     if(PlayerData[playerid][e_credits] >= 10000000) return SCM(playerid, -1, ""er"You have reached the max gc limit of 10kk.");
 
@@ -8319,7 +8319,7 @@ YCMD:bbuy(playerid, params[], help)
 	    if(BusinessData[r][e_ormid] == ORM:-1) continue;
 	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, BusinessData[r][e_pos][0], BusinessData[r][e_pos][1], BusinessData[r][e_pos][2])) continue;
 		bFound = true;
-		
+
 		if(BusinessData[r][e_sold] != 0) {
 		    player_notice(playerid, "Business not for sale", "");
 		    break;
@@ -8336,28 +8336,28 @@ YCMD:bbuy(playerid, params[], help)
 			SCM(playerid, -1, ""er"You need at least $1,250,000 to start a business");
 			break;
 		}
-		
+
 		strmid(BusinessData[r][e_owner], __GetName(playerid), 0, MAX_PLAYER_NAME + 1, MAX_PLAYER_NAME + 1);
 		BusinessData[r][e_sold] = 1;
 		BusinessData[r][e_date] = gettime();
-		
+
 		DestroyDynamic3DTextLabel(BusinessData[r][e_label_id]);
 		DestroyDynamicPickup(BusinessData[r][e_pickup_id]);
 		DestroyDynamicMapIcon(BusinessData[r][e_icon_id]);
 		BusinessData[r][e_icon_id] = -1;
-		
+
 		SetupBusiness(r);
-		
+
 		PlayerData[playerid][tickLastPBuy] = tick;
-		
+
 		player_notice(playerid, "SUCCESS!", "");
         PlayerPlaySound(playerid, 1149, 0.0, 0.0, 0.0);
         GivePlayerMoneyEx(playerid, -1250000);
         MySQL_SaveAccount(playerid, false, false);
-		
+
 	    format(gstr, sizeof(gstr), ""nef" "yellow_e"%s(%i) bought the business %i!", __GetName(playerid), playerid, BusinessData[r][e_id]);
 	    SCMToAll(-1, gstr);
-		
+
 		orm_update(BusinessData[r][e_ormid]);
 		break;
 	}
@@ -8394,7 +8394,7 @@ YCMD:bsell(playerid, params[], help)
 			SCM(playerid, -1, ""er"You don't own this business");
 			break;
 		}
-		
+
 	    strmid(BusinessData[r][e_owner], "NoData", 0, MAX_PLAYER_NAME + 1, MAX_PLAYER_NAME + 1);
 	    BusinessData[r][e_sold] = 0;
         BusinessData[r][e_level] = 1;
@@ -8406,13 +8406,13 @@ YCMD:bsell(playerid, params[], help)
         SetupBusiness(r);
 
 	    PlayerData[playerid][tickLastPSell] = tick;
-	    
+
 	    player_notice(playerid, "SUCCESS!", "");
 	    PlayerPlaySound(playerid, 1149, 0.0, 0.0, 0.0);
-	    
+
 	    format(gstr, sizeof(gstr), ""nef" "yellow_e"%s(%i) sold the business %i!", __GetName(playerid), playerid, BusinessData[r][e_id]);
 	    SCMToAll(-1, gstr);
-	    
+
 	    orm_update(BusinessData[r][e_ormid]);
 	    break;
 	}
@@ -8425,7 +8425,7 @@ YCMD:buy(playerid, params[], help)
 {
 	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
     if(!islogged(playerid)) return notlogged(playerid);
-    
+
 	new tick = GetTickCountEx();
 	if(PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 	{
@@ -8434,7 +8434,7 @@ YCMD:buy(playerid, params[], help)
 	    	return player_notice(playerid, "Command is on cooldown!", "");
 		}
 	}
-	
+
 	new bool:found = false;
 	for(new i = 0; i < houseid; i++)
 	{
@@ -8497,7 +8497,7 @@ YCMD:sell(playerid, params[], help)
 {
 	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
     if(!islogged(playerid)) return notlogged(playerid);
-    
+
 	new tick = GetTickCountEx();
 	if(PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 	{
@@ -8506,7 +8506,7 @@ YCMD:sell(playerid, params[], help)
 	    	return player_notice(playerid, "Command is on cooldown!", "");
 		}
 	}
-	
+
     new bool:found = false;
 	for(new i = 0; i < houseid; i++)
 	{
@@ -8564,7 +8564,7 @@ YCMD:sell(playerid, params[], help)
 YCMD:unlock(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
-    
+
     if(gTeam[playerid] == FREEROAM)
     {
 		if(GetPlayerState(playerid) == PLAYER_STATE_PASSENGER || GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
@@ -8576,7 +8576,7 @@ YCMD:unlock(playerid, params[], help)
 	      			for(new i = 0; i < MAX_PLAYERS; i++)
 				    {
 				        if(i == playerid) continue;
-				        
+
 				        SetVehicleParamsForPlayer(GetPlayerVehicleID(playerid), i, 0, 0);
 				        PlayerPlaySound(playerid, 1027, 0.0, 0.0, 0.0);
 				    }
@@ -8637,7 +8637,7 @@ YCMD:close(playerid, params[], help)
 YCMD:lock(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
-    
+
     if(gTeam[playerid] == FREEROAM)
     {
 		if(GetPlayerState(playerid) == PLAYER_STATE_PASSENGER || GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
@@ -8696,7 +8696,7 @@ YCMD:lock(playerid, params[], help)
 					SCM(playerid, -1, ""er"This isn't your House!");
 					break;
 				}
-				
+
 				if(!HouseInfo[i][locked])
 					GameTextForPlayer(playerid, "~b~House ~r~locked", 2000, 3);
 				else
@@ -8721,12 +8721,12 @@ YCMD:lock(playerid, params[], help)
 YCMD:gungame(playerid, params[], help)
 {
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't join minigames while being in a Gang War, type /exit");
-    
+
 	switch(gTeam[playerid])
 	{
 	    case STORE, BUYCAR, SPEC, VIPL, gBUILDRACE, HOUSE, JAIL: return SCM(playerid, RED, NOT_AVAIL);
 	}
-	
+
     if(gTeam[playerid] == GUNGAME) return SCM(playerid, -1, ""er"You are already in this minigame!");
     if(gTeam[playerid] != FREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
@@ -8770,9 +8770,9 @@ YCMD:cnr(playerid, params[], help)
 
 	if(gTeam[playerid] != FREEROAM)
 		return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
-	
+
 	new robbers = 0, cops = 0;
-	
+
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(PlayerData[i][bwCNRFraction] & CNR_COP || PlayerData[i][bwCNRFraction] & CNR_SWAT || PlayerData[i][bwCNRFraction] & CNR_ARMY)
@@ -8783,7 +8783,7 @@ YCMD:cnr(playerid, params[], help)
 
 	new string[512];
 	format(string, sizeof(string), ""YELLOW_E"Choose your side", ""LB_E"Cops\t\t"GREY_E"LVPD\t\t(Players: %i)\n"ORANGE_E"Robbers\t"GREY_E"LV Mafia\t\t(Players: %i)\n"RED_E"Pro Robbers\t"GREY_E"Mafia Commanders\n"PURPLE_E"Army\t\t"GREY_E"Army Task Force\n"BLUE_E"Swat\t\t"GREY_E"LVPD Commanders", cops, robbers);
-	
+
 	ShowPlayerDialog(playerid, CNR_DIALOG, DIALOG_STYLE_LIST, ""YELLOW_E"Choose your side", string, "Select", "Cancel");
 	return 1;
 }
@@ -8811,10 +8811,10 @@ YCMD:duel(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't join duels while being in a Gang War, type /exit");
-    
+
     if(gTeam[playerid] == gDUEL) return SCM(playerid, -1, ""er"You are already dueling!");
     if(gTeam[playerid] != FREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
-    
+
     new player;
     if(sscanf(params, "r", player))
     {
@@ -8840,38 +8840,38 @@ YCMD:duel(playerid, params[], help)
 		        	PlayerData[i][DuelRequestRecv] = INVALID_PLAYER_ID;
 			    }
 			}
-			
+
 			CheckPlayerGod(playerid);
 			CheckPlayerGod(PlayerData[playerid][DuelRequestRecv]);
-            
+
             ResetPlayerWeapons(playerid);
             ResetPlayerWeapons(PlayerData[playerid][DuelRequestRecv]);
-            
+
             GivePlayerWeapon(playerid, PlayerData[PlayerData[playerid][DuelRequestRecv]][DuelWeapon], 700000);
             GivePlayerWeapon(PlayerData[playerid][DuelRequestRecv], PlayerData[PlayerData[playerid][DuelRequestRecv]][DuelWeapon], 700000);
-            
+
             SetPlayerVirtualWorld(playerid, playerid + 10000);
             SetPlayerVirtualWorld(PlayerData[playerid][DuelRequestRecv], playerid + 10000);
-            
+
             SetPlayerPos(playerid, DuelMaps[PlayerData[PlayerData[playerid][DuelRequestRecv]][DuelLocation] - 1][0][0], DuelMaps[PlayerData[PlayerData[playerid][DuelRequestRecv]][DuelLocation] - 1][0][1], DuelMaps[PlayerData[PlayerData[playerid][DuelRequestRecv]][DuelLocation] - 1][0][2]);
             SetPlayerPos(PlayerData[playerid][DuelRequestRecv], DuelMaps[PlayerData[PlayerData[playerid][DuelRequestRecv]][DuelLocation] - 1][1][0], DuelMaps[PlayerData[PlayerData[playerid][DuelRequestRecv]][DuelLocation] - 1][1][1], DuelMaps[PlayerData[PlayerData[playerid][DuelRequestRecv]][DuelLocation] - 1][1][2]);
 
             SetPlayerFacingAngle(playerid, DuelMaps[PlayerData[PlayerData[playerid][DuelRequestRecv]][DuelLocation] - 1][0][3]);
             SetPlayerFacingAngle(PlayerData[playerid][DuelRequestRecv], DuelMaps[PlayerData[PlayerData[playerid][DuelRequestRecv]][DuelLocation] - 1][1][3]);
-            
+
             SetCameraBehindPlayer(playerid);
             SetCameraBehindPlayer(PlayerData[playerid][DuelRequestRecv]);
-            
+
 			// Closing open dialogs in order to avoid some exploits.
 			ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
 			ShowPlayerDialog(PlayerData[playerid][DuelRequestRecv], -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
-            
+
             gTeam[playerid] = gDUEL;
             gTeam[PlayerData[playerid][DuelRequestRecv]] = gDUEL;
-            
+
             PlayerData[playerid][DuelRequest] = INVALID_PLAYER_ID;
             PlayerData[PlayerData[playerid][DuelRequestRecv]][DuelRequestRecv] = INVALID_PLAYER_ID;
-            
+
             format(gstr, sizeof(gstr), ">> Duel started between %s and %s!", __GetName(PlayerData[playerid][DuelRequestRecv]), __GetName(playerid));
             SCMToAll(NEF_RED, gstr);
         }
@@ -8885,11 +8885,11 @@ YCMD:duel(playerid, params[], help)
 			{
 	        	format(gstr, sizeof(gstr), ">> %s(%i) cancelled the duel request!", __GetName(playerid), playerid);
 	        	SCM(i, NEF_RED, gstr);
-	        	
+
 	        	PlayerData[i][DuelRequestRecv] = INVALID_PLAYER_ID;
 			}
         }
-        
+
 		PlayerData[playerid][DuelRequest] = player;
 		ShowDialog(playerid, DIALOG_DUEL);
     }
@@ -8899,15 +8899,15 @@ YCMD:duel(playerid, params[], help)
 YCMD:tdm(playerid, params[], help)
 {
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't join minigames while being in a Gang War, type /exit");
-    
+
 	switch(gTeam[playerid])
 	{
 	    case STORE, BUYCAR, SPEC, VIPL, gBUILDRACE, HOUSE, JAIL: return SCM(playerid, RED, NOT_AVAIL);
 	}
-	
+
     if(gTeam[playerid] == gBG_VOTING || gTeam[playerid] == gBG_TEAM1 || gTeam[playerid] == gBG_TEAM2) return SCM(playerid, -1, ""er"You are already in this minigame!");
     if(gTeam[playerid] != FREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
-	
+
     CheckPlayerGod(playerid);
     Command_ReProcess(playerid, "/stopanims", false);
 	SetPlayerVirtualWorld(playerid, BG_WORLD);
@@ -9097,7 +9097,7 @@ YCMD:tdm(playerid, params[], help)
 		    gTeam[playerid] = gBG_TEAM1;
 		}
 	}
-	
+
 	NewMinigameJoin(playerid, "TDM", "tdm");
 	return 1;
 }
@@ -9115,15 +9115,15 @@ YCMD:adminhelp(playerid, params[], help)
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[2][e_rank]);
 		strcat(string, gstr);
 		strcat(string, "/online /offline /onduty /offduty /akill /rv /day /togglegc\n/burn /move /tban /ban /cuff /uncuff /jail /unjail /unfreeze /readrules\n\n");
-		
+
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[3][e_rank]);
 		strcat(string, gstr);
 		strcat(string, "/freeze /eject /go /getip /get /mkick /clearchat /iplookup /dawn\n/night /giveweapon /connectbots /raceforcemap /deleterecord /nstats\n\n");
-		
+
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[4][e_rank]);
 		strcat(string, gstr);
 		strcat(string, "/unban /oban /sethealth /healall /announce /armorall /cashfall\n/scorefall /announce2\n\n");
-		
+
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[5][e_rank]);
 		strcat(string, gstr);
 		strcat(string, "/onlinefix /setcash /setbcash /setscore /gdestroy /addcash /addscore\n/resetrc /resethouse /resetbizz /sethouseprice /sethousescore\n/setbizzlevel /createhouse /createbizz /createstore /gzonecreate");
@@ -9145,7 +9145,7 @@ YCMD:togglegc(playerid, params[], help)
 			player_notice(playerid, "You have been detached from [GC] channel", "");
 		else
 		    player_notice(playerid, "You have been added from [GC] channel", "");
-		    
+
 		PlayerData[playerid][bHideGC] = !PlayerData[playerid][bHideGC];
 	}
   	else
@@ -9172,7 +9172,7 @@ YCMD:minigun(playerid, params[], help)
 	new rand = random(10);
 	SetPlayerPos(playerid, Minigun_Spawns[rand][0], Minigun_Spawns[rand][1], Minigun_Spawns[rand][2] + 2.5);
 	SetPlayerFacingAngle(playerid, Minigun_Spawns[rand][3]);
-	
+
     NewMinigameJoin(playerid, "Minigun", "minigun");
     return 1;
 }
@@ -9270,7 +9270,7 @@ YCMD:ff(playerid, params[], help)
 {
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
 	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
-	
+
 	new Float:height;
 	if(sscanf(params, "f", height))
 	{
@@ -9304,7 +9304,7 @@ YCMD:setspawn(playerid, params[], help)
     if(gTeam[playerid] != FREEROAM) return SCM(playerid, GREY, NOT_AVAIL);
     if(GetPlayerInterior(playerid) != 0) return SCM(playerid, GREY, ""er"Wrong interior");
     if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't use this command now");
-    
+
     GetPlayerPos(playerid, PlayerData[playerid][CSpawnX], PlayerData[playerid][CSpawnY], PlayerData[playerid][CSpawnZ]);
     GetPlayerFacingAngle(playerid, PlayerData[playerid][CSpawnA]);
     PlayerData[playerid][bHasSpawn] = true;
@@ -9329,13 +9329,13 @@ YCMD:stopradio(playerid, params[], help)
 YCMD:hitman(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
-    
+
 	new tick = GetTickCountEx();
 	if(PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 	{
 		if((PlayerData[playerid][tickLastHitman] + COOLDOWN_CMD_HITMAN) >= tick) return player_notice(playerid, "Command is on cooldown!", "");
 	}
-	
+
 	new amount, player;
 	if(sscanf(params, "ri", player, amount))
 	{
@@ -9367,7 +9367,7 @@ YCMD:hitman(playerid, params[], help)
 		{
 			new zone[MAX_ZONE_NAME];
 		    GetPlayer2DZone(player, zone, sizeof(zone));
-		    
+
 		    if(PlayerData[player][HitmanHit] == 0)
 		    {
 		        PlayerData[player][HitmanHit] += amount;
@@ -9390,7 +9390,7 @@ YCMD:hitman(playerid, params[], help)
 				format(gstr, sizeof(gstr), "You've placed a bounty on %s(%i) for $%s", __GetName(player), player, number_format(amount));
 				SCM(playerid, YELLOW, gstr);
 		    }
-		    
+
 			PlayerData[playerid][tickLastHitman] = tick;
 			GivePlayerMoneyEx(playerid, -amount);
 		}
@@ -9420,7 +9420,7 @@ YCMD:akill(playerid, params[], help)
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 
 	    if(gTeam[player] != FREEROAM) return SCM(playerid, -1, ""er"Can't kill player because he is in a minigame");
-	    
+
  		if(IsPlayerAvail(player))
 		{
 		    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
@@ -9428,7 +9428,7 @@ YCMD:akill(playerid, params[], help)
 			SCM(player, YELLOW, gstr);
 
 			SetPlayerHealth(player, 0.0);
-			
+
 			format(gstr, sizeof(gstr), ""red"Adm: %s(%i) killed %s(%i)", __GetName(playerid), playerid, __GetName(player), player);
 			AdminMSG(-1, gstr);
 			print(gstr);
@@ -9457,9 +9457,9 @@ YCMD:sethealth(playerid, params[], help)
 
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
-    
+
 	    if(amount > 100) return SCM(playerid, -1, ""er"Do not set it higher than 100");
-	    
+
  		if(IsPlayerAvail(player))
 		{
 		    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
@@ -9498,10 +9498,10 @@ YCMD:setbcash(playerid, params[], help)
 	    {
 	        return SCM(playerid, NEF_GREEN, "Usage: /setbcash <playerid> <amount>");
 	    }
-	    
+
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
-    
+
     	if(amount < 0 || amount > 50000000)
 		{
 			return SCM(playerid, -1, ""er"$0 - $50,000,000");
@@ -9524,11 +9524,11 @@ YCMD:setbcash(playerid, params[], help)
 				format(gstr, sizeof(gstr), "You have set your bank cash to $%s.", number_format(amount));
 				SCM(playerid, YELLOW, gstr);
 			}
-			
+
 			format(gstr, sizeof(gstr), ""red"Adm: %s(%i) has been given bank $%i by %s(%i)", __GetName(player), player, amount, __GetName(playerid), playerid);
 			AdminMSG(-1, gstr);
 			print(gstr);
-			
+
 			PlayerData[player][e_bank] = amount;
 		}
 		else
@@ -9560,7 +9560,7 @@ YCMD:grantnc(playerid, params[], help)
 
 		if(IsPlayerAvail(player))
 		{
-		
+
 		    PlayerData[player][e_lastnc] = gettime() - 7786000;
 
 			if(player != playerid)
@@ -9620,7 +9620,7 @@ YCMD:suspect(playerid, params[], help)
 				}
 			}
 		}
-		
+
 		if(count > 0) {
 		    ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Suspect AC", finstring, "OK", "");
 		} else {
@@ -9639,7 +9639,7 @@ YCMD:onlinefix(playerid, params[], help)
 	if(PlayerData[playerid][e_level] >= MAX_ADMIN_LEVEL)
 	{
 	    mysql_query(pSQL, "TRUNCATE TABLE `online`;", false);
-	    
+
 	    for(new i = 0; i < MAX_PLAYERS; i++)
 	    {
 	        if(IsPlayerConnected(i))
@@ -9648,7 +9648,7 @@ YCMD:onlinefix(playerid, params[], help)
 				mysql_tquery(pSQL, gstr, "", "");
 	        }
 	    }
-	    
+
 	    SCM(playerid, -1, ""er"Table has been reloaded.");
 	}
 	else
@@ -9667,10 +9667,10 @@ YCMD:setcash(playerid, params[], help)
 	    {
 	        return SCM(playerid, NEF_GREEN, "Usage: /setcash <playerid> <amount>");
 	    }
-	    
+
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
-    
+
     	if(amount < 0 || amount > 50000000)
 		{
 			return SCM(playerid, -1, ""er"$0 - $50,000,000");
@@ -9693,11 +9693,11 @@ YCMD:setcash(playerid, params[], help)
 				format(gstr, sizeof(gstr), "You have set your cash to $%s.", number_format(amount));
 				SCM(playerid, YELLOW, gstr);
 			}
-			
+
 			format(gstr, sizeof(gstr), ""red"Adm: %s's(%i) cash has been set to $%i by %s(%i)", __GetName(player), player, amount, __GetName(playerid), playerid);
 			AdminMSG(-1, gstr);
 			print(gstr);
-			
+
 			SetPlayerMoneyEx(player, amount);
 		}
 		else
@@ -9829,10 +9829,10 @@ YCMD:setscore(playerid, params[], help)
 	    {
 	        return SCM(playerid, NEF_GREEN, "Usage: /setscore <playerid> <score>");
 	    }
-	    
+
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
-    
+
     	if(amount < 0 || amount > 1000000)
 		{
 			return SCM(playerid, -1, ""er"Score: 0 - 1,000,000");
@@ -9855,11 +9855,11 @@ YCMD:setscore(playerid, params[], help)
 				format(gstr, sizeof(gstr), "You have set your score to %i.", amount);
 				SCM(playerid, YELLOW, gstr);
 			}
-			
+
 			format(gstr, sizeof(gstr), ""red"Adm: %s(%i) has set %s(%i) score to %i", __GetName(playerid), playerid, __GetName(player), player, amount);
 			AdminMSG(-1, gstr);
 			print(gstr);
-			
+
 			SetPlayerScoreEx(player, amount);
 		}
 	 	else
@@ -9967,7 +9967,7 @@ YCMD:eject(playerid, params[], help)
 		{
 			return SCM(playerid, NEF_GREEN, "Usage: /eject <playerid>");
 	  	}
-	  	
+
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 
@@ -10035,11 +10035,11 @@ YCMD:burn(playerid, params[], help)
 		    }
 			if(!DerbyWinner[player] && gTeam[player] == DERBY) return SCM(playerid, -1, ""er"You can't use this command on that player now");
 			if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
-		    
+
 		    new Float:POS[3];
 			GetPlayerPos(player, POS[0], POS[1], POS[2]);
 			CreateExplosion(POS[0] + 0.02, POS[1] + 0.3, POS[2] + 3, 1, 10.0);
-			
+
 			format(gstr, sizeof(gstr), "You have burnt %s(%i)", __GetName(player), player);
 			SCM(playerid, BLUE, gstr);
 			format(gstr, sizeof(gstr), ""red"Adm: %s(%i) has been burnt by %s(%i)", __GetName(player), player, __GetName(playerid), playerid);
@@ -10076,12 +10076,12 @@ YCMD:getip(playerid, params[], help)
 			return SCM(playerid, -1, ""er"You cannot use this command on this admin");
 		}
 		if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
-		
+
         if(IsPlayerAvail(player))
 		{
 			format(gstr, sizeof(gstr), "%s's ip is %s", __GetName(player), __GetIP(player));
 			SCM(playerid, BLUE, gstr);
-			
+
 			rdns(__GetIP(player), playerid);
 	    }
 		else
@@ -10130,10 +10130,10 @@ YCMD:nstats(playerid, params[], help)
 			    NetStats_PacketLossPercent(player),
 			    "%%",
 			    NetStats_ConnectionStatus(player));
-			    
+
 			NetStats_GetIpPort(playerid, ip_port, sizeof(ip_port));
 			strcat(string, ip_port);
-			
+
 			ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Network Stats", string, "OK", "");
 	    }
 		else
@@ -10158,7 +10158,7 @@ YCMD:iplookup(playerid, params[], help)
 	    }
 
 	    if(strlen(gstr) > 16 || strlen(gstr) < 7) return SCM(playerid, -1, ""er"This is not an IP");
-	    
+
 	    new escape[17];
 	    mysql_escape_string(gstr, escape, pSQL, sizeof(escape));
 
@@ -10180,7 +10180,7 @@ YCMD:iplookup(playerid, params[], help)
 YCMD:car(playerid, params[], help)
 {
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
-    
+
 	if(gTeam[playerid] == FREEROAM)
 	{
 	    if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't spawn a car now");
@@ -10202,7 +10202,7 @@ YCMD:locate(playerid, params[], help)
 	{
 		return SCM(playerid, NEF_GREEN, "Usage: /locate <playerid>");
   	}
-  	
+
     if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 	if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 
@@ -10229,11 +10229,11 @@ YCMD:id(playerid, params[], help)
 	{
 		return SCM(playerid, NEF_GREEN, "Usage: /id <nick/part of nick>");
 	}
-	
+
 	new found, playername[MAX_PLAYER_NAME + 1];
 	format(gstr, sizeof(gstr), "Searched for: %s", params);
 	SCM(playerid, GREEN, gstr);
-	
+
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if(IsPlayerAvail(i) && PlayerData[playerid][bOnlineAdmin])
@@ -10266,7 +10266,7 @@ YCMD:asay(playerid, params[], help)
 	    {
 	        return SCM(playerid, NEF_GREEN, "Usage: /asay <message>");
 	    }
-	    
+
 	    if(strlen(text) > 100 || strlen(text) < 3) return SCM(playerid, -1, ""er"Length: 3-100");
 
 		format(gstr, sizeof(gstr), ""yellow"** "red"Admin %s(%i): %s", __GetName(playerid), playerid, text);
@@ -10287,7 +10287,7 @@ YCMD:announce(playerid, params[], help)
 	    {
 	        return SCM(playerid, NEF_GREEN, "Usage: /announce <message>");
 	    }
-	    
+
 	    if(strfind(text, "~", true) != -1) return SCM(playerid, -1, ""er"'~' is not allowed in announce.");
 	    if(strfind(text, "#", true) != -1) return SCM(playerid, -1, ""er"'#' is not allowed in announce.");
 	    if(strfind(text, "%", true) != -1) return SCM(playerid, -1, ""er"'%' is not allowed in announce.");
@@ -10406,7 +10406,7 @@ YCMD:go(playerid, params[], help)
 			{
 				return SCM(playerid, NEF_GREEN, "Usage: /go <playerid>");
 		  	}
-		  	
+
 			if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 			if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 			if(!IsPlayerAvail(player)) return SCM(playerid, -1, ""er"Player is not avialable");
@@ -10423,7 +10423,7 @@ YCMD:go(playerid, params[], help)
 			GetPlayerPos(player, POS[0], POS[1], POS[2]);
 			SetPlayerInterior(playerid, GetPlayerInterior(player));
 	        SetPlayerVirtualWorld(playerid, GetPlayerVirtualWorld(player));
-	        
+
 			if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
 			{
 				SetVehiclePos(GetPlayerVehicleID(playerid), floatadd(POS[0], 3), POS[1], POS[2]);
@@ -10434,7 +10434,7 @@ YCMD:go(playerid, params[], help)
 			{
 				SetPlayerPos(playerid, floatadd(POS[0], 2), POS[1], POS[2]);
 			}
-			
+
 			format(gstr, sizeof(gstr), "You have teleported to %s(%i)!", __GetName(player), player);
 			SCM(playerid, BLUE, gstr);
 			format(gstr, sizeof(gstr), "%s(%i) has teleported to you!", __GetName(playerid), playerid);
@@ -10461,7 +10461,7 @@ YCMD:go(playerid, params[], help)
 		if(gTeam[player] != FREEROAM) return SCM(playerid, -1, ""er"Player is currently unavailable to goto");
 		if(player == playerid) return SCM(playerid, -1, ""er"You may not teleport to yourself");
 		if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
-		
+
 		new Float:POS[3];
 		GetPlayerPos(player, POS[0], POS[1], POS[2]);
 		SetPlayerInterior(playerid, GetPlayerInterior(player));
@@ -10497,11 +10497,11 @@ YCMD:cuff(playerid, params[], help)
 		{
 			return SCM(playerid, NEF_GREEN, "Usage: /cuff <playerid>");
 	  	}
-	  	
+
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 		if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
-		
+
 		if(IsPlayerAvail(player))
 		{
 	        SetPlayerSpecialAction(player, SPECIAL_ACTION_CUFFED);
@@ -10533,11 +10533,11 @@ YCMD:uncuff(playerid, params[], help)
 		{
 			return SCM(playerid, NEF_GREEN, "Usage: /uncuff <playerid>");
 	  	}
-	  	
+
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 		if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
-		
+
 		if(IsPlayerAvail(player))
 		{
 	        SetPlayerSpecialAction(player, SPECIAL_ACTION_NONE);
@@ -10568,28 +10568,28 @@ YCMD:get(playerid, params[], help)
 		{
 			return SCM(playerid, NEF_GREEN, "Usage: /get <playerid>");
 	  	}
-	  	
+
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 		if(gTeam[playerid] != FREEROAM) return SCM(playerid, -1, ""er"Not useable in minigames");
 		if(PlayerData[player][bIsDead]) return SCM(playerid, -1, ""er"Cannot teleport dead players");
 		if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
-		
+
 		if(PlayerData[player][e_level] == MAX_ADMIN_LEVEL && PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 		{
 			return SCM(playerid, -1, ""er"You cannot use this command on this admin");
 		}
-		
+
 	 	if(IsPlayerAvail(player) && player != playerid && gTeam[player] == FREEROAM)
 	 	{
 	 	    if(PlayerData[player][bIsDead]) return SCM(playerid, -1, ""er"Cannot teleport dead players");
-	 	    
+
 			new Float:POS[3];
 
 			GetPlayerPos(playerid, POS[0], POS[1], POS[2]);
 			SetPlayerInterior(player, GetPlayerInterior(playerid));
 			SetPlayerVirtualWorld(player, GetPlayerVirtualWorld(playerid));
-			
+
 			if(GetPlayerState(player) == PLAYER_STATE_DRIVER)
 			{
 			    new VehicleID = GetPlayerVehicleID(player);
@@ -10603,7 +10603,7 @@ YCMD:get(playerid, params[], help)
 			}
 			SetPVarInt(player, "doingStunt", 0);
 			PlayerData[player][tickJoin_bmx] = 0;
-			
+
 			format(gstr, sizeof(gstr), "You have been teleported to Admin %s's location", __GetName(playerid));
 			SCM(player, BLUE, gstr);
 			format(gstr, sizeof(gstr), "You have teleported %s(%i) to your location", __GetName(player), player);
@@ -10633,7 +10633,7 @@ YCMD:ncrecords(playerid, params[], help)
 	{
 		if(strlen(gstr) > MAX_PLAYER_NAME)
 		    return SCM(playerid, -1, ""er"Invalid player name length");
-	
+
 		format(gstr2, sizeof(gstr2), "SELECT * FROM `ncrecords` WHERE `OldName` = '%s' OR `NewName` = '%s';", gstr, gstr);
 		mysql_tquery(pSQL, gstr2, "OnNCReceive2", "is", playerid, gstr);
 	}
@@ -10649,7 +10649,7 @@ YCMD:warn(playerid, params[], help)
 		{
 			return SCM(playerid, NEF_GREEN, "Usage: /warn <playerid> <reason>");
 		}
-		
+
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 
@@ -10657,12 +10657,12 @@ YCMD:warn(playerid, params[], help)
 		{
 	 		return SCM(playerid, -1, ""er"You cannot use this command on this admin");
 		}
-		
+
 	 	if(IsPlayerAvail(player) && player != playerid)
 	 	{
 	 	    if(PlayerData[player][bOpenSeason]) return SCM(playerid, -1, ""er"Can't warn this player!");
 	 	    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
-	 	
+
 			PlayerData[player][Warnings]++;
 			if(PlayerData[player][Warnings] == MAX_WARNINGS)
 			{
@@ -10670,7 +10670,7 @@ YCMD:warn(playerid, params[], help)
 				SCMToAll(-1, gstr);
 				print(gstr);
 				KickEx(player);
-				
+
 	   			format(gstr, sizeof(gstr), "4Server: 2%s has been kicked. 1[Reason: %s] [Warning: %i/%i]", __GetName(player), reason, PlayerData[player][Warnings], MAX_WARNINGS);
 				IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 			}
@@ -10678,7 +10678,7 @@ YCMD:warn(playerid, params[], help)
 			{
 				format(gstr, sizeof(gstr), ""yellow"** "red"Admin %s(%i) has given %s(%i) a warning. [Reason: %s] [Warning: %i/%i]", __GetName(playerid), playerid, __GetName(player), player, reason, PlayerData[player][Warnings], MAX_WARNINGS);
 				SCMToAll(-1, gstr);
-				
+
 	   			format(gstr, sizeof(gstr), "4Server: 2Admin %s(%i) has given %s(%i) a warning. [Reason: %s] [Warning: %i/%i]", __GetName(playerid), playerid, __GetName(player), player, reason, PlayerData[player][Warnings], MAX_WARNINGS);
 				IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 			}
@@ -10706,10 +10706,10 @@ YCMD:mkick(playerid, params[], help)
 	        SCM(playerid, NEF_GREEN, "Kicks someone out of a minigame, spectate system, house or shop");
 	        return 1;
 		}
-		
+
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
-		
+
  	 	if(IsPlayerAvail(player) && player != playerid && PlayerData[player][e_level] != MAX_ADMIN_LEVEL)
 	 	{
 	 	    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
@@ -10747,10 +10747,10 @@ YCMD:ping(playerid, params[], help)
 	{
         return SCM(playerid, NEF_GREEN, "Usage: /ping <playerid>");
 	}
-	
+
     if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 	if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
-	
+
 	format(gstr, sizeof(gstr), ""nef_green"%s's(%i) ping is %i", __GetName(player), player, GetPlayerPing(player));
 	SCM(playerid, -1, gstr);
 	return 1;
@@ -10759,7 +10759,7 @@ YCMD:ping(playerid, params[], help)
 YCMD:avgping(playerid, params[], help)
 {
 	new pings, players;
-	
+
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(IsPlayerConnected(i))
@@ -10768,9 +10768,9 @@ YCMD:avgping(playerid, params[], help)
 			pings += GetPlayerPing(i);
 	    }
 	}
-	
+
 	new avg = pings / players;
-	
+
 	format(gstr, sizeof(gstr), ""nef_green"Average ping of %i players: %i", players, avg);
 	SCM(playerid, -1, gstr);
 	return 1;
@@ -10783,9 +10783,9 @@ YCMD:time(playerid, params[], help)
 	{
         return SCM(playerid, NEF_GREEN, "Usage: /time <hour> <minute>");
 	}
-	
+
 	SetPlayerTime(playerid, hour, minute);
-	
+
     SCM(playerid, NEF_GREEN, "-> "PINK_E"Time set! Use /rtime to reset your time!");
 	return 1;
 }
@@ -10794,7 +10794,7 @@ YCMD:rtime(playerid, params[], help)
 {
 	SetPlayerTime(playerid, 12, 0);
 	SetPlayerWeather(playerid, 1);
-	
+
     SCM(playerid, NEF_GREEN, "-> "PINK_E"Time reset to day!");
 	return 1;
 }
@@ -10808,10 +10808,10 @@ YCMD:caps(playerid, params[], help)
 		{
 			return SCM(playerid, NEF_GREEN, "Usage: /caps <playerid>");
 		}
-		
+
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
-		
+
  	 	if(IsPlayerAvail(player))
 	 	{
 	 	    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
@@ -10911,7 +10911,7 @@ YCMD:kick(playerid, params[], help)
 			    PlayerData[playerid][iKickBanIssued]++;
 			}
 	    }
-	    
+
  		new player, reason[144];
 		if(sscanf(params, "rs[143]", player, reason))
 		{
@@ -10920,21 +10920,21 @@ YCMD:kick(playerid, params[], help)
 
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
-		
+
 		if(isnull(reason)) return SCM(playerid, NEF_GREEN, "Usage: /kick <playerid> <reason>");
-		
+
 		if(PlayerData[player][bOpenSeason]) return SCM(playerid, -1, ""er"Can't kick this player!");
 		if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
-		
+
 		if(IsPlayerAvail(player) && player != playerid && PlayerData[player][e_level] != MAX_ADMIN_LEVEL)
 		{
 			format(gstr, sizeof(gstr), ""yellow"** "red"%s(%i) has been kicked by Admin %s(%i) [Reason: %s]", __GetName(player), player, __GetName(playerid), playerid, reason);
 			SCMToAll(YELLOW, gstr);
 			print(gstr);
-			
+
 			format(gstr, sizeof(gstr), "4Server: 2Admin %s(%i) has kicked %s(%i) 1(Reason: %s)", __GetName(playerid), playerid, __GetName(player), player, reason);
 			IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
-			
+
   			KickEx(player);
 		}
 		else
@@ -10958,10 +10958,10 @@ YCMD:mute(playerid, params[], help)
 		{
 			return SCM(playerid, NEF_GREEN, "Usage: /mute <playerid> <seconds> <reason>");
 		}
-		
+
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
-		
+
 		if(time < 1 || time > 10000) return SCM(playerid, -1, ""er"seconds > 0 bitch please :p");
 		if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 
@@ -10975,7 +10975,7 @@ YCMD:mute(playerid, params[], help)
 	    	format(gstr, sizeof(gstr), ""yellow"** "red"%s(%i) has been muted by Admin %s(%i) for %i seconds [Reason: %s]", __GetName(player), player, __GetName(playerid), playerid, time, reason);
             SCMToAll(YELLOW, gstr);
             print(gstr);
-            
+
 			PlayerData[player][tMute] = SetTimerEx("player_unmute", time * 1000, false, "ii", player, YHash(__GetName(player)));
 			PlayerData[player][bMuted] = true;
 
@@ -11003,10 +11003,10 @@ YCMD:unmute(playerid, params[], help)
 		{
 			return SCM(playerid, NEF_GREEN, "Usage: /unmute <playerid>");
 		}
-		
+
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
-        
+
 		if(IsPlayerAvail(player) && player != playerid)
 		{
 			if(!PlayerData[player][bMuted])
@@ -11019,7 +11019,7 @@ YCMD:unmute(playerid, params[], help)
 
 			format(gstr, sizeof(gstr), ""yellow"** "red"%s(%i) has been unmuted by Admin %s(%i)", __GetName(player), player, __GetName(playerid), playerid);
 			SCMToAll(RED, gstr);
-			
+
   			format(gstr, sizeof(gstr), "4MUTE:3 %s(%i) has been unmuted by %s", __GetName(player), player, __GetName(playerid));
 			IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 		}
@@ -11057,14 +11057,14 @@ YCMD:grename(playerid, params[], help)
 	if(PlayerData[playerid][e_gangid] == 0) return SCM(playerid, -1, ""er"You are not in any gang");
 	if(PlayerData[playerid][e_gangrank] != GANG_POS_FOUNDER) return SCM(playerid, -1, ""er"You need to be the gang founder");
 	if(GetPlayerMoneyEx(playerid) < 100000) return SCM(playerid, -1, ""er"You need $100,000 to rename your gang");
-	
+
 	new buff[144], buff2[144];
-	
+
 	if(sscanf(params, "s[143]s[143]", buff, buff2))
 	{
 	    return SCM(playerid, NEF_GREEN, "Usage: /grename <new gang name> <new gang tag>");
 	}
-	
+
 	if(strlen(buff) > MAX_GANG_NAME || strlen(buff) < MIN_GANG_NAME)
 	{
 	    return SCM(playerid, -1, ""er"Invalid gangname length");
@@ -11081,7 +11081,7 @@ YCMD:grename(playerid, params[], help)
 	{
 		return SCM(playerid, -1, ""er"Not possible");
 	}
-	
+
 	new gangname[21];
 	mysql_escape_string(buff, gangname, pSQL, 21);
 
@@ -11117,7 +11117,7 @@ YCMD:gzonecreate(playerid, params[], help)
 	{
 		c++;
 	}
-	
+
 	if(c >= MAX_GZONES) return SCM(playerid, -1, ""er"Max. GZones reached.");
 
 	new tmp[41];
@@ -11127,7 +11127,7 @@ YCMD:gzonecreate(playerid, params[], help)
 	}
 	new zonename[40];
 	mysql_escape_string(tmp, zonename, pSQL, sizeof(zonename));
-	
+
     strmid(GZoneInfo[gzoneid][sZoneName], zonename, 0, 40, 40);
 
     new Float:POS[3];
@@ -11148,10 +11148,10 @@ YCMD:gzonecreate(playerid, params[], help)
 		GZoneInfo[gzoneid][E_z],
 		GZoneInfo[gzoneid][localGang],
 		GZoneInfo[gzoneid][iLocked]);
-		
+
 	mysql_tquery(pSQL, gstr2, "", "");
     mysql_tquery(pSQL, "SELECT * FROM `gzones` ORDER BY `id` DESC LIMIT 1;", "OnGangZoneLoadEx", "i", gzoneid);
-    
+
     gzoneid++;
 	return 1;
 }
@@ -11165,20 +11165,20 @@ YCMD:gzonereset(playerid, params[], help)
 	    {
 		    if(!IsPlayerInRangeOfPoint(playerid, 7.0, GZoneInfo[i][E_x], GZoneInfo[i][E_y], GZoneInfo[i][E_z])) continue;
 	        found = true;
-	        
+
 	        if(GZoneInfo[i][bUnderAttack])
 	        {
 	            return SCM(playerid, -1, ""er"Zone is currently under attack!");
 	        }
-	        
+
 	        GZoneInfo[i][iTimeLeft] = 0;
 			GZoneInfo[i][localGang] = 0;
 			GZoneInfo[i][AttackingGang] = 0;
 			GZoneInfo[i][DefendingGang] = 0;
 	  		GZoneInfo[i][iLocked] = gettime();
-	        
+
 			MySQL_SaveGangZone(i);
-	        
+
 	        for(new ii = 0; ii < MAX_PLAYERS; ii++)
 	        {
 			    if(IsPlayerConnected(ii) )
@@ -11186,7 +11186,7 @@ YCMD:gzonereset(playerid, params[], help)
 					SyncGangZones(ii);
 			    }
 	        }
-	        
+
 	        SCM(playerid, -1, ""orange"Zone has been reset!");
 	        break;
 	    }
@@ -11226,7 +11226,7 @@ YCMD:gdestroy(playerid, params[], help)
 YCMD:gcreate(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
-    
+
 	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 
 	new tick = GetTickCountEx();
@@ -11238,7 +11238,7 @@ YCMD:gcreate(playerid, params[], help)
 	if(PlayerData[playerid][e_gangid] != 0) return SCM(playerid, -1, ""er"You are already in a gang");
 	if(GetPlayerMoneyEx(playerid) < 500000) return SCM(playerid, -1, ""er"You need at least "nef_green"$500,000 "nef_red"for creating a gang!");
  	if(GetPlayerScoreEx(playerid) < 500) return SCM(playerid, -1, ""er"You need at least "nef_green"500 Score "nef_red"for creating a gang!");
- 	
+
     PlayerData[playerid][e_time] = PlayerData[playerid][e_time] + (gettime() - PlayerData[playerid][ConnectTime]);
     PlayerData[playerid][ConnectTime] = gettime();
 
@@ -11302,7 +11302,7 @@ YCMD:gcapture(playerid, params[], help)
 
     if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
     if(PlayerData[playerid][e_gangid] == 0) return SCM(playerid, -1, ""er"You aren't in any gang! Create a gang /gcreate or join one.");
-    
+
 	new bool:found = false;
 	for(new i = 0; i < gzoneid; i++)
 	{
@@ -11324,7 +11324,7 @@ YCMD:gcapture(playerid, params[], help)
 		    if(!IsPlayerAvail(ii)) continue;
 		    if(PlayerData[ii][e_gangid] != GZoneInfo[i][AttackingGang]) continue;
 		    if(IsPlayerOnDesktop(ii, 2500)) continue;
-		    
+
 			GetPlayerPos(ii, POS[0], POS[1], POS[2]);
 
 			if(IsPointInDynamicArea(GZoneInfo[i][zsphere], POS[0], POS[1], POS[2]))
@@ -11332,7 +11332,7 @@ YCMD:gcapture(playerid, params[], help)
 			    Iter_Add(Players, ii);
 			}
 		}
-		
+
 		if(Iter_Count(Players) != 0)
 		{
 		    SCM(playerid, -1, ""orange"You cannot re-capture this zone as there is still the attacking gang around");
@@ -11354,7 +11354,7 @@ YCMD:gcapture(playerid, params[], help)
 			        {
 			    		ResetPlayerGWarMode(ii, false);
 					}
-					
+
 					if(PlayerData[ii][e_gangid] == GZoneInfo[i][DefendingGang])
 					{
 					    GivePlayerMoneyEx(ii, 20000);
@@ -11376,7 +11376,7 @@ YCMD:gcapture(playerid, params[], help)
 			GZoneInfo[i][AttackingGang] = 0;
 			GZoneInfo[i][DefendingGang] = 0;
 			GZoneInfo[i][iLocked] = gettime() + 1800;
-			
+
 			MySQL_SaveGangZone(i);
 		}
 	    break;
@@ -11391,7 +11391,7 @@ YCMD:gzones(playerid, params[], help)
 
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode. Use /exit");
     if(PlayerData[playerid][e_gangid] == 0) return SCM(playerid, -1, ""er"You aren't in any gang");
-    
+
 	new str[1024], count = 0;
 
 	for(new i = 0; i < gzoneid; i++)
@@ -11402,7 +11402,7 @@ YCMD:gzones(playerid, params[], help)
 	        strcat(str, gstr);
 	    }
 	}
-	
+
 	if(count > 0)
 	{
 	    strins(str, ""white"Occupied zones:", 0, sizeof(str));
@@ -11412,7 +11412,7 @@ YCMD:gzones(playerid, params[], help)
 	{
 	    strmid(str, ""white"Your gang does not control any zones.", 0, 1024, 1024);
 	}
-	
+
 	ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, "Gang Zones", str, "OK", "");
 	return 1;
 }
@@ -11468,24 +11468,24 @@ YCMD:gwar(playerid, params[], help)
             ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" Gang War", gstr, "OK", "");
             return 1;
 		}
-		
+
 		if(GetGZonesByGang(PlayerData[playerid][e_gangid]) >= MAX_GZONES_PER_GANG) return ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" Gang War", ""white"Your gang owns the maximum of 15 zones", "OK", "");
-		
+
 		if(Iter_Contains(iterGangWar, PlayerData[playerid][e_gangid]))
 		{
 		    return ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" Gang War", ""white"You can't attack this zone because your gang is already\ninvloved in another Gang War!", "OK", "");
 		}
-		
+
 		if(GZoneInfo[i][localGang] == 0)
 		{
 		    GZoneInfo[i][bUnderAttack] = true;
 		    GZoneInfo[i][AttackingGang] = PlayerData[playerid][e_gangid];
 		    GZoneInfo[i][iTimeLeft] = 60;
 		    GZoneInfo[i][DefendingGang] = 0;
-		    
+
 		    format(gstr, sizeof(gstr), "Gang War: %s~n~Defend the Gang Zone!~n~~n~~n~Timeleft: 1:00", GZoneInfo[i][sZoneName]);
 		    TextDrawSetString(GZoneInfo[i][E_Txt], gstr);
-		    
+
 		    new count = 0;
 		    for(new ii = 0; ii < MAX_PLAYERS; ii++)
 		    {
@@ -11495,7 +11495,7 @@ YCMD:gwar(playerid, params[], help)
 		            {
 		        		TextDrawShowForPlayer(ii, GZoneInfo[i][E_Txt]);
 		        		SetPlayerGWarMode(ii);
-		        		
+
 		        		++count;
 					}
 				}
@@ -11505,12 +11505,12 @@ YCMD:gwar(playerid, params[], help)
 		    	format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s(%i) is capturing the zone: '%s' %i member has been tied!", __GetName(playerid), playerid, GZoneInfo[i][sZoneName], count);
 			else
                 format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s(%i) is capturing the zone: '%s' %i members have been tied!", __GetName(playerid), playerid, GZoneInfo[i][sZoneName], count);
-                
+
 			GangMSG(PlayerData[playerid][e_gangid], gstr);
-			
+
 			format(gstr, sizeof(gstr), ""orange"%s(%i) has started capturing the zone '%s' with %i gang member(s)!", __GetName(playerid), playerid, GZoneInfo[i][sZoneName], count);
 			SCMToAll(-1, gstr);
-			
+
 			Iter_Add(iterGangWar, PlayerData[playerid][e_gangid]);
 		}
 		else
@@ -11519,7 +11519,7 @@ YCMD:gwar(playerid, params[], help)
 			{
 			    return ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" Gang War", ""white"You can't attack this zone because the opposing gang\nis already invloved in another Gang War!", "OK", "");
 			}
-		
+
 		    GZoneInfo[i][bUnderAttack] = true;
 		    GZoneInfo[i][AttackingGang] = PlayerData[playerid][e_gangid];
 		    GZoneInfo[i][iTimeLeft] = 150;
@@ -11527,7 +11527,7 @@ YCMD:gwar(playerid, params[], help)
 
 		    format(gstr, sizeof(gstr), "Gang War: %s~n~Defend the Gang Zone!~n~~n~~n~Timeleft: 2:30", GZoneInfo[i][sZoneName]);
 		    TextDrawSetString(GZoneInfo[i][E_Txt], gstr);
-		    
+
 		    new count = 0;
 		    for(new ii = 0; ii < MAX_PLAYERS; ii++)
 		    {
@@ -11547,7 +11547,7 @@ YCMD:gwar(playerid, params[], help)
 		    	format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s(%i) is capturing the zone: '%s' %i member has been tied!", __GetName(playerid), playerid, GZoneInfo[i][sZoneName], count);
 			else
 			    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s(%i) is capturing the zone: '%s' %i members have been tied!", __GetName(playerid), playerid, GZoneInfo[i][sZoneName], count);
-			    
+
 			GangMSG(PlayerData[playerid][e_gangid], gstr);
 
 		    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"Gang %s started a war against your gang at %s!", GetGangNameByID(PlayerData[playerid][e_gangid]), GZoneInfo[i][sZoneName]);
@@ -11555,7 +11555,7 @@ YCMD:gwar(playerid, params[], help)
 
 			format(gstr, sizeof(gstr), ""orange"%s(%i) has started capturing the zone '%s' with %i gang member(s)!", __GetName(playerid), playerid, GZoneInfo[i][sZoneName], count);
 			SCMToAll(-1, gstr);
-		    
+
 		    Iter_Add(iterGangWar, PlayerData[playerid][e_gangid]);
 		    Iter_Add(iterGangWar, GZoneInfo[i][localGang]);
 		}
@@ -11568,7 +11568,7 @@ YCMD:gwar(playerid, params[], help)
 SetPlayerGWarMode(playerid)
 {
     SCM(playerid, -1, ""orange"You are now in Gang War mode, type /exit to leave Gang War!");
-    
+
 	if(PlayerData[playerid][bGod])
 	{
         SetPVarInt(playerid, "HadGod", 0);
@@ -11578,7 +11578,7 @@ SetPlayerGWarMode(playerid)
 		SetPlayerHealth(playerid, 100.0);
   		SCM(playerid, -1, ""orange"God mode has been disabled!");
 	}
-	
+
 	PlayerData[playerid][bSpeedBoost] = false;
     PlayerData[playerid][bSuperJump] = false;
     PlayerData[playerid][bGWarMode] = true;
@@ -11587,12 +11587,12 @@ SetPlayerGWarMode(playerid)
 ResetPlayerGWarMode(playerid, bool:msg = true)
 {
     if(msg) SCM(playerid, -1, ""orange"You have left the gang war!");
-    
+
     for(new i = 0; i < gzoneid; i++)
     {
         TextDrawHideForPlayer(playerid, GZoneInfo[i][E_Txt]);
     }
-    
+
     PlayerData[playerid][bGWarMode] = false;
 	PlayerData[playerid][bSpeedBoost] = true;
     PlayerData[playerid][bSuperJump] = false;
@@ -11601,7 +11601,7 @@ ResetPlayerGWarMode(playerid, bool:msg = true)
 YCMD:ginvite(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
-    
+
     if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 
 	new tick = GetTickCountEx();
@@ -11617,10 +11617,10 @@ YCMD:ginvite(playerid, params[], help)
 	{
         return SCM(playerid, NEF_GREEN, "Usage: /ginvite <playerid>");
 	}
-	
+
     if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 	if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
-		
+
 	new Float:pPOS[3];
 	GetPlayerPos(player, pPOS[0], pPOS[1], pPOS[2]);
 	if(!IsPlayerInRangeOfPoint(playerid, 7.5, pPOS[0], pPOS[1], pPOS[2]))
@@ -11641,11 +11641,11 @@ YCMD:ginvite(playerid, params[], help)
     PlayerData[player][e_gangrank] = GANG_POS_NONE;
     strmid(PlayerData[player][GangName], PlayerData[playerid][GangName], 0, 21, 21);
     strmid(PlayerData[player][GangTag], PlayerData[playerid][GangTag], 0, 5, 5);
-    
+
 	format(gstr, sizeof(gstr), ""gang_sign" "RED_E"%s(%i) "r_besch"invited you to: %s", __GetName(playerid), playerid, PlayerData[playerid][GangName]);
 	SCM(player, GREY, gstr);
 
-	format(gstr, sizeof(gstr), ""r_besch"Â» Invitation has been sent to "yellow"%s(%i)", __GetName(player), player);
+	format(gstr, sizeof(gstr), ""r_besch"» Invitation has been sent to "yellow"%s(%i)", __GetName(player), player);
 	SCM(playerid, GREEN, gstr);
 
 	PlayerData[playerid][tickLastGInvite] = tick;
@@ -11655,7 +11655,7 @@ YCMD:ginvite(playerid, params[], help)
 YCMD:gdeny(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
-    
+
     if(PlayerData[playerid][e_gangid] != 0) return SCM(playerid, -1, ""er"You are already in a gang!");
     if(!PlayerData[playerid][bGangInvite]) return SCM(playerid, -1, ""er"You haven't been invited!");
     PlayerData[playerid][TmpGangID] = 0;
@@ -11671,7 +11671,7 @@ YCMD:gdeny(playerid, params[], help)
 YCMD:gclose(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
-    
+
     if(PlayerData[playerid][e_gangid] == 0) return SCM(playerid, -1, ""er"You aren't in any gang!");
     if(PlayerData[playerid][e_gangrank] != GANG_POS_FOUNDER) return SCM(playerid, -1, ""er"You have to be the gang Founder!");
 	if(Iter_Contains(iterGangWar, PlayerData[playerid][e_gangid])) return SCM(playerid, -1, ""er"You can't close your gang while being in a Gang War!");
@@ -11683,10 +11683,10 @@ YCMD:gclose(playerid, params[], help)
 YCMD:gjoin(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
-    
+
     if(PlayerData[playerid][e_gangid] != 0) return SCM(playerid, -1, ""er"You are already in a gang!");
     if(!PlayerData[playerid][bGangInvite]) return SCM(playerid, -1, ""er"You did not get any invitations!");
-    
+
 	PlayerData[playerid][bGangInvite] = false;
 	PlayerData[playerid][e_gangrank] = GANG_POS_JUNIOR_MEMBER;
 	PlayerData[playerid][e_gangid] = PlayerData[playerid][TmpGangID];
@@ -11705,9 +11705,9 @@ YCMD:gjoin(playerid, params[], help)
 	    DestroyDynamic3DTextLabel(PlayerData[playerid][GangLabel]);
 		PlayerData[playerid][GangLabel] = Text3D:-1;
 	}
-	
+
 	ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Gang joined!", ""white"You can now use these commands:\n\n/gmenu\n\nUse "nef_yellow"! "white"to talk in your gang chat", "OK", "");
-	
+
 	format(gstr, sizeof(gstr), ""nef_yellow"Gang:"white" %s", PlayerData[playerid][GangName]);
 	PlayerData[playerid][GangLabel] = CreateDynamic3DTextLabel(gstr, -1, 0.0, 0.0, 0.5, 20.0, playerid, INVALID_VEHICLE_ID, 1, -1, -1, -1, 20.0);
  	return 1;
@@ -11716,7 +11716,7 @@ YCMD:gjoin(playerid, params[], help)
 YCMD:gmenu(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
-    
+
     if(PlayerData[playerid][e_gangid] == 0) return SCM(playerid, -1, ""er"You aren't in any gang!");
 
 	ShowDialog(playerid, GMENU_DIALOG);
@@ -11726,11 +11726,11 @@ YCMD:gmenu(playerid, params[], help)
 YCMD:gleave(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
-    
+
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode. Use /exit");
     if(PlayerData[playerid][e_gangid] == 0) return SCM(playerid, -1, ""er"You aren't in any gang");
     if(PlayerData[playerid][e_gangrank] == GANG_POS_FOUNDER) return SCM(playerid, -1, ""er"You can't leave a gang as Founder");
-		
+
 	format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s(%i) has left the gang", __GetName(playerid), playerid);
     GangMSG(PlayerData[playerid][e_gangid], gstr);
     SCM(playerid, -1, ""gang_sign" You've left your gang!");
@@ -11753,11 +11753,11 @@ YCMD:gleave(playerid, params[], help)
 YCMD:gsetrank(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
-    
+
     if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 	if(PlayerData[playerid][e_gangid] == 0) return SCM(playerid, -1, ""er"You aren't in any gang");
     if(PlayerData[playerid][e_gangrank] < GANG_POS_LEADER) return SCM(playerid, -1, ""er"You have to be at least the gang leader to set ranks");
-    
+
     ShowDialog(playerid, GANG_SET_RANK_DIALOG);
 	return 1;
 }
@@ -11775,7 +11775,7 @@ YCMD:gkick(playerid, params[], help)
 	if(PlayerData[playerid][e_gangrank] < GANG_POS_CO_FOUNDER) return SCM(playerid, -1, ""er"You have to be at least the Co-Founder");
 
 	ShowDialog(playerid, GANG_KICK_DIALOG);
-	
+
 	PlayerData[playerid][tickLastGKick] = tick;
 	return 1;
 }
@@ -11786,7 +11786,7 @@ YCMD:gcolor(playerid, params[], help)
 
     if(PlayerData[playerid][e_gangid] == 0) return SCM(playerid, -1, ""er"You aren't in any gang!");
     if(PlayerData[playerid][e_gangrank] < GANG_POS_LEADER) return SCM(playerid, -1, ""er"You have to be at least the gang leader to set colors");
-    
+
 	new r, g, b;
 	if(sscanf(params, "iii", r, g, b) || !(0 <= r <= 255) || !(0 <= g <= 255) || !(0 <= b <= 255))
 	{
@@ -11799,7 +11799,7 @@ YCMD:gcolor(playerid, params[], help)
 		{
    			return SCM(playerid, -1, ""er"Color too dark! RGB values under 30 are not allowed!");
 		}
-		
+
 		new col = RGBA(r, g, b, 255);
 
 		format(gstr, sizeof(gstr), "UPDATE `gangs` SET `Color` = %i WHERE `ID` = %i;", col, PlayerData[playerid][e_gangid]);
@@ -11824,10 +11824,10 @@ YCMD:gcar(playerid, params[], help)
 	    {
 	        if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't spawn a car now");
 	        if(IsPlayerInRangeOfPoint(playerid, 65.0, 1797.3141, -1302.0978, 120.2659) && PlayerData[playerid][e_level] < 1) return SCM(playerid, -1, ""er"Can't spawn vehicle at this place!");
-	        
+
 	        format(gstr, sizeof(gstr), "SELECT `Vehicle` FROM `gangs` WHERE `ID` = %i LIMIT 1;", PlayerData[playerid][e_gangid]);
 			new Cache:res = mysql_query(pSQL, gstr);
-			
+
 			if(cache_get_row_count(pSQL) != 0)
 			{
 			    if(IsValidVehicleModel(cache_get_row_int(0, 0, pSQL)))
@@ -11850,7 +11850,7 @@ YCMD:gcar(playerid, params[], help)
 		{
 		    if(strlen(params) > 29) return SCM(playerid, NEF_YELLOW, "I don't know that vehicle...");
 		    if(PlayerData[playerid][e_gangrank] < GANG_POS_LEADER) return SCM(playerid, -1, ""er"You have to be at least the gang leader to set the gang car");
-		    
+
 	 	    new gcar = -1;
 
 		    if(IsNumeric(params))
@@ -11979,7 +11979,7 @@ YCMD:tban(playerid, params[], help)
 			    PlayerData[playerid][iKickBanIssued]++;
 			}
 	    }
-	    
+
 	    new player, reason[144], time;
 	    if(sscanf(params, "rs[143]i", player, reason, time))
 	    {
@@ -12006,7 +12006,7 @@ YCMD:tban(playerid, params[], help)
 			{
 			    new amsg[144];
 			    if(!islogged(player)) return SCM(playerid, -1, ""er"Player is not registered");
-			    
+
 			    MySQL_BanPlayer(__GetName(player), __GetName(playerid), reason, gettime() + (time * 60));
 
 				format(gstr, sizeof(gstr), ""yellow"** "red"%s(%i) has been banned by Admin %s(%i) [Reason: %s] [Time: %i mins]", __GetName(player), player, __GetName(playerid), playerid, reason, time);
@@ -12071,21 +12071,21 @@ YCMD:ban(playerid, params[], help)
 			    PlayerData[playerid][iKickBanIssued]++;
 			}
 	    }
-	    
+
 	    new player, reason[144];
 	    if(sscanf(params, "rs[143]", player, reason))
 	    {
 	        return SCM(playerid, NEF_GREEN, "Usage: /ban <playerid> <reason>");
 	    }
-	    
+
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
-	    
+
 		if(strlen(reason) > 50 || isnull(reason) || strlen(reason) < 2) return SCM(playerid, -1, ""er"Ban reason length: 2-50");
 	    if(player == playerid) return SCM(playerid, -1, ""er"You can not ban yourself");
         if(PlayerData[player][bOpenSeason]) return SCM(playerid, -1, ""er"This player is flagged for disconnect");
         if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
-        
+
 		if(badsql(reason, false) != 0)
 		{
 		    return SCM(playerid, -1, ""er"You have specified invalid characters");
@@ -12099,12 +12099,12 @@ YCMD:ban(playerid, params[], help)
 			    if(islogged(player)) { // Ban registered player
                 	MySQL_BanPlayer(__GetName(player), __GetName(playerid), reason);
                     MySQL_BanIP(__GetIP(player));
-                    
+
                     format(gstr, sizeof(gstr), ""yellow"** "red"%s(%i) has been banned by Admin %s(%i) [Reason: %s]", __GetName(player), player, __GetName(playerid), playerid, reason);
                     format(amsg, sizeof(amsg), "[ADMIN CHAT] "LG_E"Account and IP banned of %s [EXPIRES: NEVER, REASON: %s]", __GetName(player), reason);
 				} else {
 				    MySQL_BanIP(__GetIP(player));
-				    
+
 				    format(gstr, sizeof(gstr), ""yellow"** "red"%s(%i) has been banned by Admin %s(%i) [Reason: %s]", __GetName(player), player, __GetName(playerid), playerid, reason);
 				    format(amsg, sizeof(amsg), "[ADMIN CHAT] "LG_E"IP banned of %s [EXPIRES: NEVER, REASON: %s]", __GetName(player), reason);
 				}
@@ -12118,7 +12118,7 @@ YCMD:ban(playerid, params[], help)
 					__GetName(playerid),
 					reason,
 					"Permanent");
-					
+
 	    		ShowPlayerDialog(player, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Notice", gstr2, "OK", "");
 
 				format(gstr, sizeof(gstr), "4Server: 2Admin %s(%i) has banned %s(%i) 1(Reason: %s)", __GetName(playerid), playerid, __GetName(player), player, reason);
@@ -12189,13 +12189,13 @@ YCMD:deleterecord(playerid, params[], help)
 		{
 		    return SCM(playerid, NEF_GREEN, "Usage: /deleterecord <map>");
 		}
-		
+
 		format(gstr, sizeof(gstr), "/Race/%03i.race", map);
 		if(!fexist(gstr))
 		{
 		    return SCM(playerid, -1, ""er"Map does not exist");
 		}
-		
+
 		format(gstr, sizeof(gstr), "SELECT `id` FROM `race_records` WHERE `track` = %i ORDER BY `time` ASC LIMIT 1;", map);
 		mysql_tquery(pSQL, gstr, "OnRaceRecordPurged", "ii", playerid, map);
 	}
@@ -12211,21 +12211,21 @@ YCMD:raceforcemap(playerid, params[], help)
 	if(PlayerData[playerid][e_level] >= 3)
 	{
 	    if(g_RaceStatus == RaceStatus_StandBy) return SCM(playerid, -1, ""er"Race is currently in standby mode!");
-	    
+
 	    new map;
 		if(sscanf(params, "i", map))
 		{
 		    return SCM(playerid, NEF_GREEN, "Usage: /raceforcemap <map>");
 		}
-		
+
 		format(gstr, sizeof(gstr), "/Race/%03i.race", map);
 		if(!fexist(gstr))
 		{
 		    return SCM(playerid, -1, ""er"Map does not exist");
 		}
-		
+
 		g_RaceForceMap = map;
-		
+
 		format(gstr, sizeof(gstr), ""red"Adm: %s(%i) forced next race map to %03i", __GetName(playerid), playerid, map);
 		AdminMSG(-1, gstr);
 		print(gstr);
@@ -12242,12 +12242,12 @@ YCMD:shutdown(playerid, params[], help)
 	if(PlayerData[playerid][e_level] == MAX_ADMIN_LEVEL && IsPlayerAdmin(playerid))
 	{
 	    bGlobalShutdown = true;
-	    
+
 	    for(new i = 0; i < MAX_PLAYERS; i++)
 	    {
 	        SCM(i, -1, "Server restart! Restart your game. IP: samp.nefserver.net:7777");
 	    }
-	    
+
 	    SetTimer("server_init_shutdown", 3000, false);
  	}
 	return 1;
@@ -12263,10 +12263,10 @@ YCMD:giveweapon(playerid, params[], help)
 		{
 		    return SCM(playerid, NEF_GREEN, "Usage: /giveweapon <playerid> <weaponid> <ammo>");
 		}
-		
+
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
-		
+
 		if(IsPlayerAvail(player))
 		{
 		    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
@@ -12368,7 +12368,7 @@ YCMD:connectbots(playerid, params[], help)
 		IRC_QuitBots();
 		IRC_SetUp(true);
 	    #endif
-		
+
 		SCM(playerid, -1, ""er"All IRC bots have been checked and if needed reconnected");
 	}
 	else
@@ -12394,7 +12394,7 @@ YCMD:jail(playerid, params[], help)
 		if(IsPlayerAvail(player))
 		{
 		    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
-		    
+
 			if(gTeam[player] == JAIL)
 			{
 			    format(reason, sizeof(reason), "ERROR: "GREY2_E"%s(%i) is already jailed (gets out in %d seconds)", __GetName(player), player, PlayerData[player][iJailTime]);
@@ -12510,11 +12510,11 @@ YCMD:slap(playerid, params[], help)
 		{
 			return SCM(playerid, NEF_GREEN, "Usage: /slap <playerid>");
 	  	}
-	  	
+
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 		if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
-		
+
 		if(IsPlayerAvail(player) && PlayerData[player][e_level] != MAX_ADMIN_LEVEL)
 		{
 		    switch(gTeam[player])
@@ -12532,7 +12532,7 @@ YCMD:slap(playerid, params[], help)
 			SetPlayerPos(player, POS[0], POS[1], floatadd(POS[2], 10.0));
 			format(gstr, sizeof(gstr), "You have slapped %s(%i)", __GetName(player), player);
 			SCM(playerid, BLUE, gstr);
-			
+
 			format(gstr, sizeof(gstr), ""red"Adm: %s(%i) has been slapped by %s(%i)", __GetName(player), player, __GetName(playerid), playerid);
 			AdminMSG(-1, gstr);
 			print(gstr);
@@ -12591,7 +12591,7 @@ YCMD:rv(playerid, params[], help)
 	        SCM(playerid, NEF_GREEN, "Destroys all unoccupied player vehicles");
 	        return 1;
 	    }
-	    
+
 	    for(new i = 0; i < MAX_PLAYERS; i++)
 	    {
 	        if(!IsPlayerAvail(i)) continue;
@@ -12659,10 +12659,10 @@ YCMD:disarm(playerid, params[], help)
 		{
 		    return SCM(playerid, NEF_GREEN, "Usage: /disarm <playerid>");
 		}
-		
+
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
-		
+
 		if(IsPlayerAvail(player) && PlayerData[player][e_level] != MAX_ADMIN_LEVEL)
 		{
 			if(gTeam[player] == GUNGAME) return SCM(playerid, -1, ""er"Cannot disarm player in gungame");
@@ -12700,7 +12700,7 @@ YCMD:getin(playerid, params[], help)
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 		if(gTeam[playerid] != FREEROAM) return SCM(playerid, -1, ""er"Not useable in minigames");
 		if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
-		
+
 		if(IsPlayerAvail(player))
 		{
 			if(player == playerid || gTeam[player] != FREEROAM)
@@ -12719,9 +12719,9 @@ YCMD:getin(playerid, params[], help)
 				SCM(playerid, -1, gstr);
 				return 1;
 			}
-			
+
             new vID = GetPlayerVehicleID(player), vM = GetVehicleModel(vID), count = 0;
-            
+
 			if(GetVehicleModelSeats(vM) == 1)
 			{
 				format(gstr, sizeof(gstr), ""er"%s(%i) is currently driving a one seat vehicle!", __GetName(player), player);
@@ -12730,7 +12730,7 @@ YCMD:getin(playerid, params[], help)
 			}
 
             if(vM == 537 || vM == 538) return SCM(playerid, -1, ""er"You can't get into trains");
-            
+
 			for(new i = 0; i < MAX_PLAYERS; i++)
 			{
 			    if(!IsPlayerInVehicle(i, vID)) continue;
@@ -12775,7 +12775,7 @@ YCMD:pweaps(playerid, params[], help)
 		{
 	        return SCM(playerid, NEF_GREEN, "Usage: /pweaps <playerid>");
 	    }
-	    
+
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 
@@ -12856,7 +12856,7 @@ YCMD:admins(playerid, params[], help)
 			count++;
 	    }
 	}
-	
+
 	if(count == 0)
 	{
 	    player_notice(playerid, "No Admins/VIPs online", "");
@@ -12908,7 +12908,7 @@ YCMD:vips(playerid, params[], help)
 /*YCMD:a(playerid, params[], help)
 {
     if(PlayerData[playerid][e_level] == 0) return SCM(playerid, -1, NO_PERM);
-    
+
 	if(sscanf(params, "s[144]", gstr))
 	{
 	    return SCM(playerid, NEF_GREEN, "Usage: /a <text>");
@@ -12959,16 +12959,16 @@ YCMD:vipli(playerid, params[], help)
 			    return player_notice(playerid, "Command is on cooldown!", "");
 			}
 		}
-		
+
 		new player;
 		if(sscanf(params, "r", player))
 		{
 		    return SCM(playerid, NEF_GREEN, "Usage: /vipli <playerid>");
 		}
-		
+
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
-		
+
  		if(IsPlayerAvail(player))
 		{
 			if(PlayerData[player][e_vip] == 1) return SCM(playerid, -1, ""er"You cannot invite this player");
@@ -12999,17 +12999,17 @@ YCMD:vipli(playerid, params[], help)
 YCMD:accept(playerid, params[], help)
 {
     if(PlayerData[playerid][e_vip] == 1) return SCM(playerid, -1, ""er"You can't use this command as VIP");
-    
+
 	if(!PlayerData[playerid][bVIPLInv])
 	{
 	    return SCM(playerid, -1, ""er"You got no invitation");
 	}
-	
+
 	if(gTeam[playerid] != FREEROAM)
 	{
 	    Command_ReProcess(playerid, "/exit", false);
 	}
-	
+
 	SetPlayerPos(playerid, -2640.762939,1406.682006,906.460937);
 	SetPlayerInterior(playerid, 3);
     gTeam[playerid] = VIPL;
@@ -13030,7 +13030,7 @@ YCMD:viplounge(playerid, params[], help)
 YCMD:vip(playerid, params[], help)
 {
 	new string[2048];
-	
+
 	strcat(string, ""nef_yellow"Very Important Player (VIP)\n\n"yellow_e"Features:"white"\n Access to VIP vehicles in /v\n $1,000,000 to your bank (/bank)\n");
 	strcat(string, " 2 PV slots + 1 house/bizz slot\n");
 	strcat(string, " VIP Chat (/p)\n 100\% armor on spawn\n Jetpack spawn (/jetpack)\n Hydra spawn (/hydra)\n");
@@ -13051,7 +13051,7 @@ YCMD:hydra(playerid, params[], help)
 	{
 	    if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 	    if(IsPlayerInRangeOfPoint(playerid, 65.0, 1797.3141, -1302.0978, 120.2659) && PlayerData[playerid][e_level] < 1) return SCM(playerid, -1, ""er"Can't spawn vehicle at this place!");
-		
+
 		CarSpawner(playerid, 520, 120);
 	}
 	else
@@ -13065,7 +13065,7 @@ YCMD:god(playerid, params[], help)
 {
 	if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
 	if(PlayerData[playerid][bDuty]) return SCM(playerid, -1, ""er"You can't use god command while being on duty");
-	
+
 	new mode[31], bool:silent = false;
 	if(!sscanf(params, "s[30]", mode))
 	{
@@ -13096,7 +13096,7 @@ YCMD:god(playerid, params[], help)
 				    return player_notice(playerid, "You were shot", "in the last 5 seconds");
 				}
 			}
-			
+
 	        new Float:HP;
 	        GetPlayerHealth(playerid, HP);
 			if(HP < 40 && !silent) return GameTextForPlayer(playerid, "~b~~h~~h~Your health may not be below 40!", 2000, 3);
@@ -13152,7 +13152,7 @@ YCMD:v70(playerid, params[], help) // Cheetah
 YCMD:v71(playerid, params[], help)// Infernus
 {
 	if(PlayerData[playerid][e_vip] == 0) return 1;
-	
+
     CarSpawner(playerid, 411);
 
     new vID = GetPlayerVehicleID(playerid);
@@ -13183,7 +13183,7 @@ YCMD:v71(playerid, params[], help)// Infernus
 YCMD:v72(playerid, params[], help) // Huntley
 {
 	if(PlayerData[playerid][e_vip] == 0) return 1;
-	
+
     CarSpawner(playerid, 579);
 
     new vID = GetPlayerVehicleID(playerid);
@@ -13235,7 +13235,7 @@ YCMD:v72(playerid, params[], help) // Huntley
 YCMD:v73(playerid, params[], help) // Bullet
 {
 	if(PlayerData[playerid][e_vip] == 0) return 1;
-	
+
     CarSpawner(playerid, 541);
 
     new vID = GetPlayerVehicleID(playerid);
@@ -13272,7 +13272,7 @@ YCMD:v73(playerid, params[], help) // Bullet
 YCMD:v74(playerid, params[], help) // NRG
 {
 	if(PlayerData[playerid][e_vip] == 0) return 1;
-	
+
     CarSpawner(playerid, 522);
 
     new vID = GetPlayerVehicleID(playerid);
@@ -13343,23 +13343,23 @@ YCMD:adminhq(playerid, params[], help)
 YCMD:cd(playerid, params[], help)
 {
     if(PlayerData[playerid][e_vip] == 0) return Command_ReProcess(playerid, "/vip", false);
-    
+
    	new tick = GetTickCountEx();
 	if((PlayerData[playerid][tickLastCD] + COOLDOWN_CMD_CD) >= tick)
 	{
 	    return SCM(playerid, -1, ""nef" Please wait before sending a message again");
 	}
     if(IsCountDownRunning) return SCM(playerid, -1, ""er"Countdown is already running");
-    
+
     iCountdownVIP = 5;
     IsCountDownRunning = true;
-    
+
     tVIPCountdown = SetTimer("CountdownVIP", 1000, true);
-    
+
     new str[255];
    	format(str, sizeof(str), ""nef" VIP {%06x}%s(%i) "white"has started a countdown!", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid);
 	SCMToAll(-1, str);
-	
+
 	PlayerData[playerid][tickLastCD] = tick;
 	return 1;
 }
@@ -13408,7 +13408,7 @@ function:CountdownVIP()
 YCMD:rainbow(playerid, params[], help)
 {
     if(PlayerData[playerid][e_vip] == 0) return Command_ReProcess(playerid, "/vip", false);
-    
+
 	if(GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
 	{
 	    return SCM(playerid, -1, ""er"You must be a driver in a vehicle to use the rainbow feature!");
@@ -13474,7 +13474,7 @@ YCMD:setadminlevel(playerid, params[], help)
 				GameTextForPlayer(player, "Promoted", 5000, 3);
 			else
 				GameTextForPlayer(player, "Demoted", 5000, 3);
-			
+
 			MySQL_SaveAccount(playerid, false, false);
 			format(gstr, sizeof(gstr), "You have made %s Level %i at %i:%i:%i", __GetName(player), alevel, time[0], time[1], time[2]);
 			SCM(playerid, BLUE, gstr);
@@ -13508,10 +13508,10 @@ YCMD:report(playerid, params[], help)
 	{
 		return SCM(playerid, NEF_GREEN, "Usage: /report <playerid> <reason>");
 	}
-	
+
     if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 	if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
-	
+
  	if(IsPlayerAvail(player) && player != playerid && PlayerData[player][e_level] == 0)
 	{
 		if(strlen(reason) < 4) return SCM(playerid, -1, ""er"Please write a proper reason");
@@ -13556,7 +13556,7 @@ YCMD:reports(playerid, params[], help)
 				SCM(playerid, WHITE, Reports[i]);
 			}
 		}
-		
+
 		if(ReportCount == 0)
 		{
 			SCM(playerid, WHITE, "There have been no reports");
@@ -13572,7 +13572,7 @@ YCMD:reports(playerid, params[], help)
 YCMD:race(playerid, params[], help)
 {
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't join minigames while being in a Gang War, type /exit");
-    
+
 	switch(gTeam[playerid])
 	{
 	    case STORE, BUYCAR, SPEC, VIPL, gBUILDRACE, HOUSE, JAIL: return SCM(playerid, RED, NOT_AVAIL);
@@ -13598,7 +13598,7 @@ YCMD:race(playerid, params[], help)
             player_notice(playerid, "Race already started", "");
         }
     }
-    
+
     if(g_RaceStatus == RaceStatus_StartUp)
     {
 		if(Iter_Contains(RaceJoins, playerid))
@@ -13608,7 +13608,7 @@ YCMD:race(playerid, params[], help)
 		else
 		{
 		    if(g_RacePlayerCount == RACE_MAX_PLAYERS) return SCM(playerid, -1, ""er"Race reached it's max players");
-		    
+
 		    CheckPlayerGod(playerid);
 
 			Command_ReProcess(playerid, "/stopanims", false);
@@ -13632,7 +13632,7 @@ YCMD:sethouseowner(playerid, params[], help)
 	}
 
 	if(strlen(owner) > 21 || strlen(owner) < 3) return SCM(playerid, -1, ""er"Invalid name");
-	
+
 	mysql_escape_string(owner, owner, pSQL, sizeof(owner));
 	format(gstr, sizeof(gstr), "SELECT `Houses`, `AdditionalHouseSlots` FROM `accounts` WHERE `Name` = '%s'", owner);
 	mysql_query(pSQL, gstr, false);
@@ -13647,9 +13647,9 @@ YCMD:sethouseowner(playerid, params[], help)
 	    houses = cache_get_row_int(0, 0, pSQL);
 	    slots = cache_get_row_int(0, 1, pSQL);
 	}
-	
+
 	if(houses
-	
+
  	new bool:found = false;
 	for(new i = 0; i < houseid; i++)
 	{
@@ -13750,7 +13750,7 @@ YCMD:resethouse(playerid, params[], help)
 			format(gstr, sizeof(gstr), "UPDATE `accounts` SET `houses` = `houses` - 1 WHERE `name` = '%s' LIMIT 1;", HouseInfo[i][Owner]);
 			mysql_tquery(pSQL, gstr, "", "");
 		}
-		
+
 	    strmid(HouseInfo[i][Owner], "ForSale", 0, 25, 25);
 	    HouseInfo[i][sold] = 0;
         HouseInfo[i][locked] = 1;
@@ -13766,7 +13766,7 @@ YCMD:resethouse(playerid, params[], help)
 			    HouseInfo[i][E_Obj_Model][ii] = 0;
 			}
 		}
-        
+
 		MySQL_SaveHouse(i, true);
 
 	    format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseInfo[i][e_id], number_format(HouseInfo[i][price]), HouseInfo[i][E_score], HouseIntTypes[HouseInfo[i][interior]][intname]);
@@ -13792,25 +13792,25 @@ YCMD:setbizzlevel(playerid, params[], help)
 	    return SCM(playerid, NEF_GREEN, "Usage: /setbizzlevel <level>");
 	}
 	if(blevel > 20 || blevel < 1) return SCM(playerid, -1, ""er"Business level 1 - 20");
-	
+
  	new bool:bFound = false;
  	for(new r = 0; r < MAX_BUSINESSES; r++)
  	{
 	    if(BusinessData[r][e_ormid] == ORM:-1) continue;
 	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, BusinessData[r][e_pos][0], BusinessData[r][e_pos][1], BusinessData[r][e_pos][2])) continue;
 		bFound = true;
-		
+
 		BusinessData[r][e_level] = blevel;
-		
+
 		if(BusinessData[r][e_sold]) {
 	        format(gstr, sizeof(gstr), ""business_mark"\nID: %i\nOwner: %s\nType: %s\nLevel: %i", BusinessData[r][e_id], BusinessData[r][e_owner], BusinessTypes[_:BusinessData[r][e_type]], BusinessData[r][e_level]);
 		} else {
 		    format(gstr, sizeof(gstr), ""business_mark"\n"nef_green"FOR SALE! Type /bbuy"white"\nID: %i\nType: %s\nLevel: %i", BusinessData[r][e_id], BusinessTypes[_:BusinessData[r][e_type]], BusinessData[r][e_level]);
 		}
-		
+
 		UpdateDynamic3DTextLabelText(BusinessData[r][e_label_id], -1, gstr);
 		orm_update(BusinessData[r][e_ormid]);
-		
+
 		player_notice(playerid, "Business level set", "");
 		break;
  	}
@@ -13833,7 +13833,7 @@ YCMD:resetbizz(playerid, params[], help)
 		    player_notice(playerid, "Business must be for sale", "");
 		    break;
 		}
-		
+
 		for(new i = 0; i < MAX_PLAYERS; i++)
 		{
 		    if(!strcmp(BusinessData[r][e_owner], __GetName(i), true) && IsPlayerConnected(i))
@@ -13842,9 +13842,9 @@ YCMD:resetbizz(playerid, params[], help)
 				break;
 		   	}
 		}
-		
+
 		strmid(BusinessData[r][e_owner], "NoData", 0, MAX_PLAYER_NAME + 1, MAX_PLAYER_NAME + 1);
-		
+
 	    BusinessData[r][e_sold] = 0;
         BusinessData[r][e_level] = 1;
         BusinessData[r][e_date] = 0;
@@ -13873,12 +13873,12 @@ YCMD:createrace(playerid, params[], help)
 		if(IsPlayerInAnyVehicle(playerid)) return SCM(playerid, -1, ""er"Please leave your vehicle first!");
 		g_BuildRace = playerid;
 		g_BuildDeployTime = gettime();
-		
+
 		ShowDialog(playerid, DIALOG_RACE_RACETYPE);
 		gTeam[playerid] = gBUILDRACE;
 
 		DestroyPlayerVehicles(playerid);
-	
+
 	    Streamer_ToggleItemUpdate(playerid, STREAMER_TYPE_OBJECT, 0);
 	    Streamer_ToggleItemUpdate(playerid, STREAMER_TYPE_PICKUP, 0);
 	    Streamer_ToggleItemUpdate(playerid, STREAMER_TYPE_CP, 0);
@@ -13904,18 +13904,18 @@ YCMD:createbizz(playerid, params[], help)
 	{
 		return SCM(playerid, -1, NO_PERM);
 	}
-	
+
 	new count = 0;
 	for(new i = 0; i < MAX_BUSINESSES; i++) {
 	    if(BusinessData[i][e_ormid] != ORM:-1) {
 			++count;
 	    }
 	}
-	
+
 	if(count >= MAX_BUSINESSES) {
 	    return SCM(playerid, -1, ""er"Max businesses reached");
 	}
-	
+
 	new r = -1;
 	for(new i = 0; i < MAX_BUSINESSES; i++) {
 	    if(BusinessData[i][e_ormid] == ORM:-1) {
@@ -13923,13 +13923,13 @@ YCMD:createbizz(playerid, params[], help)
 	        break;
 	    }
 	}
-	
+
 	if(r == -1) return SCM(playerid, -1, ""er"No free bizz slot");
-	
+
     ResetBusiness(r);
   	GetPlayerPos(playerid, BusinessData[r][e_pos][0], BusinessData[r][e_pos][1], BusinessData[r][e_pos][2]);
     strmid(BusinessData[r][e_owner], "NoData", 0, MAX_PLAYER_NAME + 1, MAX_PLAYER_NAME + 1);
-    
+
     new ORM:ormid = BusinessData[r][e_ormid] = orm_create("businesses");
 
     orm_addvar_int(ormid, BusinessData[r][e_id], "id");
@@ -13980,7 +13980,7 @@ YCMD:createhouse(playerid, params[], help)
 	strmid(HouseInfo[houseid][Owner], "ForSale", 0, 25, 25);
 
 	new query[255];
-	
+
 	format(query, sizeof(query), "INSERT INTO `houses` (`ID`, `Owner`, `XPos`, `YPos`, `ZPos`, `Interior`, `Price`, `Score`, `Sold`, `Locked`, `Date`) VALUES (NULL, '%s', %.2f, %.2f, %.2f, %i, %i, %i, %i, %i, %i);",
 	    HouseInfo[houseid][Owner],
 		HouseInfo[houseid][E_x],
@@ -14692,7 +14692,7 @@ function:OnGTopReceived(playerid)
 {
 	new rows, fields;
 	cache_get_data(rows, fields, pSQL);
-	
+
 	if(rows > 0)
 	{
 	    new tmp[21], tmp2[5], finstring[2048], tmpstring[128];
@@ -14719,7 +14719,7 @@ YCMD:top(playerid, params[], help)
 	new string[1024];
 	strcat(string, "Richlist (/richlist)\nMost Wanteds (/wanteds)\nScore (/score)\nMost Kills (/kills)\nMost Deaths (/deaths)\nMost playing time (/toptime)\nOnline Gangs (/gangs)\nTop Gangs (/gtop)");
 	strcat(string, "\nMost Reaction Wins (/rtests)\nMost Race Wins (/races)\nMost Derby Wins (/derbys)\nMost Fallout Wins (/fallouts)\nMost Gungame Wins (/gungames)");
-	
+
 	ShowPlayerDialog(playerid, TOPLIST_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Toplists", string, "Select", "Cancel");
 	return 1;
 }
@@ -14811,15 +14811,15 @@ YCMD:trailer(playerid, params[], help)
     if(PlayerData[playerid][e_vip] == 1)
 	{
 	    if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
-	    
+
 		if(GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
 		{
 		    return SCM(playerid, -1, ""er"You must be a driver in a vehicle to attach a trailer!");
 		}
-		
+
 		new vid = GetPlayerVehicleID(playerid);
 		new model = GetVehicleModel(vid);
-		
+
 		if(model == 403 || model == 514 || model == 515)
 		{
 			if(PlayerData[playerid][pTrailerVehicle] != -1)
@@ -14828,19 +14828,19 @@ YCMD:trailer(playerid, params[], help)
 				DestroyVehicle_(PlayerData[playerid][pTrailerVehicle]);
 				PlayerData[playerid][pTrailerVehicle] = -1;
 			}
-		
+
 		    new Float:p[4];
-		    
+
 			GetVehiclePos(vid, p[0], p[1], p[2]);
 			GetVehicleZAngle(vid, p[3]);
-			
+
 			p[0] += (floatsin(-p[3], degrees) * -9);
 			p[1] += (floatcos(-p[3], degrees) * -9);
-			
+
 			PlayerData[playerid][pTrailerVehicle] = CreateVehicle_(435, p[0], p[1], p[2], p[3], 0, 0, -1);
-			
+
 			AttachTrailerToVehicle(PlayerData[playerid][pTrailerVehicle], vid);
-			
+
 			player_notice(playerid, "Trailer attached", "");
 		}
 		else
@@ -14887,7 +14887,7 @@ YCMD:ramp(playerid, params[], help)
 YCMD:vmenu(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
-    
+
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
     if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
     if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't spawn a car now");
@@ -14898,7 +14898,7 @@ YCMD:vmenu(playerid, params[], help)
 	        return player_notice(playerid, "Don't spawn vehicles here!", "");
 	    }
 	}
-    
+
    	ShowDialog(playerid, VMENU_DIALOG);
 	return 1;
 }
@@ -14947,7 +14947,7 @@ YCMD:spec(playerid, params[], help)
 			{
 				CheckPlayerGod(playerid);
 			}
-			
+
   			new count = 0;
 			for(new i = 0; i < MAX_PLAYERS; i++)
 			{
@@ -14967,7 +14967,7 @@ YCMD:spec(playerid, params[], help)
 				SetPlayerInterior(playerid, GetPlayerInterior(player));
 				SetPlayerVirtualWorld(playerid, GetPlayerVirtualWorld(player));
    			}
-   			
+
 			TogglePlayerSpectating(playerid, true);
 
 			if(IsPlayerInAnyVehicle(player))
@@ -15036,10 +15036,10 @@ YCMD:freeze(playerid, params[], help)
 			SCM(playerid, NEF_GREEN, "Usage: /freeze <playerid>");
 			return 1;
 	 	}
-	 	
+
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
-	 	
+
         if(IsPlayerAvail(player) && player != playerid)
 		{
 		    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
@@ -15053,7 +15053,7 @@ YCMD:freeze(playerid, params[], help)
 			SCM(playerid, RED, "Player has been frozen");
 			TogglePlayerControllable(player, false);
 			PlayerData[player][bFrozen] = true;
-			
+
 			format(gstr, sizeof(gstr), ""red"Adm: %s(%i) has been frozen by %s(%i)", __GetName(player), player, __GetName(playerid), playerid);
 			AdminMSG(-1, gstr);
 			print(gstr);
@@ -15080,10 +15080,10 @@ YCMD:unfreeze(playerid, params[], help)
 			SCM(playerid, NEF_GREEN, "Usage: /unfreeze <playerid>");
 			return 1;
 	 	}
-	 	
+
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
-	 	
+
    		if(IsPlayerAvail(player))
 		{
 		 	if(PlayerData[player][bFrozen])
@@ -15240,7 +15240,7 @@ YCMD:changename(playerid, params[], help)
 YCMD:changepass(playerid, params[], help)
 {
 	if(!islogged(playerid)) return notlogged(playerid);
-	
+
     new tick = GetTickCountEx();
 	if((PlayerData[playerid][tickLastPW] + COOLDOWN_CMD_CHANGEPASS) >= tick)
 	{
@@ -15284,21 +15284,21 @@ YCMD:mk(playerid, params[], help)
 	    return player_notice(playerid, "You don't own any medkits", "");
 	}
 	if(PlayerData[playerid][bGod]) return SCM(playerid, -1, ""er"You can't use medkits with godmode!");
-	
+
 	new Float:Health;
 	GetPlayerHealth(playerid, Health);
 	if(Health >= 100.0)
 	{
 	    return SCM(playerid, -1, ""er"You are already at full health");
 	}
-	
+
 	PlayerData[playerid][MedkitTime] = 50;
 	PlayerData[playerid][e_medkits]--;
-	
+
 	PlayerPlaySound(playerid, 1052, 0.0, 0.0, 0.0);
-	
+
 	PlayerData[playerid][tMedkit] = SetTimerEx("p_medkit", 200, true, "i", playerid);
-	
+
 	InfoTD_MSG(playerid, 2500, "~y~~h~Medkit used!");
 	PlayerData[playerid][tickLastMedkit] = tick;
 	return 1;
@@ -15334,7 +15334,7 @@ YCMD:stats(playerid, params[], help)
 	{
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
-		
+
 		player1 = player;
 	}
 
@@ -15401,19 +15401,19 @@ YCMD:stats(playerid, params[], help)
 			GetPlayerBusinessCount(__GetName(player1)),
 			PlayerData[player1][e_wanteds],
 			UTConvert(PlayerData[player1][e_lastlogin]));
-			
+
 		if(islogged(player1))
 		{
 			strcat(string3, "\nRegister Date:\t\t");
 			strcat(string3, UTConvert(PlayerData[player1][e_regdate]));
 		}
-			
+
 		if(PlayerData[player1][BoostDeplete] != 0)
 		{
 		    strcat(string3, "\nBoost will end on:\t\t");
 		    strcat(string3, UTConvert(PlayerData[player1][BoostDeplete]));
 		}
-			
+
 		strcat(finstring, string1);
 		strcat(finstring, string2);
 		strcat(finstring, string3);
@@ -15442,7 +15442,7 @@ YCMD:healall(playerid, params[], help)
 			{
 				PlayerPlaySound(i, 1057, 0.0, 0.0, 0.0);
 				SetPlayerHealth(i, 100.0);
-				
+
 				player_notice(i, "Health for all!", "");
 			}
 		}
@@ -15468,7 +15468,7 @@ YCMD:armourall(playerid, params[], help)
 				PlayerPlaySound(i, 1057, 0.0, 0.0, 0.0);
 				SetPlayerArmour(i, 100.0);
 				PlayerData[i][ACSettings] |= SUSPECT_VALID_ARMOR;
-				
+
 				player_notice(i, "Armor for all!", "");
 			}
 		}
@@ -15492,10 +15492,10 @@ YCMD:pornos(playerid, params[], help)
 YCMD:hmenu(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
-    
+
     if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE) return SCM(playerid, RED, NOT_AVAIL);
     new string[512], tmp[64];
-    
+
     for(new i = 0; i < MAX_PLAYER_HOUSES; i++)
     {
         if(i > PlayerData[playerid][e_addhouseslots])
@@ -15523,7 +15523,7 @@ YCMD:hmenu(playerid, params[], help)
 YCMD:bmenu(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
-    
+
     if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE) return SCM(playerid, RED, NOT_AVAIL);
     new string[512], tmp[64];
 
@@ -15554,7 +15554,7 @@ YCMD:bmenu(playerid, params[], help)
 YCMD:settings(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
-    
+
 	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
     ShowDialog(playerid, SETTINGS_DIALOG);
 	return 1;
@@ -15591,16 +15591,16 @@ YCMD:m(playerid, params[], help)
         T_FalloutPlayers,
         T_GunGamePlayers,
         T_MinigunPlayers);
-        
+
 	strcat(string, gstr2);
 
 	format(gstr2, sizeof(gstr2), "\n"white"Sniper (/sniper) "green"[%i]\n"white"Death Match (/dm1-4)\n"white"Team Death Match (/tdm) "green"[%i]\n"white"WAR (/war) "green"[%i]",
 	    T_SniperPlayers,
 	    T_TDMPlayers,
 	    T_WarPlayers);
-	    
+
 	strcat(string, gstr2);
-	
+
 	ShowPlayerDialog(playerid, HELP_DIALOG + 3, DIALOG_STYLE_LIST, ""nef" :: Minigames", string, "Select", "Cancel");
 	return 1;
 }
@@ -15726,7 +15726,7 @@ YCMD:saveskin(playerid, params[], help)
 	    SCM(playerid, COLOR_GREY, ""nef" "GREY2_E"Saved skin overwritten! Skipping class selection next login. Use /deleteskin to remove it");
 	}
 	new skin = GetPlayerSkin(playerid);
-	
+
 	if(IsValidSkin(skin)) {
     	PlayerData[playerid][e_skinsave] = skin;
 	} else {
@@ -15792,26 +15792,26 @@ YCMD:new(playerid, params[], help)
 YCMD:lotto(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
-    
+
 	if(!lotto_active) return SCM(playerid, -1, ""er"No lottery active!");
 	if(GetPlayerInterior(playerid) != 17) return SCM(playerid, -1, ""er"You need to be in a 24/7 shop!");
 	if(PlayerData[playerid][DrawnNumber] != -1) return SCM(playerid, -1, ""er"You already got a lotto!");
 	if(GetPlayerMoneyEx(playerid) < 500) return SCM(playerid, -1, ""er"A lotto costs $500!");
-	
+
 	new lotto;
 	if(sscanf(params, "i", lotto))
 	{
 	    return SCM(playerid, NEF_GREEN, "Usage: /lotto <1-75>");
 	}
-	
+
 	if(lotto < 1 || lotto > 75) return SCM(playerid, -1, ""er"Invalid lotto number");
 	if(Iter_Contains(LottoNumbersUsed, lotto)) return SCM(playerid, -1, ""er"This lotto number is already in use!");
-	
+
 	PlayerData[playerid][DrawnNumber] = lotto;
 	Iter_Add(LottoNumbersUsed, PlayerData[playerid][DrawnNumber]);
-	
+
 	GivePlayerMoneyEx(playerid, -500);
-	
+
 	format(gstr, sizeof(gstr), "~y~%i", PlayerData[playerid][DrawnNumber]);
 	player_notice(playerid, "Your lotto number:", gstr, 5000);
 	return 1;
@@ -15820,13 +15820,13 @@ YCMD:lotto(playerid, params[], help)
 YCMD:answer(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
-    
+
 	new answer;
 	if(sscanf(params, "i", answer))
 	{
 	    return SCM(playerid, NEF_GREEN, "Usage: /answer <answer>");
 	}
-	
+
 	new str[255];
 	if(mathsAnswered == -1)
 	{
@@ -15861,7 +15861,7 @@ YCMD:answer(playerid, params[], help)
 	GivePlayerScoreEx(playerid, 4, true, true);
 	GivePlayerMoneyEx(playerid, mathsAward, true, true);
 	PlayerData[playerid][e_mathwins]++;
-	
+
     if(PlayerAchData[playerid][e_ach_biocalc][0] == 0 && PlayerData[playerid][e_mathwins] >= 40)
     {
         GivePlayerAchievement(playerid, e_ach_biocalc, "Biocalc", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
@@ -15900,7 +15900,7 @@ YCMD:cashfall(playerid, params[], help)
 		}
 
 		if(PlayerData[playerid][e_level] == MAX_ADMIN_LEVEL) {
-			if(money > 50000 || money < 1) return SCM(playerid, -1, ""er"Cash: $1 - $50,000"); // Needs to be increased for eventful requirements. 
+			if(money > 50000 || money < 1) return SCM(playerid, -1, ""er"Cash: $1 - $50,000"); // Needs to be increased for eventful requirements.
 		} else {
 		    if(money > 10000 || money < 1) return SCM(playerid, -1, ""er"Cash: $1 - $10,000");
 		}
@@ -15952,7 +15952,7 @@ YCMD:scorefall(playerid, params[], help)
 				player_notice(i, "SCOREFALL", gstr, 4000);
 			}
 		}
-		
+
 		format(gstr, sizeof(gstr), "Admin %s(%i) has given all players %i Score", __GetName(playerid), playerid, score);
 		SCMToAll(YELLOW, gstr);
 		print(gstr);
@@ -15967,7 +15967,7 @@ YCMD:scorefall(playerid, params[], help)
 YCMD:ignore(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
-    
+
     new player;
 	if(sscanf(params, "r", player))
 	{
@@ -15976,7 +15976,7 @@ YCMD:ignore(playerid, params[], help)
 
     if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 	if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
-		
+
 	if(player == playerid) return SCM(playerid, -1, ""er"You cannot ignore yourself!");
 	if(PlayerData[player][e_level] > 0) return SCM(playerid, -1, ""er"You cannot ignore Admins!");
 
@@ -15998,7 +15998,7 @@ YCMD:ignore(playerid, params[], help)
 YCMD:unignore(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
-    
+
 	new player;
    	if(sscanf(params, "r", player))
 	{
@@ -16031,13 +16031,13 @@ YCMD:irc(playerid, params[], help)
         SCM(playerid, NEF_GREEN, "Sends a message to IRC");
 		return 1;
 	}
-	
+
 	if(IsAd(msg))
 	{
 	    SCM(playerid, RED, "Advertising is not allowed!");
 	    return 1;
 	}
-	
+
 	format(gstr, sizeof(gstr), "3*** %s(%i) to IRC: 4%s", __GetName(playerid), playerid, msg);
 	IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 	format(gstr, sizeof(gstr), "Message sent to IRC: "YELLOW_E"%s", msg);
@@ -16058,7 +16058,7 @@ YCMD:tpm(playerid, params[], help)
 	    SCM(playerid, NEF_GREEN, "Usage: /tpm <message>");
 	    return true;
 	}
-	
+
 	if(IsAd(params))
 	{
 	  	format(gstr, sizeof(gstr), ""yellow"** "red"Suspicion advertising | Player: %s(%i) Advertised IP: %s - PlayerIP: %s", __GetName(playerid), playerid, params, __GetIP(playerid));
@@ -16067,7 +16067,7 @@ YCMD:tpm(playerid, params[], help)
         SCM(playerid, RED, "Advertising is not allowed!");
         return 1;
 	}
-	
+
 	if(GetPVarInt(playerid, "Cop") != 0)
 	{
 	    format(gstr, sizeof(gstr), "[TPM] "LB_E"%s(%d): "YELLOW_E"%s", __GetName(playerid), playerid, params);
@@ -16103,9 +16103,9 @@ YCMD:givecash(playerid, params[], help)
 	    	return player_notice(playerid, "Command is on cooldown!", "");
 		}
 	}
-	
+
 	if(GetPlayerScore(playerid) < 500) return player_notice(playerid, "Command requires 500 score!", "");
-	
+
 	new player, cash, reason[100];
 	if(sscanf(params, "ris[99]", player, cash, reason))
 	{
@@ -16148,7 +16148,7 @@ YCMD:givecash(playerid, params[], help)
     {
         SCM(playerid, -1, ""er"Player is not connected");
     }
-    
+
     PlayerData[playerid][tickLastGiveCash] = tick;
 	return 1;
 }
@@ -16166,10 +16166,10 @@ YCMD:pm(playerid, params[], help)
 	{
 		return SCM(playerid, NEF_GREEN, "Usage: /pm <playerid> <message>");
 	}
-	
+
     if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 	if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
-	
+
 	new tick = GetTickCountEx();
 	if((PlayerData[playerid][tickLastPM] + COOLDOWN_CMD_PM) >= tick)
 	{
@@ -16198,17 +16198,17 @@ YCMD:pm(playerid, params[], help)
 	{
 	    return SCM(playerid, -1, ""er"This player has blocked you from PMing him");
 	}
-	
+
 	TextDrawShowForPlayer(playerid, CheckTD);
 	TextDrawShowForPlayer(player, NewMsgTD);
 	SetTimerEx("hideMsgTD", 3000, false, "i", player);
 	SetTimerEx("hideCheck", 3000, false, "i", playerid);
-	
+
 	if(!PlayerData[playerid][bCaps])
 	{
 	    UpperToLower(msg);
 	}
-	
+
 	format(gstr, sizeof(gstr), "{26FF00}***[PM] from %s(%i): %s", __GetName(playerid), playerid, msg);
     SCM(player, YELLOW, gstr);
 	format(gstr, sizeof(gstr), "{26FF00}>>>[PM] to %s(%i): %s", __GetName(player), player, msg);
@@ -16253,7 +16253,7 @@ YCMD:r(playerid, params[], help)
         SCM(playerid, RED, "Advertising is not allowed!");
         return 1;
 	}
-	
+
 	new lID = GetPVarInt(playerid, "LastID");
 	if(lID == INVALID_PLAYER_ID || !IsPlayerAvail(lID))
 	{
@@ -16263,12 +16263,12 @@ YCMD:r(playerid, params[], help)
 	{
 	    return SCM(playerid, -1, ""er"This player has blocked you from PMing him");
 	}
-	
+
 	if(!PlayerData[playerid][bCaps])
 	{
 	    UpperToLower(msg);
 	}
-	
+
 	format(gstr, sizeof(gstr), "{26FF00}***[PM] from %s(%i): %s", __GetName(playerid), playerid, msg);
     SCM(lID, YELLOW, gstr);
 	format(gstr, sizeof(gstr), "{26FF00}>>>[PM] to %s(%i): %s", __GetName(lID), lID, msg);
@@ -16301,7 +16301,7 @@ YCMD:r(playerid, params[], help)
 YCMD:toggletoys(playerid, params[], help)
 {
 	if(!islogged(playerid)) return notlogged(playerid);
-	
+
     PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
 
 	if(PlayerData[playerid][bShowToys])
@@ -16322,7 +16322,7 @@ YCMD:toggletoys(playerid, params[], help)
 YCMD:toys(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
-    
+
     if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
 	if(IsPlayerInAnyVehicle(playerid)) return SCM(playerid, -1, ""er"Please exit your vehicle first.");
 
@@ -16355,13 +16355,13 @@ YCMD:toys(playerid, params[], help)
 YCMD:achs(playerid, params[], help)
 {
 	new otherplayer, player;
-	
+
 	if(sscanf(params, "r", otherplayer)) {
 	    player = playerid;
 	} else {
 	    if(otherplayer == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(otherplayer)) return SCM(playerid, -1, ""er"Player not connected!");
-	
+
 		player = otherplayer;
 	}
 
@@ -16369,13 +16369,13 @@ YCMD:achs(playerid, params[], help)
 	{
 		new tmp[E_PLAYER_ACH_DATA][10],
 			finstring[2048];
-			
+
 		for(new i = 0; E_PLAYER_ACH_DATA:i < E_PLAYER_ACH_DATA; i++)
 		{
 		    if(PlayerAchData[player][E_PLAYER_ACH_DATA:i][0] == 1)
 		    {
 		        tmp[E_PLAYER_ACH_DATA:i] = ""nef_green"X";
-		        
+
 		        switch(E_PLAYER_ACH_DATA:i)
 		        {
 		            case 0: format(gstr, sizeof(gstr), ""white"[%s"white"] Styler -> %s\n", tmp[e_ach_styler], UTConvert(PlayerAchData[player][e_ach_styler][1]));
@@ -16400,7 +16400,7 @@ YCMD:achs(playerid, params[], help)
 		    else
 		    {
 		        tmp[E_PLAYER_ACH_DATA:i] = ""x_red_l"X";
-		        
+
 		        switch(E_PLAYER_ACH_DATA:i)
 		        {
 		            case 0: format(gstr, sizeof(gstr), ""white"[%s"white"] Styler -> Buy a toy\n", tmp[e_ach_styler]);
@@ -16422,7 +16422,7 @@ YCMD:achs(playerid, params[], help)
 		            case 16: format(gstr, sizeof(gstr), ""white"[%s"white"] Made Man -> Rise a business to level 20\n", tmp[e_ach_mademan]);
 				}
 		    }
-		    
+
 		    strcat(finstring, gstr);
 		}
 
@@ -16474,7 +16474,7 @@ YCMD:handsup(playerid, params[], help)
     if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
     player_notice(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
-    
+
     SetPlayerSpecialAction(playerid, SPECIAL_ACTION_HANDSUP);
 	return 1;
 }
@@ -16484,7 +16484,7 @@ YCMD:cigar(playerid, params[], help)
     if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
     player_notice(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
-    
+
     SetPlayerSpecialAction(playerid, SPECIAL_ACTION_SMOKE_CIGGY);
 	return 1;
 }
@@ -16494,7 +16494,7 @@ YCMD:carry(playerid, params[], help)
     if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
     player_notice(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
-    
+
     SetPlayerSpecialAction(playerid, SPECIAL_ACTION_CARRY);
 	return 1;
 }
@@ -16504,7 +16504,7 @@ YCMD:piss(playerid, params[], help)
     if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
     player_notice(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
-    
+
     ApplyAnimation(playerid, "PAULNMAC", "Piss_loop", 4.1, 1, 0, 0, 0, 0);
     SetPlayerSpecialAction(playerid, 68);
 	return 1;
@@ -16515,7 +16515,7 @@ YCMD:wank(playerid, params[], help)
     if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
     player_notice(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
-    
+
     ApplyAnimation(playerid, "PAULNMAC", "wank_loop", 4.1, 1, 0, 0, 0, 0);
 	return 1;
 }
@@ -16577,7 +16577,7 @@ YCMD:dance(playerid, params[], help)
 
     Command_ReProcess(playerid, "/stopanims", false);
     player_notice(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
-    
+
   	if(dance == 1)
   	{
   	    SetPlayerSpecialAction(playerid, SPECIAL_ACTION_DANCE1);
@@ -16610,7 +16610,7 @@ YCMD:vomit(playerid, params[], help)
     if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
     player_notice(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
-    
+
     ApplyAnimation(playerid, "FOOD", "EAT_Vomit_P", 4.1, 1, 0, 0, 0, 0);
 	return 1;
 }
@@ -16630,7 +16630,7 @@ YCMD:wave(playerid, params[], help)
     if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
     player_notice(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
-    
+
     ApplyAnimation(playerid, "ON_LOOKERS", "wave_loop", 4.1, 1, 0, 0, 0, 0);
 	return 1;
 }
@@ -16640,7 +16640,7 @@ YCMD:lay(playerid, params[], help)
     if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
     player_notice(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
-    
+
     ApplyAnimation(playerid, "BEACH", "Lay_Bac_Loop", 4.1, 1, 0, 0, 0, 0);
 	return 1;
 }
@@ -16650,7 +16650,7 @@ YCMD:smoke(playerid, params[], help)
     if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
     player_notice(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
-    
+
     ApplyAnimation(playerid, "SHOP", "Smoke_RYD", 4.1, 1, 0, 0, 0, 0);
 	return 1;
 }
@@ -16687,7 +16687,7 @@ YCMD:rob(playerid, params[], help)
 		    	return player_notice(playerid, "Command is on cooldown!", "");
 			}
 		}
-		
+
 		if(GetPVarInt(playerid, "Robber") == 1)
 		{
 			if(GetPVarInt(playerid, "InStore") != 0)
@@ -16738,7 +16738,7 @@ YCMD:rob(playerid, params[], help)
 						SCM(playerid, COLOR_RED, "Server: "GREY2_E"Player is AFK.");
 						continue;
 		    		}
-		    		
+
 					GetPlayerPos(i, POS[0], POS[1], POS[2]);
 	   		 		if(IsPlayerInRangeOfPoint(playerid, 3.2, POS[0], POS[1], POS[2]) && GetPlayerInterior(playerid) == GetPlayerInterior(i) && GetPlayerVirtualWorld(playerid) == GetPlayerVirtualWorld(i))
 	    			{
@@ -16750,7 +16750,7 @@ YCMD:rob(playerid, params[], help)
 				    	GameTextForPlayer(playerid, "~w~Robbed him~n~~g~+$5,000", 4000, 5);
 					}
 				}
-				
+
 				if(rangepass == 0)
 				{
 					SCM(playerid, COLOR_RED, "Server: "GREY2_E"No players to rob near you.");
@@ -16771,7 +16771,7 @@ YCMD:rob(playerid, params[], help)
 	    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
 		Command_ReProcess(playerid, "/stopanims", false);
 		player_notice(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
-	    
+
 	    ApplyAnimation(playerid, "SHOP", "ROB_Loop", 4.1, 1, 0, 0, 0, 0);
 	}
 	return 1;
@@ -16787,7 +16787,7 @@ YCMD:ar(playerid, params[], help)
 	    	return player_notice(playerid, "Command cooldown in progress", "");
 		}
 	}
-	
+
 	if(GetPVarInt(playerid, "Cop") != 0)
 	{
 		if(IsPlayerInAnyVehicle(playerid)) return 1;
@@ -16803,15 +16803,15 @@ YCMD:ar(playerid, params[], help)
       		if(IsPlayerInAnyVehicle(i)) continue;
       		if(gTeam[i] != CNR) continue;
 			GetPlayerPos(i, POS[0], POS[1], POS[2]);
-			
+
    		 	if(IsPlayerInRangeOfPoint(playerid, 3.8, POS[0], POS[1], POS[2]) && GetPlayerInterior(playerid) == GetPlayerInterior(i) && GetPlayerVirtualWorld(playerid) == GetPlayerVirtualWorld(i))
     		{
     			if(GetPVarInt(i, "Robber") == 1 && GetPVarInt(i, "Cop") == 0)
 				{
-					if(PlayerData[i][bIsDead]) 
-					{ 
-						SCM(playerid, -1, ""er"The selected criminal is not alive."); 
-						continue; 
+					if(PlayerData[i][bIsDead])
+					{
+						SCM(playerid, -1, ""er"The selected criminal is not alive.");
+						continue;
 					}
 					rangepass++;
 					pArrests[playerid]++;
@@ -16832,7 +16832,7 @@ YCMD:ar(playerid, params[], help)
 				    GivePlayerMoneyEx(playerid, 10000, true, true);
 					GivePlayerScoreEx(playerid, 5, true, true);
 				    SCM(playerid, COLOR_BLUE, ""nef" "RED_E"You have received 5 score and $10,000 for catching a criminal!");
-				    
+
 				 	if(PlayerData[i][e_gangrank] > 0 && PlayerData[i][e_gangid] != PlayerData[playerid][e_gangid])
 					{
 					  	MySQL_UpdateGangScore(PlayerData[playerid][e_gangid], 1);
@@ -16840,7 +16840,7 @@ YCMD:ar(playerid, params[], help)
 	    		}
     		}
   		}
-  		
+
   		if(rangepass == 0)
 			SCM(playerid, COLOR_RED, "Server: "GREY2_E"No criminals nearby.");
 		else
@@ -16976,7 +16976,7 @@ YCMD:v(playerid, params[], help)
 				{
 					return SCM(playerid, NEF_YELLOW, "I don't know that vehicle...");
 				}
-				
+
 		        CarSpawner(playerid, veh, 120);
 			}
 			else
@@ -17014,7 +17014,7 @@ function:OnPlayerNameChangeRequest(playerid, newname[])
 {
 	new rows, fields;
 	cache_get_data(rows, fields, pSQL);
-	
+
 	if(rows > 0)
 	{
 	    SCM(playerid, -1, ""er"Your name is already in use or contains invalid characters");
@@ -17023,7 +17023,7 @@ function:OnPlayerNameChangeRequest(playerid, newname[])
 	{
 	    new oldname[MAX_PLAYER_NAME+1], query[255];
 	    strmid(oldname, __GetName(playerid), 0, sizeof(oldname), sizeof(oldname));
-	    
+
 		if(SetPlayerName(playerid, newname) == 1) // If successfull
         {
             GetPlayerName(playerid, PlayerData[playerid][e_name], MAX_PLAYER_NAME + 1);
@@ -17052,22 +17052,22 @@ function:OnPlayerNameChangeRequest(playerid, newname[])
 			    UpdateDynamic3DTextLabelText(BusinessData[r][e_label_id], -1, gstr);
 			    orm_update(BusinessData[r][e_ormid]);
 			}
-            
+
             format(query, sizeof(query), "UPDATE `accounts` SET `name` = '%s' WHERE `name` = '%s' LIMIT 1;", newname, oldname);
             mysql_tquery(pSQL, query, "", "");
-            
+
             format(query, sizeof(query), "UPDATE `race_records` SET `name` = '%s' WHERE `name` = '%s';", newname, oldname);
             mysql_tquery(pSQL, query, "", "");
-            
+
             format(query, sizeof(query), "INSERT INTO `ncrecords` VALUES (NULL, '%s', '%s', %i);", oldname, newname, gettime());
             mysql_tquery(pSQL, query, "", "");
-            
+
             format(query, sizeof(query), "UPDATE `queue` SET `Extra` = '%s' WHERE `Extra` = '%s';", newname, oldname);
             mysql_tquery(pSQL, query, "", "");
 
             format(query, sizeof(query), "UPDATE `online` SET `name` = '%s' WHERE `name` = '%s';", newname, oldname);
             mysql_tquery(pSQL, query, "", "");
-            
+
             format(query, sizeof(query), "UPDATE `creditsorder` SET `receiver` = '%s' WHERE `receiver` = '%s';", newname, oldname);
             mysql_tquery(pSQL, query, "", "");
 
@@ -17075,20 +17075,20 @@ function:OnPlayerNameChangeRequest(playerid, newname[])
             mysql_tquery(pSQL, query, "", "");
 
 			PlayerData[playerid][e_lastnc] = gettime();
-			
+
 			DestroyPlayerVehicles(playerid);
-			
+
 			new nextnc = (PlayerData[playerid][e_lastnc] + ((PlayerData[playerid][e_vip] == 1) ? (2592000) : (7776000)));
-			
+
 			format(query, sizeof(query), ""white"You have successfully changed your name.\n\nNew name: %s\nOld name: %s\nNext namechange available: %s", newname, oldname, UTConvert(nextnc));
 			ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Namechange", query, "OK", "");
-			
+
 			format(query, sizeof(query), ""nef" %s(%i) has changed their name to %s", oldname, playerid, newname);
 			SCMToAll(-1, query);
-			
+
 			format(query, sizeof(query), "2Server: 3 %s(%i)4 has changed their name to %s", oldname, playerid, newname);
 			IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, query),
-			
+
 			MySQL_SaveAccount(playerid);
         }
         else
@@ -17109,7 +17109,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			inputtext[i] = '#';
 		}
 	}
-	
+
 	if(response)
 	{
 		PlayerPlaySound(playerid, 1083, 0.0, 0.0, 0.0); //1054
@@ -17122,9 +17122,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 	            new email[26];
 	            sscanf(inputtext, "s[25]", email);
-	            
+
 	            strmid(PlayerData[playerid][e_email], email, 0, 26, 26);
-	            
+
 	            player_notice(playerid, "New email set", "");
 	            return true;
 	        }
@@ -17154,34 +17154,34 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        case DIALOG_DUEL + 1:
 	        {
 	            PlayerData[playerid][DuelLocation] = listitem + 1;
-	            
+
 	            if(!IsPlayerAvail(PlayerData[playerid][DuelRequest])) return PlayerData[playerid][DuelRequest] = INVALID_PLAYER_ID, SCM(playerid, -1, ""er"Player is not available");
 	            if(gTeam[PlayerData[playerid][DuelRequest]] != FREEROAM) return PlayerData[playerid][DuelRequest] = INVALID_PLAYER_ID, SCM(playerid, -1, ""er"Player is not in freeroam mode");
 	            if(gTeam[playerid] != FREEROAM) return PlayerData[playerid][DuelRequest] = INVALID_PLAYER_ID, player_notice(playerid, "You must be in Freeroam", "");
 	            if(IsPlayerOnDesktop(PlayerData[playerid][DuelRequest])) return PlayerData[playerid][DuelRequest] = INVALID_PLAYER_ID, SCM(playerid, -1, ""er"Player is on desktop");
 	            if(playerid == PlayerData[playerid][DuelRequest]) return PlayerData[playerid][DuelRequest] = INVALID_PLAYER_ID, SCM(playerid, -1, ""er"You can't duel yourself");
 	            if(!islogged(PlayerData[playerid][DuelRequest])) return PlayerData[playerid][DuelRequest] = INVALID_PLAYER_ID, SCM(playerid, -1, ""er"Player does not have an account");
-	            
+
 	            PlayerData[PlayerData[playerid][DuelRequest]][DuelRequestRecv] = playerid;
-	            
+
 	            for(new i = 0; i < MAX_PLAYERS; i++)
 	            {
 	                if(PlayerData[i][DuelRequest] == playerid)
 	                {
 			        	format(gstr, sizeof(gstr), ">> Duel request cancelled by %s(%i)", __GetName(playerid), playerid);
 			        	SCM(i, NEF_RED, gstr);
-			        	
+
 	                    PlayerData[i][DuelRequest] = INVALID_PLAYER_ID;
 	                }
 	            }
 	            PlayerData[playerid][DuelRequestRecv] = INVALID_PLAYER_ID;
-	            
+
 	            new tmp[50];
 	            GetWeaponName(PlayerData[playerid][DuelWeapon], tmp, sizeof(tmp));
-	            
+
 	            format(gstr, sizeof(gstr), ">> %s(%i) requests a duel with you! Type /duel to accept (Weapon: %s)", __GetName(playerid), playerid, tmp);
 	            SCM(PlayerData[playerid][DuelRequest], NEF_RED, gstr);
-	            
+
 	            player_notice(playerid, "DUEL REQUESTED", "Wait for accept");
 	            return true;
 	        }
@@ -17286,7 +17286,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					player_notice(playerid, "You can't upgrade it now", "Type ~y~/exit ~w~to leave");
 					return 1;
 				}
-						
+
 				switch(listitem)
 				{
 				    case 0:
@@ -17316,7 +17316,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        case DIALOG_SET_BUSINESS_TYPE:
 	        {
 	            new r = GetBusinessSlotBySelection(playerid);
-	            
+
 				if(r != -1) {
 				    player_notice(playerid, "Business type set", "");
 					BusinessData[r][e_type] = E_BUSINESS_TYPES:listitem;
@@ -17331,14 +17331,14 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        case DIALOG_UPGRADE_BUSINESS:
 	        {
 	            new r = GetBusinessSlotBySelection(playerid);
-			    
+
 				if(r != -1) {
 		            if(BusinessData[r][e_level] >= MAX_BUSINESS_LEVEL)
 		            {
 						Command_ReProcess(playerid, "/bmenu", false);
 						return 1;
 		            }
-                
+
 		            if(GetPlayerMoneyEx(playerid) < BusinessLevelMatrix[BusinessData[r][e_level]][E_bupgradeprice])
 		            {
 		                return SCM(playerid, -1, ""er"You don't have enough money!");
@@ -17346,7 +17346,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
                     GivePlayerMoneyEx(playerid, -BusinessLevelMatrix[BusinessData[r][e_level]][E_bupgradeprice]);
                     BusinessData[r][e_level]++;
-                    
+
                     if(PlayerAchData[playerid][e_ach_mademan][0] == 0 && BusinessData[r][e_level] == 20)
 				    {
 				        GivePlayerAchievement(playerid, e_ach_mademan, "Made Man", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
@@ -17358,10 +17358,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                  	strcat(gstr2, gstr);
 	                format(gstr, sizeof(gstr), ""nef" :: Business Level Upgrade > Slot: %i", PlayerData[playerid][BusinessIdSelected] + 1);
 					ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, gstr, gstr2, "OK", "");
-                 	
+
 					format(gstr, sizeof(gstr), ""business_mark"\nID: %i\nOwner: %s\nType: %s\nLevel: %i", BusinessData[r][e_id], BusinessData[r][e_owner], BusinessTypes[_:BusinessData[r][e_type]], BusinessData[r][e_level]);
 					UpdateDynamic3DTextLabelText(BusinessData[r][e_label_id], -1, gstr);
-				    
+
 					orm_update(BusinessData[r][e_ormid]);
 				} else {
 					player_notice(playerid, "Couldn't find the business in that slot", "Report on forums", 5000);
@@ -17400,19 +17400,19 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				    ShowDialog(playerid, CM_DIALOG);
 	                return 1;
 	            }
-	        
+
 				if(PlayerData[playerid][e_addtoyslots] >= 5)
 				{
 				    SCM(playerid, -1, ""er"You already have 5 additional toy slots!");
 				    ShowDialog(playerid, CM_DIALOG);
 				    return 1;
 				}
-				
+
 				PlayerData[playerid][e_addtoyslots]++;
-				
+
 				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[0][E_item_credits]));
 				player_notice(playerid, "Item purchased", gstr, 5000);
-				
+
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[0][E_item_credits]);
 				return true;
 	        }
@@ -17436,7 +17436,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[1][E_item_credits]));
 				player_notice(playerid, "Item purchased", gstr, 5000);
-                
+
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[1][E_item_credits]);
 	            return true;
 	        }
@@ -17460,7 +17460,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[2][E_item_credits]));
 				player_notice(playerid, "Item purchased", gstr, 5000);
-                
+
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[2][E_item_credits]);
 	            return true;
 	        }
@@ -17484,7 +17484,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[3][E_item_credits]));
 				player_notice(playerid, "Item purchased", gstr, 5000);
-                
+
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[3][E_item_credits]);
 	            return true;
 	        }
@@ -17505,10 +17505,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 
 				PlayerData[playerid][e_addbizzslots]++;
-				
+
 				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[4][E_item_credits]));
 				player_notice(playerid, "Item purchased", gstr, 5000);
-                
+
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[4][E_item_credits]);
 	            return true;
 	        }
@@ -17530,7 +17530,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 
 				PlayerData[playerid][e_lastnc] = 0;
-                
+
 				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[5][E_item_credits]));
 				player_notice(playerid, "Item purchased", gstr, 5000);
 
@@ -17550,7 +17550,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[6][E_item_credits]));
 				player_notice(playerid, "Item purchased", gstr, 5000);
-                
+
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[6][E_item_credits]);
 	            return true;
 	        }
@@ -17567,7 +17567,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[7][E_item_credits]));
 				player_notice(playerid, "Item purchased", gstr, 5000);
-                
+
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[7][E_item_credits]);
 	            return true;
 	        }
@@ -17592,10 +17592,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[8][E_item_credits]));
 				player_notice(playerid, "Item purchased", gstr, 5000);
-                
+
                 format(gstr, sizeof(gstr), "INSERT INTO `queue` VALUES (NULL, 2, UNIX_TIMESTAMP() + 86400, '%s');", __GetName(playerid));
                 mysql_tquery(pSQL, gstr, "", "");
-                
+
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[8][E_item_credits]);
 	            return true;
 	        }
@@ -17620,10 +17620,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[9][E_item_credits]));
 				player_notice(playerid, "Item purchased", gstr, 5000);
-				
+
                 format(gstr, sizeof(gstr), "INSERT INTO `queue` VALUES (NULL, 3, UNIX_TIMESTAMP() + 86400, '%s');", __GetName(playerid));
                 mysql_tquery(pSQL, gstr, "", "");
-                
+
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[9][E_item_credits]);
 	            return true;
 	        }
@@ -17648,10 +17648,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[10][E_item_credits]));
 				player_notice(playerid, "Item purchased", gstr, 5000);
-                
+
                 format(gstr, sizeof(gstr), "INSERT INTO `queue` VALUES (NULL, 4, UNIX_TIMESTAMP() + 86400, '%s');", __GetName(playerid));
                 mysql_tquery(pSQL, gstr, "", "");
-                
+
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[10][E_item_credits]);
 	            return true;
 	        }
@@ -17676,10 +17676,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[11][E_item_credits]));
 				player_notice(playerid, "Item purchased", gstr, 5000);
-                
+
                 format(gstr, sizeof(gstr), "INSERT INTO `queue` VALUES (NULL, 5, UNIX_TIMESTAMP() + 86400, '%s');", __GetName(playerid));
                 mysql_tquery(pSQL, gstr, "", "");
-                
+
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[11][E_item_credits]);
 	            return true;
 	        }
@@ -17704,10 +17704,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[12][E_item_credits]));
 				player_notice(playerid, "Item purchased", gstr, 5000);
-                
+
                 format(gstr2, sizeof(gstr2), "INSERT INTO `queue` VALUES (NULL, 6, UNIX_TIMESTAMP() + 86400, '%s');", __GetName(playerid));
                 mysql_tquery(pSQL, gstr2, "", "");
-                
+
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[12][E_item_credits]);
 	            return true;
 	        }
@@ -17726,7 +17726,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[13][E_item_credits]));
 				player_notice(playerid, "Item purchased", gstr, 5000);
 				SCM(playerid, NEF_YELLOW, "Your K/D has been reset!");
-				
+
 				AlterPlayerCredits(playerid, -CreditsProductMatrix[13][E_item_credits]);
 	            return true;
 	        }
@@ -17827,7 +17827,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                         {
                             return SCM(playerid, -1, ""er"There aren't enough cops in CNR!");
                         }
-                        
+
    			    		gTeam[playerid] = CNR;
 
 						SetPVarInt(playerid, "Robber", 1);
@@ -17989,12 +17989,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 				CheckPlayerGod(playerid);
                 ShowPlayerCNRTextdraws(playerid);
-                
+
                 Streamer_ToggleItemUpdate(playerid, STREAMER_TYPE_OBJECT, 0);
                 Streamer_ToggleItemUpdate(playerid, STREAMER_TYPE_PICKUP, 0);
 				Streamer_DestroyAllVisibleItems(playerid, STREAMER_TYPE_OBJECT);
 				Streamer_DestroyAllVisibleItems(playerid, STREAMER_TYPE_PICKUP);
-				
+
 				SetPlayerHealth(playerid, 100);
 				SetPlayerWorldBounds(playerid, 20000.0, -20000.0, 20000.0, -20000.0);
 	            return true;
@@ -18039,9 +18039,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        case HOUSE_MENU_DIALOG:
 	        {
 				format(gstr, sizeof(gstr), ""nef" :: House Menu > Slot: %i", listitem + 1);
-				
+
 	            PlayerData[playerid][HouseSlotSelected] = listitem;
-	            
+
 		        if(listitem > PlayerData[playerid][e_addhouseslots])
 		        {
 		            ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, gstr, ""nef_green"This house slot is locked.\n\n"white"You may unlock it by purchasing an extra slot at Gold Credits (/gc)", "OK", "");
@@ -18070,9 +18070,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							player_notice(playerid, "You can't do this now", "Type ~y~/exit ~w~to leave");
 							return 1;
 						}
-						
+
 						new h_id = GetHouseIdByPlayerSlotSel(playerid);
-						
+
 						if(h_id != -1)
 						{
 				   			SetPlayerPos(playerid, HouseInfo[h_id][E_x], HouseInfo[h_id][E_y], HouseInfo[h_id][E_z]);
@@ -18089,7 +18089,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							player_notice(playerid, "Get out to upgrade the house", "");
 							return 1;
 						}
-						
+
 				        ShowDialog(playerid, HOUSE_UPGRADE_DIALOG);
 				    }
 				    case 2:
@@ -18101,7 +18101,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						if(h_id != -1)
 						{
                             if(GetPlayerVirtualWorld(playerid) != (HouseInfo[h_id][e_id] + 1000)) return SCM(playerid, -1, ""er"You need to be in the house you selected!");
-                            
+
 							new string[1024];
 							format(gstr2, sizeof(gstr2), ""nef" :: House Menu > Slot: %i > House Items", PlayerData[playerid][HouseSlotSelected] + 1);
 
@@ -18151,7 +18151,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					if(h_id != -1)
 					{
 					    if(GetPlayerVirtualWorld(playerid) != (HouseInfo[h_id][e_id] + 1000)) return SCM(playerid, -1, ""er"You need to be in the house you selected!");
-					    
+
 	                    if(HouseInfo[h_id][E_Obj_Model][listitem] == 0)
 	                    {
 	                        ShowModelSelectionMenu(playerid, hobjslist, "Select House Item", 0x0500009C, 0x050000FF, 0xFAFAFA4D);
@@ -18174,7 +18174,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				if(h_id != -1)
 				{
 				    if(GetPlayerVirtualWorld(playerid) != (HouseInfo[h_id][e_id] + 1000)) return SCM(playerid, -1, ""er"You need to be in the house you selected!");
-				    
+
 		            switch(listitem)
 		            {
 		                case 0:
@@ -18206,7 +18206,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				if(listitem == 0) return PVSlotSelect(playerid);
 
                 listitem--;
-			    
+
 	            CreateFinalCar(playerid, listitem);
 	            return true;
 	        }
@@ -18285,7 +18285,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        case LABEL_DIALOG:
 	        {
 	            if(strlen(inputtext) > 35 || strlen(inputtext) < 3) return SCM(playerid, -1, ""er"Inputlength: 3-35");
-	            
+
 	            new text[36];
 	            sscanf(inputtext, "s[35]", text);
 
@@ -18297,12 +18297,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			        SCM(playerid, RED, "Advertising is not allowed!");
 			        return 1;
 				}
-	            
+
 	            if(!strcmp("admin", text, true) || !strcmp("staff", text, true) || !strcmp("mod", text, true))
 	            {
 	                return SCM(playerid, -1, ""er"Don't enter following words: admin, staff, mod");
 	            }
-	            
+
 	            PlayerData[playerid][VIPLabel] = CreateDynamic3DTextLabel(text, -1, 0.0, 0.0, 0.65, 20.0, playerid, INVALID_VEHICLE_ID, 1, -1, -1, -1, 20.0);
 
                 SCM(playerid, -1, ""er"Label attached! Note: You can't see the label yourself");
@@ -18323,12 +18323,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			        SCM(playerid, RED, "Advertising is not allowed!");
 			        return 1;
 				}
-				
+
 	            if(!strcmp("admin", text, true) || !strcmp("staff", text, true) || !strcmp("mod", text, true))
 	            {
 	                return SCM(playerid, -1, ""er"Don't enter following words: admin, staff, mod");
 	            }
-				
+
 				UpdateDynamic3DTextLabelText(PlayerData[playerid][VIPLabel], -1, text);
 	            SCM(playerid, -1, ""er"Label text changed!");
 	            return true;
@@ -18398,7 +18398,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				new newname[MAX_PLAYER_NAME + 1];
 				mysql_escape_string(inputtext, newname, pSQL, MAX_PLAYER_NAME + 1);
-				
+
                 mysql_format(pSQL, gstr, sizeof(gstr), "SELECT `id` FROM `accounts` WHERE `name` = '%e';", inputtext);
                 mysql_tquery(pSQL, gstr, "OnPlayerNameChangeRequest", "is", playerid, newname);
 	            return true;
@@ -18425,11 +18425,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        case GANG_SET_RANK_DIALOG:
 	        {
 				if(listitem == 0) return ShowDialog(playerid, GANG_SET_RANK_DIALOG);
-				
+
 				PlayerData[playerid][RankSelected] = listitem;
-				
+
 				format(gstr, sizeof(gstr), ""white"Now enter the name of the player who should get the rank:\n\nSelected Rank: %s", GangPositions[listitem][E_gang_pos_name]);
-				
+
 				ShowPlayerDialog(playerid, GANG_SET_RANK_DIALOG + 1, DIALOG_STYLE_INPUT, ""nef" :: Gang Rank Menu", gstr, "Next", "Cancel");
 	            return true;
 	        }
@@ -18439,13 +18439,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			    {
 			        return SCM(playerid, -1, ""er"You can't assign your own rank");
 			    }
-			    
+
 	            if(strlen(inputtext) > MAX_PLAYER_NAME+1 || strlen(inputtext) < 3) return SCM(playerid, -1, ""er"Player doesn't exist");
 	            if(sscanf(inputtext, "s[26]", PlayerData[playerid][GangAssignRank])) return SCM(playerid, -1, ""er"Player doesn't exist");
 	            mysql_escape_string(PlayerData[playerid][GangAssignRank], PlayerData[playerid][GangAssignRank], pSQL, MAX_PLAYER_NAME+1);
 
 				new ID = __GetPlayerID(PlayerData[playerid][GangAssignRank]);
-				
+
 		  		if(ID != INVALID_PLAYER_ID)
 		  		{
 					if(!IsPlayerAvail(ID)) return SCM(playerid, -1, ""er"Player ist not available");
@@ -18459,7 +18459,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s set %s's rank to %s", __GetName(playerid), __GetName(ID), GangPositions[PlayerData[playerid][RankSelected]][E_gang_pos_name]);
 					GangMSG(PlayerData[playerid][e_gangid], gstr);
-					
+
 					PlayerData[playerid][RankSelected] = 0;
 				}
 				else
@@ -18512,7 +18512,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					 			PlayerData[i][GangLabel] = Text3D:-1;
 							}
 						}
-						
+
 						SyncGangZones(i);
 				    }
 				}
@@ -18544,7 +18544,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			    {
 			        return SCM(playerid, -1, ""er"You can't kick yourself");
 			    }
-	        
+
 	            if(strlen(inputtext) > MAX_PLAYER_NAME+1 || strlen(inputtext) < 3) return SCM(playerid, -1, ""er"Player doesn't exist");
 	            if(sscanf(inputtext, "s[26]", PlayerData[playerid][GangKickMem])) return SCM(playerid, -1, ""er"Player doesn't exist");
 	            mysql_escape_string(PlayerData[playerid][GangKickMem], PlayerData[playerid][GangKickMem], pSQL, MAX_PLAYER_NAME+1);
@@ -18569,12 +18569,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					    DestroyDynamic3DTextLabel(PlayerData[ID][GangLabel]);
 						PlayerData[ID][GangLabel] = Text3D:-1;
 					}
-					
+
 				    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s kicked %s out of the gang", __GetName(playerid), PlayerData[playerid][GangKickMem]);
 					GangMSG(PlayerData[playerid][e_gangid], gstr);
 
 			        SCM(ID, -1, ""gang_sign" You have been kicked out of your gang!");
-			        
+
 			        PlayerData[playerid][GangKickMem][0] = '\0';
 			  	}
 			  	else
@@ -18675,20 +18675,20 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	                {
 						new cstring[2048];
 
-						strcat(cstring, ""red"Â» "nef_yellow"Commands:\n");
+						strcat(cstring, ""red"» "nef_yellow"Commands:\n");
 						strcat(cstring, ""white"There are many commands, to get an overview use "yellow"/cmds\n\n");
 
-						strcat(cstring, ""red"Â» "nef_yellow"Minigames\n");
+						strcat(cstring, ""red"» "nef_yellow"Minigames\n");
 						strcat(cstring, ""white"Available minigames:\n");
 						strcat(cstring, ""yellow"Type /m to get an overview\n\n");
 
-						strcat(cstring, ""red"Â» "nef_yellow"Admins\n");
+						strcat(cstring, ""red"» "nef_yellow"Admins\n");
 						strcat(cstring, ""white"Admins are here to help, use "yellow"/report "white"if you want to report a player or if you have a question\n\n");
 
-						strcat(cstring, ""red"Â» "nef_yellow"Gangs\n");
+						strcat(cstring, ""red"» "nef_yellow"Gangs\n");
 						strcat(cstring, ""white"Gangs are groups which have been created by players\n\n");
 
-						strcat(cstring, ""red"Â» "nef_yellow"Houses/Business\n");
+						strcat(cstring, ""red"» "nef_yellow"Houses/Business\n");
 						strcat(cstring, ""white"Houses and business are for sale around San Andreas. Use "yellow"/cmds "white"for more infos");
 
 						ShowPlayerDialog(playerid, HELP_DIALOG + 1, DIALOG_STYLE_MSGBOX, ""nef" :: General Help", cstring, "OK", "Back");
@@ -18701,13 +18701,13 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	                {
 						new cstring[512];
 
-						strcat(cstring, ""red"Â» "nef_yellow"LMB (Left Mouse Button)\n");
+						strcat(cstring, ""red"» "nef_yellow"LMB (Left Mouse Button)\n");
 						strcat(cstring, ""white"Speedboost for vehicles\n\n");
 
-						strcat(cstring, ""red"Â» "nef_yellow"2\n");
+						strcat(cstring, ""red"» "nef_yellow"2\n");
 						strcat(cstring, ""white"Flip your vehicle\n\n");
 
-						strcat(cstring, ""red"Â» "nef_yellow"H\n");
+						strcat(cstring, ""red"» "nef_yellow"H\n");
 						strcat(cstring, ""white"Jump with your vehicle\n\n");
 
 						ShowPlayerDialog(playerid, HELP_DIALOG + 2, DIALOG_STYLE_MSGBOX, ""nef" :: Shortcuts", cstring, "OK", "Back");
@@ -18766,7 +18766,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		    case CMDS_DIALOG:
 		    {
 		        new cstring[2048];
-		        
+
 		        switch(listitem)
 		        {
 		            case 0: // General
@@ -18887,7 +18887,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					{
 						s = true;
 					}
-					
+
 					if(inputtext[i] != ' ')
 					{
 						command[c++] = inputtext[i];
@@ -18921,7 +18921,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	            }
 
 				new h_id = GetHouseIdByPlayerSlotSel(playerid);
-				
+
 				if(h_id != -1)
 				{
 	  	            if(PlayerData[playerid][HouseIntSelected] == HouseInfo[h_id][interior])
@@ -18952,7 +18952,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						    HouseInfo[h_id][E_Obj_Model][ii] = 0;
 						}
 					}
-					
+
 	                GivePlayerMoneyEx(playerid, -HouseIntTypes[PlayerData[playerid][HouseIntSelected]][price]);
 	                HouseInfo[h_id][interior] = PlayerData[playerid][HouseIntSelected];
 	       			SetPlayerPos(playerid, HouseInfo[h_id][E_x], HouseInfo[h_id][E_y], HouseInfo[h_id][E_z]);
@@ -19088,7 +19088,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		            case 2:
 		            {
 						new cstring[900];
-						
+
 						strcat(cstring, ""yellow"/gmenu "white"- gang menu\n");
 						strcat(cstring, ""yellow"/gcolor "white"- set the gang color\n");
 						strcat(cstring, ""yellow"/gcar "white"- set the gang vehicle\n");
@@ -19104,7 +19104,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						strcat(cstring, ""yellow"/gcapture "white"- recapture a zone while it is begin attacked\n");
 						strcat(cstring, ""yellow"/gwar "white"- start a war against another gang\n");
 						strcat(cstring, ""yellow"/gwars "white"- view ongoing gwars\n");
-		            
+
 		                ShowPlayerDialog(playerid, GMENU_DIALOG + 1, DIALOG_STYLE_MSGBOX, ""nef" :: Gang commands", cstring, "OK", "Back");
 		            }
 		            case 3: // view gang zones
@@ -19127,9 +19127,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				if(!IsDerbyRunning)
 				{
 				    if(Iter_Contains(DerbyVoters, playerid)) return SCM(playerid, -1, ""er"You already voted this round");
-				    
+
 				    Iter_Add(DerbyVoters, playerid);
-				
+
 				    switch(listitem)
 				    {
 						case 0:
@@ -19200,17 +19200,17 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			    {
 				    case 0: // Deposit
 				    {
-				        format(gstr, sizeof(gstr), ""white"Â» You got "yellow"$%s"white" in your bank account.\n\nType in the amount you want to deposit below:", number_format(PlayerData[playerid][e_bank]));
+				        format(gstr, sizeof(gstr), ""white"» You got "yellow"$%s"white" in your bank account.\n\nType in the amount you want to deposit below:", number_format(PlayerData[playerid][e_bank]));
 				        ShowPlayerDialog(playerid, BANK_DIALOG+1, DIALOG_STYLE_INPUT, ""nef" :: Bank > Deposit", gstr, "Deposit", "Cancel");
 				    }
 				    case 1: // Withdraw
 				    {
-				        format(gstr, sizeof(gstr), ""white"Â» You got "yellow"$%s"white" in your bank account.\n\nType in the amount you want to withdraw below:", number_format(PlayerData[playerid][e_bank]));
+				        format(gstr, sizeof(gstr), ""white"» You got "yellow"$%s"white" in your bank account.\n\nType in the amount you want to withdraw below:", number_format(PlayerData[playerid][e_bank]));
 				        ShowPlayerDialog(playerid, BANK_DIALOG+2, DIALOG_STYLE_INPUT, ""nef" :: Bank > Withdraw", gstr, "Withdraw", "Cancel");
 				    }
 				    case 2: // Show Credit
 				    {
-				        format(gstr, sizeof(gstr), ""white"Â» You got "yellow"$%s"white" in your bank account.", number_format(PlayerData[playerid][e_bank]));
+				        format(gstr, sizeof(gstr), ""white"» You got "yellow"$%s"white" in your bank account.", number_format(PlayerData[playerid][e_bank]));
 				        ShowPlayerDialog(playerid, 11231, DIALOG_STYLE_MSGBOX, ""nef" :: Bank > Balance", gstr, "OK", "");
 				    }
 			    }
@@ -19235,7 +19235,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					GivePlayerMoneyEx(playerid, -inamount);
 					PlayerData[playerid][e_bank] += inamount;
-					format(gstr, sizeof(gstr), "Â» You have deposited {FF7800}$%s"white" into your bank account", number_format(inamount));
+					format(gstr, sizeof(gstr), "» You have deposited {FF7800}$%s"white" into your bank account", number_format(inamount));
 					SCM(playerid, WHITE, gstr);
 				}
 				return true;
@@ -19259,7 +19259,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					GivePlayerMoneyEx(playerid, outamount);
 					PlayerData[playerid][e_bank] -= outamount;
-					format(gstr, sizeof(gstr), "Â» You have withdrawn {FF7800}$%s"white" from your bank account", number_format(outamount));
+					format(gstr, sizeof(gstr), "» You have withdrawn {FF7800}$%s"white" from your bank account", number_format(outamount));
 					SCM(playerid, WHITE, gstr);
 				}
 				return true;
@@ -19287,7 +19287,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return SkipLogin(playerid);
 				}
 				if(isnull(inputtext)) return SkipLogin(playerid);
-				extract inputtext -> new string:password[33]; else // frÃ¼her war das auch ohne dem makro
+				extract inputtext -> new string:password[33]; else // früher war das auch ohne dem makro
 				{
 					return SkipLogin(playerid);
 				}
@@ -19423,7 +19423,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			case TOY_DIALOG:
 			{
 				format(gstr, sizeof(gstr), ""nef" :: Player Toys > Slot: %i", listitem + 1);
-					
+
 			    if(listitem > PlayerData[playerid][e_addtoyslots] + 4)
 			    {
 			        ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, gstr, ""nef_green"This toy slot is locked.\n\n"white"You may unlock it by purchasing an extra slot at Gold Credits (/gc)", "OK", "");
@@ -19431,7 +19431,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			    else
 			    {
 			        PlayerData[playerid][toy_selected] = listitem;
-			        
+
 					if(PlayerToyData[playerid][listitem][toy_model] == 0)
 					{
 					    ShowModelSelectionMenu(playerid, toyslist, "Select Toy", 0x0500009C, 0x050000FF, 0xFAFAFA4D);
@@ -19457,7 +19457,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					{
 					    new finstring[750],
 							string[128];
-							
+
 						format(string, sizeof(string), ""nef" :: Player Toys > Slot %i > Change Bone", PlayerData[playerid][toy_selected] + 1);
 
 					    strcat(finstring, "Spine\nHead\nLeft upper arm\nRight upper arm\nLeft hand\nRight hand\nLeft thigh\nRight thigh\nLeft foot\nRight foot");
@@ -19736,7 +19736,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			    else
 			    {
 			        PVVMenuSel[playerid] = listitem;
-			        
+
 				   	if(PlayerPVData[playerid][PVVMenuSel[playerid]][e_model] == 0)
 					{
 					    player_notice(playerid, "PV slot is not in use", "");
@@ -19828,9 +19828,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					    }
 
                         strmid(PlayerPVData[playerid][PVVMenuSel[playerid]][e_plate], "Plate", 0, 13, 13);
-                        
+
                         MySQL_SaveAccount(playerid, false, true);
-                        
+
                         player_notice(playerid, "Vehicle sold", "");
 					}
 				}
@@ -19844,9 +19844,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					ShowDialog(playerid, CARBUY_DIALOG);
 					return 1;
                 }
-			
+
 			    new string[2048];
-			    
+
         	    for(new i = 0; i < sizeof(PVMatrix); i++)
         	    {
         	        if(PVMatrix[i][pv_category] == listitem)
@@ -19855,9 +19855,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
         	            strcat(string, gstr);
         	        }
         	    }
-			    
+
 			    PVCatSel[playerid] = listitem;
-			    
+
 			    format(gstr, sizeof(gstr), ""nef" :: Custom cars > %s", PVCategorys[listitem]);
 			    ShowPlayerDialog(playerid, CARBUY_DIALOG + 1, DIALOG_STYLE_LIST, gstr, string, "Select", "Back");
 			    return true;
@@ -19896,9 +19896,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			case NEON_DIALOG:
 			{
 				DestroyPlayerVehicles(playerid);
-				
+
 				PVSelect[playerid] = PVVMenuSel[playerid];
-				
+
 				new Float:POS[4],
 				    vlabel[128];
 
@@ -20044,7 +20044,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					return 1;
 				}
 				mysql_escape_string(PlayerPVTMPPlate[playerid], PlayerPVTMPPlate[playerid], pSQL, 13);
-				
+
 				PVSlotSelect(playerid);
 				return true;
 			}
@@ -20072,7 +20072,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 mysql_escape_string(PlayerPVData[playerid][PVVMenuSel[playerid]][e_plate], PlayerPVData[playerid][PVVMenuSel[playerid]][e_plate], pSQL, 13);
 
 				DestroyPlayerVehicles(playerid);
-				
+
 				PVSelect[playerid] = PVVMenuSel[playerid];
 
 				new Float:POS[4],
@@ -20406,7 +20406,7 @@ function:OnHouseLoadEx(index)
 {
 	new rows, fields;
 	cache_get_data(rows, fields, pSQL);
-	
+
 	if(rows > 0)
 	{
 		new	line[144], buffer[100];
@@ -20485,7 +20485,7 @@ function:OnHouseLoad()
 			HouseInfo[houseid][label] = CreateDynamic3DTextLabel(gstr2, HouseInfo[houseid][sold] ? 0xFF0000FF : 0x00FF00FF, HouseInfo[houseid][E_x], HouseInfo[houseid][E_y], floatadd(HouseInfo[houseid][E_z], 0.3), 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 30.0);
 			HouseInfo[houseid][pickid] = CreateDynamicPickup(HouseInfo[houseid][sold] ? 1272 : 1273, 1, HouseInfo[houseid][E_x], HouseInfo[houseid][E_y], HouseInfo[houseid][E_z], -1, -1, -1, 30.0);
 			if(!HouseInfo[houseid][sold]) HouseInfo[houseid][iconid] = CreateDynamicMapIcon(HouseInfo[houseid][E_x], HouseInfo[houseid][E_y], HouseInfo[houseid][E_z], 31, 1, 0, -1, -1, 150.0);
-			
+
 			houseid++;
 		}
 	}
@@ -20500,7 +20500,7 @@ function:OnBusinessLoad()
 	for(new r = 0; r < rows && r < MAX_BUSINESSES; r++)
 	{
 	    new ORM:ormid = BusinessData[r][e_ormid] = orm_create("businesses");
-	    
+
 	    orm_addvar_int(ormid, BusinessData[r][e_id], "id");
 	    orm_addvar_string(ormid, BusinessData[r][e_owner], MAX_PLAYER_NAME + 1, "owner");
 	    orm_addvar_float(ormid, BusinessData[r][e_pos][0], "xpos");
@@ -20510,13 +20510,13 @@ function:OnBusinessLoad()
 	    orm_addvar_int(ormid, BusinessData[r][e_level], "level");
 	    orm_addvar_int(ormid, BusinessData[r][e_sold], "sold");
 	    orm_addvar_int(ormid, BusinessData[r][e_date], "date");
-	    
+
 	    orm_setkey(ormid, "id");
 		orm_apply_cache(ormid, r);
-		
+
 		SetupBusiness(r);
 	}
-	
+
 	Log(LOG_INIT, "%i businesses loaded in %i microseconds", rows, cache_get_query_exec_time(UNIT_MICROSECONDS));
 	return 1;
 }
@@ -20537,10 +20537,10 @@ SetupBusiness(slot)
 	} else {
 	    format(gstr2, sizeof(gstr2), ""business_mark"\n"nef_green"FOR SALE! Type /bbuy"white"\nID: %i\nType: %s\nLevel: %i", BusinessData[r][e_id], BusinessTypes[_:BusinessData[r][e_type]], BusinessData[r][e_level]);
 	}
-	
+
 	BusinessData[r][e_label_id] = CreateDynamic3DTextLabel(gstr2, WHITE, BusinessData[r][e_pos][0], BusinessData[r][e_pos][1], BusinessData[r][e_pos][2], 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 50.0);
     BusinessData[r][e_pickup_id] = CreateDynamicPickup(1274, 1, BusinessData[r][e_pos][0], BusinessData[r][e_pos][1], BusinessData[r][e_pos][2], 0, -1, -1, 50.0);
-    
+
 	if(!BusinessData[r][e_sold]) {
 	    BusinessData[r][e_icon_id] = CreateDynamicMapIcon(BusinessData[r][e_pos][0], BusinessData[r][e_pos][1], BusinessData[r][e_pos][2], 52, 1, 0, -1, -1, 150.0);
 	}
@@ -20575,27 +20575,27 @@ function:OnGangZoneLoad()
 {
 	new rows, fields;
 	cache_get_data(rows, fields, pSQL);
-	
+
 	new Cache:Data = cache_save(pSQL);
-	
+
 	if(rows > 0)
 	{
 	    for(new i = 0; i < rows; i++)
 	    {
 	        cache_set_active(Data, pSQL);
-	        
+
 	        GZoneInfo[gzoneid][e_id] = cache_get_row_int(i, 0, pSQL);
 	        cache_get_row(i, 1, GZoneInfo[gzoneid][sZoneName], pSQL, 40);
-	        
+
 	        GZoneInfo[gzoneid][E_x] = cache_get_row_float(i, 2, pSQL);
 	        GZoneInfo[gzoneid][E_y] = cache_get_row_float(i, 3, pSQL);
 	        GZoneInfo[gzoneid][E_z] = cache_get_row_float(i, 4, pSQL);
-	        
+
 	        GZoneInfo[gzoneid][localGang] = cache_get_row_int(i, 5, pSQL);
 	        GZoneInfo[gzoneid][iLocked] = cache_get_row_int(i, 6, pSQL);
-	        
+
 	        cache_set_active(Cache:0, pSQL);
-	        
+
 	        if(GZoneInfo[gzoneid][localGang] != 0)
 	        {
 	    		format(gstr2, sizeof(gstr2), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: %s\n"orange"Type /gwar to start an attack!", GZoneInfo[gzoneid][e_id], GZoneInfo[gzoneid][sZoneName], GetGangNameByID(GZoneInfo[gzoneid][localGang]));
@@ -20604,7 +20604,7 @@ function:OnGangZoneLoad()
 	        {
 	            format(gstr2, sizeof(gstr2), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: ---\n"orange"Type /gwar to start an attack!", GZoneInfo[gzoneid][e_id], GZoneInfo[gzoneid][sZoneName]);
 	        }
-	        
+
 	        GZoneInfo[gzoneid][label] = CreateDynamic3DTextLabel(gstr2, WHITE, GZoneInfo[gzoneid][E_x], GZoneInfo[gzoneid][E_y], GZoneInfo[gzoneid][E_z] + 0.3, 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 50.0);
 	        GZoneInfo[gzoneid][iconid] = CreateDynamicMapIcon(GZoneInfo[gzoneid][E_x], GZoneInfo[gzoneid][E_y], GZoneInfo[gzoneid][E_z], 19, 1, 0, -1, -1, 250.0);
 			GZoneInfo[gzoneid][zoneid] = GangZoneCreate(GZoneInfo[gzoneid][E_x] - GZONE_SIZE, GZoneInfo[gzoneid][E_y] - GZONE_SIZE, GZoneInfo[gzoneid][E_x] + GZONE_SIZE, GZoneInfo[gzoneid][E_y] + GZONE_SIZE);
@@ -20706,7 +20706,7 @@ ResetBusiness(slot = -1)
 	{
 	    if(slot < 0 || slot > MAX_BUSINESSES) return 0;
 	    new r = slot;
-	    
+
 	    BusinessData[r][e_ormid] = ORM:-1;
 	    BusinessData[r][e_id] = 0;
 	    BusinessData[r][e_owner][0] = '\0';
@@ -21158,7 +21158,7 @@ function:BattleGround()
 		BGTeam2Kills = 0;
 
 		money = (1500 * BGTeam1Players) + (250 * BGTeam2Players);
-		
+
 	 	for(new i = 0; i < MAX_PLAYERS; i++)
 		{
 		    if(gTeam[i] == gBG_TEAM1)
@@ -21228,7 +21228,7 @@ AutoLogin(playerid)
     PlayerData[playerid][bAllowSpawn] = true;
     PlayerData[playerid][bLogged] = true;
     PlayerData[playerid][ExitType] = EXIT_LOGGED;
-    
+
     MySQL_UpdateAccount(playerid);
     MySQL_LoadAccount(playerid);
 	return 1;
@@ -21237,7 +21237,7 @@ AutoLogin(playerid)
 RequestRegistration(playerid)
 {
 	new string[1024];
-	
+
     format(gstr, sizeof(gstr), ""nef" :: Registration - %s", __GetName(playerid));
 	format(string, sizeof(string), ""white"Welcome to "SVRLOGO""white"\n\nYour name: %s\n\nLet's create an account, enter a password below:", __GetName(playerid));
 	ShowPlayerDialog(playerid, REGISTER_DIALOG, DIALOG_STYLE_PASSWORD, gstr, string, "Register", "Skip");
@@ -21247,7 +21247,7 @@ RequestRegistration(playerid)
 RequestLogin(playerid)
 {
 	new string[1024];
-	
+
     format(gstr, sizeof(gstr), ""nef_yellow"Login "white"- %s", __GetName(playerid));
     format(string, sizeof(string), ""white"Welcome to "SVRLOGO""white"\nHow are you, %s?\n\nAccount: %s\n\nThe name that you are using is registered! Please enter the password:", __GetName(playerid), __GetName(playerid));
 	ShowPlayerDialog(playerid, LOGIN_DIALOG, DIALOG_STYLE_PASSWORD, gstr, string, "Login", "Skip");
@@ -21257,19 +21257,19 @@ RequestLogin(playerid)
 SkipRegistration(playerid)
 {
     PlayerData[playerid][bAllowSpawn] = true;
-	
+
     PlayerData[playerid][e_regdate] = gettime();
 	PlayerData[playerid][e_payday] = 60;
 	PlayerData[playerid][ConnectTime] = gettime();
     PlayerData[playerid][e_wanteds] = 0;
 	PlayerData[playerid][e_lastlogin] = gettime();
 	PlayerData[playerid][e_lastnc] = 0;
-	
+
 	format(gstr, sizeof(gstr), "~y~[] ~w~%i", PlayerData[playerid][e_wanteds]);
 	PlayerTextDrawSetString(playerid, TXTWantedsTD[playerid], gstr);
-	
+
 	ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef"", ""white"You have chosen not to register.\n\n"red"Please note:\n"white"Your statistics won't be saved.\nYou will be limited to some features.\nYou can register at any time using /register.\n\nEnjoy playing here at "nef"!", "OK", "");
-	
+
     GameTextForPlayer(playerid, "Welcome", 3000, 4);
 	GivePlayerMoneyEx(playerid, 20000, false);
 	GameTextForPlayer(playerid, "~n~+$20,000~n~Startcash", 3000, 1);
@@ -21284,24 +21284,24 @@ SkipLogin(playerid)
 	    Log(LOG_NET, "Name error, cannot set new name, kicking (%s, %i)", __GetName(playerid), playerid);
 		return Kick(playerid);
 	}
-	
+
 	new string[255],
 	    number = random(998) + 1,
 	    newname[26],
 	    oldname[26];
-	    
+
 	format(newname, sizeof(newname), "%s_%i", __GetName(playerid), number);
 	format(oldname, sizeof(oldname), "%s", __GetName(playerid));
-	    
+
     PlayerData[playerid][bAllowSpawn] = true;
-	    
+
 	if(SetPlayerName(playerid, newname) == 1)
 	{
 	    GetPlayerName(playerid, PlayerData[playerid][e_name], MAX_PLAYER_NAME + 1);
-			
+
 		format(string, sizeof(string), ""white"Your name has been changed to %s because you failed to log in.\n\n"nef_yellow"Please restart the game if this is incorrect.", newname);
 		ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef"", string, "OK", "");
-		
+
 	    PlayerData[playerid][e_regdate] = gettime();
 		PlayerData[playerid][e_payday] = 60;
 		PlayerData[playerid][ConnectTime] = gettime();
@@ -21352,7 +21352,7 @@ CarSpawner(playerid, model, respawn_delay = -1, bool:spawnzone_check = true)
 	{
 	    return 0;
 	}
-	
+
 	if(model == 432 || model == 425 || model == 447 || model == 571 || model == 568 || model == 539 || model == 545 || model == 464)
 	{
 	    if(PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
@@ -21361,22 +21361,22 @@ CarSpawner(playerid, model, respawn_delay = -1, bool:spawnzone_check = true)
             return 0;
 		}
 	}
-	
+
 	if(model == 520 && PlayerData[playerid][e_vip] == 0 && PlayerData[playerid][e_level] == 0)
 	{
 	    SCM(playerid, -1, ""er"Only admins can spawn this");
 		return 0;
 	}
-	
+
 	if(model == 520 && PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL && PlayerData[playerid][bGWarMode])
 	{
 	    new Float:POS[3];
 	    GetPlayerPos(playerid, POS[0], POS[1], POS[2]);
-	    
+
 		for(new i = 0; i < gzoneid; i++)
 		{
 		    if(!GZoneInfo[i][bUnderAttack]) continue;
-		    
+
 		    if(IsPointInDynamicArea(GZoneInfo[i][zsphere], POS[0], POS[1], POS[2]))
 		    {
 		        player_notice(playerid, "Failed to spawn hydra", "Not allowed in the gang zone");
@@ -21384,13 +21384,13 @@ CarSpawner(playerid, model, respawn_delay = -1, bool:spawnzone_check = true)
 		    }
 		}
 	}
-	
+
 	if(model == 538 || model == 537 || model == 449)
 	{
 	    player_notice(playerid, "Failed to spawn vehicle", "not allowed");
 		return 0;
 	}
-	
+
 	if(spawnzone_check)
 	{
 		for(new ii = 0; ii < sizeof(g_SpawnAreas); ii++)
@@ -21402,9 +21402,9 @@ CarSpawner(playerid, model, respawn_delay = -1, bool:spawnzone_check = true)
 		    }
 		}
 	}
-	
+
 	DestroyPlayerVehicles(playerid);
-		
+
 	new Float:POS[4],
 		color1 = (random(128) + 127),
 		color2 = (random(128) + 127);
@@ -21425,7 +21425,7 @@ CarSpawner(playerid, model, respawn_delay = -1, bool:spawnzone_check = true)
 	if(IsComponentIdCompatible(GetVehicleModel(PlayerData[playerid][pVehicle]), 1010)) AddVehicleComponent(PlayerData[playerid][pVehicle], 1010);
 	PutPlayerInVehicle(playerid, PlayerData[playerid][pVehicle], 0);
 	player_notice(playerid, "Vehicle spawned", "");
-	
+
 	if(PlayerData[playerid][bGod])
 	{
 	    ResetPlayerWeapons(playerid);
@@ -21511,7 +21511,7 @@ AdminMSG(color, const string[], bool:beep = false, bool:gc = false)
 		if(IsPlayerAvail(i) && PlayerData[i][e_level] >= 1)
 		{
 		    if(gc && PlayerData[i][bHideGC]) continue;
-		    
+
 			SCM(i, color, string);
 			if(beep) PlayerPlaySound(i, 1057, 0.0, 0.0, 0.0);
 			count++;
@@ -21588,10 +21588,10 @@ MySQL_KickFromGangIfExist(playerid)
 MySQL_SaveAccount(playerid, bool:toys = true, bool:pv = true)
 {
     if(!islogged(playerid)) return 1;
-    
+
     PlayerData[playerid][e_time] = PlayerData[playerid][e_time] + (gettime() - PlayerData[playerid][ConnectTime]);
     PlayerData[playerid][ConnectTime] = gettime();
-    
+
     if(PlayerData[playerid][e_ormid] == ORM:-1) {
     	Log(LOG_PLAYER, "Crit: ORM -1 in SaveAccount %s, %i", __GetName(playerid), playerid);
 	} else {
@@ -21602,7 +21602,7 @@ MySQL_SaveAccount(playerid, bool:toys = true, bool:pv = true)
 	{
         mysql_format(pSQL, gstr, sizeof(gstr), "DELETE FROM `toys` WHERE `id` = %i;", PlayerData[playerid][e_accountid]);
 		mysql_tquery(pSQL, gstr);
-		
+
 		new buff[512];
 		for(new i = 0; i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
 		{
@@ -21631,7 +21631,7 @@ MySQL_SaveAccount(playerid, bool:toys = true, bool:pv = true)
 	{
         mysql_format(pSQL, gstr, sizeof(gstr), "DELETE FROM `vehicles` WHERE `id` = %i;", PlayerData[playerid][e_accountid]);
 		mysql_tquery(pSQL, gstr);
-		
+
 		new buff[512];
 		for(new i = 0; i < MAX_PLAYER_PVS; i++)
 		{
@@ -21708,7 +21708,7 @@ MySQL_DestroyGang(playerid, gangname[])
 MySQL_GangRename(playerid, newgangname[], newgangtag[])
 {
 	format(gstr2, sizeof(gstr2), "SELECT `ID` FROM `gangs` WHERE `GangName` = '%s';", newgangname);
-	mysql_tquery(pSQL, gstr2, "OnGangRenameAttempt", "iss", playerid, newgangname, newgangtag);
+	mysql_tquery(pSQL, gstr2, "OnGangRenameAttempt", "iiss", playerid, YHash(__GetName(playerid)), newgangname, newgangtag);
 }
 
 MySQL_RegisterAccount(playerid, register, password[])
@@ -21718,9 +21718,9 @@ MySQL_RegisterAccount(playerid, register, password[])
     PlayerData[playerid][e_regdate] = gettime();
     PlayerData[playerid][e_payday] = 60;
     PlayerData[playerid][e_wanteds] = 0;
-    
+
     new ORM:ormid = PlayerData[playerid][e_ormid] = orm_create("accounts");
-    
+
  	orm_addvar_int(ormid, PlayerData[playerid][e_accountid], "id");
 	orm_addvar_string(ormid, PlayerData[playerid][e_name], MAX_PLAYER_NAME + 1, "name");
 	orm_addvar_string(ormid, PlayerData[playerid][e_email], 26, "email");
@@ -21758,7 +21758,7 @@ MySQL_RegisterAccount(playerid, register, password[])
 	orm_addvar_int(ormid, PlayerData[playerid][e_lastlogin], "lastlogin");
 	orm_addvar_int(ormid, PlayerData[playerid][e_lastnc], "lastnc");
 	orm_addvar_int(ormid, PlayerData[playerid][e_skinsave], "skinsave");
-	
+
 	orm_setkey(ormid, "id");
 	orm_insert(ormid, "OnPlayerRegister", "iiisss", playerid, YHash(__GetName(playerid)), register, password, __GetName(playerid), __GetIP(playerid));
 }
@@ -21767,7 +21767,7 @@ function:OnPlayerRegister(playerid, namehash, register, password[], playername[]
 {
 	mysql_format(pSQL, gstr2, sizeof(gstr2), "UPDATE `accounts` SET `hash` = SHA1('%e'), `ip` = '%s' WHERE `name` = '%s';", password, ip_address, playername);
 	mysql_tquery(pSQL, gstr2);
-	
+
 	if(namehash == YHash(__GetName(playerid)))
 	{
 		if(register == REGISTER_CONNECT)
@@ -21847,7 +21847,7 @@ MySQL_SaveGangZone(id)
 MySQL_SaveHouse(house, bool:save_items = false)
 {
     new query[1024];
-    
+
     format(query, sizeof(query), "UPDATE `houses` SET `Owner` = '%s', `XPos` = %.2f, `YPos` = %.2f, `ZPos` = %.2f, `Interior` = %i, `Price` = %i, `Score` = %i, `Sold` = %i, `Locked` = %i, `Date` = %i WHERE `ID` = %i LIMIT 1;",
 		HouseInfo[house][Owner],
 		HouseInfo[house][E_x],
@@ -21863,7 +21863,7 @@ MySQL_SaveHouse(house, bool:save_items = false)
 
     mysql_tquery(pSQL, "START TRANSACTION;");
     mysql_tquery(pSQL, query);
-		
+
 	if(save_items)
 	{
 		new Float:POS[6];
@@ -21889,7 +21889,7 @@ MySQL_SaveHouse(house, bool:save_items = false)
 			mysql_tquery(pSQL, query);
 		}
 	}
-	
+
 	mysql_tquery(pSQL, "COMMIT;");
 }
 
@@ -22112,7 +22112,7 @@ CallElevator(playerid, floorid)
 	{
 	    return 0;
 	}
-	
+
 	FloorRequestedBy[floorid] = playerid;
 	AddFloorToQueue(floorid);
 	return 1;
@@ -22216,7 +22216,7 @@ GetPosInFrontOfPlayer(playerid, &Float:x, &Float:y, Float:distance)
 {
 	new Float:a;
 	GetPlayerPos(playerid, x, y, a);
-	
+
 	if(IsPlayerInAnyVehicle(playerid))
 	{
 		GetVehicleZAngle(GetPlayerVehicleID(playerid), a);
@@ -22225,7 +22225,7 @@ GetPosInFrontOfPlayer(playerid, &Float:x, &Float:y, Float:distance)
 	{
 		GetPlayerFacingAngle(playerid, a);
 	}
-	
+
 	x += (distance * floatsin(-a, degrees));
 	y += (distance * floatcos(-a, degrees));
 }
@@ -22456,7 +22456,7 @@ RandomWeapons(playerid)
 server_load_textdraws()
 {
     new count = GetTickCountEx();
-	
+
 	#if WINTER_EDITION == true
 	TXTWinterEdition = TextDrawCreate(545.000000, 405.000000, "Winter Edition");
 	TextDrawBackgroundColor(TXTWinterEdition, 255);
@@ -22467,7 +22467,7 @@ server_load_textdraws()
 	TextDrawSetProportional(TXTWinterEdition, 1);
 	TextDrawSetSelectable(TXTWinterEdition, 0);
 	#endif
-	
+
 	for(new i = 0; i < MAX_GZONES; i++)
 	{
 		GZoneInfo[i][E_Txt] = TextDrawCreate(503.000000, 298.000000, "Gang War: %s~n~Defend the Gang Zone!~n~~n~~n~Timeleft: --:--");
@@ -22479,7 +22479,7 @@ server_load_textdraws()
 		TextDrawSetProportional(GZoneInfo[i][E_Txt], 1);
 		TextDrawSetSelectable(GZoneInfo[i][E_Txt], 0);
 	}
-	
+
 	TXTSpeedo_Main = TextDrawCreate(126.500000, 333.666687, "KM/H");
 	TextDrawLetterSize(TXTSpeedo_Main, 0.209998, 0.905833);
 	TextDrawAlignment(TXTSpeedo_Main, 1);
@@ -22489,7 +22489,7 @@ server_load_textdraws()
 	TextDrawBackgroundColor(TXTSpeedo_Main, 51);
 	TextDrawFont(TXTSpeedo_Main, 1);
 	TextDrawSetProportional(TXTSpeedo_Main, 1);
-	
+
 	TXTRandomInfo = TextDrawCreate(599.000000, 426.000000, "~w~Need a ~b~~h~vehicle~w~? Spawn one using ~r~~h~/v~w~!");
 	TextDrawAlignment(TXTRandomInfo, 3);
 	TextDrawBackgroundColor(TXTRandomInfo, 168430233);
@@ -22551,7 +22551,7 @@ server_load_textdraws()
 	TextDrawSetOutline(TXTFooter, 1);
 	TextDrawSetProportional(TXTFooter, 1);
 	TextDrawSetSelectable(TXTFooter, 0);
-	
+
 	NEFLOGO[0] = TextDrawCreate(88.000000, 426.000000, "~y~N~w~ew ~g~~h~E~w~volution ~r~~h~F~w~reeroam");
 	TextDrawAlignment(NEFLOGO[0], 2);
 	TextDrawBackgroundColor(NEFLOGO[0], 51);
@@ -22666,7 +22666,7 @@ server_load_textdraws()
 	TextDrawSetShadow(CheckTD, 0);
 	TextDrawSetOutline(CheckTD, 0);
 	TextDrawFont(CheckTD, 4);
-	
+
 	TXTGodTD = TextDrawCreate(499.000000, 106.000000, "~y~~h~GODMODE ENABLED");
 	TextDrawBackgroundColor(TXTGodTD, 168430202);
 	TextDrawFont(TXTGodTD, 1);
@@ -22857,7 +22857,7 @@ server_load_textdraws()
 	TextDrawUseBox(TXTLoading, 1);
 	TextDrawBoxColor(TXTLoading, 170);
 	TextDrawTextSize(TXTLoading, -9.000000, -152.000000);
-	
+
 	Log(LOG_INIT, "TextDraws loaded in %i ms", GetTickCountEx() - count);
 	return 1;
 }
@@ -22875,7 +22875,7 @@ function:xReactionProgress()
 function:xReactionTest()
 {
     ReactionOn = true;
-    
+
 	new xLength = (random(8) + 3),
 		count = 0;
 
@@ -22938,7 +22938,7 @@ function:_server_shutdown()
 server_initialize()
 {
 	new count = GetTickCountEx();
-	
+
 	// SA_MP Server config
 	format(gstr, sizeof(gstr), "hostname %s", HOSTNAME);
 	SendRconCommand(gstr);
@@ -22951,7 +22951,7 @@ server_initialize()
 	SendRconCommand("messageholelimit 1800");
 	SendRconCommand("rcon 0");
 	SendRconCommand("maxnpc 0");
-	
+
 	EnableVehicleFriendlyFire();
 	ShowPlayerMarkers(1);
 	DisableInteriorEnterExits();
@@ -22963,12 +22963,12 @@ server_initialize()
 	EnableStuntBonusForAll(0);
 	SetWeather(1);
 	SetWorldTime(12);
-	
+
 	// Variable setting
     CurrentBGMap = BG_VOTING;
 	StartTime = gettime();
 	Iter_Init(PlayerIgnore);
-	
+
 	for(new i = 1; i < MAX_REPORTS; i++)
 		Reports[i] = "<none>";
 
@@ -22977,10 +22977,10 @@ server_initialize()
 	    format(gstr, sizeof(gstr), "%s\n", PVCategorys[i]);
 	    strcat(sPVCategory, gstr);
 	}
-	
+
 	for(new i = 0; i < MAX_GZONES; i++)
 		GZoneInfo[i][bUnderAttack] = false;
-		
+
 	// Other stuff to initialize TODO: Overhaul spawns using polygons
     g_SpawnAreas[0] = CreateDynamicSphere(341.8535, -1852.6327, 6.8569, 25.0); // <- beach sphere
     g_SpawnAreas[1] = CreateDynamicSphere(385.4325, 2541.2456, 14.5953, 13.5); // <- AA sphere
@@ -23202,7 +23202,7 @@ server_initialize()
     Command_AddAltNamed("vmenu", "mycars");
     Command_AddAltNamed("gmenu", "mygang");
     Command_AddAltNamed("hmenu", "myhouses");
-	
+
     AddPlayerClass(3, 1958.3783, 1343.1572, 15.3746, 270.1425, 0, 0, 0, 0, 0, 0);
     AddPlayerClass(81, 1958.3783, 1343.1572, 15.3746, 270.1425, 0, 0, 0, 0, 0, 0);
 	AddPlayerClass(1, 1958.3783, 1343.1572, 15.3746, 270.1425, 0, 0, 0, 0, 0, 0);
@@ -23238,22 +23238,22 @@ server_initialize()
 server_load_visuals()
 {
 	// 3374 heuballen
-	// 2898 grÃ¼nes rasen ding
-	
+	// 2898 grünes rasen ding
+
     new count = GetTickCountEx();
-    
+
 	bb_mcc = CreateDynamicObject(8323, -2322.76880, -1704.56067, 499.98999,   0.00000, 0.00000, 69.30000);
 	SetDynamicObjectMaterialText(bb_mcc, 0, "Welcome to New Evolution Freeroam!\nServer Realtime: \n"green"Players online: ", OBJECT_MATERIAL_SIZE_256x128, "Calibri", 0, 0, -32256, -16777216, OBJECT_MATERIAL_TEXT_ALIGN_LEFT);
 
     new object_id = CreateDynamicObject(11317, 1914.20313, -1377.58191, 26.29986,   0.00000, 0.00000, 91.91999); // Gold Credits Wang Cars
     SetDynamicObjectMaterial(object_id, 2, 19341, "egg_texts", "easter_egg01");
     SetDynamicObjectMaterial(object_id, 3, 19341, "egg_texts", "easter_egg01");
-    
+
 	MellnikGate = CreateDynamicObject(980, -205.68774, -2285.10693, 30.65776,   0.00000, 0.00000, 122.80286);
 	MellnikRamp = CreateDynamicObject(3115, -153.74190, -2210.68457, 27.16690,   0.00000, 0.00000, -145.55995);
 
 	new mc_text = CreateDynamicObject(19479, -2331.787841, -1635.757690, 484.685546, 0.099999, -90.299964, 178.450790);
-	SetDynamicObjectMaterialText(mc_text, 0, ""nef_yellow"New "nef_green"Evolution "nef_red"Freeroam{F0F0F0}â„¢\n"CURRENT_VERSION"\n"SVRURLWWW"", OBJECT_MATERIAL_SIZE_256x128, "Arial", 20, 1, -32256, 0, OBJECT_MATERIAL_TEXT_ALIGN_CENTER);
+	SetDynamicObjectMaterialText(mc_text, 0, ""nef_yellow"New "nef_green"Evolution "nef_red"Freeroam{F0F0F0}™\n"CURRENT_VERSION"\n"SVRURLWWW"", OBJECT_MATERIAL_SIZE_256x128, "Arial", 20, 1, -32256, 0, OBJECT_MATERIAL_TEXT_ALIGN_CENTER);
 
 	new beach_text = CreateDynamicObject(19479, 309.903930, -1934.953369, 12.736993, 0.000000, 0.000000, 39.940856);
 	SetDynamicObjectMaterialText(beach_text, 0, ""orange""SVRURLWWW"\n"red""CURRENT_VERSION"", OBJECT_MATERIAL_SIZE_256x128, "Arial", 30, 1, -32256, 0, OBJECT_MATERIAL_TEXT_ALIGN_CENTER);
@@ -23273,7 +23273,7 @@ server_load_visuals()
     pick_life[11] = CreateDynamicPickup(1240, 23, -1405.9728,492.3374,18.0023);
     pick_life[12] = CreateDynamicPickup(1240, 23, 2035.2893,-2348.9136,13.6844);
     pick_life[13] = CreateDynamicPickup(1240, 23, 400.7469, 2544.7986, 19.6311);
-    
+
     for(new i = 0; i < 16; i++)
     {
         pick_armor[i] = CreateDynamicPickup(1242, 23, g_ArmorPickups[i][0], g_ArmorPickups[i][1], g_ArmorPickups[i][2]);
@@ -23331,7 +23331,7 @@ server_load_visuals()
 	CreateDynamicCP(2890.5774, -3223.6228, 2132.9097, 12.0, 0, -1, -1, 100.0); // SkyDive3 Reward
 	CreateDynamicCP(148.6426, 3655.9390, 19.3876, 12.0, 0, -1, -1, 100.0); // SkyDive4 Reward
     CreateDynamicCP(3259.0864, -1837.3140, 170.1097, 12.0, 0, -1, -1, 100.0); // BMX Reward
-    
+
     // CNR START
 	// Refill Stations
 	CreateDynamicCP(2199.9460,2474.7231,10.8203, 3.0, CNR_WORLD, -1, -1, 100.0);
@@ -23390,7 +23390,7 @@ server_load_visuals()
 	CreateDynamicMapIcon(-26.1917,2531.7217,17.4203, 48, 0, CNR_WORLD); // RPC 2
 	CreateDynamicMapIcon(-2624.0850,1411.7439,7.0938, 48, 0, CNR_WORLD); // RPC 3
 	// CNR END
-    
+
 	// anti vehile drop
 	CreateObject(8040, 660.65997, -1361.88000, 2548.94995,   0.00000, 0.00000, -179.78000); // /speed
 	CreateObject(4726, 338.60001, -1853.16003, 5.92000,   0.00000, 0.00000, 270.00000); // LS beach
@@ -23433,7 +23433,7 @@ server_load_visuals()
 	CreateObject(18769, -2320.75146, -1696.56824, 483.17276,   0.00000, 0.00000, 50.64000); // mc vspawn
 	CreateObject(18769, -2332.69995, -1630.66577, 483.17276,   0.00000, 0.00000, -2.10001); // mc vspawn
 	CreateObject(9241, -2339.24951, -1636.16699, 483.82617,   0.00000, 0.00000, -271.79977); // mc spawn
-	
+
 	// derby townhall fix
 	CreateDynamicObject(8558, 1544.65198, -1843.98779, 17.14610,   1.80000, -88.90002, -89.69999);
 	CreateDynamicObject(8558, 1541.62708, -1843.84485, 17.14610,   1.80000, -88.90002, -89.69999);
@@ -23450,12 +23450,12 @@ server_load_visuals()
 	//CreateDynamicObject(19462, 391.57999, -1808.23999, 16.17000,   0.00000, 90.00000, 13.00000);
 	//CreateDynamicObject(18102, 386.79163, -1807.13257, 20.75563,   0.00000, 0.00000, -245.76001);
 	// login obj end
-	
+
 	CreateObject(986, 1385.98, 2643.14, 11.81,   0.00, 0.00, 90.13); // Robbers Gate
 	Gate[0] = CreateObject(976, 1397.24, 2694.51, 9.91,   0.00, 0.00, 269.23);
 	Gate[1] = CreateObject(976, 1397.24, 2693.86, 9.91,   0.00, 0.00, 90.07);
 
-	/*// gehÃ¶rt zu beach
+	/*// gehört zu beach
 	CreateDynamicObject(10771, 224.30000, -2004.00000, 4.10000,   0.00000, 0.00000, 220.00000);
 	CreateDynamicObject(11145, 274.20001, -1962.30005, 3.20000,   0.00000, 0.00000, 220.00000);
 	CreateDynamicObject(10770, 217.70000, -1999.59998, 37.30000,   0.00000, 0.00000, 220.00000);
@@ -23466,7 +23466,7 @@ server_load_visuals()
 	CreateObject(10770, 217.70000, -1999.59998, 37.30000,   0.00000, 0.00000, 220.00000, 350.0);
 	CreateObject(11237, 217.10001, -1999.30005, 37.10000,   0.00000, 0.00000, 220.00000, 350.0);
 	// beach end*/
-    
+
     AddTeleport(4, "Gold Credits", "gc", 1858.1874,-1466.7080,13.3981);
 	AddTeleport(6, "Drift", "drift", -344.308, 1528.474, 75.159);
 	AddTeleport(6, "Drift City", "dc", 3431.8589, 484.3132, 1788.7490);
@@ -23724,14 +23724,14 @@ server_load_visuals()
 	{
 		SetVehicleVirtualWorld(veh_cnr[iit], CNR_WORLD);
 	}
-	
+
 	#if WINTER_EDITION == true
 	/*// /sfa
 	CreateDynamicObject(18864, -1194.72559, -0.87202, -11.20715,   0.78000, -2.34000, 0.00000);
 	CreateDynamicObject(18864, -1220.71948, -13.26828, -11.20715,   -6.48000, 0.30000, -19.38000);
 	CreateDynamicObject(18864, -1280.35095, -34.72476, -11.20715,   3.60000, 0.12000, -31.50000);
 	CreateDynamicObject(18864, -1141.50659, 10.96347, -11.20715,   0.00000, 0.00000, -10.38000);
-	
+
 	// /aa
 	CreateDynamicObject(18864, 367.69247, 2541.04590, 11.47494,   21.24000, -13.86000, -16.26000);
 	CreateDynamicObject(18864, 349.47034, 2557.65430, 11.47494,   17.16000, -14.16001, -42.72001);
@@ -23749,13 +23749,13 @@ server_load_visuals()
 	CreateDynamicObject(18864, 1016.54395, -1877.87366, 6.09436,   0.00000, 0.00000, 0.00000);
 	CreateDynamicObject(18864, 1075.43176, -1786.99316, 5.67135,   0.00000, 0.00000, 0.00000);
 	CreateDynamicObject(18864, 1016.54395, -1877.87366, 5.51193,   49.86001, 19.44000, 0.00000);
-	
+
 	// /sfa xmas tree + gifts
 	CreateDynamicObject(19076, -1229.98816, 15.61859, 13.00140,   0.00000, 0.00000, 0.00000);
 	CreateDynamicObject(19058, -1227.87573, 15.38023, 13.62287,   0.00000, 0.00000, 0.00000);
 	CreateDynamicObject(19056, -1230.08716, 13.93682, 13.67405,   0.00000, 0.00000, -29.82000);
 	CreateDynamicObject(19055, -1228.39331, 13.85308, 13.74400,   0.00000, 0.00000, -50.40001);
-	
+
 	// /aa xmas tree + gifts
 	CreateDynamicObject(19076, 398.50684, 2507.79150, 15.53978,   0.00000, 0.00000, 0.00000);
 	CreateDynamicObject(19058, 398.99847, 2508.93213, 16.00566,   0.00000, 0.00000, 0.00000);
@@ -23767,7 +23767,7 @@ server_load_visuals()
 	CreateDynamicObject(3891, 382.23135, 2537.15796, 15.11454,   7.08000, -2.76000, -168.36002);
 	CreateDynamicObject(3891, 431.83859, 2495.83105, 15.11454,   7.02000, -4.02000, -308.09958);
 	CreateDynamicObject(19054, 396.12781, 2508.60010, 15.83313,   0.00000, 0.00000, -81.05999);
-	
+
 	AddStaticVehicleEx(539, 1104.3873,-1758.3083,13.6477,105.2126, randomColors[random(23)], randomColors[random(23)], 30);
 	AddStaticVehicleEx(539, 1104.8311,-1764.4894,13.6477,95.1859, randomColors[random(23)], randomColors[random(23)], 30);
 	AddStaticVehicleEx(539, 1104.7172,-1772.7986,13.6497,77.3257, randomColors[random(23)], randomColors[random(23)], 30);
@@ -24256,7 +24256,7 @@ CreateFinalCar(playerid, pv_slot)
     PVSelect[playerid] = pv_slot;
     PlayerPVData[playerid][PVSelect[playerid]][e_model] = PlayerPVTMP[playerid][0];
     strmid(PlayerPVData[playerid][PVSelect[playerid]][e_plate], PlayerPVTMPPlate[playerid], 0, 13, 13);
-    
+
 	new vlabel[100];
 
 	format(vlabel, sizeof(vlabel), ""nef_yellow"%s's\n"white"custom car", __GetName(playerid));
@@ -24303,16 +24303,16 @@ PortPlayerMap(playerid, Float:X, Float:Y, Float:Z, Float:Angle, const mapname[],
 
     PlayerPlaySound(playerid, 1039, 0.0, 0.0, 0.0);
     SetCameraBehindPlayer(playerid);
-    
+
     if(populate)
 	{
 		new rcmd[32];
 		rcmd[0] = '/';
 		strcat(rcmd, cmd, sizeof(rcmd));
 		player_notice(playerid, mapname, rcmd);
-	
+
         NewMapEvent(playerid, cmd);
-	} 
+	}
 	return 1;
 }
 
@@ -24323,10 +24323,10 @@ PortPlayerMapVeh(playerid, Float:X, Float:Y, Float:Z, Float:Angle, Float:XVeh, F
 	    SCM(playerid, GREY, NOT_AVAIL);
 		return 0;
 	}
-	
+
 	SetPlayerVirtualWorld(playerid, 0);
 	SetPlayerInterior(playerid, 0);
-	
+
 	if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
 	{
 	    new veh = GetPlayerVehicleID(playerid);
@@ -24343,30 +24343,30 @@ PortPlayerMapVeh(playerid, Float:X, Float:Y, Float:Z, Float:Angle, Float:XVeh, F
 		SetPlayerPos(playerid, X, Y, floatadd(Z, 3.0));
 		SetPlayerFacingAngle(playerid, Angle);
 	}
-	
+
 	PlayerPlaySound(playerid, 1039, 0.0, 0.0, 0.0);
     SetCameraBehindPlayer(playerid);
-    
+
     if(populate)
 	{
 	 	new rcmd[32];
 		rcmd[0] = '/';
 		strcat(rcmd, cmd, sizeof(rcmd));
 	    player_notice(playerid, mapname, rcmd);
-	    
+
         NewMapEvent(playerid, cmd);
-	} 
+	}
 	return 1;
 }
 
 SendWelcomeMSG(playerid)
 {
 	SCM(playerid, GREY, "===================="white""CURRENT_VERSION""grey"=======================");
-	SCM(playerid, RED, "Â» Welcome to "SVRLOGO"");
-	SCM(playerid, NEF_GREEN, "Â» Type /help for further information");
-	SCM(playerid, BLUE, "Â» You can show/hide the textdraws with /textdraws");
-	SCM(playerid, YELLOW, "Â» Visit our forum at http://"SVRFORUM"");
-	SCM(playerid, NEF_YELLOW, "Â» You can use /radio or /streams for music streams");
+	SCM(playerid, RED, "» Welcome to "SVRLOGO"");
+	SCM(playerid, NEF_GREEN, "» Type /help for further information");
+	SCM(playerid, BLUE, "» You can show/hide the textdraws with /textdraws");
+	SCM(playerid, YELLOW, "» Visit our forum at http://"SVRFORUM"");
+	SCM(playerid, NEF_YELLOW, "» You can use /radio or /streams for music streams");
 	SCM(playerid, GREY, "===================="white""CURRENT_VERSION""grey"=======================");
 	return 1;
 }
@@ -24504,7 +24504,7 @@ function:DerbyVoting()
 	}
 	if(active_db_players < 2)
 	{
-	    // Wir kÃ¶nnen nicht starten
+	    // Wir können nicht starten
 		DerbyMSG("Couldn't start Derby! Too many AFK players");
         ExecDerbyVotingTimer();
         ClearDerbyVotes();
@@ -24613,11 +24613,11 @@ function:StartDerbyMap1()
 					PutPlayerInVehicle(i, PlayerData[i][pDerbyVehicle], 0);
 					RepairVehicle(PlayerData[i][pDerbyVehicle]);
 					SetCameraBehindPlayer(i);
-					
+
 					new Float:POS[3];
 					GetVehicleVelocity(PlayerData[i][pDerbyVehicle], POS[0], POS[1], POS[2]);
 					SetVehicleVelocity(PlayerData[i][pDerbyVehicle], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
-					
+
 					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby is starting!", 3000, 5);
 					Derby_Map1Spawns[m1s][m1sUsed] = true;
 					break;
@@ -24708,11 +24708,11 @@ function:StartDerbyMap2()
 					PutPlayerInVehicle(i, PlayerData[i][pDerbyVehicle], 0);
 					RepairVehicle(PlayerData[i][pDerbyVehicle]);
 					SetCameraBehindPlayer(i);
-					
+
 					new Float:POS[3];
 					GetVehicleVelocity(PlayerData[i][pDerbyVehicle], POS[0], POS[1], POS[2]);
 					SetVehicleVelocity(PlayerData[i][pDerbyVehicle], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
-					
+
 					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby is starting!", 3000, 5);
 					Derby_Map2Spawns[m2s][m2sUsed] = true;
 					break;
@@ -24803,11 +24803,11 @@ function:StartDerbyMap3()
 					PutPlayerInVehicle(i, PlayerData[i][pDerbyVehicle], 0);
 					RepairVehicle(PlayerData[i][pDerbyVehicle]);
 					SetCameraBehindPlayer(i);
-					
+
 					new Float:POS[3];
 					GetVehicleVelocity(PlayerData[i][pDerbyVehicle], POS[0], POS[1], POS[2]);
 					SetVehicleVelocity(PlayerData[i][pDerbyVehicle], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
-					
+
 					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby is starting!", 3000, 5);
 					Derby_Map3Spawns[m3s][m3sUsed] = true;
 					break;
@@ -24898,11 +24898,11 @@ function:StartDerbyMap4()
 					PutPlayerInVehicle(i, PlayerData[i][pDerbyVehicle], 0);
 					RepairVehicle(PlayerData[i][pDerbyVehicle]);
 					SetCameraBehindPlayer(i);
-					
+
 					new Float:POS[3];
 					GetVehicleVelocity(PlayerData[i][pDerbyVehicle], POS[0], POS[1], POS[2]);
 					SetVehicleVelocity(PlayerData[i][pDerbyVehicle], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
-					
+
 					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby is starting!", 3000, 5);
 					Derby_Map4Spawns[m4s][m4sUsed] = true;
 					break;
@@ -24993,11 +24993,11 @@ function:StartDerbyMap5()
 					PutPlayerInVehicle(i, PlayerData[i][pDerbyVehicle], 0);
 					RepairVehicle(PlayerData[i][pDerbyVehicle]);
 					SetCameraBehindPlayer(i);
-					
+
 					new Float:POS[3];
 					GetVehicleVelocity(PlayerData[i][pDerbyVehicle], POS[0], POS[1], POS[2]);
 					SetVehicleVelocity(PlayerData[i][pDerbyVehicle], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
-					
+
 					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby is starting!", 3000, 5);
 					Derby_Map5Spawns[m5s][m5sUsed] = true;
 					break;
@@ -25078,11 +25078,11 @@ function:StartDerbyMap6()
 					PutPlayerInVehicle(i, PlayerData[i][pDerbyVehicle], 0);
 					RepairVehicle(PlayerData[i][pDerbyVehicle]);
 					SetCameraBehindPlayer(i);
-					
+
 					new Float:POS[3];
 					GetVehicleVelocity(PlayerData[i][pDerbyVehicle], POS[0], POS[1], POS[2]);
 					SetVehicleVelocity(PlayerData[i][pDerbyVehicle], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
-					
+
 					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby is starting!", 3000, 5);
 					Derby_Map6Spawns[m6s][m6sUsed] = true;
 					break;
@@ -25163,11 +25163,11 @@ function:StartDerbyMap7()
 					PutPlayerInVehicle(i, PlayerData[i][pDerbyVehicle], 0);
 					RepairVehicle(PlayerData[i][pDerbyVehicle]);
 					SetCameraBehindPlayer(i);
-					
+
 					new Float:POS[3];
 					GetVehicleVelocity(PlayerData[i][pDerbyVehicle], POS[0], POS[1], POS[2]);
 					SetVehicleVelocity(PlayerData[i][pDerbyVehicle], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
-					
+
 					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby is starting!", 3000, 5);
 					Derby_Map7Spawns[m7s][m7sUsed] = true;
 					break;
@@ -25248,11 +25248,11 @@ function:StartDerbyMap8()
 					PutPlayerInVehicle(i, PlayerData[i][pDerbyVehicle], 0);
 					RepairVehicle(PlayerData[i][pDerbyVehicle]);
 					SetCameraBehindPlayer(i);
-					
+
 					new Float:POS[3];
 					GetVehicleVelocity(PlayerData[i][pDerbyVehicle], POS[0], POS[1], POS[2]);
 					SetVehicleVelocity(PlayerData[i][pDerbyVehicle], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
-					
+
 					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby is starting!", 3000, 5);
 					Derby_Map8Spawns[m8s][m8sUsed] = true;
 					break;
@@ -25333,11 +25333,11 @@ function:StartDerbyMap9()
 					PutPlayerInVehicle(i, PlayerData[i][pDerbyVehicle], 0);
 					RepairVehicle(PlayerData[i][pDerbyVehicle]);
 					SetCameraBehindPlayer(i);
-					
+
 					new Float:POS[3];
 					GetVehicleVelocity(PlayerData[i][pDerbyVehicle], POS[0], POS[1], POS[2]);
 					SetVehicleVelocity(PlayerData[i][pDerbyVehicle], POS[0] * 1.2, POS[1] * 1.2, POS[2] * 1.2);
-					
+
 					GameTextForPlayer(i, "~p~[DERBY]: ~w~Derby is starting!", 3000, 5);
 					Derby_Map9Spawns[m9s][m9sUsed] = true;
 					break;
@@ -25404,9 +25404,9 @@ function:Derby()
 
 			    	GivePlayerMoneyEx(i, money, true, true);
 			    	GivePlayerScoreEx(i, score, true, true);
-			    	
+
 			    	DerbyWinner[i] = false;
-			    	
+
 			    	format(string, sizeof(string), "%s won the Derby and earned "nef_yellow"$%s", __GetName(i), number_format(money));
 					DerbyMSG(string);
 	   			}
@@ -25451,7 +25451,7 @@ function:DerbyFallOver()
 	    case 8: CURRENT_FALLOVER = DERBY_FALLOVER_M8;
 	    case 9: CURRENT_FALLOVER = DERBY_FALLOVER_M9;
 	}
-	
+
 	new Float:POS[3], string[64];
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -25509,12 +25509,12 @@ function:DerbyFallOver()
 function:QueueProcess()
 {
 	mysql_tquery(pSQL, "SELECT * FROM `queue` WHERE `ExecutionDate` < UNIX_TIMESTAMP();", "OnQueueReceived", "");
-	
+
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(!IsPlayerAvail(i)) continue;
 	    if(IsPlayerOnDesktop(i, 30000)) continue;
-	
+
 		if(PlayerData[i][e_payday] > 1)
 		{
 		    PlayerData[i][e_payday]--;
@@ -25522,12 +25522,12 @@ function:QueueProcess()
 		else if(PlayerData[i][e_payday] <= 1)
 		{
 		    PlayerData[i][e_payday] = 60;
-		    
+
 		    if((PlayerData[i][e_bank] + PlayerData[i][e_money]) > 100000000)
 		    {
 		        continue;
 		    }
-		    
+
 		    new string0[100],
 				string1[100],
 				string2[100],
@@ -25586,33 +25586,33 @@ function:OnQueueReceived()
 {
 	new rows, fields;
 	cache_get_data(rows, fields, pSQL);
-	
+
 	if(rows > 0)
 	{
 	    new Cache:Data = cache_save(pSQL);
 	    cache_set_active(Data, pSQL);
-	
+
 		for(new i = 0; i < rows; i++)
 		{
 		    new action = cache_get_row_int(i, 1, pSQL);
-		    
+
 		    switch(action)
 			{
 		        case 1: // give a player credits
 		        {
 		            new name[26], credits, payment[21];
 		            cache_get_row(i, 3, gstr2, pSQL, sizeof(gstr2));
-		            
+
 		            sscanf(gstr2, "p<,>s[25]is[20]",
 		                name,
 		                credits,
 						payment);
-		            
+
 		            new playerid = __GetPlayerID(name);
 		            if(playerid != INVALID_PLAYER_ID && islogged(playerid))
 		            {
 						AlterPlayerCredits(playerid, credits);
-						
+
 						format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"You were given %sGC!", number_format(credits));
 						SCM(playerid, -1, gstr2);
 
@@ -25627,7 +25627,7 @@ function:OnQueueReceived()
 						mysql_format(pSQL, gstr2, sizeof(gstr2), "INSERT INTO `creditslog` VALUES (NULL, '%e', %i, %i);", name, credits, gettime());
 						mysql_tquery(pSQL, gstr2);
 		            }
-		            
+
 					format(gstr, sizeof(gstr), "~p~%s received %s credits for donating!", name, number_format(credits));
                     GameTextForAll(gstr, 10000, 3);
                     format(gstr, sizeof(gstr), "%s received %s credits for donating!", name, number_format(credits));
@@ -25637,7 +25637,7 @@ function:OnQueueReceived()
 		        {
 		            new name[25];
 		            cache_get_row(i, 3, name, pSQL, sizeof(name));
-		            
+
 		            new playerid = __GetPlayerID(name);
 		            if(playerid != INVALID_PLAYER_ID)
 		            {
@@ -25680,7 +25680,7 @@ function:OnQueueReceived()
 		        {
 		            new name[26], payment[21];
                     cache_get_row(i, 3, gstr2, pSQL, sizeof(gstr2));
-                    
+
 				    sscanf(gstr2, "p<,>s[25]s[20]",
 		                name,
 		                payment);
@@ -25690,7 +25690,7 @@ function:OnQueueReceived()
 		            {
 		                PlayerData[playerid][e_vip] = 1;
 		                PlayerData[playerid][e_bank] += 1000000;
-		                
+
 		                if(PlayerData[playerid][e_addpvslots] < 7)
 		                {
 		                    PlayerData[playerid][e_addpvslots]++;
@@ -25707,7 +25707,7 @@ function:OnQueueReceived()
 						{
 							PlayerData[playerid][e_addbizzslots]++;
 						}
-		                
+
 						SCM(playerid, -1, ""server_sign" "r_besch"You received VIP status + $1,000,000 bank money + 2 PV Slots + 1 House Slot + 1 Bizz Slot!");
 
 						InfoTD_MSG(playerid, 10000, "~r~~h~~h~You received VIP status + $1,000,000 bank money + 2 PV Slots + 1 House Slot + 1 Bizz Slot!");
@@ -25716,10 +25716,10 @@ function:OnQueueReceived()
 		            else
 		            {
 						cache_set_active(Cache:0, pSQL);
-		                
+
 						mysql_format(pSQL, gstr, sizeof(gstr), "SELECT `addpvslots`, `addhouseslots`, `addbizzslots` FROM `accounts` WHERE `name` = '%e';", name);
 						new Cache:res = mysql_query(pSQL, gstr);
-						
+
 						if(cache_get_row_count(pSQL) > 0)
 						{
 							new pvslot = cache_get_row_int(0, 0, pSQL),
@@ -25755,7 +25755,7 @@ function:OnQueueReceived()
     					cache_delete(res);
 						cache_set_active(Data, pSQL);
 		            }
-		            
+
 					format(gstr, sizeof(gstr), "~p~%s received VIP for donating!", name);
                     GameTextForAll(gstr, 10000, 3);
                     format(gstr, sizeof(gstr), "%s received VIP for donating!", name);
@@ -25766,7 +25766,7 @@ function:OnQueueReceived()
 			format(gstr2, sizeof(gstr2), "DELETE FROM `queue` WHERE `ID` = %i LIMIT 1;", cache_get_row_int(i, 0, pSQL));
 			mysql_tquery(pSQL, gstr2, "", "");
 		}
-		
+
 		cache_delete(Data, pSQL);
 	}
 	return 1;
@@ -25823,7 +25823,7 @@ function:ProcessTick()
 	T_JPDMPlayers = 0;
 	T_RocketDMPlayers = 0;
 	T_ServerPlayers = 0;
-	
+
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(IsPlayerConnected(i))
@@ -25834,7 +25834,7 @@ function:ProcessTick()
 			    case FREEROAM:
 			    {
 			        SavePos(i);
-			        
+
 				    if(GetPlayerState(i) == PLAYER_STATE_DRIVER)
 				    {
 						for(new ii = 0; ii < sizeof(g_SpawnAreas); ii++)
@@ -25861,7 +25861,7 @@ function:ProcessTick()
 			            new Float:hp, Float:ar;
 			 			GetPlayerHealth(PlayerData[i][SpecID], hp);
 						GetPlayerArmour(PlayerData[i][SpecID], ar);
-						
+
 						format(gstr, sizeof(gstr), "~n~~n~~n~~n~~n~~n~~n~~w~%s - id:%i~n~hp:%0.1f ar:%0.1f $%s~n~Godmode: %s",
 							__GetName(PlayerData[i][SpecID]),
 							PlayerData[i][SpecID],
@@ -25869,7 +25869,7 @@ function:ProcessTick()
 							ar,
 							number_format((GetPlayerMoneyEx(PlayerData[i][SpecID]) + PlayerData[PlayerData[i][SpecID]][e_bank])),
 							PlayerData[PlayerData[i][SpecID]][bGod] ? ("Yes") : ("No"));
-							
+
 						GameTextForPlayer(i, gstr, 30000, 3);
 					}
 				}
@@ -25930,7 +25930,7 @@ function:ProcessTick()
 			    case FALLOUT:
 			    {
 			        T_FalloutPlayers++;
-			        
+
 			        if(g_FalloutStatus == e_Fallout_Running)
 			        {
 				        if(IsPlayerOnDesktop(i, 6000))
@@ -26006,7 +26006,7 @@ function:ProcessTick()
 			}
 	    }
 	}
-                             
+
 	format(gstr2, sizeof(gstr2), "~y~/derby ~r~~h~%i ~y~/cnr ~r~~h~%i ~y~/race ~r~~h~%i ~y~/tdm ~r~~h~%i ~y~/fallout ~r~~h~%i ~y~/gungame ~r~~h~%i ~y~/war ~r~~h~%i ~y~/mini ~r~~h~%i ~y~/sniper ~r~~h~%i ~y~/rocket ~r~~h~%i",
         T_DerbyPlayers,
         T_CNRPlayers,
@@ -26046,7 +26046,7 @@ function:ProcessTick()
 		--BGGameTime;
 		new bg_players = BGTeam1Players + BGTeam2Players;
 		switch(CurrentBGMap)
-		{                                     
+		{
 		    case BG_MAP1: format(gstr2, sizeof(gstr2), "Timeleft: ~r~~h~~h~%s~n~~w~Players: ~b~~h~~h~%i~n~~w~Map: ~g~~h~~h~Forest~n~~w~Ranger Kills: ~g~~h~~h~%i~n~~w~Spetsnaz Kills: ~g~~h~~h~%i", GameTimeConvert(BGGameTime), bg_players, BGTeam1Kills, BGTeam2Kills);
 		    case BG_MAP2: format(gstr2, sizeof(gstr2), "Timeleft: ~r~~h~~h~%s~n~~w~Players: ~b~~h~~h~%i~n~~w~Map: ~g~~h~~h~Quaters~n~~w~Ranger Kills: ~g~~h~~h~%i~n~~w~Spetsnaz Kills: ~g~~h~~h~%i", GameTimeConvert(BGGameTime), bg_players, BGTeam1Kills, BGTeam2Kills);
             case BG_MAP3: format(gstr2, sizeof(gstr2), "Timeleft: ~r~~h~~h~%s~n~~w~Players: ~b~~h~~h~%i~n~~w~Map: ~g~~h~~h~Rust~n~~w~Ranger Kills: ~g~~h~~h~%i~n~~w~Spetsnaz Kills: ~g~~h~~h~%i", GameTimeConvert(BGGameTime), bg_players, BGTeam1Kills, BGTeam2Kills);
@@ -26065,7 +26065,7 @@ function:ProcessTick()
 	{
  		--DerbyGameTime;
    		switch(CurrentDerbyMap)
-	    {                                    
+	    {
 			case 1: format(gstr2, sizeof(gstr2), "Timeleft: ~r~~h~~h~%s~n~~w~Players: ~b~~h~~h~%i/20~n~~w~Map: ~g~~h~~h~Lighthouse", GameTimeConvert(DerbyGameTime), DerbyPlayers);
 		    case 2: format(gstr2, sizeof(gstr2), "Timeleft: ~r~~h~~h~%s~n~~w~Players: ~b~~h~~h~%i/20~n~~w~Map: ~g~~h~~h~Truncat", GameTimeConvert(DerbyGameTime), DerbyPlayers);
 		    case 3: format(gstr2, sizeof(gstr2), "Timeleft: ~r~~h~~h~%s~n~~w~Players: ~b~~h~~h~%i/20~n~~w~Map: ~g~~h~~h~SkySkiing", GameTimeConvert(DerbyGameTime), DerbyPlayers);
@@ -26096,7 +26096,7 @@ function:ProcessTick()
 				}
             }
 		}
-	
+
 		if(GZoneInfo[i][bUnderAttack])
 		{
 			if(GZoneInfo[i][iTimeLeft] > 0)
@@ -26140,9 +26140,9 @@ function:ProcessTick()
 								}
 							}
 						}
-						
+
 						Iter_Remove(iterGangWar, GZoneInfo[i][AttackingGang]);
-						
+
 						GZoneInfo[i][iTimeLeft] = 0;
 						GZoneInfo[i][bUnderAttack] = false;
 						GZoneInfo[i][AttackingGang] = 0;
@@ -26168,12 +26168,12 @@ function:ProcessTick()
 								}
 							}
 						}
-						
+
 						GangMSG(GZoneInfo[i][DefendingGang], ""gang_sign" "r_besch" The opposing gang failed to capture your gang zone.");
 
 						Iter_Remove(iterGangWar, GZoneInfo[i][AttackingGang]);
 						Iter_Remove(iterGangWar, GZoneInfo[i][localGang]);
-						
+
 						GZoneInfo[i][localGang] = GZoneInfo[i][DefendingGang];
 						GZoneInfo[i][iTimeLeft] = 0;
 						GZoneInfo[i][bUnderAttack] = false;
@@ -26195,7 +26195,7 @@ function:ProcessTick()
 						SCMToAll(-1, ""orange"This zone is now locked for 2 hours and cannot be attacked during that time!");
 
 						MySQL_UpdateGangScore(GZoneInfo[i][AttackingGang], 5);
-						
+
 						Iter_Remove(iterGangWar, GZoneInfo[i][AttackingGang]);
 					}
 					else
@@ -26209,19 +26209,19 @@ function:ProcessTick()
 						SCMToAll(-1, ""orange"This zone is now locked for 2 hours and cannot be attacked during that time!");
 
 						MySQL_UpdateGangScore(GZoneInfo[i][AttackingGang], 10);
-						
+
                         format(gstr, sizeof(gstr), ""gang_sign" "r_besch" '%s' was captured by the gang %s!", GZoneInfo[i][sZoneName], GetGangNameByID(GZoneInfo[i][AttackingGang]));
 						GangMSG(GZoneInfo[i][DefendingGang], gstr);
-						
+
 						Iter_Remove(iterGangWar, GZoneInfo[i][AttackingGang]);
 						Iter_Remove(iterGangWar, GZoneInfo[i][localGang]);
 					}
-			    
+
         			format(gstr2, sizeof(gstr2), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: %s\n"orange"Type /gwar to start an attack!", GZoneInfo[i][e_id], GZoneInfo[i][sZoneName], GetGangNameByID(GZoneInfo[i][AttackingGang]));
                     UpdateDynamic3DTextLabelText(GZoneInfo[i][label], WHITE, gstr2);
-			    
+
 			        GZoneInfo[i][localGang] = GZoneInfo[i][AttackingGang];
-			        
+
 					for(new ii = 0; ii < MAX_PLAYERS; ii++)
 					{
 					    if(IsPlayerAvail(ii) && PlayerData[ii][bGWarMode])
@@ -26238,14 +26238,14 @@ function:ProcessTick()
 						}
 					    SyncGangZones(ii);
 					}
-					
+
 					GZoneInfo[i][iTimeLeft] = 0;
 					GZoneInfo[i][bUnderAttack] = false;
 					GZoneInfo[i][AttackingGang] = 0;
 					GZoneInfo[i][DefendingGang] = 0;
 					GZoneInfo[i][iLocked] = gettime() + 7200;
 				}
-				
+
 				MySQL_SaveGangZone(i);
 			}
 		}
@@ -26436,15 +26436,15 @@ UpdateBar(playerid)
 UpdateString(Float:HP)
 {
 	new str[30];
-	if(HP == 1000) format(str, sizeof(str), "{00ff00}â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢");
-	else if(HP >= 900) format(str, sizeof(str), "{66ff00}â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢{ffffff}â€¢");
-	else if(HP >= 800) format(str, sizeof(str), "{7fff00}â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢{ffffff}â€¢â€¢");
-	else if(HP >= 700) format(str, sizeof(str), "{ccff00}â€¢â€¢â€¢â€¢â€¢â€¢â€¢{ffffff}â€¢â€¢â€¢");
-	else if(HP >= 600) format(str, sizeof(str), "{f7f21a}â€¢â€¢â€¢â€¢â€¢â€¢{ffffff}â€¢â€¢â€¢â€¢");
-	else if(HP >= 500) format(str, sizeof(str), "{f4c430}â€¢â€¢â€¢â€¢â€¢{ffffff}â€¢â€¢â€¢â€¢â€¢");
-	else if(HP >= 400) format(str, sizeof(str), "{e49b0f}â€¢â€¢â€¢â€¢{ffffff}â€¢â€¢â€¢â€¢â€¢â€¢");
-	else if(HP >= 300) format(str, sizeof(str), "{e4650e}â€¢â€¢â€¢{ffffff}â€¢â€¢â€¢â€¢â€¢â€¢â€¢");
-	else if(HP >= 250) format(str, sizeof(str), "{ff2400}â€¢â€¢{ffffff}â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢");
+	if(HP == 1000) format(str, sizeof(str), "{00ff00}••••••••••");
+	else if(HP >= 900) format(str, sizeof(str), "{66ff00}•••••••••{ffffff}•");
+	else if(HP >= 800) format(str, sizeof(str), "{7fff00}••••••••{ffffff}••");
+	else if(HP >= 700) format(str, sizeof(str), "{ccff00}•••••••{ffffff}•••");
+	else if(HP >= 600) format(str, sizeof(str), "{f7f21a}••••••{ffffff}••••");
+	else if(HP >= 500) format(str, sizeof(str), "{f4c430}•••••{ffffff}•••••");
+	else if(HP >= 400) format(str, sizeof(str), "{e49b0f}••••{ffffff}••••••");
+	else if(HP >= 300) format(str, sizeof(str), "{e4650e}•••{ffffff}•••••••");
+	else if(HP >= 250) format(str, sizeof(str), "{ff2400}••{ffffff}••••••••");
 	else format(str, sizeof(str), "{ff2400}Boom!");
 	return str;
 }
@@ -26629,7 +26629,7 @@ HidePlayerInfoTextdraws(playerid)
 {
 	if(playerid)
 	{
-	
+
 	}
 	TextDrawHideForPlayer(playerid, TXTTeleportInfo);
 }
@@ -26955,7 +26955,7 @@ function:DecideFalloutWinners()
 		    HidePlayerFalloutTextdraws(i);
 		    ResetPlayerWorld(i);
 		    RandomWeapons(i);
-		    
+
 			if(!PlayerData[i][FalloutLost])
 			{
 				winners++;
@@ -26966,19 +26966,19 @@ function:DecideFalloutWinners()
 				money = (2500 * CurrentFalloutPlayers);
                 GivePlayerMoneyEx(i, money, true, true);
 				GivePlayerScoreEx(i, 5, true, true);
-				
+
 				PlayerData[i][e_falloutwins]++;
-				
+
 				if(PlayerAchData[i][e_ach_deepimpact][0] == 0 && PlayerData[i][e_falloutwins] >= 10)
 				{
 				    GivePlayerAchievement(i, e_ach_deepimpact, "Deep Impact", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
 				}
-				
+
 				gTeam[i] = FREEROAM;
 				SpawnPlayer(i);
 			}
 		}
-		
+
 		PlayerData[i][FalloutLost] = true;
 	}
 	fallout_cancel();
@@ -27264,12 +27264,12 @@ function:ShowDialog(playerid, dialogid)
 	    case DIALOG_UPGRADE_BUSINESS:
 	    {
 	        new string[512], tmp[255];
-	        
+
 	        new r = GetBusinessSlotBySelection(playerid);
-	        
+
 			if(r != -1) {
 			    strcat(string, ""white"The higher the level the higher the earnings. Upgrade your business\nlevel to receive more money each payday! Max. level: 20\n\nCurrent Business Level: ");
-			    
+
 			    if(BusinessData[r][e_level] >= MAX_BUSINESS_LEVEL)
 			    {
 				    format(tmp, sizeof(tmp), "%i\nCurrent Business Earnings: $%s\n\nThis business reached it's max. level!", BusinessData[r][e_level], number_format(GetBusinessEarnings(r)));
@@ -27284,7 +27284,7 @@ function:ShowDialog(playerid, dialogid)
 						number_format(BusinessLevelMatrix[BusinessData[r][e_level]][E_bupgradeprice]));
 					strcat(string, tmp);
 				}
-				
+
 	 	        format(tmp, sizeof(tmp), ""nef" :: Business Level Upgrade > Slot: %i", PlayerData[playerid][BusinessIdSelected] + 1);
 
 	            if(BusinessData[r][e_level] == MAX_BUSINESS_LEVEL) {
@@ -27314,11 +27314,11 @@ function:ShowDialog(playerid, dialogid)
 	        new string[680];
 	        format(string, sizeof(string), "%s since %s. During that time...\n\n... "yellow_e"%i "white"commands have been performed\n... "yellow_e"%i "white"chat messages have been sent\n... "yellow_e"%i "white"new players have registered\n... "yellow_e"%i "white"players have been murdered",
 				GetUptime(), UTConvert(StartTime), SrvStat[0], SrvStat[1], SrvStat[2], SrvStat[3]);
-				
+
 			format(gstr2, sizeof(gstr2), "\n\nStreamed client objects: %i\nTotal map obejcts: %i\nServer FPS: %i\nPlayer record: %i", Streamer_CountVisibleItems(playerid, STREAMER_TYPE_OBJECT), Streamer_CountItems(STREAMER_TYPE_OBJECT), GetServerTickRate(), m_PlayerRecord);
 	        strcat(string, gstr2);
 	        strcat(string, "\n\nServer version: "SVRNAME" "CURRENT_VERSION", "HOTFIX_REV" on "SAMP_VERSION"");
-	        
+
 	        ShowPlayerDialog(playerid, SERVERSTATS_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" :: Server Stats", string, "OK", "");
 	    }
 	    case LABEL_DIALOG + 1:
@@ -27362,7 +27362,7 @@ function:ShowDialog(playerid, dialogid)
 							UTConvert(PlayerData[playerid][e_lastnc] + 1209600),
 							__GetName(playerid));
 	                }
-	                
+
 					return ShowPlayerDialog(playerid, NAME_CHANGE_DIALOG, DIALOG_STYLE_INPUT, ""nef" :: Namechange", string, "Change", "Cancel");
 	            }
 	        }
@@ -27479,13 +27479,13 @@ function:ShowDialog(playerid, dialogid)
 		case TELE_DIALOG:
 		{
 		    ShowPlayerDialog(playerid, TELE_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Teleports", "Stunt Zones\nJumps\nFun Maps\nChallenges\nSpecials\nHotspots\nDrifts\nTune Shops\nCities", "Select", "Cancel");
-		    
+
 			//ShowPlayerDialog(playerid, TELE_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Teleports", "Parkours\nStunts\nBasejump/Skydive\nVehicle Jumps\nFun Maps\nSpecials\nVehicle Tuning\nCities\nHotspots\nDrifts", "Select", "Cancel");
 		}
 		case VMENU_DIALOG:
 		{
 		    new string[1024], tmp[128];
-		    
+
 		    for(new i = 0; i < MAX_PLAYER_PVS; i++)
 		    {
 		        if(i > PlayerData[playerid][e_addpvslots]) // Can not use
@@ -27507,7 +27507,7 @@ function:ShowDialog(playerid, dialogid)
 					}
 				}
 		    }
-		    
+
 			ShowPlayerDialog(playerid, VMENU_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Custom car shop", string, "Select", "Cancel");
 		}
 		case WEAPON_DIALOG:
@@ -27521,7 +27521,7 @@ function:ShowDialog(playerid, dialogid)
 		case GMENU_DIALOG:
 		{
 		    format(gstr, sizeof(gstr), ""grey"[%s] %s "white"- Gang Menu", PlayerData[playerid][GangTag], PlayerData[playerid][GangName]);
-		
+
 		    switch(PlayerData[playerid][e_gangrank])
 			{
 			    case GANG_POS_JUNIOR_MEMBER, GANG_POS_MEMBER, GANG_POS_SENIOR_MEMBER, GANG_POS_ADVISOR:
@@ -27596,7 +27596,7 @@ function:InitSession(playerid)
 	PlayerTextDrawSetOutline(playerid, TXTWantedsTD[playerid], 1);
 	PlayerTextDrawSetProportional(playerid, TXTWantedsTD[playerid], 1);
 	PlayerTextDrawSetSelectable(playerid, TXTWantedsTD[playerid], 0);
-	
+
 	TXTInfoTD[playerid] = CreatePlayerTextDraw(playerid, 148.888, 361.385, "~b~~h~Welcome!");
  	PlayerTextDrawLetterSize(playerid, TXTInfoTD[playerid], 0.326, 1.654);
 	PlayerTextDrawAlignment(playerid, TXTInfoTD[playerid], 1);
@@ -27605,7 +27605,7 @@ function:InitSession(playerid)
 	PlayerTextDrawBackgroundColor(playerid, TXTInfoTD[playerid], 0x000000FF);
 	PlayerTextDrawFont(playerid, TXTInfoTD[playerid], 1);
 	PlayerTextDrawSetProportional(playerid, TXTInfoTD[playerid], 1);
-	
+
 	DynamicAchTD[playerid][0] = CreatePlayerTextDraw(playerid, 313.000000, 213.000000, "TITLE");
 	PlayerTextDrawAlignment(playerid, DynamicAchTD[playerid][0], 2);
 	PlayerTextDrawBackgroundColor(playerid, DynamicAchTD[playerid][0], 255);
@@ -27625,7 +27625,7 @@ function:InitSession(playerid)
 	PlayerTextDrawSetOutline(playerid, DynamicAchTD[playerid][1], 0);
 	PlayerTextDrawSetProportional(playerid, DynamicAchTD[playerid][1], 1);
 	PlayerTextDrawSetShadow(playerid, DynamicAchTD[playerid][1], 0);
-	
+
 	vTD[playerid] = CreatePlayerTextDraw(playerid, 555.110412, 320.119964, "_");
 	PlayerTextDrawLetterSize(playerid, vTD[playerid], 0.561555, 3.038580);
 	PlayerTextDrawAlignment(playerid, vTD[playerid], 2);
@@ -27703,7 +27703,7 @@ KickEx(playerid, delay = 3200)
 {
 	PlayerData[playerid][bOpenSeason] = true;
 	SetTimerEx("Kick_Delay", delay, false, "ii", playerid, YHash(__GetName(playerid)));
-	
+
 	Log(LOG_PLAYER, "%s (%i, %s, %s, %i) KickEx initiated.", __GetName(playerid), playerid, __GetIP(playerid), __GetSerial(playerid), delay);
 	return 1;
 }
@@ -27843,7 +27843,7 @@ number_format(num)
 GetPlayerKMH(playerid)
 {
 	new Float:Vx, Float:Vy, Float:Vz, Float:rtn;
-  
+
   	GetVehicleVelocity(GetPlayerVehicleID(playerid), Vx, Vy, Vz);
   	rtn = floatsqroot(floatabs(floatpower(Vx + Vy + Vz, 2)));
   	return floatround(rtn * 100 * 1.61);
@@ -27896,13 +27896,13 @@ GetVehicleModelSeats(modelid)
 AddTeleport(teleport_category, const teleport_name[], const teleport_cmd[], Float:x, Float:y, Float:z)
 {
 	new buffer[70];
-	
+
 	format(buffer, sizeof(buffer), ""nef"\n%s (/%s)", teleport_name, teleport_cmd);
-	
+
 	CreateDynamic3DTextLabel(buffer, -1, x, y, z + 0.50, 40.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1);
 
 	format(buffer, sizeof(buffer), "%s (/%s)\n", teleport_name, teleport_cmd);
-	
+
 	strcat(TeleportDialogString[teleport_category], buffer);
     strmid(Teleports[teleport_category][Teleport_Index[teleport_category]++], teleport_cmd, 0, 26, 26);
     return 1;
@@ -28120,7 +28120,7 @@ function:Maths()
 		format(gstr2, sizeof(gstr2), ""RED_E"[MATHS] "white"Previous question(%s) wasn't answered "GREEN_E"(right answer was %i)", mathsCurrent, mathsAnswer);
 		SCMToAll(NEF_GREEN, gstr2);
 	}
-	
+
     new NR1 = random(100),
 		NR2 = random(100),
 		NR3 = random(100),
@@ -28253,7 +28253,7 @@ GivePlayerAchievement(playerid, E_PLAYER_ACH_DATA:achivement, achname[], descrip
 		mysql_format(pSQL, gstr, sizeof(gstr), "INSERT INTO `achievements` VALUES (%i, %i, UNIX_TIMESTAMP());", PlayerData[playerid][e_accountid], _:achivement);
 		mysql_pquery(pSQL, gstr);
 	}
-	
+
 	PlayerAchData[playerid][achivement][0] = 1;
 	PlayerAchData[playerid][achivement][1] = gettime();
 
@@ -28333,25 +28333,25 @@ IRC_SetUp(bool:restart = false)
 {
 	#if IRC_CONNECT == true
     if(!restart) IRC_GroupID = IRC_CreateGroup();
-    
+
     #if IS_RELEASE_BUILD == true
 	IRC_Bots[0] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]Floatround", "["SVRSC"]Floatround", "foatround", false, "31.204.152.218", "");
 	IRC_SetIntData(IRC_Bots[0], E_IRC_CONNECT_DELAY, 1);
-	
+
 	IRC_Bots[1] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]Inyaface", "["SVRSC"]Inyaface", "inyaface", false, "31.204.152.218", "");
 	IRC_SetIntData(IRC_Bots[1], E_IRC_CONNECT_DELAY, 7);
-	
+
 	IRC_Bots[2] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]SS_FatGuy", "["SVRSC"]SS_FatGuy", "ss_fatguy", false, "31.204.152.218", "");
 	IRC_SetIntData(IRC_Bots[2], E_IRC_CONNECT_DELAY, 17);
-	
+
 	IRC_Bots[3] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]TrainRider", "["SVRSC"]TrainRider", "trainrider", false, "31.204.152.218", "");
 	IRC_SetIntData(IRC_Bots[3], E_IRC_CONNECT_DELAY, 27);
-	
+
 	IRC_Bots[4] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]CrazyLilMan", "["SVRSC"]CrazyLilMan", "crazylilman", false, "31.204.152.218", "");
 	IRC_SetIntData(IRC_Bots[4], E_IRC_CONNECT_DELAY, 39);
-	
+
 	#else
-	
+
 	IRC_Bots[0] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]Floatround_BETA", "["SVRSC"]Floatround_BETA", "foatround_BETA", false, "31.204.152.218", "");
 	IRC_SetIntData(IRC_Bots[0], E_IRC_CONNECT_DELAY, 1);
 
@@ -28386,7 +28386,7 @@ function:DoLotto()
 	    if(!IsPlayerAvail(i)) continue;
 		InfoTD_MSG(i, 15000, gstr);
 	}
-	
+
 	SetTimer("LottoDraw", 300000, false);
 	return 1;
 }
@@ -28396,7 +28396,7 @@ function:LottoDraw()
     lotto_active = false;
 
 	format(gstr2, sizeof(gstr2), "~g~~h~~<~ Lottery Information ~>~~n~~w~Numbers have been drawn. Current jackpot is: $%s - Drawn number: %i~n~~b~~h~~h~", number_format(lotto_jackpot), lotto_number);
-	
+
 	new bool:found = false;
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -28414,15 +28414,15 @@ function:LottoDraw()
 	        break;
 	    }
 	}
-	
+
 	if(!found) strcat(gstr2, "No winner this round!");
-	
+
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(!IsPlayerAvail(i)) continue;
 		InfoTD_MSG(i, 15000, gstr2);
 	}
-	
+
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
         PlayerData[i][DrawnNumber] = -1;
@@ -28558,11 +28558,11 @@ function:AlterPlayerCredits(playerid, amount)
 {
 	format(gstr, sizeof(gstr), "INSERT INTO `creditslog` VALUES (NULL, '%s', %i, %i);", __GetName(playerid), amount, gettime());
 	mysql_tquery(pSQL, gstr);
-	
+
 	PlayerData[playerid][e_credits] += amount;
 	format(gstr, sizeof(gstr), "UPDATE `accounts` SET `credits` = %i WHERE `name` = '%s' LIMIT 1;", PlayerData[playerid][e_credits], __GetName(playerid));
 	mysql_tquery(pSQL, gstr);
-	
+
 	PlayerPlaySound(playerid, 1058, 0.0, 0.0, 0.0);
 	return 1;
 }
@@ -28698,7 +28698,7 @@ ExitPlayer(playerid)
         ResetPlayerGWarMode(playerid);
         return 0;
     }
-    
+
 	switch(gTeam[playerid])
 	{
 	    case gDUEL:
@@ -28728,15 +28728,15 @@ ExitPlayer(playerid)
             Streamer_ToggleItemUpdate(playerid, STREAMER_TYPE_OBJECT, 1);
             Streamer_ToggleItemUpdate(playerid, STREAMER_TYPE_PICKUP, 1);
             Streamer_Update(playerid);
-            
+
 		    HidePlayerCNRTextdraws(playerid);
 		    SetPlayerWantedLevel(playerid, 0);
 		    ResetPlayerWorld(playerid);
 		    RandomSpawn(playerid, true);
 		    RandomWeapons(playerid);
-		    
+
 		    SetPlayerTeam(playerid, NO_TEAM);
-		    
+
 		    if(GetPVarInt(playerid, "HadGod") == 1) Command_ReProcess(playerid, "/god silent", false);
 		    SetPVarInt(playerid, "doingStunt", 0);
 		    PlayerData[playerid][tickJoin_bmx] = 0;
@@ -28770,7 +28770,7 @@ ExitPlayer(playerid)
 			SetPlayerInterior(playerid, 0);
 		    SetPlayerPosEx(playerid, 1798.0952, -1410.8192, floatadd(13.5458, 4.5));
 		    RandomWeapons(playerid);
-		    
+
 			gTeam[playerid] = FREEROAM;
 			SetPVarInt(playerid, "doingStunt", 0);
 			PlayerData[playerid][tickJoin_bmx] = 0;
@@ -28803,13 +28803,13 @@ ExitPlayer(playerid)
 		    	if(GetPlayerInterior(playerid) == HouseIntTypes[HouseInfo[i][interior]][interior] && GetPlayerVirtualWorld(playerid) == (HouseInfo[i][e_id] + 1000))
 				{
 				    found = true;
-				    
+
 				    LoadMap(playerid);
 			    	SetPlayerPos(playerid, HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z]);
 			    	SetPlayerInterior(playerid, 0);
 			    	SetPlayerVirtualWorld(playerid, 0);
 			    	CancelEdit(playerid);
-			    	
+
 			    	gTeam[playerid] = FREEROAM;
 			    	break;
 		    	}
@@ -28924,7 +28924,7 @@ ExitPlayer(playerid)
             DisablePlayerRaceCheckpoint(playerid);
 
 			ResetPlayerWorld(playerid);
-			
+
 		    if(GetPVarInt(playerid, "HadGod") == 1) Command_ReProcess(playerid, "/god", false);
 		    SetPVarInt(playerid, "doingStunt", 0);
 		    PlayerData[playerid][tickJoin_bmx] = 0;
@@ -28941,11 +28941,11 @@ ExitPlayer(playerid)
 			RandomSpawn(playerid, true);
 			RandomWeapons(playerid);
 		    gTeam[playerid] = FREEROAM;
-		    
+
 		    Streamer_ToggleItemUpdate(playerid, STREAMER_TYPE_MAP_ICON, 1);
 		    Streamer_ToggleItemUpdate(playerid, STREAMER_TYPE_CP, 1);
 		    Streamer_Update(playerid);
-            
+
 		    if(PlayerData[playerid][t3dDerbyVehicleLabel] != PlayerText3D:-1)
 		    {
 		    	DeletePlayer3DTextLabel(playerid, PlayerData[playerid][t3dDerbyVehicleLabel]);
@@ -29053,7 +29053,7 @@ LoadMap(playerid)
 	Streamer_Update(playerid);
 	PlayerData[playerid][bLoadMap] = true;
 	TextDrawShowForPlayer(playerid, TXTLoading);
-	
+
 	new ping = GetPlayerPing(playerid);
 	if(ping < 65)
 	{
@@ -29102,7 +29102,7 @@ GetItem(index)
 		number_format(CreditsProductMatrix[index][E_item_credits]),
         CreditsProductMatrix[index][E_item_quantity],
         CreditsProductMatrix[index][E_item_duration]);
-	
+
 	format(tmp, sizeof(tmp), ""green"* "white"Item Description:\n%s",
 		CreditsProductMatrix[index][E_item_description]);
 	strcat(string, tmp);
@@ -29115,17 +29115,34 @@ GetCredits(playerid)
 	return c;
 }
 
-function:OnGangRenameAttempt(playerid, newgangname[], newgangtag[])
+function:OnGangRenameAttempt(playerid, namehash, newgangname[], newgangtag[])
 {
-	new rows, fields;
-	cache_get_data(rows, fields, pSQL);
+	if(!IsPlayerConnected(playerid))
+	    return 0;
+	    
+	if(YHash(__GetName(playerid)) != namehash)
+		return 0;
 
-	if(rows > 0)
+	if(cache_get_row_count() > 0)
 	{
 		SCM(playerid, -1, ""er"This gang name is already in use!");
 	}
 	else
 	{
+		for(new i = 0; i < gzoneid; i++)
+		{
+		    if(GZoneInfo[i][localGang] == PlayerData[playerid][e_gangid])
+		    {
+		    	new text[41];
+		    	GetDynamic3DTextLabelText(GZoneInfo[i][label], text, sizeof(text));
+
+				new pos = strfind(text, PlayerData[playerid][e_gangid], true);
+				strmid(text, newgangname, pos, pos + strlen(PlayerData[playerid][GangName]), sizeof(text));
+
+				UpdateDynamic3DTextLabelText(GZoneInfo[i][label], WHITE, text);
+			}
+		}
+
 	    for(new i = 0; i < MAX_PLAYERS; i++)
 	    {
 	        if(PlayerData[i][e_gangid] == PlayerData[playerid][e_gangid] || PlayerData[i][TmpGangID] == PlayerData[playerid][e_gangid])
@@ -29134,12 +29151,13 @@ function:OnGangRenameAttempt(playerid, newgangname[], newgangtag[])
 	            strmid(PlayerData[i][GangTag], newgangtag, 0, 5, 5);
 	        }
 	    }
+	    
 	    format(gstr2, sizeof(gstr2), "UPDATE `gangs` SET `GangName` = '%s', `GangTag` = '%s' WHERE `ID` = %i LIMIT 1;", newgangname, newgangtag, PlayerData[playerid][e_gangid]);
 	    mysql_tquery(pSQL, gstr2);
-	    
+
 	    format(gstr2, sizeof(gstr2), ""gang_sign" "r_besch"Gang Founder %s(%i) changed the gang's name to [%s]%s", __GetName(playerid), playerid, newgangtag, newgangname);
 		GangMSG(PlayerData[playerid][e_gangid], gstr2);
-		
+
 		GivePlayerMoneyEx(playerid, -100000);
 	}
 	return 1;
@@ -29149,19 +29167,19 @@ function:OnBoostReceive(playerid, namehash)
 {
     if(!IsPlayerConnected(playerid))
 		return 0;
-		
+
 	if(YHash(__GetName(playerid)) != namehash)
 		return 0;
 
 	new rows, fields;
 	cache_get_data(rows, fields, pSQL);
-	
+
 	if(rows > 0)
 	{
 	    for(new i = 0; i < rows; i++)
 	    {
 	        new bool:set = true;
-	        
+
 			switch(cache_get_row_int(i, 1, pSQL))
 			{
 			    case 2: PlayerData[playerid][Boost] |= BOOST_MONEY_x2;
@@ -29171,11 +29189,11 @@ function:OnBoostReceive(playerid, namehash)
 			    case 6: PlayerData[playerid][Boost] |= BOOST_MASTER;
 			    default: set = false;
 			}
-			
+
 			if(set)
 			{
 				PlayerData[playerid][BoostDeplete] = cache_get_row_int(i, 2, pSQL);
-				
+
 				format(gstr, sizeof(gstr), ""server_sign" "r_besch"Boost has been loaded! Runs out on: %s", UTConvert(PlayerData[playerid][BoostDeplete]));
 				SCM(playerid, -1, gstr);
 			}
@@ -29194,7 +29212,7 @@ function:p_medkit(playerid)
 			PlayerData[playerid][tMedkit] = -1;
 			return 1;
 	    }
-	
+
 		new Float:health;
 		GetPlayerHealth(playerid, health);
 
@@ -29208,7 +29226,7 @@ function:p_medkit(playerid)
 
 		SetPlayerHealth(playerid, health + 1.0);
 		SetPlayerChatBubble(playerid, ""green"Used 1 Medkit!", -1, 15.0, 200);
-		
+
 		PlayerData[playerid][MedkitTime]--;
 	}
 	else
@@ -29226,7 +29244,7 @@ GetPlayerBusinessEarnings(playerid)
 	for(new r = 0; r < MAX_BUSINESSES; r++)
 	{
 	    if(strcmp(BusinessData[r][e_owner], __GetName(playerid), true)) continue;
-	    
+
 	    __int32 += GetBusinessEarnings(r);
 	}
 	return __int32;
@@ -29249,11 +29267,11 @@ GetBusinessEarnings(r)
 GetPlayerBusinessCount(const name[])
 {
 	mysql_format(pSQL, gstr, sizeof(gstr), "SELECT COUNT(`id`) FROM `businesses` WHERE `owner` = '%e';", name);
-	
+
 	new Cache:cache = mysql_query(pSQL, gstr);
 	new count = cache_get_row_int(0, 0);
 	cache_delete(cache);
-	
+
 	return count;
 }
 
@@ -29321,7 +29339,7 @@ function:OnUnbanAttempt(playerid, unban[])
 	{
 	    format(gstr, sizeof(gstr), "DELETE FROM `bans` WHERE `PlayerName` = '%s' LIMIT 1;", unban);
 	    mysql_pquery(pSQL, gstr);
-	    
+
 	    format(gstr, sizeof(gstr), "SELECT `ip` FROM `accounts` WHERE `name` = '%s';", unban);
 	    mysql_pquery(pSQL, gstr, "OnUnbanAttempt2");
 
@@ -29340,7 +29358,7 @@ function:OnUnbanAttempt2()
 	{
 	    new ip[MAX_PLAYER_IP + 1];
 	    cache_get_row(0, 0, ip, pSQL, sizeof(ip));
-	    
+
 	    format(gstr, sizeof(gstr), "DELETE FROM `blacklist` WHERE `IP` = '%s';", ip);
 	    mysql_pquery(pSQL, gstr);
 	}
@@ -29356,7 +29374,7 @@ function:OnOfflineBanAttempt(playerid, ban[], reason[])
 	{
 		new buffer[30];
 		cache_get_row(0, 0, buffer, pSQL, sizeof(buffer));
-		
+
 		format(gstr, sizeof(gstr), ""er"%s has already been banned by %s", ban, buffer);
 	    SCM(playerid, -1, gstr);
 	}
@@ -29387,7 +29405,7 @@ function:OnOfflineBanAttempt2(playerid, ban[], reason[])
 		MySQL_BanIP(ip);
 
 		SCM(playerid, -1, ""er"Player has been banned!");
-		
+
 		format(gstr, sizeof(gstr), "[ADMIN CHAT] "LG_E"Account and IP banned of %s [EXPIRES: NEVER, REASON: %s] by %s", ban, reason, __GetName(playerid));
 		AdminMSG(COLOR_RED, gstr);
 	}
@@ -29445,7 +29463,7 @@ FetchRaces()
 function:OpenNewRace()
 {
 	if(g_RaceCount == 0) return 1;
-	
+
 	if(g_RaceForceMap != 0)
 	{
 	    g_NextRace = g_RaceForceMap;
@@ -29455,9 +29473,9 @@ function:OpenNewRace()
 	    g_NextRace = random(g_RaceCount) + 1;
 	}
 	g_RaceForceMap = 0;
-	
+
 	PrepareRace();
-	
+
 	format(gstr, sizeof(gstr), ""race_sign" New race "white"%03i is now active [/race]", g_NextRace);
 	SCMToAll(-1, gstr);
 
@@ -29472,7 +29490,7 @@ PrepareRace()
 	format(file, sizeof(file), "/Race/%03i.race", g_NextRace);
 
 	if(!fexist(file)) return StopRace();
-	
+
 	g_RaceArray[E_vModel] = dini_Int(file, "vModel");
 	g_RaceArray[E_rType] = dini_Int(file, "rType");
     g_RaceArray[E_rWorld] = dini_Int(file, "rVirtualWorld");
@@ -29490,7 +29508,7 @@ PrepareRace()
 	    format(gstr, sizeof(gstr), "vAngle_%i", i);
 	    g_RaceVehCoords[i][3] = dini_Float(file, gstr);
 	}
-	
+
 	for(new i = 0; i < g_RaceArray[E_rCPs]; i++)
 	{
 	    format(gstr, sizeof(gstr), "CP_%i_PosX", i);
@@ -29502,7 +29520,7 @@ PrepareRace()
 	}
 
 	Iter_Clear(RaceJoins);
-	
+
     g_rPosition = 0;
 	g_RaceTime = MAX_RACE_TIME;
 	g_RacePlayerCount = 0;
@@ -29538,7 +29556,7 @@ function:OnRaceDataLoaded()
 SetupRaceForPlayer(playerid)
 {
     gTeam[playerid] = gRACE;
-    
+
  	SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
 	ClearAnimations(playerid);
 	ResetPlayerWeapons(playerid);
@@ -29569,7 +29587,7 @@ SetupRaceForPlayer(playerid)
     Streamer_DestroyAllVisibleItems(playerid, STREAMER_TYPE_CP);
     Streamer_DestroyAllVisibleItems(playerid, STREAMER_TYPE_MAP_ICON);
     Streamer_DestroyAllVisibleItems(playerid, STREAMER_TYPE_3D_TEXT_LABEL);
-    
+
 	PutPlayerInVehicle(playerid, g_RaceVehicle[playerid], 0);
 
     TogglePlayerControllable(playerid, false);
@@ -29634,7 +29652,7 @@ StartRace()
 	    }
 	}
 	g_tRaceCounter = SetTimer("RaceCounter", 1000, true);
-	
+
     SCMToAll(-1, ""race_sign" The current race has been started!");
 }
 
@@ -29667,7 +29685,7 @@ function:StopRace()
 	g_RaceStatus = RaceStatus_Inactive;
     g_RaceFinishCount = 0;
     g_iRaceEnd = 0;
-    
+
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(!IsPlayerConnected(i)) continue;
@@ -29698,7 +29716,7 @@ function:StopRace()
 			if(GetPVarInt(i, "HadGod") == 1) Command_ReProcess(i, "/god", false);
 		}
 	}
-	
+
 	g_tRaceOpenSelection = SetTimer("OpenNewRace", (6 * 30 * 1000) + 307, false);
 	return 1;
 }
@@ -29713,7 +29731,7 @@ function:Race_End()
 	{
 	    return StopRace();
 	}
-	
+
 	format(gstr, sizeof(gstr), "~w~Still ~p~%i ~w~seconds left!", g_iRaceEnd);
 
     for(new i = 0; i < MAX_PLAYERS; i++)
@@ -29740,20 +29758,20 @@ RemoveFromRaceBuilder(playerid)
 	g_BuildVirtualWorld = 0;
 	g_BuildTakeCheckpoints = false;
 	g_BuildTakeVehPos = false;
-	
+
 	if(g_BuildVehicle != -1)
 	{
 		DestroyVehicle_(g_BuildVehicle);
 		g_BuildVehicle = -1;
 	}
-	
+
     Streamer_ToggleItemUpdate(playerid, STREAMER_TYPE_OBJECT, 1);
     Streamer_ToggleItemUpdate(playerid, STREAMER_TYPE_PICKUP, 1);
     Streamer_ToggleItemUpdate(playerid, STREAMER_TYPE_CP, 1);
     Streamer_ToggleItemUpdate(playerid, STREAMER_TYPE_MAP_ICON, 1);
     Streamer_ToggleItemUpdate(playerid, STREAMER_TYPE_3D_TEXT_LABEL, 1);
     Streamer_Update(playerid);
-    
+
     gTeam[playerid] = FREEROAM;
 }
 
@@ -29842,10 +29860,10 @@ DestroyPlayerVehicles(playerid, bool:minigames = false)
 	    {
 	        DestroyDynamicObject(hVIPVehObj[playerid][obj]);
 	    }
-	    
+
 	    hVIPVehObj[playerid][obj] = -1;
 	}
-	
+
 	if(PlayerData[playerid][pVehicle] != -1)
 	{
 		DestroyVehicle_(PlayerData[playerid][pVehicle]);
@@ -29875,13 +29893,13 @@ DestroyPlayerVehicles(playerid, bool:minigames = false)
 			PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid] = -1;
 		}
 	}
-	
+
 	if(PlayerData[playerid][pTrailerVehicle] != -1)
 	{
 		DestroyVehicle_(PlayerData[playerid][pTrailerVehicle]);
 		PlayerData[playerid][pTrailerVehicle] = -1;
 	}
-	
+
 	if(minigames)
 	{
 		if(g_RaceVehicle[playerid] != -1)
@@ -29889,7 +29907,7 @@ DestroyPlayerVehicles(playerid, bool:minigames = false)
 			DestroyVehicle_(g_RaceVehicle[playerid]);
 			g_RaceVehicle[playerid] = -1;
 		}
-		
+
 	    if(PlayerData[playerid][pDerbyVehicle] != -1)
 	    {
 	    	DestroyVehicle_(PlayerData[playerid][pDerbyVehicle]);
@@ -29930,7 +29948,7 @@ function:OnRaceRecordPurged(playerid, map)
 CreateVehicle_(modelid, Float:x, Float:y, Float:z, Float:angle, color1, color2, respawn_delay)
 {
 	new vid = CreateVehicle(modelid, x, y, z, angle, color1, color2, respawn_delay);
-	
+
 	if(vid == INVALID_VEHICLE_ID)
 	{
 	    printf("[ERROR] Could not create vehicle! return: %i, params: %i %.2f %.2f %.2f %.2f %i %i %i", vid, modelid, x, y, z, angle, color1, color2, respawn_delay);
@@ -30162,7 +30180,7 @@ badsql(const string[], bool:strict = true)
 	if(strfind(string, "'", true) != -1) return 1;
 	if(strfind(string, "/", true) != -1) return 1;
 	if(strfind(string, "\\", true) != -1) return 1;
-	if(strfind(string, "Â´", true) != -1) return 1;
+	if(strfind(string, "´", true) != -1) return 1;
 	if(strfind(string, "`", true) != -1) return 1;
 	if(strfind(string, "~", true) != -1) return 1;
 	if(strfind(string, "#", true) != -1) return 1;
@@ -30266,7 +30284,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 			{
 	 		   	TextDrawHideForPlayer(playerid, TXTOnJoin[0]);
 	 		   	TextDrawHideForPlayer(playerid, TXTOnJoin[1]);
-			
+
 	 		   	SCM(playerid, -1, ""server_sign" You have been banned.");
        			KickEx(playerid);
 			}
@@ -30382,20 +30400,20 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 				orm_addvar_int(ormid, PlayerData[playerid][e_lastlogin], "lastlogin");
 				orm_addvar_int(ormid, PlayerData[playerid][e_lastnc], "lastnc");
 				orm_addvar_int(ormid, PlayerData[playerid][e_skinsave], "skinsave");
-				
+
 				orm_setkey(ormid, "id");
 				orm_apply_cache(ormid, 0);
 
 				if(!IsValidSkin(PlayerData[playerid][e_skinsave])) {
 				    PlayerData[playerid][e_skinsave] = -1;
 				}
-				
+
 				PlayerData[playerid][ConnectTime] = gettime();
-				
+
 				if(PlayerData[playerid][e_gangid] != 0) {
 					MySQL_LoadPlayerGang(playerid);
 				}
-				
+
 				MySQL_LoadPlayerAchs(playerid);
 				MySQL_LoadPlayerToys(playerid);
 				MySQL_LoadPlayerPVs(playerid);
@@ -30422,7 +30440,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 				SCM(playerid, -1, gstr);
 				format(gstr, sizeof(gstr), ""server_sign" "r_besch"You've been online for %s", GetPlayingTimeFormat(playerid));
 				SCM(playerid, -1, gstr);
-				
+
 				if(PlayerData[playerid][e_color] != 0)
 				{
 				    SetPlayerColor(playerid, PlayerData[playerid][e_color]);
@@ -30433,7 +30451,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 				{
                     format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"VIP %s(%i) logged in!", __GetName(playerid), playerid);
                     SCMToAll(-1, gstr2);
-                    
+
 					format(gstr2, sizeof(gstr2), "02[%i] 03*** VIP %s has joined the server.", playerid, __GetName(playerid));
 					IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr2);
 				}
@@ -30489,7 +30507,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 	            for(new i = 0; i < cache_get_row_count() && i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
 	            {
 					new r = cache_get_row_int(i, 1);
-					
+
 					PlayerToyData[playerid][r][toy_model] = cache_get_row_int(i, 2);
 					PlayerToyData[playerid][r][toy_bone] = cache_get_row_int(i, 3);
 					PlayerToyData[playerid][r][toy_x] = cache_get_row_float(i, 4);
@@ -30512,13 +30530,13 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 				for(new i = 0; i < cache_get_row_count() && i < MAX_PLAYER_PVS; i++)
 				{
 				    new r = cache_get_row_int(i, 1);
-				    
+
 				    PlayerPVData[playerid][r][e_model] = cache_get_row_int(i, 2);
 				    cache_get_row(i, 3, PlayerPVData[playerid][r][e_plate], pSQL, 13);
 				    PlayerPVData[playerid][r][e_paintjob] = cache_get_row_int(i, 4);
 				    PlayerPVData[playerid][r][e_color1] = cache_get_row_int(i, 5);
 				    PlayerPVData[playerid][r][e_color2] = cache_get_row_int(i, 6);
-				    
+
 				    for(new m = 0; m < 17; m++)
 				    {
 				        PlayerPVData[playerid][r][e_mods][m] = cache_get_row_int(i, m + 7);
@@ -30551,7 +30569,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 Log(E_LOG_LEVEL:log_level, const fmat[], va_args<>)
 {
 	va_format(gstr2, sizeof(gstr2), fmat, va_start<2>);
-	
+
 	switch(log_level)
 	{
 	    case LOG_INIT: strins(gstr2, "LogInit: ", 0, sizeof(gstr2));
@@ -30985,3 +31003,4 @@ GetCommandName(cmdtext[])
 	strmid(gstr, cmdtext, 1, space, sizeof(gstr));
 	return gstr;
 }
+
