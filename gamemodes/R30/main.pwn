@@ -4420,20 +4420,23 @@ public OnPlayerDeath(playerid, killerid, reason)
 
 	PlayerData[playerid][bIsDead] = true;
 	
-	if(GetTickCountEx() - PlayerData[playerid][iLastDeathTime] < COOLDOWN_DEATH)
+	new cstime = gettime(); // http://forum.sa-mp.com/showpost.php?p=1820351&postcount=41
+	switch(cstime - PlayerData[playerid][iLastDeathTime])
 	{
-	    if(++PlayerData[playerid][iDeathCountThreshold] >= 7)
+	    case 0..3:
 	    {
-		    format(gstr, sizeof(gstr), "[SUSPECT] Fake deaths/kills detected, kicking (%s, %i)", __GetName(playerid), playerid);
-		    AdminMSG(RED, gstr);
-		    Log(LOG_NET, gstr);
-			return Kick(playerid);
+		    if(++PlayerData[playerid][iDeathCountThreshold] == 4)
+		    {
+			    format(gstr, sizeof(gstr), "[SUSPECT] Fake deaths/kills detected, kicking (%s, %i)", __GetName(playerid), playerid);
+			    AdminMSG(RED, gstr);
+			    Log(LOG_NET, gstr);
+				return Kick(playerid);
+		    }
 	    }
+	    default: PlayerData[playerid][iDeathCountThreshold] = 0;
 	}
-	else PlayerData[playerid][iDeathCountThreshold] = 0;
-	
-	PlayerData[playerid][iLastDeathTime] = GetTickCountEx();
-	
+	PlayerData[playerid][iLastDeathTime] = cstime;
+
 	if(PlayerData[playerid][bLoadMap])
 	{
 		KillTimer(PlayerData[playerid][tLoadMap]);
