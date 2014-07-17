@@ -423,7 +423,6 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define COOLDOWN_CMD_GINVITE            (60000)
 #define COOLDOWN_CMD_GKICK              (8000)
 #define COOLDOWN_CMD_GCREATE            (5000)
-#define COOLDOWN_DEATH                  (3000)
 #define COOLDOWN_CMD                  	(1100)
 #define COOLDOWN_CHAT                   (1000)
 #define COOLDOWN_CMD_HAREFILL           (120000)
@@ -744,7 +743,7 @@ enum E_PLAYER_DATA // Prefixes: i = Integer, s = String, b = bool, f = Float, p 
 	iKickBanIssued,
 	iCoolDownCommand,
 	iCoolDownChat,
-	iCoolDownDeath,
+	iLastDeathTime,
 	PlayerText3D:t3dDerbyVehicleLabel,
 	pDerbyVehicle,
 	pTrailerVehicle,
@@ -4412,8 +4411,9 @@ public OnPlayerDeath(playerid, killerid, reason)
 {
 	// Closing open dialogs in order to avoid some exploits.
 	ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
-	
-<<<<<<< HEAD
+
+    PlayerData[playerid][bIsDead] = true;
+
 	new cstime = gettime(); // http://forum.sa-mp.com/showpost.php?p=1820351&postcount=41
 	switch(cstime - PlayerData[playerid][iLastDeathTime])
 	{
@@ -4431,20 +4431,6 @@ public OnPlayerDeath(playerid, killerid, reason)
 	}
 	PlayerData[playerid][iLastDeathTime] = cstime;
 
-=======
-	PlayerData[playerid][bIsDead] = true;
-	PlayerData[playerid][iCoolDownDeath]++;
-	SetTimerEx("CoolDownDeath", COOLDOWN_DEATH, false, "i", playerid);
-	if(PlayerData[playerid][iCoolDownDeath] >= 4)
-	{
-	    format(gstr, sizeof(gstr), "[SUSPECT] %i fake deaths detected, kicking (%s, %i)", PlayerData[playerid][iCoolDownDeath], __GetName(playerid), playerid);
-	    AdminMSG(RED, gstr);
-	    Log(LOG_NET, gstr);
-	    
-		return Kick(playerid);
-	}
-	
->>>>>>> origin/master
 	if(PlayerData[playerid][bLoadMap])
 	{
 		KillTimer(PlayerData[playerid][tLoadMap]);
@@ -9932,7 +9918,7 @@ YCMD:onduty(playerid, params[], help)
 			PlayerData[playerid][bDuty] = true;
 			PlayerData[playerid][AdminDutyLabel] = CreateDynamic3DTextLabel("Admin On Duty", ADMIN, 0.0, 0.0, 0.35, 20.0, playerid, INVALID_VEHICLE_ID, 0, -1, -1, -1, 20.0);
 
-	        format(gstr, sizeof(gstr), ""yellow"** "red"Admin %s(%i) is now onduty!", __GetName(playerid), playerid);
+	        format(gstr, sizeof(gstr), ""yellow"** "red"Admin %s(%i) is now onduty", __GetName(playerid), playerid);
 	        SCMToAll(RED, gstr);
         	SetPlayerHealth(playerid, 99999.0);
 		}
@@ -9956,7 +9942,7 @@ YCMD:offduty(playerid, params[], help)
 		{
 		    PlayerData[playerid][bDuty] = false;
 
-        	format(gstr, sizeof(gstr), ""yellow"** "red"Admin %s(%i) is now offduty!", __GetName(playerid), playerid);
+        	format(gstr, sizeof(gstr), ""yellow"** "red"Admin %s(%i) is now offduty", __GetName(playerid), playerid);
         	SCMToAll(-1, gstr);
         	SetPlayerHealth(playerid, 100.0);
         	RemovePlayerAttachedObject(playerid, 9);
@@ -27574,12 +27560,6 @@ function:ShowDialog(playerid, dialogid)
 	return 1;
 }
 
-function:CoolDownDeath(playerid)
-{
-	PlayerData[playerid][iCoolDownDeath]--;
-	return 1;
-}
-
 function:server_random_broadcast()
 {
     SCMToAll(WHITE, ServerMSGS[random(sizeof(ServerMSGS))]);
@@ -30161,7 +30141,7 @@ PreparePlayerVars(playerid)
 	PlayerData[playerid][houseobj_selected] = 0;
 	PlayerData[playerid][iCoolDownCommand] = 0;
 	PlayerData[playerid][iCoolDownChat] = 0;
-	PlayerData[playerid][iCoolDownDeath] = 0;
+	PlayerData[playerid][iLastDeathTime] = 0;
 	PlayerData[playerid][DuelWeapon] = 0;
 	PlayerData[playerid][DuelLocation] = 0;
 	PlayerData[playerid][DuelRequest] = INVALID_PLAYER_ID;
