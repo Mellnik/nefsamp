@@ -2159,6 +2159,12 @@ new Float:g_CarShopLocations[CAR_SHOPS][4] =
 	{-1639.0990, 1202.4598, 7.2247, 68.4220},
 	{2106.9548, 1403.5167, 11.1395, 89.2744}
 };
+new Float:g_CarShopTelePos[CAR_SHOPS][4] =
+{
+	{2107.1802, 1378.5853, 10.8618, 1.2502},
+	{2127.6726, -1129.2881, 25.5523, 175.3369},
+	{-1622.3246, 1198.9712, 7.0391, 68.1087}
+};
 new Float:DM_MAP_1[2][4] =
 {
 	{1309.0240, 2110.4265, 11.0156, 316.7284},
@@ -7109,7 +7115,7 @@ YCMD:vs(playerid, params[], help)
 {
 	new rand = random(CAR_SHOPS);
 
-    PortPlayerMap(playerid, g_CarShopLocations[rand][0] - 2.0, g_CarShopLocations[rand][1] - 2.0, g_CarShopLocations[rand][2] + 0.5, g_CarShopLocations[rand][3], "Car Shop", "vs");
+    PortPlayerMapVeh(playerid, g_CarShopTelePos[rand][0], g_CarShopTelePos[rand][1], g_CarShopTelePos[rand][2], g_CarShopTelePos[rand][3], g_CarShopTelePos[rand][0], g_CarShopTelePos[rand][1], g_CarShopTelePos[rand][2], g_CarShopTelePos[rand][3], "Car Shop", "vs");
     return 1;
 }
 YCMD:gc(playerid, params[], help)
@@ -28803,12 +28809,18 @@ ExitPlayer(playerid)
 	    }
 	    case BUYCAR:
 	    {
-	        LoadMap(playerid);
-			SetPlayerInterior(playerid, 0);
-		    SetPlayerPosEx(playerid, 1798.0952, -1410.8192, floatadd(13.5458, 4.5));
-		    RandomWeapons(playerid);
-		    
-			gTeam[playerid] = FREEROAM;
+		    for(new i = 0; i < CAR_SHOPS; i++)
+		    {
+		        if(gLastMap[playerid] == g_CarShops[i][e_pickup])
+		        {
+					SetPlayerInterior(playerid, 0);
+				    SetPlayerPos(playerid, g_CarShopLocations[i][0] - 2.0, g_CarShopLocations[i][1] - 2.0, g_CarShopLocations[i][2] + 0.5);
+				    RandomWeapons(playerid);
+					gTeam[playerid] = FREEROAM;
+					gLastMap[playerid] = 0;
+		        }
+		    }
+
 			SetPVarInt(playerid, "doingStunt", 0);
 			PlayerData[playerid][tickJoin_bmx] = 0;
 			return 0;
