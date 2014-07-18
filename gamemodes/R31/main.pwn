@@ -8349,8 +8349,8 @@ YCMD:bbuy(playerid, params[], help)
 			SCM(playerid, -1, ""er"You need at least 1000 score to start a business");
 			break;
 		}
-		if(GetPlayerMoneyEx(playerid) < 1250000) {
-			SCM(playerid, -1, ""er"You need at least $1,250,000 to start a business");
+		if(GetPlayerMoneyEx(playerid) < 1500000) {
+			SCM(playerid, -1, ""er"You need at least $1,500,000 to start a business");
 			break;
 		}
 		
@@ -8369,7 +8369,7 @@ YCMD:bbuy(playerid, params[], help)
 		
 		player_notice(playerid, "SUCCESS!", "");
         PlayerPlaySound(playerid, 1149, 0.0, 0.0, 0.0);
-        GivePlayerMoneyEx(playerid, -1250000);
+        GivePlayerMoneyEx(playerid, -1500000);
         MySQL_SaveAccount(playerid, false, false);
 		
 	    format(gstr, sizeof(gstr), ""nef" "yellow_e"%s(%i) bought the business %i!", __GetName(playerid), playerid, BusinessData[r][e_id]);
@@ -13092,6 +13092,8 @@ YCMD:vip(playerid, params[], help)
 
 YCMD:hydra(playerid, params[], help)
 {
+    if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
+    
 	if(PlayerData[playerid][e_vip] == 1)
 	{
 	    if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
