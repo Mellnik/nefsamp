@@ -23534,7 +23534,7 @@ server_load_visuals()
 	AddTeleport(7, "Arch Wheel Angels", "arch", -2689.1001,217.8290,3.9509);
 	AddTeleport(8, "Las Venturas Airport", "lva", 1320.6082,1268.7208,13.5903);
 	AddTeleport(8, "Las Venturas", "lv", 2039.8860,1546.1112,10.4450);
-	AddTeleport(7, "Custom car shop", "vs", 1850.7683,-1459.0325,13.3984);
+	AddTeleport(7, "Custom car shop", "vs", 1850.7683,-1459.0325,13.3984, false);
 	AddTeleport(2, "RectAngle", "rect", 742.8961,533.1397,461.9956);
 	AddTeleport(4, "Balloon", "balloon", 295.4890,-1813.5734,52.0518);
 	AddTeleport(3, "Parkour 1", "parkour", 2586.5618,-1346.5614,232.2472);
@@ -27886,13 +27886,14 @@ GetVehicleModelSeats(modelid)
     return (modelid < 400 || modelid > 611) ? 0 : gVehicleSeats[modelid - 400];
 }
 
-AddTeleport(teleport_category, const teleport_name[], const teleport_cmd[], Float:x, Float:y, Float:z)
+AddTeleport(teleport_category, const teleport_name[], const teleport_cmd[], Float:x, Float:y, Float:z, bool:create_label = true)
 {
 	new buffer[70];
 	
 	format(buffer, sizeof(buffer), ""nef"\n%s (/%s)", teleport_name, teleport_cmd);
 	
-	CreateDynamic3DTextLabel(buffer, -1, x, y, z + 0.50, 40.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1);
+	if(create_label)
+		CreateDynamic3DTextLabel(buffer, -1, x, y, z + 0.50, 40.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1);
 
 	format(buffer, sizeof(buffer), "%s (/%s)\n", teleport_name, teleport_cmd);
 	
