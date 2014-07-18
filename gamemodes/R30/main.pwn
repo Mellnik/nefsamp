@@ -4368,7 +4368,7 @@ public OnPlayerText(playerid, text[])
 	   		}
 			else
 			{
-				format(gstr, sizeof(gstr), "{%06x}[%s] %s"white"(%i): {A8DBFF}%s", GetColorEx(playerid) >>> 8, PlayerData[playerid][GangTag], __GetName(playerid), playerid, text);
+				format(gstr, sizeof(gstr), "{%06x}[%s] %s"white"(%i): %s%s", GetColorEx(playerid) >>> 8, PlayerData[playerid][GangTag], __GetName(playerid), playerid, PlayerData[playerid][bOnlineAdmin] ? ("{A8DBFF}") : (""), text);
 				SCMToAll(-1, gstr);
 			}
 		}
@@ -4388,6 +4388,7 @@ public OnPlayerText(playerid, text[])
 		if(PlayerData[playerid][e_level] != 0) strcat(tmp, "{A8DBFF}");
 		strcat(tmp, text[pos]);
 		text[pos] = EOS;
+		
 		if(PlayerData[playerid][e_level] == 0)
 		{
 			format(gstr, sizeof(gstr), "{%06x}%s"white"(%i): %s", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, text);
@@ -4408,7 +4409,7 @@ public OnPlayerText(playerid, text[])
 	 		format(gstr, sizeof(gstr), "{%06x}%s"white"(%i): %s", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, text);
 			SCMToAll(-1, gstr);
   		}
-		else if(PlayerData[playerid][e_level] > 0)
+		else
 		{
             format(gstr, sizeof(gstr), "{%06x}%s"white"(%i): %s%s", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, PlayerData[playerid][bOnlineAdmin] ? ("{A8DBFF}") : (""), text);
 			SCMToAll(-1, gstr);
