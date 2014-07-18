@@ -25,7 +25,7 @@
 #pragma dynamic 8192
 
 #define IS_RELEASE_BUILD (true)
-#define INC_ENVIORMENT (false)
+#define INC_ENVIORMENT (true)
 #define IRC_CONNECT (true)
 #define WINTER_EDITION (false) // Requires FS ferriswheelfair.amx
 #define YSI_IS_SERVER
