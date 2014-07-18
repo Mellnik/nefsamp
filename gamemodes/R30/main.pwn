@@ -25,7 +25,7 @@
 #pragma dynamic 8192
 
 #define IS_RELEASE_BUILD (true)
-#define INC_ENVIORMENT (true)
+#define INC_ENVIORMENT (false)
 #define IRC_CONNECT (true)
 #define WINTER_EDITION (false) // Requires FS ferriswheelfair.amx
 #define YSI_IS_SERVER
@@ -955,14 +955,14 @@ enum E_CAR_SHOP
 enum E_GZONE_DATA
 {
 	e_id,
-	sZoneName[41],
+	e_zonename[41],
 	Float:E_x,
 	Float:E_y,
 	Float:E_z,
-	localGang,
-	iLocked,
-	iTimeLeft,
-	iconid,
+	e_localgang,
+	e_locked,
+	e_timeleft,
+	e_iconid,
 	Text3D:label,
 	Text:E_Txt,
 	e_pickupid,
@@ -988,7 +988,7 @@ enum e_house_data
 	sold,
 	locked,
 	pickid,
-	iconid,
+	e_iconid,
 	E_Obj_Model[MAX_HOUSE_OBJECTS],
 	E_Obj_ObjectID[MAX_HOUSE_OBJECTS],
 	Text3D:E_Obj_Label[MAX_HOUSE_OBJECTS],
@@ -3823,16 +3823,16 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 
 				for(new i = 0; i < gzoneid; i++)
 				{
-				    if(GZoneData[i][localGang] == gangid)
+				    if(GZoneData[i][e_localgang] == gangid)
 				    {
-						GZoneData[i][iTimeLeft] = 0;
+						GZoneData[i][e_timeleft] = 0;
 						GZoneData[i][bUnderAttack] = false;
 						GZoneData[i][AttackingGang] = 0;
 						GZoneData[i][DefendingGang] = 0;
-						GZoneData[i][iLocked] = gettime();
-						GZoneData[i][localGang] = 0;
+						GZoneData[i][e_locked] = gettime();
+						GZoneData[i][e_localgang] = 0;
 
-						format(gstr2, sizeof(gstr2), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: ---\n"orange"Type /gwar to start an attack!", GZoneData[i][e_id], GZoneData[i][sZoneName]);
+						format(gstr2, sizeof(gstr2), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: ---\n"orange"Type /gwar to start an attack!", GZoneData[i][e_id], GZoneData[i][e_zonename]);
 						UpdateDynamic3DTextLabelText(GZoneData[i][label], WHITE, gstr2);
 
 						MySQL_SaveGangZone(i);
@@ -5110,7 +5110,7 @@ public OnPlayerEnterDynamicArea(playerid, areaid)
 	
 	for(new i = 0; i < gzoneid; i++)
 	{
-	    if(GZoneData[i][localGang] == PlayerData[playerid][e_gangid] && GZoneData[i][bUnderAttack] && areaid == GZoneData[i][zsphere])
+	    if(GZoneData[i][e_localgang] == PlayerData[playerid][e_gangid] && GZoneData[i][bUnderAttack] && areaid == GZoneData[i][zsphere])
 	    {
 	        // Player entered GWAR
 			//SCM(playerid, -1, ""orange"You have joined the Gang War! Type /gcapture near the flag when no enemy is around!");
@@ -5119,7 +5119,7 @@ public OnPlayerEnterDynamicArea(playerid, areaid)
 			break;
 		}
 
-		if(GZoneData[i][zsphere] == areaid && GZoneData[i][bUnderAttack] && GZoneData[i][localGang] != PlayerData[playerid][e_gangid] && GZoneData[i][AttackingGang] != PlayerData[playerid][e_gangid])
+		if(GZoneData[i][zsphere] == areaid && GZoneData[i][bUnderAttack] && GZoneData[i][e_localgang] != PlayerData[playerid][e_gangid] && GZoneData[i][AttackingGang] != PlayerData[playerid][e_gangid])
 		{
 		    if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
 			{
@@ -5143,7 +5143,7 @@ public OnPlayerLeaveDynamicArea(playerid, areaid)
 {
 	for(new i = 0; i < gzoneid; i++)
 	{
-	    if(GZoneData[i][localGang] == PlayerData[playerid][e_gangid] && GZoneData[i][bUnderAttack] && areaid == GZoneData[i][zsphere] && PlayerData[playerid][bGWarMode])
+	    if(GZoneData[i][e_localgang] == PlayerData[playerid][e_gangid] && GZoneData[i][bUnderAttack] && areaid == GZoneData[i][zsphere] && PlayerData[playerid][bGWarMode])
 	    {
 	        // Player left GWAR
             SCM(playerid, -1, ""orange"You have left the gang zone! Get back fast and defend it!");
@@ -7928,7 +7928,7 @@ YCMD:l(playerid, params[], help)
 	
 	for(new i = 0; i < gzoneid; i++)
 	{
-	    if(GZoneData[i][bUnderAttack] && (GZoneData[i][localGang] == PlayerData[playerid][e_gangid] || GZoneData[i][AttackingGang] == PlayerData[playerid][e_gangid]))
+	    if(GZoneData[i][bUnderAttack] && (GZoneData[i][e_localgang] == PlayerData[playerid][e_gangid] || GZoneData[i][AttackingGang] == PlayerData[playerid][e_gangid]))
 	    {
 	        if(GZONE_SIZE + 100.0 > GetDistance3D(PlayerData[playerid][sX], PlayerData[playerid][sY], PlayerData[playerid][sZ], GZoneData[i][E_x], GZoneData[i][E_y], GZoneData[i][E_z]))
 	        {
@@ -8484,9 +8484,9 @@ YCMD:buy(playerid, params[], help)
 
 	    format(gstr, sizeof(gstr), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", __GetName(playerid), HouseInfo[i][e_id], number_format(HouseInfo[i][price]), HouseInfo[i][E_score], HouseIntTypes[HouseInfo[i][interior]][intname]);
 	    UpdateDynamic3DTextLabelText(HouseInfo[i][label], -1, gstr);
-	    DestroyDynamicMapIcon(HouseInfo[i][iconid]);
+	    DestroyDynamicMapIcon(HouseInfo[i][e_iconid]);
 	    DestroyDynamicPickup(HouseInfo[i][pickid]);
-	    HouseInfo[i][iconid] = -1; //CreateDynamicMapIcon(HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], 32, 1, 0, -1, -1, 150.0);
+	    HouseInfo[i][e_iconid] = -1; //CreateDynamicMapIcon(HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], 32, 1, 0, -1, -1, 150.0);
 	    HouseInfo[i][pickid] = CreateDynamicPickup(1272, 1, HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], -1, -1, -1, 30.0);
 	    GivePlayerMoneyEx(playerid, -HouseInfo[i][price]);
 	    HouseInfo[i][date] = gettime();
@@ -8558,9 +8558,9 @@ YCMD:sell(playerid, params[], help)
 
 	    format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseInfo[i][e_id], number_format(HouseInfo[i][price]), HouseInfo[i][E_score], HouseIntTypes[HouseInfo[i][interior]][intname]);
 	    UpdateDynamic3DTextLabelText(HouseInfo[i][label], -1, gstr);
-	    DestroyDynamicMapIcon(HouseInfo[i][iconid]);
+	    DestroyDynamicMapIcon(HouseInfo[i][e_iconid]);
 	    DestroyDynamicPickup(HouseInfo[i][pickid]);
-	    HouseInfo[i][iconid] = CreateDynamicMapIcon(HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], 31, 1, 0, -1, -1, 150.0);
+	    HouseInfo[i][e_iconid] = CreateDynamicMapIcon(HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], 31, 1, 0, -1, -1, 150.0);
 	    HouseInfo[i][pickid] = CreateDynamicPickup(1273, 1, HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], -1, -1, -1, 30.0);
 	    PlayerData[playerid][e_houses]--;
 	    HouseInfo[i][date] = 0;
@@ -11153,7 +11153,7 @@ YCMD:gzonecreate(playerid, params[], help)
 	new zonename[40];
 	mysql_escape_string(tmp, zonename, pSQL, sizeof(zonename));
 	
-    strmid(GZoneData[gzoneid][sZoneName], zonename, 0, 40, 40);
+    strmid(GZoneData[gzoneid][e_zonename], zonename, 0, 40, 40);
 
     new Float:POS[3];
     GetPlayerPos(playerid, POS[0], POS[1], POS[2]);
@@ -11162,17 +11162,17 @@ YCMD:gzonecreate(playerid, params[], help)
     GZoneData[gzoneid][E_y] = POS[1];
     GZoneData[gzoneid][E_z] = POS[2];
 
-	GZoneData[gzoneid][localGang] = 0;
-	GZoneData[gzoneid][iLocked] = gettime();
+	GZoneData[gzoneid][e_localgang] = 0;
+	GZoneData[gzoneid][e_locked] = gettime();
     GZoneData[gzoneid][bUnderAttack] = false;
 
 	format(gstr2, sizeof(gstr2), "INSERT INTO `gzones` VALUES (NULL, '%s', %f, %f, %f, %i, %i);",
-		GZoneData[gzoneid][sZoneName],
+		GZoneData[gzoneid][e_zonename],
 		GZoneData[gzoneid][E_x],
 		GZoneData[gzoneid][E_y],
 		GZoneData[gzoneid][E_z],
-		GZoneData[gzoneid][localGang],
-		GZoneData[gzoneid][iLocked]);
+		GZoneData[gzoneid][e_localgang],
+		GZoneData[gzoneid][e_locked]);
 		
 	mysql_tquery(pSQL, gstr2, "", "");
     mysql_tquery(pSQL, "SELECT * FROM `gzones` ORDER BY `id` DESC LIMIT 1;", "OnGangZoneLoadEx", "i", gzoneid);
@@ -11196,11 +11196,11 @@ YCMD:gzonereset(playerid, params[], help)
 	            return SCM(playerid, -1, ""er"Zone is currently under attack!");
 	        }
 	        
-	        GZoneData[i][iTimeLeft] = 0;
-			GZoneData[i][localGang] = 0;
+	        GZoneData[i][e_timeleft] = 0;
+			GZoneData[i][e_localgang] = 0;
 			GZoneData[i][AttackingGang] = 0;
 			GZoneData[i][DefendingGang] = 0;
-	  		GZoneData[i][iLocked] = gettime();
+	  		GZoneData[i][e_locked] = gettime();
 	        
 			MySQL_SaveGangZone(i);
 	        
@@ -11365,10 +11365,10 @@ YCMD:gcapture(playerid, params[], help)
 		else
 		{
 		    // Reset zone
-		    format(gstr, sizeof(gstr), ""gang_sign" "r_besch" Your gang failed to capture '%s'. %s(%i) re-captured it!", GZoneData[i][sZoneName], __GetName(playerid), playerid);
+		    format(gstr, sizeof(gstr), ""gang_sign" "r_besch" Your gang failed to capture '%s'. %s(%i) re-captured it!", GZoneData[i][e_zonename], __GetName(playerid), playerid);
 			GangMSG(GZoneData[i][AttackingGang], gstr);
 
-			format(gstr, sizeof(gstr), ""orange"Gang %s failed to capture '%s'. Zone remains %s territory and will be locked for 30 minutes!", GetGangNameByID(GZoneData[i][AttackingGang]), GZoneData[i][sZoneName], GetGangNameByID(GZoneData[i][DefendingGang]));
+			format(gstr, sizeof(gstr), ""orange"Gang %s failed to capture '%s'. Zone remains %s territory and will be locked for 30 minutes!", GetGangNameByID(GZoneData[i][AttackingGang]), GZoneData[i][e_zonename], GetGangNameByID(GZoneData[i][DefendingGang]));
 			SCMToAll(-1, gstr);
 
 			for(new ii = 0; ii < MAX_PLAYERS; ii++)
@@ -11387,20 +11387,20 @@ YCMD:gcapture(playerid, params[], help)
 				}
 			}
 
-			format(gstr, sizeof(gstr), ""gang_sign" "r_besch" %s %s(%i) re-captured zone '%s' which was under attack.", GangPositions[PlayerData[playerid][e_gangrank]][E_gang_pos_name], __GetName(playerid), playerid, GZoneData[i][sZoneName]);
+			format(gstr, sizeof(gstr), ""gang_sign" "r_besch" %s %s(%i) re-captured zone '%s' which was under attack.", GangPositions[PlayerData[playerid][e_gangrank]][E_gang_pos_name], __GetName(playerid), playerid, GZoneData[i][e_zonename]);
 			GangMSG(GZoneData[i][DefendingGang], gstr);
 
-			MySQL_UpdateGangScore(GZoneData[i][localGang], 5);
+			MySQL_UpdateGangScore(GZoneData[i][e_localgang], 5);
 
 			Iter_Remove(iterGangWar, GZoneData[i][AttackingGang]);
-			Iter_Remove(iterGangWar, GZoneData[i][localGang]);
+			Iter_Remove(iterGangWar, GZoneData[i][e_localgang]);
 
-			GZoneData[i][localGang] = GZoneData[i][DefendingGang];
-			GZoneData[i][iTimeLeft] = 0;
+			GZoneData[i][e_localgang] = GZoneData[i][DefendingGang];
+			GZoneData[i][e_timeleft] = 0;
 			GZoneData[i][bUnderAttack] = false;
 			GZoneData[i][AttackingGang] = 0;
 			GZoneData[i][DefendingGang] = 0;
-			GZoneData[i][iLocked] = gettime() + 1800;
+			GZoneData[i][e_locked] = gettime() + 1800;
 			
 			MySQL_SaveGangZone(i);
 		}
@@ -11421,9 +11421,9 @@ YCMD:gzones(playerid, params[], help)
 
 	for(new i = 0; i < gzoneid; i++)
 	{
-	    if(PlayerData[playerid][e_gangid] == GZoneData[i][localGang])
+	    if(PlayerData[playerid][e_gangid] == GZoneData[i][e_localgang])
 	    {
-	        format(gstr, sizeof(gstr), "\n%i - %s", ++count, GZoneData[i][sZoneName]);
+	        format(gstr, sizeof(gstr), "\n%i - %s", ++count, GZoneData[i][e_zonename]);
 	        strcat(str, gstr);
 	    }
 	}
@@ -11450,7 +11450,7 @@ YCMD:gwars(playerid, params[], help)
 	{
 	    if(GZoneData[i][bUnderAttack])
 	    {
-	        format(gstr, sizeof(gstr), "%s is attacking zone '%s'\n", GetGangNameByID(GZoneData[i][AttackingGang]), GZoneData[i][sZoneName]);
+	        format(gstr, sizeof(gstr), "%s is attacking zone '%s'\n", GetGangNameByID(GZoneData[i][AttackingGang]), GZoneData[i][e_zonename]);
 	        strcat(str, gstr);
 			++count;
 	    }
@@ -11482,14 +11482,14 @@ YCMD:gwar(playerid, params[], help)
 
 		if(GZoneData[i][bUnderAttack]) return ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" Gang War", ""white"This Gang Zone is currently under attack!", "OK", "");
 
-		if(GZoneData[i][localGang] == PlayerData[playerid][e_gangid])
+		if(GZoneData[i][e_localgang] == PlayerData[playerid][e_gangid])
 		{
 		    return ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" Gang War", ""white"This zone already belongs to your gang!", "OK", "");
 		}
 
-        if(GZoneData[i][iLocked] > gettime())
+        if(GZoneData[i][e_locked] > gettime())
         {
-            format(gstr, sizeof(gstr), ""white"This zone is currently locked!\n\nIt will become available for Gang War in %i minutes.", floatround((GZoneData[i][iLocked] - gettime()) / 60.0));
+            format(gstr, sizeof(gstr), ""white"This zone is currently locked!\n\nIt will become available for Gang War in %i minutes.", floatround((GZoneData[i][e_locked] - gettime()) / 60.0));
             ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" Gang War", gstr, "OK", "");
             return 1;
 		}
@@ -11501,14 +11501,14 @@ YCMD:gwar(playerid, params[], help)
 		    return ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" Gang War", ""white"You can't attack this zone because your gang is already\ninvloved in another Gang War!", "OK", "");
 		}
 		
-		if(GZoneData[i][localGang] == 0)
+		if(GZoneData[i][e_localgang] == 0)
 		{
 		    GZoneData[i][bUnderAttack] = true;
 		    GZoneData[i][AttackingGang] = PlayerData[playerid][e_gangid];
-		    GZoneData[i][iTimeLeft] = 60;
+		    GZoneData[i][e_timeleft] = 60;
 		    GZoneData[i][DefendingGang] = 0;
 		    
-		    format(gstr, sizeof(gstr), "Gang War: %s~n~Defend the Gang Zone!~n~~n~~n~Timeleft: 1:00", GZoneData[i][sZoneName]);
+		    format(gstr, sizeof(gstr), "Gang War: %s~n~Defend the Gang Zone!~n~~n~~n~Timeleft: 1:00", GZoneData[i][e_zonename]);
 		    TextDrawSetString(GZoneData[i][E_Txt], gstr);
 		    
 		    new count = 0;
@@ -11527,30 +11527,30 @@ YCMD:gwar(playerid, params[], help)
 			}
 
 			if(count == 1)
-		    	format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s(%i) is capturing the zone: '%s' %i member has been tied!", __GetName(playerid), playerid, GZoneData[i][sZoneName], count);
+		    	format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s(%i) is capturing the zone: '%s' %i member has been tied!", __GetName(playerid), playerid, GZoneData[i][e_zonename], count);
 			else
-                format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s(%i) is capturing the zone: '%s' %i members have been tied!", __GetName(playerid), playerid, GZoneData[i][sZoneName], count);
+                format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s(%i) is capturing the zone: '%s' %i members have been tied!", __GetName(playerid), playerid, GZoneData[i][e_zonename], count);
                 
 			GangMSG(PlayerData[playerid][e_gangid], gstr);
 			
-			format(gstr, sizeof(gstr), ""orange"%s(%i) has started capturing the zone '%s' with %i gang member(s)!", __GetName(playerid), playerid, GZoneData[i][sZoneName], count);
+			format(gstr, sizeof(gstr), ""orange"%s(%i) has started capturing the zone '%s' with %i gang member(s)!", __GetName(playerid), playerid, GZoneData[i][e_zonename], count);
 			SCMToAll(-1, gstr);
 			
 			Iter_Add(iterGangWar, PlayerData[playerid][e_gangid]);
 		}
 		else
 		{
-			if(Iter_Contains(iterGangWar, GZoneData[i][localGang]))
+			if(Iter_Contains(iterGangWar, GZoneData[i][e_localgang]))
 			{
 			    return ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" Gang War", ""white"You can't attack this zone because the opposing gang\nis already invloved in another Gang War!", "OK", "");
 			}
 		
 		    GZoneData[i][bUnderAttack] = true;
 		    GZoneData[i][AttackingGang] = PlayerData[playerid][e_gangid];
-		    GZoneData[i][iTimeLeft] = 150;
-		    GZoneData[i][DefendingGang] = GZoneData[i][localGang];
+		    GZoneData[i][e_timeleft] = 150;
+		    GZoneData[i][DefendingGang] = GZoneData[i][e_localgang];
 
-		    format(gstr, sizeof(gstr), "Gang War: %s~n~Defend the Gang Zone!~n~~n~~n~Timeleft: 2:30", GZoneData[i][sZoneName]);
+		    format(gstr, sizeof(gstr), "Gang War: %s~n~Defend the Gang Zone!~n~~n~~n~Timeleft: 2:30", GZoneData[i][e_zonename]);
 		    TextDrawSetString(GZoneData[i][E_Txt], gstr);
 		    
 		    new count = 0;
@@ -11569,20 +11569,20 @@ YCMD:gwar(playerid, params[], help)
 			}
 
 			if(count == 1)
-		    	format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s(%i) is capturing the zone: '%s' %i member has been tied!", __GetName(playerid), playerid, GZoneData[i][sZoneName], count);
+		    	format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s(%i) is capturing the zone: '%s' %i member has been tied!", __GetName(playerid), playerid, GZoneData[i][e_zonename], count);
 			else
-			    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s(%i) is capturing the zone: '%s' %i members have been tied!", __GetName(playerid), playerid, GZoneData[i][sZoneName], count);
+			    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s(%i) is capturing the zone: '%s' %i members have been tied!", __GetName(playerid), playerid, GZoneData[i][e_zonename], count);
 			    
 			GangMSG(PlayerData[playerid][e_gangid], gstr);
 
-		    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"Gang %s started a war against your gang at %s!", GetGangNameByID(PlayerData[playerid][e_gangid]), GZoneData[i][sZoneName]);
-			GangMSG(GZoneData[i][localGang], gstr);
+		    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"Gang %s started a war against your gang at %s!", GetGangNameByID(PlayerData[playerid][e_gangid]), GZoneData[i][e_zonename]);
+			GangMSG(GZoneData[i][e_localgang], gstr);
 
-			format(gstr, sizeof(gstr), ""orange"%s(%i) has started capturing the zone '%s' with %i gang member(s)!", __GetName(playerid), playerid, GZoneData[i][sZoneName], count);
+			format(gstr, sizeof(gstr), ""orange"%s(%i) has started capturing the zone '%s' with %i gang member(s)!", __GetName(playerid), playerid, GZoneData[i][e_zonename], count);
 			SCMToAll(-1, gstr);
 		    
 		    Iter_Add(iterGangWar, PlayerData[playerid][e_gangid]);
-		    Iter_Add(iterGangWar, GZoneData[i][localGang]);
+		    Iter_Add(iterGangWar, GZoneData[i][e_localgang]);
 		}
 	    break;
 	}
@@ -13796,9 +13796,9 @@ YCMD:resethouse(playerid, params[], help)
 
 	    format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseInfo[i][e_id], number_format(HouseInfo[i][price]), HouseInfo[i][E_score], HouseIntTypes[HouseInfo[i][interior]][intname]);
 	    UpdateDynamic3DTextLabelText(HouseInfo[i][label], -1, gstr);
-	    DestroyDynamicMapIcon(HouseInfo[i][iconid]);
+	    DestroyDynamicMapIcon(HouseInfo[i][e_iconid]);
 	    DestroyDynamicPickup(HouseInfo[i][pickid]);
-	    HouseInfo[i][iconid] = CreateDynamicMapIcon(HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], 31, 1, 0, -1, -1, 150.0);
+	    HouseInfo[i][e_iconid] = CreateDynamicMapIcon(HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], 31, 1, 0, -1, -1, 150.0);
 	    HouseInfo[i][pickid] = CreateDynamicPickup(1273, 1, HouseInfo[i][E_x], HouseInfo[i][E_y], HouseInfo[i][E_z], -1, -1, -1, 30.0);
 
 		player_notice(playerid, "The house has been reset", "");
@@ -18483,16 +18483,16 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				for(new i = 0; i < gzoneid; i++)
 				{
-				    if(GZoneData[i][localGang] == PlayerData[playerid][e_gangid])
+				    if(GZoneData[i][e_localgang] == PlayerData[playerid][e_gangid])
 				    {
-						GZoneData[i][iTimeLeft] = 0;
+						GZoneData[i][e_timeleft] = 0;
 						GZoneData[i][bUnderAttack] = false;
 						GZoneData[i][AttackingGang] = 0;
 						GZoneData[i][DefendingGang] = 0;
-						GZoneData[i][iLocked] = gettime();
-						GZoneData[i][localGang] = 0;
+						GZoneData[i][e_locked] = gettime();
+						GZoneData[i][e_localgang] = 0;
 
-						format(gstr2, sizeof(gstr2), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: ---\n"orange"Type /gwar to start an attack!", GZoneData[i][e_id], GZoneData[i][sZoneName]);
+						format(gstr2, sizeof(gstr2), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: ---\n"orange"Type /gwar to start an attack!", GZoneData[i][e_id], GZoneData[i][e_zonename]);
 						UpdateDynamic3DTextLabelText(GZoneData[i][label], WHITE, gstr2);
 
 						MySQL_SaveGangZone(i);
@@ -20434,7 +20434,7 @@ function:OnHouseLoadEx(index)
 
 		HouseInfo[index][label] = CreateDynamic3DTextLabel(line, (HouseInfo[index][sold]) ? (0xFF0000FF) : (0x00FF00FF), HouseInfo[index][E_x], HouseInfo[index][E_y], floatadd(HouseInfo[index][E_z], 0.3), 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 30.0);
 		HouseInfo[index][pickid] = CreateDynamicPickup((HouseInfo[index][sold]) ? (1272) : (1273), 1, HouseInfo[index][E_x], HouseInfo[index][E_y], HouseInfo[index][E_z], -1, -1, -1, 30.0);
-		HouseInfo[index][iconid] = CreateDynamicMapIcon(HouseInfo[index][E_x], HouseInfo[index][E_y], HouseInfo[index][E_z], 31, 1, 0, -1, -1, 150.0);
+		HouseInfo[index][e_iconid] = CreateDynamicMapIcon(HouseInfo[index][E_x], HouseInfo[index][E_y], HouseInfo[index][E_z], 31, 1, 0, -1, -1, 150.0);
 
 		index++;
 	}
@@ -20490,7 +20490,7 @@ function:OnHouseLoad()
 
 			HouseInfo[houseid][label] = CreateDynamic3DTextLabel(gstr2, HouseInfo[houseid][sold] ? 0xFF0000FF : 0x00FF00FF, HouseInfo[houseid][E_x], HouseInfo[houseid][E_y], floatadd(HouseInfo[houseid][E_z], 0.3), 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 30.0);
 			HouseInfo[houseid][pickid] = CreateDynamicPickup(HouseInfo[houseid][sold] ? 1272 : 1273, 1, HouseInfo[houseid][E_x], HouseInfo[houseid][E_y], HouseInfo[houseid][E_z], -1, -1, -1, 30.0);
-			if(!HouseInfo[houseid][sold]) HouseInfo[houseid][iconid] = CreateDynamicMapIcon(HouseInfo[houseid][E_x], HouseInfo[houseid][E_y], HouseInfo[houseid][E_z], 31, 1, 0, -1, -1, 150.0);
+			if(!HouseInfo[houseid][sold]) HouseInfo[houseid][e_iconid] = CreateDynamicMapIcon(HouseInfo[houseid][E_x], HouseInfo[houseid][E_y], HouseInfo[houseid][E_z], 31, 1, 0, -1, -1, 150.0);
 			
 			houseid++;
 		}
@@ -20562,10 +20562,10 @@ function:OnGangZoneLoadEx(gindex)
 	{
 	    GZoneData[gindex][e_id] = cache_get_row_int(0, 0, pSQL);
 
-        format(gstr2, sizeof(gstr2), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: ---\n"orange"Type /gwar to start an attack!", GZoneData[gindex][e_id], GZoneData[gindex][sZoneName]);
+        format(gstr2, sizeof(gstr2), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: ---\n"orange"Type /gwar to start an attack!", GZoneData[gindex][e_id], GZoneData[gindex][e_zonename]);
 
         GZoneData[gindex][label] = CreateDynamic3DTextLabel(gstr2, WHITE, GZoneData[gindex][E_x], GZoneData[gindex][E_y], GZoneData[gindex][E_z] + 0.3, 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 50.0);
-        GZoneData[gindex][iconid] = CreateDynamicMapIcon(GZoneData[gindex][E_x], GZoneData[gindex][E_y], GZoneData[gindex][E_z], 19, 1, 0, -1, -1, 250.0);
+        GZoneData[gindex][e_iconid] = CreateDynamicMapIcon(GZoneData[gindex][E_x], GZoneData[gindex][E_y], GZoneData[gindex][E_z], 19, 1, 0, -1, -1, 250.0);
         GZoneData[gindex][zoneid] = GangZoneCreate(GZoneData[gindex][E_x] - GZONE_SIZE, GZoneData[gindex][E_y] - GZONE_SIZE, GZoneData[gindex][E_x] + GZONE_SIZE, GZoneData[gindex][E_y] + GZONE_SIZE);
         GZoneData[gindex][checkid] = CreateDynamicCP(GZoneData[gindex][E_x], GZoneData[gindex][E_y], GZoneData[gindex][E_z], 7.0, 0, -1, -1, 60.0);
 		GZoneData[gindex][zsphere] = CreateDynamicSphere(GZoneData[gindex][E_x], GZoneData[gindex][E_y], GZoneData[gindex][E_z], GZONE_SIZE, 0, -1, -1);
@@ -20591,28 +20591,28 @@ function:OnGangZoneLoad()
 	        cache_set_active(Data, pSQL);
 	        
 	        GZoneData[gzoneid][e_id] = cache_get_row_int(i, 0, pSQL);
-	        cache_get_row(i, 1, GZoneData[gzoneid][sZoneName], pSQL, 40);
+	        cache_get_row(i, 1, GZoneData[gzoneid][e_zonename], pSQL, 40);
 	        
 	        GZoneData[gzoneid][E_x] = cache_get_row_float(i, 2, pSQL);
 	        GZoneData[gzoneid][E_y] = cache_get_row_float(i, 3, pSQL);
 	        GZoneData[gzoneid][E_z] = cache_get_row_float(i, 4, pSQL);
 	        
-	        GZoneData[gzoneid][localGang] = cache_get_row_int(i, 5, pSQL);
-	        GZoneData[gzoneid][iLocked] = cache_get_row_int(i, 6, pSQL);
+	        GZoneData[gzoneid][e_localgang] = cache_get_row_int(i, 5, pSQL);
+	        GZoneData[gzoneid][e_locked] = cache_get_row_int(i, 6, pSQL);
 	        
 	        cache_set_active(Cache:0, pSQL);
 	        
-	        if(GZoneData[gzoneid][localGang] != 0)
+	        if(GZoneData[gzoneid][e_localgang] != 0)
 	        {
-	    		format(gstr2, sizeof(gstr2), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: %s\n"orange"Type /gwar to start an attack!", GZoneData[gzoneid][e_id], GZoneData[gzoneid][sZoneName], GetGangNameByID(GZoneData[gzoneid][localGang]));
+	    		format(gstr2, sizeof(gstr2), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: %s\n"orange"Type /gwar to start an attack!", GZoneData[gzoneid][e_id], GZoneData[gzoneid][e_zonename], GetGangNameByID(GZoneData[gzoneid][e_localgang]));
 			}
 	        else
 	        {
-	            format(gstr2, sizeof(gstr2), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: ---\n"orange"Type /gwar to start an attack!", GZoneData[gzoneid][e_id], GZoneData[gzoneid][sZoneName]);
+	            format(gstr2, sizeof(gstr2), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: ---\n"orange"Type /gwar to start an attack!", GZoneData[gzoneid][e_id], GZoneData[gzoneid][e_zonename]);
 	        }
 	        
 	        GZoneData[gzoneid][label] = CreateDynamic3DTextLabel(gstr2, WHITE, GZoneData[gzoneid][E_x], GZoneData[gzoneid][E_y], GZoneData[gzoneid][E_z] + 0.3, 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 50.0);
-	        GZoneData[gzoneid][iconid] = CreateDynamicMapIcon(GZoneData[gzoneid][E_x], GZoneData[gzoneid][E_y], GZoneData[gzoneid][E_z], 19, 1, 0, -1, -1, 250.0);
+	        GZoneData[gzoneid][e_iconid] = CreateDynamicMapIcon(GZoneData[gzoneid][E_x], GZoneData[gzoneid][E_y], GZoneData[gzoneid][E_z], 19, 1, 0, -1, -1, 250.0);
 			GZoneData[gzoneid][zoneid] = GangZoneCreate(GZoneData[gzoneid][E_x] - GZONE_SIZE, GZoneData[gzoneid][E_y] - GZONE_SIZE, GZoneData[gzoneid][E_x] + GZONE_SIZE, GZoneData[gzoneid][E_y] + GZONE_SIZE);
             GZoneData[gzoneid][checkid] = CreateDynamicCP(GZoneData[gzoneid][E_x], GZoneData[gzoneid][E_y], GZoneData[gzoneid][E_z], 7.0, 0, -1, -1, 60.0);
             GZoneData[gzoneid][zsphere] = CreateDynamicSphere(GZoneData[gzoneid][E_x], GZoneData[gzoneid][E_y], GZoneData[gzoneid][E_z], GZONE_SIZE, 0, -1, -1);
@@ -20630,13 +20630,13 @@ SyncGangZones(playerid)
 {
 	for(new i = 0; i < gzoneid; i++)
 	{
-	    if(GZoneData[i][localGang] == 0)
+	    if(GZoneData[i][e_localgang] == 0)
 	    {
 	        GangZoneShowForPlayer(playerid, GZoneData[i][zoneid], COLOR_NONE);
 	    }
 	    else
 	    {
-			if(PlayerData[playerid][e_gangid] == GZoneData[i][localGang])
+			if(PlayerData[playerid][e_gangid] == GZoneData[i][e_localgang])
 			{
 				GangZoneShowForPlayer(playerid, GZoneData[i][zoneid], COLOR_FRIENDLY);
 			}
@@ -20669,7 +20669,7 @@ GetGZonesByGang(id)
 	new count = 0;
 	for(new i = 0; i < gzoneid; i++)
 	{
-	    if(GZoneData[i][localGang] == id)
+	    if(GZoneData[i][e_localgang] == id)
 	    {
 	        ++count;
 	    }
@@ -21845,7 +21845,7 @@ MySQL_BanAccount(account[], admin[], reason[], lift = 0)
 
 MySQL_SaveGangZone(id)
 {
-	format(gstr, sizeof(gstr), "UPDATE `gzones` SET `localgang` = %i, `locked` = %i WHERE `id` = %i;", GZoneData[id][localGang], GZoneData[id][iLocked], GZoneData[id][e_id]);
+	format(gstr, sizeof(gstr), "UPDATE `gzones` SET `localgang` = %i, `locked` = %i WHERE `id` = %i;", GZoneData[id][e_localgang], GZoneData[id][e_locked], GZoneData[id][e_id]);
 	mysql_pquery(pSQL, gstr);
 }
 
@@ -26093,7 +26093,7 @@ function:ProcessTick()
 
 	for(new i = 0; i < gzoneid; i++)
 	{
-        if(GZoneData[i][iLocked] < utime) {
+        if(GZoneData[i][e_locked] < utime) {
             if(GZoneData[i][e_pickupid] == -1) {
                 GZoneData[i][e_pickupid] = CreateDynamicPickup(1314, 1, GZoneData[i][E_x], GZoneData[i][E_y], GZoneData[i][E_z], 0, -1, -1);
             }
@@ -26107,14 +26107,14 @@ function:ProcessTick()
 	
 		if(GZoneData[i][bUnderAttack])
 		{
-			if(GZoneData[i][iTimeLeft] > 0)
+			if(GZoneData[i][e_timeleft] > 0)
 			{
-			    --GZoneData[i][iTimeLeft];
+			    --GZoneData[i][e_timeleft];
 
-			    format(gstr, sizeof(gstr), "Gang War: %s~n~Defend the Gang Zone!~n~~n~~n~Timeleft: %s", GZoneData[i][sZoneName], GameTimeConvert(GZoneData[i][iTimeLeft]));
+			    format(gstr, sizeof(gstr), "Gang War: %s~n~Defend the Gang Zone!~n~~n~~n~Timeleft: %s", GZoneData[i][e_zonename], GameTimeConvert(GZoneData[i][e_timeleft]));
 			    TextDrawSetString(GZoneData[i][E_Txt], gstr);
 			}
-			else if(GZoneData[i][iTimeLeft] <= 0)
+			else if(GZoneData[i][e_timeleft] <= 0)
 			{
 			    new Iterator:Players<MAX_PLAYERS>;
 			    for(new ii = 0; ii < MAX_PLAYERS; ii++)
@@ -26132,10 +26132,10 @@ function:ProcessTick()
 			    {
 			        if(GZoneData[i][DefendingGang] == 0)
 			        {
-					    format(gstr, sizeof(gstr), ""gang_sign" "r_besch" Your gang failed to capture '%s' as there are no alive players around!", GZoneData[i][sZoneName]);
+					    format(gstr, sizeof(gstr), ""gang_sign" "r_besch" Your gang failed to capture '%s' as there are no alive players around!", GZoneData[i][e_zonename]);
 						GangMSG(GZoneData[i][AttackingGang], gstr);
 
-						format(gstr, sizeof(gstr), ""orange"[GANG] %s failed to capture '%s' (No players left!)", GetGangNameByID(GZoneData[i][AttackingGang]), GZoneData[i][sZoneName]);
+						format(gstr, sizeof(gstr), ""orange"[GANG] %s failed to capture '%s' (No players left!)", GetGangNameByID(GZoneData[i][AttackingGang]), GZoneData[i][e_zonename]);
 						SCMToAll(-1, gstr);
 
 						for(new ii = 0; ii < MAX_PLAYERS; ii++)
@@ -26151,19 +26151,19 @@ function:ProcessTick()
 						
 						Iter_Remove(iterGangWar, GZoneData[i][AttackingGang]);
 						
-						GZoneData[i][iTimeLeft] = 0;
+						GZoneData[i][e_timeleft] = 0;
 						GZoneData[i][bUnderAttack] = false;
 						GZoneData[i][AttackingGang] = 0;
 						GZoneData[i][DefendingGang] = 0;
-						GZoneData[i][iLocked] = gettime();
-						GZoneData[i][localGang] = 0;
+						GZoneData[i][e_locked] = gettime();
+						GZoneData[i][e_localgang] = 0;
 					}
 					else
 					{
-					    format(gstr, sizeof(gstr), ""gang_sign" "r_besch" Your gang failed to capture '%s' as there are no alive players around!", GZoneData[i][sZoneName]);
+					    format(gstr, sizeof(gstr), ""gang_sign" "r_besch" Your gang failed to capture '%s' as there are no alive players around!", GZoneData[i][e_zonename]);
 						GangMSG(GZoneData[i][AttackingGang], gstr);
 
-						format(gstr, sizeof(gstr), ""orange"Gang %s failed to capture '%s' The zone remains %s gang territory!", GetGangNameByID(GZoneData[i][AttackingGang]), GZoneData[i][sZoneName], GetGangNameByID(GZoneData[i][DefendingGang]));
+						format(gstr, sizeof(gstr), ""orange"Gang %s failed to capture '%s' The zone remains %s gang territory!", GetGangNameByID(GZoneData[i][AttackingGang]), GZoneData[i][e_zonename], GetGangNameByID(GZoneData[i][DefendingGang]));
 						SCMToAll(-1, gstr);
 
 						for(new ii = 0; ii < MAX_PLAYERS; ii++)
@@ -26180,25 +26180,25 @@ function:ProcessTick()
 						GangMSG(GZoneData[i][DefendingGang], ""gang_sign" "r_besch" The opposing gang failed to capture your gang zone.");
 
 						Iter_Remove(iterGangWar, GZoneData[i][AttackingGang]);
-						Iter_Remove(iterGangWar, GZoneData[i][localGang]);
+						Iter_Remove(iterGangWar, GZoneData[i][e_localgang]);
 						
-						GZoneData[i][localGang] = GZoneData[i][DefendingGang];
-						GZoneData[i][iTimeLeft] = 0;
+						GZoneData[i][e_localgang] = GZoneData[i][DefendingGang];
+						GZoneData[i][e_timeleft] = 0;
 						GZoneData[i][bUnderAttack] = false;
 						GZoneData[i][AttackingGang] = 0;
 						GZoneData[i][DefendingGang] = 0;
-						GZoneData[i][iLocked] = gettime();
+						GZoneData[i][e_locked] = gettime();
 					}
 			    }
 			    else
 				{
 				    if(GZoneData[i][DefendingGang] == 0)
 				    {
-					    format(gstr, sizeof(gstr), ""gang_sign" "r_besch" Your gang successfully captured '%s' with %i alive player(s)!", GZoneData[i][sZoneName], Iter_Count(Players));
+					    format(gstr, sizeof(gstr), ""gang_sign" "r_besch" Your gang successfully captured '%s' with %i alive player(s)!", GZoneData[i][e_zonename], Iter_Count(Players));
 						GangMSG(GZoneData[i][AttackingGang], gstr);
 						GangMSG(GZoneData[i][AttackingGang], ""gang_sign" "r_besch" The gang gained 5 gang score and each member $20,000 who were tied.");
 
-						format(gstr, sizeof(gstr), ""orange"Gang %s captured zone '%s' and gained their reward", GetGangNameByID(GZoneData[i][AttackingGang]), GZoneData[i][sZoneName]);
+						format(gstr, sizeof(gstr), ""orange"Gang %s captured zone '%s' and gained their reward", GetGangNameByID(GZoneData[i][AttackingGang]), GZoneData[i][e_zonename]);
 						SCMToAll(-1, gstr);
 						SCMToAll(-1, ""orange"This zone is now locked for 2 hours and cannot be attacked during that time!");
 
@@ -26208,27 +26208,27 @@ function:ProcessTick()
 					}
 					else
 					{
-					    format(gstr, sizeof(gstr), ""gang_sign" "r_besch" Your gang successfully captured '%s' with %i alive player(s)!", GZoneData[i][sZoneName], Iter_Count(Players));
+					    format(gstr, sizeof(gstr), ""gang_sign" "r_besch" Your gang successfully captured '%s' with %i alive player(s)!", GZoneData[i][e_zonename], Iter_Count(Players));
 						GangMSG(GZoneData[i][AttackingGang], gstr);
 						GangMSG(GZoneData[i][AttackingGang], ""gang_sign" "r_besch" The gang gained 10 gang score and each member $20,000 who were tied.");
 
-						format(gstr, sizeof(gstr), ""orange"Gang %s captured zone '%s' which was territory of %s", GetGangNameByID(GZoneData[i][AttackingGang]), GZoneData[i][sZoneName], GetGangNameByID(GZoneData[i][DefendingGang]));
+						format(gstr, sizeof(gstr), ""orange"Gang %s captured zone '%s' which was territory of %s", GetGangNameByID(GZoneData[i][AttackingGang]), GZoneData[i][e_zonename], GetGangNameByID(GZoneData[i][DefendingGang]));
 						SCMToAll(-1, gstr);
 						SCMToAll(-1, ""orange"This zone is now locked for 2 hours and cannot be attacked during that time!");
 
 						MySQL_UpdateGangScore(GZoneData[i][AttackingGang], 10);
 						
-                        format(gstr, sizeof(gstr), ""gang_sign" "r_besch" '%s' was captured by the gang %s!", GZoneData[i][sZoneName], GetGangNameByID(GZoneData[i][AttackingGang]));
+                        format(gstr, sizeof(gstr), ""gang_sign" "r_besch" '%s' was captured by the gang %s!", GZoneData[i][e_zonename], GetGangNameByID(GZoneData[i][AttackingGang]));
 						GangMSG(GZoneData[i][DefendingGang], gstr);
 						
 						Iter_Remove(iterGangWar, GZoneData[i][AttackingGang]);
-						Iter_Remove(iterGangWar, GZoneData[i][localGang]);
+						Iter_Remove(iterGangWar, GZoneData[i][e_localgang]);
 					}
 			    
-        			format(gstr2, sizeof(gstr2), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: %s\n"orange"Type /gwar to start an attack!", GZoneData[i][e_id], GZoneData[i][sZoneName], GetGangNameByID(GZoneData[i][AttackingGang]));
+        			format(gstr2, sizeof(gstr2), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: %s\n"orange"Type /gwar to start an attack!", GZoneData[i][e_id], GZoneData[i][e_zonename], GetGangNameByID(GZoneData[i][AttackingGang]));
                     UpdateDynamic3DTextLabelText(GZoneData[i][label], WHITE, gstr2);
 			    
-			        GZoneData[i][localGang] = GZoneData[i][AttackingGang];
+			        GZoneData[i][e_localgang] = GZoneData[i][AttackingGang];
 			        
 					for(new ii = 0; ii < MAX_PLAYERS; ii++)
 					{
@@ -26247,11 +26247,11 @@ function:ProcessTick()
 					    SyncGangZones(ii);
 					}
 					
-					GZoneData[i][iTimeLeft] = 0;
+					GZoneData[i][e_timeleft] = 0;
 					GZoneData[i][bUnderAttack] = false;
 					GZoneData[i][AttackingGang] = 0;
 					GZoneData[i][DefendingGang] = 0;
-					GZoneData[i][iLocked] = gettime() + 7200;
+					GZoneData[i][e_locked] = gettime() + 7200;
 				}
 				
 				MySQL_SaveGangZone(i);
@@ -29136,7 +29136,7 @@ function:OnGangRenameAttempt(playerid, newgangname[], newgangtag[])
 	{
 	    for(new i = 0; i < gzoneid; i++)
 	    {
-	        if(GZoneData[i][localGang] == PlayerData[playerid][e_gangid])
+	        if(GZoneData[i][e_localgang] == PlayerData[playerid][e_gangid])
 	        {
 	            new text[51];
 	            GetDynamic3DTextLabelText(GZoneData[i][label], text, sizeof(text));
