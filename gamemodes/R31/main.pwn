@@ -3228,8 +3228,6 @@ public OnPlayerDisconnect(playerid, reason)
 		{
 		    case gDUEL:
 		    {
-		        PrintAmxBacktrace();
-		        
 				new bool:found = false;
 				
 		        for(new i = 0; i < MAX_PLAYERS; i++)
@@ -4523,9 +4521,6 @@ public OnPlayerDeath(playerid, killerid, reason)
 	{
 	    case gDUEL:
 	    {
-			Log(LOG_PLAYER, "gDUEL OnPlayerDeath(%i, %i, %i)", playerid, killerid, reason);
-	        PrintAmxBacktrace();
-	    
 	        new bool:found = false;
 	    
 			for(new i = 0; i < MAX_PLAYERS; i++)
@@ -7576,10 +7571,10 @@ YCMD:fallout(playerid, params[], help)
 	    Command_ReProcess(playerid, "/stopanims", false);
 	    gTeam[playerid] = FALLOUT;
 	    ResetFalloutGameTime();
-	    Fallout_BuildMap();
-	    Fallout_StartGame();
+	    fallout_buildmap();
+	    fallout_startgame();
 		g_FalloutStatus = e_Fallout_Startup;
-		Fallout_SetPlayer(playerid);
+		fallout_setplayer(playerid);
         SCMToAll(BLUE, ""fallout_sign" Type /fallout to participate");
         CurrentFalloutPlayers++;
         NewMinigameJoin(playerid, "Fallout", "fallout");
@@ -7592,7 +7587,7 @@ YCMD:fallout(playerid, params[], help)
 		gTeam[playerid] = FALLOUT;
 		format(gstr, sizeof(gstr), "%s(%i) joined Fallout!", __GetName(playerid), playerid);
 		fallout_msg(gstr);
-		Fallout_SetPlayer(playerid);
+		fallout_setplayer(playerid);
 		CurrentFalloutPlayers++;
         NewMinigameJoin(playerid, "Fallout", "fallout");
         SetPlayerInterior(playerid, 0);
@@ -8805,7 +8800,21 @@ YCMD:cnr(playerid, params[], help)
     if(gTeam[playerid] == CNR) return SCM(playerid, -1, ""er"You are already in this minigame!");
     if(gTeam[playerid] != FREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
-	ShowPlayerDialog(playerid, CNR_DIALOG, DIALOG_STYLE_LIST, ""YELLOW_E"Choose your side", ""LB_E"Cops\t\t"GREY_E"LVPD\n"ORANGE_E"Robbers\t"GREY_E"LV Mafia\n"RED_E"Pro Robbers\t"GREY_E"Mafia Commanders\n"PURPLE_E"Army\t\t"GREY_E"Army Task Force\n"BLUE_E"Swat\t\t"GREY_E"LVPD Commanders", "Select", "Cancel");
+	new robbers = 0, cops = 0;
+	
+	for(new i = 0; i < MAX_PLAYERS; i++)
+	{
+	    if(GetPVarInt(i, "Cop") == 1)
+			cops++;
+			
+		if(GetPVarInt(i, "Robber") == 1)
+			robbers++;
+	}
+	
+	new string[512];
+	format(string, sizeof(string), ""LB_E"Cops\t\t"GREY_E"LVPD\t\t(Players: %i)\n"ORANGE_E"Robbers\t"GREY_E"LV Mafia\t\t(Players: %i)\n"RED_E"Pro Robbers\t"GREY_E"Mafia Commanders\n"PURPLE_E"Army\t\t"GREY_E"Army Task Force\n"BLUE_E"Swat\t\t"GREY_E"LVPD Commanders", cops, robbers);
+
+	ShowPlayerDialog(playerid, CNR_DIALOG, DIALOG_STYLE_LIST, ""YELLOW_E"Choose your side", string, "Select", "Cancel");
 	return 1;
 }
 
@@ -8867,8 +8876,6 @@ YCMD:duel(playerid, params[], help)
 		        	PlayerData[i][DuelRequest] = INVALID_PLAYER_ID;
 			    }
 			}
-			
-			PrintAmxBacktrace();
 			
 			CheckPlayerGod(playerid);
 			CheckPlayerGod(PlayerData[playerid][DuelRequestRecv]);
@@ -21778,7 +21785,6 @@ MySQL_RegisterAccount(playerid, register, password[])
 function:OnPlayerRegister(playerid, namehash, register, password[], playername[], ip_address[])
 {
     PrintAmxBacktrace();
-    PrintNativeBacktrace();
 
 	mysql_format(pSQL, gstr2, sizeof(gstr2), "UPDATE `accounts` SET `hash` = SHA1('%e'), `ip` = '%s' WHERE `name` = '%s';", password, ip_address, playername);
 	mysql_tquery(pSQL, gstr2);
@@ -26665,9 +26671,9 @@ ShowPlayerInfoTextdraws(playerid)
 	TextDrawShowForPlayer(playerid, TXTTeleportInfo);
 }
 
-Fallout_BuildMap()
+fallout_buildmap()
 {
-	Log(LOG_WORLD, "Fallout_BuildMap()");
+	Log(LOG_WORLD, "fallout_buildmap()");
 	PrintAmxBacktrace();
 
 	for(new i = 0; i < 101; i++)
@@ -26784,8 +26790,11 @@ Fallout_BuildMap()
 	return 1;
 }
 
-Fallout_StartGame()
+fallout_startgame()
 {
+	Log(LOG_WORLD, "fallout_startgame()");
+	PrintAmxBacktrace();
+	
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 		PlayerData[i][FalloutLost] = false;
@@ -26795,16 +26804,13 @@ Fallout_StartGame()
 	    }
 	}
 
-	FalloutData[I_iTimer][1] = SetTimer("FalloutCountDown", 1000, true);
-
-	Log(LOG_WORLD, "Fallout_StartGame()");
-	PrintAmxBacktrace();
+	FalloutData[I_iTimer][1] = SetTimer("fallout_countdown", 1000, true);
 
 	fallout_msg("A new game has started!");
 	return 1;
 }
 
-Fallout_SetPlayer(playerid)
+fallout_setplayer(playerid)
 {
 	SetPlayerPos(playerid, 2482.1921 - random(39), -1660.4783 + random(47), 161.0000);
 	SetPlayerFacingAngle(playerid, random(360));
@@ -26818,6 +26824,9 @@ Fallout_SetPlayer(playerid)
 
 fallout_cancel()
 {
+	Log(LOG_WORLD, "fallout_cancel()");
+	PrintAmxBacktrace();
+	
     CurrentFalloutPlayers = 0;
 	g_FalloutStatus = e_Fallout_Inactive;
 	for(new i = 0; i < 101; i++)
@@ -26832,8 +26841,11 @@ fallout_cancel()
 	return 1;
 }
 
-function:Fallout_LoseGame()
+function:fallout_losegame()
 {
+	Log(LOG_WORLD, "fallout_losegame()");
+	PrintAmxBacktrace();
+	
 	new players,
 		Float:POS[3];
 
@@ -26868,12 +26880,12 @@ function:Fallout_LoseGame()
 	if(players <= 1 && g_FalloutStatus == e_Fallout_Running)
 	{
 	    g_FalloutStatus = e_Fallout_Finish;
-		SetTimer("DecideFalloutWinners", 1500, false);
+		SetTimer("fallout_decidewinners", 1500, false);
 	}
 	return 1;
 }
 
-function:FalloutCountDown()
+function:fallout_countdown()
 {
 	new player;
 
@@ -26927,15 +26939,18 @@ function:FalloutCountDown()
 		}
 		else
 		{
-			SetTimer("StartFalling", 587, false);
+			SetTimer("fallout_startfalling", 587, false);
 			g_FalloutStatus = e_Fallout_Running;
 		}
 	}
 	return 1;
 }
 
-function:SolarFall()
+function:fallout_solarfall()
 {
+	Log(LOG_WORLD, "fallout_solarfall()");
+	PrintAmxBacktrace();
+	
 	new objectid, go;
 	for(new i = 0; i < 101; i++) if(FalloutData[I_iNumberout][i] == -1) go++;
 
@@ -26944,7 +26959,7 @@ function:SolarFall()
 		if(g_FalloutStatus == e_Fallout_Running)
 		{
 			g_FalloutStatus = e_Fallout_Finish;
-			SetTimer("DecideFalloutWinners", 200, false);
+			SetTimer("fallout_decidewinners", 200, false);
 		}
 		KillTimer(FalloutData[I_iTimer][0]);
 		return 1;
@@ -26957,18 +26972,18 @@ function:SolarFall()
 
 	FalloutData[I_iNumberout][objectid] = 0;
 
-	FalloutData[I_iShaketimer][objectid] = SetTimerEx("SquareShake", 100, true, "i", objectid);
+	FalloutData[I_iShaketimer][objectid] = SetTimerEx("fallout_squareshake", 100, true, "i", objectid);
 	return 1;
 }
 
-function:StartFalling()
+function:fallout_startfalling()
 {
-	FalloutData[I_iTimer][0] = SetTimer("SolarFall", 500, true);
-	FalloutData[I_tLoseGame] = SetTimer("Fallout_LoseGame", 500, true);
+	FalloutData[I_iTimer][0] = SetTimer("fallout_solarfall", 500, true);
+	FalloutData[I_tLoseGame] = SetTimer("fallout_losegame", 500, true);
 	return 1;
 }
 
-function:DecideFalloutWinners()
+function:fallout_decidewinners()
 {
 	g_FalloutStatus = e_Fallout_Inactive;
 
@@ -27015,8 +27030,11 @@ function:DecideFalloutWinners()
 	return 1;
 }
 
-function:SquareShake(objectid)
+function:fallout_squareshake(objectid)
 {
+	Log(LOG_WORLD, "fallout_solarfall()");
+	PrintAmxBacktrace();
+	
 	if(objectid == 0)
 	{
 		return KillTimer(FalloutData[I_iShaketimer][objectid]);
@@ -29152,7 +29170,7 @@ function:OnGangRenameAttempt(playerid, newgangname[], newgangtag[])
 	        {
 	            new text[51];
 	            GetDynamic3DTextLabelText(GZoneData[i][label], text, sizeof(text));
-	            
+
 	            new pos = strfind(text, PlayerData[playerid][GangName], true);
 	            
 	            if(pos == -1)
@@ -29415,15 +29433,22 @@ function:OnOfflineBanAttempt2(playerid, ban[], reason[])
 
 	    new ip[16];
 		cache_get_row(0, 1, ip, pSQL, sizeof(ip));
+		
+		mysql_format(pSQL, gstr, sizeof(gstr), "SELECT `ID` FROM `blacklist` WHERE `IP` = '%e';", ip);
+		new Cache:cache = mysql_query(pSQL, gstr);
+		
+		if(cache_get_row_count() == 0)
+		    MySQL_BanIP(ip);
+		
+		cache_delete(cache);
 
 		MySQL_BanAccount(ban, __GetName(playerid), reason);
-		MySQL_BanIP(ip);
-		
-    	PrintAmxBacktrace();
 		
 		format(gstr, sizeof(gstr), "[ADMIN CHAT] "LG_E"Account and IP (o)banned of %s [EXPIRES: NEVER, REASON: %s] by %s", ban, reason, __GetName(playerid));
 		AdminMSG(COLOR_RED, gstr);
 		Log(LOG_PLAYER, gstr);
+
+        PrintAmxBacktrace();
 
         SCM(playerid, -1, ""er"Player has been banned!");
 	}
