@@ -29164,16 +29164,17 @@ function:OnGangRenameAttempt(playerid, newgangname[], newgangtag[])
 	    {
 	        if(GZoneData[i][e_localgang] == PlayerData[playerid][e_gangid])
 	        {
-	            new text[51];
+	            new text[144];
 	            GetDynamic3DTextLabelText(GZoneData[i][label], text, sizeof(text));
 
 	            new pos = strfind(text, PlayerData[playerid][GangName], true);
-	            
+
 	            if(pos == -1)
 					continue;
 					
-				strmid(text, newgangname, pos, pos + strlen(newgangname), sizeof(text));
-					
+				strdel(text, pos, pos + strlen(PlayerData[playerid][GangName]));
+				strins(text, newgangname, pos, sizeof(text));
+
 				UpdateDynamic3DTextLabelText(GZoneData[i][label], WHITE, text);
 	        }
 	    }
