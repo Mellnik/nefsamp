@@ -14963,23 +14963,23 @@ YCMD:spec(playerid, params[], help)
 {
     if(PlayerData[playerid][e_level] >= 1 || IsPlayerAdmin(playerid) || PlayerData[playerid][e_vip] == 1)
 	{
-	    new player;
-	 	if(sscanf(params, "r", player))
+	    new otherid;
+	 	if(sscanf(params, "r", otherid))
 		{
 			return SCM(playerid, NEF_GREEN, "Usage: /spec <playerid>");
 	  	}
 
-	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
-		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
-		if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
+	    if(otherid == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
+		if(!IsPlayerConnected(otherid)) return SCM(playerid, -1, ""er"Player not connected!");
+		if(CSG[otherid]) return SCM(playerid, -1, ""er"Invalid player!");
 
- 		if(IsPlayerAvail(player) && player != playerid)
+ 		if(IsPlayerAvail(otherid) && otherid != playerid)
 		{
-			if(PlayerData[playerid][e_level] == 0 && PlayerData[playerid][e_vip] == 1 && PlayerData[player][e_level] > 0) return SCM(playerid, -1, ""er"You may not spectate admins");
-			if(PlayerData[player][e_level] == MAX_ADMIN_LEVEL && PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL) return SCM(playerid, -1, ""er"You cannot use this command on this admin");
-			if(gTeam[player] == SPEC) return SCM(playerid, -1, ""er"Player is spectating someone else");
-			if(PlayerData[player][bIsDead]) return SCM(playerid, -1, ""er"Player is not alive");
-			if(GetPlayerState(player) == PLAYER_STATE_SPECTATING) return SCM(playerid, -1, ""er"Player is in spectating state");
+			if(PlayerData[playerid][e_level] == 0 && PlayerData[playerid][e_vip] == 1 && PlayerData[otherid][e_level] > 0) return SCM(playerid, -1, ""er"You may not spectate admins");
+			if(PlayerData[otherid][e_level] == MAX_ADMIN_LEVEL && PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL) return SCM(playerid, -1, ""er"You cannot use this command on this admin");
+			if(gTeam[otherid] == SPEC) return SCM(playerid, -1, ""er"Player is spectating someone else");
+			if(PlayerData[otherid][bIsDead]) return SCM(playerid, -1, ""er"Player is not alive");
+			if(GetPlayerState(otherid) == PLAYER_STATE_SPECTATING) return SCM(playerid, -1, ""er"Player is in spectating state");
 			if(gTeam[playerid] != FREEROAM && gTeam[playerid] != SPEC) return player_notice(playerid, "Type ~y~/exit ~w~to leave first", "");
 
 			if(gTeam[playerid] != SPEC)
@@ -14990,42 +14990,38 @@ YCMD:spec(playerid, params[], help)
   			new count = 0;
 			for(new i = 0; i < MAX_PLAYERS; i++)
 			{
-			    if(gTeam[i] == SPEC && PlayerData[i][SpecID] == player && i != playerid)
+			    if(gTeam[i] == SPEC && PlayerData[i][SpecID] == otherid && i != playerid)
 			    {
 			        count++;
 			    }
 			}
 
-			gTeam[playerid] = SPEC;
-            PlayerData[playerid][SpecID] = player;
-
 			if(GetPlayerState(playerid) != PLAYER_STATE_SPECTATING && gTeam[playerid] != SPEC)
 			{
 				GetPlayerPos(playerid, PlayerData[playerid][SpecX], PlayerData[playerid][SpecY], PlayerData[playerid][SpecZ]);
 				GetPlayerFacingAngle(playerid, PlayerData[playerid][SpecA]);
-				SetPlayerInterior(playerid, GetPlayerInterior(player));
-				SetPlayerVirtualWorld(playerid, GetPlayerVirtualWorld(player));
+				SetPlayerInterior(playerid, GetPlayerInterior(otherid));
+				SetPlayerVirtualWorld(playerid, GetPlayerVirtualWorld(otherid));
    			}
+
+			gTeam[playerid] = SPEC;
+            PlayerData[playerid][SpecID] = otherid;
    			
 			TogglePlayerSpectating(playerid, true);
 
-			if(IsPlayerInAnyVehicle(player))
-			{
-				PlayerSpectateVehicle(playerid, GetPlayerVehicleID(player));
-			}
+			if(IsPlayerInAnyVehicle(otherid))
+				PlayerSpectateVehicle(playerid, GetPlayerVehicleID(otherid));
 			else
-			{
-				PlayerSpectatePlayer(playerid, player);
-			}
+				PlayerSpectatePlayer(playerid, otherid);
 
 			if(count == 1)
 			{
-				format(gstr, sizeof(gstr), ""nef" "GREY_E"%s(%i) is also being spectated by another admin/VIP (/spectators)", __GetName(player), player);
+				format(gstr, sizeof(gstr), ""nef" "GREY_E"%s(%i) is also being spectated by another admin/VIP (/spectators)", __GetName(otherid), otherid);
                 SCM(playerid, -1, gstr);
 			}
 			else if(count > 1)
 			{
-			    format(gstr, sizeof(gstr), ""nef" "GREY_E"%s(%i) is also spectated by %i other admins/VIPs (/spectators)", __GetName(player), player, count);
+			    format(gstr, sizeof(gstr), ""nef" "GREY_E"%s(%i) is also spectated by %i other admins/VIPs (/spectators)", __GetName(otherid), otherid, count);
                 SCM(playerid, -1, gstr);
 			}
 
