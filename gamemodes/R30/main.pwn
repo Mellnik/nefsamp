@@ -744,6 +744,7 @@ enum E_PLAYER_DATA // Prefixes: i = Integer, s = String, b = bool, f = Float, p 
 	iCoolDownCommand,
 	iCoolDownChat,
 	iLastDeathTime,
+	iDeathCountThreshold,
 	PlayerText3D:t3dDerbyVehicleLabel,
 	pDerbyVehicle,
 	pTrailerVehicle,
@@ -8848,14 +8849,14 @@ YCMD:duel(playerid, params[], help)
 
 		        	PlayerData[i][DuelRequestRecv] = INVALID_PLAYER_ID;
 			    }
-			}
-		    if(PlayerData[i][DuelRequest] == playerid && i != PlayerData[playerid][DuelRequestRecv])
-		    {
-	        	format(gstr, sizeof(gstr), ">> %s(%i) cancelled the duel request!", __GetName(playerid), playerid);
-	        	SCM(i, NEF_RED, gstr);
+			    if(PlayerData[i][DuelRequest] == playerid && i != PlayerData[playerid][DuelRequestRecv])
+			    {
+		        	format(gstr, sizeof(gstr), ">> %s(%i) cancelled the duel request!", __GetName(playerid), playerid);
+		        	SCM(i, NEF_RED, gstr);
 
-	        	PlayerData[i][DuelRequest] = INVALID_PLAYER_ID;
-		    }
+		        	PlayerData[i][DuelRequest] = INVALID_PLAYER_ID;
+			    }
+			}
 			
 			CheckPlayerGod(playerid);
 			CheckPlayerGod(PlayerData[playerid][DuelRequestRecv]);
@@ -11962,8 +11963,8 @@ YCMD:oban(playerid, params[], help)
 		    return SCM(playerid, -1, ""er"You have specified invalid characters");
 		}
 
-	    format(player, sizeof(player), "SELECT `AdminName` FROM `bans` WHERE `PlayerName` = '%s' LIMIT 1;", escape);
-	    mysql_tquery(pSQL, player, "OnOfflineBanAttempt", "iss", playerid, escape, ereason);
+	    mysql_format(pSQL, player, sizeof(player), "SELECT `AdminName` FROM `bans` WHERE `PlayerName` = '%e' LIMIT 1;", escape);
+	    mysql_pquery(pSQL, player, "OnOfflineBanAttempt", "iss", playerid, escape, ereason);
 	}
 	else
 	{
@@ -12023,7 +12024,7 @@ YCMD:tban(playerid, params[], help)
 			    new amsg[144];
 			    if(!islogged(player)) return SCM(playerid, -1, ""er"Player is not registered");
 			    
-			    MySQL_BanPlayer(__GetName(player), __GetName(playerid), reason, gettime() + (time * 60));
+			    MySQL_BanAccount(__GetName(player), __GetName(playerid), reason, gettime() + (time * 60));
 
 				format(gstr, sizeof(gstr), ""yellow"** "red"%s(%i) has been banned by Admin %s(%i) [Reason: %s] [Time: %i mins]", __GetName(player), player, __GetName(playerid), playerid, reason, time);
 				format(amsg, sizeof(amsg), "[ADMIN CHAT] "LG_E"Account banned of %s [EXPIRES: %s, REASON: %s]", __GetName(player), UTConvert(gettime() + (time * 60)), reason);
@@ -12113,7 +12114,7 @@ YCMD:ban(playerid, params[], help)
 			{
 			    new amsg[144];
 			    if(islogged(player)) { // Ban registered player
-                	MySQL_BanPlayer(__GetName(player), __GetName(playerid), reason);
+                	MySQL_BanAccount(__GetName(player), __GetName(playerid), reason);
                     MySQL_BanIP(__GetIP(player));
                     
                     format(gstr, sizeof(gstr), ""yellow"** "red"%s(%i) has been banned by Admin %s(%i) [Reason: %s]", __GetName(player), player, __GetName(playerid), playerid, reason);
@@ -21680,8 +21681,8 @@ MySQL_FetchGangMemberNames(playerid, gGangID)
 
 MySQL_BanIP(const ip[])
 {
- 	format(gstr, sizeof(gstr), "INSERT INTO `blacklist` VALUES (NULL, '%s');", ip);
- 	mysql_tquery(pSQL, gstr, "", "");
+ 	mysql_format(pSQL, gstr, sizeof(gstr), "INSERT INTO `blacklist` VALUES (NULL, '%e');", ip);
+ 	mysql_pquery(pSQL, gstr);
 }
 
 MySQL_ExistGang(playerid)
@@ -21825,14 +21826,10 @@ MySQL_UpdateAccount(playerid)
 	}
 }
 
-MySQL_BanPlayer(PlayerName[], AdminName[], Reason[], lift = 0)
+MySQL_BanAccount(account[], admin[], reason[], lift = 0)
 {
-	new query[300], rescape[129], aescape[25], pescape[25];
-	mysql_escape_string(Reason, rescape, pSQL, 129);
-	mysql_escape_string(AdminName, aescape, pSQL, 25);
-	mysql_escape_string(PlayerName, pescape, pSQL, 25);
-    format(query, sizeof(query), "INSERT INTO `bans` VALUES (NULL, '%s', '%s', '%s', %i, %i);", pescape, aescape, rescape, lift, gettime());
-    mysql_tquery(pSQL, query);
+    mysql_format(pSQL, gstr2, sizeof(gstr2), "INSERT INTO `bans` VALUES (NULL, '%e', '%e', '%e', %i, UNIX_TIMESTAMP());", account, admin, reason, lift);
+    mysql_pquery(pSQL, gstr2);
 }
 
 MySQL_SaveGangZone(id)
@@ -22942,12 +22939,13 @@ server_initialize()
 	SendRconCommand("weburl "SVRURLWWW"");
     SetGameModeText("TdmDerbyRaceCNRFunStuntFreeroam");
 	SendRconCommand("mapname "SVRSC" "CURRENT_VERSION"");
-	SendRconCommand("playertimeout 7000");
+	SendRconCommand("playertimeout 8000");
 	SendRconCommand("ackslimit 4000");
-	SendRconCommand("messageslimit 500");
-	SendRconCommand("messageholelimit 1800");
+	SendRconCommand("messageslimit 520");
+	SendRconCommand("messageholelimit 1900");
 	SendRconCommand("rcon 0");
 	SendRconCommand("maxnpc 0");
+	SendRconCommand("chatlogging 0");
 	
 	EnableVehicleFriendlyFire();
 	ShowPlayerMarkers(1);
@@ -29340,10 +29338,7 @@ function:OnUnbanAttempt2()
 
 function:OnOfflineBanAttempt(playerid, ban[], reason[])
 {
-	new rows, fields;
-	cache_get_data(rows, fields, pSQL);
-
-	if(rows > 0)
+	if(cache_get_row_count() > 0)
 	{
 		new buffer[30];
 		cache_get_row(0, 0, buffer, pSQL, sizeof(buffer));
@@ -29353,20 +29348,17 @@ function:OnOfflineBanAttempt(playerid, ban[], reason[])
 	}
 	else
 	{
-	    format(gstr, sizeof(gstr), "SELECT `level`, `ip` FROM `accounts` WHERE `name` = '%s' LIMIT 1;", ban);
-	    mysql_tquery(pSQL, gstr, "OnOfflineBanAttempt2", "iss", playerid, ban, reason);
+	    mysql_format(pSQL, gstr, sizeof(gstr), "SELECT `level`, `ip` FROM `accounts` WHERE `name` = '%e' LIMIT 1;", ban);
+	    mysql_pquery(pSQL, gstr, "OnOfflineBanAttempt2", "iss", playerid, ban, reason);
 	}
 	return 1;
 }
 
 function:OnOfflineBanAttempt2(playerid, ban[], reason[])
 {
-	new rows, fields;
-	cache_get_data(rows, fields, pSQL);
-
-	if(rows > 0)
+    if(cache_get_row_count() > 0)
 	{
-	    if(cache_get_row_int(0, 0, pSQL) != 0)
+	    if(cache_get_row_int(0, 0, pSQL) != 0 && PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 	    {
 	        return SCM(playerid, -1, ""er"You may not ban admins");
 	    }
@@ -29374,13 +29366,14 @@ function:OnOfflineBanAttempt2(playerid, ban[], reason[])
 	    new ip[16];
 		cache_get_row(0, 1, ip, pSQL, sizeof(ip));
 
-		MySQL_BanPlayer(ban, __GetName(playerid), reason);
+		MySQL_BanAccount(ban, __GetName(playerid), reason);
 		MySQL_BanIP(ip);
-
-		SCM(playerid, -1, ""er"Player has been banned!");
 		
-		format(gstr, sizeof(gstr), "[ADMIN CHAT] "LG_E"Account and IP banned of %s [EXPIRES: NEVER, REASON: %s] by %s", ban, reason, __GetName(playerid));
+		format(gstr, sizeof(gstr), "[ADMIN CHAT] "LG_E"Account and IP (o)banned of %s [EXPIRES: NEVER, REASON: %s] by %s", ban, reason, __GetName(playerid));
 		AdminMSG(COLOR_RED, gstr);
+		Log(LOG_PLAYER, gstr);
+
+        SCM(playerid, -1, ""er"Player has been banned!");
 	}
 	else
 	{
@@ -30133,6 +30126,7 @@ PreparePlayerVars(playerid)
 	PlayerData[playerid][iCoolDownCommand] = 0;
 	PlayerData[playerid][iCoolDownChat] = 0;
 	PlayerData[playerid][iLastDeathTime] = 0;
+    PlayerData[playerid][iDeathCountThreshold] = 0;
 	PlayerData[playerid][DuelWeapon] = 0;
 	PlayerData[playerid][DuelLocation] = 0;
 	PlayerData[playerid][DuelRequest] = INVALID_PLAYER_ID;

@@ -1,5 +1,5 @@
 		<div align="center">
-			<img src="http://ams1.boostlayer.net/static/nef.png" alt="Logo"/>
+			<img src="https://cdn-ams1.horzine.net/nef/nef.png" alt="Logo"/>
 		</div>
 
 		<br>
