@@ -34,6 +34,7 @@
 #include <a_http>           // API Requests
 #undef MAX_PLAYERS
 #define MAX_PLAYERS (400)
+#include <crashdetect>
 #include <YSI\y_iterate>	
 #include <YSI\y_commands>   
 #include <YSI\y_master>    
@@ -4077,6 +4078,8 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 public OnQueryError(errorid, error[], callback[], query[], connectionHandle)
 {
 	Log(LOG_FAIL, "OnQueryError(%i, %s, %s, %s, %i)", errorid, error, callback, query, connectionHandle);
+
+    PrintAmxBacktrace();
 	return 1;
 }
 
@@ -21762,6 +21765,9 @@ MySQL_RegisterAccount(playerid, register, password[])
 
 function:OnPlayerRegister(playerid, namehash, register, password[], playername[], ip_address[])
 {
+    PrintAmxBacktrace();
+    PrintNativeBacktrace();
+
 	mysql_format(pSQL, gstr2, sizeof(gstr2), "UPDATE `accounts` SET `hash` = SHA1('%e'), `ip` = '%s' WHERE `name` = '%s';", password, ip_address, playername);
 	mysql_tquery(pSQL, gstr2);
 	
@@ -29391,6 +29397,8 @@ function:OnOfflineBanAttempt2(playerid, ban[], reason[])
 
 		MySQL_BanAccount(ban, __GetName(playerid), reason);
 		MySQL_BanIP(ip);
+		
+    	PrintAmxBacktrace();
 		
 		format(gstr, sizeof(gstr), "[ADMIN CHAT] "LG_E"Account and IP (o)banned of %s [EXPIRES: NEVER, REASON: %s] by %s", ban, reason, __GetName(playerid));
 		AdminMSG(COLOR_RED, gstr);
