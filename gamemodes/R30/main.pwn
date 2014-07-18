@@ -3229,6 +3229,8 @@ public OnPlayerDisconnect(playerid, reason)
 		{
 		    case gDUEL:
 		    {
+		        PrintAmxBacktrace();
+		        
 				new bool:found = false;
 				
 		        for(new i = 0; i < MAX_PLAYERS; i++)
@@ -4523,6 +4525,8 @@ public OnPlayerDeath(playerid, killerid, reason)
 	{
 	    case gDUEL:
 	    {
+	        PrintAmxBacktrace();
+	    
 	        new bool:found = false;
 	    
 			for(new i = 0; i < MAX_PLAYERS; i++)
@@ -8859,6 +8863,8 @@ YCMD:duel(playerid, params[], help)
 		        	PlayerData[i][DuelRequest] = INVALID_PLAYER_ID;
 			    }
 			}
+			
+			PrintAmxBacktrace();
 			
 			CheckPlayerGod(playerid);
 			CheckPlayerGod(PlayerData[playerid][DuelRequestRecv]);
@@ -14979,7 +14985,7 @@ YCMD:spec(playerid, params[], help)
 			gTeam[playerid] = SPEC;
             PlayerData[playerid][SpecID] = player;
 
-			if(GetPlayerState(playerid) != PLAYER_STATE_SPECTATING || gTeam[playerid] == SPEC)
+			if(GetPlayerState(playerid) != PLAYER_STATE_SPECTATING && gTeam[playerid] != SPEC)
 			{
 				GetPlayerPos(playerid, PlayerData[playerid][SpecX], PlayerData[playerid][SpecY], PlayerData[playerid][SpecZ]);
 				GetPlayerFacingAngle(playerid, PlayerData[playerid][SpecA]);
@@ -16723,7 +16729,7 @@ YCMD:rob(playerid, params[], help)
 					{
 						SetPlayerColor(playerid, COLOR_ORANGE2);
 					}
-				    SetTimerEx("ResetRobbery", 250000, false, "ii", playerid, YHash(__GetName(playerid)));
+				    SetTimerEx("cnr_reset_robbery", 250000, false, "ii", playerid, YHash(__GetName(playerid)));
 				    PlayerData[playerid][iRobberyCount] = 20;
 				    PlayerData[playerid][tRobbery] = SetTimerEx("StartRobbery", 1000, true, "ii", playerid, YHash(__GetName(playerid)));
 					SCM(playerid, COLOR_BLUE, ">> "ORANGE_E"You have started a robbery, the cops have been notified!");
@@ -26779,6 +26785,9 @@ Fallout_StartGame()
 
 	FalloutData[I_iTimer][1] = SetTimer("FalloutCountDown", 1000, true);
 
+	Log(LOG_WORLD, "Fallout_StartGame()");
+	PrintAmxBacktrace();
+
 	fallout_msg("A new game has started!");
 	return 1;
 }
@@ -27931,7 +27940,7 @@ SetPlayerPosition(playerid, Float:X, Float:Y, Float:Z, Float:a, inter = 0)
 	SetPlayerInterior(playerid, inter);
 }
 
-function:ResetRobbery(playerid, namehash)
+function:cnr_reset_robbery(playerid, namehash)
 {
 	if(IsPlayerConnected(playerid) && YHash(__GetName(playerid)) == namehash)
 	{
