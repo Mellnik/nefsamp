@@ -740,6 +740,10 @@ enum E_PLAYER_DATA // Prefixes: i = Integer, s = String, b = bool, f = Float, p 
 	bool:bLogged,
 	bool:bSpeedo,
 	bool:bDerbyAFK,
+	bool:bDerbyHealthBarShowing,
+	Float:fDerbyVehicleHealth,
+	Float:fDerbyVehicleDamage,
+	Float:fDerbyCDamage,
 	iKickBanIssued,
 	iCoolDownCommand,
 	iCoolDownChat,
@@ -754,7 +758,7 @@ enum E_PLAYER_DATA // Prefixes: i = Integer, s = String, b = bool, f = Float, p 
 	iRobberyCount,
 	tRobbery,
 	tLoadMap,
-	tTimerHP,
+	tDerbyHealthBar,
 	tRainbow,
 	tTDhandle,
 	tMedkit,
@@ -1726,11 +1730,7 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
   	PlayerPVTMP[MAX_PLAYERS][2],
   	PlayerPVTMPPlate[MAX_PLAYERS][13],
  	GunGame_Player[MAX_PLAYERS][e_gungame_data],
-  	bool:LabelActive[MAX_PLAYERS],
   	bool:PlayerHit[MAX_PLAYERS] = {false, ...},
- 	Float:OldHealth[MAX_PLAYERS],
-  	Float:OldDamage[MAX_PLAYERS],
- 	Float:CDamage[MAX_PLAYERS],
   	DerbyMapVotes[9],
   	CurrentDerbyMap = 1,
   	BGGameTime = DEFAULT_BG_TIME,
@@ -3496,7 +3496,7 @@ public OnPlayerCommandReceived(playerid, cmdtext[])
 	{
 	    switch(YHash(GetCommandName(cmdtext), false))
 	    {
-			case _I(p,m), _I(r), _I(p), _I(s,t,a,t,s), _I(e,x,i,t), _I(h,e,l,p), _I(c), _I(c,m,d,s): {}
+			case _I(p,m), _I(r), _I(p), _I(s,t,a,t,s), _I(e,x,i,t), _I(h,e,l,p), _I(c), _I(c,m,d,s): { }
 			case _I(f,s), _I(i,d), _I(t,o,p), _I(r,e,p,o,r,t), _I(a,c,h,s), _I(s,t,r,e,a,m,s), _I(r,a,d,i,o): { }
 	        default:
 			{
@@ -3511,7 +3511,7 @@ public OnPlayerCommandReceived(playerid, cmdtext[])
 		{
 		    case _I(b,i,k,e,c), _I(b,m,x): { }
 			case _I(s,k,y,d,i,v,e), _I(s,k,y,d,i,v,e,2), _I(s,k,y,d,i,v,e,3), _I(s,k,y,d,i,v,e,4), _I(s,k,y,d,i,v,e,5), _I(s,k,y,d,i,v,e,6): { }
-			case _I(p,m), _I(r), _I(p), _I(s,t,a,t,s), _I(e,x,i,t), _I(h,e,l,p), _I(c), _I(c,m,d,s): {}
+			case _I(p,m), _I(r), _I(p), _I(s,t,a,t,s), _I(e,x,i,t), _I(h,e,l,p), _I(c), _I(c,m,d,s): { }
 			case _I(f,s), _I(i,d), _I(t,o,p), _I(r,e,p,o,r,t), _I(a,c,h,s), _I(s,t,r,e,a,m,s), _I(r,a,d,i,o): { }
 			default:
 			{
@@ -6236,32 +6236,31 @@ public OnVehicleDamageStatusUpdate(vehicleid, playerid)
 	else if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER && gTeam[playerid] == DERBY)
 	{
 		new Float:HP,
-			veh = GetPlayerVehicleID(playerid);
+			vehicle = GetPlayerVehicleID(playerid);
 
-		GetVehicleHealth(veh, HP);
+		GetVehicleHealth(vehicle, HP);
 
-		if(HP != OldHealth[playerid])
+		if(HP != PlayerData[playerid][fDerbyVehicleHealth])
 		{
-			OldDamage[playerid] = OldHealth[playerid] - HP;
-			OldHealth[playerid] = HP;
+			PlayerData[playerid][fDerbyVehicleDamage] = PlayerData[playerid][fDerbyVehicleHealth]- HP;
+			PlayerData[playerid][fDerbyVehicleHealth] = HP;
 
-			if(OldDamage[playerid] > 0)
+			if(PlayerData[playerid][fDerbyVehicleDamage] > 0)
 			{
-				new texts[128];
-				if(LabelActive[playerid])
+				if(PlayerData[playerid][bDerbyHealthBarShowing])
 				{
-					CDamage[playerid] += OldDamage[playerid];
-					format(texts, sizeof(texts), "{ffd800}-%.0f\n%s", CDamage[playerid], UpdateString(HP));
-					KillTimer(PlayerData[playerid][tTimerHP]);
-					PlayerData[playerid][tTimerHP] = SetTimerEx("DeleteDerbyText", 2000, false, "i", playerid);
+					PlayerData[playerid][fDerbyCDamage] += PlayerData[playerid][fDerbyVehicleDamage];
+					format(gstr, sizeof(gstr), "{ffd800}-%.0f\n%s", PlayerData[playerid][fDerbyCDamage], derby_healthbar_format(HP));
+					KillTimer(PlayerData[playerid][tDerbyHealthBar]);
+					PlayerData[playerid][tDerbyHealthBar] = SetTimerEx("derby_healthbar_reset", 2000, false, "ii", playerid, YHash(__GetName(playerid)));
 				}
 				else
 				{
-					LabelActive[playerid] = true;
-					format(texts, sizeof(texts), "{ffd800}-%.0f\n%s",OldDamage[playerid],UpdateString(HP));
-					PlayerData[playerid][tTimerHP] = SetTimerEx("DeleteDerbyText", 2000, false, "i", playerid);
+					PlayerData[playerid][bDerbyHealthBarShowing] = true;
+					format(gstr, sizeof(gstr), "{ffd800}-%.0f\n%s", PlayerData[playerid][fDerbyVehicleDamage], derby_healthbar_format(HP));
+					PlayerData[playerid][tDerbyHealthBar] = SetTimerEx("derby_healthbar_reset", 2000, false, "ii", playerid, YHash(__GetName(playerid)));
 				}
-				UpdatePlayer3DTextLabelText(playerid, PlayerData[playerid][t3dDerbyVehicleLabel], -1, texts);
+				UpdatePlayer3DTextLabelText(playerid, PlayerData[playerid][t3dDerbyVehicleLabel], -1, gstr);
 			}
 		}
 	}
@@ -6339,7 +6338,7 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 		    	PlayerData[playerid][t3dDerbyVehicleLabel] = PlayerText3D:-1;
 		    }
 			PlayerData[playerid][t3dDerbyVehicleLabel] = CreatePlayer3DTextLabel(playerid, " ", -1, 0, 0, 0.9, 10.0, INVALID_PLAYER_ID, GetPlayerVehicleID(playerid), 1);
-			UpdateBar(playerid);
+			derby_healthbar_update(playerid);
 		}
 		else if(PlayerData[playerid][t3dDerbyVehicleLabel] != PlayerText3D:-1)
 	    {
@@ -8777,7 +8776,7 @@ YCMD:gungame(playerid, params[], help)
 YCMD:cnr(playerid, params[], help)
 {
     if(gTeam[playerid] == CNR)
-		return SCM(playerid, -1, ""er"You are already in this minigame!");
+		return player_notice(playerid, "You already joined CnR", "");
 
 	if(gTeam[playerid] != FREEROAM)
 		return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
@@ -21705,8 +21704,8 @@ MySQL_DestroyGang(playerid, gangname[])
 
 MySQL_GangRename(playerid, newgangname[], newgangtag[])
 {
-	format(gstr2, sizeof(gstr2), "SELECT `ID` FROM `gangs` WHERE `GangName` = '%s';", newgangname);
-	mysql_tquery(pSQL, gstr2, "OnGangRenameAttempt", "iss", playerid, newgangname, newgangtag);
+	mysql_format(pSQL, gstr2, sizeof(gstr2), "SELECT `ID` FROM `gangs` WHERE `GangName` = '%e';", newgangname);
+	mysql_pquery(pSQL, gstr2, "OnGangRenameAttempt", "iss", playerid, newgangname, newgangtag);
 }
 
 MySQL_RegisterAccount(playerid, register, password[])
@@ -26420,15 +26419,15 @@ function:SetPlayerDerbyStaticMeshes(playerid)
 	TogglePlayerControllable(playerid, false);
 }
 
-UpdateBar(playerid)
+derby_healthbar_update(playerid)
 {
 	new Float:HP;
 	GetVehicleHealth(GetPlayerVehicleID(playerid), HP);
-	UpdatePlayer3DTextLabelText(playerid, PlayerData[playerid][t3dDerbyVehicleLabel], -1, UpdateString(HP));
+	UpdatePlayer3DTextLabelText(playerid, PlayerData[playerid][t3dDerbyVehicleLabel], -1, derby_healthbar_format(HP));
 	return 1;
 }
 
-UpdateString(Float:HP)
+derby_healthbar_format(Float:HP)
 {
 	new str[30];
 	if(HP == 1000) format(str, sizeof(str), "{00ff00}••••••••••");
@@ -26444,12 +26443,17 @@ UpdateString(Float:HP)
 	return str;
 }
 
-function:DeleteDerbyText(playerid)
+function:derby_healthbar_reset(playerid, namehash)
 {
-	KillTimer(PlayerData[playerid][tTimerHP]);
-	LabelActive[playerid] = false;
-	UpdateBar(playerid);
-	CDamage[playerid] = 0;
+	if(namehash != YHash(__GetName(playerid)))
+	    return 0;
+
+	PlayerData[playerid][bDerbyHealthBarShowing] = false;
+	PlayerData[playerid][tDerbyHealthBar] = -1;
+	PlayerData[playerid][fDerbyCDamage] = 0;
+
+	derby_healthbar_update(playerid);
+	return 1;
 }
 
 SetPlayerBGTeam1(playerid)
@@ -29106,15 +29110,30 @@ GetCredits(playerid)
 
 function:OnGangRenameAttempt(playerid, newgangname[], newgangtag[])
 {
-	new rows, fields;
-	cache_get_data(rows, fields, pSQL);
-
-	if(rows > 0)
+	if(cache_get_row_count() > 0)
 	{
-		SCM(playerid, -1, ""er"This gang name is already in use!");
+		SCM(playerid, -1, ""er"This gang name is already in use");
 	}
 	else
 	{
+	    for(new i = 0; i < gzoneid; i++)
+	    {
+	        if(GZoneInfo[i][localGang] == PlayerData[playerid][e_gangid])
+	        {
+	            new text[41];
+	            GetDynamic3DTextLabelText(GZoneInfo[i][label], text, sizeof(text));
+	            
+	            new pos = strfind(text, PlayerData[playerid][GangName], true);
+	            
+	            if(pos == -1)
+					continue;
+					
+				strmid(text, newgangname, pos, pos + strlen(newgangname), sizeof(text));
+					
+				UpdateDynamic3DTextLabelText(GZoneInfo[i][label], WHITE, text);
+	        }
+	    }
+	
 	    for(new i = 0; i < MAX_PLAYERS; i++)
 	    {
 	        if(PlayerData[i][e_gangid] == PlayerData[playerid][e_gangid] || PlayerData[i][TmpGangID] == PlayerData[playerid][e_gangid])
@@ -29123,8 +29142,9 @@ function:OnGangRenameAttempt(playerid, newgangname[], newgangtag[])
 	            strmid(PlayerData[i][GangTag], newgangtag, 0, 5, 5);
 	        }
 	    }
-	    format(gstr2, sizeof(gstr2), "UPDATE `gangs` SET `GangName` = '%s', `GangTag` = '%s' WHERE `ID` = %i LIMIT 1;", newgangname, newgangtag, PlayerData[playerid][e_gangid]);
-	    mysql_tquery(pSQL, gstr2);
+	    
+	    mysql_format(pSQL, gstr2, sizeof(gstr2), "UPDATE `gangs` SET `GangName` = '%s', `GangTag` = '%s' WHERE `ID` = %i LIMIT 1;", newgangname, newgangtag, PlayerData[playerid][e_gangid]);
+	    mysql_pquery(pSQL, gstr2);
 	    
 	    format(gstr2, sizeof(gstr2), ""gang_sign" "r_besch"Gang Founder %s(%i) changed the gang's name to [%s]%s", __GetName(playerid), playerid, newgangtag, newgangname);
 		GangMSG(PlayerData[playerid][e_gangid], gstr2);
@@ -29958,7 +29978,6 @@ PreparePlayerVars(playerid)
 	gTeam[playerid] = FREEROAM;
 	CSG[playerid] = false;
 	DerbyWinner[playerid] = false;
-    LabelActive[playerid] = false;
     PlayerHit[playerid] = false;
     g_RaceVehicle[playerid] = -1;
     PreviewTmpVeh[playerid] = -1;
@@ -30015,6 +30034,7 @@ PreparePlayerVars(playerid)
 	PlayerData[playerid][bLogged] = false;
 	PlayerData[playerid][bSpeedo] = false;
 	PlayerData[playerid][bDerbyAFK] = false;
+	PlayerData[playerid][bDerbyHealthBarShowing] = false;
 	PlayerData[playerid][t3dDerbyVehicleLabel] = PlayerText3D:-1;
 	PlayerData[playerid][pDerbyVehicle] = -1;
 	PlayerData[playerid][iJailTime] = 0;
@@ -30120,7 +30140,7 @@ PreparePlayerVars(playerid)
 	PlayerData[playerid][e_regdate] = 0;
  	PlayerData[playerid][HouseIntSelected] = 0;
 	PlayerData[playerid][SpecID] = INVALID_PLAYER_ID;
-	PlayerData[playerid][tTimerHP] = -1;
+	PlayerData[playerid][tDerbyHealthBar] = -1;
 	PlayerData[playerid][toy_selected] = 0;
 	PlayerData[playerid][houseobj_selected] = 0;
 	PlayerData[playerid][iCoolDownCommand] = 0;
