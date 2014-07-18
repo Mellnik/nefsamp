@@ -401,7 +401,7 @@ LoadServerVehicles()
 	AddStaticVehicleEx(411,2969.0051,-1434.2621,1243.8635,10.8093,randomColors[random(23)], randomColors[random(23)], 100); // Infernus
 	AddStaticVehicleEx(411,2965.7427,-1434.8345,1243.8635,9.8446,randomColors[random(23)], randomColors[random(23)], 100); // Infernus
 	AddStaticVehicleEx(411,2962.6904,-1435.3536,1243.8635,9.4565,randomColors[random(23)], randomColors[random(23)], 100); // Infernus
-	AddStaticVehicleEx(411,2959.4126,-1435.9664,1243.8635,9.5607,randomColors[random(23)], randomColors[random(23)], 100); // Infernus´
+	AddStaticVehicleEx(411,2959.4126,-1435.9664,1243.8635,9.5607,randomColors[random(23)], randomColors[random(23)], 100); // Infernus
 	
 	//beach
 	AddStaticVehicleEx(520, 301.1120, -1942.4363, 17.7506, -230.1600, randomColors[random(23)], randomColors[random(23)], 100);
