@@ -25,7 +25,7 @@
 #pragma dynamic 8192
 
 #define IS_RELEASE_BUILD (true)
-#define INC_ENVIORMENT (false)
+#define INC_ENVIORMENT (true)
 #define IRC_CONNECT (true)
 #define WINTER_EDITION (false) // Requires FS ferriswheelfair.amx
 #define YSI_IS_SERVER
@@ -3115,7 +3115,7 @@ public OnPlayerSpawn(playerid)
 
 public OnIncomingConnection(playerid, ip_address[], port)
 {
-	Log(LOG_NET, "OnIncomingConnection(%i, %s, %i)", playerid, ip_address, port);
+	//Log(LOG_NET, "OnIncomingConnection(%i, %s, %i)", playerid, ip_address, port);
 	
 	new connections = 0, buffer[16];
 	for(new i = 0; i < MAX_PLAYERS; i++)
@@ -3545,14 +3545,13 @@ public OnPlayerCommandReceived(playerid, cmdtext[])
 
 public OnPlayerCommandPerformed(playerid, cmdtext[], success)
 {
-    new File:lFile = fopen("/Log/cmdlog.txt", io_append),
+    new File:hFile = fopen("/Log/cmdlog.txt", io_append),
         time[3];
 
     gettime(time[0], time[1], time[2]);
-
     format(gstr2, sizeof(gstr2), "[%02d:%02d:%02d] [%i]%s used %s with success: %i\r\n", time[0], time[1], time[2], playerid, __GetName(playerid), cmdtext, success);
-    fwrite(lFile, gstr2);
-    fclose(lFile);
+    fwrite(hFile, gstr2);
+    fclose(hFile);
 
 	if(!success) {
 	    player_notice(playerid, "Unknown command", "Type ~y~/c ~w~for all commands");
@@ -4227,14 +4226,13 @@ public OnPlayerText(playerid, text[])
 	if(strfind(text, "/q", true) != -1 || strfind(text, "/ q", true) != -1 || strfind(text, "/quit", true) != -1 || strfind(text, "/ quit", true) != -1)
   		return 0;
 
-    new File:lFile = fopen("/Log/chatlog.txt", io_append),
+    new File:hFile = fopen("/Log/chatlog.txt", io_append),
         time[3];
 
     gettime(time[0], time[1], time[2]);
-
     format(gstr2, sizeof(gstr2), "[%02d:%02d:%02d] [%i]%s: %s \r\n", time[0], time[1], time[2], playerid, __GetName(playerid), text);
-    fwrite(lFile, gstr2);
-    fclose(lFile);
+    fwrite(hFile, gstr2);
+    fclose(hFile);
 
 	if(IsAd(text))
 	{
