@@ -4525,6 +4525,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 	{
 	    case gDUEL:
 	    {
+			Log(LOG_PLAYER, "gDUEL OnPlayerDeath(%i, %i, %i)", playerid, killerid, reason);
 	        PrintAmxBacktrace();
 	    
 	        new bool:found = false;
@@ -25516,12 +25517,14 @@ function:DerbyFallOver()
 
 function:QueueProcess()
 {
-	mysql_tquery(pSQL, "SELECT * FROM `queue` WHERE `ExecutionDate` < UNIX_TIMESTAMP();", "OnQueueReceived", "");
+	mysql_pquery(pSQL, "SELECT * FROM `queue` WHERE `ExecutionDate` < UNIX_TIMESTAMP();", "OnQueueReceived", "");
 	
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-	    if(!IsPlayerAvail(i)) continue;
-	    if(IsPlayerOnDesktop(i, 30000)) continue;
+	    if(!IsPlayerAvail(i))
+			continue;
+	    if(IsPlayerOnDesktop(i, 30000))
+			continue;
 	
 		if(PlayerData[i][e_payday] > 1)
 		{
@@ -25782,23 +25785,24 @@ function:OnQueueReceived()
 
 function:LogoSwitch()
 {
-	static Phase;
-	switch(Phase)
+	static phase;
+	
+	switch(phase)
 	{
 	    case 0:
 	    {
 	        TextDrawSetString(NEFLOGO[2], "~w~NEF "CURRENT_VERSION"");
-	        Phase = 1;
+	        phase = 1;
 	    }
 	    case 1:
 	    {
             TextDrawSetString(NEFLOGO[2], "~b~~h~~h~Stunt~w~/~g~~h~Drift~w~/~y~Race~w~/~r~~h~DM~w~/~p~Fun");
-	        Phase = 2;
+	        phase = 2;
 	    }
 	    case 2:
 	    {
 			TextDrawSetString(NEFLOGO[2], "~b~~h~~h~Stunt~w~/~g~~h~Drift~w~/~y~Race~w~/~r~~h~DM~w~/~p~Fun");
-	        Phase = 0;
+	        phase = 0;
 	    }
 	}
 	return 1;
@@ -26287,6 +26291,7 @@ function:ClearDerbyVotes()
 	{
 	    DerbyMapVotes[i] = 0;
 	}
+	
 	Iter_Clear(DerbyVoters);
 	return 1;
 }
@@ -26475,6 +26480,7 @@ function:derby_healthbar_reset(playerid, namehash)
 SetPlayerBGTeam1(playerid)
 {
     ResetPlayerWeapons(playerid);
+    
     SetPVarInt(playerid, "LastSkin", GetPlayerSkin(playerid));
 	SetPlayerSkin(playerid, 285);
 	SetPlayerHealth(playerid, 100.0);
@@ -26483,6 +26489,7 @@ SetPlayerBGTeam1(playerid)
 	GivePlayerWeapon(playerid, 24, 999999);
 	GivePlayerWeapon(playerid, 31, 999999);
 	GivePlayerWeapon(playerid, 34, 999999);
+	
 	switch(random(3))
 	{
 		case 1: GivePlayerWeapon(playerid, 35, 1);
@@ -26493,14 +26500,17 @@ SetPlayerBGTeam1(playerid)
 SetPlayerBGTeam2(playerid)
 {
 	ResetPlayerWeapons(playerid);
+	
     SetPVarInt(playerid, "LastSkin", GetPlayerSkin(playerid));
 	SetPlayerSkin(playerid, 122);
 	SetPlayerHealth(playerid, 100.0);
 	SetPlayerTeam(playerid, 20);
 	SetPlayerColor(playerid, RED);
+	
 	GivePlayerWeapon(playerid, 24, 999999);
 	GivePlayerWeapon(playerid, 30, 999999);
 	GivePlayerWeapon(playerid, 34, 999999);
+	
 	switch(random(3))
 	{
 		case 1: GivePlayerWeapon(playerid, 35, 1);
@@ -26642,24 +26652,19 @@ ShowPlayerDMTextdraws(playerid)
 
 HidePlayerInfoTextdraws(playerid)
 {
-	if(playerid)
-	{
-	
-	}
 	TextDrawHideForPlayer(playerid, TXTTeleportInfo);
 }
 
 ShowPlayerInfoTextdraws(playerid)
 {
-	if(playerid)
-	{
-
-	}
 	TextDrawShowForPlayer(playerid, TXTTeleportInfo);
 }
 
 Fallout_BuildMap()
 {
+	Log(LOG_WORLD, "Fallout_BuildMap()");
+	PrintAmxBacktrace();
+
 	for(new i = 0; i < 101; i++)
 	{
 		DestroyDynamicObject(FalloutData[I_iObject][i]);
