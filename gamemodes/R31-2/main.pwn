@@ -229,6 +229,7 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define DEFAULT_FALLOUT_TIME            (240)
 
 // Deathmatch
+#define SAWN_WORLD                      (42014)
 #define DM_WORLD                        (100000)
 #define DM_1                            (1)
 #define DM_2                            (2)
@@ -598,7 +599,8 @@ enum
 	STORE,
 	SPEC,
 	VIPL,
-	JAIL
+	JAIL,
+	gSAWN
 };
 
 // Player related
@@ -1883,6 +1885,7 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
 	T_JPDMPlayers = 0,
 	T_RocketDMPlayers = 0,
 	T_ServerPlayers = 0,
+	T_SawnPlayers = 0,
 	IRC_Bots[IRC_MAX_BOTS],
 	IRC_GroupID;
 	
@@ -2833,7 +2836,6 @@ public OnPlayerSpawn(playerid)
 		case DM:
 		{
 		    ResetPlayerWeapons(playerid);
-		    SetPlayerHealth(playerid, 100.0);
 		    new rand = random(2);
 			switch(gLastMap[playerid])
 			{
@@ -2868,6 +2870,15 @@ public OnPlayerSpawn(playerid)
 					SetPlayerFacingAngle(playerid, DM_MAP_4[rand][3]);
 			    }
 			}
+		}
+		case gSAWN:
+		{
+		    ResetPlayerWeapons(playerid);
+		    new rand = random(2);
+
+			GivePlayerWeapon(playerid, 26, 99999);
+			SetPlayerPos(playerid, DM_MAP_1[rand][0], DM_MAP_1[rand][1], DM_MAP_1[rand][2]);
+			SetPlayerFacingAngle(playerid, DM_MAP_1[rand][3]);
 		}
 		case gBG_VOTING:
 		{
@@ -4861,7 +4872,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 				GivePlayerMoneyEx(killerid, 2500, true, true);
 		    }
 		}
-		case DM, WAR:
+		case DM, WAR, gSAWN:
 		{
   		    if(IsPlayerAvail(killerid))
 		    {
@@ -7827,6 +7838,38 @@ YCMD:dm4(playerid, params[], help)
 	SetPlayerInterior(playerid, 0);
 	
 	NewMinigameJoin(playerid, "Deathmatch 4", "dm4");
+	return 1;
+}
+
+YCMD:sawn(playerid, params[], help)
+{
+    if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't join minigames while being in a Gang War, type /exit");
+
+	switch(gTeam[playerid])
+	{
+	    case STORE, BUYCAR, SPEC, VIPL, gBUILDRACE, HOUSE, JAIL: return SCM(playerid, RED, NOT_AVAIL);
+	}
+
+    if(gTeam[playerid] == gSAWN) return SCM(playerid, -1, ""er"You are already in this minigame!");
+    if(gTeam[playerid] != FREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
+
+    CheckPlayerGod(playerid);
+    Command_ReProcess(playerid, "/stopanims", false);
+    ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
+	SetPlayerVirtualWorld(playerid, SAWN_WORLD);
+	ResetPlayerWeapons(playerid);
+	ShowPlayerDMTextdraws(playerid);
+	new rand = random(2);
+	gTeam[playerid] = gSAWN;
+
+	GivePlayerWeapon(playerid, 26, 99999);
+
+	SetPlayerPos(playerid, DM_MAP_1[rand][0], DM_MAP_1[rand][1], DM_MAP_1[rand][2]+2);
+	SetPlayerFacingAngle(playerid, DM_MAP_1[rand][3]);
+	SetCameraBehindPlayer(playerid);
+	SetPlayerInterior(playerid, 0);
+
+	NewMinigameJoin(playerid, "Sawnoff DM", "sawn");
 	return 1;
 }
 
@@ -11746,7 +11789,7 @@ YCMD:gjoin(playerid, params[], help)
 		PlayerData[playerid][GangLabel] = Text3D:-1;
 	}
 	
-	ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Gang joined!", ""white"You can now use these commands:\n\n/gmenu\n\nUse "nef_yellow"! "white"to talk in your gang chat", "OK", "");
+	ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Gang joined!", ""white"You can now use these commands:\n\n/gmenu\n\nPut "nef_yellow"! "white"before your text to talk in your gang chat.", "OK", "");
 	
 	format(gstr, sizeof(gstr), ""nef_yellow"Gang:"white" %s", PlayerData[playerid][GangName]);
 	PlayerData[playerid][GangLabel] = CreateDynamic3DTextLabel(gstr, -1, 0.0, 0.0, 0.5, 20.0, playerid, INVALID_VEHICLE_ID, 1, -1, -1, -1, 20.0);
@@ -15639,6 +15682,11 @@ YCMD:m(playerid, params[], help)
 	    
 	strcat(string, gstr2);
 	
+	format(gstr2, sizeof(gstr2), "\n"white"Sawn DM (/sawn) "green"[%i]",
+	    T_SawnPlayers);
+	    
+	strcat(string, gstr2);
+	
 	ShowPlayerDialog(playerid, HELP_DIALOG + 3, DIALOG_STYLE_LIST, ""nef" :: Minigames", string, "Select", "Close");
 	return 1;
 }
@@ -18778,6 +18826,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	                case 8: ShowPlayerDialog(playerid, HELP_DIALOG + 4, DIALOG_STYLE_MSGBOX, ""nef" :: Minigames", ""white"Death Match (/dm1-4)", "OK", "Back");
 	                case 9: Command_ReProcess(playerid, "/tdm", false);
 	                case 10: Command_ReProcess(playerid, "/war", false);
+	                case 11: Command_ReProcess(playerid, "/sawn", false);
 	            }
 	            return true;
 	        }
@@ -25845,6 +25894,7 @@ function:ProcessTick()
 	T_JPDMPlayers = 0;
 	T_RocketDMPlayers = 0;
 	T_ServerPlayers = 0;
+	T_SawnPlayers = 0;
 	
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -25997,6 +26047,10 @@ function:ProcessTick()
 			    case JETPACKDM:
 			    {
 			        T_JPDMPlayers++;
+			    }
+			    case gSAWN:
+			    {
+			        T_SawnPlayers++;
 			    }
 			    case JAIL:
 			    {
@@ -27586,7 +27640,7 @@ function:ShowDialog(playerid, dialogid)
 				}
 		    }
 		    
-			ShowPlayerDialog(playerid, VMENU_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Custom car shop", string, "Select", "Cancel");
+			ShowPlayerDialog(playerid, VMENU_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Your custom cars", string, "Select", "Cancel");
 		}
 		case WEAPON_DIALOG:
 		{
