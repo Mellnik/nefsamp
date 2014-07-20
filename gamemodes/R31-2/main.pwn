@@ -4451,6 +4451,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 
     SendDeathMessage(killerid, playerid, reason);
 	PlayerData[playerid][e_deaths]++;
+	PlayerData[playerid][tickLastShot] = 0;
 
 	if(killerid != INVALID_PLAYER_ID)
 	{
@@ -8817,7 +8818,7 @@ YCMD:cnr(playerid, params[], help)
 	}
 	
 	new string[512];
-	format(string, sizeof(string), ""LB_E"Cops\t\t"GREY_E"LVPD\t\t(Players: %i)\n"ORANGE_E"Robbers\t"GREY_E"LV Mafia\t\t(Players: %i)\n"RED_E"Pro Robbers\t"GREY_E"Mafia Commanders\n"PURPLE_E"Army\t\t"GREY_E"Army Task Force\n"BLUE_E"Swat\t\t"GREY_E"LVPD Commanders", cops, robbers);
+	format(string, sizeof(string), ""LB_E"Cops\t\t"GREY_E"LVPD\t\t\t(Players: %i)\n"ORANGE_E"Robbers\t"GREY_E"LV Mafia\t\t(Players: %i)\n"RED_E"Pro Robbers\t"GREY_E"Mafia Commanders\n"PURPLE_E"Army\t\t"GREY_E"Army Task Force\n"BLUE_E"Swat\t\t"GREY_E"LVPD Commanders", cops, robbers);
 
 	ShowPlayerDialog(playerid, CNR_DIALOG, DIALOG_STYLE_LIST, ""YELLOW_E"Choose your side", string, "Select", "Cancel");
 	return 1;
