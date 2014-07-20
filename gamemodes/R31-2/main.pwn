@@ -25,7 +25,7 @@
 #pragma dynamic 8192
 
 #define IS_RELEASE_BUILD (true)
-#define INC_ENVIORMENT (true)
+#define INC_ENVIORMENT (false)
 #define IRC_CONNECT (true)
 #define WINTER_EDITION (false) // Requires FS ferriswheelfair.amx
 #define YSI_IS_SERVER
@@ -3500,7 +3500,7 @@ public OnPlayerCommandReceived(playerid, cmdtext[])
 	
 	if((PlayerData[playerid][iCoolDownCommand] + COOLDOWN_CMD) >= GetTickCountEx())
 	{
-		player_notice(playerid, "1 command every second", "");
+		player_notice(playerid, "1 command per second", "");
 	    return 0;
 	}
 
@@ -3634,6 +3634,21 @@ public OnPlayerGiveDamage(playerid, damagedid, Float:amount, weaponid, bodypart)
 
 public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY, Float:fZ)
 {
+	/* ANTI PROAIM.CS EXPERIMENTAL */
+	if(hittype == BULLET_HIT_TYPE_PLAYER) {
+	    if(hitid != INVALID_PLAYER_ID) {
+			static Float:vect[7];
+			GetPlayerLastShotVectors(playerid, vect[0], vect[1], vect[2], vect[3], vect[4], vect[5]);
+            vect[6] = GetPlayerDistanceFromPoint(hitid, vect[3], vect[4], vect[5]);
+            
+            if(vect[6] >= 5.0) {
+			  	format(gstr2, sizeof(gstr2), "[SUSPECT] Possible ProAim detected. Player: %s(%i), dist: %0.3f | vectors: %0.2f %0.2f %0.2f, %0.2f %0.2f %0.2f", __GetName(playerid), playerid, vect[6], vect[3], vect[4], vect[5], fX, fY, fZ);
+				AdminMSG(RED, gstr2);
+				print(gstr2);
+			}
+	    }
+	}
+
 	/* PLAYER QUEUED FOR KICK */
 	if(hittype == BULLET_HIT_TYPE_PLAYER) {
 	    if(hitid != INVALID_PLAYER_ID) {
@@ -3647,7 +3662,7 @@ public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY
 	if(hittype == BULLET_HIT_TYPE_PLAYER) {
 	    if(hitid != INVALID_PLAYER_ID) {
 	        if(PlayerData[hitid][bGod]) {
-			    GameTextForPlayer(playerid, "~g~~h~~h~Player has /GOD enabled", 2000, 3);
+	            player_notice(playerid, "Player has /god enabled", "");
 			    return 0;
 	        }
 	    }
@@ -3669,14 +3684,21 @@ public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY
 	}
 	
 	/* ANTI GBUG */
-	if(hittype == BULLET_HIT_TYPE_PLAYER) {
-	    if(hitid != INVALID_PLAYER_ID) {
-			if(GetPlayerState(playerid) == PLAYER_STATE_PASSENGER) {
-				switch(GetVehicleModel(GetPlayerVehicleID(playerid)))
+	if(hittype == BULLET_HIT_TYPE_PLAYER || hittype == BULLET_HIT_TYPE_VEHICLE) {
+	    if(hitid != INVALID_PLAYER_ID || hitid != INVALID_VEHICLE_ID) {
+	        if(IsPlayerInAnyVehicle(playerid)) {
+				switch(GetPlayerVehicleSeat(playerid))
 				{
-				    case 522, 521, 461, 462, 463, 581: return 0;
+				    case 1:
+				    {
+						switch(GetVehicleModel(GetPlayerVehicleID(playerid)))
+						{
+						    case 509, 510, 581, 521, 522, 523, 586, 481, 462, 448, 461, 463, 468, 471: return 0;
+						}
+				    }
+				    case 2..4: return 0;
 				}
-			}
+	        }
 	    }
  	}
 	
@@ -15451,7 +15473,7 @@ YCMD:stats(playerid, params[], help)
 		}
 		else strmid(vip, "No", 0, 5, 5);
 
- 		format(string1, sizeof(string1), ""ngs_blue"Statistics of member -"white"%s (%i)\n\n\
+ 		format(string1, sizeof(string1), ""ngs_blue"Statistics of player "white"%s (%i)\n\n\
 	 	Kills:\t\t\t%i\nDeaths:\t\t\t%i\nK/D:\t\t\t%0.2f\nScore:\t\t\t%i\nMoney:\t\t\t$%s\nBank:\t\t\t$%s\nGold Credits:\t\t%sGC\n",
    			__GetName(player1),
    			PlayerData[player1][e_accountid],
@@ -25967,16 +25989,16 @@ function:ProcessTick()
 			        if(IsPlayerInAnyVehicle(i))
 			        {
 						new kmh = GetPlayerKMH(i);
-						if(290 <= kmh > 270)
+						if(292 <= kmh > 270)
 						{
-						  	format(gstr2, sizeof(gstr2), ""yellow"** "red"Possible speed cheat detected | Player: %s(%i) | Race", __GetName(i), i);
+						  	format(gstr2, sizeof(gstr2), "[SUSPECT] Possible speed cheat detected | Player: %s(%i) | Race", __GetName(i), i);
 							AdminMSG(RED, gstr2);
 							print(gstr2);
 						}
-						else if(kmh > 290)
+						else if(kmh > 292)
 						{
 						    Command_ReProcess(i, "/exit", false);
-						  	format(gstr2, sizeof(gstr2), ""yellow"** "red"Speed cheat detected | Player: %s(%i) | Player has been removed from race", __GetName(i), i);
+						  	format(gstr2, sizeof(gstr2), "[SUSPECT] Speed cheat detected | Player: %s(%i) | Player has been removed from race", __GetName(i), i);
 							AdminMSG(RED, gstr2);
 							print(gstr2);
 						}
@@ -26007,7 +26029,7 @@ function:ProcessTick()
 			        {
 				        if(IsPlayerOnDesktop(i, 6000))
 				        {
-							format(gstr, sizeof(gstr), "%s(%i) was AFK for too long!", __GetName(i), i);
+							format(gstr, sizeof(gstr), "%s(%i) went AFK for too long!", __GetName(i), i);
 							fallout_msg(gstr);
 
 							PlayerData[i][bFalloutLost] = true;
