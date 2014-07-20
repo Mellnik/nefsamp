@@ -3241,8 +3241,7 @@ public OnPlayerDisconnect(playerid, reason)
 		        {
 		            if(PlayerData[i][DuelRequestRecv] == playerid && gTeam[i] == gDUEL)
 		            {
-			            format(gstr, sizeof(gstr), ">> Duel cancelled between %s and %s. Reason: Disconnect", __GetName(playerid), __GetName(i));
-			            SCMToAll(NEF_RED, gstr);
+		                global_broadcast("Duel cancelled between %s and %s. Reason: Disconnect", __GetName(playerid), __GetName(i));
 
 		                gTeam[i] = FREEROAM;
 		                ResetPlayerWorld(i);
@@ -3263,8 +3262,7 @@ public OnPlayerDisconnect(playerid, reason)
 				    {
 				        if(PlayerData[i][DuelRequest] == playerid) // Sender won
 				        {
-				            format(gstr, sizeof(gstr),  ">> Duel cancelled between %s and %s. Reason: Disconnect", __GetName(playerid), __GetName(i));
-				            SCMToAll(NEF_RED, gstr);
+				           	global_broadcast(">> Duel cancelled between %s and %s. Reason: Disconnect", __GetName(playerid), __GetName(i));
 
 		 		            gTeam[i] = FREEROAM;
 
@@ -4533,8 +4531,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 			    {
 		            new Float:HP;
 		            GetPlayerHealth(i, HP);
-		            format(gstr, sizeof(gstr), ">> DUEL: %s won the duel against %s and has %.2f HP left!", __GetName(i), __GetName(playerid), HP);
-		            SCMToAll(NEF_RED, gstr);
+		            global_broadcast(">> DUEL: %s won the duel against %s and has %.2f HP left!", __GetName(i), __GetName(playerid), HP);
 		            
  		            gTeam[i] = FREEROAM;
 		            gTeam[playerid] = FREEROAM;
@@ -4563,8 +4560,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 			        {
 			            new Float:HP;
 			            GetPlayerHealth(i, HP);
-			            format(gstr, sizeof(gstr), ">> DUEL: %s won the duel against %s and has %.2f HP left!", __GetName(i), __GetName(playerid), HP);
-			            SCMToAll(NEF_RED, gstr);
+			            global_broadcast(">> DUEL: %s won the duel against %s and has %.2f HP left!", __GetName(i), __GetName(playerid), HP);
 
 	 		            gTeam[i] = FREEROAM;
 			            gTeam[playerid] = FREEROAM;
@@ -8914,8 +8910,7 @@ YCMD:duel(playerid, params[], help)
             PlayerData[playerid][DuelRequest] = INVALID_PLAYER_ID;
             PlayerData[PlayerData[playerid][DuelRequestRecv]][DuelRequestRecv] = INVALID_PLAYER_ID;
             
-            format(gstr, sizeof(gstr), ">> Duel started between %s and %s!", __GetName(PlayerData[playerid][DuelRequestRecv]), __GetName(playerid));
-            SCMToAll(NEF_RED, gstr);
+            global_broadcast(">> Duel started between %s and %s!", __GetName(PlayerData[playerid][DuelRequestRecv]), __GetName(playerid));
         }
     }
     else
@@ -17195,8 +17190,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	            {
 	                if(PlayerData[i][DuelRequest] == playerid)
 	                {
-			        	format(gstr, sizeof(gstr), ">> Duel request cancelled by %s(%i)", __GetName(playerid), playerid);
-			        	SCM(i, NEF_RED, gstr);
+			        	global_broadcast(">> Duel request cancelled by %s(%i)", __GetName(playerid), playerid);
 			        	
 	                    PlayerData[i][DuelRequest] = INVALID_PLAYER_ID;
 	                }
