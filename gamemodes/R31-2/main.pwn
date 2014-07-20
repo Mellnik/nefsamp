@@ -186,7 +186,7 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define DERBY_WORLD                     (5050)
 #define DERBY_TIME      				(180000)
 #define DERBY_VOTING_TIME     			(15000)
-#define DEFAULT_DERBY_TIME              (120)
+#define DEFAULT_DERBY_TIME              (180)
 #define DERBY_FALLOVER_CHECK_TIME   	(500)
 #define DERBY_FREEZE_TIME 				(1750)
 #define DERBY_FREEZE_INTERVAL 			(70)
@@ -3336,14 +3336,8 @@ public OnPlayerDisconnect(playerid, reason)
                 PlayerData[playerid][bFalloutLost] = true;
 				gTeam[playerid] = FREEROAM;
 				CurrentFalloutPlayers--;
-			    new count = 0;
-				for(new i = 0; i < MAX_PLAYERS; i++)
-				{
-				    if(!IsPlayerAvail(i)) continue;
-				    if(gTeam[i] == FALLOUT) count++;
-				}
 
-				if(count < 2)
+				if(fallout_get_playercount() < 2)
 				{
 				    KillTimer(FalloutData[I_tCountdown]);
 
@@ -3356,10 +3350,12 @@ public OnPlayerDisconnect(playerid, reason)
 						    RandomWeapons(i);
 						    HidePlayerFalloutTextdraws(i);
 						    ResetPlayerWorld(i);
-						    fallout_msg("Fallout has been canceled!");
+						    global_broadcast("Fallout has been canceled! Reason: %s disconnected.", __GetName(playerid));
+						    
 						    gTeam[i] = FREEROAM;
 					    }
 					}
+					
 					fallout_cancel();
 				}
 			}
@@ -4794,19 +4790,13 @@ public OnPlayerDeath(playerid, killerid, reason)
 		    TogglePlayerControllable(playerid, true);
 		    HidePlayerFalloutTextdraws(playerid);
 		    ResetPlayerWorld(playerid);
+		    player_notice(playerid, "You lost this fallout match", "");
+		    
 		    CurrentFalloutPlayers--;
             PlayerData[playerid][bFalloutLost] = true;
-            player_notice(playerid, "You lost this fallout match", "");
             gTeam[playerid] = FREEROAM;
 
-		    new count = 0;
-			for(new i = 0; i < MAX_PLAYERS; i++)
-			{
-			    if(!IsPlayerAvail(i)) continue;
-			    if(gTeam[i] == FALLOUT) count++;
-			}
-
-			if(count < 2)
+			if(fallout_get_playercount() < 2)
 			{
 			    KillTimer(FalloutData[I_tCountdown]);
 
@@ -4820,9 +4810,11 @@ public OnPlayerDeath(playerid, killerid, reason)
 					    HidePlayerFalloutTextdraws(i);
 					    ResetPlayerWorld(i);
 					    fallout_msg("Fallout has been canceled!");
+					    
 						gTeam[i] = FREEROAM;
 				    }
 				}
+				
 				fallout_cancel();
 			}
 	  	}
@@ -7575,14 +7567,17 @@ YCMD:fallout(playerid, params[], help)
 	{
 	    CheckPlayerGod(playerid);
 	    Command_ReProcess(playerid, "/stopanims", false);
-	    gTeam[playerid] = FALLOUT;
-	    ResetFalloutGameTime();
+	    
+	    fallout_reset_gametime();
 	    fallout_buildmap();
 	    fallout_startgame();
+	    fallout_setplayer(playerid);
+	    
 		g_FalloutStatus = e_Fallout_Startup;
-		fallout_setplayer(playerid);
+		CurrentFalloutPlayers++;
+		gTeam[playerid] = FALLOUT;
+		
         SCMToAll(BLUE, ""fallout_sign" Type /fallout to participate");
-        CurrentFalloutPlayers++;
         NewMinigameJoin(playerid, "Fallout", "fallout");
         SetPlayerInterior(playerid, 0);
 	}
@@ -7590,11 +7585,14 @@ YCMD:fallout(playerid, params[], help)
 	{
 	    CheckPlayerGod(playerid);
 	    Command_ReProcess(playerid, "/stopanims", false);
+	    
+	    CurrentFalloutPlayers++;
 		gTeam[playerid] = FALLOUT;
+		
 		format(gstr, sizeof(gstr), "%s(%i) joined Fallout!", __GetName(playerid), playerid);
 		fallout_msg(gstr);
 		fallout_setplayer(playerid);
-		CurrentFalloutPlayers++;
+		
         NewMinigameJoin(playerid, "Fallout", "fallout");
         SetPlayerInterior(playerid, 0);
 	}
@@ -26288,7 +26286,7 @@ ResetBGGameTime()
 	return 1;
 }
 
-ResetFalloutGameTime()
+fallout_reset_gametime()
 {
 	FalloutGameTime = DEFAULT_FALLOUT_TIME;
 	return 1;
@@ -26685,9 +26683,12 @@ fallout_buildmap()
 		DestroyDynamicObject(FalloutData[I_iObject][i]);
 		FalloutData[I_iNumberout][i] = -1;
 		KillTimer(FalloutData[I_iShaketimer][i]);
-		KillTimer(FalloutData[I_tSolarfall]);
 		FalloutData[I_iShake][i] = 0;
 	}
+
+    KillTimer(FalloutData[I_tSolarfall]);
+    KillTimer(FalloutData[I_tCountdown]);
+    KillTimer(FalloutData[I_tLoseGame]);
 
 	new j;
 	FalloutData[I_iCount] = 15;
@@ -26844,6 +26845,7 @@ fallout_cancel()
 	}
 	
 	KillTimer(FalloutData[I_tSolarfall]);
+	KillTimer(FalloutData[I_tCountdown]);
 	KillTimer(FalloutData[I_tLoseGame]);
 	return 1;
 }
@@ -26851,7 +26853,6 @@ fallout_cancel()
 function:fallout_losegame()
 {
 	Log(LOG_WORLD, "fallout_losegame()");
-	PrintAmxBacktrace();
 	
 	new players,
 		Float:POS[3];
@@ -26874,8 +26875,9 @@ function:fallout_losegame()
 
             gTeam[i] = FREEROAM;
 			PlayerData[i][bFalloutLost] = true;
-			HidePlayerFalloutTextdraws(i);
 			CurrentFalloutPlayers--;
+			
+			HidePlayerFalloutTextdraws(i);
 			ResetPlayerWorld(i);
 			RandomSpawn(i, true);
 			RandomWeapons(i);
@@ -26896,37 +26898,11 @@ function:fallout_losegame()
 
 function:fallout_countdown()
 {
-	new player;
-
-	if(--FalloutData[I_iCount] == 0)
-		format(gstr, sizeof(gstr), "~b~Start!");
-	else
-		format(gstr, sizeof(gstr), "~y~FALLOUT STARTING IN~n~~p~- %i -~n~~y~SECONDS", FalloutData[I_iCount]);
-
-	for(new i = 0; i < MAX_PLAYERS; i++)
-	{
-	    if(gTeam[i] == FALLOUT)
-		{
-			GameTextForPlayer(i, gstr, 1000, 3);
-	    }
-	}
-
-	if(FalloutData[I_iCount] <= 0)
+	if(--FalloutData[I_iCount] <= 0)
 	{
 		KillTimer(FalloutData[I_tCountdown]);
-		
-		for(new i = 0; i < MAX_PLAYERS; i++)
-		{
-		    if(gTeam[i] == FALLOUT)
-			{
-				Streamer_Update(i);
-				TogglePlayerControllable(i, true);
-				PlayerData[i][bFalloutLost] = false;
-				player++;
-		    }
-		}
 
-		if(player <= 1)
+		if(fallout_get_playercount() <= 1)
 		{
 		    fallout_cancel();
 
@@ -26938,16 +26914,41 @@ function:fallout_countdown()
 			        ResetPlayerWorld(i);
                     RandomSpawn(i, true);
 					RandomWeapons(i);
+					
 			        gTeam[i] = FREEROAM;
 			        
-			        SCM(i, RED, "Fallout canceled due to lack of players!");
+			        global_broadcast("Fallout canceled due to lack of players!");
 			    }
 			}
 		}
 		else
 		{
-			SetTimer("fallout_startfalling", 587, false);
+			format(gstr, sizeof(gstr), "~b~Start!");
+			for(new i = 0; i < MAX_PLAYERS; i++)
+			{
+			    if(gTeam[i] == FALLOUT)
+				{
+				    GameTextForPlayer(i, gstr, 1000, 3);
+					Streamer_Update(i);
+					TogglePlayerControllable(i, true);
+
+					PlayerData[i][bFalloutLost] = false;
+			    }
+			}
+
+			SetTimer("fallout_start_falling", 587, false);
 			g_FalloutStatus = e_Fallout_Running;
+		}
+	}
+	else
+	{
+	    format(gstr, sizeof(gstr), "~y~FALLOUT STARTING IN~n~~p~- %i -~n~~y~SECONDS", FalloutData[I_iCount]);
+		for(new i = 0; i < MAX_PLAYERS; i++)
+		{
+		    if(gTeam[i] == FALLOUT)
+			{
+				GameTextForPlayer(i, gstr, 1000, 3);
+		    }
 		}
 	}
 	return 1;
@@ -26956,7 +26957,6 @@ function:fallout_countdown()
 function:fallout_solarfall()
 {
 	Log(LOG_WORLD, "fallout_solarfall()");
-	PrintAmxBacktrace();
 	
 	new objectid,
 		go;
@@ -26970,7 +26970,7 @@ function:fallout_solarfall()
 		if(g_FalloutStatus == e_Fallout_Running)
 		{
 			g_FalloutStatus = e_Fallout_Finish;
-			SetTimer("fallout_decidewinners", 200, false);
+            fallout_decidewinners();
 		}
 		
 		KillTimer(FalloutData[I_tSolarfall]);
@@ -26984,23 +26984,24 @@ function:fallout_solarfall()
 		goto start;
 
 	FalloutData[I_iNumberout][objectid] = 0;
-
 	FalloutData[I_iShaketimer][objectid] = SetTimerEx("fallout_squareshake", 100, true, "i", objectid);
 	return 1;
 }
 
-function:fallout_startfalling()
+function:fallout_start_falling()
 {
-	Log(LOG_WORLD, "fallout_startfalling()");
-	PrintAmxBacktrace();
+	Log(LOG_WORLD, "fallout_start_falling()");
 	
 	FalloutData[I_tSolarfall] = SetTimer("fallout_solarfall", 500, true);
-	FalloutData[I_tLoseGame] = SetTimer("fallout_losegame", 500, true);
+	FalloutData[I_tLoseGame] = SetTimer("fallout_losegame", 750, true);
 	return 1;
 }
 
 function:fallout_decidewinners()
 {
+	Log(LOG_WORLD, "fallout_decidewinners()");
+	PrintAmxBacktrace();
+	
 	g_FalloutStatus = e_Fallout_Inactive;
 
 	new winners,
@@ -27054,7 +27055,6 @@ function:fallout_decidewinners()
 function:fallout_squareshake(objectid)
 {
 	Log(LOG_WORLD, "fallout_squareshake()");
-	PrintAmxBacktrace();
 
 	if(objectid == 0)
 	{
@@ -30671,6 +30671,13 @@ Log(E_LOG_LEVEL:log_level, const fmat[], va_args<>)
 		case LOG_SUSPECT: strins(gstr2, "LogSuspect: ", 0, sizeof(gstr2));
 	}
 	return print(gstr2);
+}
+
+global_broadcast(const fmat[], va_args<>)
+{
+	format(gstr, sizeof(gstr), "{00FF96}[GLOBAL] %s", fmat);
+	va_format(gstr2, sizeof(gstr2), gstr, va_start<1>);
+	return SCMToAll(-1, gstr2);
 }
 
 IsWhitelisted(ip[])
