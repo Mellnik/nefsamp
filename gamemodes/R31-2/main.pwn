@@ -15006,9 +15006,10 @@ YCMD:spec(playerid, params[], help)
 			{
 				GetPlayerPos(playerid, PlayerData[playerid][SpecX], PlayerData[playerid][SpecY], PlayerData[playerid][SpecZ]);
 				GetPlayerFacingAngle(playerid, PlayerData[playerid][SpecA]);
-				SetPlayerInterior(playerid, GetPlayerInterior(otherid));
-				SetPlayerVirtualWorld(playerid, GetPlayerVirtualWorld(otherid));
    			}
+
+			SetPlayerInterior(playerid, GetPlayerInterior(otherid));
+			SetPlayerVirtualWorld(playerid, GetPlayerVirtualWorld(otherid));
 
 			gTeam[playerid] = SPEC;
             PlayerData[playerid][SpecID] = otherid;
