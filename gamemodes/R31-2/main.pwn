@@ -230,7 +230,7 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 
 // Deathmatch
 #define SAWN_WORLD                      (42014)
-#define DM_WORLD                        (100000)
+#define DM_WORLD                        (541378)
 #define DM_1                            (1)
 #define DM_2                            (2)
 #define DM_3                            (3)
@@ -7754,7 +7754,7 @@ YCMD:dm2(playerid, params[], help)
     CheckPlayerGod(playerid);
 	Command_ReProcess(playerid, "/stopanims", false);
     ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
-	SetPlayerVirtualWorld(playerid, DM_WORLD+1);
+	SetPlayerVirtualWorld(playerid, DM_WORLD + 1);
 	ResetPlayerWeapons(playerid);
 	ShowPlayerDMTextdraws(playerid);
 	new rand = random(2);
@@ -7788,7 +7788,7 @@ YCMD:dm3(playerid, params[], help)
     CheckPlayerGod(playerid);
     Command_ReProcess(playerid, "/stopanims", false);
     ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
-	SetPlayerVirtualWorld(playerid, DM_WORLD+2);
+	SetPlayerVirtualWorld(playerid, DM_WORLD + 2);
 	ResetPlayerWeapons(playerid);
 	ShowPlayerDMTextdraws(playerid);
 	new rand = random(2);
@@ -7821,7 +7821,7 @@ YCMD:dm4(playerid, params[], help)
     CheckPlayerGod(playerid);
     Command_ReProcess(playerid, "/stopanims", false);
     ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
-	SetPlayerVirtualWorld(playerid, DM_WORLD+3);
+	SetPlayerVirtualWorld(playerid, DM_WORLD + 3);
 	ResetPlayerWeapons(playerid);
 	ShowPlayerDMTextdraws(playerid);
 	new rand = random(2);
@@ -12063,10 +12063,10 @@ YCMD:tban(playerid, params[], help)
 			}
 	    }
 	    
-	    new player, reason[144], time;
-	    if(sscanf(params, "rs[143]i", player, reason, time))
+	    new player, reason[128], time;
+	    if(sscanf(params, "ris[127]", player, time, reason))
 	    {
-	        return SCM(playerid, NEF_GREEN, "Usage: /tban <playerid> <reason> <time>");
+	        return SCM(playerid, NEF_GREEN, "Usage: /tban <playerid> <time> <reason>");
 	    }
 
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
