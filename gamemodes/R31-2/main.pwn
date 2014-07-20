@@ -1242,6 +1242,17 @@ new const ServerMSGS[15][] =
 	""yellow_e"- Server - "LB2_E"Get your own car at /vs which you can tune!"
 };
 
+new const stock GangCarLevels[7][2] =
+{
+	{567, 500},
+	{517, 1000},
+	{522, 2500},
+	{589, 4000},
+	{560, 6500},
+	{506, 10000},
+	{528, 25000}
+};
+
 new Derby_Map1Spawns[MAX_DERBY_PLAYERS][e_derby_map1_data] =
 {
 	{-3957.3640, 969.7915, 65.6281, 235.3673, false},
@@ -11984,7 +11995,7 @@ YCMD:gcar(playerid, params[], help)
 			if(gcar != -1)
 			{
 				format(gstr, sizeof(gstr), "UPDATE `gangs` SET `Vehicle` = %i WHERE `ID` = %i;", gcar, PlayerData[playerid][e_gangid]);
-				mysql_tquery(pSQL, gstr, "", "");
+				mysql_pquery(pSQL, gstr, "", "");
 
 			    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s set the gang vehicle to %s", __GetName(playerid), VehicleNames[gcar - 400]);
 				GangMSG(PlayerData[playerid][e_gangid], gstr);
