@@ -27471,7 +27471,7 @@ function:ShowDialog(playerid, dialogid)
 
 	        if(PlayerData[playerid][e_vip] == 1)
 	        {
-	            if((PlayerData[playerid][e_lastnc] + 1209600) > gettime())
+	            if((PlayerData[playerid][e_lastnc] + 1209600) > gettime() && PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 	            {
 	                format(string, sizeof(string), ""red"Namechange not possible"white"\n\nNamechange cooldown: 14 days "lb_e"(VIP)"white"\nLast Namechange: %s\nNext Namechange available: %s\nCurrent Name: %s",
 						UTConvert(PlayerData[playerid][e_lastnc]),
@@ -27500,7 +27500,7 @@ function:ShowDialog(playerid, dialogid)
 	        }
 	        else
 	        {
-	            if((PlayerData[playerid][e_lastnc] + 2678400) > gettime())
+	            if((PlayerData[playerid][e_lastnc] + 2678400) > gettime() && PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 	            {
 	                format(string, sizeof(string), ""red"Namechange not possible"white"\n\nNamechange cooldown: 30 days\nLast Namechange: %s\nNext Namechange available: %s\nCurrent Name: %s",
 						UTConvert(PlayerData[playerid][e_lastnc]),
