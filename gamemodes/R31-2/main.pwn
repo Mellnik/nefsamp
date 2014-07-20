@@ -8816,7 +8816,7 @@ YCMD:cnr(playerid, params[], help)
 	new string[512];
 	format(string, sizeof(string), ""LB_E"Cops\t\t"GREY_E"LVPD\t\t\t(Players: %i)\n"ORANGE_E"Robbers\t"GREY_E"LV Mafia\t\t(Players: %i)\n"RED_E"Pro Robbers\t"GREY_E"Mafia Commanders\n"PURPLE_E"Army\t\t"GREY_E"Army Task Force\n"BLUE_E"Swat\t\t"GREY_E"LVPD Commanders", cops, robbers);
 
-	ShowPlayerDialog(playerid, CNR_DIALOG, DIALOG_STYLE_LIST, ""YELLOW_E"Choose your side", string, "Select", "Cancel");
+	ShowPlayerDialog(playerid, CNR_DIALOG, DIALOG_STYLE_LIST, ""YELLOW_E"Choose your side", string, "Select", "Close");
 	return 1;
 }
 
@@ -14762,7 +14762,7 @@ YCMD:top(playerid, params[], help)
 	strcat(string, "Richlist (/richlist)\nMost Wanteds (/wanteds)\nScore (/score)\nMost Kills (/kills)\nMost Deaths (/deaths)\nMost playing time (/toptime)\nOnline Gangs (/gangs)\nTop Gangs (/gtop)");
 	strcat(string, "\nMost Reaction Wins (/rtests)\nMost Race Wins (/races)\nMost Derby Wins (/derbys)\nMost Fallout Wins (/fallouts)\nMost Gungame Wins (/gungames)");
 	
-	ShowPlayerDialog(playerid, TOPLIST_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Toplists", string, "Select", "Cancel");
+	ShowPlayerDialog(playerid, TOPLIST_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Toplists", string, "Select", "Close");
 	return 1;
 }
 
@@ -15639,7 +15639,7 @@ YCMD:m(playerid, params[], help)
 	    
 	strcat(string, gstr2);
 	
-	ShowPlayerDialog(playerid, HELP_DIALOG + 3, DIALOG_STYLE_LIST, ""nef" :: Minigames", string, "Select", "Cancel");
+	ShowPlayerDialog(playerid, HELP_DIALOG + 3, DIALOG_STYLE_LIST, ""nef" :: Minigames", string, "Select", "Close");
 	return 1;
 }
 
@@ -19456,7 +19456,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					}
 					else
 					{
-		            	ShowPlayerDialog(playerid, TOY_DIALOG + 1, DIALOG_STYLE_LIST, gstr, "Edit Toy Position\nChange Bone\n"grey"Remove Toy", "Select", "Cancel");
+		            	ShowPlayerDialog(playerid, TOY_DIALOG + 1, DIALOG_STYLE_LIST, gstr, "Edit Toy Position\nChange Bone\n"grey"Remove Toy", "Select", "Close");
 					}
 			    }
 				return true;
