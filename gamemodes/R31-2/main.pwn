@@ -2795,10 +2795,11 @@ public OnPlayerSpawn(playerid)
         {
 	    	SetPlayerPos(playerid, PlayerData[playerid][SpecX], PlayerData[playerid][SpecY], PlayerData[playerid][SpecZ]);
 			SetPlayerFacingAngle(playerid, PlayerData[playerid][SpecA]);
+			SetCameraBehindPlayer(playerid);
 			RandomWeapons(playerid);
-			gTeam[playerid] = FREEROAM;
-			
 			player_notice(playerid, "No longer spectating", "");
+			
+			gTeam[playerid] = FREEROAM;
 
 			if(GetPVarInt(playerid, "HadGod") == 1) Command_ReProcess(playerid, "/god silent", false);
         }
