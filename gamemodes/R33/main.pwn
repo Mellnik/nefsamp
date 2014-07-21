@@ -1,6 +1,6 @@
 /*======================================================================*\
 || #################################################################### ||
-|| # Project New Evolution Freeroam - Build 32           			  # ||
+|| # Project New Evolution Freeroam - Build 33           			  # ||
 || # ---------------------------------------------------------------- # ||
 || # Copyright (c)2011-2014 New Evolution Freeroam  				  # ||
 || # Created by Mellnik                                               # ||
@@ -85,9 +85,9 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define SERVER_IP                       "31.204.152.218:7777"
 #define HOSTNAME                        " 	      ..:: NEF ::.. ×Stunt/DM/Race/Minigames×"
 #if IS_RELEASE_BUILD == true
-#define CURRENT_VERSION                 "Build 32"
+#define CURRENT_VERSION                 "Build 33"
 #else
-#define CURRENT_VERSION                 "PTS:Build 32"
+#define CURRENT_VERSION                 "PTS:Build 33"
 #endif
 #define HOTFIX_REV                      "Hotfix #0"
 #define SAMP_VERSION                    "SA-MP 0.3z-R3"
@@ -8233,11 +8233,11 @@ YCMD:sb(playerid, params[], help)
 	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 	if(PlayerData[playerid][bSpeedBoost])
     {
-     	player_notice(playerid, "SpeedBoost", "~r~OFF");
+     	player_notice(playerid, "Speed Boost", "~r~OFF");
 	}
 	else
 	{
-	    player_notice(playerid, "SpeedBoost", "~g~ON");
+	    player_notice(playerid, "Speed Boost", "~g~ON");
 	}
 	PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
 	PlayerData[playerid][bSpeedBoost] = !PlayerData[playerid][bSpeedBoost];
@@ -8250,11 +8250,11 @@ YCMD:sj(playerid, params[], help)
 	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 	if(PlayerData[playerid][bSuperJump])
     {
-     	player_notice(playerid, "bSuperJump", "~r~OFF");
+     	player_notice(playerid, "Super Jump", "~r~OFF");
 	}
 	else
 	{
-	    player_notice(playerid, "bSuperJump", "~g~ON");
+	    player_notice(playerid, "Super Jump", "~g~ON");
 	}
 	PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
 	PlayerData[playerid][bSuperJump] = !PlayerData[playerid][bSuperJump];
@@ -9258,7 +9258,7 @@ YCMD:togglegc(playerid, params[], help)
 	    if(!PlayerData[playerid][bHideGC])
 			player_notice(playerid, "You have been detached from [GC] channel", "");
 		else
-		    player_notice(playerid, "You have been added from [GC] channel", "");
+		    player_notice(playerid, "You have been added to [GC] channel", "");
 		    
 		PlayerData[playerid][bHideGC] = !PlayerData[playerid][bHideGC];
 	}
@@ -23101,6 +23101,7 @@ server_initialize()
     Command_AddAltNamed("xmas", "christmas");
     Command_AddAltNamed("xmas", "christ");
 	#endif
+	Command_AddAltNamed("togglegc", "toggc");
 	Command_AddAltNamed("lock", "carlock");
 	Command_AddAltNamed("unlock", "carunlock");
 	Command_AddAltNamed("suspect", "sus");
