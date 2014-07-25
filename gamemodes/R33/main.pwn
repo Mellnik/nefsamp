@@ -8505,7 +8505,6 @@ YCMD:bsell(playerid, params[], help)
 	return 1;
 }
 
-
 YCMD:buy(playerid, params[], help)
 {
 	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
@@ -8678,46 +8677,6 @@ YCMD:unlock(playerid, params[], help)
 	}
     return 1;
 }
-/*
-YCMD:open(playerid, params[], help)
-{
-    new bool:found = false;
-	for(new i = 0; i < houseid; i++)
-	{
-	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, HouseData[i][e_x], HouseData[i][e_y], HouseData[i][e_z])) continue;
-	    found = true;
-
-	    if(strcmp(HouseData[i][Owner], __GetName(playerid), true))
-		{
-			SCM(playerid, -1, ""er"You don't own this house!");
-			break;
-		}
-
-	    break;
-	}
-	if(!found) SCM(playerid, -1, ""er"You aren't near of any house");
-	return 1;
-}
-
-YCMD:close(playerid, params[], help)
-{
-    new bool:found = false;
-	for(new i = 0; i < houseid; i++)
-	{
-	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, HouseData[i][e_x], HouseData[i][e_y], HouseData[i][e_z])) continue;
-	    found = true;
-
-	    if(strcmp(HouseData[i][Owner], __GetName(playerid), true))
-		{
-			SCM(playerid, -1, ""er"You don't own this house!");
-			break;
-		}
-
-	    break;
-	}
-	if(!found) SCM(playerid, -1, ""er"You aren't near of any house");
-	return 1;
-}*/
 
 YCMD:lock(playerid, params[], help)
 {
@@ -13665,7 +13624,7 @@ YCMD:race(playerid, params[], help)
         {
             Iter_Clear(RaceJoins);
             g_RaceStatus = RaceStatus_StartUp;
-            g_tRaceCounter = SetTimer("CountTillRace", 1000, true);
+            g_tRaceCounter = SetTimer("race_countdown", 1000, true);
         }
         case RaceStatus_Inactive:
         {
@@ -13691,7 +13650,7 @@ YCMD:race(playerid, params[], help)
 
 			Command_ReProcess(playerid, "/stopanims", false);
 			Iter_Add(RaceJoins, playerid);
-			SetupRaceForPlayer(playerid);
+			race_player_setup(playerid);
 			NewMinigameJoin(playerid, "Race", "race");
 		}
     }
@@ -29580,7 +29539,7 @@ function:race_open()
 	}
 	g_RaceForceMap = 0;
 	
-	PrepareRace();
+	race_prepare();
 	
 	format(gstr, sizeof(gstr), ""race_sign" New race "white"%03i is now active [/race]", g_NextRace);
 	SCMToAll(-1, gstr);
@@ -29590,7 +29549,7 @@ function:race_open()
 	return 1;
 }
 
-PrepareRace()
+race_prepare()
 {
 	new file[16];
 	format(file, sizeof(file), "/Race/%03i.race", g_NextRace);
@@ -29659,7 +29618,7 @@ function:OnRaceDataLoaded()
 	return 1;
 }
 
-SetupRaceForPlayer(playerid)
+race_player_setup(playerid)
 {
     gTeam[playerid] = gRACE;
     
@@ -29710,7 +29669,7 @@ SetupRaceForPlayer(playerid)
 	++g_RaceSpawnCount;
 }
 
-function:CountTillRace()
+function:race_countdown()
 {
 	switch(g_RaceCountDown)
 	{
