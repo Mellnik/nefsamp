@@ -138,7 +138,7 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define RESPAWN_TIME                    (60)
 #define SCM SendClientMessage
 #define SCMToAll SendClientMessageToAll
-#define MAX_TELE_CATEGORYS              (10)
+#define MAX_TELE_CATEGORIES             (10)
 #define CAR_SHOPS                       (3)
 #define RGBA(%1,%2,%3,%4) (((((%1) & 0xff) << 24) | (((%2) & 0xff) << 16) | (((%3) & 0xff) << 8) | ((%4) & 0xff)))
 #define UpperToLower(%1) for(new ToLowerChar; ToLowerChar < strlen(%1); ToLowerChar++) if(%1[ToLowerChar] > 64 && %1[ToLowerChar] < 91) %1[ToLowerChar] += 32
@@ -1711,9 +1711,9 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
 	lotto_number,
 	lotto_jackpot,
 	bool:bLottoActive = false,
-	Teleports[MAX_TELE_CATEGORYS][50][26],
-	Teleport_Index[MAX_TELE_CATEGORYS],
-	TeleportDialogString[MAX_TELE_CATEGORYS][2048],
+	Teleports[MAX_TELE_CATEGORIES][50][26],
+	Teleport_Index[MAX_TELE_CATEGORIES],
+	TeleportDialogString[MAX_TELE_CATEGORIES][2048],
 	SrvStat[4],
 	sPVCategory[512],
 	mathsAnswered = -1,
@@ -2589,7 +2589,6 @@ public OnGameModeInit()
 	LoadBusinesses();
 	SollIchDirMaEtWatSagen();
 
-	// Timer init
 	tReactionTimer = SetTimer("xReactionTest", REAC_TIME, true);
 	g_tRaceOpenSelection = SetTimer("race_open", 40307, false);
 	SetTimer("ProcessTick", 1000, true);
@@ -2610,13 +2609,20 @@ public OnGameModeInit()
 		ChangeVehicleColor(i, (random(128) + 127), (random(128) + 127));
 	}
 	
+	new teleports = 0;
+	for(new i = 0; i < MAX_TELE_CATEGORIES; i++)
+	    teleports += Teleport_Index[i];
+	    
+	Log(LOG_INIT, "Teleports: %i (%i,%i,%i,%i,%i,%i,%i,%i,%i,%i)", teleports,
+		Teleport_Index[0], Teleport_Index[1], Teleport_Index[2], Teleport_Index[3], Teleport_Index[4], Teleport_Index[5], Teleport_Index[6], Teleport_Index[7], Teleport_Index[8], Teleport_Index[9]);
+		
     Log(LOG_INIT, "Server successfully loaded");
 	return 1;
 }
 
 public OnGameModeExit()
 {
-	Log(LOG_EXIT, "Garbage cleanup");
+	Log(LOG_EXIT, "MySQL: Garbage cleanup");
     MySQL_CleanUp();
     
 	mysql_stat(gstr2, pSQL, sizeof(gstr2));
@@ -4061,7 +4067,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		case THREAD_ASSIGN_RANK_2:
 		{
 		    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s's Rank has been assigned to %s", PlayerData[extraid][GangAssignRank], GangPositions[PlayerData[extraid][RankSelected]][E_gang_pos_name]);
-			GangMSG(PlayerData[extraid][e_gangid], gstr);
+			gang_broadcast(PlayerData[extraid][e_gangid], gstr);
 
 			PlayerData[extraid][RankSelected] = 0;
 			PlayerData[extraid][GangAssignRank][0] = '\0';
@@ -4091,7 +4097,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		case THREAD_KICK_FROM_GANG_2:
 		{
 		    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s has kicked %s from the gang.", __GetName(extraid), PlayerData[extraid][GangKickMem]);
-			GangMSG(PlayerData[extraid][e_gangid], gstr);
+			gang_broadcast(PlayerData[extraid][e_gangid], gstr);
 
             PlayerData[extraid][GangKickMem][0] = '\0';
 		}
@@ -4274,7 +4280,7 @@ public OnPlayerText(playerid, text[])
 	if(IsAd(text))
 	{
 	  	format(gstr2, sizeof(gstr2), ""yellow"** "red"Suspicion advertising | Player: %s(%i) Advertised IP: %s - PlayerIP: %s", __GetName(playerid), playerid, text, __GetIP(playerid));
-		AdminMSG(RED, gstr2);
+		admin_broadcast(RED, gstr2);
 
         SCM(playerid, RED, "Advertising is not allowed!");
         return 0;
@@ -4324,13 +4330,13 @@ public OnPlayerText(playerid, text[])
 	if(PlayerData[playerid][e_level] >= 1 && PlayerData[playerid][bDuty] && text[0] == '#')
 	{
 	    format(gstr, sizeof(gstr), "[ADMIN CHAT] "LG_E"%s(%i): "LB_E"%s", __GetName(playerid), playerid, text[1]);
-		AdminMSG(COLOR_RED, gstr);
+		admin_broadcast(COLOR_RED, gstr);
 	    return 0;
 	}
 	if(text[0] == '#' && PlayerData[playerid][e_level] >= 1)
 	{
 		format(gstr, sizeof(gstr), "[ADMIN CHAT] "LG_E"%s(%i): "LB_E"%s", __GetName(playerid), playerid, text[1]);
-		AdminMSG(COLOR_RED, gstr);
+		admin_broadcast(COLOR_RED, gstr);
 		return 0;
 	}
 	if(text[0] == '@')
@@ -4344,10 +4350,10 @@ public OnPlayerText(playerid, text[])
 	if(text[0] == '!' && PlayerData[playerid][e_gangrank] != 0)
 	{
 	    format(gstr, sizeof(gstr), ""gang_sign" {%06x}%s(%i)"r_besch": %s", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, text[1]);
-		GangMSG(PlayerData[playerid][e_gangid], gstr);
+		gang_broadcast(PlayerData[playerid][e_gangid], gstr);
 		
 		format(gstr, sizeof(gstr), "[GC] %s(%i): %s", __GetName(playerid), playerid, text[1]);
-		AdminMSG(GREY, gstr, false, true);
+		admin_broadcast(GREY, gstr, false, true);
 		return 0;
 	}
 
@@ -4467,7 +4473,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 		    if(++PlayerData[playerid][iDeathCountThreshold] == 4)
 		    {
 			    format(gstr, sizeof(gstr), "[SUSPECT] Fake deaths/kills detected, kicking (%s, %i)", __GetName(playerid), playerid);
-			    AdminMSG(RED, gstr);
+			    admin_broadcast(RED, gstr);
 			    Log(LOG_NET, gstr);
 				return Kick(playerid);
 		    }
@@ -4732,7 +4738,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 				else
 				{
 					GivePlayerScoreEx(killerid, 1, true, true);
-					GivePlayerMoneyEx(killerid, 1100, true, true);
+					GivePlayerMoneyEx(killerid, 1250, true, true);
 				}
 
 				if(PlayerData[playerid][e_wanteds] >= 3)
@@ -4758,7 +4764,7 @@ public OnPlayerDeath(playerid, killerid, reason)
      		--g_RacePlayerCount;
 
 	    	format(gstr, sizeof(gstr), "%s(%i) has died!", __GetName(playerid), playerid);
-			RaceMSG(gstr);
+			race_broadcast(gstr);
 
 			gTeam[playerid] = FREEROAM;
 
@@ -4796,7 +4802,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 		    if(IsDerbyRunning && PlayerData[playerid][bDerbyWinner])
 		    {
 		    	format(gstr, sizeof(gstr), "%s's vehicle has been destroyed!", __GetName(playerid));
-				DerbyMSG(gstr);
+				derby_broadcast(gstr);
 
 		    	DerbyPlayers--;
 		    	PlayerData[playerid][bDerbyWinner] = false;
@@ -4821,7 +4827,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 		case FALLOUT:
 		{
 			format(gstr, sizeof(gstr), "%s(%i) died!", __GetName(playerid), playerid);
-			fallout_msg(gstr);
+			fallout_broadcast(gstr);
 
 		    TogglePlayerControllable(playerid, true);
 		    HidePlayerFalloutTextdraws(playerid);
@@ -4845,7 +4851,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 					    RandomWeapons(i);
 					    HidePlayerFalloutTextdraws(i);
 					    ResetPlayerWorld(i);
-					    fallout_msg("Fallout has been canceled!");
+					    fallout_broadcast("Fallout has been canceled!");
 					    
 						gTeam[i] = FREEROAM;
 				    }
@@ -5730,7 +5736,7 @@ public OnPlayerEnterRaceCheckpoint(playerid)
 			else if(TotalRaceTime < 40000) // Do not save cheaters time
 			{
 			  	format(gstr2, sizeof(gstr2), ""yellow"** "red"Suspect player completed race in %i seconds | Player: %s(%i) | Race", floatround(TotalRaceTime / 1000), __GetName(playerid), playerid);
-				AdminMSG(RED, gstr2);
+				admin_broadcast(RED, gstr2);
 				print(gstr2);
 			}
 
@@ -6340,7 +6346,7 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 			if((++PlayerData[playerid][VehicleSpamViolation]) >= 3 && !PlayerData[playerid][bOpenSeason])
 			{
 		        format(gstr, sizeof(gstr), "[SUSPECT] %i vehicle spam hack detected, kicking (%s, %i)", PlayerData[playerid][VehicleSpamViolation], __GetName(playerid), playerid);
-		        AdminMSG(RED, gstr);
+		        admin_broadcast(RED, gstr);
 		        Log(LOG_NET, gstr);
 		        
 			    Kick(playerid);
@@ -7626,7 +7632,7 @@ YCMD:fallout(playerid, params[], help)
 		gTeam[playerid] = FALLOUT;
 		
 		format(gstr, sizeof(gstr), "%s(%i) joined Fallout!", __GetName(playerid), playerid);
-		fallout_msg(gstr);
+		fallout_broadcast(gstr);
 		fallout_setplayer(playerid);
 		
         NewMinigameJoin(playerid, "Fallout", "fallout");
@@ -9485,7 +9491,7 @@ YCMD:akill(playerid, params[], help)
 			SetPlayerHealth(player, 0.0);
 			
 			format(gstr, sizeof(gstr), ""red"Adm: %s(%i) killed %s(%i)", __GetName(playerid), playerid, __GetName(player), player);
-			AdminMSG(-1, gstr);
+			admin_broadcast(-1, gstr);
 			print(gstr);
 		}
 		else
@@ -9581,7 +9587,7 @@ YCMD:setbcash(playerid, params[], help)
 			}
 			
 			format(gstr, sizeof(gstr), ""red"Adm: %s(%i) has been given bank $%i by %s(%i)", __GetName(player), player, amount, __GetName(playerid), playerid);
-			AdminMSG(-1, gstr);
+			admin_broadcast(-1, gstr);
 			print(gstr);
 			
 			PlayerData[player][e_bank] = amount;
@@ -9631,7 +9637,7 @@ YCMD:grantnc(playerid, params[], help)
 			}
 
 			format(gstr, sizeof(gstr), ""red"Adm: %s's(%i) has reset %s's NC cooldown", __GetName(playerid), playerid, __GetName(player));
-			AdminMSG(-1, gstr);
+			admin_broadcast(-1, gstr);
 			print(gstr);
 		}
 		else
@@ -9754,7 +9760,7 @@ YCMD:setcash(playerid, params[], help)
 			}
 			
 			format(gstr, sizeof(gstr), ""red"Adm: %s's(%i) cash has been set to $%i by %s(%i)", __GetName(player), player, amount, __GetName(playerid), playerid);
-			AdminMSG(-1, gstr);
+			admin_broadcast(-1, gstr);
 			print(gstr);
 			
 			SetPlayerMoneyEx(player, amount);
@@ -9808,7 +9814,7 @@ YCMD:addscore(playerid, params[], help)
 			}
 
 			format(gstr, sizeof(gstr), ""red"Adm: %s(%i) has been given %i score by %s(%i)", __GetName(player), player, amount, __GetName(playerid), playerid);
-			AdminMSG(-1, gstr);
+			admin_broadcast(-1, gstr);
 			print(gstr);
 
 			GivePlayerScoreEx(player, amount);
@@ -9862,7 +9868,7 @@ YCMD:addcash(playerid, params[], help)
 			}
 
 			format(gstr, sizeof(gstr), ""red"Adm: %s(%i) has been given $%s by %s(%i)", __GetName(player), player, number_format(amount), __GetName(playerid), playerid);
-			AdminMSG(-1, gstr);
+			admin_broadcast(-1, gstr);
 			print(gstr);
 
 			GivePlayerMoneyEx(player, amount);
@@ -9916,7 +9922,7 @@ YCMD:setscore(playerid, params[], help)
 			}
 			
 			format(gstr, sizeof(gstr), ""red"Adm: %s(%i) has set %s(%i) score to %i", __GetName(playerid), playerid, __GetName(player), player, amount);
-			AdminMSG(-1, gstr);
+			admin_broadcast(-1, gstr);
 			print(gstr);
 			
 			SetPlayerScoreEx(player, amount);
@@ -10102,7 +10108,7 @@ YCMD:burn(playerid, params[], help)
 			format(gstr, sizeof(gstr), "You have burnt %s(%i)", __GetName(otherid), otherid);
 			SCM(playerid, BLUE, gstr);
 			format(gstr, sizeof(gstr), ""red"Adm: %s(%i) has been burnt by %s(%i)", __GetName(otherid), otherid, __GetName(playerid), playerid);
-			AdminMSG(-1, gstr);
+			admin_broadcast(-1, gstr);
 			print(gstr);
 	    }
 		else
@@ -11400,7 +11406,7 @@ YCMD:gcapture(playerid, params[], help)
 		{
 		    // Reset zone
 		    format(gstr, sizeof(gstr), ""gang_sign" "r_besch" Your gang failed to capture '%s'. %s(%i) re-captured it!", GZoneData[i][e_zonename], __GetName(playerid), playerid);
-			GangMSG(GZoneData[i][e_attacker], gstr);
+			gang_broadcast(GZoneData[i][e_attacker], gstr);
 
 			format(gstr, sizeof(gstr), ""orange"Gang %s failed to capture '%s'. Zone remains %s territory and will be locked for 30 minutes!", GetGangNameByID(GZoneData[i][e_attacker]), GZoneData[i][e_zonename], GetGangNameByID(GZoneData[i][e_defender]));
 			SCMToAll(-1, gstr);
@@ -11422,7 +11428,7 @@ YCMD:gcapture(playerid, params[], help)
 			}
 
 			format(gstr, sizeof(gstr), ""gang_sign" "r_besch" %s %s(%i) re-captured zone '%s' which was under attack.", GangPositions[PlayerData[playerid][e_gangrank]][E_gang_pos_name], __GetName(playerid), playerid, GZoneData[i][e_zonename]);
-			GangMSG(GZoneData[i][e_defender], gstr);
+			gang_broadcast(GZoneData[i][e_defender], gstr);
 
 			MySQL_UpdateGangScore(GZoneData[i][e_localgang], 5);
 
@@ -11565,7 +11571,7 @@ YCMD:gwar(playerid, params[], help)
 			else
                 format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s(%i) is capturing the zone: '%s' %i members have been tied!", __GetName(playerid), playerid, GZoneData[i][e_zonename], count);
                 
-			GangMSG(PlayerData[playerid][e_gangid], gstr);
+			gang_broadcast(PlayerData[playerid][e_gangid], gstr);
 			
 			format(gstr, sizeof(gstr), ""orange"%s(%i) has started capturing the zone '%s' with %i gang member(s)!", __GetName(playerid), playerid, GZoneData[i][e_zonename], count);
 			SCMToAll(-1, gstr);
@@ -11607,10 +11613,10 @@ YCMD:gwar(playerid, params[], help)
 			else
 			    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s(%i) is capturing the zone: '%s' %i members have been tied!", __GetName(playerid), playerid, GZoneData[i][e_zonename], count);
 			    
-			GangMSG(PlayerData[playerid][e_gangid], gstr);
+			gang_broadcast(PlayerData[playerid][e_gangid], gstr);
 
 		    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"Gang %s started a war against your gang at %s!", GetGangNameByID(PlayerData[playerid][e_gangid]), GZoneData[i][e_zonename]);
-			GangMSG(GZoneData[i][e_localgang], gstr);
+			gang_broadcast(GZoneData[i][e_localgang], gstr);
 
 			format(gstr, sizeof(gstr), ""orange"%s(%i) has started capturing the zone '%s' with %i gang member(s)!", __GetName(playerid), playerid, GZoneData[i][e_zonename], count);
 			SCMToAll(-1, gstr);
@@ -11754,7 +11760,7 @@ YCMD:gjoin(playerid, params[], help)
     MySQL_SaveAccount(playerid, false, false);
 
 	format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s(%i) has joined the gang!", __GetName(playerid), playerid);
-	GangMSG(PlayerData[playerid][e_gangid], gstr);
+	gang_broadcast(PlayerData[playerid][e_gangid], gstr);
 
 	format(gstr, sizeof(gstr), ""gang_sign" "r_besch"You joined the gang "yellow"%s"white"!", PlayerData[playerid][GangName]);
 	SCM(playerid, -1, gstr);
@@ -11791,7 +11797,7 @@ YCMD:gleave(playerid, params[], help)
     if(PlayerData[playerid][e_gangrank] == GANG_POS_FOUNDER) return SCM(playerid, -1, ""er"You can't leave a gang as Founder");
 		
 	format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s(%i) has left the gang", __GetName(playerid), playerid);
-    GangMSG(PlayerData[playerid][e_gangid], gstr);
+    gang_broadcast(PlayerData[playerid][e_gangid], gstr);
     SCM(playerid, -1, ""gang_sign" You've left your gang!");
 
     PlayerData[playerid][e_gangid] = 0;
@@ -11865,7 +11871,7 @@ YCMD:gcolor(playerid, params[], help)
 		mysql_tquery(pSQL, gstr, "", "");
 
 	    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s set the gang color to {%06x}NEW COLOR", __GetName(playerid), col >>> 8);
-		GangMSG(PlayerData[playerid][e_gangid], gstr);
+		gang_broadcast(PlayerData[playerid][e_gangid], gstr);
 	}
 	return 1;
 }
@@ -11941,7 +11947,7 @@ YCMD:gcar(playerid, params[], help)
 				mysql_pquery(pSQL, gstr, "", "");
 
 			    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s set the gang vehicle to %s", __GetName(playerid), VehicleNames[gcar - 400]);
-				GangMSG(PlayerData[playerid][e_gangid], gstr);
+				gang_broadcast(PlayerData[playerid][e_gangid], gstr);
 			}
 		}
 	}
@@ -12072,7 +12078,7 @@ YCMD:tban(playerid, params[], help)
 				format(amsg, sizeof(amsg), "[ADMIN CHAT] "LG_E"Account banned of %s [EXPIRES: %s, REASON: %s]", __GetName(player), UTConvert(gettime() + (time * 60)), reason);
 
 				SCMToAll(-1, gstr);
-                AdminMSG(COLOR_RED, amsg);
+                admin_broadcast(COLOR_RED, amsg);
 				print(gstr);
 				print(amsg);
 
@@ -12169,7 +12175,7 @@ YCMD:ban(playerid, params[], help)
 				}
 
 				SCMToAll(-1, gstr);
-                AdminMSG(COLOR_RED, amsg);
+                admin_broadcast(COLOR_RED, amsg);
 				print(gstr);
 				print(amsg);
 
@@ -12286,7 +12292,7 @@ YCMD:raceforcemap(playerid, params[], help)
 		g_RaceForceMap = map;
 		
 		format(gstr, sizeof(gstr), ""red"Adm: %s(%i) forced next race map to %03i", __GetName(playerid), playerid, map);
-		AdminMSG(-1, gstr);
+		admin_broadcast(-1, gstr);
 		print(gstr);
   	}
 	else
@@ -12593,7 +12599,7 @@ YCMD:slap(playerid, params[], help)
 			format(gstr, sizeof(gstr), "You have slapped %s(%i)", __GetName(player), player);
 			SCM(playerid, BLUE, gstr);
 			format(gstr, sizeof(gstr), ""red"Adm: %s(%i) has been slapped by %s(%i)", __GetName(player), player, __GetName(playerid), playerid);
-			AdminMSG(-1, gstr);
+			admin_broadcast(-1, gstr);
 			print(gstr);
 		}
 		else
@@ -12695,7 +12701,7 @@ YCMD:readrules(playerid, params[], help)
 			print(gstr);
 
 			format(gstr, sizeof(gstr), ""red"Adm: %s(%i) has been forced to read the rules by admin %s(%i)", __GetName(player), player, __GetName(playerid), playerid);
-			AdminMSG(-1, gstr);
+			admin_broadcast(-1, gstr);
 		}
 		else
 		{
@@ -12974,7 +12980,7 @@ YCMD:vips(playerid, params[], help)
 	}
 
     format(gstr2, sizeof(gstr2), "[ADMIN CHAT] "LG_E"%s(%i): "LB_E"%s", __GetName(playerid), playerid, gstr);
-	AdminMSG(COLOR_RED, gstr2);
+	admin_broadcast(COLOR_RED, gstr2);
 	return 1;
 }*/
 
@@ -12990,7 +12996,7 @@ YCMD:p(playerid, params[], help)
 	if(IsAd(gstr))
 	{
 	  	format(gstr2, sizeof(gstr2), ""yellow"** "red"Suspicion advertising | Player: %s(%i) Advertised IP: %s - PlayerIP: %s", __GetName(playerid), playerid, gstr, __GetIP(playerid));
-		AdminMSG(RED, gstr2);
+		admin_broadcast(RED, gstr2);
 
         SCM(playerid, RED, "Advertising is not allowed!");
         return 1;
@@ -13002,7 +13008,7 @@ YCMD:p(playerid, params[], help)
 	}
 
 	format(gstr, sizeof(gstr), ""white"["lb_e"VIP CHAT"white"] {%06x}%s"lb_e"(%i): %s", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, gstr);
-	VIPMSG(-1, gstr);
+	vip_broadcast(-1, gstr);
 	return 1;
 }
 
@@ -13548,10 +13554,10 @@ YCMD:report(playerid, params[], help)
 		}
 		Reports[MAX_REPORTS - 1] = gstr;
 
-        if(AdminMSG(COLOR_RED, gstr, true) == 0)
+        if(admin_broadcast(COLOR_RED, gstr, true) == 0)
         {
 			format(gstr, sizeof(gstr), ""white"["lb_e"VIP CHAT"white"] "YELLOW_E"Report(%02i:%02i:%02i) "RED_E"%s(%i) -> %s(%i) -> %s", time[0], time[1], time[2], __GetName(playerid), playerid, __GetName(player), player, reason);
-			VIPMSG(-1, gstr);
+			vip_broadcast(-1, gstr);
         }
 
 		SCM(playerid, YELLOW, "Your report has been sent to online Administrators");
@@ -15073,7 +15079,7 @@ YCMD:freeze(playerid, params[], help)
 			PlayerData[player][bFrozen] = true;
 			
 			format(gstr, sizeof(gstr), ""red"Adm: %s(%i) has been frozen by %s(%i)", __GetName(player), player, __GetName(playerid), playerid);
-			AdminMSG(-1, gstr);
+			admin_broadcast(-1, gstr);
 			print(gstr);
  		}
 		else
@@ -16084,7 +16090,7 @@ YCMD:tpm(playerid, params[], help)
 	if(IsAd(params))
 	{
 	  	format(gstr, sizeof(gstr), ""yellow"** "red"Suspicion advertising | Player: %s(%i) Advertised IP: %s - PlayerIP: %s", __GetName(playerid), playerid, params, __GetIP(playerid));
-		AdminMSG(RED, gstr);
+		admin_broadcast(RED, gstr);
 
         SCM(playerid, RED, "Advertising is not allowed!");
         return 1;
@@ -16163,7 +16169,7 @@ YCMD:givecash(playerid, params[], help)
         SCM(player, YELLOW, gstr);
         SCM(playerid, YELLOW, "Successfully paid the money!");
 		format(gstr, sizeof(gstr), ""red"Adm: %s(%i) paid $%s to %s reason: %s", __GetName(playerid), playerid, number_format(cash), __GetName(player), reason);
-		AdminMSG(-1, gstr);
+		admin_broadcast(-1, gstr);
 		print(gstr);
     }
     else
@@ -16202,7 +16208,7 @@ YCMD:pm(playerid, params[], help)
 	if(IsAd(msg))
 	{
 	  	format(gstr, sizeof(gstr), ""yellow"** "red"Suspicion advertising | Player: %s(%i) Advertised IP: %s - PlayerIP: %s", __GetName(playerid), playerid, msg, __GetIP(playerid));
-		AdminMSG(RED, gstr);
+		admin_broadcast(RED, gstr);
 
         SCM(playerid, RED, "Advertising is not allowed!");
         return 1;
@@ -16251,7 +16257,7 @@ YCMD:pm(playerid, params[], help)
 	}
 
 	format(gstr, sizeof(gstr), "[PM] from %s(%i) to %s(%i): %s", __GetName(playerid), playerid, __GetName(player), player, msg);
-	AdminMSG(GREY, gstr);
+	admin_broadcast(GREY, gstr);
 	return 1;
 }
 
@@ -16270,7 +16276,7 @@ YCMD:r(playerid, params[], help)
 	if(IsAd(msg))
 	{
 	  	format(gstr, sizeof(gstr), ""yellow"** "red"Suspicion advertising | Player: %s(%i) Advertised IP: %s - PlayerIP: %s", __GetName(playerid), playerid, msg, __GetIP(playerid));
-		AdminMSG(RED, gstr);
+		admin_broadcast(RED, gstr);
 
         SCM(playerid, RED, "Advertising is not allowed!");
         return 1;
@@ -16316,7 +16322,7 @@ YCMD:r(playerid, params[], help)
 	}
 
 	format(gstr, sizeof(gstr), ""grey"[PM] from %s(%i) to %s(%i): %s", __GetName(playerid), playerid, __GetName(lID), lID, msg);
-	AdminMSG(GREY, gstr);
+	admin_broadcast(GREY, gstr);
 	return 1;
 }
 
@@ -18294,7 +18300,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				if(IsAd(text))
 				{
 				  	format(gstr, sizeof(gstr), ""yellow"** "red"Suspicion advertising | Player: %s(%i) Advertised IP: %s - PlayerIP: %s", __GetName(playerid), playerid, text, __GetIP(playerid));
-					AdminMSG(RED, gstr);
+					admin_broadcast(RED, gstr);
 
 			        SCM(playerid, RED, "Advertising is not allowed!");
 			        return 1;
@@ -18320,7 +18326,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				if(IsAd(text))
 				{
 				  	format(gstr, sizeof(gstr), ""yellow"** "red"Suspicion advertising | Player: %s(%i) Advertised IP: %s - PlayerIP: %s", __GetName(playerid), playerid, text, __GetIP(playerid));
-					AdminMSG(RED, gstr);
+					admin_broadcast(RED, gstr);
 
 			        SCM(playerid, RED, "Advertising is not allowed!");
 			        return 1;
@@ -18460,7 +18466,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		  			MySQL_SaveAccount(ID, false, false);
 
 				    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s set %s's rank to %s", __GetName(playerid), __GetName(ID), GangPositions[PlayerData[playerid][RankSelected]][E_gang_pos_name]);
-					GangMSG(PlayerData[playerid][e_gangid], gstr);
+					gang_broadcast(PlayerData[playerid][e_gangid], gstr);
 					
 					PlayerData[playerid][RankSelected] = 0;
 				}
@@ -18475,7 +18481,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				format(gstr, sizeof(gstr), "UPDATE `accounts` SET `gangrank` = 0, `gangid` = 0 WHERE `gangid` = %i;", PlayerData[playerid][e_gangid]);
 				mysql_tquery(pSQL, gstr);
 
-				GangMSG(PlayerData[playerid][e_gangid], ""gang_sign" "r_besch"The gang has been closed by it's Leader");
+				gang_broadcast(PlayerData[playerid][e_gangid], ""gang_sign" "r_besch"The gang has been closed by it's Leader");
 
 				for(new i = 0; i < gzoneid; i++)
 				{
@@ -18573,7 +18579,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					}
 					
 				    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s kicked %s out of the gang", __GetName(playerid), PlayerData[playerid][GangKickMem]);
-					GangMSG(PlayerData[playerid][e_gangid], gstr);
+					gang_broadcast(PlayerData[playerid][e_gangid], gstr);
 
 			        SCM(ID, -1, ""gang_sign" You have been kicked out of your gang!");
 			        
@@ -19138,55 +19144,55 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						{
 						    format(gstr, sizeof(gstr), "%s(%i) has voted for Map 'SilverGround'", __GetName(playerid), playerid);
 							DerbyMapVotes[6]++;
-							DerbyMSG(gstr);
+							derby_broadcast(gstr);
 						}
 						case 1:
 						{
 						    format(gstr, sizeof(gstr), "%s(%i) has voted for Map 'Anubis'", __GetName(playerid), playerid);
 							DerbyMapVotes[7]++;
-							DerbyMSG(gstr);
+							derby_broadcast(gstr);
 						}
 						case 2:
 						{
 						    format(gstr, sizeof(gstr), "%s(%i) has voted for Map 'Confusing'", __GetName(playerid), playerid);
 							DerbyMapVotes[8]++;
-							DerbyMSG(gstr);
+							derby_broadcast(gstr);
 						}
 				        case 3:
 						{
 						    format(gstr, sizeof(gstr), "%s(%i) has voted for Map 'Lighthouse'", __GetName(playerid), playerid);
 							DerbyMapVotes[0]++;
-							DerbyMSG(gstr);
+							derby_broadcast(gstr);
 						}
 						case 4:
 						{
 						    format(gstr, sizeof(gstr), "%s(%i) has voted for Map 'Truncat'", __GetName(playerid), playerid);
 							DerbyMapVotes[1]++;
-							DerbyMSG(gstr);
+							derby_broadcast(gstr);
 						}
 						case 5:
 						{
 						    format(gstr, sizeof(gstr), "%s(%i) has voted for Map 'Sky Skiing'", __GetName(playerid), playerid);
 							DerbyMapVotes[2]++;
-							DerbyMSG(gstr);
+							derby_broadcast(gstr);
 						}
 						case 6:
 						{
 						    format(gstr, sizeof(gstr), "%s(%i) has voted for Map 'Townhall'", __GetName(playerid), playerid);
 							DerbyMapVotes[3]++;
-							DerbyMSG(gstr);
+							derby_broadcast(gstr);
 						}
 						case 7:
 						{
 						    format(gstr, sizeof(gstr), "%s(%i) has voted for Map 'Glazz'", __GetName(playerid), playerid);
 							DerbyMapVotes[4]++;
-							DerbyMSG(gstr);
+							derby_broadcast(gstr);
 						}
 						case 8:
 						{
 						    format(gstr, sizeof(gstr), "%s(%i) has voted for Map 'Rambo'", __GetName(playerid), playerid);
 							DerbyMapVotes[5]++;
-							DerbyMSG(gstr);
+							derby_broadcast(gstr);
 						}
 					}
 				}
@@ -20107,37 +20113,37 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						case 0:
 						{
 						   	format(gstr, sizeof(gstr), "%s(%i) voted for map 'Forest'", __GetName(playerid), playerid);
-							BGMSG(gstr);
+							tdm_broadcast(gstr);
 							BGMapVotes[0]++;
 						}
 						case 1:
 						{
 						   	format(gstr, sizeof(gstr), "%s(%i) voted for map 'Quarters'", __GetName(playerid), playerid);
-							BGMSG(gstr);
+							tdm_broadcast(gstr);
 						   	BGMapVotes[1]++;
 						}
 						case 2:
 						{
 						   	format(gstr, sizeof(gstr), "%s(%i) voted for map 'Rust'", __GetName(playerid), playerid);
-							BGMSG(gstr);
+							tdm_broadcast(gstr);
 						   	BGMapVotes[2]++;
 						}
 						case 3:
 						{
 						   	format(gstr, sizeof(gstr), "%s(%i) voted for map 'Italy'", __GetName(playerid), playerid);
-							BGMSG(gstr);
+							tdm_broadcast(gstr);
 						   	BGMapVotes[3]++;
 						}
 						case 4:
 						{
 						   	format(gstr, sizeof(gstr), "%s(%i) voted for map 'Medieval'", __GetName(playerid), playerid);
-							BGMSG(gstr);
+							tdm_broadcast(gstr);
 						   	BGMapVotes[4]++;
 						}
 						case 5:
 						{
 						   	format(gstr, sizeof(gstr), "%s(%i) voted for map 'Hangar War'", __GetName(playerid), playerid);
-							BGMSG(gstr);
+							tdm_broadcast(gstr);
 						   	BGMapVotes[5]++;
 						}
 					}
@@ -20730,7 +20736,7 @@ function:BGVoting()
 
 	if(iTotalVotes == 0)
 	{
-	    BGMSG("There were no votes! New Voting starting");
+	    tdm_broadcast("There were no votes! New Voting starting");
 	    ExecBGVotingTimer();
 		ClearBGVotes();
 		for(new i = 0; i < MAX_PLAYERS; i++)
@@ -20765,7 +20771,7 @@ function:BGVoting()
 
 	if(draw >= 1)
 	{
-	    BGMSG("Voting was not clear! New Voting starting!");
+	    tdm_broadcast("Voting was not clear! New Voting starting!");
 	    ExecBGVotingTimer();
 		ClearBGVotes();
 		for(new i = 0; i < MAX_PLAYERS; i++)
@@ -20780,7 +20786,7 @@ function:BGVoting()
 
 	if(highestmapvotes == BGMapVotes[0])
 	{
-	    BGMSG("Map 'Forest' won! Let's start!");
+	    tdm_broadcast("Map 'Forest' won! Let's start!");
 		CurrentBGMap = BG_MAP1;
 		ClearBGVotes();
 		ExecBGTimer();
@@ -20833,7 +20839,7 @@ function:BGVoting()
 	}
 	else if(highestmapvotes == BGMapVotes[1])
 	{
-	    BGMSG("Map 'Quaters' won! Let's start!");
+	    tdm_broadcast("Map 'Quaters' won! Let's start!");
 	    CurrentBGMap = BG_MAP2;
 	    ClearBGVotes();
 	    ExecBGTimer();
@@ -20886,7 +20892,7 @@ function:BGVoting()
 	}
 	else if(highestmapvotes == BGMapVotes[2])
 	{
-	    BGMSG("Map 'Rust' won! Let's start!");
+	    tdm_broadcast("Map 'Rust' won! Let's start!");
 	    CurrentBGMap = BG_MAP3;
 	    ClearBGVotes();
 	    ExecBGTimer();
@@ -20939,7 +20945,7 @@ function:BGVoting()
 	}
 	else if(highestmapvotes == BGMapVotes[3])
 	{
-	    BGMSG("Map 'Italy' won! Let's start!");
+	    tdm_broadcast("Map 'Italy' won! Let's start!");
 	    CurrentBGMap = BG_MAP4;
 	    ClearBGVotes();
 	    ExecBGTimer();
@@ -20992,7 +20998,7 @@ function:BGVoting()
 	}
 	else if(highestmapvotes == BGMapVotes[4])
 	{
-	    BGMSG("Map 'Medieval' won! Let's start!");
+	    tdm_broadcast("Map 'Medieval' won! Let's start!");
 	    CurrentBGMap = BG_MAP5;
 	    ClearBGVotes();
 	    ExecBGTimer();
@@ -21045,7 +21051,7 @@ function:BGVoting()
 	}
 	else if(highestmapvotes == BGMapVotes[5])
 	{
-	    BGMSG("Map 'Hangar War' won! Let's start!");
+	    tdm_broadcast("Map 'Hangar War' won! Let's start!");
 	    CurrentBGMap = BG_MAP6;
 	    ClearBGVotes();
 	    ExecBGTimer();
@@ -21130,16 +21136,16 @@ function:BattleGround()
 	if(BGTeam1Kills == BGTeam2Kills)
 	{
 	    format(gstr, sizeof(gstr), "Standoff! Rangers kills: %i Spetsnaz kills: %i", BGTeam1Kills, BGTeam2Kills);
-		BGMSG(gstr);
-		BGMSG("New Voting starting!");
+		tdm_broadcast(gstr);
+		tdm_broadcast("New Voting starting!");
 		BGTeam1Kills = 0;
 		BGTeam2Kills = 0;
 	}
 	else if(BGTeam1Kills > BGTeam2Kills)
 	{
 	    format(gstr, sizeof(gstr), "Rangers won! Rangers kills: %i Spetsnaz kills: %i", BGTeam1Kills, BGTeam2Kills);
-		BGMSG(gstr);
-		BGMSG("New Voting starting!");
+		tdm_broadcast(gstr);
+		tdm_broadcast("New Voting starting!");
 		BGTeam1Kills = 0;
 		BGTeam2Kills = 0;
 
@@ -21158,8 +21164,8 @@ function:BattleGround()
 	else if(BGTeam1Kills < BGTeam2Kills)
 	{
 	    format(gstr, sizeof(gstr), "Spetsnaz won! Rangers kills: %i Spetsnaz kills: %i", BGTeam1Kills, BGTeam2Kills);
-		BGMSG(gstr);
-		BGMSG("New Voting starting!");
+		tdm_broadcast(gstr);
+		tdm_broadcast("New Voting starting!");
 		BGTeam1Kills = 0;
 		BGTeam2Kills = 0;
 
@@ -21420,10 +21426,10 @@ CarSpawner(playerid, model, respawn_delay = -1, bool:spawnzone_check = true)
 }
 
 // --
-// -- Messages
+// -- Channel broadcasts
 // --
 
-fallout_msg(const string[])
+fallout_broadcast(const string[])
 {
 	format(gstr, sizeof(gstr), ""fallout_sign" %s", string);
 
@@ -21436,7 +21442,7 @@ fallout_msg(const string[])
 	}
 }
 
-DerbyMSG(const string[])
+derby_broadcast(const string[])
 {
 	format(gstr, sizeof(gstr), ""derby_sign" %s", string);
 
@@ -21449,7 +21455,7 @@ DerbyMSG(const string[])
 	}
 }
 
-BGMSG(const string[])
+tdm_broadcast(const string[])
 {
 	format(gstr, sizeof(gstr), ""tdm_sign" %s", string);
 
@@ -21462,7 +21468,7 @@ BGMSG(const string[])
 	}
 }
 
-RaceMSG(const string[])
+race_broadcast(const string[])
 {
 	format(gstr, sizeof(gstr), ""race_sign" %s", string);
 
@@ -21475,13 +21481,13 @@ RaceMSG(const string[])
 	}
 }
 
-GangMSG(gGangID, const string[])
+gang_broadcast(gangid, const string[])
 {
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(IsPlayerAvail(i))
 	    {
-			if(PlayerData[i][e_gangid] == gGangID && PlayerData[i][e_gangrank] != GANG_POS_NONE)
+			if(PlayerData[i][e_gangid] == gangid && PlayerData[i][e_gangrank] != GANG_POS_NONE)
 			{
 				SCM(i, RED, string);
 			}
@@ -21489,7 +21495,7 @@ GangMSG(gGangID, const string[])
 	}
 }
 
-AdminMSG(color, const string[], bool:beep = false, bool:gc = false)
+admin_broadcast(color, const string[], bool:beep = false, bool:gc = false)
 {
 	new count = 0;
 	for(new i = 0; i < MAX_PLAYERS; i++)
@@ -21506,7 +21512,7 @@ AdminMSG(color, const string[], bool:beep = false, bool:gc = false)
 	return count;
 }
 
-VIPMSG(color, const msg[])
+vip_broadcast(color, const msg[])
 {
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -21517,16 +21523,16 @@ VIPMSG(color, const msg[])
 	}
 }
 
-MySQL_FetchGangInfo(playerid, gGangID)
+MySQL_FetchGangInfo(playerid, gangid)
 {
-	format(gstr, sizeof(gstr), "SELECT * FROM `gangs` WHERE `ID` = %i LIMIT 1;", gGangID);
+	format(gstr, sizeof(gstr), "SELECT * FROM `gangs` WHERE `ID` = %i LIMIT 1;", gangid);
 	mysql_tquery(pSQL, gstr, "OnQueryFinish", "siii", gstr, THREAD_FETCH_GANG_INFO, playerid, pSQL);
 }
 
-MySQL_UpdateGangScore(gGangID, value)
+MySQL_UpdateGangScore(gangid, value)
 {
-	format(gstr2, sizeof(gstr2), "UPDATE `gangs` SET `GangScore` = `GangScore` + %i, `Top` = `Top` + %i WHERE `ID` = %i LIMIT 1;", value, value, gGangID);
-	mysql_tquery(pSQL, gstr2, "", "");
+	format(gstr2, sizeof(gstr2), "UPDATE `gangs` SET `GangScore` = `GangScore` + %i, `Top` = `Top` + %i WHERE `ID` = %i LIMIT 1;", value, value, gangid);
+	mysql_pquery(pSQL, gstr2);
 }
 
 MySQL_LoadAccount(playerid)
@@ -21661,9 +21667,9 @@ MySQL_UpdatePlayerPass(playerid, const hash[])
  	mysql_pquery(pSQL, gstr2);
 }
 
-MySQL_FetchGangMemberNames(playerid, gGangID)
+MySQL_FetchGangMemberNames(playerid, gangid)
 {
-	format(gstr, sizeof(gstr), "SELECT `name`, `gangrank` FROM `accounts` WHERE `gangid` = %i ORDER BY `gangrank` DESC;", gGangID);
+	format(gstr, sizeof(gstr), "SELECT `name`, `gangrank` FROM `accounts` WHERE `gangid` = %i ORDER BY `gangrank` DESC;", gangid);
 	mysql_tquery(pSQL, gstr, "OnQueryFinish", "siii", gstr, THREAD_FETCH_GANG_MEMBER_NAMES, playerid, pSQL);
 }
 
@@ -24417,7 +24423,7 @@ function:DerbyVoting()
 {
 	if(CurrentDerbyPlayers < 2)
 	{
-	    DerbyMSG("There need to be 2 players to start!");
+	    derby_broadcast("There need to be 2 players to start!");
 		ClearDerbyVotes();
 		ExecDerbyVotingTimer();
 		for(new i = 0; i < MAX_PLAYERS; i++)
@@ -24435,7 +24441,7 @@ function:DerbyVoting()
 	{
 	    ExecDerbyVotingTimer();
 		ClearDerbyVotes();
-		DerbyMSG("There were no votes!");
+		derby_broadcast("There were no votes!");
 		for(new i = 0; i < MAX_PLAYERS; i++)
 		{
  			if(gTeam[i] == DERBY) ShowDialog(i, DERBY_VOTING_DIALOG);
@@ -24463,7 +24469,7 @@ function:DerbyVoting()
 
 	if(draw >= 1)
 	{
-	    DerbyMSG("Voting was not clear. New Voting starting.");
+	    derby_broadcast("Voting was not clear. New Voting starting.");
 	    ExecDerbyVotingTimer();
 		ClearDerbyVotes();
 		for(new i = 0; i < MAX_PLAYERS; i++)
@@ -24493,7 +24499,7 @@ function:DerbyVoting()
 	if(active_db_players < 2)
 	{
 	    // Wir können nicht starten
-		DerbyMSG("Couldn't start Derby! Too many AFK players");
+		derby_broadcast("Couldn't start Derby! Too many AFK players");
         ExecDerbyVotingTimer();
         ClearDerbyVotes();
 		for(new i = 0; i < MAX_PLAYERS; i++)
@@ -24529,7 +24535,7 @@ function:StartDerbyMap1()
     CurrentDerbyMap = 1;
     new pcount = 0;
 	ClearDerbyVotes();
-	DerbyMSG("Map 'Lighthouse' won! Let's start!");
+	derby_broadcast("Map 'Lighthouse' won! Let's start!");
 
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -24542,7 +24548,7 @@ function:StartDerbyMap1()
 	        if(IsPlayerOnDesktop(i, 1500))
 			{
 			    format(gstr, sizeof(gstr), "%s couldn't be put in vehicle!", __GetName(i));
-				DerbyMSG(gstr);
+				derby_broadcast(gstr);
 				PlayerData[i][bDerbyAFK] = true;
 	        }
 			else pcount++;
@@ -24551,7 +24557,7 @@ function:StartDerbyMap1()
 
 	if(pcount <= 1)
 	{
-		DerbyMSG("Couldn't start Derby! Too many AFK players");
+		derby_broadcast("Couldn't start Derby! Too many AFK players");
         ExecDerbyVotingTimer();
         ClearDerbyVotes();
         IsDerbyRunning = false;
@@ -24624,7 +24630,7 @@ function:StartDerbyMap2()
     CurrentDerbyMap = 2;
     new pcount = 0;
 	ClearDerbyVotes();
-    DerbyMSG("Map 'Truncat' won! Let's start!");
+    derby_broadcast("Map 'Truncat' won! Let's start!");
 
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -24637,7 +24643,7 @@ function:StartDerbyMap2()
 	        if(IsPlayerOnDesktop(i, 1500))
 			{
 			    format(gstr, sizeof(gstr), "%s couldn't be put in vehicle!", __GetName(i));
-				DerbyMSG(gstr);
+				derby_broadcast(gstr);
 				PlayerData[i][bDerbyAFK] = true;
 	        }
 			else pcount++;
@@ -24646,7 +24652,7 @@ function:StartDerbyMap2()
 
 	if(pcount <= 1)
 	{
-		DerbyMSG("Couldn't start Derby! Too many AFK players");
+		derby_broadcast("Couldn't start Derby! Too many AFK players");
         ExecDerbyVotingTimer();
         ClearDerbyVotes();
         IsDerbyRunning = false;
@@ -24719,7 +24725,7 @@ function:StartDerbyMap3()
     CurrentDerbyMap = 3;
     new pcount = 0;
 	ClearDerbyVotes();
-	DerbyMSG("Map 'Sky Skiing' won! Let's start!");
+	derby_broadcast("Map 'Sky Skiing' won! Let's start!");
 
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -24732,7 +24738,7 @@ function:StartDerbyMap3()
 	        if(IsPlayerOnDesktop(i, 1500))
 			{
 			    format(gstr, sizeof(gstr), "%s couldn't be put in vehicle!", __GetName(i));
-				DerbyMSG(gstr);
+				derby_broadcast(gstr);
 				PlayerData[i][bDerbyAFK] = true;
 	        }
 			else pcount++;
@@ -24741,7 +24747,7 @@ function:StartDerbyMap3()
 
 	if(pcount <= 1)
 	{
-		DerbyMSG("Couldn't start Derby! Too many AFK players");
+		derby_broadcast("Couldn't start Derby! Too many AFK players");
         ExecDerbyVotingTimer();
         ClearDerbyVotes();
         IsDerbyRunning = false;
@@ -24814,7 +24820,7 @@ function:StartDerbyMap4()
     CurrentDerbyMap = 4;
     new pcount = 0;
 	ClearDerbyVotes();
-	DerbyMSG("Map 'Townhall' won! Let's start!");
+	derby_broadcast("Map 'Townhall' won! Let's start!");
 
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -24827,7 +24833,7 @@ function:StartDerbyMap4()
 	        if(IsPlayerOnDesktop(i, 1500))
 			{
 			    format(gstr, sizeof(gstr), "%s couldn't be put in vehicle!", __GetName(i));
-				DerbyMSG(gstr);
+				derby_broadcast(gstr);
 				PlayerData[i][bDerbyAFK] = true;
 	        }
 			else pcount++;
@@ -24836,7 +24842,7 @@ function:StartDerbyMap4()
 
 	if(pcount <= 1)
 	{
-		DerbyMSG("Couldn't start Derby! Too many AFK players");
+		derby_broadcast("Couldn't start Derby! Too many AFK players");
         ExecDerbyVotingTimer();
         ClearDerbyVotes();
         IsDerbyRunning = false;
@@ -24909,7 +24915,7 @@ function:StartDerbyMap5()
     CurrentDerbyMap = 5;
     new pcount = 0;
 	ClearDerbyVotes();
-	DerbyMSG("Map 'Glazz' won! Let's start!");
+	derby_broadcast("Map 'Glazz' won! Let's start!");
 
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -24922,7 +24928,7 @@ function:StartDerbyMap5()
 	        if(IsPlayerOnDesktop(i, 1500))
 			{
 			    format(gstr, sizeof(gstr), "%s couldn't be put in vehicle!", __GetName(i));
-				DerbyMSG(gstr);
+				derby_broadcast(gstr);
 				PlayerData[i][bDerbyAFK] = true;
 	        }
 			else pcount++;
@@ -24931,7 +24937,7 @@ function:StartDerbyMap5()
 
 	if(pcount <= 1)
 	{
-		DerbyMSG("Couldn't start Derby! Too many AFK players");
+		derby_broadcast("Couldn't start Derby! Too many AFK players");
         ExecDerbyVotingTimer();
         ClearDerbyVotes();
         IsDerbyRunning = false;
@@ -25004,7 +25010,7 @@ function:StartDerbyMap6()
     CurrentDerbyMap = 6;
     new pcount = 0;
 	ClearDerbyVotes();
-	DerbyMSG("Map 'Rambo' won! Let's start!");
+	derby_broadcast("Map 'Rambo' won! Let's start!");
 
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -25017,7 +25023,7 @@ function:StartDerbyMap6()
 	        if(IsPlayerOnDesktop(i, 1500))
 			{
 			    format(gstr, sizeof(gstr), "%s couldn't be put in vehicle!", __GetName(i));
-				DerbyMSG(gstr);
+				derby_broadcast(gstr);
 				PlayerData[i][bDerbyAFK] = true;
 	        }
 			else pcount++;
@@ -25026,7 +25032,7 @@ function:StartDerbyMap6()
 
 	if(pcount <= 1)
 	{
-		DerbyMSG("Couldn't start Derby! Too many AFK players");
+		derby_broadcast("Couldn't start Derby! Too many AFK players");
         ExecDerbyVotingTimer();
         ClearDerbyVotes();
         IsDerbyRunning = false;
@@ -25089,7 +25095,7 @@ function:StartDerbyMap7()
     CurrentDerbyMap = 7;
     new pcount = 0;
 	ClearDerbyVotes();
-	DerbyMSG("Map 'SilverGround' won! Let's start!");
+	derby_broadcast("Map 'SilverGround' won! Let's start!");
 
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -25102,7 +25108,7 @@ function:StartDerbyMap7()
 	        if(IsPlayerOnDesktop(i, 1500))
 			{
 			    format(gstr, sizeof(gstr), "%s couldn't be put in vehicle!", __GetName(i));
-				DerbyMSG(gstr);
+				derby_broadcast(gstr);
 				PlayerData[i][bDerbyAFK] = true;
 	        }
 			else pcount++;
@@ -25111,7 +25117,7 @@ function:StartDerbyMap7()
 
 	if(pcount <= 1)
 	{
-		DerbyMSG("Couldn't start Derby! Too many AFK players");
+		derby_broadcast("Couldn't start Derby! Too many AFK players");
         ExecDerbyVotingTimer();
         ClearDerbyVotes();
         IsDerbyRunning = false;
@@ -25174,7 +25180,7 @@ function:StartDerbyMap8()
     CurrentDerbyMap = 8;
     new pcount = 0;
 	ClearDerbyVotes();
-	DerbyMSG("Map 'Anubis' won! Let's start!");
+	derby_broadcast("Map 'Anubis' won! Let's start!");
 
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -25187,7 +25193,7 @@ function:StartDerbyMap8()
 	        if(IsPlayerOnDesktop(i, 1500))
 			{
 			    format(gstr, sizeof(gstr), "%s couldn't be put in vehicle!", __GetName(i));
-				DerbyMSG(gstr);
+				derby_broadcast(gstr);
 				PlayerData[i][bDerbyAFK] = true;
 	        }
 			else pcount++;
@@ -25196,7 +25202,7 @@ function:StartDerbyMap8()
 
 	if(pcount <= 1)
 	{
-		DerbyMSG("Couldn't start Derby! Too many AFK players");
+		derby_broadcast("Couldn't start Derby! Too many AFK players");
         ExecDerbyVotingTimer();
         ClearDerbyVotes();
         IsDerbyRunning = false;
@@ -25259,7 +25265,7 @@ function:StartDerbyMap9()
     CurrentDerbyMap = 9;
     new pcount = 0;
 	ClearDerbyVotes();
-	DerbyMSG("Map 'Confusing' won! Let's start!");
+	derby_broadcast("Map 'Confusing' won! Let's start!");
 
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -25272,7 +25278,7 @@ function:StartDerbyMap9()
 	        if(IsPlayerOnDesktop(i, 1500))
 			{
 			    format(gstr, sizeof(gstr), "%s couldn't be put in vehicle!", __GetName(i));
-				DerbyMSG(gstr);
+				derby_broadcast(gstr);
 				PlayerData[i][bDerbyAFK] = true;
 	        }
 			else pcount++;
@@ -25281,7 +25287,7 @@ function:StartDerbyMap9()
 
 	if(pcount <= 1)
 	{
-		DerbyMSG("Couldn't start Derby! Too many AFK players");
+		derby_broadcast("Couldn't start Derby! Too many AFK players");
         ExecDerbyVotingTimer();
         ClearDerbyVotes();
         IsDerbyRunning = false;
@@ -25396,7 +25402,7 @@ function:Derby()
 			    	PlayerData[i][bDerbyWinner] = false;
 			    	
 			    	format(string, sizeof(string), "%s won the Derby and earned "nef_yellow"$%s", __GetName(i), number_format(money));
-					DerbyMSG(string);
+					derby_broadcast(string);
 	   			}
 				SetPlayerDerbyStaticMeshes(i);
 	      		ShowDialog(i, DERBY_VOTING_DIALOG);
@@ -25458,7 +25464,7 @@ function:DerbyFallOver()
 			    	PlayerData[i][pDerbyVehicle] = INVALID_VEHICLE_ID;
 				}
 				format(string, sizeof(string), "%s(%i) was kicked out of derby (AFK)", __GetName(i), i);
-                DerbyMSG(string);
+                derby_broadcast(string);
 				DerbyPlayers--;
 	 			PlayerData[i][bDerbyWinner] = false;
 				SetPlayerDerbyStaticMeshes(i);
@@ -25475,7 +25481,7 @@ function:DerbyFallOver()
 				if(POS[2] <= CURRENT_FALLOVER)
 				{
 					format(string, sizeof(string), "%s(%i) fell over the map!", __GetName(i), i);
-					DerbyMSG(string);
+					derby_broadcast(string);
 		 			DerbyPlayers--;
      			    if(PlayerData[i][pDerbyVehicle] != INVALID_VEHICLE_ID)
 				    {
@@ -25890,14 +25896,14 @@ function:ProcessTick()
 						if(292 <= kmh > 270)
 						{
 						  	format(gstr2, sizeof(gstr2), "[SUSPECT] Possible speed cheat detected | Player: %s(%i) | Race", __GetName(i), i);
-							AdminMSG(RED, gstr2);
+							admin_broadcast(RED, gstr2);
 							print(gstr2);
 						}
 						else if(kmh > 292)
 						{
 						    Command_ReProcess(i, "/exit", false);
 						  	format(gstr2, sizeof(gstr2), "[SUSPECT] Speed cheat detected | Player: %s(%i) | Player has been removed from race", __GetName(i), i);
-							AdminMSG(RED, gstr2);
+							admin_broadcast(RED, gstr2);
 							print(gstr2);
 						}
 					}
@@ -25928,7 +25934,7 @@ function:ProcessTick()
 				        if(IsPlayerOnDesktop(i, 6000))
 				        {
 							format(gstr, sizeof(gstr), "%s(%i) went AFK for too long!", __GetName(i), i);
-							fallout_msg(gstr);
+							fallout_broadcast(gstr);
 
 							PlayerData[i][bFalloutLost] = true;
 							HidePlayerFalloutTextdraws(i);
@@ -26123,7 +26129,7 @@ function:ProcessTick()
 			        if(GZoneData[i][e_defender] == 0)
 			        {
 					    format(gstr, sizeof(gstr), ""gang_sign" "r_besch" Your gang failed to capture '%s' as there are no alive players around!", GZoneData[i][e_zonename]);
-						GangMSG(GZoneData[i][e_attacker], gstr);
+						gang_broadcast(GZoneData[i][e_attacker], gstr);
 
 						format(gstr, sizeof(gstr), ""orange"[GANG] %s failed to capture '%s' (No players left!)", GetGangNameByID(GZoneData[i][e_attacker]), GZoneData[i][e_zonename]);
 						SCMToAll(-1, gstr);
@@ -26151,7 +26157,7 @@ function:ProcessTick()
 					else
 					{
 					    format(gstr, sizeof(gstr), ""gang_sign" "r_besch" Your gang failed to capture '%s' as there are no alive players around!", GZoneData[i][e_zonename]);
-						GangMSG(GZoneData[i][e_attacker], gstr);
+						gang_broadcast(GZoneData[i][e_attacker], gstr);
 
 						format(gstr, sizeof(gstr), ""orange"Gang %s failed to capture '%s' The zone remains %s gang territory!", GetGangNameByID(GZoneData[i][e_attacker]), GZoneData[i][e_zonename], GetGangNameByID(GZoneData[i][e_defender]));
 						SCMToAll(-1, gstr);
@@ -26167,7 +26173,7 @@ function:ProcessTick()
 							}
 						}
 						
-						GangMSG(GZoneData[i][e_defender], ""gang_sign" "r_besch" The opposing gang failed to capture your gang zone.");
+						gang_broadcast(GZoneData[i][e_defender], ""gang_sign" "r_besch" The opposing gang failed to capture your gang zone.");
 
 						Iter_Remove(iterGangWar, GZoneData[i][e_attacker]);
 						Iter_Remove(iterGangWar, GZoneData[i][e_localgang]);
@@ -26185,8 +26191,8 @@ function:ProcessTick()
 				    if(GZoneData[i][e_defender] == 0)
 				    {
 					    format(gstr, sizeof(gstr), ""gang_sign" "r_besch" Your gang successfully captured '%s' with %i alive player(s)!", GZoneData[i][e_zonename], Iter_Count(Players));
-						GangMSG(GZoneData[i][e_attacker], gstr);
-						GangMSG(GZoneData[i][e_attacker], ""gang_sign" "r_besch" The gang gained 5 gang score and each member $20,000 who were tied.");
+						gang_broadcast(GZoneData[i][e_attacker], gstr);
+						gang_broadcast(GZoneData[i][e_attacker], ""gang_sign" "r_besch" The gang gained 5 gang score and each member $20,000 who were tied.");
 
 						format(gstr, sizeof(gstr), ""orange"Gang %s captured zone '%s' and gained their reward", GetGangNameByID(GZoneData[i][e_attacker]), GZoneData[i][e_zonename]);
 						SCMToAll(-1, gstr);
@@ -26199,8 +26205,8 @@ function:ProcessTick()
 					else
 					{
 					    format(gstr, sizeof(gstr), ""gang_sign" "r_besch" Your gang successfully captured '%s' with %i alive player(s)!", GZoneData[i][e_zonename], Iter_Count(Players));
-						GangMSG(GZoneData[i][e_attacker], gstr);
-						GangMSG(GZoneData[i][e_attacker], ""gang_sign" "r_besch" The gang gained 10 gang score and each member $20,000 who were tied.");
+						gang_broadcast(GZoneData[i][e_attacker], gstr);
+						gang_broadcast(GZoneData[i][e_attacker], ""gang_sign" "r_besch" The gang gained 10 gang score and each member $20,000 who were tied.");
 
 						format(gstr, sizeof(gstr), ""orange"Gang %s captured zone '%s' which was territory of %s", GetGangNameByID(GZoneData[i][e_attacker]), GZoneData[i][e_zonename], GetGangNameByID(GZoneData[i][e_defender]));
 						SCMToAll(-1, gstr);
@@ -26209,7 +26215,7 @@ function:ProcessTick()
 						MySQL_UpdateGangScore(GZoneData[i][e_attacker], 10);
 						
                         format(gstr, sizeof(gstr), ""gang_sign" "r_besch" '%s' was captured by the gang %s!", GZoneData[i][e_zonename], GetGangNameByID(GZoneData[i][e_attacker]));
-						GangMSG(GZoneData[i][e_defender], gstr);
+						gang_broadcast(GZoneData[i][e_defender], gstr);
 						
 						Iter_Remove(iterGangWar, GZoneData[i][e_attacker]);
 						Iter_Remove(iterGangWar, GZoneData[i][e_localgang]);
@@ -26777,7 +26783,7 @@ fallout_startgame()
 
 	FalloutData[I_tCountdown] = SetTimer("fallout_countdown", 1000, true);
 
-	fallout_msg("A new game has started!");
+	fallout_broadcast("A new game has started!");
 	return 1;
 }
 
@@ -26831,7 +26837,7 @@ function:fallout_losegame()
 			GameTextForPlayer(i, "~p~You lost the Fallout!", 3000, 1);
 
 			format(gstr, sizeof(gstr), "%s(%i) fell over the glass bottom!", __GetName(i), i);
-			fallout_msg(gstr);
+			fallout_broadcast(gstr);
 
             gTeam[i] = FREEROAM;
 			PlayerData[i][bFalloutLost] = true;
@@ -27002,7 +27008,7 @@ function:fallout_decidewinners()
 	fallout_cancel();
 
 	if(winners == 0)
-		fallout_msg(""white"There are no winners this round!");
+		fallout_broadcast(""white"There are no winners this round!");
 
 	return 1;
 }
@@ -28933,7 +28939,7 @@ ExitPlayer(playerid)
      		--g_RacePlayerCount;
 
 	    	format(gstr, sizeof(gstr), "%s(%i) left the race!", __GetName(playerid), playerid);
-			RaceMSG(gstr);
+			race_broadcast(gstr);
 
 			gTeam[playerid] = FREEROAM;
 
@@ -29048,7 +29054,7 @@ ExitPlayer(playerid)
 					    RandomWeapons(i);
 					    HidePlayerFalloutTextdraws(i);
 					    ResetPlayerWorld(i);
-					    fallout_msg("Fallout has been canceled!");
+					    fallout_broadcast("Fallout has been canceled!");
                         gTeam[i] = FREEROAM;
 					}
 				}
@@ -29188,7 +29194,7 @@ function:OnGangRenameAttempt(playerid, newgangname[], newgangtag[])
 	    mysql_pquery(pSQL, gstr2);
 	    
 	    format(gstr2, sizeof(gstr2), ""gang_sign" "r_besch"Gang Founder %s(%i) changed the gang's name to [%s]%s", __GetName(playerid), playerid, newgangtag, newgangname);
-		GangMSG(PlayerData[playerid][e_gangid], gstr2);
+		gang_broadcast(PlayerData[playerid][e_gangid], gstr2);
 		
 		GivePlayerMoneyEx(playerid, -100000);
 	}
@@ -29438,7 +29444,7 @@ function:OnOfflineBanAttempt2(playerid, ban[], reason[])
 		MySQL_BanAccount(ban, __GetName(playerid), reason);
 		
 		format(gstr, sizeof(gstr), "[ADMIN CHAT] "LG_E"Account and IP (o)banned of %s [EXPIRES: NEVER, REASON: %s] by %s", ban, reason, __GetName(playerid));
-		AdminMSG(COLOR_RED, gstr);
+		admin_broadcast(COLOR_RED, gstr);
 		Log(LOG_PLAYER, gstr);
 
         SCM(playerid, -1, ""er"Player has been banned!");
@@ -29973,7 +29979,7 @@ function:OnRaceRecordPurged(playerid, map)
 		mysql_tquery(pSQL, gstr, "", "");
 
 		format(gstr, sizeof(gstr), ""red"Adm: %s(%i) deleted the first record in race %i", __GetName(playerid), playerid, map);
-		AdminMSG(-1, gstr);
+		admin_broadcast(-1, gstr);
 		print(gstr);
 	}
 	else
@@ -30296,7 +30302,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 				PlayerData[playerid][GangLabel] = CreateDynamic3DTextLabel(gstr, -1, 0.0, 0.0, 0.5, 20.0, playerid, INVALID_VEHICLE_ID, 1, -1, -1, -1, 20.0);
 
 			    format(gstr, sizeof(gstr), ""gang_sign" "grey"%s %s(%i) logged in!", GangPositions[PlayerData[playerid][e_gangrank]][E_gang_pos_name], __GetName(playerid), playerid);
-				GangMSG(PlayerData[playerid][e_gangid], gstr);
+				gang_broadcast(PlayerData[playerid][e_gangid], gstr);
 			}
 	        return 1;
 	    }
