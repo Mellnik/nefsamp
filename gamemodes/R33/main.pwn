@@ -16,7 +16,6 @@
 || Streamer Plugin v2.7.2
 || MySQL Plugin R38
 || IRC Plugin 1.4.5
-|| DNS Plugin 2.4
 ||
 || Build specific:
 ||
@@ -34,6 +33,7 @@
 #include <a_http>           // API Requests
 #undef MAX_PLAYERS
 #define MAX_PLAYERS (400)
+#include <amx\os>
 #include <YSI_Data\y_iterate>
 #include <YSI_Core\y_master>
 #include <YSI_Visual\y_commands>
@@ -43,7 +43,6 @@
 #include <streamer>
 #include <a_mysql_R38>
 #include <irc>
-#include <dns>
 #include <a_zones>          // V2.0
 #include <mSelection>       // 1.1 R3
 #include <Dini>         	// 1.6
@@ -2554,10 +2553,11 @@ public OnGameModeInit()
 	Log(LOG_INIT, "NEF Server Copyright (c)2011 - 2014 "SVRNAME"");
     Log(LOG_INIT, "Version: "CURRENT_VERSION"");
 	#if IS_RELEASE_BUILD == true
-	Log(LOG_INIT, "Build Configuration: Release");
+	Log(LOG_INIT, "Build config: Release");
 	#else
-	Log(LOG_INIT, "Build Configuration: Development");
+	Log(LOG_INIT, "Build config: Development");
 	#endif
+	Log(LOG_INIT, "Operating on %s", GetOS() == OS_LINUX ? ("Linux") : ("Windows"));
 	Log(LOG_INIT, "MySQL: Logging: LOG_ERROR | LOG_WARNING");
 	mysql_log(LOG_ERROR | LOG_WARNING, LOG_TYPE_TEXT);
 	
@@ -2609,6 +2609,7 @@ public OnGameModeInit()
 		if(IsComponentIdCompatible(GetVehicleModel(i), 1010)) AddVehicleComponent(i, 1010);
 		ChangeVehicleColor(i, (random(128) + 127), (random(128) + 127));
 	}
+	
     Log(LOG_INIT, "Server successfully loaded");
 	return 1;
 }
@@ -9194,7 +9195,7 @@ YCMD:adminhelp(playerid, params[], help)
 		
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[5][e_rank]);
 		strcat(string, gstr);
-		strcat(string, "/onlinefix /setcash /setbcash /setscore /gdestroy /addcash /addscore\n/resetrc /resethouse /resetbizz /sethouseprice /sethousescore\n/setbizzlevel /createhouse /createbizz /createstore /gzonecreate");
+		strcat(string, "/onlinefix /setcash /setbcash /setscore /gdestroy /addcash /addscore\n/resetrc /hreset /breset /hsetprice /hsetscore\n/setbizzlevel /hcreate /bcreate /createstore /gzonecreate");
 
         ShowPlayerDialog(playerid, ADMIN_CMD_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" :: Admin Commands", string, "OK", "");
 	}
@@ -10153,8 +10154,6 @@ YCMD:getip(playerid, params[], help)
 		{
 			format(gstr, sizeof(gstr), "%s's ip is %s", __GetName(player), __GetIP(player));
 			SCM(playerid, BLUE, gstr);
-			
-			rdns(__GetIP(player), playerid);
 	    }
 		else
 		{
@@ -13702,13 +13701,13 @@ YCMD:sethouseowner(playerid, params[], help)
 	return 1;
 }*/
 
-YCMD:sethouseprice(playerid, params[], help)
+YCMD:hsetprice(playerid, params[], help)
 {
     if(!IsPlayerAdmin(playerid) || PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL) return SCM(playerid, -1, NO_PERM);
 
 	extract params -> new hprice; else
 	{
-	    return SCM(playerid, NEF_GREEN, "Usage: /sethouseprice <price>");
+	    return SCM(playerid, NEF_GREEN, "Usage: /hsetprice <price>");
 	}
 
  	new bool:found = false;
@@ -13732,13 +13731,13 @@ YCMD:sethouseprice(playerid, params[], help)
 	return 1;
 }
 
-YCMD:sethousescore(playerid, params[], help)
+YCMD:hsetscore(playerid, params[], help)
 {
     if(!IsPlayerAdmin(playerid) || PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL) return SCM(playerid, -1, NO_PERM);
 
 	extract params -> new hscore; else
 	{
-	    return SCM(playerid, NEF_GREEN, "Usage: /sethousescore <score>");
+	    return SCM(playerid, NEF_GREEN, "Usage: /hsetscore <score>");
 	}
 
  	new bool:found = false;
@@ -13762,7 +13761,7 @@ YCMD:sethousescore(playerid, params[], help)
 	return 1;
 }
 
-YCMD:resethouse(playerid, params[], help)
+YCMD:hreset(playerid, params[], help)
 {
     if(!IsPlayerAdmin(playerid) || PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL) return SCM(playerid, -1, NO_PERM);
 
@@ -13854,7 +13853,7 @@ YCMD:setbizzlevel(playerid, params[], help)
 	return 1;
 }
 
-YCMD:resetbizz(playerid, params[], help)
+YCMD:breset(playerid, params[], help)
 {
     if(!IsPlayerAdmin(playerid) || PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL) return SCM(playerid, -1, NO_PERM);
 
@@ -13934,7 +13933,7 @@ YCMD:createrace(playerid, params[], help)
 }
 #endif
 
-YCMD:createbizz(playerid, params[], help)
+YCMD:bcreate(playerid, params[], help)
 {
     if(!IsPlayerAdmin(playerid) || PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL || !IsWhitelisted(__GetIP(playerid)))
 	{
@@ -13983,7 +13982,7 @@ YCMD:createbizz(playerid, params[], help)
     return 1;
 }
 
-YCMD:createhouse(playerid, params[], help)
+YCMD:hcreate(playerid, params[], help)
 {
     if(!IsPlayerAdmin(playerid) || PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL || !IsWhitelisted(__GetIP(playerid)))
 	{
@@ -13992,7 +13991,7 @@ YCMD:createhouse(playerid, params[], help)
 
 	extract params -> new h_price, h_score, h_int; else
 	{
-	    return SCM(playerid, NEF_GREEN, "Usage: /createhouse <price> <score> <int id>");
+	    return SCM(playerid, NEF_GREEN, "Usage: /hcreate <price> <score> <int id>");
 	}
 
 	if(h_int > 13 || h_int < 0) return SCM(playerid, -1, ""er"Interior 0-13");
@@ -20404,22 +20403,6 @@ public IRC_OnConnectAttemptFail(botid, ip[], port, reason[])
 }
 #endif
 
-public OnReverseDNS(ip[], host[], extra)
-{
-	format(gstr, sizeof(gstr), "Hostname: %s", host);
-	SCM(extra, BLUE, gstr);
-	return 1;
-}
-
-function:CancelGangCreation(playerid)
-{
-	PlayerData[playerid][e_gangrank] = 0;
-	PlayerData[playerid][e_gangid] = 0;
-	PlayerData[playerid][GangName][0] = '\0';
-	PlayerData[playerid][GangTag][0] = '\0';
- 	return 1;
-}
-
 function:OnHouseLoadEx(index)
 {
 	new rows, fields;
@@ -21575,7 +21558,7 @@ MySQL_LoadPlayerAchs(playerid)
 
 MySQL_LoadPlayerToys(playerid)
 {
-	mysql_format(pSQL, gstr, sizeof(gstr), "SELECT * FROM `toys` WHERE `id` = %i;", PlayerData[playerid][e_accountid]);
+	mysql_format(pSQL, gstr, sizeof(gstr), "SELECT * FROM `toys` WHERE `id` = %i LIMIT 10;", PlayerData[playerid][e_accountid]);
 	mysql_pquery(pSQL, gstr, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_TOYS_LOAD);
 }
 
@@ -31139,4 +31122,13 @@ ResetPlayerVars(playerid)
 		DestroyVehicleEx(PlayerData[playerid][pPreviewVehicle]);
 		PlayerData[playerid][pPreviewVehicle] = INVALID_VEHICLE_ID;
 	}
+}
+
+CancelGangCreation(playerid)
+{
+	PlayerData[playerid][e_gangrank] = 0;
+	PlayerData[playerid][e_gangid] = 0;
+	PlayerData[playerid][GangName][0] = '\0';
+	PlayerData[playerid][GangTag][0] = '\0';
+ 	return 1;
 }
