@@ -8566,7 +8566,7 @@ YCMD:buy(playerid, params[], help)
 	    PlayerPlaySound(playerid, 1149, 0.0, 0.0, 0.0);
 	    format(gstr, sizeof(gstr), ""nef" "yellow_e"%s(%i) bought the house %i for $%s!", __GetName(playerid), playerid, HouseData[i][e_id], number_format(HouseData[i][price]));
 	    SCMToAll(-1, gstr);
-	    ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""white"House bought!", ""white"You can now use these commands:\n\n/hmenu\n/lock\n/enter\n/exit\n/sell\n\nCustomize your house's interior by using /hmenu", "OK", "");
+	    ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""white"House bought!", ""white"You can now use these commands:\n\n/hmenu\n/hlock\n/enter\n/exit\n/sell\n\nCustomize your house's interior by using /hmenu", "OK", "");
 
 	    if(PlayerAchData[playerid][e_ach_settled][0] == 0)
 	    {
@@ -8646,39 +8646,6 @@ YCMD:sell(playerid, params[], help)
 	return 1;
 }
 
-YCMD:unlock(playerid, params[], help)
-{
-    if(!islogged(playerid)) return notlogged(playerid);
-    
-    if(gTeam[playerid] == FREEROAM)
-    {
-		if(GetPlayerState(playerid) == PLAYER_STATE_PASSENGER || GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
-		{
-		    if(PVSelect[playerid] != -1)
-		    {
-			    if(GetPlayerVehicleID(playerid) == PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid])
-			    {
-	      			for(new i = 0; i < MAX_PLAYERS; i++)
-				    {
-				        if(i == playerid) continue;
-				        
-				        SetVehicleParamsForPlayer(GetPlayerVehicleID(playerid), i, 0, 0);
-				        PlayerPlaySound(playerid, 1027, 0.0, 0.0, 0.0);
-				    }
-				    return player_notice(playerid, "~r~Unlocked", "");
-			    }
-			    else SCM(playerid, -1, ""er"You have to be in one of your private cars");
-			}
-			else SCM(playerid, -1, ""er"You have to be in one of your private cars");
-		}
-    }
-    else
-	{
-		SCM(playerid, -1, NOT_AVAIL);
-	}
-    return 1;
-}
-
 YCMD:lock(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
@@ -8687,22 +8654,41 @@ YCMD:lock(playerid, params[], help)
     {
 		if(GetPlayerState(playerid) == PLAYER_STATE_PASSENGER || GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
 		{
-		    if(PVSelect[playerid] != -1)
+		    new vehicle = -1;
+		    if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
 		    {
+		        vehicle = GetPlayerVehicleID(playerid);
+			}
+			else if(PVSelect[playerid] != -1)
+			{
 			    if(GetPlayerVehicleID(playerid) == PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid])
 			    {
-	      			for(new i = 0; i < MAX_PLAYERS; i++)
-				    {
-				        if(i == playerid) continue;
-				        SetVehicleParamsForPlayer(GetPlayerVehicleID(playerid), i, 0, 1);
-				        PlayerPlaySound(playerid, 1027, 0.0, 0.0, 0.0);
-				    }
-				    return player_notice(playerid, "Locked", "");
+                    vehicle = GetPlayerVehicleID(playerid);
 			    }
 			}
-		}
-    }
+			
+			if(vehicle != -1)
+			{
+		        new vengine, vlights, valarm, vdoors, vbonnet, vboot, vobjective;
+		        GetVehicleParamsEx(vehicle, vengine, vlights, valarm, vdoors, vbonnet, vboot, vobjective);
+		        SetVehicleParamsEx(vehicle, vengine, vlights, valarm, !vdoors, vbonnet, vboot, vobjective);
 
+		        player_notice(playerid, "Vehicle:", vdoors == 1 ? ("~r~Unlocked") : ("~g~Locked"));
+		        PlayerPlaySound(playerid, 1027, 0.0, 0.0, 0.0);
+		        return 1;
+			}
+		}
+		else player_notice(playerid, "You have to be in a vehicle", "");
+    }
+	else
+	{
+  		SCM(playerid, RED, NOT_AVAIL);
+	}
+	return 1;
+}
+
+YCMD:hlock(playerid, params[], help)
+{
 	if(gTeam[playerid] == FREEROAM || gTeam[playerid] == HOUSE)
 	{
 		new tick = GetTickCountEx();
@@ -8741,7 +8727,7 @@ YCMD:lock(playerid, params[], help)
 					SCM(playerid, -1, ""er"This isn't your House!");
 					break;
 				}
-				
+
 				if(!HouseData[i][locked])
 					GameTextForPlayer(playerid, "~b~House ~r~locked", 2000, 3);
 				else
@@ -18848,7 +18834,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						strcat(cstring, ""yellow"/buy "white"- buy a house\n");
 						strcat(cstring, ""yellow"/exit "white"- exit your house\n");
 						strcat(cstring, ""yellow"/sell "white"- sell your house\n");
-						strcat(cstring, ""yellow"/lock "white"- lock or unlock your house\n");
+						strcat(cstring, ""yellow"/hlock "white"- lock or unlock your house\n");
 						strcat(cstring, ""yellow"/gotomyhouse "white"- goto your house\n");
 						strcat(cstring, ""yellow"/gotomybizz "white"- goto your business\n");
 						strcat(cstring, ""yellow"/bbuy "white"- buy a business\n");
@@ -18857,9 +18843,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		            case 4: // Private Vehicle
 		            {
                         strcat(cstring, ""yellow"/pv "white"- vehicle control\n");
-                        strcat(cstring, ""yellow"/lock "white"- lock your vehicle\n");
-                        strcat(cstring, ""yellow"/unlock "white"- unlock your vehicle\n");
-                        strcat(cstring, ""yellow"/vcolor "white"- dye your vehicle\n");
+                        strcat(cstring, ""yellow"/lock "white"- (un)lock your vehicle\n");
+                        strcat(cstring, ""yellow"/vcolor "white"- set your vehicles color\n");
 		            }
 		            case 5: // Other
 		            {
@@ -22917,9 +22902,7 @@ function:server_init_shutdown()
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(IsPlayerConnected(i))
-	    {
 			Kick(i);
-		}
 	}
 	SetTimer("_server_shutdown", 2000, false);
 	return 1;
@@ -22927,7 +22910,7 @@ function:server_init_shutdown()
 
 function:_server_shutdown()
 {
-	Log(LOG_EXIT, "server_shutdown called");
+	Log(LOG_EXIT, "server_shutdown() called");
 	SendRconCommand("exit");
 	return 1;
 }
@@ -22996,7 +22979,11 @@ server_initialize()
 	#endif
 	Command_AddAltNamed("togglegc", "toggc");
 	Command_AddAltNamed("lock", "carlock");
-	Command_AddAltNamed("unlock", "carunlock");
+	Command_AddAltNamed("lock", "carunlock");
+	Command_AddAltNamed("lock", "unlock");
+	Command_AddAltNamed("lock", "vlock");
+	Command_AddAltNamed("lock", "vunlock");
+	Command_AddAltNamed("hlock", "hunlock");
 	Command_AddAltNamed("suspect", "sus");
     Command_AddAltNamed("time", "stime");
     Command_AddAltNamed("oban", "offlineban");
