@@ -11,10 +11,10 @@
 
 /* Build Dependencies
 || SA-MP Server 0.3z-R3
-|| YSI Library 3.1
+|| YSI Library 4.0 beta
 || sscanf Plugin 2.8.1
 || Streamer Plugin v2.7.2
-|| MySQL Plugin R38
+|| MySQL Plugin R39-2
 || IRC Plugin 1.4.5
 ||
 || Build specific:
@@ -23,7 +23,7 @@
 
 #pragma dynamic 8192
 
-#define IS_RELEASE_BUILD (false)
+#define IS_RELEASE_BUILD (true)
 #define INC_ENVIRONMENT (true)
 #define IRC_CONNECT (true)
 #define WINTER_EDITION (false) // Requires FS ferriswheelfair.amx
@@ -436,6 +436,8 @@ Float:GetDistance3D(Float:x1, Float:y1, Float:z1, Float:x2, Float:y2, Float:z2);
 #define COOLDOWN_BIKEC                  (300000)
 #define COOLDOWN_CMD_MEDKIT             (120000)
 #define COOLDOWN_VEHICLE                (220)
+#define COOLDOWN_PICKUP_HEALTH          (60000)
+#define COOLDOWN_PICKUP_ARMOR           (60000)
 
 // Log
 enum E_LOG_LEVEL
@@ -711,6 +713,7 @@ enum E_PLAYER_DATA // Prefixes: i = Integer, s = String, b = bool, f = Float, p 
   	tickLastCD,
     tickJoin_bmx,
     tickLastBan,
+    tickLastPickup[2],
     bool:bHideGC,
 	bool:bAchsLoad,
 	bool:bVIPLInv,
@@ -3268,7 +3271,7 @@ public OnPlayerDisconnect(playerid, reason)
 		        {
 		            if(PlayerData[i][DuelRequestRecv] == playerid && gTeam[i] == gDUEL)
 		            {
-		                global_broadcast("Duel cancelled between %s and %s. Reason: Disconnect", __GetName(playerid), __GetName(i));
+		                global_broadcast("Duel canceled between %s and %s. Reason: Disconnect", __GetName(playerid), __GetName(i));
 
 		                gTeam[i] = FREEROAM;
 		                ResetPlayerWorld(i);
@@ -3289,7 +3292,7 @@ public OnPlayerDisconnect(playerid, reason)
 				    {
 				        if(PlayerData[i][DuelRequest] == playerid) // Sender won
 				        {
-				           	global_broadcast(">> Duel cancelled between %s and %s. Reason: Disconnect", __GetName(playerid), __GetName(i));
+				           	global_broadcast(">> Duel canceled between %s and %s. Reason: Disconnect", __GetName(playerid), __GetName(i));
 
 		 		            gTeam[i] = FREEROAM;
 
@@ -3469,7 +3472,7 @@ public OnPlayerDisconnect(playerid, reason)
         {
             if(gTeam[i] != gDUEL)
             {
-	        	format(gstr, sizeof(gstr), ">> %s(%i) cancelled the duel request! Reason: Disconnect", __GetName(playerid), playerid);
+	        	format(gstr, sizeof(gstr), ">> %s(%i) canceled the duel request! Reason: Disconnect", __GetName(playerid), playerid);
 	        	SCM(i, NEF_RED, gstr);
 
 	        	PlayerData[i][DuelRequestRecv] = INVALID_PLAYER_ID;
@@ -3500,24 +3503,24 @@ public OnPlayerDisconnect(playerid, reason)
 public e_COMMAND_ERRORS:OnPlayerCommandReceived(playerid, cmdtext[], e_COMMAND_ERRORS:success)
 {
 	if(PlayerData[playerid][bOpenSeason])
-		return COMMAND_DENIED;
+		return COMMAND_OK;
 	
 	if(PlayerData[playerid][bIsDead])
 	{
 	    SCM(playerid, -1, ""er"You can't use commands while being dead!");
-	    return COMMAND_DENIED;
+	    return COMMAND_OK;
 	}
 	
 	if(PlayerData[playerid][ExitType] != EXIT_FIRST_SPAWNED)
 	{
 	    SCM(playerid, -1, ""er"You need to spawn to use commands!");
-	    return COMMAND_DENIED;
+	    return COMMAND_OK;
 	}
 	
 	if((PlayerData[playerid][iCoolDownCommand] + COOLDOWN_CMD) >= GetTickCountEx())
 	{
 		player_notice(playerid, "1 command per second", "");
-	    return COMMAND_DENIED;
+	    return COMMAND_OK;
 	}
 
 	if(PlayerData[playerid][bFrozen])
@@ -3529,7 +3532,7 @@ public e_COMMAND_ERRORS:OnPlayerCommandReceived(playerid, cmdtext[], e_COMMAND_E
 	        default:
 			{
 			    SCM(playerid, -1, ""er"You can't use this command while you are frozen!");
-				return COMMAND_DENIED;
+				return COMMAND_OK;
    			}
 	    }
 	}
@@ -3558,7 +3561,7 @@ public e_COMMAND_ERRORS:OnPlayerCommandReceived(playerid, cmdtext[], e_COMMAND_E
 	if(PlayerData[playerid][bLoadMap])
 	{
 	    player_notice(playerid, "Please wait for the map to load", "");
-	    return COMMAND_DENIED;
+	    return COMMAND_OK;
 	}
 	
 	PlayerData[playerid][iCoolDownCommand] = GetTickCountEx();
@@ -3566,7 +3569,7 @@ public e_COMMAND_ERRORS:OnPlayerCommandReceived(playerid, cmdtext[], e_COMMAND_E
 	CancelEdit(playerid);
 	// Closing open dialogs in order to avoid some exploits.
 	ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
-	Log(LOG_FAIL, "OPCR %i", _:success);
+
 	if(success == COMMAND_UNDEFINED) {
 	    player_notice(playerid, "Unknown command", "Type ~y~/c ~w~for all commands");
 	}
@@ -3583,8 +3586,9 @@ public e_COMMAND_ERRORS:OnPlayerCommandPerformed(playerid, cmdtext[], e_COMMAND_
     fwrite(hFile, gstr2);
     fclose(hFile);
 
-    SrvStat[0]++;
-	return COMMAND_OK;
+	return
+		SrvStat[0]++,
+		COMMAND_OK;
 }
 
 public OnVehicleMod(playerid, vehicleid, componentid)
@@ -5839,6 +5843,11 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 			    {
 					if(pickupid == pick_life[i])
 					{
+					    new tick = GetTickCountEx();
+					        
+					    if((PlayerData[playerid][tickLastPickup][0] + COOLDOWN_PICKUP_HEALTH) >= tick)
+					        return 1;
+					        
 					    new Float:h;
 					    GetPlayerHealth(playerid, h);
 
@@ -5852,7 +5861,9 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
                             player_notice(playerid, "Health refilled", "");
 						    SetPlayerHealth(playerid, 100.0);
 						}
-						return 1;
+						return
+						    PlayerData[playerid][tickLastPickup][0] = tick,
+						    1;
 					}
 			    }
 
@@ -5860,6 +5871,11 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 			    {
 			        if(pickupid == pick_armor[i])
 			        {
+					    new tick = GetTickCountEx();
+
+					    if((PlayerData[playerid][tickLastPickup][1] + COOLDOWN_PICKUP_ARMOR) >= tick)
+					        return 1;
+					        
 			            new Float:ar;
 			            GetPlayerArmour(playerid, ar);
 
@@ -5869,7 +5885,9 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 			            	SetPlayerArmour(playerid, ar + 10.0);
 			            	PlayerData[playerid][bwSuspect] |= SUSPECT_VALID_ARMOR;
 						}
-						return 1;
+						return
+						    PlayerData[playerid][tickLastPickup][1] = tick,
+						    1;
 					}
 			    }
 
@@ -8713,9 +8731,9 @@ YCMD:hlock(playerid, params[], help)
 				}
 				if(!HouseData[i][locked])
 				{
-					GameTextForPlayer(playerid, "~b~House ~r~locked", 2000, 3);
+				    player_notice(playerid, "House:", "~g~locked");
 				}
-				else GameTextForPlayer(playerid, "~b~House ~g~unlocked", 2000, 3);
+				else player_notice(playerid, "House:", "~r~unlocked");
 
 	   			HouseData[i][locked] = (HouseData[i][locked]) ? (0) : (1);
 	            PlayerPlaySound(playerid, 1027, 0.0, 0.0, 0.0);
@@ -8731,9 +8749,9 @@ YCMD:hlock(playerid, params[], help)
 				}
 
 				if(!HouseData[i][locked])
-					GameTextForPlayer(playerid, "~b~House ~r~locked", 2000, 3);
+					player_notice(playerid, "House:", "~g~locked");
 				else
-					GameTextForPlayer(playerid, "~b~House ~g~unlocked", 2000, 3);
+					player_notice(playerid, "House:", "~r~unlocked");
 
 	            HouseData[i][locked] = HouseData[i][locked] ? 0 : 1;
 	            PlayerPlaySound(playerid, 1027, 0.0, 0.0, 0.0);
@@ -8885,14 +8903,14 @@ YCMD:duel(playerid, params[], help)
 			{
 			    if(PlayerData[i][DuelRequestRecv] == playerid)
 			    {
-		        	format(gstr, sizeof(gstr), ">> %s(%i) cancelled the duel request!", __GetName(playerid), playerid);
+		        	format(gstr, sizeof(gstr), ">> %s(%i) canceled the duel request!", __GetName(playerid), playerid);
 		        	SCM(i, NEF_RED, gstr);
 
 		        	PlayerData[i][DuelRequestRecv] = INVALID_PLAYER_ID;
 			    }
 			    if(PlayerData[i][DuelRequest] == playerid && i != PlayerData[playerid][DuelRequestRecv])
 			    {
-		        	format(gstr, sizeof(gstr), ">> %s(%i) cancelled the duel request!", __GetName(playerid), playerid);
+		        	format(gstr, sizeof(gstr), ">> %s(%i) canceled the duel request!", __GetName(playerid), playerid);
 		        	SCM(i, NEF_RED, gstr);
 
 		        	PlayerData[i][DuelRequest] = INVALID_PLAYER_ID;
@@ -8945,7 +8963,7 @@ YCMD:duel(playerid, params[], help)
         {
 			if(PlayerData[i][DuelRequestRecv] == playerid)
 			{
-	        	format(gstr, sizeof(gstr), ">> %s(%i) cancelled the duel request!", __GetName(playerid), playerid);
+	        	format(gstr, sizeof(gstr), ">> %s(%i) canceled the duel request!", __GetName(playerid), playerid);
 	        	SCM(i, NEF_RED, gstr);
 	        	
 	        	PlayerData[i][DuelRequestRecv] = INVALID_PLAYER_ID;
@@ -17263,7 +17281,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	            {
 	                if(PlayerData[i][DuelRequest] == playerid)
 	                {
-			        	global_broadcast(">> Duel request cancelled by %s(%i)", __GetName(playerid), playerid);
+			        	global_broadcast(">> Duel request canceled by %s(%i)", __GetName(playerid), playerid);
 			        	
 	                    PlayerData[i][DuelRequest] = INVALID_PLAYER_ID;
 	                }
@@ -26962,6 +26980,7 @@ function:fallout_countdown()
 			{
 			    if(gTeam[i] == FALLOUT)
 				{
+				    TogglePlayerControllable(i, true);
 			        HidePlayerFalloutTextdraws(i);
 			        ResetPlayerWorld(i);
                     RandomSpawn(i, true);
@@ -31159,6 +31178,8 @@ ResetPlayerVars(playerid)
     PlayerData[playerid][tickJoin_bmx] = 0;
     PlayerData[playerid][iKickBanIssued] = 0,
     PlayerData[playerid][tickLastBan] = 0,
+    PlayerData[playerid][tickLastPickup][0] = 0,
+    PlayerData[playerid][tickLastPickup][1] = 0,
   	PlayerData[playerid][e_lastlogin] = 0;
 	PlayerData[playerid][e_reaction] = 0;
 	PlayerData[playerid][e_mathwins] = 0;
