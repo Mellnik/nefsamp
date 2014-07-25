@@ -24,10 +24,9 @@
 #pragma dynamic 8192
 
 #define IS_RELEASE_BUILD (true)
-#define INC_ENVIORMENT (true)
+#define INC_ENVIRONMENT (false)
 #define IRC_CONNECT (true)
 #define WINTER_EDITION (false) // Requires FS ferriswheelfair.amx
-#define YSI_NO_MASTER
 
 #include <a_samp>   		
 #include <a_http>           // API Requests
@@ -35,7 +34,6 @@
 #define MAX_PLAYERS (400)
 #include <amx\os>
 #include <YSI_Data\y_iterate>
-#include <YSI_Core\y_master>
 #include <YSI_Visual\y_commands>
 #include <YSI_Coding\y_stringhash>
 #include <YSI_Coding\y_va>
@@ -48,7 +46,7 @@
 #include <Dini>         	// 1.6
 #include <md-sort>      	// 13/02/2014
 #include <unixtimetodate> 	// 2.0
-#if INC_ENVIORMENT == true
+#if INC_ENVIRONMENT == true
 #include <server_maps>
 #include <server_maps_2>
 #include <server_maps_3>
@@ -2569,7 +2567,7 @@ public OnGameModeInit()
     MySQL_Connect();
 	MySQL_CleanUp();
 
-	#if INC_ENVIORMENT == true
+	#if INC_ENVIRONMENT == true
     BuildServerMap();
     BuildServerMap2();
     BuildServerMap3();
@@ -9169,7 +9167,7 @@ YCMD:adminhelp(playerid, params[], help)
 		
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[3][e_rank]);
 		strcat(string, gstr);
-		strcat(string, "/freeze /eject /go /getip /get /mkick /clearchat /iplookup /dawn\n/night /giveweapon /connectbots /raceforcemap /deleterecord /nstats\n\n");
+		strcat(string, "/freeze /eject /go /getip /get /mkick /clearchat /iplookup /dawn\n/night /giveweapon /connectbots /raceforcemap /deleterecord /nstats\n/tplayer\n\n");
 		
 		format(gstr, sizeof(gstr), "%s\n", StaffLevels[4][e_rank]);
 		strcat(string, gstr);
@@ -10659,6 +10657,68 @@ YCMD:get(playerid, params[], help)
 			format(gstr, sizeof(gstr), "You have been teleported to Admin %s's location", __GetName(playerid));
 			SCM(player, BLUE, gstr);
 			format(gstr, sizeof(gstr), "You have teleported %s(%i) to your location", __GetName(player), player);
+			SCM(playerid, BLUE, gstr);
+		}
+		else
+		{
+			SCM(playerid, -1, ""er"Player is not connected, is yourself or is in a minigame");
+		}
+	}
+	else
+	{
+		SCM(playerid, -1, NO_PERM);
+	}
+	return 1;
+}
+
+YCMD:tplayer(playerid, params[], help)
+{
+    if(PlayerData[playerid][e_level] >= 3)
+	{
+	    new fromplayer, toplayer;
+	 	if(sscanf(params, "rr", fromplayer, toplayer))
+		{
+			return SCM(playerid, NEF_GREEN, "Usage: /tplayer <playerid> <to playerid>");
+	  	}
+
+	    if(fromplayer == INVALID_PLAYER_ID || toplayer == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player ids");
+		if(!IsPlayerConnected(fromplayer) || !IsPlayerConnected(toplayer)) return SCM(playerid, -1, ""er"One of them is not connected");
+		if(gTeam[fromplayer] != FREEROAM || gTeam[toplayer] != FREEROAM) return SCM(playerid, -1, ""er"One of them is not in freeroam");
+		if(PlayerData[fromplayer][bIsDead] || PlayerData[toplayer][bIsDead]) return SCM(playerid, -1, ""er"One of them is dead");
+		if(playerid == fromplayer || playerid == toplayer) return SCM(playerid, -1, ""er"You can't use this command on yourself");
+		if(CSG[fromplayer] || CSG[toplayer]) return SCM(playerid, -1, ""er"Invalid player");
+
+		if((PlayerData[fromplayer][e_level] == MAX_ADMIN_LEVEL || PlayerData[toplayer][e_level] == MAX_ADMIN_LEVEL) && PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
+		{
+			return SCM(playerid, -1, ""er"You cannot use this command on this admin");
+		}
+
+	 	if(IsPlayerAvail(fromplayer) && IsPlayerAvail(toplayer))
+	 	{
+			new Float:POS[3];
+
+			GetPlayerPos(toplayer, POS[0], POS[1], POS[2]);
+			SetPlayerInterior(fromplayer, GetPlayerInterior(toplayer));
+			SetPlayerVirtualWorld(fromplayer, GetPlayerVirtualWorld(toplayer));
+
+			if(GetPlayerState(fromplayer) == PLAYER_STATE_DRIVER)
+			{
+			    new vehicle = GetPlayerVehicleID(fromplayer);
+				SetVehiclePos(vehicle, POS[0] + 2.0, POS[1], POS[2] + 0.5);
+				LinkVehicleToInterior(vehicle, GetPlayerInterior(toplayer));
+				SetVehicleVirtualWorld(vehicle, GetPlayerVirtualWorld(toplayer));
+			}
+			else
+			{
+				SetPlayerPos(fromplayer, floatadd(POS[0], 2), POS[1], POS[2]);
+			}
+			
+			SetPVarInt(fromplayer, "doingStunt", 0);
+			PlayerData[fromplayer][tickJoin_bmx] = 0;
+
+			format(gstr, sizeof(gstr), "Admin %s has teleported you to %s", __GetName(playerid), __GetName(toplayer));
+			SCM(fromplayer, BLUE, gstr);
+			format(gstr, sizeof(gstr), "You have teleported %s(%i) to your %s's location", __GetName(fromplayer), fromplayer, __GetName(toplayer));
 			SCM(playerid, BLUE, gstr);
 		}
 		else
@@ -14937,7 +14997,7 @@ YCMD:harefill(playerid, params[], help)
 	return 1;
 }
 
-YCMD:spec(playerid, params[], help)
+YCMD:spectate(playerid, params[], help)
 {
     if(PlayerData[playerid][e_level] >= 1 || IsPlayerAdmin(playerid) || PlayerData[playerid][e_vip] == 1)
 	{
@@ -22973,6 +23033,7 @@ server_initialize()
     Command_AddAltNamed("xmas", "christmas");
     Command_AddAltNamed("xmas", "christ");
 	#endif
+	Command_AddAltNamed("spectate", "spec");
 	Command_AddAltNamed("togglegc", "toggc");
 	Command_AddAltNamed("lock", "carlock");
 	Command_AddAltNamed("lock", "carunlock");
