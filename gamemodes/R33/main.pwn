@@ -1711,7 +1711,7 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
 	gstr2[255],
 	lotto_number,
 	lotto_jackpot,
-	bool:lotto_active = false,
+	bool:bLottoActive = false,
 	Teleports[MAX_TELE_CATEGORYS][50][26],
 	Teleport_Index[MAX_TELE_CATEGORYS],
 	TeleportDialogString[MAX_TELE_CATEGORYS][2048],
@@ -2581,7 +2581,7 @@ public OnGameModeInit()
 	ClearDerbyVotes();
     ExecDerbyVotingTimer();
     ExecBGVotingTimer();
-    FetchRaces();
+    race_fetch_data();
     IRC_SetUp();
 	LoadStores();
 	LoadGZones();
@@ -2591,7 +2591,7 @@ public OnGameModeInit()
 
 	// Timer init
 	tReactionTimer = SetTimer("xReactionTest", REAC_TIME, true);
-	g_tRaceOpenSelection = SetTimer("OpenNewRace", 40307, false);
+	g_tRaceOpenSelection = SetTimer("race_open", 40307, false);
 	SetTimer("ProcessTick", 1000, true);
 	SetTimer("LogoSwitch", 10000, true);
 	SetTimer("RandomTXTInfo", 30000, true);
@@ -2646,7 +2646,7 @@ public OnPlayerRequestClass(playerid, classid)
 		KickEx(playerid);*/
 	    new rand = random(4);
 	    SetSpawnInfoEx(playerid, NO_TEAM, PlayerData[playerid][e_skinsave] != -1 ? PlayerData[playerid][e_skinsave] : GetPlayerSkin(playerid), WorldSpawns[rand][0], WorldSpawns[rand][1], WorldSpawns[rand][2] + 3.0, WorldSpawns[rand][3]);
-        SetTimerEx("ForceClassSpawn", 10, 0, "i", playerid);
+        SetTimerEx("server_force_spawn", 10, 0, "i", playerid);
 		return 0;
 	}
 		
@@ -2669,7 +2669,7 @@ public OnPlayerRequestClass(playerid, classid)
 
 	if(PlayerData[playerid][e_skinsave] != -1)
 	{
-	    SetTimerEx("ForceClassSpawn", 10, 0, "i", playerid);
+	    SetTimerEx("server_force_spawn", 10, 0, "i", playerid);
 	    SCM(playerid, -1, ""server_sign" "r_besch"Your saved skin has been set. (/deleteskin to remove)");
 	    return 0;
 	}
@@ -5740,7 +5740,7 @@ public OnPlayerEnterRaceCheckpoint(playerid)
 			
 			if(g_RacePlayerCount == 1) // Wenn er alleine race fährt
 			{
-				return StopRace();
+				return race_stop();
 			}
 			else // Mehr als 1 im race
 			{
@@ -5749,13 +5749,13 @@ public OnPlayerEnterRaceCheckpoint(playerid)
 			    if(g_rPosition == 1)
 			    {
 				    g_iRaceEnd = 30 + 1;
-				    SetTimer("Race_End", 1000, false);
+				    SetTimer("race_end", 1000, false);
 				}
 				else
 				{
 				    if(g_RaceFinishCount >= g_RacePlayerCount)
 					{
-						return StopRace();
+						return race_stop();
 					}
 				}
 			}
@@ -5763,7 +5763,7 @@ public OnPlayerEnterRaceCheckpoint(playerid)
 		else
 		{
 			++g_CPProgress[playerid];
-		    SetCP(playerid, g_CPProgress[playerid], g_CPProgress[playerid] + 1, g_RaceArray[E_rCPs], g_RaceArray[E_rType]);
+		    race_set_cp(playerid, g_CPProgress[playerid], g_CPProgress[playerid] + 1, g_RaceArray[E_rCPs], g_RaceArray[E_rType]);
 		    PlayerPlaySound(playerid, 1137, 0.0, 0.0, 0.0);
 		}
 	}
@@ -13473,54 +13473,13 @@ YCMD:cd(playerid, params[], help)
     iCountdownVIP = 5;
     IsCountDownRunning = true;
     
-    tVIPCountdown = SetTimer("CountdownVIP", 1000, true);
+    tVIPCountdown = SetTimer("server_vip_countdown", 1000, true);
     
     new str[255];
    	format(str, sizeof(str), ""nef" VIP {%06x}%s(%i) "white"has started a countdown!", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid);
 	SCMToAll(-1, str);
 	
 	PlayerData[playerid][tickLastCD] = tick;
-	return 1;
-}
-
-function:CountdownVIP()
-{
-	switch(iCountdownVIP)
-	{
-	    case 5:
-	    {
-			GameTextForAll("~r~~h~~h~- 5 -", 1000, 3);
-	    }
-	    case 4:
-	    {
-	        GameTextForAll("~p~~h~~h~- 4 -", 1000, 3);
-	    }
-	    case 3:
-	    {
-	        GameTextForAll("~b~~h~~h~- 3 -", 1000, 3);
-	    }
-	    case 2:
-	    {
-	        GameTextForAll("~g~~h~~h~- 2 -", 1000, 3);
-	    }
-	    case 1:
-	    {
-	        GameTextForAll("~y~~h~- 1 -", 1000, 3);
-	    }
- 	    case 0:
-	    {
-	        GameTextForAll("~g~~h~~h~GO GO GO", 1000, 3);
-	        KillTimer(tVIPCountdown);
-         	IsCountDownRunning = false;
-	    }
-	    default:
-	    {
-	        GameTextForAll("~g~~h~~h~GO GO GO", 1000, 3);
-	        KillTimer(tVIPCountdown);
-         	IsCountDownRunning = false;
-	    }
-	}
-	iCountdownVIP--;
 	return 1;
 }
 
@@ -15913,7 +15872,7 @@ YCMD:lotto(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
     
-	if(!lotto_active) return SCM(playerid, -1, ""er"No lottery active!");
+	if(!bLottoActive) return SCM(playerid, -1, ""er"No lottery active!");
 	if(GetPlayerInterior(playerid) != 17) return SCM(playerid, -1, ""er"You need to be in a 24/7 shop!");
 	if(PlayerData[playerid][DrawnNumber] != -1) return SCM(playerid, -1, ""er"You already got a lotto!");
 	if(GetPlayerMoneyEx(playerid) < 500) return SCM(playerid, -1, ""er"A lotto costs $500!");
@@ -25912,7 +25871,7 @@ function:ProcessTick()
 
 	if(g_RaceStatus == RaceStatus_Active)
 	{
-	    Race_CalculatePosition();
+	    race_calculate_position();
 	}
 
 	T_RacePlayers = 0;
@@ -28053,6 +28012,10 @@ AddTeleport(teleport_category, const teleport_name[], const teleport_cmd[], Floa
 PushTeleportIntput(playerid, teleport_category, input)
 {
 	new string[32];
+
+	string[0] = '/';
+	strcat(string, Teleports[teleport_category][input], sizeof(string));
+	
 	format(string, sizeof(string), "/%s", Teleports[teleport_category][input]);
 	Command_ReProcess(playerid, string, false);
 }
@@ -28519,7 +28482,7 @@ function:DoLotto()
 	Iter_Clear(LottoNumbersUsed);
 	lotto_number = random(75) + 1;
 	lotto_jackpot = 200000 + random(100000);
-	lotto_active = true;
+	bLottoActive = true;
 
 	format(gstr, sizeof(gstr), "~g~~h~~<~ Lottery Information ~>~~n~~w~Buy a lotto in any 24/7 shop (/247) inside use /lotto <1-75>~n~~r~~h~Jackpot: $%s - Draw starts in 5 minutes!", number_format(lotto_jackpot));
 
@@ -28535,7 +28498,7 @@ function:DoLotto()
 
 function:LottoDraw()
 {
-    lotto_active = false;
+    bLottoActive = false;
 
 	format(gstr2, sizeof(gstr2), "~g~~h~~<~ Lottery Information ~>~~n~~w~Numbers have been drawn. Current jackpot is: $%s - Drawn number: %i~n~~b~~h~~h~", number_format(lotto_jackpot), lotto_number);
 	
@@ -29598,12 +29561,12 @@ function:OnIpLookUp(playerid, ip[])
 	return 1;
 }
 
-FetchRaces()
+race_fetch_data()
 {
 	g_RaceCount = dini_Int("/Race/Index/Index.ini", "TotalRaces");
 }
 
-function:OpenNewRace()
+function:race_open()
 {
 	if(g_RaceCount == 0) return 1;
 	
@@ -29632,7 +29595,7 @@ PrepareRace()
 	new file[16];
 	format(file, sizeof(file), "/Race/%03i.race", g_NextRace);
 
-	if(!fexist(file)) return StopRace();
+	if(!fexist(file)) return race_stop();
 	
 	g_RaceArray[E_vModel] = dini_Int(file, "vModel");
 	g_RaceArray[E_rType] = dini_Int(file, "rType");
@@ -29706,7 +29669,7 @@ SetupRaceForPlayer(playerid)
     ShowPlayerRaceTextdraws(playerid);
     HidePlayerInfoTextdraws(playerid);
 
-    SetCP(playerid, g_CPProgress[playerid], g_CPProgress[playerid] + 1, g_RaceArray[E_rCPs], g_RaceArray[E_rType]);
+    race_set_cp(playerid, g_CPProgress[playerid], g_CPProgress[playerid] + 1, g_RaceArray[E_rCPs], g_RaceArray[E_rType]);
 
 	g_RaceVehicle[playerid] = CreateVehicleEx(g_RaceArray[E_vModel], g_RaceVehCoords[g_RaceSpawnCount][0], g_RaceVehCoords[g_RaceSpawnCount][1], g_RaceVehCoords[g_RaceSpawnCount][2] + 0.5, g_RaceVehCoords[g_RaceSpawnCount][3], (random(128) + 127), (random(128) + 127), 60);
 	SetPlayerPos(playerid, g_RaceVehCoords[g_RaceSpawnCount][0], g_RaceVehCoords[g_RaceSpawnCount][1], floatadd(g_RaceVehCoords[g_RaceSpawnCount][2], 2.0));
@@ -29754,7 +29717,7 @@ function:CountTillRace()
  		case 0:
 	    {
 	        KillTimer(g_tRaceCounter);
-			StartRace();
+			race_start();
 	    }
 	    case 1..5:
 	    {
@@ -29778,7 +29741,7 @@ function:CountTillRace()
 	return g_RaceCountDown--;
 }
 
-StartRace()
+race_start()
 {
     g_RaceStatus = RaceStatus_Active;
     g_RaceTick = GetTickCountEx();
@@ -29794,12 +29757,12 @@ StartRace()
 			SetCameraBehindPlayer(i);
 	    }
 	}
-	g_tRaceCounter = SetTimer("RaceCounter", 1000, true);
+	g_tRaceCounter = SetTimer("race_counter", 1000, true);
 	
     SCMToAll(-1, ""race_sign" The current race has been started!");
 }
 
-function:RaceCounter()
+function:race_counter()
 {
 	if(g_RaceStatus == RaceStatus_Active)
 	{
@@ -29807,18 +29770,18 @@ function:RaceCounter()
 		if(g_RacePlayerCount <= 0)
 		{
 			SCMToAll(-1, ""race_sign" Race ended, no one left in the race");
-			return StopRace();
+			return race_stop();
 		}
 	}
 	if(g_RaceTime <= 0)
 	{
 	    SCMToAll(-1, ""race_sign" Race ended. No time left!");
-	    return StopRace();
+	    return race_stop();
 	}
 	return 1;
 }
 
-function:StopRace()
+function:race_stop()
 {
 	KillTimer(g_tRaceCounter);
 	KillTimer(g_tRaceOpenSelection);
@@ -29860,19 +29823,19 @@ function:StopRace()
 		}
 	}
 	
-	g_tRaceOpenSelection = SetTimer("OpenNewRace", (6 * 30 * 1000) + 307, false);
+	g_tRaceOpenSelection = SetTimer("race_open", (6 * 30 * 1000) + 307, false);
 	return 1;
 }
 
-function:Race_End()
+function:race_end()
 {
 	if(--g_iRaceEnd <= 0)
 	{
-	    return StopRace();
+	    return race_stop();
 	}
 	if(g_RacePlayerCount <= 0)
 	{
-	    return StopRace();
+	    return race_stop();
 	}
 	
 	format(gstr, sizeof(gstr), "~w~Still ~p~%i ~w~seconds left!", g_iRaceEnd);
@@ -29887,7 +29850,7 @@ function:Race_End()
 
 	g_RaceTime = g_iRaceEnd;
 
-    SetTimer("Race_End", 1000, false);
+    SetTimer("race_end", 1000, false);
 	return 1;
 }
 
@@ -29918,7 +29881,7 @@ RemoveFromRaceBuilder(playerid)
     gTeam[playerid] = FREEROAM;
 }
 
-SetCP(playerid, PrevCP, NextCP, MaxCP, Type)
+race_set_cp(playerid, PrevCP, NextCP, MaxCP, Type)
 {
 	const Float:RACE_CHECKPOINT_SIZE = 12.0;
 	if(Type == 1)
@@ -29945,7 +29908,7 @@ SetCP(playerid, PrevCP, NextCP, MaxCP, Type)
 	}
 }
 
-Race_CalculatePosition()
+race_calculate_position()
 {
 	new cp,
 	    vehicleid,
@@ -30092,282 +30055,50 @@ function:OnRaceRecordPurged(playerid, map)
 	return 1;
 }
 
-CreateVehicleEx(modelid, Float:x, Float:y, Float:z, Float:angle, color1, color2, respawn_delay)
-{
-	new vid = CreateVehicle(modelid, x, y, z, angle, color1, color2, respawn_delay);
-	
-	if(vid == INVALID_VEHICLE_ID)
-	{
-	    Log(LOG_FAIL, "Could not create vehicle! return: %i, params: %i %.2f %.2f %.2f %.2f %i %i %i", vid, modelid, x, y, z, angle, color1, color2, respawn_delay);
-	}
-	return vid;
-}
-
-DestroyVehicleEx(vehicleid)
-{
-	if(!IsValidVehicle(vehicleid))
-		return 0;
-
-	new ret = DestroyVehicle(vehicleid);
-
-	if(!ret)
-	{
-	    Log(LOG_FAIL, "Could not destroy vehicle! return %i, params: %i", ret, vehicleid);
-	}
-	return ret;
-}
-
-ToggleSpeedo(playerid, bool:toggle)
-{
-	if(!toggle)
-	{
-	    PlayerData[playerid][bSpeedo] = false;
-
-		PlayerTextDrawHide(playerid, TXTSpeedo[playerid]);
-		TextDrawHideForPlayer(playerid, TXTSpeedo_Main);
-	}
-	else
-	{
-	    PlayerData[playerid][bSpeedo] = true;
-
-		PlayerTextDrawShow(playerid, TXTSpeedo[playerid]);
-		TextDrawShowForPlayer(playerid, TXTSpeedo_Main);
-	}
-}
-
-ResetPlayerVars(playerid)
-{
-	gTeam[playerid] = FREEROAM;
-	CSG[playerid] = false;
-    g_RaceVehicle[playerid] = -1;
- 	GunGame_Player[playerid][level] = 0;
-	GunGame_Player[playerid][dead] = true;
-	GunGame_Player[playerid][pw] = true;
-	strmid(LastPlayerText[playerid], " ", 0, 144, 144);
-
-	for(new i = 0; E_PLAYER_ACH_DATA:i < E_PLAYER_ACH_DATA; i++)
-	{
-	    PlayerAchData[playerid][E_PLAYER_ACH_DATA:i][0] = 0;
-	}
-
-    Iter_Clear(PlayerIgnore[playerid]);
-
-	SetPVarInt(playerid, "LastID", INVALID_PLAYER_ID);
-    SetPVarInt(playerid, "doingStunt", 0);
-	SetPVarInt(playerid, "Cop", 0);
-	SetPVarInt(playerid, "Robber", 0);
-	SetPVarInt(playerid, "inCNR", 0);
-
-	strmid(PlayerData[playerid][e_email], "NoData", 0, 26, 26);
-	PlayerData[playerid][fOldPos][0] = 2012.4763;
-	PlayerData[playerid][fOldPos][1] = -2448.1399;
-	PlayerData[playerid][fOldPos][2] = 14.6396;
-    PlayerData[playerid][e_ormid] = ORM:-1;
-    PlayerData[playerid][e_accountid] = 0;
-    PlayerData[playerid][bHideGC] = false;
-    PlayerData[playerid][bAchsLoad] = false;
-	PlayerData[playerid][bVIPLInv] = false;
-	PlayerData[playerid][bIsDead] = false;
-	PlayerData[playerid][bShowToys] = true;
-	PlayerData[playerid][bFrozen] = false;
-	PlayerData[playerid][bAllowSpawn] = false;
- 	PlayerData[playerid][bDuty] = false;
-	PlayerData[playerid][bMuted] = false;
- 	PlayerData[playerid][bSpeedBoost] = true;
- 	PlayerData[playerid][bSuperJump] = false;
-	PlayerData[playerid][bOnlineAdmin] = true;
- 	PlayerData[playerid][bGangInvite] = false;
- 	PlayerData[playerid][bFalloutLost] = true;
-	PlayerData[playerid][bStateSaved] = false;
-	PlayerData[playerid][bHasSpawn] = false;
-	PlayerData[playerid][bFirstSpawn] = false;
-	PlayerData[playerid][bTextdraws] = true;
-	PlayerData[playerid][bRainbow] = false;
-	PlayerData[playerid][bVehicleInfo] = false;
-	PlayerData[playerid][bRampActive] = false;
-	PlayerData[playerid][bCaps] = true;
-	PlayerData[playerid][bGod] = false;
-	PlayerData[playerid][bGWarMode] = false;
-	PlayerData[playerid][bLoadMap] = false;
-	PlayerData[playerid][bOpenSeason] = false;
-	PlayerData[playerid][bLogged] = false;
-	PlayerData[playerid][bSpeedo] = false;
-	PlayerData[playerid][bDerbyWinner] = false;
-	PlayerData[playerid][bDerbyAFK] = false;
-	PlayerData[playerid][bDerbyHealthBarShowing] = false;
-	PlayerData[playerid][t3dDerbyVehicleLabel] = PlayerText3D:-1;
-	PlayerData[playerid][pDerbyVehicle] = INVALID_VEHICLE_ID;
-	PlayerData[playerid][iProAimCount] = 0;
-	PlayerData[playerid][iJailTime] = 0;
-	PlayerData[playerid][bwCNRFraction] = CNR_NONE;
-	PlayerData[playerid][iRobberyCount] = 0;
-	PlayerData[playerid][tRobbery] = -1;
-	PlayerData[playerid][tLoadMap] = -1;
-	PlayerData[playerid][Boost] = BOOST:0;
-	PlayerData[playerid][bwSuspect] = SUSPECT:0;
-	PlayerData[playerid][BoostDeplete] = 0;
-	PlayerData[playerid][e_color] = 0;
-	PlayerData[playerid][e_skinsave] = -1;
-	PlayerData[playerid][e_addpvslots] = 0;
-	PlayerData[playerid][e_addtoyslots] = 0;
-	PlayerData[playerid][e_addhouseslots] = 0;
-	PlayerData[playerid][e_addbizzslots] = 0;
-	PlayerData[playerid][e_addhouseitemslots] = 0;
-	PlayerData[playerid][HouseSlotSelected] = 0;
-	PlayerData[playerid][BusinessIdSelected] = 0;
-	PlayerData[playerid][DrawnNumber] = -1;
-	PlayerData[playerid][pTrailerVehicle] = INVALID_VEHICLE_ID;
-	PlayerData[playerid][tRainbow] = -1;
-	PlayerData[playerid][tTDhandle] = -1;
-	PlayerData[playerid][ExitType] = EXIT_NONE;
-	PlayerData[playerid][e_level] = 0;
-	PlayerData[playerid][e_kills] = 0;
-	PlayerData[playerid][e_deaths] = 0;
-	PlayerData[playerid][e_money] = 0;
-	PlayerData[playerid][e_score] = 0;
-	PlayerData[playerid][e_derbywins] = 0;
-	PlayerData[playerid][e_racewins] = 0;
-	PlayerData[playerid][e_falloutwins] = 0;
-	PlayerData[playerid][e_gungamewins] = 0;
-	PlayerData[playerid][e_eventwins] = 0;
-	PlayerData[playerid][e_tdmwins] = 0;
-	PlayerData[playerid][e_credits] = 0;
-	PlayerData[playerid][e_medkits] = 0;
-	PlayerData[playerid][tMedkit] = -1;
-	PlayerData[playerid][MedkitTime] = 0;
-	PlayerData[playerid][e_payday] = 60;
-  	PlayerData[playerid][e_houses] = 0;
-	PlayerData[playerid][GCPlayer] = INVALID_PLAYER_ID;
-	PlayerData[playerid][GCNameHash] = 0;
-	PlayerData[playerid][GCOffer] = 0;
-	PlayerData[playerid][GCPrice] = 0;
-	PlayerData[playerid][VIPPlayer] = INVALID_PLAYER_ID;
-	PlayerData[playerid][VIPNameHash] = 0;
-	PlayerData[playerid][VIPOffer] = 0;
-	PlayerData[playerid][VehicleSpamViolation] = 0;
-    PlayerData[playerid][tickLastAr] = 0;
-	PlayerData[playerid][tickLastShot] = 0;
-	PlayerData[playerid][tickLastRob] = 0;
-	PlayerData[playerid][tickVehicleEnterTime] = 0;
-	PlayerData[playerid][tickLastGiveCash] = 0;
-	PlayerData[playerid][tickLastMedkit] = 0;
-	PlayerData[playerid][tickLastVIPLInv] = 0;
-	PlayerData[playerid][tickLastRefill] = 0;
-	PlayerData[playerid][tickLastReport] = 0;
-	PlayerData[playerid][tickLastHitman] = 0;
-	PlayerData[playerid][tickLastGInvite] = 0;
-	PlayerData[playerid][tickLastGKick] = 0;
-	PlayerData[playerid][tickLastGCreate] = 0;
-	PlayerData[playerid][tickLastLocked] = 0;
-	PlayerData[playerid][tickLastBIKEC] = 0;
-  	PlayerData[playerid][tickLastBuy] = 0;
-  	PlayerData[playerid][tickLastPBuy] = 0;
-  	PlayerData[playerid][tickLastSell] = 0;
-  	PlayerData[playerid][tickLastPSell] = 0;
-  	PlayerData[playerid][tickLastPW] = 0;
-  	PlayerData[playerid][tickLastChat] = 0;
-  	PlayerData[playerid][tickLastPM] = 0;
-  	PlayerData[playerid][tickPlayerUpdate] = 0;
-  	PlayerData[playerid][tickLastCD] = 0;
-    PlayerData[playerid][tickJoin_bmx] = 0;
-    PlayerData[playerid][iKickBanIssued] = 0,
-    PlayerData[playerid][tickLastBan] = 0,
-  	PlayerData[playerid][e_lastlogin] = 0;
-	PlayerData[playerid][e_reaction] = 0;
-	PlayerData[playerid][e_mathwins] = 0;
-	PlayerData[playerid][e_bank] = 0;
-	PlayerData[playerid][e_time] = 0;
-	PlayerData[playerid][e_skin] = 0;
-	PlayerData[playerid][ConnectTime] = 0;
-	PlayerData[playerid][e_vip] = 0;
-	PlayerData[playerid][e_lastnc] = 0;
-	PlayerData[playerid][Warnings] = 0;
-	PlayerData[playerid][RankSelected] = 0;
-	PlayerData[playerid][e_wanteds] = 0;
-	PlayerData[playerid][HitmanHit] = 0;
-	PlayerData[playerid][pVehicle] = INVALID_VEHICLE_ID;
-	PlayerData[playerid][AdminDutyLabel] = Text3D:-1;
-	PlayerData[playerid][VIPLabel] = Text3D:-1;
-	PlayerData[playerid][iLastChat] = 0;
-	PlayerData[playerid][tMute] = -1;
- 	PlayerData[playerid][e_gangrank] = GANG_POS_NONE;
- 	PlayerData[playerid][TmpGangID] = 0;
- 	PlayerData[playerid][e_gangid] = 0;
-	PlayerData[playerid][GangLabel] = Text3D:-1;
-	PlayerData[playerid][GangKickMem][0] = '\0';
-	PlayerData[playerid][GangAssignRank][0] = '\0';
- 	PlayerData[playerid][GangName][0] = '\0';
- 	PlayerData[playerid][GangTag][0] = '\0';
-	PlayerData[playerid][e_regdate] = 0;
- 	PlayerData[playerid][HouseIntSelected] = 0;
-	PlayerData[playerid][SpecID] = INVALID_PLAYER_ID;
-	PlayerData[playerid][tDerbyHealthBar] = -1;
-	PlayerData[playerid][toy_selected] = 0;
-	PlayerData[playerid][houseobj_selected] = 0;
-	PlayerData[playerid][iCoolDownCommand] = 0;
-	PlayerData[playerid][iCoolDownChat] = 0;
-	PlayerData[playerid][iLastDeathTime] = 0;
-    PlayerData[playerid][iDeathCountThreshold] = 0;
-	PlayerData[playerid][DuelWeapon] = 0;
-	PlayerData[playerid][DuelLocation] = 0;
-	PlayerData[playerid][DuelRequest] = INVALID_PLAYER_ID;
-	PlayerData[playerid][DuelRequestRecv] = INVALID_PLAYER_ID;
-	
-    if(PlayerData[playerid][pPreviewVehicle] != INVALID_VEHICLE_ID)
-    {
-		DestroyVehicleEx(PlayerData[playerid][pPreviewVehicle]);
-		PlayerData[playerid][pPreviewVehicle] = INVALID_VEHICLE_ID;
-	}
-}
-
-badsql(const string[], bool:strict = true)
-{
-	if(strict)
-	{
-	    if(strfind(string, " ", true) != -1) return 1;
-	    if(strfind(string, ",", true) != -1) return 1;
-	}
-
-	if(strfind(string, "|", true) != -1) return 1;
-	if(strfind(string, "@", true) != -1) return 1;
-	if(strfind(string, "*", true) != -1) return 1;
-	if(strfind(string, "'", true) != -1) return 1;
-	if(strfind(string, "/", true) != -1) return 1;
-	if(strfind(string, "\\", true) != -1) return 1;
-	if(strfind(string, "´", true) != -1) return 1;
-	if(strfind(string, "`", true) != -1) return 1;
-	if(strfind(string, "~", true) != -1) return 1;
-	if(strfind(string, "#", true) != -1) return 1;
-	if(strfind(string, "\"", true) != -1) return 1;
-	return 0;
-}
-
-SetSpawnInfoEx(playerid, team, skin, Float:x, Float:y, Float:z, Float:Angle)
-{
-	if(!IsValidSkin(skin)) skin = 0;
-	//printf("SetSpawnInfo(%i, %i, %i, %f, %f, %f, %f, 0, 0, 0, 0, 0, 0);", playerid, team, skin, x, y, z, Angle);
-	return SetSpawnInfo(playerid, team, skin, x, y, z, Angle, 0, 0, 0, 0, 0, 0);
-}
-
-GunGamePlayers()
-{
-	new count = 0;
-	for(new i = 0; i < MAX_PLAYERS; i++) {
-	    if(gTeam[i] == GUNGAME) {
-	        ++count;
-		}
-	}
-	return count;
-}
-
-GetTickCountEx()
-{
-	return (GetTickCount() + 3600000);
-}
-
-function:ForceClassSpawn(playerid)
+function:server_force_spawn(playerid)
 {
 	SpawnPlayer(playerid);
+	return 1;
+}
+
+function:server_vip_countdown()
+{
+	switch(iCountdownVIP)
+	{
+	    case 5:
+	    {
+			GameTextForAll("~r~~h~~h~- 5 -", 1000, 3);
+	    }
+	    case 4:
+	    {
+	        GameTextForAll("~p~~h~~h~- 4 -", 1000, 3);
+	    }
+	    case 3:
+	    {
+	        GameTextForAll("~b~~h~~h~- 3 -", 1000, 3);
+	    }
+	    case 2:
+	    {
+	        GameTextForAll("~g~~h~~h~- 2 -", 1000, 3);
+	    }
+	    case 1:
+	    {
+	        GameTextForAll("~y~~h~- 1 -", 1000, 3);
+	    }
+ 	    case 0:
+	    {
+	        GameTextForAll("~g~~h~~h~GO GO GO", 1000, 3);
+	        KillTimer(tVIPCountdown);
+         	IsCountDownRunning = false;
+	    }
+	    default:
+	    {
+	        GameTextForAll("~g~~h~~h~GO GO GO", 1000, 3);
+	        KillTimer(tVIPCountdown);
+         	IsCountDownRunning = false;
+	    }
+	}
+	iCountdownVIP--;
 	return 1;
 }
 
@@ -30748,7 +30479,9 @@ global_broadcast(const fmat[], va_args<>)
 IsWhitelisted(ip[])
 {
 	format(gstr, sizeof(gstr), "/Other/%s.ip", ip);
-	if(fexist(gstr)) return 1;
+	if(fexist(gstr))
+		return 1;
+
 	return 0;
 }
 
@@ -30772,12 +30505,14 @@ ResetPlayerWorld(playerid)
 
 IsPlayerAvail(playerid)
 {
-	if(playerid == INVALID_PLAYER_ID) return 0;
+	if(playerid == INVALID_PLAYER_ID)
+		return 0;
 
 	if(IsPlayerConnected(playerid) && PlayerData[playerid][ExitType] == EXIT_FIRST_SPAWNED)
 	{
 	    return 1;
 	}
+	
 	return 0;
 }
 
@@ -30802,8 +30537,12 @@ GameTimeConvert(seconds)
 
 SetPlayerMoneyEx(playerid, amount)
 {
-	if(playerid == INVALID_PLAYER_ID) return 1;
-	if(PlayerData[playerid][e_money] >= 1000000000) return 1;
+	if(playerid == INVALID_PLAYER_ID)
+		return 0;
+		
+	if(PlayerData[playerid][e_money] >= 1000000000)
+		return 0;
+	
     ResetPlayerMoney(playerid);
 	PlayerData[playerid][e_money] = amount;
     GivePlayerMoney(playerid, PlayerData[playerid][e_money]);
@@ -30862,7 +30601,9 @@ GivePlayerMoneyEx(playerid, amount, bool:populate = true, bool:boost = false)
 
 GetPlayerMoneyEx(playerid)
 {
-    if(playerid == INVALID_PLAYER_ID) return 1;
+    if(playerid == INVALID_PLAYER_ID)
+		return 0;
+
 	return PlayerData[playerid][e_money];
 }
 
@@ -30922,7 +30663,9 @@ GivePlayerScoreEx(playerid, amount, bool:populate = true, bool:boost = false)
 
 SetPlayerScoreEx(playerid, amount)
 {
-    if(playerid == INVALID_PLAYER_ID) return 1;
+    if(playerid == INVALID_PLAYER_ID)
+		return 0;
+
 	PlayerData[playerid][e_score] = amount;
     SetPlayerScore(playerid, PlayerData[playerid][e_score]);
 
@@ -30938,7 +30681,9 @@ SetPlayerScoreEx(playerid, amount)
 
 GetPlayerScoreEx(playerid)
 {
-    if(playerid == INVALID_PLAYER_ID) return -1;
+    if(playerid == INVALID_PLAYER_ID)
+		return -1;
+
 	return PlayerData[playerid][e_score];
 }
 
@@ -31163,4 +30908,277 @@ get_command_name(cmdtext[])
 	}
 	strmid(gstr, cmdtext, 1, space, sizeof(gstr));
 	return gstr;
+}
+
+badsql(const string[], bool:strict = true)
+{
+	if(strict)
+	{
+	    if(strfind(string, " ", true) != -1) return 1;
+	    if(strfind(string, ",", true) != -1) return 1;
+	}
+
+	if(strfind(string, "|", true) != -1) return 1;
+	if(strfind(string, "@", true) != -1) return 1;
+	if(strfind(string, "*", true) != -1) return 1;
+	if(strfind(string, "'", true) != -1) return 1;
+	if(strfind(string, "/", true) != -1) return 1;
+	if(strfind(string, "\\", true) != -1) return 1;
+	if(strfind(string, "´", true) != -1) return 1;
+	if(strfind(string, "`", true) != -1) return 1;
+	if(strfind(string, "~", true) != -1) return 1;
+	if(strfind(string, "#", true) != -1) return 1;
+	if(strfind(string, "\"", true) != -1) return 1;
+	return 0;
+}
+
+SetSpawnInfoEx(playerid, team, skin, Float:x, Float:y, Float:z, Float:Angle)
+{
+	if(!IsValidSkin(skin)) skin = 0;
+	//printf("SetSpawnInfo(%i, %i, %i, %f, %f, %f, %f, 0, 0, 0, 0, 0, 0);", playerid, team, skin, x, y, z, Angle);
+	return SetSpawnInfo(playerid, team, skin, x, y, z, Angle, 0, 0, 0, 0, 0, 0);
+}
+
+GunGamePlayers()
+{
+	new count = 0;
+	for(new i = 0; i < MAX_PLAYERS; i++) {
+	    if(gTeam[i] == GUNGAME) {
+	        ++count;
+		}
+	}
+	return count;
+}
+
+GetTickCountEx()
+{
+	return (GetTickCount() + 3600000);
+}
+
+CreateVehicleEx(modelid, Float:x, Float:y, Float:z, Float:angle, color1, color2, respawn_delay)
+{
+	new vid = CreateVehicle(modelid, x, y, z, angle, color1, color2, respawn_delay);
+
+	if(vid == INVALID_VEHICLE_ID)
+	{
+	    Log(LOG_FAIL, "Could not create vehicle! return: %i, params: %i %.2f %.2f %.2f %.2f %i %i %i", vid, modelid, x, y, z, angle, color1, color2, respawn_delay);
+	}
+	return vid;
+}
+
+DestroyVehicleEx(vehicleid)
+{
+	if(!IsValidVehicle(vehicleid))
+		return 0;
+
+	new ret = DestroyVehicle(vehicleid);
+
+	if(!ret)
+	{
+	    Log(LOG_FAIL, "Could not destroy vehicle! return %i, params: %i", ret, vehicleid);
+	}
+	return ret;
+}
+
+ToggleSpeedo(playerid, bool:toggle)
+{
+	if(!toggle)
+	{
+	    PlayerData[playerid][bSpeedo] = false;
+
+		PlayerTextDrawHide(playerid, TXTSpeedo[playerid]);
+		TextDrawHideForPlayer(playerid, TXTSpeedo_Main);
+	}
+	else
+	{
+	    PlayerData[playerid][bSpeedo] = true;
+
+		PlayerTextDrawShow(playerid, TXTSpeedo[playerid]);
+		TextDrawShowForPlayer(playerid, TXTSpeedo_Main);
+	}
+}
+
+ResetPlayerVars(playerid)
+{
+	gTeam[playerid] = FREEROAM;
+	CSG[playerid] = false;
+    g_RaceVehicle[playerid] = -1;
+ 	GunGame_Player[playerid][level] = 0;
+	GunGame_Player[playerid][dead] = true;
+	GunGame_Player[playerid][pw] = true;
+	strmid(LastPlayerText[playerid], " ", 0, 144, 144);
+
+	for(new i = 0; E_PLAYER_ACH_DATA:i < E_PLAYER_ACH_DATA; i++)
+	{
+	    PlayerAchData[playerid][E_PLAYER_ACH_DATA:i][0] = 0;
+	}
+
+    Iter_Clear(PlayerIgnore[playerid]);
+
+	SetPVarInt(playerid, "LastID", INVALID_PLAYER_ID);
+    SetPVarInt(playerid, "doingStunt", 0);
+	SetPVarInt(playerid, "Cop", 0);
+	SetPVarInt(playerid, "Robber", 0);
+	SetPVarInt(playerid, "inCNR", 0);
+
+	strmid(PlayerData[playerid][e_email], "NoData", 0, 26, 26);
+	PlayerData[playerid][fOldPos][0] = 2012.4763;
+	PlayerData[playerid][fOldPos][1] = -2448.1399;
+	PlayerData[playerid][fOldPos][2] = 14.6396;
+    PlayerData[playerid][e_ormid] = ORM:-1;
+    PlayerData[playerid][e_accountid] = 0;
+    PlayerData[playerid][bHideGC] = false;
+    PlayerData[playerid][bAchsLoad] = false;
+	PlayerData[playerid][bVIPLInv] = false;
+	PlayerData[playerid][bIsDead] = false;
+	PlayerData[playerid][bShowToys] = true;
+	PlayerData[playerid][bFrozen] = false;
+	PlayerData[playerid][bAllowSpawn] = false;
+ 	PlayerData[playerid][bDuty] = false;
+	PlayerData[playerid][bMuted] = false;
+ 	PlayerData[playerid][bSpeedBoost] = true;
+ 	PlayerData[playerid][bSuperJump] = false;
+	PlayerData[playerid][bOnlineAdmin] = true;
+ 	PlayerData[playerid][bGangInvite] = false;
+ 	PlayerData[playerid][bFalloutLost] = true;
+	PlayerData[playerid][bStateSaved] = false;
+	PlayerData[playerid][bHasSpawn] = false;
+	PlayerData[playerid][bFirstSpawn] = false;
+	PlayerData[playerid][bTextdraws] = true;
+	PlayerData[playerid][bRainbow] = false;
+	PlayerData[playerid][bVehicleInfo] = false;
+	PlayerData[playerid][bRampActive] = false;
+	PlayerData[playerid][bCaps] = true;
+	PlayerData[playerid][bGod] = false;
+	PlayerData[playerid][bGWarMode] = false;
+	PlayerData[playerid][bLoadMap] = false;
+	PlayerData[playerid][bOpenSeason] = false;
+	PlayerData[playerid][bLogged] = false;
+	PlayerData[playerid][bSpeedo] = false;
+	PlayerData[playerid][bDerbyWinner] = false;
+	PlayerData[playerid][bDerbyAFK] = false;
+	PlayerData[playerid][bDerbyHealthBarShowing] = false;
+	PlayerData[playerid][t3dDerbyVehicleLabel] = PlayerText3D:-1;
+	PlayerData[playerid][pDerbyVehicle] = INVALID_VEHICLE_ID;
+	PlayerData[playerid][iProAimCount] = 0;
+	PlayerData[playerid][iJailTime] = 0;
+	PlayerData[playerid][bwCNRFraction] = CNR_NONE;
+	PlayerData[playerid][iRobberyCount] = 0;
+	PlayerData[playerid][tRobbery] = -1;
+	PlayerData[playerid][tLoadMap] = -1;
+	PlayerData[playerid][Boost] = BOOST:0;
+	PlayerData[playerid][bwSuspect] = SUSPECT:0;
+	PlayerData[playerid][BoostDeplete] = 0;
+	PlayerData[playerid][e_color] = 0;
+	PlayerData[playerid][e_skinsave] = -1;
+	PlayerData[playerid][e_addpvslots] = 0;
+	PlayerData[playerid][e_addtoyslots] = 0;
+	PlayerData[playerid][e_addhouseslots] = 0;
+	PlayerData[playerid][e_addbizzslots] = 0;
+	PlayerData[playerid][e_addhouseitemslots] = 0;
+	PlayerData[playerid][HouseSlotSelected] = 0;
+	PlayerData[playerid][BusinessIdSelected] = 0;
+	PlayerData[playerid][DrawnNumber] = -1;
+	PlayerData[playerid][pTrailerVehicle] = INVALID_VEHICLE_ID;
+	PlayerData[playerid][tRainbow] = -1;
+	PlayerData[playerid][tTDhandle] = -1;
+	PlayerData[playerid][ExitType] = EXIT_NONE;
+	PlayerData[playerid][e_level] = 0;
+	PlayerData[playerid][e_kills] = 0;
+	PlayerData[playerid][e_deaths] = 0;
+	PlayerData[playerid][e_money] = 0;
+	PlayerData[playerid][e_score] = 0;
+	PlayerData[playerid][e_derbywins] = 0;
+	PlayerData[playerid][e_racewins] = 0;
+	PlayerData[playerid][e_falloutwins] = 0;
+	PlayerData[playerid][e_gungamewins] = 0;
+	PlayerData[playerid][e_eventwins] = 0;
+	PlayerData[playerid][e_tdmwins] = 0;
+	PlayerData[playerid][e_credits] = 0;
+	PlayerData[playerid][e_medkits] = 0;
+	PlayerData[playerid][tMedkit] = -1;
+	PlayerData[playerid][MedkitTime] = 0;
+	PlayerData[playerid][e_payday] = 60;
+  	PlayerData[playerid][e_houses] = 0;
+	PlayerData[playerid][GCPlayer] = INVALID_PLAYER_ID;
+	PlayerData[playerid][GCNameHash] = 0;
+	PlayerData[playerid][GCOffer] = 0;
+	PlayerData[playerid][GCPrice] = 0;
+	PlayerData[playerid][VIPPlayer] = INVALID_PLAYER_ID;
+	PlayerData[playerid][VIPNameHash] = 0;
+	PlayerData[playerid][VIPOffer] = 0;
+	PlayerData[playerid][VehicleSpamViolation] = 0;
+    PlayerData[playerid][tickLastAr] = 0;
+	PlayerData[playerid][tickLastShot] = 0;
+	PlayerData[playerid][tickLastRob] = 0;
+	PlayerData[playerid][tickVehicleEnterTime] = 0;
+	PlayerData[playerid][tickLastGiveCash] = 0;
+	PlayerData[playerid][tickLastMedkit] = 0;
+	PlayerData[playerid][tickLastVIPLInv] = 0;
+	PlayerData[playerid][tickLastRefill] = 0;
+	PlayerData[playerid][tickLastReport] = 0;
+	PlayerData[playerid][tickLastHitman] = 0;
+	PlayerData[playerid][tickLastGInvite] = 0;
+	PlayerData[playerid][tickLastGKick] = 0;
+	PlayerData[playerid][tickLastGCreate] = 0;
+	PlayerData[playerid][tickLastLocked] = 0;
+	PlayerData[playerid][tickLastBIKEC] = 0;
+  	PlayerData[playerid][tickLastBuy] = 0;
+  	PlayerData[playerid][tickLastPBuy] = 0;
+  	PlayerData[playerid][tickLastSell] = 0;
+  	PlayerData[playerid][tickLastPSell] = 0;
+  	PlayerData[playerid][tickLastPW] = 0;
+  	PlayerData[playerid][tickLastChat] = 0;
+  	PlayerData[playerid][tickLastPM] = 0;
+  	PlayerData[playerid][tickPlayerUpdate] = 0;
+  	PlayerData[playerid][tickLastCD] = 0;
+    PlayerData[playerid][tickJoin_bmx] = 0;
+    PlayerData[playerid][iKickBanIssued] = 0,
+    PlayerData[playerid][tickLastBan] = 0,
+  	PlayerData[playerid][e_lastlogin] = 0;
+	PlayerData[playerid][e_reaction] = 0;
+	PlayerData[playerid][e_mathwins] = 0;
+	PlayerData[playerid][e_bank] = 0;
+	PlayerData[playerid][e_time] = 0;
+	PlayerData[playerid][e_skin] = 0;
+	PlayerData[playerid][ConnectTime] = 0;
+	PlayerData[playerid][e_vip] = 0;
+	PlayerData[playerid][e_lastnc] = 0;
+	PlayerData[playerid][Warnings] = 0;
+	PlayerData[playerid][RankSelected] = 0;
+	PlayerData[playerid][e_wanteds] = 0;
+	PlayerData[playerid][HitmanHit] = 0;
+	PlayerData[playerid][pVehicle] = INVALID_VEHICLE_ID;
+	PlayerData[playerid][AdminDutyLabel] = Text3D:-1;
+	PlayerData[playerid][VIPLabel] = Text3D:-1;
+	PlayerData[playerid][iLastChat] = 0;
+	PlayerData[playerid][tMute] = -1;
+ 	PlayerData[playerid][e_gangrank] = GANG_POS_NONE;
+ 	PlayerData[playerid][TmpGangID] = 0;
+ 	PlayerData[playerid][e_gangid] = 0;
+	PlayerData[playerid][GangLabel] = Text3D:-1;
+	PlayerData[playerid][GangKickMem][0] = '\0';
+	PlayerData[playerid][GangAssignRank][0] = '\0';
+ 	PlayerData[playerid][GangName][0] = '\0';
+ 	PlayerData[playerid][GangTag][0] = '\0';
+	PlayerData[playerid][e_regdate] = 0;
+ 	PlayerData[playerid][HouseIntSelected] = 0;
+	PlayerData[playerid][SpecID] = INVALID_PLAYER_ID;
+	PlayerData[playerid][tDerbyHealthBar] = -1;
+	PlayerData[playerid][toy_selected] = 0;
+	PlayerData[playerid][houseobj_selected] = 0;
+	PlayerData[playerid][iCoolDownCommand] = 0;
+	PlayerData[playerid][iCoolDownChat] = 0;
+	PlayerData[playerid][iLastDeathTime] = 0;
+    PlayerData[playerid][iDeathCountThreshold] = 0;
+	PlayerData[playerid][DuelWeapon] = 0;
+	PlayerData[playerid][DuelLocation] = 0;
+	PlayerData[playerid][DuelRequest] = INVALID_PLAYER_ID;
+	PlayerData[playerid][DuelRequestRecv] = INVALID_PLAYER_ID;
+
+    if(PlayerData[playerid][pPreviewVehicle] != INVALID_VEHICLE_ID)
+    {
+		DestroyVehicleEx(PlayerData[playerid][pPreviewVehicle]);
+		PlayerData[playerid][pPreviewVehicle] = INVALID_VEHICLE_ID;
+	}
 }
