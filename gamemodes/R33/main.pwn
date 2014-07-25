@@ -24,7 +24,7 @@
 #pragma dynamic 8192
 
 #define IS_RELEASE_BUILD (true)
-#define INC_ENVIORMENT (false)
+#define INC_ENVIORMENT (true)
 #define IRC_CONNECT (true)
 #define WINTER_EDITION (false) // Requires FS ferriswheelfair.amx
 #define YSI_NO_MASTER
@@ -59,6 +59,11 @@
 
 native IsValidVehicle(vehicleid); // undefined in a_samp.inc
 native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
+
+// Protoypes
+Float:GetElevatorZCoordForFloor(floorid);
+Float:GetDoorsZCoordForFloor(floorid);
+Float:GetDistance3D(Float:x1, Float:y1, Float:z1, Float:x2, Float:y2, Float:z2);
 
 // MySQL
 #define SQL_HOST   						"127.0.0.1"
@@ -6388,21 +6393,6 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 	    }
 	}
 	return 1;
-}
-
-Float:GetElevatorZCoordForFloor(floorid)
-{
-    return (GROUND_Z_COORD + FloorZOffsets[floorid] + ELEVATOR_OFFSET); // A small offset for the elevator object itself.
-}
-
-Float:GetDoorsZCoordForFloor(floorid)
-{
-	return (GROUND_Z_COORD + FloorZOffsets[floorid]);
-}
-
-Float:GetDistance3D(Float:x1, Float:y1, Float:z1, Float:x2, Float:y2, Float:z2)
-{
-	return VectorSize(x1 - x2, y1 - y2, z1 - z2);
 }
 
 public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
@@ -31124,4 +31114,19 @@ CancelGangCreation(playerid)
 	PlayerData[playerid][GangName][0] = '\0';
 	PlayerData[playerid][GangTag][0] = '\0';
  	return 1;
+}
+
+Float:GetElevatorZCoordForFloor(floorid)
+{
+    return (GROUND_Z_COORD + FloorZOffsets[floorid] + ELEVATOR_OFFSET); // A small offset for the elevator object itself.
+}
+
+Float:GetDoorsZCoordForFloor(floorid)
+{
+	return (GROUND_Z_COORD + FloorZOffsets[floorid]);
+}
+
+Float:GetDistance3D(Float:x1, Float:y1, Float:z1, Float:x2, Float:y2, Float:z2)
+{
+	return VectorSize(x1 - x2, y1 - y2, z1 - z2);
 }
