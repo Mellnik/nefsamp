@@ -23,10 +23,12 @@
 
 #pragma dynamic 8192
 
-#define IS_RELEASE_BUILD (true)
+#define IS_RELEASE_BUILD (false)
 #define INC_ENVIRONMENT (true)
 #define IRC_CONNECT (true)
 #define WINTER_EDITION (false) // Requires FS ferriswheelfair.amx
+#define _YSI_NO_VERSION_CHECK
+#define MAX_COMMANDS (768)
 
 #include <a_samp>   		
 #include <a_http>           // API Requests
@@ -3564,6 +3566,10 @@ public e_COMMAND_ERRORS:OnPlayerCommandReceived(playerid, cmdtext[], e_COMMAND_E
 	CancelEdit(playerid);
 	// Closing open dialogs in order to avoid some exploits.
 	ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
+	Log(LOG_FAIL, "OPCR %i", _:success);
+	if(success == COMMAND_UNDEFINED) {
+	    player_notice(playerid, "Unknown command", "Type ~y~/c ~w~for all commands");
+	}
 	return COMMAND_OK;
 }
 
@@ -3577,11 +3583,7 @@ public e_COMMAND_ERRORS:OnPlayerCommandPerformed(playerid, cmdtext[], e_COMMAND_
     fwrite(hFile, gstr2);
     fclose(hFile);
 
-	if(!success) {
-	    player_notice(playerid, "Unknown command", "Type ~y~/c ~w~for all commands");
-	} else {
-	    SrvStat[0]++;
-	}
+    SrvStat[0]++;
 	return COMMAND_OK;
 }
 
@@ -5840,10 +5842,15 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 					    new Float:h;
 					    GetPlayerHealth(playerid, h);
 
-					    if(h < 100.0)
+					    if(h + 25.0 < 100.0)
 					    {
-						    player_notice(playerid, "Health refilled", "");
-							SetPlayerHealth(playerid, 100.0);
+					        player_notice(playerid, "+25 Health", "");
+							SetPlayerHealth(playerid, h + 25.0);
+						}
+						else
+						{
+                            player_notice(playerid, "Health refilled", "");
+						    SetPlayerHealth(playerid, 100.0);
 						}
 						return 1;
 					}
@@ -16397,7 +16404,7 @@ YCMD:toggletoys(playerid, params[], help)
 	else if(!PlayerData[playerid][bShowToys])
 	{
 	    AttachPlayerToy(playerid);
-	    player_notice(playerid, "Toys:", "~r~ON");
+	    player_notice(playerid, "Toys:", "~g~ON");
 	}
 
 	PlayerData[playerid][bShowToys] = !PlayerData[playerid][bShowToys];
@@ -16416,7 +16423,7 @@ YCMD:toggletp(playerid, params[], help)
 	}
 	else if(!PlayerData[playerid][bAllowPlayerTeleport])
 	{
-	    player_notice(playerid, "Toys:", "~r~ON");
+	    player_notice(playerid, "Toys:", "~g~ON");
 	}
 
 	PlayerData[playerid][bAllowPlayerTeleport] = !PlayerData[playerid][bAllowPlayerTeleport];
