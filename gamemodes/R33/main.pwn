@@ -5072,7 +5072,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 			}
 		}
 	}
-	
+
 	new reasonMsg[32];
 	if(killerid != INVALID_PLAYER_ID)
 	{
@@ -10451,12 +10451,11 @@ YCMD:jetpack(playerid, params[], help)
 
 		for(new i = 0; i < gzoneid; i++)
 		{
-		    if(!GZoneData[i][e_underattack]) continue;
+		    if(!GZoneData[i][e_underattack])
+				continue;
 
 		    if(IsPointInDynamicArea(GZoneData[i][e_sphereid], POS[0], POS[1], POS[2]))
-		    {
 		        return player_notice(playerid, "Failed to spawn jetpack", "Not allowed in gang zone");
-		    }
 		}
 	}
 
@@ -20581,7 +20580,7 @@ function:OnGangZoneLoadEx(gindex)
         GZoneData[gindex][e_iconid] = CreateDynamicMapIcon(GZoneData[gindex][e_x], GZoneData[gindex][e_y], GZoneData[gindex][e_z], 19, 1, 0, -1, -1, 250.0);
         GZoneData[gindex][e_zoneid] = GangZoneCreate(GZoneData[gindex][e_x] - GZONE_SIZE, GZoneData[gindex][e_y] - GZONE_SIZE, GZoneData[gindex][e_x] + GZONE_SIZE, GZoneData[gindex][e_y] + GZONE_SIZE);
         GZoneData[gindex][e_checkid] = CreateDynamicCP(GZoneData[gindex][e_x], GZoneData[gindex][e_y], GZoneData[gindex][e_z], 7.0, 0, -1, -1, 60.0);
-		GZoneData[gindex][e_sphereid] = CreateDynamicSphere(GZoneData[gindex][e_x], GZoneData[gindex][e_y], GZoneData[gindex][e_z], GZONE_SIZE, 0, -1, -1);
+		GZoneData[gindex][e_sphereid] = CreateDynamicRectangle(GZoneData[gindex][e_x] - GZONE_SIZE, GZoneData[gindex][e_y] - GZONE_SIZE, GZoneData[gindex][e_x] + GZONE_SIZE, GZoneData[gindex][e_y] + GZONE_SIZE);
 
         GangZoneShowForAll(GZoneData[gindex][e_zoneid], COLOR_NONE);
 
@@ -20628,7 +20627,7 @@ function:OnGangZoneLoad()
 	        GZoneData[gzoneid][e_iconid] = CreateDynamicMapIcon(GZoneData[gzoneid][e_x], GZoneData[gzoneid][e_y], GZoneData[gzoneid][e_z], 19, 1, 0, -1, -1, 250.0);
 			GZoneData[gzoneid][e_zoneid] = GangZoneCreate(GZoneData[gzoneid][e_x] - GZONE_SIZE, GZoneData[gzoneid][e_y] - GZONE_SIZE, GZoneData[gzoneid][e_x] + GZONE_SIZE, GZoneData[gzoneid][e_y] + GZONE_SIZE);
             GZoneData[gzoneid][e_checkid] = CreateDynamicCP(GZoneData[gzoneid][e_x], GZoneData[gzoneid][e_y], GZoneData[gzoneid][e_z], 7.0, 0, -1, -1, 60.0);
-            GZoneData[gzoneid][e_sphereid] = CreateDynamicSphere(GZoneData[gzoneid][e_x], GZoneData[gzoneid][e_y], GZoneData[gzoneid][e_z], GZONE_SIZE, 0, -1, -1);
+            GZoneData[gzoneid][e_sphereid] = CreateDynamicRectangle(GZoneData[gzoneid][e_x] - GZONE_SIZE, GZoneData[gzoneid][e_y] - GZONE_SIZE, GZoneData[gzoneid][e_x] + GZONE_SIZE, GZoneData[gzoneid][e_y] + GZONE_SIZE);
 
 	        gzoneid++;
 	    }
