@@ -961,11 +961,11 @@ enum E_GZONE_DATA
 	e_locked,
 	e_timeleft,
 	e_iconid,
-	Text3D:label,
+	Text3D:e_labelid,
 	Text:e_txtid,
 	e_pickupid,
 	e_checkid,
-	zoneid,
+	e_zoneid,
 	e_sphereid,
 	bool:e_underattack,
 	e_attacker,
@@ -982,7 +982,7 @@ enum E_HOUSE_DATA
 	interior,
 	price,
 	E_score,
-	Text3D:label,
+	Text3D:e_labelid,
 	sold,
 	locked,
 	pickid,
@@ -3869,7 +3869,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 						GZoneData[i][e_localgang] = 0;
 
 						format(gstr2, sizeof(gstr2), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: ---\n"orange"Type /gwar to start an attack!", GZoneData[i][e_id], GZoneData[i][e_zonename]);
-						UpdateDynamic3DTextLabelText(GZoneData[i][label], WHITE, gstr2);
+						UpdateDynamic3DTextLabelText(GZoneData[i][e_labelid], WHITE, gstr2);
 
 						MySQL_SaveGangZone(i);
 				    }
@@ -8551,7 +8551,7 @@ YCMD:buy(playerid, params[], help)
 	    HouseData[i][sold] = 1;
 
 	    format(gstr, sizeof(gstr), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", __GetName(playerid), HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][E_score], HouseIntTypes[HouseData[i][interior]][intname]);
-	    UpdateDynamic3DTextLabelText(HouseData[i][label], -1, gstr);
+	    UpdateDynamic3DTextLabelText(HouseData[i][e_labelid], -1, gstr);
 	    DestroyDynamicMapIcon(HouseData[i][e_iconid]);
 	    DestroyDynamicPickup(HouseData[i][pickid]);
 	    HouseData[i][e_iconid] = -1; //CreateDynamicMapIcon(HouseData[i][E_x], HouseData[i][E_y], HouseData[i][E_z], 32, 1, 0, -1, -1, 150.0);
@@ -8625,7 +8625,7 @@ YCMD:sell(playerid, params[], help)
 		}
 
 	    format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][E_score], HouseIntTypes[HouseData[i][interior]][intname]);
-	    UpdateDynamic3DTextLabelText(HouseData[i][label], -1, gstr);
+	    UpdateDynamic3DTextLabelText(HouseData[i][e_labelid], -1, gstr);
 	    DestroyDynamicMapIcon(HouseData[i][e_iconid]);
 	    DestroyDynamicPickup(HouseData[i][pickid]);
 	    HouseData[i][e_iconid] = CreateDynamicMapIcon(HouseData[i][E_x], HouseData[i][E_y], HouseData[i][E_z], 31, 1, 0, -1, -1, 150.0);
@@ -11291,7 +11291,7 @@ YCMD:gzonereset(playerid, params[], help)
 	  		GZoneData[i][e_locked] = gettime();
 	        
         	format(gstr2, sizeof(gstr2), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: ---\n"orange"Type /gwar to start an attack!", GZoneData[i][e_id], GZoneData[i][e_zonename]);
-			UpdateDynamic3DTextLabelText(GZoneData[i][label], WHITE, gstr2);
+			UpdateDynamic3DTextLabelText(GZoneData[i][e_labelid], WHITE, gstr2);
 	        
 			MySQL_SaveGangZone(i);
 	        
@@ -13805,7 +13805,7 @@ YCMD:sethouseprice(playerid, params[], help)
 	    HouseData[i][price] = hprice;
 
  	   	format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][E_score], HouseIntTypes[HouseData[i][interior]][intname]);
-	    UpdateDynamic3DTextLabelText(HouseData[i][label], -1, gstr);
+	    UpdateDynamic3DTextLabelText(HouseData[i][e_labelid], -1, gstr);
 	    MySQL_SaveHouse(i);
 
 		player_notice(playerid, "House price has been set", "");
@@ -13835,7 +13835,7 @@ YCMD:sethousescore(playerid, params[], help)
 	    HouseData[i][E_score] = hscore;
 
  	   	format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][E_score], HouseIntTypes[HouseData[i][interior]][intname]);
-	    UpdateDynamic3DTextLabelText(HouseData[i][label], -1, gstr);
+	    UpdateDynamic3DTextLabelText(HouseData[i][e_labelid], -1, gstr);
 	    MySQL_SaveHouse(i);
 
 		player_notice(playerid, "House score has been set", "");
@@ -13889,7 +13889,7 @@ YCMD:resethouse(playerid, params[], help)
 		MySQL_SaveHouse(i, true);
 
 	    format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][E_score], HouseIntTypes[HouseData[i][interior]][intname]);
-	    UpdateDynamic3DTextLabelText(HouseData[i][label], -1, gstr);
+	    UpdateDynamic3DTextLabelText(HouseData[i][e_labelid], -1, gstr);
 	    DestroyDynamicMapIcon(HouseData[i][e_iconid]);
 	    DestroyDynamicPickup(HouseData[i][pickid]);
 	    HouseData[i][e_iconid] = CreateDynamicMapIcon(HouseData[i][E_x], HouseData[i][E_y], HouseData[i][E_z], 31, 1, 0, -1, -1, 150.0);
@@ -17157,7 +17157,7 @@ function:OnPlayerNameChangeRequest(playerid, newname[])
                     strmid(HouseData[i][Owner], newname, 0, 25, 25);
 
 				    format(query, sizeof(query), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", __GetName(playerid), HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][E_score], HouseIntTypes[HouseData[i][interior]][intname]);
-				    UpdateDynamic3DTextLabelText(HouseData[i][label], -1, query);
+				    UpdateDynamic3DTextLabelText(HouseData[i][e_labelid], -1, query);
 				    MySQL_SaveHouse(i);
 				}
             }
@@ -18587,7 +18587,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						GZoneData[i][e_localgang] = 0;
 
 						format(gstr2, sizeof(gstr2), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: ---\n"orange"Type /gwar to start an attack!", GZoneData[i][e_id], GZoneData[i][e_zonename]);
-						UpdateDynamic3DTextLabelText(GZoneData[i][label], WHITE, gstr2);
+						UpdateDynamic3DTextLabelText(GZoneData[i][e_labelid], WHITE, gstr2);
 
 						MySQL_SaveGangZone(i);
 				    }
@@ -19060,7 +19060,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					ResetPlayerWorld(playerid);
 					gTeam[playerid] = FREEROAM;
 	      		    format(gstr, sizeof(gstr), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", __GetName(playerid), HouseData[h_id][e_id], number_format(HouseData[h_id][price]), HouseData[h_id][E_score], HouseIntTypes[PlayerData[playerid][HouseIntSelected]][intname]);
-	    			UpdateDynamic3DTextLabelText(HouseData[h_id][label], -1, gstr);
+	    			UpdateDynamic3DTextLabelText(HouseData[h_id][e_labelid], -1, gstr);
 	                MySQL_SaveHouse(h_id, true);
 	                MySQL_SaveAccount(playerid, false, false);
 	                SCM(playerid, GREEN, "Successfully upgraded the interior!");
@@ -20527,7 +20527,7 @@ function:OnHouseLoadEx(index)
 
 		format(line, sizeof(line), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[index][e_id], number_format(HouseData[index][price]), HouseData[index][E_score], HouseIntTypes[HouseData[index][interior]][intname]);
 
-		HouseData[index][label] = CreateDynamic3DTextLabel(line, (HouseData[index][sold]) ? (0xFF0000FF) : (0x00FF00FF), HouseData[index][E_x], HouseData[index][E_y], floatadd(HouseData[index][E_z], 0.3), 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 30.0);
+		HouseData[index][e_labelid] = CreateDynamic3DTextLabel(line, (HouseData[index][sold]) ? (0xFF0000FF) : (0x00FF00FF), HouseData[index][E_x], HouseData[index][E_y], floatadd(HouseData[index][E_z], 0.3), 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 30.0);
 		HouseData[index][pickid] = CreateDynamicPickup((HouseData[index][sold]) ? (1272) : (1273), 1, HouseData[index][E_x], HouseData[index][E_y], HouseData[index][E_z], -1, -1, -1, 30.0);
 		HouseData[index][e_iconid] = CreateDynamicMapIcon(HouseData[index][E_x], HouseData[index][E_y], HouseData[index][E_z], 31, 1, 0, -1, -1, 150.0);
 
@@ -20583,7 +20583,7 @@ function:OnHouseLoad()
 
             HouseData[houseid][date] = cache_get_row_int(i, 20, pSQL);
 
-			HouseData[houseid][label] = CreateDynamic3DTextLabel(gstr2, HouseData[houseid][sold] ? 0xFF0000FF : 0x00FF00FF, HouseData[houseid][E_x], HouseData[houseid][E_y], floatadd(HouseData[houseid][E_z], 0.3), 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 30.0);
+			HouseData[houseid][e_labelid] = CreateDynamic3DTextLabel(gstr2, HouseData[houseid][sold] ? 0xFF0000FF : 0x00FF00FF, HouseData[houseid][E_x], HouseData[houseid][E_y], floatadd(HouseData[houseid][E_z], 0.3), 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 30.0);
 			HouseData[houseid][pickid] = CreateDynamicPickup(HouseData[houseid][sold] ? 1272 : 1273, 1, HouseData[houseid][E_x], HouseData[houseid][E_y], HouseData[houseid][E_z], -1, -1, -1, 30.0);
 			if(!HouseData[houseid][sold]) HouseData[houseid][e_iconid] = CreateDynamicMapIcon(HouseData[houseid][E_x], HouseData[houseid][E_y], HouseData[houseid][E_z], 31, 1, 0, -1, -1, 150.0);
 			
@@ -20659,13 +20659,13 @@ function:OnGangZoneLoadEx(gindex)
 
         format(gstr2, sizeof(gstr2), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: ---\n"orange"Type /gwar to start an attack!", GZoneData[gindex][e_id], GZoneData[gindex][e_zonename]);
 
-        GZoneData[gindex][label] = CreateDynamic3DTextLabel(gstr2, WHITE, GZoneData[gindex][E_x], GZoneData[gindex][E_y], GZoneData[gindex][E_z] + 0.3, 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 50.0);
+        GZoneData[gindex][e_labelid] = CreateDynamic3DTextLabel(gstr2, WHITE, GZoneData[gindex][E_x], GZoneData[gindex][E_y], GZoneData[gindex][E_z] + 0.3, 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 50.0);
         GZoneData[gindex][e_iconid] = CreateDynamicMapIcon(GZoneData[gindex][E_x], GZoneData[gindex][E_y], GZoneData[gindex][E_z], 19, 1, 0, -1, -1, 250.0);
-        GZoneData[gindex][zoneid] = GangZoneCreate(GZoneData[gindex][E_x] - GZONE_SIZE, GZoneData[gindex][E_y] - GZONE_SIZE, GZoneData[gindex][E_x] + GZONE_SIZE, GZoneData[gindex][E_y] + GZONE_SIZE);
+        GZoneData[gindex][e_zoneid] = GangZoneCreate(GZoneData[gindex][E_x] - GZONE_SIZE, GZoneData[gindex][E_y] - GZONE_SIZE, GZoneData[gindex][E_x] + GZONE_SIZE, GZoneData[gindex][E_y] + GZONE_SIZE);
         GZoneData[gindex][e_checkid] = CreateDynamicCP(GZoneData[gindex][E_x], GZoneData[gindex][E_y], GZoneData[gindex][E_z], 7.0, 0, -1, -1, 60.0);
 		GZoneData[gindex][e_sphereid] = CreateDynamicSphere(GZoneData[gindex][E_x], GZoneData[gindex][E_y], GZoneData[gindex][E_z], GZONE_SIZE, 0, -1, -1);
 
-        GangZoneShowForAll(GZoneData[gindex][zoneid], COLOR_NONE);
+        GangZoneShowForAll(GZoneData[gindex][e_zoneid], COLOR_NONE);
 
         gindex++;
 	}
@@ -20706,9 +20706,9 @@ function:OnGangZoneLoad()
 	            format(gstr2, sizeof(gstr2), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: ---\n"orange"Type /gwar to start an attack!", GZoneData[gzoneid][e_id], GZoneData[gzoneid][e_zonename]);
 	        }
 	        
-	        GZoneData[gzoneid][label] = CreateDynamic3DTextLabel(gstr2, WHITE, GZoneData[gzoneid][E_x], GZoneData[gzoneid][E_y], GZoneData[gzoneid][E_z] + 0.3, 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 50.0);
+	        GZoneData[gzoneid][e_labelid] = CreateDynamic3DTextLabel(gstr2, WHITE, GZoneData[gzoneid][E_x], GZoneData[gzoneid][E_y], GZoneData[gzoneid][E_z] + 0.3, 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 50.0);
 	        GZoneData[gzoneid][e_iconid] = CreateDynamicMapIcon(GZoneData[gzoneid][E_x], GZoneData[gzoneid][E_y], GZoneData[gzoneid][E_z], 19, 1, 0, -1, -1, 250.0);
-			GZoneData[gzoneid][zoneid] = GangZoneCreate(GZoneData[gzoneid][E_x] - GZONE_SIZE, GZoneData[gzoneid][E_y] - GZONE_SIZE, GZoneData[gzoneid][E_x] + GZONE_SIZE, GZoneData[gzoneid][E_y] + GZONE_SIZE);
+			GZoneData[gzoneid][e_zoneid] = GangZoneCreate(GZoneData[gzoneid][E_x] - GZONE_SIZE, GZoneData[gzoneid][E_y] - GZONE_SIZE, GZoneData[gzoneid][E_x] + GZONE_SIZE, GZoneData[gzoneid][E_y] + GZONE_SIZE);
             GZoneData[gzoneid][e_checkid] = CreateDynamicCP(GZoneData[gzoneid][E_x], GZoneData[gzoneid][E_y], GZoneData[gzoneid][E_z], 7.0, 0, -1, -1, 60.0);
             GZoneData[gzoneid][e_sphereid] = CreateDynamicSphere(GZoneData[gzoneid][E_x], GZoneData[gzoneid][E_y], GZoneData[gzoneid][E_z], GZONE_SIZE, 0, -1, -1);
 
@@ -20727,17 +20727,17 @@ SyncGangZones(playerid)
 	{
 	    if(GZoneData[i][e_localgang] == 0)
 	    {
-	        GangZoneShowForPlayer(playerid, GZoneData[i][zoneid], COLOR_NONE);
+	        GangZoneShowForPlayer(playerid, GZoneData[i][e_zoneid], COLOR_NONE);
 	    }
 	    else
 	    {
 			if(PlayerData[playerid][e_gangid] == GZoneData[i][e_localgang])
 			{
-				GangZoneShowForPlayer(playerid, GZoneData[i][zoneid], COLOR_FRIENDLY);
+				GangZoneShowForPlayer(playerid, GZoneData[i][e_zoneid], COLOR_FRIENDLY);
 			}
 			else
 			{
-                GangZoneShowForPlayer(playerid, GZoneData[i][zoneid], COLOR_HOSTILE);
+                GangZoneShowForPlayer(playerid, GZoneData[i][e_zoneid], COLOR_HOSTILE);
 			}
 		}
 	}
@@ -26329,7 +26329,7 @@ function:ProcessTick()
 					}
 			    
         			format(gstr2, sizeof(gstr2), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: %s\n"orange"Type /gwar to start an attack!", GZoneData[i][e_id], GZoneData[i][e_zonename], GetGangNameByID(GZoneData[i][e_attacker]));
-                    UpdateDynamic3DTextLabelText(GZoneData[i][label], WHITE, gstr2);
+                    UpdateDynamic3DTextLabelText(GZoneData[i][e_labelid], WHITE, gstr2);
 			    
 			        GZoneData[i][e_localgang] = GZoneData[i][e_attacker];
 			        
@@ -29270,7 +29270,7 @@ function:OnGangRenameAttempt(playerid, newgangname[], newgangtag[])
 	        if(GZoneData[i][e_localgang] == PlayerData[playerid][e_gangid])
 	        {
 	            new text[144];
-	            GetDynamic3DTextLabelText(GZoneData[i][label], text, sizeof(text));
+	            GetDynamic3DTextLabelText(GZoneData[i][e_labelid], text, sizeof(text));
 
 	            new pos = strfind(text, PlayerData[playerid][GangName], true);
 
@@ -29280,7 +29280,7 @@ function:OnGangRenameAttempt(playerid, newgangname[], newgangtag[])
 				strdel(text, pos, pos + strlen(PlayerData[playerid][GangName]));
 				strins(text, newgangname, pos, sizeof(text));
 
-				UpdateDynamic3DTextLabelText(GZoneData[i][label], WHITE, text);
+				UpdateDynamic3DTextLabelText(GZoneData[i][e_labelid], WHITE, text);
 	        }
 	    }
 	
