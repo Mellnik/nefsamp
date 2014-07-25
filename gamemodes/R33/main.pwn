@@ -954,9 +954,9 @@ enum E_GZONE_DATA
 {
 	e_id,
 	e_zonename[41],
-	Float:E_x,
-	Float:E_y,
-	Float:E_z,
+	Float:e_x,
+	Float:e_y,
+	Float:e_z,
 	e_localgang,
 	e_locked,
 	e_timeleft,
@@ -976,12 +976,12 @@ enum E_HOUSE_DATA
 {
 	e_id,
 	Owner[25],
-	Float:E_x,
-	Float:E_y,
-	Float:E_z,
+	Float:e_x,
+	Float:e_y,
+	Float:e_z,
 	interior,
 	price,
-	E_score,
+	e_score,
 	Text3D:e_labelid,
 	sold,
 	locked,
@@ -3487,24 +3487,24 @@ public OnPlayerDisconnect(playerid, reason)
 public e_COMMAND_ERRORS:OnPlayerCommandReceived(playerid, cmdtext[], e_COMMAND_ERRORS:success)
 {
 	if(PlayerData[playerid][bOpenSeason])
-		return 0;
+		return COMMAND_DENIED;
 	
 	if(PlayerData[playerid][bIsDead])
 	{
 	    SCM(playerid, -1, ""er"You can't use commands while being dead!");
-	    return 0;
+	    return COMMAND_DENIED;
 	}
 	
 	if(PlayerData[playerid][ExitType] != EXIT_FIRST_SPAWNED)
 	{
 	    SCM(playerid, -1, ""er"You need to spawn to use commands!");
-	    return 0;
+	    return COMMAND_DENIED;
 	}
 	
 	if((PlayerData[playerid][iCoolDownCommand] + COOLDOWN_CMD) >= GetTickCountEx())
 	{
 		player_notice(playerid, "1 command per second", "");
-	    return 0;
+	    return COMMAND_DENIED;
 	}
 
 	if(PlayerData[playerid][bFrozen])
@@ -3516,7 +3516,7 @@ public e_COMMAND_ERRORS:OnPlayerCommandReceived(playerid, cmdtext[], e_COMMAND_E
 	        default:
 			{
 			    SCM(playerid, -1, ""er"You can't use this command while you are frozen!");
-				return 0;
+				return COMMAND_DENIED;
    			}
 	    }
 	}
@@ -3545,7 +3545,7 @@ public e_COMMAND_ERRORS:OnPlayerCommandReceived(playerid, cmdtext[], e_COMMAND_E
 	if(PlayerData[playerid][bLoadMap])
 	{
 	    player_notice(playerid, "Please wait for the map to load", "");
-	    return 0;
+	    return COMMAND_DENIED;
 	}
 	
 	PlayerData[playerid][iCoolDownCommand] = GetTickCountEx();
@@ -3553,7 +3553,7 @@ public e_COMMAND_ERRORS:OnPlayerCommandReceived(playerid, cmdtext[], e_COMMAND_E
 	CancelEdit(playerid);
 	// Closing open dialogs in order to avoid some exploits.
 	ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
-	return 1;
+	return COMMAND_OK;
 }
 
 public e_COMMAND_ERRORS:OnPlayerCommandPerformed(playerid, cmdtext[], e_COMMAND_ERRORS:success)
@@ -3571,7 +3571,7 @@ public e_COMMAND_ERRORS:OnPlayerCommandPerformed(playerid, cmdtext[], e_COMMAND_
 	} else {
 	    SrvStat[0]++;
 	}
-	return 1;
+	return COMMAND_OK;
 }
 
 public OnVehicleMod(playerid, vehicleid, componentid)
@@ -7998,7 +7998,7 @@ YCMD:l(playerid, params[], help)
 	{
 	    if(GZoneData[i][e_underattack] && (GZoneData[i][e_localgang] == PlayerData[playerid][e_gangid] || GZoneData[i][e_attacker] == PlayerData[playerid][e_gangid]))
 	    {
-	        if(GZONE_SIZE + 100.0 > GetDistance3D(PlayerData[playerid][sX], PlayerData[playerid][sY], PlayerData[playerid][sZ], GZoneData[i][E_x], GZoneData[i][E_y], GZoneData[i][E_z]))
+	        if(GZONE_SIZE + 100.0 > GetDistance3D(PlayerData[playerid][sX], PlayerData[playerid][sY], PlayerData[playerid][sZ], GZoneData[i][e_x], GZoneData[i][e_y], GZoneData[i][e_z]))
 	        {
 	            return SCM(playerid, -1, ""er"Point is next to a Gang Zone which is under attack");
 	        }
@@ -8523,7 +8523,7 @@ YCMD:buy(playerid, params[], help)
 	new bool:found = false;
 	for(new i = 0; i < houseid; i++)
 	{
-	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, HouseData[i][E_x], HouseData[i][E_y], HouseData[i][E_z])) continue;
+	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, HouseData[i][e_x], HouseData[i][e_y], HouseData[i][e_z])) continue;
         found = true;
 
 	    if(HouseData[i][sold])
@@ -8536,7 +8536,7 @@ YCMD:buy(playerid, params[], help)
 			SCM(playerid, -1, ""er"You have no free house slot!");
 			break;
 		}
-	    if(GetPlayerScoreEx(playerid) < HouseData[i][E_score])
+	    if(GetPlayerScoreEx(playerid) < HouseData[i][e_score])
 		{
 			SCM(playerid, -1, ""er"You need more score for this House!");
 			break;
@@ -8550,12 +8550,12 @@ YCMD:buy(playerid, params[], help)
 		strmid(HouseData[i][Owner], __GetName(playerid), 0, 25, 25);
 	    HouseData[i][sold] = 1;
 
-	    format(gstr, sizeof(gstr), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", __GetName(playerid), HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][E_score], HouseIntTypes[HouseData[i][interior]][intname]);
+	    format(gstr, sizeof(gstr), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", __GetName(playerid), HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][e_score], HouseIntTypes[HouseData[i][interior]][intname]);
 	    UpdateDynamic3DTextLabelText(HouseData[i][e_labelid], -1, gstr);
 	    DestroyDynamicMapIcon(HouseData[i][e_iconid]);
 	    DestroyDynamicPickup(HouseData[i][pickid]);
-	    HouseData[i][e_iconid] = -1; //CreateDynamicMapIcon(HouseData[i][E_x], HouseData[i][E_y], HouseData[i][E_z], 32, 1, 0, -1, -1, 150.0);
-	    HouseData[i][pickid] = CreateDynamicPickup(1272, 1, HouseData[i][E_x], HouseData[i][E_y], HouseData[i][E_z], -1, -1, -1, 30.0);
+	    HouseData[i][e_iconid] = -1; //CreateDynamicMapIcon(HouseData[i][e_x], HouseData[i][e_y], HouseData[i][e_z], 32, 1, 0, -1, -1, 150.0);
+	    HouseData[i][pickid] = CreateDynamicPickup(1272, 1, HouseData[i][e_x], HouseData[i][e_y], HouseData[i][e_z], -1, -1, -1, 30.0);
 	    GivePlayerMoneyEx(playerid, -HouseData[i][price]);
 	    HouseData[i][date] = gettime();
 	    PlayerData[playerid][e_houses]++;
@@ -8595,7 +8595,7 @@ YCMD:sell(playerid, params[], help)
     new bool:found = false;
 	for(new i = 0; i < houseid; i++)
 	{
-	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, HouseData[i][E_x], HouseData[i][E_y], HouseData[i][E_z])) continue;
+	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, HouseData[i][e_x], HouseData[i][e_y], HouseData[i][e_z])) continue;
 	    found = true;
 
 	    if(!HouseData[i][sold])
@@ -8624,12 +8624,12 @@ YCMD:sell(playerid, params[], help)
 			}
 		}
 
-	    format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][E_score], HouseIntTypes[HouseData[i][interior]][intname]);
+	    format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][e_score], HouseIntTypes[HouseData[i][interior]][intname]);
 	    UpdateDynamic3DTextLabelText(HouseData[i][e_labelid], -1, gstr);
 	    DestroyDynamicMapIcon(HouseData[i][e_iconid]);
 	    DestroyDynamicPickup(HouseData[i][pickid]);
-	    HouseData[i][e_iconid] = CreateDynamicMapIcon(HouseData[i][E_x], HouseData[i][E_y], HouseData[i][E_z], 31, 1, 0, -1, -1, 150.0);
-	    HouseData[i][pickid] = CreateDynamicPickup(1273, 1, HouseData[i][E_x], HouseData[i][E_y], HouseData[i][E_z], -1, -1, -1, 30.0);
+	    HouseData[i][e_iconid] = CreateDynamicMapIcon(HouseData[i][e_x], HouseData[i][e_y], HouseData[i][e_z], 31, 1, 0, -1, -1, 150.0);
+	    HouseData[i][pickid] = CreateDynamicPickup(1273, 1, HouseData[i][e_x], HouseData[i][e_y], HouseData[i][e_z], -1, -1, -1, 30.0);
 	    PlayerData[playerid][e_houses]--;
 	    HouseData[i][date] = 0;
 	    GivePlayerMoneyEx(playerid, floatround(HouseData[i][price] / 4));
@@ -8684,7 +8684,7 @@ YCMD:open(playerid, params[], help)
     new bool:found = false;
 	for(new i = 0; i < houseid; i++)
 	{
-	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, HouseData[i][E_x], HouseData[i][E_y], HouseData[i][E_z])) continue;
+	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, HouseData[i][e_x], HouseData[i][e_y], HouseData[i][e_z])) continue;
 	    found = true;
 
 	    if(strcmp(HouseData[i][Owner], __GetName(playerid), true))
@@ -8704,7 +8704,7 @@ YCMD:close(playerid, params[], help)
     new bool:found = false;
 	for(new i = 0; i < houseid; i++)
 	{
-	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, HouseData[i][E_x], HouseData[i][E_y], HouseData[i][E_z])) continue;
+	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, HouseData[i][e_x], HouseData[i][e_y], HouseData[i][e_z])) continue;
 	    found = true;
 
 	    if(strcmp(HouseData[i][Owner], __GetName(playerid), true))
@@ -8755,7 +8755,7 @@ YCMD:lock(playerid, params[], help)
 	    new bool:found = false;
 		for(new i = 0; i < houseid; i++)
 		{
-			if(IsPlayerInRangeOfPoint(playerid, 1.5, HouseData[i][E_x], HouseData[i][E_y], HouseData[i][E_z]))
+			if(IsPlayerInRangeOfPoint(playerid, 1.5, HouseData[i][e_x], HouseData[i][e_y], HouseData[i][e_z]))
 			{
 				found = true;
 				if(strcmp(HouseData[i][Owner], __GetName(playerid), true))
@@ -11246,9 +11246,9 @@ YCMD:gzonecreate(playerid, params[], help)
     new Float:POS[3];
     GetPlayerPos(playerid, POS[0], POS[1], POS[2]);
 
-    GZoneData[gzoneid][E_x] = POS[0];
-    GZoneData[gzoneid][E_y] = POS[1];
-    GZoneData[gzoneid][E_z] = POS[2];
+    GZoneData[gzoneid][e_x] = POS[0];
+    GZoneData[gzoneid][e_y] = POS[1];
+    GZoneData[gzoneid][e_z] = POS[2];
 
 	GZoneData[gzoneid][e_localgang] = 0;
 	GZoneData[gzoneid][e_locked] = gettime();
@@ -11256,9 +11256,9 @@ YCMD:gzonecreate(playerid, params[], help)
 
 	format(gstr2, sizeof(gstr2), "INSERT INTO `gzones` VALUES (NULL, '%s', %f, %f, %f, %i, %i);",
 		GZoneData[gzoneid][e_zonename],
-		GZoneData[gzoneid][E_x],
-		GZoneData[gzoneid][E_y],
-		GZoneData[gzoneid][E_z],
+		GZoneData[gzoneid][e_x],
+		GZoneData[gzoneid][e_y],
+		GZoneData[gzoneid][e_z],
 		GZoneData[gzoneid][e_localgang],
 		GZoneData[gzoneid][e_locked]);
 		
@@ -11276,7 +11276,7 @@ YCMD:gzonereset(playerid, params[], help)
 	    new bool:found = false;
 	    for(new i = 0; i < gzoneid; i++)
 	    {
-		    if(!IsPlayerInRangeOfPoint(playerid, 7.0, GZoneData[i][E_x], GZoneData[i][E_y], GZoneData[i][E_z])) continue;
+		    if(!IsPlayerInRangeOfPoint(playerid, 7.0, GZoneData[i][e_x], GZoneData[i][e_y], GZoneData[i][e_z])) continue;
 	        found = true;
 	        
 	        if(GZoneData[i][e_underattack])
@@ -11422,7 +11422,7 @@ YCMD:gcapture(playerid, params[], help)
 	new bool:found = false;
 	for(new i = 0; i < gzoneid; i++)
 	{
-	    if(!IsPlayerInRangeOfPoint(playerid, 7.0, GZoneData[i][E_x], GZoneData[i][E_y], GZoneData[i][E_z])) continue;
+	    if(!IsPlayerInRangeOfPoint(playerid, 7.0, GZoneData[i][e_x], GZoneData[i][e_y], GZoneData[i][e_z])) continue;
         found = true;
 
 		if(!GZoneData[i][e_underattack]) return ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" Gang War", ""white"This zone is not under attack.", "OK", "");
@@ -11568,7 +11568,7 @@ YCMD:gwar(playerid, params[], help)
 	new bool:found = false;
 	for(new i = 0; i < gzoneid; i++)
 	{
-	    if(!IsPlayerInRangeOfPoint(playerid, 7.0, GZoneData[i][E_x], GZoneData[i][E_y], GZoneData[i][E_z])) continue;
+	    if(!IsPlayerInRangeOfPoint(playerid, 7.0, GZoneData[i][e_x], GZoneData[i][e_y], GZoneData[i][e_z])) continue;
         found = true;
 
 		if(GZoneData[i][e_underattack]) return ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" Gang War", ""white"This Gang Zone is currently under attack!", "OK", "");
@@ -11607,7 +11607,7 @@ YCMD:gwar(playerid, params[], help)
 		    {
 		        if(PlayerData[ii][e_gangid] == PlayerData[playerid][e_gangid] && IsPlayerAvail(ii))
 		        {
-		            if(IsPlayerInRangeOfPoint(ii, 30.0, GZoneData[i][E_x], GZoneData[i][E_y], GZoneData[i][E_z]))
+		            if(IsPlayerInRangeOfPoint(ii, 30.0, GZoneData[i][e_x], GZoneData[i][e_y], GZoneData[i][e_z]))
 		            {
 		        		TextDrawShowForPlayer(ii, GZoneData[i][e_txtid]);
 		        		SetPlayerGWarMode(ii);
@@ -11649,7 +11649,7 @@ YCMD:gwar(playerid, params[], help)
 		    {
 		        if(PlayerData[ii][e_gangid] == PlayerData[playerid][e_gangid] && IsPlayerAvail(ii))
 		        {
-		            if(IsPlayerInRangeOfPoint(ii, 30.0, GZoneData[i][E_x], GZoneData[i][E_y], GZoneData[i][E_z]))
+		            if(IsPlayerInRangeOfPoint(ii, 30.0, GZoneData[i][e_x], GZoneData[i][e_y], GZoneData[i][e_z]))
 		            {
 		        		TextDrawShowForPlayer(ii, GZoneData[i][e_txtid]);
 		        		SetPlayerGWarMode(ii);
@@ -13772,7 +13772,7 @@ YCMD:sethouseowner(playerid, params[], help)
  	new bool:found = false;
 	for(new i = 0; i < houseid; i++)
 	{
-	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, HouseData[i][E_x], HouseData[i][E_y], HouseData[i][E_z])) continue;
+	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, HouseData[i][e_x], HouseData[i][e_y], HouseData[i][e_z])) continue;
 	    found = true;
 
 	    if(HouseData[i][sold] == 1) return SCM(playerid, -1, ""er"House connot be sold");
@@ -13797,14 +13797,14 @@ YCMD:sethouseprice(playerid, params[], help)
  	new bool:found = false;
 	for(new i = 0; i < houseid; i++)
 	{
-	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, HouseData[i][E_x], HouseData[i][E_y], HouseData[i][E_z])) continue;
+	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, HouseData[i][e_x], HouseData[i][e_y], HouseData[i][e_z])) continue;
 	    found = true;
 
 	    if(HouseData[i][sold] == 1) return SCM(playerid, -1, ""er"House connot be sold");
 
 	    HouseData[i][price] = hprice;
 
- 	   	format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][E_score], HouseIntTypes[HouseData[i][interior]][intname]);
+ 	   	format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][e_score], HouseIntTypes[HouseData[i][interior]][intname]);
 	    UpdateDynamic3DTextLabelText(HouseData[i][e_labelid], -1, gstr);
 	    MySQL_SaveHouse(i);
 
@@ -13827,14 +13827,14 @@ YCMD:sethousescore(playerid, params[], help)
  	new bool:found = false;
 	for(new i = 0; i < houseid; i++)
 	{
-	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, HouseData[i][E_x], HouseData[i][E_y], HouseData[i][E_z])) continue;
+	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, HouseData[i][e_x], HouseData[i][e_y], HouseData[i][e_z])) continue;
 	    found = true;
 
 	    if(HouseData[i][sold] == 1) return SCM(playerid, -1, ""er"House connot be sold");
 
-	    HouseData[i][E_score] = hscore;
+	    HouseData[i][e_score] = hscore;
 
- 	   	format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][E_score], HouseIntTypes[HouseData[i][interior]][intname]);
+ 	   	format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][e_score], HouseIntTypes[HouseData[i][interior]][intname]);
 	    UpdateDynamic3DTextLabelText(HouseData[i][e_labelid], -1, gstr);
 	    MySQL_SaveHouse(i);
 
@@ -13852,7 +13852,7 @@ YCMD:resethouse(playerid, params[], help)
  	new bool:found = false;
 	for(new i = 0; i < houseid; i++)
 	{
-	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, HouseData[i][E_x], HouseData[i][E_y], HouseData[i][E_z])) continue;
+	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, HouseData[i][e_x], HouseData[i][e_y], HouseData[i][e_z])) continue;
 	    found = true;
 
 		if(HouseData[i][sold] == 0) return SCM(playerid, -1, ""er"House is not sold");
@@ -13888,12 +13888,12 @@ YCMD:resethouse(playerid, params[], help)
         
 		MySQL_SaveHouse(i, true);
 
-	    format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][E_score], HouseIntTypes[HouseData[i][interior]][intname]);
+	    format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][e_score], HouseIntTypes[HouseData[i][interior]][intname]);
 	    UpdateDynamic3DTextLabelText(HouseData[i][e_labelid], -1, gstr);
 	    DestroyDynamicMapIcon(HouseData[i][e_iconid]);
 	    DestroyDynamicPickup(HouseData[i][pickid]);
-	    HouseData[i][e_iconid] = CreateDynamicMapIcon(HouseData[i][E_x], HouseData[i][E_y], HouseData[i][E_z], 31, 1, 0, -1, -1, 150.0);
-	    HouseData[i][pickid] = CreateDynamicPickup(1273, 1, HouseData[i][E_x], HouseData[i][E_y], HouseData[i][E_z], -1, -1, -1, 30.0);
+	    HouseData[i][e_iconid] = CreateDynamicMapIcon(HouseData[i][e_x], HouseData[i][e_y], HouseData[i][e_z], 31, 1, 0, -1, -1, 150.0);
+	    HouseData[i][pickid] = CreateDynamicPickup(1273, 1, HouseData[i][e_x], HouseData[i][e_y], HouseData[i][e_z], -1, -1, -1, 30.0);
 
 		player_notice(playerid, "The house has been reset", "");
   		break;
@@ -14086,10 +14086,10 @@ YCMD:createhouse(playerid, params[], help)
 
 	GetPlayerPos(playerid, POS[0], POS[1], POS[2]);
 
-	HouseData[houseid][E_x] = POS[0];
-	HouseData[houseid][E_y] = POS[1];
-	HouseData[houseid][E_z] = POS[2];
-	HouseData[houseid][E_score] = h_score;
+	HouseData[houseid][e_x] = POS[0];
+	HouseData[houseid][e_y] = POS[1];
+	HouseData[houseid][e_z] = POS[2];
+	HouseData[houseid][e_score] = h_score;
 	HouseData[houseid][price] = h_price;
 	HouseData[houseid][interior] = h_int;
 	HouseData[houseid][locked] = 1;
@@ -14102,12 +14102,12 @@ YCMD:createhouse(playerid, params[], help)
 	
 	format(query, sizeof(query), "INSERT INTO `houses` (`ID`, `Owner`, `XPos`, `YPos`, `ZPos`, `Interior`, `Price`, `Score`, `Sold`, `Locked`, `Date`) VALUES (NULL, '%s', %.2f, %.2f, %.2f, %i, %i, %i, %i, %i, %i);",
 	    HouseData[houseid][Owner],
-		HouseData[houseid][E_x],
-		HouseData[houseid][E_y],
-		HouseData[houseid][E_z],
+		HouseData[houseid][e_x],
+		HouseData[houseid][e_y],
+		HouseData[houseid][e_z],
 	    HouseData[houseid][interior],
 	    HouseData[houseid][price],
-	    HouseData[houseid][E_score],
+	    HouseData[houseid][e_score],
 	    HouseData[houseid][sold],
 	    HouseData[houseid][locked],
 		HouseData[houseid][date]);
@@ -17156,7 +17156,7 @@ function:OnPlayerNameChangeRequest(playerid, newname[])
 
                     strmid(HouseData[i][Owner], newname, 0, 25, 25);
 
-				    format(query, sizeof(query), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", __GetName(playerid), HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][E_score], HouseIntTypes[HouseData[i][interior]][intname]);
+				    format(query, sizeof(query), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", __GetName(playerid), HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][e_score], HouseIntTypes[HouseData[i][interior]][intname]);
 				    UpdateDynamic3DTextLabelText(HouseData[i][e_labelid], -1, query);
 				    MySQL_SaveHouse(i);
 				}
@@ -18175,7 +18175,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						
 						if(h_id != -1)
 						{
-				   			SetPlayerPos(playerid, HouseData[h_id][E_x], HouseData[h_id][E_y], HouseData[h_id][E_z]);
+				   			SetPlayerPos(playerid, HouseData[h_id][e_x], HouseData[h_id][e_y], HouseData[h_id][e_z]);
 				   			PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
 				   			SetPVarInt(playerid, "doingStunt", 0);
 				   			PlayerData[playerid][tickJoin_bmx] = 0;
@@ -19037,7 +19037,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		                if(gTeam[pid] == HOUSE && GetPlayerInterior(pid) == HouseIntTypes[HouseData[h_id][interior]][interior] && GetPlayerVirtualWorld(pid) == (HouseData[h_id][e_id] + 1000))
 		                {
 		                    gTeam[pid] = FREEROAM;
-		                    SetPlayerPos(pid, HouseData[h_id][E_x], HouseData[h_id][E_y], HouseData[h_id][E_z]);
+		                    SetPlayerPos(pid, HouseData[h_id][e_x], HouseData[h_id][e_y], HouseData[h_id][e_z]);
 							ResetPlayerWorld(pid);
 		                }
 		            }
@@ -19056,10 +19056,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					
 	                GivePlayerMoneyEx(playerid, -HouseIntTypes[PlayerData[playerid][HouseIntSelected]][price]);
 	                HouseData[h_id][interior] = PlayerData[playerid][HouseIntSelected];
-	       			SetPlayerPos(playerid, HouseData[h_id][E_x], HouseData[h_id][E_y], HouseData[h_id][E_z]);
+	       			SetPlayerPos(playerid, HouseData[h_id][e_x], HouseData[h_id][e_y], HouseData[h_id][e_z]);
 					ResetPlayerWorld(playerid);
 					gTeam[playerid] = FREEROAM;
-	      		    format(gstr, sizeof(gstr), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", __GetName(playerid), HouseData[h_id][e_id], number_format(HouseData[h_id][price]), HouseData[h_id][E_score], HouseIntTypes[PlayerData[playerid][HouseIntSelected]][intname]);
+	      		    format(gstr, sizeof(gstr), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", __GetName(playerid), HouseData[h_id][e_id], number_format(HouseData[h_id][price]), HouseData[h_id][e_score], HouseIntTypes[PlayerData[playerid][HouseIntSelected]][intname]);
 	    			UpdateDynamic3DTextLabelText(HouseData[h_id][e_labelid], -1, gstr);
 	                MySQL_SaveHouse(h_id, true);
 	                MySQL_SaveAccount(playerid, false, false);
@@ -20516,20 +20516,20 @@ function:OnHouseLoadEx(index)
 		cache_get_row(0, 1, buffer, pSQL, sizeof(buffer));
 		strmid(HouseData[index][Owner], buffer, 0, 25, 25);
 
-        HouseData[index][E_x] = cache_get_row_float(0, 2, pSQL);
-        HouseData[index][E_y] = cache_get_row_float(0, 3, pSQL);
-        HouseData[index][E_z] = cache_get_row_float(0, 4, pSQL);
+        HouseData[index][e_x] = cache_get_row_float(0, 2, pSQL);
+        HouseData[index][e_y] = cache_get_row_float(0, 3, pSQL);
+        HouseData[index][e_z] = cache_get_row_float(0, 4, pSQL);
 		HouseData[index][interior] = cache_get_row_int(0, 5, pSQL);
 		HouseData[index][price] = cache_get_row_int(0, 6, pSQL);
-		HouseData[index][E_score] = cache_get_row_int(0, 7, pSQL);
+		HouseData[index][e_score] = cache_get_row_int(0, 7, pSQL);
 		HouseData[index][sold] = cache_get_row_int(0, 8, pSQL);
 		HouseData[index][locked] = cache_get_row_int(0, 9, pSQL);
 
-		format(line, sizeof(line), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[index][e_id], number_format(HouseData[index][price]), HouseData[index][E_score], HouseIntTypes[HouseData[index][interior]][intname]);
+		format(line, sizeof(line), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[index][e_id], number_format(HouseData[index][price]), HouseData[index][e_score], HouseIntTypes[HouseData[index][interior]][intname]);
 
-		HouseData[index][e_labelid] = CreateDynamic3DTextLabel(line, (HouseData[index][sold]) ? (0xFF0000FF) : (0x00FF00FF), HouseData[index][E_x], HouseData[index][E_y], floatadd(HouseData[index][E_z], 0.3), 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 30.0);
-		HouseData[index][pickid] = CreateDynamicPickup((HouseData[index][sold]) ? (1272) : (1273), 1, HouseData[index][E_x], HouseData[index][E_y], HouseData[index][E_z], -1, -1, -1, 30.0);
-		HouseData[index][e_iconid] = CreateDynamicMapIcon(HouseData[index][E_x], HouseData[index][E_y], HouseData[index][E_z], 31, 1, 0, -1, -1, 150.0);
+		HouseData[index][e_labelid] = CreateDynamic3DTextLabel(line, (HouseData[index][sold]) ? (0xFF0000FF) : (0x00FF00FF), HouseData[index][e_x], HouseData[index][e_y], floatadd(HouseData[index][e_z], 0.3), 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 30.0);
+		HouseData[index][pickid] = CreateDynamicPickup((HouseData[index][sold]) ? (1272) : (1273), 1, HouseData[index][e_x], HouseData[index][e_y], HouseData[index][e_z], -1, -1, -1, 30.0);
+		HouseData[index][e_iconid] = CreateDynamicMapIcon(HouseData[index][e_x], HouseData[index][e_y], HouseData[index][e_z], 31, 1, 0, -1, -1, 150.0);
 
 		index++;
 	}
@@ -20551,22 +20551,22 @@ function:OnHouseLoad()
 			cache_get_row(i, 1, gstr, pSQL, sizeof(gstr));
 			strmid(HouseData[houseid][Owner], gstr, 0, 25, 25);
 
-	        HouseData[houseid][E_x] = cache_get_row_float(i, 2, pSQL);
-	        HouseData[houseid][E_y] = cache_get_row_float(i, 3, pSQL);
-	        HouseData[houseid][E_z] = cache_get_row_float(i, 4, pSQL);
+	        HouseData[houseid][e_x] = cache_get_row_float(i, 2, pSQL);
+	        HouseData[houseid][e_y] = cache_get_row_float(i, 3, pSQL);
+	        HouseData[houseid][e_z] = cache_get_row_float(i, 4, pSQL);
 			HouseData[houseid][interior] = cache_get_row_int(i, 5, pSQL);
 			HouseData[houseid][price] = cache_get_row_int(i, 6, pSQL);
-			HouseData[houseid][E_score] = cache_get_row_int(i, 7, pSQL);
+			HouseData[houseid][e_score] = cache_get_row_int(i, 7, pSQL);
 			HouseData[houseid][sold] = cache_get_row_int(i, 8, pSQL);
 			HouseData[houseid][locked] = cache_get_row_int(i, 9, pSQL);
 
 			if(!HouseData[houseid][sold])
 			{
-			    format(gstr2, sizeof(gstr2), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[houseid][e_id], number_format(HouseData[houseid][price]), HouseData[houseid][E_score], HouseIntTypes[HouseData[houseid][interior]][intname]);
+			    format(gstr2, sizeof(gstr2), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[houseid][e_id], number_format(HouseData[houseid][price]), HouseData[houseid][e_score], HouseIntTypes[HouseData[houseid][interior]][intname]);
 			}
 			else
 			{
-			    format(gstr2, sizeof(gstr2), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[houseid][Owner], HouseData[houseid][e_id], number_format(HouseData[houseid][price]), HouseData[houseid][E_score], HouseIntTypes[HouseData[houseid][interior]][intname]);
+			    format(gstr2, sizeof(gstr2), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[houseid][Owner], HouseData[houseid][e_id], number_format(HouseData[houseid][price]), HouseData[houseid][e_score], HouseIntTypes[HouseData[houseid][interior]][intname]);
 
 				for(new ii = 0; ii < MAX_HOUSE_OBJECTS; ii++)
 				{
@@ -20583,9 +20583,9 @@ function:OnHouseLoad()
 
             HouseData[houseid][date] = cache_get_row_int(i, 20, pSQL);
 
-			HouseData[houseid][e_labelid] = CreateDynamic3DTextLabel(gstr2, HouseData[houseid][sold] ? 0xFF0000FF : 0x00FF00FF, HouseData[houseid][E_x], HouseData[houseid][E_y], floatadd(HouseData[houseid][E_z], 0.3), 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 30.0);
-			HouseData[houseid][pickid] = CreateDynamicPickup(HouseData[houseid][sold] ? 1272 : 1273, 1, HouseData[houseid][E_x], HouseData[houseid][E_y], HouseData[houseid][E_z], -1, -1, -1, 30.0);
-			if(!HouseData[houseid][sold]) HouseData[houseid][e_iconid] = CreateDynamicMapIcon(HouseData[houseid][E_x], HouseData[houseid][E_y], HouseData[houseid][E_z], 31, 1, 0, -1, -1, 150.0);
+			HouseData[houseid][e_labelid] = CreateDynamic3DTextLabel(gstr2, HouseData[houseid][sold] ? 0xFF0000FF : 0x00FF00FF, HouseData[houseid][e_x], HouseData[houseid][e_y], floatadd(HouseData[houseid][e_z], 0.3), 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 30.0);
+			HouseData[houseid][pickid] = CreateDynamicPickup(HouseData[houseid][sold] ? 1272 : 1273, 1, HouseData[houseid][e_x], HouseData[houseid][e_y], HouseData[houseid][e_z], -1, -1, -1, 30.0);
+			if(!HouseData[houseid][sold]) HouseData[houseid][e_iconid] = CreateDynamicMapIcon(HouseData[houseid][e_x], HouseData[houseid][e_y], HouseData[houseid][e_z], 31, 1, 0, -1, -1, 150.0);
 			
 			houseid++;
 		}
@@ -20659,11 +20659,11 @@ function:OnGangZoneLoadEx(gindex)
 
         format(gstr2, sizeof(gstr2), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: ---\n"orange"Type /gwar to start an attack!", GZoneData[gindex][e_id], GZoneData[gindex][e_zonename]);
 
-        GZoneData[gindex][e_labelid] = CreateDynamic3DTextLabel(gstr2, WHITE, GZoneData[gindex][E_x], GZoneData[gindex][E_y], GZoneData[gindex][E_z] + 0.3, 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 50.0);
-        GZoneData[gindex][e_iconid] = CreateDynamicMapIcon(GZoneData[gindex][E_x], GZoneData[gindex][E_y], GZoneData[gindex][E_z], 19, 1, 0, -1, -1, 250.0);
-        GZoneData[gindex][e_zoneid] = GangZoneCreate(GZoneData[gindex][E_x] - GZONE_SIZE, GZoneData[gindex][E_y] - GZONE_SIZE, GZoneData[gindex][E_x] + GZONE_SIZE, GZoneData[gindex][E_y] + GZONE_SIZE);
-        GZoneData[gindex][e_checkid] = CreateDynamicCP(GZoneData[gindex][E_x], GZoneData[gindex][E_y], GZoneData[gindex][E_z], 7.0, 0, -1, -1, 60.0);
-		GZoneData[gindex][e_sphereid] = CreateDynamicSphere(GZoneData[gindex][E_x], GZoneData[gindex][E_y], GZoneData[gindex][E_z], GZONE_SIZE, 0, -1, -1);
+        GZoneData[gindex][e_labelid] = CreateDynamic3DTextLabel(gstr2, WHITE, GZoneData[gindex][e_x], GZoneData[gindex][e_y], GZoneData[gindex][e_z] + 0.3, 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 50.0);
+        GZoneData[gindex][e_iconid] = CreateDynamicMapIcon(GZoneData[gindex][e_x], GZoneData[gindex][e_y], GZoneData[gindex][e_z], 19, 1, 0, -1, -1, 250.0);
+        GZoneData[gindex][e_zoneid] = GangZoneCreate(GZoneData[gindex][e_x] - GZONE_SIZE, GZoneData[gindex][e_y] - GZONE_SIZE, GZoneData[gindex][e_x] + GZONE_SIZE, GZoneData[gindex][e_y] + GZONE_SIZE);
+        GZoneData[gindex][e_checkid] = CreateDynamicCP(GZoneData[gindex][e_x], GZoneData[gindex][e_y], GZoneData[gindex][e_z], 7.0, 0, -1, -1, 60.0);
+		GZoneData[gindex][e_sphereid] = CreateDynamicSphere(GZoneData[gindex][e_x], GZoneData[gindex][e_y], GZoneData[gindex][e_z], GZONE_SIZE, 0, -1, -1);
 
         GangZoneShowForAll(GZoneData[gindex][e_zoneid], COLOR_NONE);
 
@@ -20688,9 +20688,9 @@ function:OnGangZoneLoad()
 	        GZoneData[gzoneid][e_id] = cache_get_row_int(i, 0, pSQL);
 	        cache_get_row(i, 1, GZoneData[gzoneid][e_zonename], pSQL, 40);
 	        
-	        GZoneData[gzoneid][E_x] = cache_get_row_float(i, 2, pSQL);
-	        GZoneData[gzoneid][E_y] = cache_get_row_float(i, 3, pSQL);
-	        GZoneData[gzoneid][E_z] = cache_get_row_float(i, 4, pSQL);
+	        GZoneData[gzoneid][e_x] = cache_get_row_float(i, 2, pSQL);
+	        GZoneData[gzoneid][e_y] = cache_get_row_float(i, 3, pSQL);
+	        GZoneData[gzoneid][e_z] = cache_get_row_float(i, 4, pSQL);
 	        
 	        GZoneData[gzoneid][e_localgang] = cache_get_row_int(i, 5, pSQL);
 	        GZoneData[gzoneid][e_locked] = cache_get_row_int(i, 6, pSQL);
@@ -20706,11 +20706,11 @@ function:OnGangZoneLoad()
 	            format(gstr2, sizeof(gstr2), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: ---\n"orange"Type /gwar to start an attack!", GZoneData[gzoneid][e_id], GZoneData[gzoneid][e_zonename]);
 	        }
 	        
-	        GZoneData[gzoneid][e_labelid] = CreateDynamic3DTextLabel(gstr2, WHITE, GZoneData[gzoneid][E_x], GZoneData[gzoneid][E_y], GZoneData[gzoneid][E_z] + 0.3, 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 50.0);
-	        GZoneData[gzoneid][e_iconid] = CreateDynamicMapIcon(GZoneData[gzoneid][E_x], GZoneData[gzoneid][E_y], GZoneData[gzoneid][E_z], 19, 1, 0, -1, -1, 250.0);
-			GZoneData[gzoneid][e_zoneid] = GangZoneCreate(GZoneData[gzoneid][E_x] - GZONE_SIZE, GZoneData[gzoneid][E_y] - GZONE_SIZE, GZoneData[gzoneid][E_x] + GZONE_SIZE, GZoneData[gzoneid][E_y] + GZONE_SIZE);
-            GZoneData[gzoneid][e_checkid] = CreateDynamicCP(GZoneData[gzoneid][E_x], GZoneData[gzoneid][E_y], GZoneData[gzoneid][E_z], 7.0, 0, -1, -1, 60.0);
-            GZoneData[gzoneid][e_sphereid] = CreateDynamicSphere(GZoneData[gzoneid][E_x], GZoneData[gzoneid][E_y], GZoneData[gzoneid][E_z], GZONE_SIZE, 0, -1, -1);
+	        GZoneData[gzoneid][e_labelid] = CreateDynamic3DTextLabel(gstr2, WHITE, GZoneData[gzoneid][e_x], GZoneData[gzoneid][e_y], GZoneData[gzoneid][e_z] + 0.3, 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 50.0);
+	        GZoneData[gzoneid][e_iconid] = CreateDynamicMapIcon(GZoneData[gzoneid][e_x], GZoneData[gzoneid][e_y], GZoneData[gzoneid][e_z], 19, 1, 0, -1, -1, 250.0);
+			GZoneData[gzoneid][e_zoneid] = GangZoneCreate(GZoneData[gzoneid][e_x] - GZONE_SIZE, GZoneData[gzoneid][e_y] - GZONE_SIZE, GZoneData[gzoneid][e_x] + GZONE_SIZE, GZoneData[gzoneid][e_y] + GZONE_SIZE);
+            GZoneData[gzoneid][e_checkid] = CreateDynamicCP(GZoneData[gzoneid][e_x], GZoneData[gzoneid][e_y], GZoneData[gzoneid][e_z], 7.0, 0, -1, -1, 60.0);
+            GZoneData[gzoneid][e_sphereid] = CreateDynamicSphere(GZoneData[gzoneid][e_x], GZoneData[gzoneid][e_y], GZoneData[gzoneid][e_z], GZONE_SIZE, 0, -1, -1);
 
 	        gzoneid++;
 	    }
@@ -21947,12 +21947,12 @@ MySQL_SaveHouse(house, bool:save_items = false)
     
     format(query, sizeof(query), "UPDATE `houses` SET `Owner` = '%s', `XPos` = %.2f, `YPos` = %.2f, `ZPos` = %.2f, `Interior` = %i, `Price` = %i, `Score` = %i, `Sold` = %i, `Locked` = %i, `Date` = %i WHERE `ID` = %i LIMIT 1;",
 		HouseData[house][Owner],
-		HouseData[house][E_x],
-		HouseData[house][E_y],
-		HouseData[house][E_z],
+		HouseData[house][e_x],
+		HouseData[house][e_y],
+		HouseData[house][e_z],
 		HouseData[house][interior],
 		HouseData[house][price],
-		HouseData[house][E_score],
+		HouseData[house][e_score],
 		HouseData[house][sold],
 		HouseData[house][locked],
 		HouseData[house][date],
@@ -26196,7 +26196,7 @@ function:ProcessTick()
 	{
         if(GZoneData[i][e_locked] > utime) {
             if(GZoneData[i][e_pickupid] == -1) {
-                GZoneData[i][e_pickupid] = CreateDynamicPickup(1314, 23, GZoneData[i][E_x], GZoneData[i][E_y], GZoneData[i][E_z], 0, -1, -1);
+                GZoneData[i][e_pickupid] = CreateDynamicPickup(1314, 23, GZoneData[i][e_x], GZoneData[i][e_y], GZoneData[i][e_z], 0, -1, -1);
                 Log(LOG_WORLD, "Creating zone pickup %i,%i", GZoneData[i][e_locked], GZoneData[i][e_localgang]);
             }
 		} else {
@@ -26224,7 +26224,7 @@ function:ProcessTick()
 			    {
 			        if(IsPlayerAvail(ii) && PlayerData[ii][e_gangid] == GZoneData[i][e_attacker] && PlayerData[ii][bGWarMode])
 			        {
-			            if(!IsPlayerInRangeOfPoint(ii, GZONE_SIZE, GZoneData[i][E_x], GZoneData[i][E_y], GZoneData[i][E_z]) || IsPlayerOnDesktop(ii, 50000)) continue;
+			            if(!IsPlayerInRangeOfPoint(ii, GZONE_SIZE, GZoneData[i][e_x], GZoneData[i][e_y], GZoneData[i][e_z]) || IsPlayerOnDesktop(ii, 50000)) continue;
                         if(IsPlayerOnDesktop(ii, 2500)) continue;
 
 			            Iter_Add(Players, ii);
@@ -28792,7 +28792,7 @@ GetNearestHouse(playerid)
 {
 	for(new i = 0; i < houseid; i++)
 	{
-	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, HouseData[i][E_x], HouseData[i][E_y], HouseData[i][E_z])) continue;
+	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, HouseData[i][e_x], HouseData[i][e_y], HouseData[i][e_z])) continue;
 
 	    return i;
 	}
@@ -28953,7 +28953,7 @@ ExitPlayer(playerid)
 				    found = true;
 				    
 				    LoadMap(playerid);
-			    	SetPlayerPos(playerid, HouseData[i][E_x], HouseData[i][E_y], HouseData[i][E_z]);
+			    	SetPlayerPos(playerid, HouseData[i][e_x], HouseData[i][e_y], HouseData[i][e_z]);
 			    	SetPlayerInterior(playerid, 0);
 			    	SetPlayerVirtualWorld(playerid, 0);
 			    	CancelEdit(playerid);
