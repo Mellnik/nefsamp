@@ -25,21 +25,20 @@
 #pragma dynamic 8192
 
 #define IS_RELEASE_BUILD (true)
-#define INC_ENVIORMENT (true)
+#define INC_ENVIORMENT (false)
 #define IRC_CONNECT (true)
 #define WINTER_EDITION (false) // Requires FS ferriswheelfair.amx
-#define YSI_IS_SERVER
+#define YSI_NO_MASTER
 
 #include <a_samp>   		
 #include <a_http>           // API Requests
 #undef MAX_PLAYERS
 #define MAX_PLAYERS (400)
-#include <crashdetect>
-#include <YSI\y_iterate>	
-#include <YSI\y_commands>   
-#include <YSI\y_master>    
-#include <YSI\y_stringhash> 
-#include <YSI\y_va>
+#include <YSI_Data\y_iterate>
+#include <YSI_Core\y_master>
+#include <YSI_Visual\y_commands>
+#include <YSI_Coding\y_stringhash>
+#include <YSI_Coding\y_va>
 #include <sscanf2>
 #include <streamer>
 #include <a_mysql_R38>
@@ -3139,8 +3138,6 @@ public OnPlayerSpawn(playerid)
 
 public OnIncomingConnection(playerid, ip_address[], port)
 {
-	//Log(LOG_NET, "OnIncomingConnection(%i, %s, %i)", playerid, ip_address, port);
-	
 	new connections = 0, buffer[16];
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -3487,7 +3484,7 @@ public OnPlayerDisconnect(playerid, reason)
 	return 1;
 }
 
-public OnPlayerCommandReceived(playerid, cmdtext[])
+public e_COMMAND_ERRORS:OnPlayerCommandReceived(playerid, cmdtext[], e_COMMAND_ERRORS:success)
 {
 	if(PlayerData[playerid][bOpenSeason])
 		return 0;
@@ -3512,7 +3509,7 @@ public OnPlayerCommandReceived(playerid, cmdtext[])
 
 	if(PlayerData[playerid][bFrozen])
 	{
-	    switch(YHash(GetCommandName(cmdtext), false))
+	    switch(YHash(get_command_name(cmdtext), false))
 	    {
 			case _I(p,m), _I(r), _I(p), _I(s,t,a,t,s), _I(e,x,i,t), _I(h,e,l,p), _I(c), _I(c,m,d,s): { }
 			case _I(f,s), _I(i,d), _I(t,o,p), _I(r,e,p,o,r,t), _I(a,c,h,s), _I(s,t,r,e,a,m,s), _I(r,a,d,i,o): { }
@@ -3525,7 +3522,7 @@ public OnPlayerCommandReceived(playerid, cmdtext[])
 	}
 	else
 	{
-		switch(YHash(GetCommandName(cmdtext), false))
+		switch(YHash(get_command_name(cmdtext), false))
 		{
 		    case _I(b,i,k,e,c), _I(b,m,x): { }
 			case _I(s,k,y,d,i,v,e), _I(s,k,y,d,i,v,e,2), _I(s,k,y,d,i,v,e,3), _I(s,k,y,d,i,v,e,4), _I(s,k,y,d,i,v,e,5), _I(s,k,y,d,i,v,e,6): { }
@@ -3559,7 +3556,7 @@ public OnPlayerCommandReceived(playerid, cmdtext[])
 	return 1;
 }
 
-public OnPlayerCommandPerformed(playerid, cmdtext[], success)
+public e_COMMAND_ERRORS:OnPlayerCommandPerformed(playerid, cmdtext[], e_COMMAND_ERRORS:success)
 {
     new File:hFile = fopen("/Log/cmdlog.txt", io_append),
         time[3];
@@ -4119,8 +4116,6 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 public OnQueryError(errorid, error[], callback[], query[], connectionHandle)
 {
 	Log(LOG_FAIL, "OnQueryError(%i, %s, %s, %s, %i)", errorid, error, callback, query, connectionHandle);
-
-    PrintAmxBacktrace();
 	return 1;
 }
 
@@ -21871,8 +21866,6 @@ MySQL_RegisterAccount(playerid, register, password[])
 
 function:OnPlayerRegister(playerid, namehash, register, password[], playername[], ip_address[])
 {
-    PrintAmxBacktrace();
-
 	mysql_format(pSQL, gstr2, sizeof(gstr2), "UPDATE `accounts` SET `hash` = SHA1('%e'), `ip` = '%s' WHERE `name` = '%s';", password, ip_address, playername);
 	mysql_tquery(pSQL, gstr2);
 	
@@ -26766,9 +26759,6 @@ ShowPlayerInfoTextdraws(playerid)
 
 fallout_buildmap()
 {
-	Log(LOG_WORLD, "fallout_buildmap()");
-	PrintAmxBacktrace();
-
 	for(new i = 0; i < 101; i++)
 	{
 		DestroyDynamicObject(FalloutData[I_iObject][i]);
@@ -26888,9 +26878,6 @@ fallout_buildmap()
 
 fallout_startgame()
 {
-	Log(LOG_WORLD, "fallout_startgame()");
-	PrintAmxBacktrace();
-	
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 		PlayerData[i][bFalloutLost] = false;
@@ -26921,9 +26908,6 @@ fallout_setplayer(playerid)
 
 fallout_cancel()
 {
-	Log(LOG_WORLD, "fallout_cancel()");
-	PrintAmxBacktrace();
-	
     CurrentFalloutPlayers = 0;
 	g_FalloutStatus = e_Fallout_Inactive;
 	
@@ -26943,8 +26927,6 @@ fallout_cancel()
 
 function:fallout_losegame()
 {
-	Log(LOG_WORLD, "fallout_losegame()");
-	
 	new players,
 		Float:POS[3];
 
@@ -26989,8 +26971,6 @@ function:fallout_losegame()
 
 function:fallout_countdown()
 {
-    Log(LOG_WORLD, "fallout_countdown()");
-    
 	if(--FalloutData[I_iCount] <= 0)
 	{
 		KillTimer(FalloutData[I_tCountdown]);
@@ -27049,8 +27029,6 @@ function:fallout_countdown()
 
 function:fallout_solarfall()
 {
-	Log(LOG_WORLD, "fallout_solarfall()");
-	
 	new objectid,
 		go;
 		
@@ -27092,9 +27070,6 @@ function:fallout_start_falling()
 
 function:fallout_decidewinners()
 {
-	Log(LOG_WORLD, "fallout_decidewinners()");
-	PrintAmxBacktrace();
-	
 	g_FalloutStatus = e_Fallout_Inactive;
 
 	new winners,
@@ -27147,8 +27122,6 @@ function:fallout_decidewinners()
 
 function:fallout_squareshake(objectid)
 {
-	Log(LOG_WORLD, "fallout_squareshake()");
-
 	if(objectid == 0)
 	{
 		return KillTimer(FalloutData[I_iShaketimer][objectid]);
@@ -27200,8 +27173,6 @@ function:fallout_squareshake(objectid)
 
 fallout_get_playercount()
 {
-	Log(LOG_WORLD, "fallout_get_playercount()");
-	
 	new count = 0;
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -29579,8 +29550,6 @@ function:OnOfflineBanAttempt2(playerid, ban[], reason[])
 		AdminMSG(COLOR_RED, gstr);
 		Log(LOG_PLAYER, gstr);
 
-        PrintAmxBacktrace();
-
         SCM(playerid, -1, ""er"Player has been banned!");
 	}
 	else
@@ -29598,7 +29567,7 @@ function:HideMoneyTD(playerid, namehash)
 	}
 }
 
-function:HideScoreTD(playerid, namehash)
+function:player_hide_scoretd(playerid, namehash)
 {
 	if(IsPlayerConnected(playerid) && YHash(__GetName(playerid)) == namehash)
 	{
@@ -30938,7 +30907,7 @@ GivePlayerScoreEx(playerid, amount, bool:populate = true, bool:boost = false)
     {
 		PlayerTextDrawSetString(playerid, TXTScore[playerid], gstr);
         PlayerTextDrawShow(playerid, TXTScore[playerid]);
-		SetTimerEx("HideScoreTD", 3000, false, "ii", playerid, YHash(__GetName(playerid)));
+		SetTimerEx("player_hide_scoretd", 3000, false, "ii", playerid, YHash(__GetName(playerid)));
     }
 
     if(PlayerData[playerid][bLogged] && PlayerData[playerid][bAchsLoad])
@@ -31174,7 +31143,7 @@ SetPlayerPosEx(playerid, Float:X, Float:Y, Float:Z)
 	SetPlayerPos(playerid, X, Y, Z);
 }
 
-GetCommandName(cmdtext[])
+get_command_name(cmdtext[])
 {
 	new space = -1;
 	for(new i, l = strlen(cmdtext); i < l; i++)
