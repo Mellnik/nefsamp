@@ -147,7 +147,7 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #define MAX_TELE_CATEGORYS              (10)
 #define CAR_SHOPS                       (3)
 #define RGBA(%1,%2,%3,%4) (((((%1) & 0xff) << 24) | (((%2) & 0xff) << 16) | (((%3) & 0xff) << 8) | ((%4) & 0xff)))
-#define UpperToLower(%1) for(new ToLowerChar; ToLowerChar < strlen(%1); ToLowerChar++) if(%1[ToLowerChar] > 64 && %1[ToLowerChar] < 91) %1[ToLowerChar] += 32
+#define UpperToLower(%1) for___loop(new ToLowerChar; ToLowerChar < strlen(%1); ToLowerChar++) if(%1[ToLowerChar] > 64 && %1[ToLowerChar] < 91) %1[ToLowerChar] += 32
 
 // Derby
 #define DERBY_WIHLE_CAM_M1				-3948.2632, 951.8198, 78.4012
@@ -2607,7 +2607,7 @@ public OnGameModeInit()
 
     LoadServerVehicles();
 
-	for(new i = 0; i < MAX_VEHICLES; i++)
+	for___loop(new i = 0; i < MAX_VEHICLES; i++)
 	{
 		SetVehicleNumberPlate(i, "{F81414}NEF");
 		SetVehicleToRespawn(i);
@@ -3146,7 +3146,7 @@ public OnIncomingConnection(playerid, ip_address[], port)
 	//Log(LOG_NET, "OnIncomingConnection(%i, %s, %i)", playerid, ip_address, port);
 	
 	new connections = 0, buffer[16];
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(i == playerid || !IsPlayerConnected(i))
 	        continue;
@@ -3199,7 +3199,7 @@ public OnPlayerConnect(playerid)
 	    Log(LOG_NET, "%s(%i, %s, %s) connected.", __GetName(playerid), playerid, __GetIP(playerid), __GetSerial(playerid));
 	
 	    new count_r = 0;
-	    for(new i = 0; i < MAX_PLAYERS; i++)
+	    for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	    {
 	        if(IsPlayerConnected(i))
 	            count_r++;
@@ -3258,7 +3258,7 @@ public OnPlayerDisconnect(playerid, reason)
 		    {
 				new bool:found = false;
 				
-		        for(new i = 0; i < MAX_PLAYERS; i++)
+		        for___loop(new i = 0; i < MAX_PLAYERS; i++)
 		        {
 		            if(PlayerData[i][DuelRequestRecv] == playerid && gTeam[i] == gDUEL)
 		            {
@@ -3279,7 +3279,7 @@ public OnPlayerDisconnect(playerid, reason)
 		        
 				if(!found)
 				{
-				    for(new i = 0; i < MAX_PLAYERS; i++)
+				    for___loop(new i = 0; i < MAX_PLAYERS; i++)
 				    {
 				        if(PlayerData[i][DuelRequest] == playerid) // Sender won
 				        {
@@ -3361,7 +3361,7 @@ public OnPlayerDisconnect(playerid, reason)
 				{
 				    KillTimer(FalloutData[I_tCountdown]);
 
-					for(new i = 0; i < MAX_PLAYERS; i++)
+					for___loop(new i = 0; i < MAX_PLAYERS; i++)
 					{
 					    if(gTeam[i] == FALLOUT)
 					    {
@@ -3437,7 +3437,7 @@ public OnPlayerDisconnect(playerid, reason)
         DestroyDynamic3DTextLabel(PlayerData[playerid][VIPLabel]);
         PlayerData[playerid][VIPLabel] = Text3D:-1;
     }
-    for(new i = 0; i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
+    for___loop(new i = 0; i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
     {
 		RemovePlayerAttachedObject(playerid, i);
 	}
@@ -3446,7 +3446,7 @@ public OnPlayerDisconnect(playerid, reason)
 		KillTimer(PlayerData[playerid][tRainbow]);
 		PlayerData[playerid][bRainbow] = false;
 	}
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
     	if(gTeam[i] == SPEC && PlayerData[i][SpecID] == playerid)
     	{
@@ -3689,7 +3689,7 @@ public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY
 	    if(hitid != INVALID_PLAYER_ID) {
             if(gTeam[hitid] == FREEROAM) {
 				if(GetPlayerVehicleSeat(playerid) == 0) {
-					for(new i = 0; i < sizeof(g_SpawnAreas); i++) {
+					for___loop(new i = 0; i < sizeof(g_SpawnAreas); i++) {
 					    if(IsPlayerInDynamicArea(playerid, g_SpawnAreas[i])) {
 							return 0;
 					    }
@@ -3740,14 +3740,14 @@ public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY
 		    GivePlayerWeapon(playerid, 35, 0);
 		
 		    new p_Weapons[13][2];
-			for(new i = 0; i < 13; i++) {
+			for___loop(new i = 0; i < 13; i++) {
 			    GetPlayerWeaponData(playerid, i, p_Weapons[i][0], p_Weapons[i][1]);
 			}
 			p_Weapons[7][0] = 0; // RPG
 			
 			ResetPlayerWeapons(playerid);
 			
-			for(new i = 0; i < 13; i++) {
+			for___loop(new i = 0; i < 13; i++) {
 			    GivePlayerWeapon(playerid, p_Weapons[i][0], p_Weapons[i][1]);
 			}
 		}
@@ -3776,7 +3776,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 			    new name[25], time, id,
 			        minute, sec, msec;
 			    
-				for(new i = 0; i < rows; i++)
+				for___loop(new i = 0; i < rows; i++)
 				{
 				    name[0] = '\0';
 					id = cache_get_row_int(i, 0, pSQL);
@@ -3834,7 +3834,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 					name[25],
 					time;
 
-				for(new i = 0; i < rows; i++)
+				for___loop(new i = 0; i < rows; i++)
 				{
 					cache_get_row(i, 0, name, pSQL, sizeof(name));
 					time = cache_get_row_int(i, 1, pSQL);
@@ -3864,7 +3864,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				format(gstr, sizeof(gstr), "UPDATE `accounts` SET `gangrank` = 0, `gangid` = 0 WHERE `gangid` = %i;", gangid);
 				mysql_tquery(pSQL, gstr);
 
-				for(new i = 0; i < gzoneid; i++)
+				for___loop(new i = 0; i < gzoneid; i++)
 				{
 				    if(GZoneData[i][e_localgang] == gangid)
 				    {
@@ -3882,7 +3882,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				    }
 				}
 
-				for(new i = 0; i < MAX_PLAYERS; i++)
+				for___loop(new i = 0; i < MAX_PLAYERS; i++)
 				{
 				    if(IsPlayerConnected(i))
 				    {
@@ -3925,7 +3925,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 			        count = 0,
 			        finstring[sizeof(tmpstring) + 300];
 
-				for(new i = 0; i < rows; i++)
+				for___loop(new i = 0; i < rows; i++)
 				{
 					new result[MAX_PLAYER_NAME+1],
 					    tmp[MAX_PLAYER_NAME+1 + 25],
@@ -3970,7 +3970,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				color = cache_get_row_int(0, 5, pSQL);
 				gcar = cache_get_row_int(0, 6, pSQL);
 
-				for(new i = 0; i < MAX_PLAYERS; i++)
+				for___loop(new i = 0; i < MAX_PLAYERS; i++)
 				{
 				    if(!IsPlayerConnected(i)) continue;
 				    if(PlayerData[i][e_gangrank] == 0) continue;
@@ -4130,7 +4130,7 @@ public OnQueryError(errorid, error[], callback[], query[], connectionHandle)
 
 public OnPlayerInteriorChange(playerid, newinteriorid, oldinteriorid)
 {
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if(gTeam[i] == SPEC && PlayerData[i][SpecID] == playerid)
    		{
@@ -4533,7 +4533,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 	    GivePlayerAchievement(playerid, e_ach_restinpeace, "Rest in Peace", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
 	}
 
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
  		if(gTeam[i] == SPEC && PlayerData[i][SpecID] == playerid)
 	    {
@@ -4571,7 +4571,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 	    {
 	        new bool:found = false;
 	    
-			for(new i = 0; i < MAX_PLAYERS; i++)
+			for___loop(new i = 0; i < MAX_PLAYERS; i++)
 			{
 			    if(PlayerData[i][DuelRequestRecv] == playerid && gTeam[i] == gDUEL) // Sender lost
 			    {
@@ -4600,7 +4600,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 			
 			if(!found)
 			{
-			    for(new i = 0; i < MAX_PLAYERS; i++)
+			    for___loop(new i = 0; i < MAX_PLAYERS; i++)
 			    {
 			        if(PlayerData[i][DuelRequest] == playerid) // Sender won
 			        {
@@ -4844,7 +4844,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 			{
 			    KillTimer(FalloutData[I_tCountdown]);
 
-				for(new i = 0; i < MAX_PLAYERS; i++)
+				for___loop(new i = 0; i < MAX_PLAYERS; i++)
 				{
 				    if(gTeam[i] == FALLOUT)
 				    {
@@ -4977,7 +4977,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 						g_WinnerName[3][MAX_PLAYER_NAME+1],
 						g_Data[MAX_PLAYERS][e_GunGame];
 
-					for(new i = 0; i < MAX_PLAYERS; i++)
+					for___loop(new i = 0; i < MAX_PLAYERS; i++)
 					{
 					    g_Data[i][GG_iPlayer] = i;
 						if(IsPlayerAvail(i) && gTeam[i] == GUNGAME)
@@ -4990,7 +4990,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 						}
 					}
 					SortDeepArray(g_Data, GG_iLevel, .order = SORT_DESC);
-					for(new i = 0; i < 3; i++)
+					for___loop(new i = 0; i < 3; i++)
 					{
 					    if(g_Data[i][GG_iLevel] == -1)
 						{
@@ -5004,7 +5004,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 					}
 
 					new gWinners[3];
-					for(new i = 0; i < 3; i++)
+					for___loop(new i = 0; i < 3; i++)
 					{
 					    gWinners[i] = __GetPlayerID(g_WinnerName[i]);
 					}
@@ -5040,7 +5040,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 						g_Data[2][GG_iLevel],
 						g_WinnerName[2]);
 
-					for(new i = 0; i < MAX_PLAYERS; i++)
+					for___loop(new i = 0; i < MAX_PLAYERS; i++)
 				    {
 						if(IsPlayerAvail(i) && gTeam[i] == GUNGAME)
 						{
@@ -5069,7 +5069,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 					if(GunGame_Player[killerid][level] == 13)
 					{
 						format(gstr, sizeof gstr, "%s reached the last level!", __GetName(killerid));
-     				    for(new i = 0; i < MAX_PLAYERS; i++)
+     				    for___loop(new i = 0; i < MAX_PLAYERS; i++)
 					    {
 							if(IsPlayerAvail(i) && gTeam[i] == GUNGAME)
 							{
@@ -5144,7 +5144,7 @@ public OnPlayerEnterDynamicArea(playerid, areaid)
 {
 	if(gTeam[playerid] != FREEROAM) return 1;
 	
-	for(new i = 0; i < gzoneid; i++)
+	for___loop(new i = 0; i < gzoneid; i++)
 	{
 	    if(GZoneData[i][e_localgang] == PlayerData[playerid][e_gangid] && GZoneData[i][e_underattack] && areaid == GZoneData[i][e_sphereid])
 	    {
@@ -5177,7 +5177,7 @@ public OnPlayerEnterDynamicArea(playerid, areaid)
 
 public OnPlayerLeaveDynamicArea(playerid, areaid)
 {
-	for(new i = 0; i < gzoneid; i++)
+	for___loop(new i = 0; i < gzoneid; i++)
 	{
 	    if(GZoneData[i][e_localgang] == PlayerData[playerid][e_gangid] && GZoneData[i][e_underattack] && areaid == GZoneData[i][e_sphereid] && PlayerData[playerid][bGWarMode])
 	    {
@@ -5831,7 +5831,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 
 		    if(!PlayerData[playerid][bGod])
 			{
-			    for(new i = 0; i < sizeof(pick_life); i++)
+			    for___loop(new i = 0; i < sizeof(pick_life); i++)
 			    {
 					if(pickupid == pick_life[i])
 					{
@@ -5847,7 +5847,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 					}
 			    }
 
-			    for(new i = 0; i < sizeof(pick_armor); i++)
+			    for___loop(new i = 0; i < sizeof(pick_armor); i++)
 			    {
 			        if(pickupid == pick_armor[i])
 			        {
@@ -5872,7 +5872,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 		  		}
 			}
 
-			for(new i = 0; i < CAR_SHOPS; i++)
+			for___loop(new i = 0; i < CAR_SHOPS; i++)
 			{
 			    if(pickupid == g_CarShops[i][e_pickup])
 			    {
@@ -5902,7 +5902,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 		{
 		    if(pickupid == g_CarShopInteriorPickup)
 		    {
-			    for(new i = 0; i < CAR_SHOPS; i++)
+			    for___loop(new i = 0; i < CAR_SHOPS; i++)
 			    {
 			        if(gLastMap[playerid] == g_CarShops[i][e_pickup])
 			        {
@@ -5970,7 +5970,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
  	if(!IsPlayerInAnyVehicle(playerid) && GetPlayerState(playerid) != PLAYER_STATE_SPECTATING)
 	{
 	    new file[50];
-   		for(new b = 0; b < MAX_BANKS; b++)
+   		for___loop(new b = 0; b < MAX_BANKS; b++)
    		{
    		    format(file, sizeof(file), "/Store/Banks/%i.ini", b);
   			if(pickupid == BankPickInt[b])
@@ -5984,7 +5984,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 		        return 1;
 			}
 		}
- 		for(new a = 0; a < MAX_AMMUNATIONS; a++)
+ 		for___loop(new a = 0; a < MAX_AMMUNATIONS; a++)
 		{
 		    format(file, sizeof(file), "/Store/Ammunations/%i.ini", a);
 			if(pickupid == AmmunationPickInt[a])
@@ -5998,7 +5998,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 		        return 1;
 			}
 		}
-		for(new bs = 0; bs < MAX_BURGERSHOTS; bs++)
+		for___loop(new bs = 0; bs < MAX_BURGERSHOTS; bs++)
 		{
 		    format(file, sizeof(file), "/Store/BurgerShots/%i.ini", bs);
 			if(pickupid == BurgerPickInt[bs])
@@ -6012,7 +6012,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 		        return 1;
 			}
 		}
-		for(new cb = 0; cb < MAX_CLUCKINBELLS; cb++)
+		for___loop(new cb = 0; cb < MAX_CLUCKINBELLS; cb++)
 		{
 		    format(file, sizeof(file), "/Store/CluckinBells/%i.ini", cb);
 			if(pickupid == CluckinBellPickInt[cb])
@@ -6026,7 +6026,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 		        return 1;
 			}
 		}
-		for(new ps = 0; ps < MAX_PIZZASTACKS; ps++)
+		for___loop(new ps = 0; ps < MAX_PIZZASTACKS; ps++)
 		{
 		    format(file, sizeof(file), "/Store/WellStackedPizzas/%i.ini", ps);
 			if(pickupid == PizzaPickInt[ps])
@@ -6040,7 +6040,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 		        return 1;
 			}
 		}
- 		for(new tfs = 0; tfs < MAX_TFS; tfs++)
+ 		for___loop(new tfs = 0; tfs < MAX_TFS; tfs++)
 		{
 		    format(file, sizeof(file), "/Store/TwentyFourSeven/%i.ini", tfs);
 			if(pickupid == TFSPickInt[tfs])
@@ -6056,7 +6056,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 		}
 
 	    // aout
-		for(new bo = 0; bo < MAX_BANKS; bo++)
+		for___loop(new bo = 0; bo < MAX_BANKS; bo++)
 		{
 		    if(pickupid == BankPickOut[bo])
 		    {
@@ -6069,7 +6069,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
                 return 1;
 			}
 		}
-		for(new ao = 0; ao < MAX_AMMUNATIONS; ao++)
+		for___loop(new ao = 0; ao < MAX_AMMUNATIONS; ao++)
 		{
   			if(pickupid == AmmunationPickOut[ao])
 		    {
@@ -6082,7 +6082,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 		        return 1;
 			}
 		}
-		for(new bso = 0; bso < MAX_BURGERSHOTS; bso++)
+		for___loop(new bso = 0; bso < MAX_BURGERSHOTS; bso++)
 		{
   			if(pickupid == BurgerPickOut[bso])
 		    {
@@ -6097,7 +6097,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 			}
 
 		}
-		for(new cbo = 0; cbo < MAX_CLUCKINBELLS; cbo++)
+		for___loop(new cbo = 0; cbo < MAX_CLUCKINBELLS; cbo++)
 		{
   			if(pickupid == CluckinBellPickOut[cbo])
 			{
@@ -6111,7 +6111,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 		        return 1;
 			}
 		}
-		for(new pso = 0; pso < MAX_PIZZASTACKS; pso++)
+		for___loop(new pso = 0; pso < MAX_PIZZASTACKS; pso++)
 		{
   			if(pickupid == PizzaPickOut[pso])
 		    {
@@ -6125,7 +6125,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 		        return 1;
 			}
 		}
-		for(new tfso = 0; tfso < MAX_TFS; tfso++)
+		for___loop(new tfso = 0; tfso < MAX_TFS; tfso++)
 		{
   			if(pickupid == TFSPickOut[tfso])
 		    {
@@ -6146,7 +6146,7 @@ public OnObjectMoved(objectid)
 {
     new Float:POS[3];
     
-	for(new i = 0; i < sizeof(Obj_FloorDoors); i++)
+	for___loop(new i = 0; i < sizeof(Obj_FloorDoors); i++)
 	{
 		if(objectid == Obj_FloorDoors[i][0])
 		{
@@ -6317,7 +6317,7 @@ public OnPlayerEnterVehicle(playerid, vehicleid)
 
 public OnPlayerStateChange(playerid, newstate, oldstate)
 {
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
  		if(gTeam[i] == SPEC && PlayerData[i][SpecID] == playerid)
 	    {
@@ -6725,7 +6725,7 @@ IRCCMD:playerlist(botid, channel[], user[], host[], params[])
 {
 	if(IRC_IsVoice(botid, channel, user))
 	{
-		for(new i = 0; i < MAX_PLAYERS; i++)
+		for___loop(new i = 0; i < MAX_PLAYERS; i++)
 		{
 		    if(IsPlayerConnected(i))
 		    {
@@ -6741,7 +6741,7 @@ IRCCMD:cc(botid, channel[], user[], host[], params[])
 {
    	if(IRC_IsHalfop(botid, channel, user))
 	{
-		for(new i = 0; i < 21; i++)
+		for___loop(new i = 0; i < 21; i++)
 		{
 		    SCMToAll(COLOR_SYSTEM, " ");
 		}
@@ -8004,7 +8004,7 @@ YCMD:l(playerid, params[], help)
 		return 1;
 	}
 	
-	for(new i = 0; i < gzoneid; i++)
+	for___loop(new i = 0; i < gzoneid; i++)
 	{
 	    if(GZoneData[i][e_underattack] && (GZoneData[i][e_localgang] == PlayerData[playerid][e_gangid] || GZoneData[i][e_attacker] == PlayerData[playerid][e_gangid]))
 	    {
@@ -8409,7 +8409,7 @@ YCMD:bbuy(playerid, params[], help)
 	}
 
 	new bool:bFound = false;
-	for(new r = 0; r < MAX_BUSINESSES; r++)
+	for___loop(new r = 0; r < MAX_BUSINESSES; r++)
 	{
 	    if(BusinessData[r][e_ormid] == ORM:-1) continue;
 	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, BusinessData[r][e_pos][0], BusinessData[r][e_pos][1], BusinessData[r][e_pos][2])) continue;
@@ -8475,7 +8475,7 @@ YCMD:bsell(playerid, params[], help)
 	}
 
 	new bool:bFound = false;
-	for(new r = 0; r < MAX_BUSINESSES; r++)
+	for___loop(new r = 0; r < MAX_BUSINESSES; r++)
 	{
 	    if(BusinessData[r][e_ormid] == ORM:-1) continue;
 	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, BusinessData[r][e_pos][0], BusinessData[r][e_pos][1], BusinessData[r][e_pos][2])) continue;
@@ -8531,7 +8531,7 @@ YCMD:buy(playerid, params[], help)
 	}
 	
 	new bool:found = false;
-	for(new i = 0; i < houseid; i++)
+	for___loop(new i = 0; i < houseid; i++)
 	{
 	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, HouseData[i][E_x], HouseData[i][E_y], HouseData[i][E_z])) continue;
         found = true;
@@ -8603,7 +8603,7 @@ YCMD:sell(playerid, params[], help)
 	}
 	
     new bool:found = false;
-	for(new i = 0; i < houseid; i++)
+	for___loop(new i = 0; i < houseid; i++)
 	{
 	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, HouseData[i][E_x], HouseData[i][E_y], HouseData[i][E_z])) continue;
 	    found = true;
@@ -8622,7 +8622,7 @@ YCMD:sell(playerid, params[], help)
 	    HouseData[i][sold] = 0;
 	    HouseData[i][locked] = 1;
 
-		for(new ii = 0; ii < MAX_HOUSE_OBJECTS; ii++)
+		for___loop(new ii = 0; ii < MAX_HOUSE_OBJECTS; ii++)
 		{
 			if(HouseData[i][E_Obj_Model][ii] != 0)
 			{
@@ -8668,7 +8668,7 @@ YCMD:unlock(playerid, params[], help)
 		    {
 			    if(GetPlayerVehicleID(playerid) == PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid])
 			    {
-	      			for(new i = 0; i < MAX_PLAYERS; i++)
+	      			for___loop(new i = 0; i < MAX_PLAYERS; i++)
 				    {
 				        if(i == playerid) continue;
 				        
@@ -8692,7 +8692,7 @@ YCMD:unlock(playerid, params[], help)
 YCMD:open(playerid, params[], help)
 {
     new bool:found = false;
-	for(new i = 0; i < houseid; i++)
+	for___loop(new i = 0; i < houseid; i++)
 	{
 	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, HouseData[i][E_x], HouseData[i][E_y], HouseData[i][E_z])) continue;
 	    found = true;
@@ -8712,7 +8712,7 @@ YCMD:open(playerid, params[], help)
 YCMD:close(playerid, params[], help)
 {
     new bool:found = false;
-	for(new i = 0; i < houseid; i++)
+	for___loop(new i = 0; i < houseid; i++)
 	{
 	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, HouseData[i][E_x], HouseData[i][E_y], HouseData[i][E_z])) continue;
 	    found = true;
@@ -8741,7 +8741,7 @@ YCMD:lock(playerid, params[], help)
 		    {
 			    if(GetPlayerVehicleID(playerid) == PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid])
 			    {
-	      			for(new i = 0; i < MAX_PLAYERS; i++)
+	      			for___loop(new i = 0; i < MAX_PLAYERS; i++)
 				    {
 				        if(i == playerid) continue;
 				        SetVehicleParamsForPlayer(GetPlayerVehicleID(playerid), i, 0, 1);
@@ -8763,7 +8763,7 @@ YCMD:lock(playerid, params[], help)
 		}
 
 	    new bool:found = false;
-		for(new i = 0; i < houseid; i++)
+		for___loop(new i = 0; i < houseid; i++)
 		{
 			if(IsPlayerInRangeOfPoint(playerid, 1.5, HouseData[i][E_x], HouseData[i][E_y], HouseData[i][E_z]))
 			{
@@ -8868,7 +8868,7 @@ YCMD:cnr(playerid, params[], help)
 	
 	new robbers = 0, cops = 0;
 	
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(PlayerData[i][bwCNRFraction] & CNR_COP || PlayerData[i][bwCNRFraction] & CNR_SWAT || PlayerData[i][bwCNRFraction] & CNR_ARMY)
 			cops++;
@@ -8886,7 +8886,7 @@ YCMD:cnr(playerid, params[], help)
 
 	new robbers = 0, cops = 0;
 	
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(GetPVarInt(i, "Cop") == 1)
 			cops++;
@@ -8943,7 +8943,7 @@ YCMD:duel(playerid, params[], help)
             if(IsPlayerOnDesktop(PlayerData[playerid][DuelRequestRecv], 1500)) return SCM(playerid, -1, ""er"Player is on desktop");
             if(PlayerData[PlayerData[playerid][DuelRequestRecv]][DuelRequest] != playerid) return SCM(playerid, -1, ""er"Error: Players do not match");
 
-			for(new i = 0; i < MAX_PLAYERS; i++)
+			for___loop(new i = 0; i < MAX_PLAYERS; i++)
 			{
 			    if(PlayerData[i][DuelRequestRecv] == playerid)
 			    {
@@ -8998,7 +8998,7 @@ YCMD:duel(playerid, params[], help)
     else
     {
         // Begin duel request
-        for(new i = 0; i < MAX_PLAYERS; i++)
+        for___loop(new i = 0; i < MAX_PLAYERS; i++)
         {
 			if(PlayerData[i][DuelRequestRecv] == playerid)
 			{
@@ -9368,7 +9368,7 @@ YCMD:bounties(playerid, params[], help)
 {
 	new count = 0;
 	SCM(playerid, -1, "================Current bounties=================");
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if(IsPlayerAvail(i) && PlayerData[i][HitmanHit] > 0)
 		{
@@ -9715,7 +9715,7 @@ YCMD:suspect(playerid, params[], help)
 	if(PlayerData[playerid][e_level] >= 1)
 	{
 	    new count = 0, tmpstring[55], finstring[1500];
-		for(new i = 0; i < MAX_PLAYERS; i++)
+		for___loop(new i = 0; i < MAX_PLAYERS; i++)
 		{
 		    if(!IsPlayerAvail(i))
 				continue;
@@ -9763,7 +9763,7 @@ YCMD:onlinefix(playerid, params[], help)
 	{
 	    mysql_query(pSQL, "TRUNCATE TABLE `online`;", false);
 	    
-	    for(new i = 0; i < MAX_PLAYERS; i++)
+	    for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	    {
 	        if(IsPlayerConnected(i))
 	        {
@@ -10357,13 +10357,13 @@ YCMD:id(playerid, params[], help)
 	format(gstr, sizeof(gstr), "Searched for: %s", params);
 	SCM(playerid, GREEN, gstr);
 	
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if(IsPlayerAvail(i) && PlayerData[playerid][bOnlineAdmin])
 		{
 	  		GetPlayerName(i, playername, MAX_PLAYER_NAME+1);
 			new namelen = strlen(playername), bool:searched = false;
-	    	for(new pos = 0; pos < namelen; pos++)
+	    	for___loop(new pos = 0; pos < namelen; pos++)
 			{
 				if(!searched)
 				{
@@ -10439,7 +10439,7 @@ YCMD:announce2(playerid, params[], help)
 
 		format(gstr, sizeof(gstr), ""white"Admin %s(%i):\n\n %s", __GetName(playerid), playerid, text);
 
-		for(new i = 0; i < MAX_PLAYERS; i++)
+		for___loop(new i = 0; i < MAX_PLAYERS; i++)
 		{
 		    if(IsPlayerAvail(i) && gTeam[i] != BUYCAR)
 		    {
@@ -10459,7 +10459,7 @@ YCMD:spectators(playerid, params[], help)
     if(PlayerData[playerid][e_level] >= 1)
 	{
 	    new Iterator:speccers<MAX_PLAYERS>;
-		for(new i = 0; i < MAX_PLAYERS; i++)
+		for___loop(new i = 0; i < MAX_PLAYERS; i++)
 		{
 		    if(gTeam[i] == SPEC)
 		    {
@@ -10475,7 +10475,7 @@ YCMD:spectators(playerid, params[], help)
 		format(gstr, sizeof(gstr), ""nef" Displaying a list of %i admin(s)/VIP(s) spectating:", Iter_Count(speccers));
 		SCM(playerid, -1, gstr);
 
-        for(new i = Iter_First(speccers), count = 0; i != Iter_End(speccers); i = Iter_Next(speccers, i), ++count)
+        for___loop(new i = Iter_First(speccers), count = 0; i != Iter_End(speccers); i = Iter_Next(speccers, i), ++count)
         {
             if(PlayerData[i][SpecID] == INVALID_PLAYER_ID) continue;
             format(gstr, sizeof(gstr), " %i. %s(%i) spectating %s(%i)", count + 1, __GetName(i), i, __GetName(PlayerData[i][SpecID]), PlayerData[i][SpecID]);
@@ -10500,7 +10500,7 @@ YCMD:jetpack(playerid, params[], help)
 	    new Float:POS[3];
 	    GetPlayerPos(playerid, POS[0], POS[1], POS[2]);
 
-		for(new i = 0; i < gzoneid; i++)
+		for___loop(new i = 0; i < gzoneid; i++)
 		{
 		    if(!GZoneData[i][e_underattack]) continue;
 
@@ -10883,7 +10883,7 @@ YCMD:avgping(playerid, params[], help)
 {
 	new pings, players;
 	
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(IsPlayerConnected(i))
 	    {
@@ -11236,7 +11236,7 @@ YCMD:gzonecreate(playerid, params[], help)
 	}
 
     new c = 0;
-	for(new i = 0; i < gzoneid; i++)
+	for___loop(new i = 0; i < gzoneid; i++)
 	{
 		c++;
 	}
@@ -11284,7 +11284,7 @@ YCMD:gzonereset(playerid, params[], help)
 	if(PlayerData[playerid][e_level] == MAX_ADMIN_LEVEL)
 	{
 	    new bool:found = false;
-	    for(new i = 0; i < gzoneid; i++)
+	    for___loop(new i = 0; i < gzoneid; i++)
 	    {
 		    if(!IsPlayerInRangeOfPoint(playerid, 7.0, GZoneData[i][E_x], GZoneData[i][E_y], GZoneData[i][E_z])) continue;
 	        found = true;
@@ -11305,7 +11305,7 @@ YCMD:gzonereset(playerid, params[], help)
 	        
 			MySQL_SaveGangZone(i);
 	        
-	        for(new ii = 0; ii < MAX_PLAYERS; ii++)
+	        for___loop(new ii = 0; ii < MAX_PLAYERS; ii++)
 	        {
 			    if(IsPlayerConnected(ii) )
 			    {
@@ -11430,7 +11430,7 @@ YCMD:gcapture(playerid, params[], help)
     if(PlayerData[playerid][e_gangid] == 0) return SCM(playerid, -1, ""er"You aren't in any gang! Create a gang /gcreate or join one.");
     
 	new bool:found = false;
-	for(new i = 0; i < gzoneid; i++)
+	for___loop(new i = 0; i < gzoneid; i++)
 	{
 	    if(!IsPlayerInRangeOfPoint(playerid, 7.0, GZoneData[i][E_x], GZoneData[i][E_y], GZoneData[i][E_z])) continue;
         found = true;
@@ -11445,7 +11445,7 @@ YCMD:gcapture(playerid, params[], help)
 		//if(!PlayerData[i][bGWarMode]) return SCM(playerid, -1, ""orange"You are not participating in this gang war");
 
 		new Float:POS[3], Iterator:Players<MAX_PLAYERS>;
-		for(new ii = 0; ii < MAX_PLAYERS; ii++)
+		for___loop(new ii = 0; ii < MAX_PLAYERS; ii++)
 		{
 		    if(!IsPlayerAvail(ii)) continue;
 		    if(PlayerData[ii][e_gangid] != GZoneData[i][e_attacker]) continue;
@@ -11472,7 +11472,7 @@ YCMD:gcapture(playerid, params[], help)
 			format(gstr, sizeof(gstr), ""orange"Gang %s failed to capture '%s'. Zone remains %s territory and will be locked for 30 minutes!", GetGangNameByID(GZoneData[i][e_attacker]), GZoneData[i][e_zonename], GetGangNameByID(GZoneData[i][e_defender]));
 			SCMToAll(-1, gstr);
 
-			for(new ii = 0; ii < MAX_PLAYERS; ii++)
+			for___loop(new ii = 0; ii < MAX_PLAYERS; ii++)
 			{
 			    if(IsPlayerAvail(ii) && PlayerData[ii][bGWarMode])
 			    {
@@ -11520,7 +11520,7 @@ YCMD:gzones(playerid, params[], help)
     
 	new str[1024], count = 0;
 
-	for(new i = 0; i < gzoneid; i++)
+	for___loop(new i = 0; i < gzoneid; i++)
 	{
 	    if(PlayerData[playerid][e_gangid] == GZoneData[i][e_localgang])
 	    {
@@ -11547,7 +11547,7 @@ YCMD:gwars(playerid, params[], help)
 {
 	new str[512], count = 0;
 	strcat(str, ""white"");
-	for(new i = 0; i < gzoneid; i++)
+	for___loop(new i = 0; i < gzoneid; i++)
 	{
 	    if(GZoneData[i][e_underattack])
 	    {
@@ -11576,7 +11576,7 @@ YCMD:gwar(playerid, params[], help)
 	if(PlayerData[playerid][e_gangrank] < GANG_POS_SENIOR_MEMBER) return SCM(playerid, -1, ""er"You you need to be at least Senior Member in your gang!");
 
 	new bool:found = false;
-	for(new i = 0; i < gzoneid; i++)
+	for___loop(new i = 0; i < gzoneid; i++)
 	{
 	    if(!IsPlayerInRangeOfPoint(playerid, 7.0, GZoneData[i][E_x], GZoneData[i][E_y], GZoneData[i][E_z])) continue;
         found = true;
@@ -11613,7 +11613,7 @@ YCMD:gwar(playerid, params[], help)
 		    TextDrawSetString(GZoneData[i][e_txtid], gstr);
 		    
 		    new count = 0;
-		    for(new ii = 0; ii < MAX_PLAYERS; ii++)
+		    for___loop(new ii = 0; ii < MAX_PLAYERS; ii++)
 		    {
 		        if(PlayerData[ii][e_gangid] == PlayerData[playerid][e_gangid] && IsPlayerAvail(ii))
 		        {
@@ -11655,7 +11655,7 @@ YCMD:gwar(playerid, params[], help)
 		    TextDrawSetString(GZoneData[i][e_txtid], gstr);
 		    
 		    new count = 0;
-		    for(new ii = 0; ii < MAX_PLAYERS; ii++)
+		    for___loop(new ii = 0; ii < MAX_PLAYERS; ii++)
 		    {
 		        if(PlayerData[ii][e_gangid] == PlayerData[playerid][e_gangid] && IsPlayerAvail(ii))
 		        {
@@ -11714,7 +11714,7 @@ ResetPlayerGWarMode(playerid, bool:msg = true)
 {
     if(msg) SCM(playerid, -1, ""orange"You have left the gang war!");
     
-    for(new i = 0; i < gzoneid; i++)
+    for___loop(new i = 0; i < gzoneid; i++)
     {
         TextDrawHideForPlayer(playerid, GZoneData[i][e_txtid]);
     }
@@ -12369,7 +12369,7 @@ YCMD:shutdown(playerid, params[], help)
 	{
 	    bGlobalShutdown = true;
 	    
-	    for(new i = 0; i < MAX_PLAYERS; i++)
+	    for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	    {
 	        SCM(i, -1, "Server restart! Restart your game. IP: samp.nefserver.net:7777");
 	    }
@@ -12445,7 +12445,7 @@ YCMD:dplayers(playerid, params[], help)
 	if(PlayerData[playerid][e_level] >= 1)
 	{
 		new string[512], tmp[50];
-		for(new i = 0; i < MAX_PLAYERS; i++)
+		for___loop(new i = 0; i < MAX_PLAYERS; i++)
 		{
 		    if(IsPlayerAvail(i) && gTeam[i] == DERBY)
 		    {
@@ -12467,7 +12467,7 @@ YCMD:rplayers(playerid, params[], help)
 	if(PlayerData[playerid][e_level] >= 1)
 	{
 		new string[512], tmp[50], count = 0;
-		for(new i = 0; i < MAX_PLAYERS; i++)
+		for___loop(new i = 0; i < MAX_PLAYERS; i++)
 		{
 		    if(IsPlayerAvail(i) && gTeam[i] == gRACE)
 		    {
@@ -12718,7 +12718,7 @@ YCMD:rv(playerid, params[], help)
 	        return 1;
 	    }
 	    
-	    for(new i = 0; i < MAX_PLAYERS; i++)
+	    for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	    {
 	        if(!IsPlayerAvail(i)) continue;
 	        if(!IsPlayerInAnyVehicle(i) && gTeam[i] == FREEROAM)
@@ -12857,7 +12857,7 @@ YCMD:getin(playerid, params[], help)
 
             if(vM == 537 || vM == 538) return SCM(playerid, -1, ""er"You can't get into trains");
             
-			for(new i = 0; i < MAX_PLAYERS; i++)
+			for___loop(new i = 0; i < MAX_PLAYERS; i++)
 			{
 			    if(!IsPlayerInVehicle(i, vID)) continue;
 			    count++;
@@ -12912,12 +12912,12 @@ YCMD:pweaps(playerid, params[], help)
 		 		weapname[12][50],
 		 		string[512];
 
-			for(new i = 0; i < 12; i++)
+			for___loop(new i = 0; i < 12; i++)
 			{
 			    GetPlayerWeaponData(player, i + 1, weapons[i], bullets[i]);
 			}
 
-			for(new i = 0; i < 11; i++)
+			for___loop(new i = 0; i < 11; i++)
 			{
 			    GetWeaponName(weapons[i], weapname[i], 50);
 			}
@@ -12946,7 +12946,7 @@ YCMD:admins(playerid, params[], help)
 	new finstring[2048], count = 0;
 	format(finstring, sizeof(finstring), ""nef_yellow"Administrators:\n"white"");
 
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(!IsPlayerAvail(i)) continue;
 	    if(PlayerData[i][e_level] > 0 && PlayerData[i][bOnlineAdmin])
@@ -12965,7 +12965,7 @@ YCMD:admins(playerid, params[], help)
 	}
 
 	strcat(finstring, "\n"nef_yellow"Very Important Players:\n"white"");
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(!IsPlayerAvail(i)) continue;
 	    if(PlayerData[i][e_vip] == 1)
@@ -13001,7 +13001,7 @@ YCMD:vips(playerid, params[], help)
 	new finstring[1024], count = 0;
 	format(finstring, sizeof(finstring), ""yellow"ID:\t\tName:\n"white"");
 
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(!IsPlayerAvail(i)) continue;
 	    if(PlayerData[i][e_vip] == 1)
@@ -13650,7 +13650,7 @@ YCMD:report(playerid, params[], help)
 		gettime(time[0], time[1], time[2]);
 
 		format(gstr, sizeof(gstr), "[ADMIN CHAT] "YELLOW_E"Report(%02i:%02i:%02i) "RED_E"%s(%i) -> %s(%i) -> %s", time[0], time[1], time[2], __GetName(playerid), playerid, __GetName(player), player, reason);
-		for(new i = 1; i < MAX_REPORTS - 1; i++)
+		for___loop(new i = 1; i < MAX_REPORTS - 1; i++)
 		{
 			Reports[i] = Reports[i + 1];
 		}
@@ -13677,7 +13677,7 @@ YCMD:reports(playerid, params[], help)
     if(PlayerData[playerid][e_level] >= 1)
 	{
         new ReportCount;
-		for(new i = 1; i < MAX_REPORTS; i++)
+		for___loop(new i = 1; i < MAX_REPORTS; i++)
 		{
 			if(strcmp(Reports[i], "<none>", true) != 0)
 			{
@@ -13780,7 +13780,7 @@ YCMD:sethouseowner(playerid, params[], help)
 	if(houses
 	
  	new bool:found = false;
-	for(new i = 0; i < houseid; i++)
+	for___loop(new i = 0; i < houseid; i++)
 	{
 	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, HouseData[i][E_x], HouseData[i][E_y], HouseData[i][E_z])) continue;
 	    found = true;
@@ -13805,7 +13805,7 @@ YCMD:sethouseprice(playerid, params[], help)
 	}
 
  	new bool:found = false;
-	for(new i = 0; i < houseid; i++)
+	for___loop(new i = 0; i < houseid; i++)
 	{
 	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, HouseData[i][E_x], HouseData[i][E_y], HouseData[i][E_z])) continue;
 	    found = true;
@@ -13835,7 +13835,7 @@ YCMD:sethousescore(playerid, params[], help)
 	}
 
  	new bool:found = false;
-	for(new i = 0; i < houseid; i++)
+	for___loop(new i = 0; i < houseid; i++)
 	{
 	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, HouseData[i][E_x], HouseData[i][E_y], HouseData[i][E_z])) continue;
 	    found = true;
@@ -13860,7 +13860,7 @@ YCMD:resethouse(playerid, params[], help)
     if(!IsPlayerAdmin(playerid) || PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL) return SCM(playerid, -1, NO_PERM);
 
  	new bool:found = false;
-	for(new i = 0; i < houseid; i++)
+	for___loop(new i = 0; i < houseid; i++)
 	{
 	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, HouseData[i][E_x], HouseData[i][E_y], HouseData[i][E_z])) continue;
 	    found = true;
@@ -13884,7 +13884,7 @@ YCMD:resethouse(playerid, params[], help)
 	    HouseData[i][sold] = 0;
         HouseData[i][locked] = 1;
         HouseData[i][date] = 0;
-		for(new ii = 0; ii < MAX_HOUSE_OBJECTS; ii++)
+		for___loop(new ii = 0; ii < MAX_HOUSE_OBJECTS; ii++)
 		{
 			if(HouseData[i][E_Obj_Model][ii] != 0)
 			{
@@ -13923,7 +13923,7 @@ YCMD:setbizzlevel(playerid, params[], help)
 	if(blevel > 20 || blevel < 1) return SCM(playerid, -1, ""er"Business level 1 - 20");
 	
  	new bool:bFound = false;
- 	for(new r = 0; r < MAX_BUSINESSES; r++)
+ 	for___loop(new r = 0; r < MAX_BUSINESSES; r++)
  	{
 	    if(BusinessData[r][e_ormid] == ORM:-1) continue;
 	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, BusinessData[r][e_pos][0], BusinessData[r][e_pos][1], BusinessData[r][e_pos][2])) continue;
@@ -13952,7 +13952,7 @@ YCMD:resetbizz(playerid, params[], help)
     if(!IsPlayerAdmin(playerid) || PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL) return SCM(playerid, -1, NO_PERM);
 
  	new bool:bFound = false;
-	for(new r = 0; r < MAX_BUSINESSES; r++)
+	for___loop(new r = 0; r < MAX_BUSINESSES; r++)
 	{
 	    if(BusinessData[r][e_ormid] == ORM:-1) continue;
 	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, BusinessData[r][e_pos][0], BusinessData[r][e_pos][1], BusinessData[r][e_pos][2])) continue;
@@ -13963,7 +13963,7 @@ YCMD:resetbizz(playerid, params[], help)
 		    break;
 		}
 		
-		for(new i = 0; i < MAX_PLAYERS; i++)
+		for___loop(new i = 0; i < MAX_PLAYERS; i++)
 		{
 		    if(!strcmp(BusinessData[r][e_owner], __GetName(i), true) && IsPlayerConnected(i))
 		    {
@@ -14035,7 +14035,7 @@ YCMD:createbizz(playerid, params[], help)
 	}
 	
 	new count = 0;
-	for(new i = 0; i < MAX_BUSINESSES; i++) {
+	for___loop(new i = 0; i < MAX_BUSINESSES; i++) {
 	    if(BusinessData[i][e_ormid] != ORM:-1) {
 			++count;
 	    }
@@ -14046,7 +14046,7 @@ YCMD:createbizz(playerid, params[], help)
 	}
 	
 	new r = -1;
-	for(new i = 0; i < MAX_BUSINESSES; i++) {
+	for___loop(new i = 0; i < MAX_BUSINESSES; i++) {
 	    if(BusinessData[i][e_ormid] == ORM:-1) {
 	        r = i;
 	        break;
@@ -14331,7 +14331,7 @@ YCMD:gungames(playerid, params[], help)
 		finstring[2048],
 		tmpstring[68];
 
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(IsPlayerAvail(i))
 	    {
@@ -14347,7 +14347,7 @@ YCMD:gungames(playerid, params[], help)
 
 	SortDeepArray(gungames, E_gungame, .order = SORT_DESC);
 
-	for(new i = 0; i < 30; i++)
+	for___loop(new i = 0; i < 30; i++)
 	{
 	    if(gungames[i][E_gungame] != -1)
 	    {
@@ -14371,7 +14371,7 @@ YCMD:fallouts(playerid, params[], help)
 		finstring[2048],
 		tmpstring[68];
 
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(IsPlayerAvail(i))
 	    {
@@ -14387,7 +14387,7 @@ YCMD:fallouts(playerid, params[], help)
 
 	SortDeepArray(fallouts, E_fallout, .order = SORT_DESC);
 
-	for(new i = 0; i < 30; i++)
+	for___loop(new i = 0; i < 30; i++)
 	{
 	    if(fallouts[i][E_fallout] != -1)
 	    {
@@ -14411,7 +14411,7 @@ YCMD:derbys(playerid, params[], help)
 		finstring[2048],
 		tmpstring[68];
 
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(IsPlayerAvail(i))
 	    {
@@ -14427,7 +14427,7 @@ YCMD:derbys(playerid, params[], help)
 
 	SortDeepArray(derbys, E_derby, .order = SORT_DESC);
 
-	for(new i = 0; i < 30; i++)
+	for___loop(new i = 0; i < 30; i++)
 	{
 	    if(derbys[i][E_derby] != -1)
 	    {
@@ -14451,7 +14451,7 @@ YCMD:races(playerid, params[], help)
 		finstring[2048],
 		tmpstring[68];
 
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(IsPlayerAvail(i))
 	    {
@@ -14467,7 +14467,7 @@ YCMD:races(playerid, params[], help)
 
 	SortDeepArray(races, E_race, .order = SORT_DESC);
 
-	for(new i = 0; i < 30; i++)
+	for___loop(new i = 0; i < 30; i++)
 	{
 	    if(races[i][E_race] != -1)
 	    {
@@ -14491,7 +14491,7 @@ YCMD:rtests(playerid, params[], help)
 		finstring[2048],
 		tmpstring[68];
 
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(IsPlayerAvail(i))
 	    {
@@ -14507,7 +14507,7 @@ YCMD:rtests(playerid, params[], help)
 
 	SortDeepArray(tests, E_test, .order = SORT_DESC);
 
-	for(new i = 0; i < 30; i++)
+	for___loop(new i = 0; i < 30; i++)
 	{
 	    if(tests[i][E_test] != -1)
 	    {
@@ -14531,7 +14531,7 @@ YCMD:kills(playerid, params[], help)
 		finstring[2048],
 		tmpstring[68];
 
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(IsPlayerAvail(i))
 	    {
@@ -14547,7 +14547,7 @@ YCMD:kills(playerid, params[], help)
 
 	SortDeepArray(kills, E_kills, .order = SORT_DESC);
 
-	for(new i = 0; i < 30; i++)
+	for___loop(new i = 0; i < 30; i++)
 	{
 	    if(kills[i][E_kills] != -1)
 	    {
@@ -14571,7 +14571,7 @@ YCMD:deaths(playerid, params[], help)
 		finstring[2048],
 		tmpstring[68];
 
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(IsPlayerAvail(i))
 	    {
@@ -14587,7 +14587,7 @@ YCMD:deaths(playerid, params[], help)
 
 	SortDeepArray(deaths, E_deaths, .order = SORT_DESC);
 
-	for(new i = 0; i < 30; i++)
+	for___loop(new i = 0; i < 30; i++)
 	{
 	    if(deaths[i][E_deaths] != -1)
 	    {
@@ -14611,7 +14611,7 @@ YCMD:toptime(playerid, params[], help)
 		finstring[2048],
 		tmpstring[68];
 
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(IsPlayerAvail(i))
 	    {
@@ -14629,7 +14629,7 @@ YCMD:toptime(playerid, params[], help)
 
 	SortDeepArray(playingtime, E_time, .order = SORT_DESC);
 
-	for(new i = 0; i < 30; i++)
+	for___loop(new i = 0; i < 30; i++)
 	{
 	    if(playingtime[i][E_time] != -1)
 	    {
@@ -14653,7 +14653,7 @@ YCMD:richlist(playerid, params[], help)
 		finstring[2048],
 		tmpstring[68];
 
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(IsPlayerAvail(i))
 	    {
@@ -14669,7 +14669,7 @@ YCMD:richlist(playerid, params[], help)
 
 	SortDeepArray(richlist, E_money, .order = SORT_DESC);
 
-	for(new i = 0; i < 30; i++)
+	for___loop(new i = 0; i < 30; i++)
 	{
 	    if(richlist[i][E_money] != -1)
 	    {
@@ -14693,7 +14693,7 @@ YCMD:wanteds(playerid, params[], help)
 		finstring[2048],
 		tmpstring[68];
 
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(IsPlayerAvail(i))
 	    {
@@ -14709,7 +14709,7 @@ YCMD:wanteds(playerid, params[], help)
 
 	SortDeepArray(wanteds, E_wanteds, .order = SORT_DESC);
 
-	for(new i = 0; i < 30; i++)
+	for___loop(new i = 0; i < 30; i++)
 	{
 	    if(wanteds[i][E_wanteds] != -1)
 	    {
@@ -14732,7 +14732,7 @@ YCMD:score(playerid, params[], help)
 		finstring[2048],
 		tmpstring[68];
 
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(IsPlayerAvail(i))
 	    {
@@ -14748,7 +14748,7 @@ YCMD:score(playerid, params[], help)
 
 	SortDeepArray(score, E_pscore, .order = SORT_DESC);
 
-	for(new i = 0; i < 30; i++)
+	for___loop(new i = 0; i < 30; i++)
 	{
 	    if(score[i][E_pscore] != -1)
 	    {
@@ -14773,7 +14773,7 @@ YCMD:gangs(playerid, params[], help)
 
 	Iter_Init(Gangs);
 
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(!IsPlayerAvail(i)) continue;
         if(PlayerData[i][e_gangid] > 0 && !Iter_Contains(Gangs[0], PlayerData[i][e_gangid]))
@@ -14788,7 +14788,7 @@ YCMD:gangs(playerid, params[], help)
 	    format(tmpstring, sizeof(tmpstring), ""white"%i gang(s) online:\n", Iter_Count(Gangs[1]));
 	    strcat(finstring, tmpstring);
 
-	    for(new i = Iter_First(Gangs[1]), count = 0; i != Iter_End(Gangs[1]); i = Iter_Next(Gangs[1], i), ++count)
+	    for___loop(new i = Iter_First(Gangs[1]), count = 0; i != Iter_End(Gangs[1]); i = Iter_Next(Gangs[1], i), ++count)
 	    {
 	        if(count <= 40)
 	        {
@@ -14826,7 +14826,7 @@ function:OnGTopReceived(playerid)
 	{
 	    new tmp[21], tmp2[5], finstring[2048], tmpstring[128];
 	    strcat(finstring, ""white"");
-	    for(new i = 0; i < rows; i++)
+	    for___loop(new i = 0; i < rows; i++)
 	    {
 	        cache_get_row(i, 0, tmp, pSQL, sizeof(tmp));
 	        cache_get_row(i, 1, tmp2, pSQL, sizeof(tmp2));
@@ -15020,7 +15020,7 @@ YCMD:vmenu(playerid, params[], help)
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
     if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
     if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't spawn a car now");
-	for(new ii = 0; ii < sizeof(g_SpawnAreas); ii++)
+	for___loop(new ii = 0; ii < sizeof(g_SpawnAreas); ii++)
 	{
 	    if(IsPlayerInDynamicArea(playerid, g_SpawnAreas[ii]))
 	    {
@@ -15078,7 +15078,7 @@ YCMD:spec(playerid, params[], help)
 			}
 			
   			new count = 0;
-			for(new i = 0; i < MAX_PLAYERS; i++)
+			for___loop(new i = 0; i < MAX_PLAYERS; i++)
 			{
 			    if(gTeam[i] == SPEC && PlayerData[i][SpecID] == otherid && i != playerid)
 			    {
@@ -15240,7 +15240,7 @@ YCMD:clearchat(playerid, params[], help)
 {
 	if(PlayerData[playerid][e_level] >= 3)
 	{
-		for(new i = 0; i < 22; i++)
+		for___loop(new i = 0; i < 22; i++)
 		{
 			SCMToAll(GREEN, " ");
 		}
@@ -15562,7 +15562,7 @@ YCMD:healall(playerid, params[], help)
 {
 	if(PlayerData[playerid][e_level] >= 4)
 	{
-	   	for(new i = 0; i < MAX_PLAYERS; i++)
+	   	for___loop(new i = 0; i < MAX_PLAYERS; i++)
  		{
 			if(IsPlayerAvail(i) && i != MAX_ADMIN_LEVEL && gTeam[i] == FREEROAM && !CSG[i])
 			{
@@ -15587,7 +15587,7 @@ YCMD:armourall(playerid, params[], help)
 {
 	if(PlayerData[playerid][e_level] >= 4)
 	{
-	   	for(new i = 0; i < MAX_PLAYERS; i++)
+	   	for___loop(new i = 0; i < MAX_PLAYERS; i++)
  		{
 			if(IsPlayerAvail(i) && i != MAX_ADMIN_LEVEL && gTeam[i] == FREEROAM && !CSG[i])
 			{
@@ -15622,7 +15622,7 @@ YCMD:hmenu(playerid, params[], help)
     if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE) return SCM(playerid, RED, NOT_AVAIL);
     new string[512], tmp[64];
     
-    for(new i = 0; i < MAX_PLAYER_HOUSES; i++)
+    for___loop(new i = 0; i < MAX_PLAYER_HOUSES; i++)
     {
         if(i > PlayerData[playerid][e_addhouseslots])
         {
@@ -15653,7 +15653,7 @@ YCMD:bmenu(playerid, params[], help)
     if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE) return SCM(playerid, RED, NOT_AVAIL);
     new string[512], tmp[64];
 
-    for(new i = 0; i < MAX_PLAYER_BUSINESSES; i++)
+    for___loop(new i = 0; i < MAX_PLAYER_BUSINESSES; i++)
     {
         if(i > PlayerData[playerid][e_addbizzslots])
         {
@@ -16036,7 +16036,7 @@ YCMD:cashfall(playerid, params[], help)
 		}
 
         format(gstr, sizeof(gstr), "~g~+$%i USD", money);
-		for(new i = 0; i < MAX_PLAYERS; i++)
+		for___loop(new i = 0; i < MAX_PLAYERS; i++)
 		{
 			if(IsPlayerAvail(i))
 			{
@@ -16073,7 +16073,7 @@ YCMD:scorefall(playerid, params[], help)
 		}
 
         format(gstr, sizeof(gstr), "~y~+%i score", score);
-		for(new i = 0; i < MAX_PLAYERS; i++)
+		for___loop(new i = 0; i < MAX_PLAYERS; i++)
 		{
 			if(IsPlayerAvail(i))
 			{
@@ -16201,7 +16201,7 @@ YCMD:tpm(playerid, params[], help)
 	if(GetPVarInt(playerid, "Cop") != 0)
 	{
 	    format(gstr, sizeof(gstr), "[TPM] "LB_E"%s(%d): "YELLOW_E"%s", __GetName(playerid), playerid, params);
-	    for(new i = 0; i < MAX_PLAYERS; i++)
+	    for___loop(new i = 0; i < MAX_PLAYERS; i++)
 		{
 			if(GetPVarInt(i, "Cop") != 0)
 			{
@@ -16212,7 +16212,7 @@ YCMD:tpm(playerid, params[], help)
  	else if(GetPVarInt(playerid, "Robber") != 0)
  	{
  	    format(gstr, sizeof(gstr), "[TPM] "ORANGE_E"%s(%d): "YELLOW_E"%s", __GetName(playerid), playerid, params);
- 		for(new i = 0; i < MAX_PLAYERS; i++)
+ 		for___loop(new i = 0; i < MAX_PLAYERS; i++)
 		{
 			if(GetPVarInt(i, "Robber") != 0)
 			{
@@ -16458,7 +16458,7 @@ YCMD:toys(playerid, params[], help)
 
 	new string[512], tmp[64];
 
-	for(new i = 0; i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
+	for___loop(new i = 0; i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
 	{
 	    if(i > PlayerData[playerid][e_addtoyslots] + 4)
 	    {
@@ -16500,7 +16500,7 @@ YCMD:achs(playerid, params[], help)
 		new tmp[E_PLAYER_ACH_DATA][10],
 			finstring[2048];
 			
-		for(new i = 0; E_PLAYER_ACH_DATA:i < E_PLAYER_ACH_DATA; i++)
+		for___loop(new i = 0; E_PLAYER_ACH_DATA:i < E_PLAYER_ACH_DATA; i++)
 		{
 		    if(PlayerAchData[player][E_PLAYER_ACH_DATA:i][0] == 1)
 		    {
@@ -16843,7 +16843,7 @@ YCMD:rob(playerid, params[], help)
                     PlayerData[playerid][tickLastRob] = tick;
 
                     format(gstr, sizeof(gstr), "COP RADIO: "LB_E"Suspect %s(%i) has started a robbery at the %s!", __GetName(playerid), playerid, GetStoreName(playerid));
-					for(new i = 0; i < MAX_PLAYERS; i++)
+					for___loop(new i = 0; i < MAX_PLAYERS; i++)
 				   	{
 			     		if(GetPVarInt(i, "Cop") != 0)
 						{
@@ -16859,7 +16859,7 @@ YCMD:rob(playerid, params[], help)
 	  		else // Robing players.
 	  		{
 				new Float:POS[3], rangepass;
-				for(new i = 0; i < MAX_PLAYERS; i++)
+				for___loop(new i = 0; i < MAX_PLAYERS; i++)
 				{
 		    		if(i == playerid) continue;
 		    		if(IsPlayerInAnyVehicle(i)) continue;
@@ -16927,7 +16927,7 @@ YCMD:ar(playerid, params[], help)
 		}
 
 		new Float:POS[3], rangepass;
-		for(new i = 0; i < MAX_PLAYERS; i++)
+		for___loop(new i = 0; i < MAX_PLAYERS; i++)
 		{
 	    	if(i == playerid) continue;
       		if(IsPlayerInAnyVehicle(i)) continue;
@@ -17008,7 +17008,7 @@ YCMD:escape(playerid, params[], help)
 			SetPlayerVirtualWorld(playerid, 20);
 
             format(gstr2, sizeof(gstr2), "COP RADIO: "LB_E"Suspect %s(%d) has escaped from prision, units respond!", __GetName(playerid), playerid);
-			for(new i = 0; i < MAX_PLAYERS; i++)
+			for___loop(new i = 0; i < MAX_PLAYERS; i++)
    			{
     			if(GetPVarInt(i, "Cop") != 0)
 				{
@@ -17033,7 +17033,7 @@ YCMD:escape(playerid, params[], help)
 			SCM(playerid, COLOR_WHITE, "*** "RED_E"Your escape has failed, 20 seconds added to your jail sentence!");
 
             format(gstr2, sizeof(gstr2), "COP RADIO: "GREY_E"Suspect %s(%d) has failed an attempt escape from jail.", __GetName(playerid), playerid);
-            for(new i = 0; i < MAX_PLAYERS; i++)
+            for___loop(new i = 0; i < MAX_PLAYERS; i++)
    			{
     			if(GetPVarInt(i, "Cop") != 0)
 				{
@@ -17124,7 +17124,7 @@ YCMD:v(playerid, params[], help)
 
 public OnVehicleSpawn(vehicleid)
 {
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if(IsPlayerConnected(i) && PVSelect[i] != -1)
 		{
@@ -17160,7 +17160,7 @@ function:OnPlayerNameChangeRequest(playerid, newname[])
 
             if(PlayerData[playerid][e_houses] > 0)
             {
-				for(new i = 0; i < houseid; i++)
+				for___loop(new i = 0; i < houseid; i++)
 				{
     				if(strcmp(HouseData[i][Owner], oldname, true)) continue;
 
@@ -17172,7 +17172,7 @@ function:OnPlayerNameChangeRequest(playerid, newname[])
 				}
             }
 
-			for(new r = 0; r < MAX_BUSINESSES; r++)
+			for___loop(new r = 0; r < MAX_BUSINESSES; r++)
 			{
 				if(strcmp(BusinessData[r][e_owner], oldname, true)) continue;
 
@@ -17232,7 +17232,7 @@ function:OnPlayerNameChangeRequest(playerid, newname[])
 public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 {
 	// Fixing dialog exploit
-	for(new i = 0, l = strlen(inputtext); i < l; i++)
+	for___loop(new i = 0, l = strlen(inputtext); i < l; i++)
 	{
 		if(inputtext[i] == '%')
 		{
@@ -17278,7 +17278,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	            
 	            PlayerData[PlayerData[playerid][DuelRequest]][DuelRequestRecv] = playerid;
 	            
-	            for(new i = 0; i < MAX_PLAYERS; i++)
+	            for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	            {
 	                if(PlayerData[i][DuelRequest] == playerid)
 	                {
@@ -18215,7 +18215,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 							new string[1024];
 							format(gstr2, sizeof(gstr2), ""nef" :: House Menu > Slot: %i > House Items", PlayerData[playerid][HouseSlotSelected] + 1);
 
-							for(new i = 0; i < MAX_HOUSE_OBJECTS; i++)
+							for___loop(new i = 0; i < MAX_HOUSE_OBJECTS; i++)
 							{
 								if(i > PlayerData[playerid][e_addhouseitemslots] + 2)
 								{
@@ -18585,7 +18585,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				GangMSG(PlayerData[playerid][e_gangid], ""gang_sign" "r_besch"The gang has been closed by it's Leader");
 
-				for(new i = 0; i < gzoneid; i++)
+				for___loop(new i = 0; i < gzoneid; i++)
 				{
 				    if(GZoneData[i][e_localgang] == PlayerData[playerid][e_gangid])
 				    {
@@ -18603,7 +18603,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				    }
 				}
 
-				for(new i = 0; i < MAX_PLAYERS; i++)
+				for___loop(new i = 0; i < MAX_PLAYERS; i++)
 				{
 				    if(IsPlayerConnected(i) && i != playerid)
 				    {
@@ -18988,7 +18988,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		    case CMDS_DIALOG + 1:
 		    {
 		        new command[32], bool:s = false;
-		        for(new i = 0, c = 0; i < strlen(inputtext); i++)
+		        for___loop(new i = 0, c = 0; i < strlen(inputtext); i++)
 		        {
 		            if(!s && inputtext[i] != '/')
 					{
@@ -19042,7 +19042,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
                     HouseData[h_id][locked] = 1;
 
-		            for(new pid = 0; pid < MAX_PLAYERS; pid++)
+		            for___loop(new pid = 0; pid < MAX_PLAYERS; pid++)
 		            {
 		                if(gTeam[pid] == HOUSE && GetPlayerInterior(pid) == HouseIntTypes[HouseData[h_id][interior]][interior] && GetPlayerVirtualWorld(pid) == (HouseData[h_id][e_id] + 1000))
 		                {
@@ -19052,7 +19052,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		                }
 		            }
 
-					for(new ii = 0; ii < MAX_HOUSE_OBJECTS; ii++)
+					for___loop(new ii = 0; ii < MAX_HOUSE_OBJECTS; ii++)
 					{
 						if(HouseData[h_id][E_Obj_Model][ii] != 0)
 						{
@@ -19933,7 +19933,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					    PlayerPVData[playerid][PVVMenuSel[playerid]][e_color2] = 0;
 					    PlayerPVData[playerid][PVVMenuSel[playerid]][e_neon1] = -1;
 					    PlayerPVData[playerid][PVVMenuSel[playerid]][e_neon2] = -1;
-					    for(new i = 0; i < 17; i++)
+					    for___loop(new i = 0; i < 17; i++)
 					    {
 					        PlayerPVData[playerid][PVVMenuSel[playerid]][e_mods][i] = 0;
 					    }
@@ -19958,7 +19958,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			
 			    new string[2048];
 			    
-        	    for(new i = 0; i < sizeof(PVMatrix); i++)
+        	    for___loop(new i = 0; i < sizeof(PVMatrix); i++)
         	    {
         	        if(PVMatrix[i][pv_category] == listitem)
         	        {
@@ -19976,7 +19976,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			case CARBUY_DIALOG + 1:
 			{
 				new idx = 0;
-				for(new i = 0; i < sizeof(PVMatrix); i++)
+				for___loop(new i = 0; i < sizeof(PVMatrix); i++)
 				{
 				    if(PVMatrix[i][pv_category] == PVCatSel[playerid])
 				    {
@@ -20555,7 +20555,7 @@ function:OnHouseLoad()
 	{
 		new	Float:postal[6];
 
-		for(new i = 0; i < rows; i++)
+		for___loop(new i = 0; i < rows; i++)
 		{
 		    HouseData[houseid][e_id] = cache_get_row_int(i, 0, pSQL);
 			cache_get_row(i, 1, gstr, pSQL, sizeof(gstr));
@@ -20578,7 +20578,7 @@ function:OnHouseLoad()
 			{
 			    format(gstr2, sizeof(gstr2), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[houseid][Owner], HouseData[houseid][e_id], number_format(HouseData[houseid][price]), HouseData[houseid][E_score], HouseIntTypes[HouseData[houseid][interior]][intname]);
 
-				for(new ii = 0; ii < MAX_HOUSE_OBJECTS; ii++)
+				for___loop(new ii = 0; ii < MAX_HOUSE_OBJECTS; ii++)
 				{
 				    cache_get_row(i, ii + 10, gstr, pSQL, sizeof(gstr));
 				    sscanf(gstr, "p<,>iffffff", HouseData[houseid][E_Obj_Model][ii], postal[0], postal[1], postal[2], postal[3], postal[4], postal[5]);
@@ -20608,7 +20608,7 @@ function:OnBusinessLoad()
 {
 	new rows = cache_get_row_count();
 
-	for(new r = 0; r < rows && r < MAX_BUSINESSES; r++)
+	for___loop(new r = 0; r < rows && r < MAX_BUSINESSES; r++)
 	{
 	    new ORM:ormid = BusinessData[r][e_ormid] = orm_create("businesses");
 	    
@@ -20691,7 +20691,7 @@ function:OnGangZoneLoad()
 	
 	if(rows > 0)
 	{
-	    for(new i = 0; i < rows; i++)
+	    for___loop(new i = 0; i < rows; i++)
 	    {
 	        cache_set_active(Data, pSQL);
 	        
@@ -20733,7 +20733,7 @@ function:OnGangZoneLoad()
 
 SyncGangZones(playerid)
 {
-	for(new i = 0; i < gzoneid; i++)
+	for___loop(new i = 0; i < gzoneid; i++)
 	{
 	    if(GZoneData[i][e_localgang] == 0)
 	    {
@@ -20772,7 +20772,7 @@ GetGangNameByID(id)
 GetGZonesByGang(id)
 {
 	new count = 0;
-	for(new i = 0; i < gzoneid; i++)
+	for___loop(new i = 0; i < gzoneid; i++)
 	{
 	    if(GZoneData[i][e_localgang] == id)
 	    {
@@ -20798,7 +20798,7 @@ ResetBusiness(slot = -1)
 {
 	if(slot == -1)
 	{
-		for(new r = 0; r < MAX_BUSINESSES; r++)
+		for___loop(new r = 0; r < MAX_BUSINESSES; r++)
 		{
 		    BusinessData[r][e_ormid] = ORM:-1;
 		    BusinessData[r][e_id] = 0;
@@ -20848,7 +20848,7 @@ IsPlayerOnDesktop(playerid, afktimems = 5000)
 function:BGVoting()
 {
 	new iTotalVotes = 0;
-	for(new i = 0; i < sizeof(BGMapVotes); i++)
+	for___loop(new i = 0; i < sizeof(BGMapVotes); i++)
 	{
 		iTotalVotes += BGMapVotes[i];
 	}
@@ -20858,7 +20858,7 @@ function:BGVoting()
 	    BGMSG("There were no votes! New Voting starting");
 	    ExecBGVotingTimer();
 		ClearBGVotes();
-		for(new i = 0; i < MAX_PLAYERS; i++)
+		for___loop(new i = 0; i < MAX_PLAYERS; i++)
 		{
  			if(gTeam[i] == gBG_VOTING)
    			{
@@ -20871,7 +20871,7 @@ function:BGVoting()
 	new highestmapvotes = -1;
 	new draw = 0;
 
-	for(new i = 0; i < sizeof(BGMapVotes); i++)
+	for___loop(new i = 0; i < sizeof(BGMapVotes); i++)
 	{
  		if(BGMapVotes[i] > highestmapvotes && draw == 0)
 		{
@@ -20893,7 +20893,7 @@ function:BGVoting()
 	    BGMSG("Voting was not clear! New Voting starting!");
 	    ExecBGVotingTimer();
 		ClearBGVotes();
-		for(new i = 0; i < MAX_PLAYERS; i++)
+		for___loop(new i = 0; i < MAX_PLAYERS; i++)
 		{
  			if(gTeam[i] == gBG_VOTING)
    			{
@@ -20910,7 +20910,7 @@ function:BGVoting()
 		ClearBGVotes();
 		ExecBGTimer();
 
-		for(new i = 0; i < MAX_PLAYERS; i++)
+		for___loop(new i = 0; i < MAX_PLAYERS; i++)
 		{
 		    if(gTeam[i] == gBG_VOTING)
 		    {
@@ -20963,7 +20963,7 @@ function:BGVoting()
 	    ClearBGVotes();
 	    ExecBGTimer();
 
-		for(new i = 0; i < MAX_PLAYERS; i++)
+		for___loop(new i = 0; i < MAX_PLAYERS; i++)
 		{
 		    if(gTeam[i] == gBG_VOTING)
 		    {
@@ -21016,7 +21016,7 @@ function:BGVoting()
 	    ClearBGVotes();
 	    ExecBGTimer();
 
-		for(new i = 0; i < MAX_PLAYERS; i++)
+		for___loop(new i = 0; i < MAX_PLAYERS; i++)
 		{
 		    if(gTeam[i] == gBG_VOTING)
 		    {
@@ -21069,7 +21069,7 @@ function:BGVoting()
 	    ClearBGVotes();
 	    ExecBGTimer();
 
-		for(new i = 0; i < MAX_PLAYERS; i++)
+		for___loop(new i = 0; i < MAX_PLAYERS; i++)
 		{
 		    if(gTeam[i] == gBG_VOTING)
 		    {
@@ -21122,7 +21122,7 @@ function:BGVoting()
 	    ClearBGVotes();
 	    ExecBGTimer();
 
-		for(new i = 0; i < MAX_PLAYERS; i++)
+		for___loop(new i = 0; i < MAX_PLAYERS; i++)
 		{
 		    if(gTeam[i] == gBG_VOTING)
 		    {
@@ -21175,7 +21175,7 @@ function:BGVoting()
 	    ClearBGVotes();
 	    ExecBGTimer();
 
-		for(new i = 0; i < MAX_PLAYERS; i++)
+		for___loop(new i = 0; i < MAX_PLAYERS; i++)
 		{
 		    if(gTeam[i] == gBG_VOTING)
 		    {
@@ -21226,7 +21226,7 @@ function:BGVoting()
 
 function:BattleGround()
 {
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(gTeam[i] == gBG_TEAM1 || gTeam[i] == gBG_TEAM2 || gTeam[i] == gBG_VOTING)
 	    {
@@ -21237,7 +21237,7 @@ function:BattleGround()
 	CurrentBGMap = BG_VOTING;
 	ExecBGVotingTimer();
 
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(gTeam[i] == gBG_TEAM1 || gTeam[i] == gBG_TEAM2 || gTeam[i] == gBG_VOTING)
 	    {
@@ -21270,7 +21270,7 @@ function:BattleGround()
 
 		money = (1500 * BGTeam1Players) + (250 * BGTeam2Players);
 		
-	 	for(new i = 0; i < MAX_PLAYERS; i++)
+	 	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 		{
 		    if(gTeam[i] == gBG_TEAM1)
 		    {
@@ -21290,7 +21290,7 @@ function:BattleGround()
 
 		money = (1500 * BGTeam1Players) + (250 * BGTeam2Players);
 
-	 	for(new i = 0; i < MAX_PLAYERS; i++)
+	 	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 		{
 		    if(gTeam[i] == gBG_TEAM2)
 		    {
@@ -21301,7 +21301,7 @@ function:BattleGround()
 		}
 	}
 
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(gTeam[i] == gBG_TEAM1 || gTeam[i] == gBG_TEAM2 || gTeam[i] == gBG_VOTING)
 	    {
@@ -21327,7 +21327,7 @@ ExecBGVotingTimer()
 
 ClearBGVotes()
 {
-	for(new i = 0; i < sizeof(BGMapVotes); i++)
+	for___loop(new i = 0; i < sizeof(BGMapVotes); i++)
 	{
 	    BGMapVotes[i] = 0;
 	}
@@ -21484,7 +21484,7 @@ CarSpawner(playerid, model, respawn_delay = -1, bool:spawnzone_check = true)
 	    new Float:POS[3];
 	    GetPlayerPos(playerid, POS[0], POS[1], POS[2]);
 	    
-		for(new i = 0; i < gzoneid; i++)
+		for___loop(new i = 0; i < gzoneid; i++)
 		{
 		    if(!GZoneData[i][e_underattack]) continue;
 		    
@@ -21504,7 +21504,7 @@ CarSpawner(playerid, model, respawn_delay = -1, bool:spawnzone_check = true)
 	
 	if(spawnzone_check)
 	{
-		for(new ii = 0; ii < sizeof(g_SpawnAreas); ii++)
+		for___loop(new ii = 0; ii < sizeof(g_SpawnAreas); ii++)
 		{
 		    if(IsPlayerInDynamicArea(playerid, g_SpawnAreas[ii]))
 		    {
@@ -21552,7 +21552,7 @@ fallout_msg(const string[])
 {
 	format(gstr, sizeof(gstr), ""fallout_sign" %s", string);
 
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if(IsPlayerAvail(i) && gTeam[i] == FALLOUT)
 		{
@@ -21565,7 +21565,7 @@ DerbyMSG(const string[])
 {
 	format(gstr, sizeof(gstr), ""derby_sign" %s", string);
 
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if(IsPlayerAvail(i) && (gTeam[i] == DERBY))
 		{
@@ -21578,7 +21578,7 @@ BGMSG(const string[])
 {
 	format(gstr, sizeof(gstr), ""tdm_sign" %s", string);
 
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if(IsPlayerAvail(i) && (gTeam[i] == gBG_TEAM1 || gTeam[i] == gBG_VOTING || gTeam[i] == gBG_TEAM2))
 		{
@@ -21591,7 +21591,7 @@ RaceMSG(const string[])
 {
 	format(gstr, sizeof(gstr), ""race_sign" %s", string);
 
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if(IsPlayerAvail(i) && gTeam[i] == gRACE)
 		{
@@ -21602,7 +21602,7 @@ RaceMSG(const string[])
 
 GangMSG(gGangID, const string[])
 {
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(IsPlayerAvail(i))
 	    {
@@ -21617,7 +21617,7 @@ GangMSG(gGangID, const string[])
 AdminMSG(color, const string[], bool:beep = false, bool:gc = false)
 {
 	new count = 0;
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if(IsPlayerAvail(i) && PlayerData[i][e_level] >= 1)
 		{
@@ -21633,7 +21633,7 @@ AdminMSG(color, const string[], bool:beep = false, bool:gc = false)
 
 VIPMSG(color, const msg[])
 {
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if(IsPlayerAvail(i) && (PlayerData[i][e_vip] == 1 || PlayerData[i][e_level] > 0))
 		{
@@ -21715,7 +21715,7 @@ MySQL_SaveAccount(playerid, bool:toys = true, bool:pv = true)
 		mysql_tquery(pSQL, gstr);
 		
 		new buff[512];
-		for(new i = 0; i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
+		for___loop(new i = 0; i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
 		{
 		    if(PlayerToyData[playerid][i][toy_model] != 0)
 		    {
@@ -21744,7 +21744,7 @@ MySQL_SaveAccount(playerid, bool:toys = true, bool:pv = true)
 		mysql_tquery(pSQL, gstr);
 		
 		new buff[512];
-		for(new i = 0; i < MAX_PLAYER_PVS; i++)
+		for___loop(new i = 0; i < MAX_PLAYER_PVS; i++)
 		{
 		    if(PlayerPVData[playerid][i][e_model] != 0)
 		    {
@@ -21976,7 +21976,7 @@ MySQL_SaveHouse(house, bool:save_items = false)
 	if(save_items)
 	{
 		new Float:POS[6];
-		for(new i = 0; i < MAX_HOUSE_OBJECTS; i++)
+		for___loop(new i = 0; i < MAX_HOUSE_OBJECTS; i++)
 		{
 			if(HouseData[house][E_Obj_Model][i] != 0) {
 			    GetDynamicObjectPos(HouseData[house][E_Obj_ObjectID][i], POS[0], POS[1], POS[2]);
@@ -22040,7 +22040,7 @@ LoadStores()
 	new file[50],
 		count = GetTickCountEx();
 
-	for(new b = 0; b < MAX_BANKS; b++)
+	for___loop(new b = 0; b < MAX_BANKS; b++)
 	{
 	    format(file, sizeof(file), "/Store/Banks/%i.ini", b);
 		if(fexist(file))
@@ -22053,7 +22053,7 @@ LoadStores()
 	  		CreateDynamic3DTextLabel(gstr, YELLOW, dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ") + 0.7, 25.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 25.0);
 		}
 	}
-    for(new a = 0; a < MAX_AMMUNATIONS; a++)
+    for___loop(new a = 0; a < MAX_AMMUNATIONS; a++)
 	{
 	    format(file, sizeof(file), "/Store/Ammunations/%i.ini", a);
 		if(fexist(file))
@@ -22065,7 +22065,7 @@ LoadStores()
 			CreateDynamic3DTextLabel(gstr, YELLOW, dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ") + 0.7, 25.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 25.0);
 		}
 	}
-	for(new bs = 0; bs < MAX_BURGERSHOTS; bs++)
+	for___loop(new bs = 0; bs < MAX_BURGERSHOTS; bs++)
 	{
 	    format(file, sizeof(file), "/Store/BurgerShots/%i.ini", bs);
 		if(fexist(file))
@@ -22077,7 +22077,7 @@ LoadStores()
 	  		CreateDynamic3DTextLabel(gstr, YELLOW, dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ") + 0.7, 25.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 25.0);
 		}
 	}
-	for(new cb = 0; cb < MAX_CLUCKINBELLS; cb++)
+	for___loop(new cb = 0; cb < MAX_CLUCKINBELLS; cb++)
 	{
 	    format(file, sizeof(file), "/Store/CluckinBells/%i.ini", cb);
 		if(fexist(file))
@@ -22089,7 +22089,7 @@ LoadStores()
 	  		CreateDynamic3DTextLabel(gstr, YELLOW, dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ") + 0.7, 25.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 25.0);
 		}
 	}
-	for(new ps = 0; ps < MAX_PIZZASTACKS; ps++)
+	for___loop(new ps = 0; ps < MAX_PIZZASTACKS; ps++)
 	{
 	    format(file, sizeof(file), "/Store/WellStackedPizzas/%i.ini", ps);
 		if(fexist(file))
@@ -22101,7 +22101,7 @@ LoadStores()
 	  		CreateDynamic3DTextLabel(gstr, YELLOW, dini_Float(file, "PickOutX"), dini_Float(file, "PickOutY"), dini_Float(file, "PickOutZ") + 0.7, 25.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 25.0);
 		}
 	}
-	for(new tfs = 0; tfs < MAX_TFS; tfs++)
+	for___loop(new tfs = 0; tfs < MAX_TFS; tfs++)
 	{
 	    format(file, sizeof(file), "/Store/TwentyFourSeven/%i.ini", tfs);
 		if(fexist(file))
@@ -22120,7 +22120,7 @@ LoadStores()
 
 RemoveFirstQueueFloor()
 {
-	for(new i = 0; i < sizeof(ElevatorQueue) - 1; i++)
+	for___loop(new i = 0; i < sizeof(ElevatorQueue) - 1; i++)
 	{
 	    ElevatorQueue[i] = ElevatorQueue[i + 1];
 	}
@@ -22131,7 +22131,7 @@ RemoveFirstQueueFloor()
 AddFloorToQueue(floorid)
 {
 	new slot = -1;
-	for(new i = 0; i < sizeof(ElevatorQueue); i++)
+	for___loop(new i = 0; i < sizeof(ElevatorQueue); i++)
 	{
 	    if(ElevatorQueue[i] == INVALID_FLOOR)
 	    {
@@ -22155,7 +22155,7 @@ AddFloorToQueue(floorid)
 
 ResetElevatorQueue()
 {
-	for(new i = 0; i < sizeof(ElevatorQueue); i++)
+	for___loop(new i = 0; i < sizeof(ElevatorQueue); i++)
 	{
 	    ElevatorQueue[i] = INVALID_FLOOR;
 	    FloorRequestedBy[i] = INVALID_PLAYER_ID;
@@ -22165,7 +22165,7 @@ ResetElevatorQueue()
 
 IsFloorInQueue(floorid)
 {
-	for(new i = 0; i < sizeof(ElevatorQueue); i++)
+	for___loop(new i = 0; i < sizeof(ElevatorQueue); i++)
 	{
 	    if(ElevatorQueue[i] == floorid)
 	    {
@@ -22188,7 +22188,7 @@ ReadNextFloorInQueue()
 
 DidPlayerRequestElevator(playerid)
 {
-	for(new i = 0; i < sizeof(FloorRequestedBy); i++)
+	for___loop(new i = 0; i < sizeof(FloorRequestedBy); i++)
 	{
 	    if(FloorRequestedBy[i] == playerid)
 	    {
@@ -22201,7 +22201,7 @@ DidPlayerRequestElevator(playerid)
 ShowElevatorDialog(playerid)
 {
 	new string[512];
-	for(new i = 0; i < sizeof(ElevatorQueue); i++)
+	for___loop(new i = 0; i < sizeof(ElevatorQueue); i++)
 	{
 	    if(FloorRequestedBy[i] != INVALID_PLAYER_ID)
 	    {
@@ -22238,7 +22238,7 @@ Elevator_Initialize()
 	new string[128],
 		Float:z;
 
-	for(new i = 0; i < sizeof(Obj_FloorDoors); i++)
+	for___loop(new i = 0; i < sizeof(Obj_FloorDoors); i++)
 	{
 	    Obj_FloorDoors[i][0] = CreateObject(18757, X_DOOR_CLOSED, -1303.171142, GetDoorsZCoordForFloor(i), 0.000000, 0.000000, 270.000000);
 		Obj_FloorDoors[i][1] = CreateObject(18756, X_DOOR_CLOSED, -1303.171142, GetDoorsZCoordForFloor(i), 0.000000, 0.000000, 270.000000);
@@ -22262,7 +22262,7 @@ DestroyElevator()
 	DestroyObject(Obj_ElevatorDoors[1]);
 	Delete3DTextLabel(Label_Elevator);
 
-	for(new i = 0; i < sizeof(Obj_FloorDoors); i++)
+	for___loop(new i = 0; i < sizeof(Obj_FloorDoors); i++)
 	{
 	    DestroyObject(Obj_FloorDoors[i][0]);
 		DestroyObject(Obj_FloorDoors[i][1]);
@@ -22341,7 +22341,7 @@ GetPosInFrontOfPlayer(playerid, &Float:x, &Float:y, Float:distance)
 
 GetVehicleModelID(vehiclename[])
 {
-	for(new i = 0; i < 211; i++)
+	for___loop(new i = 0; i < 211; i++)
 	{
 		if(strfind(VehicleNames[i], vehiclename, true) != -1)
 		return i + 400;
@@ -22485,7 +22485,7 @@ RandomBGSpawn(playerid, Map, Team)
 
 IsNumeric(string[])
 {
-	for(new i = 0, j = strlen(string); i < j; i++)
+	for___loop(new i = 0, j = strlen(string); i < j; i++)
 	{
 		if(string[i] > '9' || string[i] < '0') return 0;
 	}
@@ -22577,7 +22577,7 @@ server_load_textdraws()
 	TextDrawSetSelectable(TXTWinterEdition, 0);
 	#endif
 	
-	for(new i = 0; i < MAX_GZONES; i++)
+	for___loop(new i = 0; i < MAX_GZONES; i++)
 	{
 		GZoneData[i][e_txtid] = TextDrawCreate(503.000000, 298.000000, "Gang War: %s~n~Defend the Gang Zone!~n~~n~~n~Timeleft: --:--");
 		TextDrawBackgroundColor(GZoneData[i][e_txtid], 255);
@@ -22988,7 +22988,7 @@ function:xReactionTest()
 	new xLength = (random(8) + 3),
 		count = 0;
 
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(IsPlayerConnected(i)) count++;
 	}
@@ -22996,7 +22996,7 @@ function:xReactionTest()
 	xCash = 250 * count;
 	xScore = (random(7) + 2);
 	format(xChars, sizeof(xChars), "");
-	for(new i = 0; i < xLength; i++)
+	for___loop(new i = 0; i < xLength; i++)
 	{
 		format(xChars, sizeof(xChars), "%s%s", xChars, xCharacters[random(sizeof(xCharacters))][0]);
 	}
@@ -23026,7 +23026,7 @@ function:Elevator_TurnToIdle()
 
 function:server_init_shutdown()
 {
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(IsPlayerConnected(i))
 	    {
@@ -23079,16 +23079,16 @@ server_initialize()
 	StartTime = gettime();
 	Iter_Init(PlayerIgnore);
 	
-	for(new i = 1; i < MAX_REPORTS; i++)
+	for___loop(new i = 1; i < MAX_REPORTS; i++)
 		Reports[i] = "<none>";
 
-	for(new i = 0; i < sizeof(PVCategorys); i++)
+	for___loop(new i = 0; i < sizeof(PVCategorys); i++)
 	{
 	    format(gstr, sizeof(gstr), "%s\n", PVCategorys[i]);
 	    strcat(sPVCategory, gstr);
 	}
 	
-	for(new i = 0; i < MAX_GZONES; i++)
+	for___loop(new i = 0; i < MAX_GZONES; i++)
 		GZoneData[i][e_underattack] = false;
 		
 	// Other stuff to initialize TODO: Overhaul spawns using polygons
@@ -23386,12 +23386,12 @@ server_load_visuals()
     pick_life[12] = CreateDynamicPickup(1240, 23, 2035.2893,-2348.9136,13.6844);
     pick_life[13] = CreateDynamicPickup(1240, 23, 400.7469, 2544.7986, 19.6311);
     
-    for(new i = 0; i < 16; i++)
+    for___loop(new i = 0; i < 16; i++)
     {
         pick_armor[i] = CreateDynamicPickup(1242, 23, g_ArmorPickups[i][0], g_ArmorPickups[i][1], g_ArmorPickups[i][2]);
     }
 
-	for(new i = 0; i < CAR_SHOPS; i++)
+	for___loop(new i = 0; i < CAR_SHOPS; i++)
 	{
 		g_CarShops[i][e_pickup] = CreateDynamicPickup(1559, 23, g_CarShopLocations[i][0], g_CarShopLocations[i][1], g_CarShopLocations[i][2], 0, -1, -1, 200.0);
 		g_CarShops[i][e_mapicon] = CreateDynamicMapIcon(g_CarShopLocations[i][0], g_CarShopLocations[i][1], g_CarShopLocations[i][2], 55, 1, 0, -1, -1, 200.0);
@@ -23832,7 +23832,7 @@ server_load_visuals()
 	veh_cnr[99] = AddStaticVehicle(476,1280.4342,1322.4233,11.5314,269.4824,149,0); // Ruster 1
 	veh_cnr[100] = AddStaticVehicle(476,1280.1094,1359.2792,11.5311,271.8246,0,0); // ruster 2
 
-	for(new iit = 0; iit < sizeof(veh_cnr); iit++)
+	for___loop(new iit = 0; iit < sizeof(veh_cnr); iit++)
 	{
 		SetVehicleVirtualWorld(veh_cnr[iit], CNR_WORLD);
 	}
@@ -24315,7 +24315,7 @@ PVSlotSelect(playerid)
 
 	strcat(string, ""nef_green"Select an unused slot for your new vehicle below:\n");
 
-    for(new i = 0; i < MAX_PLAYER_PVS; i++)
+    for___loop(new i = 0; i < MAX_PLAYER_PVS; i++)
     {
         if(i > PlayerData[playerid][e_addpvslots]) // Can not use
         {
@@ -24544,7 +24544,7 @@ function:DerbyVoting()
 	    DerbyMSG("There need to be 2 players to start!");
 		ClearDerbyVotes();
 		ExecDerbyVotingTimer();
-		for(new i = 0; i < MAX_PLAYERS; i++)
+		for___loop(new i = 0; i < MAX_PLAYERS; i++)
 		{
  			if(gTeam[i] == DERBY) ShowDialog(i, DERBY_VOTING_DIALOG);
 		}
@@ -24560,7 +24560,7 @@ function:DerbyVoting()
 	    ExecDerbyVotingTimer();
 		ClearDerbyVotes();
 		DerbyMSG("There were no votes!");
-		for(new i = 0; i < MAX_PLAYERS; i++)
+		for___loop(new i = 0; i < MAX_PLAYERS; i++)
 		{
  			if(gTeam[i] == DERBY) ShowDialog(i, DERBY_VOTING_DIALOG);
 		}
@@ -24568,7 +24568,7 @@ function:DerbyVoting()
 	}
 
 	new highestmapvotes = -1, draw = 0;
-	for(new i = 0; i < sizeof(DerbyMapVotes); i++)
+	for___loop(new i = 0; i < sizeof(DerbyMapVotes); i++)
 	{
  		if(DerbyMapVotes[i] > highestmapvotes && draw == 0)
 		{
@@ -24590,7 +24590,7 @@ function:DerbyVoting()
 	    DerbyMSG("Voting was not clear. New Voting starting.");
 	    ExecDerbyVotingTimer();
 		ClearDerbyVotes();
-		for(new i = 0; i < MAX_PLAYERS; i++)
+		for___loop(new i = 0; i < MAX_PLAYERS; i++)
 		{
  			if(gTeam[i] == DERBY) ShowDialog(i, DERBY_VOTING_DIALOG);
 		}
@@ -24599,7 +24599,7 @@ function:DerbyVoting()
 
 	new	active_db_players = 0;
 
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(gTeam[i] == DERBY)
 		{
@@ -24620,7 +24620,7 @@ function:DerbyVoting()
 		DerbyMSG("Couldn't start Derby! Too many AFK players");
         ExecDerbyVotingTimer();
         ClearDerbyVotes();
-		for(new i = 0; i < MAX_PLAYERS; i++)
+		for___loop(new i = 0; i < MAX_PLAYERS; i++)
 		{
  			if(gTeam[i] == DERBY) ShowDialog(i, DERBY_VOTING_DIALOG);
 		}
@@ -24641,7 +24641,7 @@ function:DerbyVoting()
 
 ClearDerbyAfkPlayers()
 {
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    PlayerData[i][bDerbyAFK] = false;
 	}
@@ -24655,7 +24655,7 @@ function:StartDerbyMap1()
 	ClearDerbyVotes();
 	DerbyMSG("Map 'Lighthouse' won! Let's start!");
 
- 	for(new i = 0; i < MAX_PLAYERS; i++)
+ 	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    PlayerData[i][bDerbyWinner] = false;
 		if(gTeam[i] == DERBY && IsPlayerConnected(i))
@@ -24679,7 +24679,7 @@ function:StartDerbyMap1()
         ExecDerbyVotingTimer();
         ClearDerbyVotes();
         IsDerbyRunning = false;
-		for(new i = 0; i < MAX_PLAYERS; i++)
+		for___loop(new i = 0; i < MAX_PLAYERS; i++)
 		{
  			if(gTeam[i] == DERBY) ShowDialog(i, DERBY_VOTING_DIALOG);
 		}
@@ -24688,13 +24688,13 @@ function:StartDerbyMap1()
 
 	IsDerbyRunning = true;
 
- 	for(new i = 0; i < MAX_PLAYERS; i++)
+ 	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !PlayerData[i][bDerbyAFK])
 		{
 			PlayerData[i][bDerbyWinner] = true;
 			DerbyPlayers++;
-		   	for(new m1s = 0; m1s < sizeof(Derby_Map1Spawns); m1s++)
+		   	for___loop(new m1s = 0; m1s < sizeof(Derby_Map1Spawns); m1s++)
 			{
 				if(!Derby_Map1Spawns[m1s][m1sUsed])
 		 		{
@@ -24750,7 +24750,7 @@ function:StartDerbyMap2()
 	ClearDerbyVotes();
     DerbyMSG("Map 'Truncat' won! Let's start!");
 
- 	for(new i = 0; i < MAX_PLAYERS; i++)
+ 	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    PlayerData[i][bDerbyWinner] = false;
 		if(gTeam[i] == DERBY && IsPlayerConnected(i))
@@ -24774,7 +24774,7 @@ function:StartDerbyMap2()
         ExecDerbyVotingTimer();
         ClearDerbyVotes();
         IsDerbyRunning = false;
-		for(new i = 0; i < MAX_PLAYERS; i++)
+		for___loop(new i = 0; i < MAX_PLAYERS; i++)
 		{
  			if(gTeam[i] == DERBY) ShowDialog(i, DERBY_VOTING_DIALOG);
 		}
@@ -24783,13 +24783,13 @@ function:StartDerbyMap2()
 
     IsDerbyRunning = true;
 
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
   		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !PlayerData[i][bDerbyAFK])
 		{
 			PlayerData[i][bDerbyWinner] = true;
 			DerbyPlayers++;
-			for(new m2s = 0; m2s < sizeof(Derby_Map2Spawns); m2s++)
+			for___loop(new m2s = 0; m2s < sizeof(Derby_Map2Spawns); m2s++)
 			{
 				if(!Derby_Map2Spawns[m2s][m2sUsed])
 	    		{
@@ -24845,7 +24845,7 @@ function:StartDerbyMap3()
 	ClearDerbyVotes();
 	DerbyMSG("Map 'Sky Skiing' won! Let's start!");
 
- 	for(new i = 0; i < MAX_PLAYERS; i++)
+ 	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    PlayerData[i][bDerbyWinner] = false;
 		if(gTeam[i] == DERBY && IsPlayerConnected(i))
@@ -24869,7 +24869,7 @@ function:StartDerbyMap3()
         ExecDerbyVotingTimer();
         ClearDerbyVotes();
         IsDerbyRunning = false;
-		for(new i = 0; i < MAX_PLAYERS; i++)
+		for___loop(new i = 0; i < MAX_PLAYERS; i++)
 		{
  			if(gTeam[i] == DERBY) ShowDialog(i, DERBY_VOTING_DIALOG);
 		}
@@ -24878,13 +24878,13 @@ function:StartDerbyMap3()
 
     IsDerbyRunning = true;
 
-    for(new i = 0; i < MAX_PLAYERS; i++)
+    for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !PlayerData[i][bDerbyAFK])
 		{
 			PlayerData[i][bDerbyWinner] = true;
 			DerbyPlayers++;
-			for(new m3s = 0; m3s < sizeof(Derby_Map3Spawns); m3s++)
+			for___loop(new m3s = 0; m3s < sizeof(Derby_Map3Spawns); m3s++)
 			{
 				if(!Derby_Map3Spawns[m3s][m3sUsed])
 	    		{
@@ -24940,7 +24940,7 @@ function:StartDerbyMap4()
 	ClearDerbyVotes();
 	DerbyMSG("Map 'Townhall' won! Let's start!");
 
- 	for(new i = 0; i < MAX_PLAYERS; i++)
+ 	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    PlayerData[i][bDerbyWinner] = false;
 		if(gTeam[i] == DERBY && IsPlayerConnected(i))
@@ -24964,7 +24964,7 @@ function:StartDerbyMap4()
         ExecDerbyVotingTimer();
         ClearDerbyVotes();
         IsDerbyRunning = false;
-		for(new i = 0; i < MAX_PLAYERS; i++)
+		for___loop(new i = 0; i < MAX_PLAYERS; i++)
 		{
  			if(gTeam[i] == DERBY) ShowDialog(i, DERBY_VOTING_DIALOG);
 		}
@@ -24973,13 +24973,13 @@ function:StartDerbyMap4()
 
     IsDerbyRunning = true;
 
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !PlayerData[i][bDerbyAFK])
   		{
 			PlayerData[i][bDerbyWinner] = true;
 			DerbyPlayers++;
-			for(new m4s = 0; m4s < sizeof(Derby_Map4Spawns); m4s++)
+			for___loop(new m4s = 0; m4s < sizeof(Derby_Map4Spawns); m4s++)
 			{
 				if(!Derby_Map4Spawns[m4s][m4sUsed])
 	    		{
@@ -25035,7 +25035,7 @@ function:StartDerbyMap5()
 	ClearDerbyVotes();
 	DerbyMSG("Map 'Glazz' won! Let's start!");
 
- 	for(new i = 0; i < MAX_PLAYERS; i++)
+ 	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    PlayerData[i][bDerbyWinner] = false;
 		if(gTeam[i] == DERBY && IsPlayerConnected(i))
@@ -25059,7 +25059,7 @@ function:StartDerbyMap5()
         ExecDerbyVotingTimer();
         ClearDerbyVotes();
         IsDerbyRunning = false;
-		for(new i = 0; i < MAX_PLAYERS; i++)
+		for___loop(new i = 0; i < MAX_PLAYERS; i++)
 		{
  			if(gTeam[i] == DERBY) ShowDialog(i, DERBY_VOTING_DIALOG);
 		}
@@ -25068,13 +25068,13 @@ function:StartDerbyMap5()
 
     IsDerbyRunning = true;
 
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !PlayerData[i][bDerbyAFK])
 		{
 			PlayerData[i][bDerbyWinner] = true;
 			DerbyPlayers++;
-			for(new m5s = 0; m5s < sizeof(Derby_Map5Spawns); m5s++)
+			for___loop(new m5s = 0; m5s < sizeof(Derby_Map5Spawns); m5s++)
 			{
 				if(!Derby_Map5Spawns[m5s][m5sUsed])
 	    		{
@@ -25130,7 +25130,7 @@ function:StartDerbyMap6()
 	ClearDerbyVotes();
 	DerbyMSG("Map 'Rambo' won! Let's start!");
 
- 	for(new i = 0; i < MAX_PLAYERS; i++)
+ 	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    PlayerData[i][bDerbyWinner] = false;
 		if(gTeam[i] == DERBY && IsPlayerConnected(i))
@@ -25154,7 +25154,7 @@ function:StartDerbyMap6()
         ExecDerbyVotingTimer();
         ClearDerbyVotes();
         IsDerbyRunning = false;
-		for(new i = 0; i < MAX_PLAYERS; i++)
+		for___loop(new i = 0; i < MAX_PLAYERS; i++)
 		{
  			if(gTeam[i] == DERBY) ShowDialog(i, DERBY_VOTING_DIALOG);
 		}
@@ -25163,13 +25163,13 @@ function:StartDerbyMap6()
 
     IsDerbyRunning = true;
 
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !PlayerData[i][bDerbyAFK])
 		{
 			PlayerData[i][bDerbyWinner] = true;
 			DerbyPlayers++;
-			for(new m6s = 0; m6s < sizeof(Derby_Map6Spawns); m6s++)
+			for___loop(new m6s = 0; m6s < sizeof(Derby_Map6Spawns); m6s++)
 			{
 				if(!Derby_Map6Spawns[m6s][m6sUsed])
 	    		{
@@ -25215,7 +25215,7 @@ function:StartDerbyMap7()
 	ClearDerbyVotes();
 	DerbyMSG("Map 'SilverGround' won! Let's start!");
 
- 	for(new i = 0; i < MAX_PLAYERS; i++)
+ 	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    PlayerData[i][bDerbyWinner] = false;
 		if(gTeam[i] == DERBY && IsPlayerConnected(i))
@@ -25239,7 +25239,7 @@ function:StartDerbyMap7()
         ExecDerbyVotingTimer();
         ClearDerbyVotes();
         IsDerbyRunning = false;
-		for(new i = 0; i < MAX_PLAYERS; i++)
+		for___loop(new i = 0; i < MAX_PLAYERS; i++)
 		{
  			if(gTeam[i] == DERBY) ShowDialog(i, DERBY_VOTING_DIALOG);
 		}
@@ -25248,13 +25248,13 @@ function:StartDerbyMap7()
 
     IsDerbyRunning = true;
 
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !PlayerData[i][bDerbyAFK])
 		{
 			PlayerData[i][bDerbyWinner] = true;
 			DerbyPlayers++;
-			for(new m7s = 0; m7s < sizeof(Derby_Map7Spawns); m7s++)
+			for___loop(new m7s = 0; m7s < sizeof(Derby_Map7Spawns); m7s++)
 			{
 				if(!Derby_Map7Spawns[m7s][m7sUsed])
 	    		{
@@ -25300,7 +25300,7 @@ function:StartDerbyMap8()
 	ClearDerbyVotes();
 	DerbyMSG("Map 'Anubis' won! Let's start!");
 
- 	for(new i = 0; i < MAX_PLAYERS; i++)
+ 	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    PlayerData[i][bDerbyWinner] = false;
 		if(gTeam[i] == DERBY && IsPlayerConnected(i))
@@ -25324,7 +25324,7 @@ function:StartDerbyMap8()
         ExecDerbyVotingTimer();
         ClearDerbyVotes();
         IsDerbyRunning = false;
-		for(new i = 0; i < MAX_PLAYERS; i++)
+		for___loop(new i = 0; i < MAX_PLAYERS; i++)
 		{
  			if(gTeam[i] == DERBY) ShowDialog(i, DERBY_VOTING_DIALOG);
 		}
@@ -25333,13 +25333,13 @@ function:StartDerbyMap8()
 
     IsDerbyRunning = true;
 
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !PlayerData[i][bDerbyAFK])
 		{
 			PlayerData[i][bDerbyWinner] = true;
 			DerbyPlayers++;
-			for(new m8s = 0; m8s < sizeof(Derby_Map8Spawns); m8s++)
+			for___loop(new m8s = 0; m8s < sizeof(Derby_Map8Spawns); m8s++)
 			{
 				if(!Derby_Map8Spawns[m8s][m8sUsed])
 	    		{
@@ -25385,7 +25385,7 @@ function:StartDerbyMap9()
 	ClearDerbyVotes();
 	DerbyMSG("Map 'Confusing' won! Let's start!");
 
- 	for(new i = 0; i < MAX_PLAYERS; i++)
+ 	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    PlayerData[i][bDerbyWinner] = false;
 		if(gTeam[i] == DERBY && IsPlayerConnected(i))
@@ -25409,7 +25409,7 @@ function:StartDerbyMap9()
         ExecDerbyVotingTimer();
         ClearDerbyVotes();
         IsDerbyRunning = false;
-		for(new i = 0; i < MAX_PLAYERS; i++)
+		for___loop(new i = 0; i < MAX_PLAYERS; i++)
 		{
  			if(gTeam[i] == DERBY) ShowDialog(i, DERBY_VOTING_DIALOG);
 		}
@@ -25418,13 +25418,13 @@ function:StartDerbyMap9()
 
     IsDerbyRunning = true;
 
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !PlayerData[i][bDerbyAFK])
 		{
 			PlayerData[i][bDerbyWinner] = true;
 			DerbyPlayers++;
-			for(new m9s = 0; m9s < sizeof(Derby_Map9Spawns); m9s++)
+			for___loop(new m9s = 0; m9s < sizeof(Derby_Map9Spawns); m9s++)
 			{
 				if(!Derby_Map9Spawns[m9s][m9sUsed])
 	    		{
@@ -25473,7 +25473,7 @@ function:Derby()
 	ResetDerbyGameTime();
 	ExecDerbyVotingTimer();
 
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(PlayerData[i][pDerbyVehicle] != INVALID_VEHICLE_ID)
 	    {
@@ -25484,7 +25484,7 @@ function:Derby()
 
 	if(DerbyPlayers > 1)
 	{
-    	for(new i = 0; i < MAX_PLAYERS; i++)
+    	for___loop(new i = 0; i < MAX_PLAYERS; i++)
     	{
   			if(gTeam[i] == DERBY)
 			{
@@ -25497,7 +25497,7 @@ function:Derby()
 	}
 	else if(DerbyPlayers == 1)
 	{
-		for(new i = 0; i < MAX_PLAYERS; i++)
+		for___loop(new i = 0; i < MAX_PLAYERS; i++)
     	{
 			if(gTeam[i] == DERBY && !PlayerData[i][bDerbyAFK])
 			{
@@ -25529,7 +25529,7 @@ function:Derby()
 	}
 	DerbyPlayers = 0;
 	CurrentDerbyPlayers = 0;
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
    	{
 		if(gTeam[i] == DERBY)
 		{
@@ -25565,7 +25565,7 @@ function:DerbyFallOver()
 	}
 	
 	new Float:POS[3], string[64];
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if(gTeam[i] == DERBY && PlayerData[i][bDerbyWinner])
 		{
@@ -25622,7 +25622,7 @@ function:QueueProcess()
 {
 	mysql_pquery(pSQL, "SELECT * FROM `queue` WHERE `ExecutionDate` < UNIX_TIMESTAMP();", "OnQueueReceived", "");
 	
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(!IsPlayerAvail(i))
 			continue;
@@ -25706,7 +25706,7 @@ function:OnQueueReceived()
 	    new Cache:Data = cache_save(pSQL);
 	    cache_set_active(Data, pSQL);
 	
-		for(new i = 0; i < rows; i++)
+		for___loop(new i = 0; i < rows; i++)
 		{
 		    new action = cache_get_row_int(i, 1, pSQL);
 		    
@@ -25940,7 +25940,7 @@ function:ProcessTick()
 	T_ServerPlayers = 0;
 	T_SawnPlayers = 0;
 	
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(IsPlayerConnected(i))
 	    {
@@ -25953,7 +25953,7 @@ function:ProcessTick()
 			        
 				    if(GetPlayerState(i) == PLAYER_STATE_DRIVER)
 				    {
-						for(new ii = 0; ii < sizeof(g_SpawnAreas); ii++)
+						for___loop(new ii = 0; ii < sizeof(g_SpawnAreas); ii++)
 						{
 						    if(IsPlayerInDynamicArea(i, g_SpawnAreas[ii]))
 						    {
@@ -26203,7 +26203,7 @@ function:ProcessTick()
 		TextDrawSetString(TXTDerbyInfo, "Timeleft: ~r~~h~~h~--:--~n~~w~Players: ~b~~h~~h~--/--~n~~w~Map: ~g~~h~~h~Voting");
 	}
 
-	for(new i = 0; i < gzoneid; i++)
+	for___loop(new i = 0; i < gzoneid; i++)
 	{
         if(GZoneData[i][e_locked] > utime) {
             if(GZoneData[i][e_pickupid] == -1) {
@@ -26231,7 +26231,7 @@ function:ProcessTick()
 			else if(GZoneData[i][e_timeleft] <= 0)
 			{
 			    new Iterator:Players<MAX_PLAYERS>;
-			    for(new ii = 0; ii < MAX_PLAYERS; ii++)
+			    for___loop(new ii = 0; ii < MAX_PLAYERS; ii++)
 			    {
 			        if(IsPlayerAvail(ii) && PlayerData[ii][e_gangid] == GZoneData[i][e_attacker] && PlayerData[ii][bGWarMode])
 			        {
@@ -26252,7 +26252,7 @@ function:ProcessTick()
 						format(gstr, sizeof(gstr), ""orange"[GANG] %s failed to capture '%s' (No players left!)", GetGangNameByID(GZoneData[i][e_attacker]), GZoneData[i][e_zonename]);
 						SCMToAll(-1, gstr);
 
-						for(new ii = 0; ii < MAX_PLAYERS; ii++)
+						for___loop(new ii = 0; ii < MAX_PLAYERS; ii++)
 						{
 						    if(IsPlayerAvail(ii) && PlayerData[ii][bGWarMode])
 						    {
@@ -26280,7 +26280,7 @@ function:ProcessTick()
 						format(gstr, sizeof(gstr), ""orange"Gang %s failed to capture '%s' The zone remains %s gang territory!", GetGangNameByID(GZoneData[i][e_attacker]), GZoneData[i][e_zonename], GetGangNameByID(GZoneData[i][e_defender]));
 						SCMToAll(-1, gstr);
 
-						for(new ii = 0; ii < MAX_PLAYERS; ii++)
+						for___loop(new ii = 0; ii < MAX_PLAYERS; ii++)
 						{
 						    if(IsPlayerAvail(ii) && PlayerData[ii][bGWarMode])
 						    {
@@ -26344,7 +26344,7 @@ function:ProcessTick()
 			    
 			        GZoneData[i][e_localgang] = GZoneData[i][e_attacker];
 			        
-					for(new ii = 0; ii < MAX_PLAYERS; ii++)
+					for___loop(new ii = 0; ii < MAX_PLAYERS; ii++)
 					{
 					    if(IsPlayerAvail(ii) && PlayerData[ii][bGWarMode])
 					    {
@@ -26395,7 +26395,7 @@ ResetDerbyGameTime()
 
 function:ClearDerbyVotes()
 {
-	for(new i = 0; i < 9; i++)
+	for___loop(new i = 0; i < 9; i++)
 	{
 	    DerbyMapVotes[i] = 0;
 	}
@@ -26426,7 +26426,7 @@ Derby_EnableFreezePool()
 
 function:Derby_FreezeVehicles()
 {
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(gTeam[i] == DERBY)
 	    {
@@ -26446,39 +26446,39 @@ function:Derby_FreezeVehicles()
 
 function:ClearDerbySpawns()
 {
-	for(new i = 0; i < sizeof(Derby_Map1Spawns); i++)
+	for___loop(new i = 0; i < sizeof(Derby_Map1Spawns); i++)
 	{
 	    Derby_Map1Spawns[i][m1sUsed] = false;
 	}
-	for(new i = 0; i < sizeof(Derby_Map2Spawns); i++)
+	for___loop(new i = 0; i < sizeof(Derby_Map2Spawns); i++)
 	{
 	    Derby_Map2Spawns[i][m2sUsed] = false;
 	}
-	for(new i = 0; i < sizeof(Derby_Map3Spawns); i++)
+	for___loop(new i = 0; i < sizeof(Derby_Map3Spawns); i++)
 	{
 	    Derby_Map3Spawns[i][m3sUsed] = false;
 	}
-	for(new i = 0; i < sizeof(Derby_Map4Spawns); i++)
+	for___loop(new i = 0; i < sizeof(Derby_Map4Spawns); i++)
 	{
 	    Derby_Map4Spawns[i][m4sUsed] = false;
 	}
-	for(new i = 0; i < sizeof(Derby_Map5Spawns); i++)
+	for___loop(new i = 0; i < sizeof(Derby_Map5Spawns); i++)
 	{
 	    Derby_Map5Spawns[i][m5sUsed] = false;
 	}
-	for(new i = 0; i < sizeof(Derby_Map6Spawns); i++)
+	for___loop(new i = 0; i < sizeof(Derby_Map6Spawns); i++)
 	{
 	    Derby_Map6Spawns[i][m6sUsed] = false;
 	}
-	for(new i = 0; i < sizeof(Derby_Map7Spawns); i++)
+	for___loop(new i = 0; i < sizeof(Derby_Map7Spawns); i++)
 	{
 	    Derby_Map7Spawns[i][m7sUsed] = false;
 	}
-	for(new i = 0; i < sizeof(Derby_Map8Spawns); i++)
+	for___loop(new i = 0; i < sizeof(Derby_Map8Spawns); i++)
 	{
 	    Derby_Map8Spawns[i][m8sUsed] = false;
 	}
-	for(new i = 0; i < sizeof(Derby_Map9Spawns); i++)
+	for___loop(new i = 0; i < sizeof(Derby_Map9Spawns); i++)
 	{
 	    Derby_Map9Spawns[i][m9sUsed] = false;
 	}
@@ -26628,7 +26628,7 @@ SetPlayerBGTeam2(playerid)
 
 ShowPlayerWelcomeTextdraws(playerid)
 {
-	for(new i = 0; i < sizeof(TXTWelcome); i++)
+	for___loop(new i = 0; i < sizeof(TXTWelcome); i++)
 	{
     	TextDrawShowForPlayer(playerid, TXTWelcome[i]);
 	}
@@ -26636,7 +26636,7 @@ ShowPlayerWelcomeTextdraws(playerid)
 
 HidePlayerWelcomeTextdraws(playerid)
 {
-	for(new i = 0; i < sizeof(TXTWelcome); i++)
+	for___loop(new i = 0; i < sizeof(TXTWelcome); i++)
 	{
     	TextDrawHideForPlayer(playerid, TXTWelcome[i]);
 	}
@@ -26773,7 +26773,7 @@ fallout_buildmap()
 	Log(LOG_WORLD, "fallout_buildmap()");
 	//PrintAmxBacktrace();
 
-	for(new i = 0; i < 101; i++)
+	for___loop(new i = 0; i < 101; i++)
 	{
 		DestroyDynamicObject(FalloutData[I_iObject][i]);
 		FalloutData[I_iNumberout][i] = -1;
@@ -26895,7 +26895,7 @@ fallout_start_game()
 	Log(LOG_WORLD, "fallout_start_game()");
 	//PrintAmxBacktrace();
 	
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 		PlayerData[i][bFalloutLost] = false;
 		
@@ -26931,7 +26931,7 @@ fallout_cancel()
     CurrentFalloutPlayers = 0;
 	g_FalloutStatus = e_Fallout_Inactive;
 	
-	for(new i = 0; i < 101; i++)
+	for___loop(new i = 0; i < 101; i++)
 	{
 		DestroyDynamicObject(FalloutData[I_iObject][i]);
 		FalloutData[I_iNumberout][i] = -1;
@@ -26952,7 +26952,7 @@ function:fallout_losegame()
 	new players,
 		Float:POS[3];
 
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if(gTeam[i] != FALLOUT)
 			continue;
@@ -27001,7 +27001,7 @@ function:fallout_countdown()
 		{
 		    fallout_cancel();
 
-			for(new i = 0; i < MAX_PLAYERS; i++)
+			for___loop(new i = 0; i < MAX_PLAYERS; i++)
 			{
 			    if(gTeam[i] == FALLOUT)
 				{
@@ -27019,7 +27019,7 @@ function:fallout_countdown()
 		else
 		{
 			format(gstr, sizeof(gstr), "~b~Start!");
-			for(new i = 0; i < MAX_PLAYERS; i++)
+			for___loop(new i = 0; i < MAX_PLAYERS; i++)
 			{
 			    if(gTeam[i] == FALLOUT)
 				{
@@ -27038,7 +27038,7 @@ function:fallout_countdown()
 	else
 	{
 	    format(gstr, sizeof(gstr), "~y~FALLOUT STARTING IN~n~~p~- %i -~n~~y~SECONDS", FalloutData[I_iCount]);
-		for(new i = 0; i < MAX_PLAYERS; i++)
+		for___loop(new i = 0; i < MAX_PLAYERS; i++)
 		{
 		    if(gTeam[i] == FALLOUT)
 			{
@@ -27056,7 +27056,7 @@ function:fallout_solarfall()
 	new objectid,
 		go;
 		
-	for(new i = 0; i < 101; i++)
+	for___loop(new i = 0; i < 101; i++)
 		if(FalloutData[I_iNumberout][i] == -1)
 			go++;
 
@@ -27103,7 +27103,7 @@ function:fallout_decidewinners()
 	new winners,
 		money;
 
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(IsPlayerAvail(i))
 		{
@@ -27205,7 +27205,7 @@ function:fallout_squareshake(objectid)
 fallout_get_playercount()
 {
 	new count = 0;
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(!IsPlayerAvail(i))
 			continue;
@@ -27239,7 +27239,7 @@ function:ModVehiclePaintJob(playerid)
 
 function:ModVehicleComponents(playerid)
 {
-    for(new i = 0; i < 17; i++)
+    for___loop(new i = 0; i < 17; i++)
     {
         if(PlayerPVData[playerid][PVSelect[playerid]][e_mods][i] != 0)
         {
@@ -27251,7 +27251,7 @@ function:ModVehicleComponents(playerid)
 
 function:SaveVehComponets(playerid, componentid)
 {
-	for(new s = 0; s < 20; s++)
+	for___loop(new s = 0; s < 20; s++)
 	{
     	if(componentid == pv_spoiler[s][0])
 		{
@@ -27259,7 +27259,7 @@ function:SaveVehComponets(playerid, componentid)
    	    }
 	}
 
-	for(new s = 0; s < 3; s++)
+	for___loop(new s = 0; s < 3; s++)
 	{
     	if(componentid == pv_nitro[s][0])
 		{
@@ -27267,7 +27267,7 @@ function:SaveVehComponets(playerid, componentid)
    		}
 	}
 
-	for(new s = 0; s < 23; s++)
+	for___loop(new s = 0; s < 23; s++)
 	{
     	if(componentid == pv_fbumper[s][0])
 		{
@@ -27275,7 +27275,7 @@ function:SaveVehComponets(playerid, componentid)
    	 	}
 	}
 
-	for(new s = 0; s < 22; s++)
+	for___loop(new s = 0; s < 22; s++)
 	{
     	if(componentid == pv_rbumper[s][0])
 		{
@@ -27283,7 +27283,7 @@ function:SaveVehComponets(playerid, componentid)
    		}
 	}
 
-	for(new s = 0; s < 28; s++)
+	for___loop(new s = 0; s < 28; s++)
 	{
      	if(componentid == pv_exhaust[s][0])
 		{
@@ -27291,7 +27291,7 @@ function:SaveVehComponets(playerid, componentid)
 		}
 	}
 
-	for(new s = 0; s < 2; s++)
+	for___loop(new s = 0; s < 2; s++)
 	{
 		if(componentid == pv_bventr[s][0])
 		{
@@ -27299,7 +27299,7 @@ function:SaveVehComponets(playerid, componentid)
  		}
 	}
 
-	for(new s = 0; s < 2; s++)
+	for___loop(new s = 0; s < 2; s++)
 	{
 		if(componentid == pv_bventl[s][0])
 		{
@@ -27307,7 +27307,7 @@ function:SaveVehComponets(playerid, componentid)
  		}
 	}
 
-	for(new s = 0; s < 4; s++)
+	for___loop(new s = 0; s < 4; s++)
 	{
 		if(componentid == pv_bscoop[s][0])
 		{
@@ -27315,7 +27315,7 @@ function:SaveVehComponets(playerid, componentid)
  		}
 	}
 
-	for(new s = 0; s < 17; s++)
+	for___loop(new s = 0; s < 17; s++)
 	{
 		if(componentid == pv_roof[s][0])
 		{
@@ -27323,7 +27323,7 @@ function:SaveVehComponets(playerid, componentid)
 		}
 	}
 
-	for(new s = 0; s < 21; s++)
+	for___loop(new s = 0; s < 21; s++)
 	{
 		if(componentid == pv_lskirt[s][0])
 		{
@@ -27331,7 +27331,7 @@ function:SaveVehComponets(playerid, componentid)
 		}
 	}
 
-	for(new s = 0; s < 21; s++)
+	for___loop(new s = 0; s < 21; s++)
 	{
 		if(componentid == pv_rskirt[s][0])
 		{
@@ -27339,7 +27339,7 @@ function:SaveVehComponets(playerid, componentid)
  		}
 	}
 
-	for(new s = 0; s < 1; s++)
+	for___loop(new s = 0; s < 1; s++)
 	{
 		if(componentid == pv_hydraulics[s][0])
 		{
@@ -27347,7 +27347,7 @@ function:SaveVehComponets(playerid, componentid)
 		}
 	}
 
-	for(new s = 0; s < 1; s++)
+	for___loop(new s = 0; s < 1; s++)
 	{
      	if(componentid == pv_base[s][0])
  		{
@@ -27355,7 +27355,7 @@ function:SaveVehComponets(playerid, componentid)
 		}
 	}
 
-	for(new s = 0; s < 4; s++)
+	for___loop(new s = 0; s < 4; s++)
 	{
      	if(componentid == pv_rbbars[s][0])
  		{
@@ -27363,7 +27363,7 @@ function:SaveVehComponets(playerid, componentid)
  		}
 	}
 
-	for(new s = 0; s < 2; s++)
+	for___loop(new s = 0; s < 2; s++)
 	{
     	if(componentid == pv_fbbars[s][0])
 		{
@@ -27371,7 +27371,7 @@ function:SaveVehComponets(playerid, componentid)
 		}
 	}
 
-	for(new s = 0; s < 17; s++)
+	for___loop(new s = 0; s < 17; s++)
 	{
     	if(componentid == pv_wheels[s][0])
 		{
@@ -27379,7 +27379,7 @@ function:SaveVehComponets(playerid, componentid)
    	    }
 	}
 
-	for(new s = 0; s < 2; s++)
+	for___loop(new s = 0; s < 2; s++)
 	{
     	if(componentid == pv_lights[s][0])
 		{
@@ -27664,7 +27664,7 @@ function:ShowDialog(playerid, dialogid)
 		{
 		    new string[1024], tmp[128];
 		    
-		    for(new i = 0; i < MAX_PLAYER_PVS; i++)
+		    for___loop(new i = 0; i < MAX_PLAYER_PVS; i++)
 		    {
 		        if(i > PlayerData[playerid][e_addpvslots]) // Can not use
 		        {
@@ -28005,7 +28005,7 @@ number_format(num)
     new szStr[16];
     format(szStr, sizeof(szStr), "%i", num);
 
-    for(new iLen = strlen(szStr) - (num < 0 ? 4 : 3); iLen > 0; iLen -= 3)
+    for___loop(new iLen = strlen(szStr) - (num < 0 ? 4 : 3); iLen > 0; iLen -= 3)
     {
         strins(szStr, ",", iLen);
     }
@@ -28149,7 +28149,7 @@ function:StartRobbery(playerid, namehash)
 			KillTimer(PlayerData[playerid][tRobbery]);
 			RemovePlayerAttachedObject(playerid, 4);
 
-			for(new i = 0; i < MAX_PLAYERS; i++)
+			for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	 		{
 	 			if(GetPVarInt(i, "Cop") != 0)
 				{
@@ -28554,7 +28554,7 @@ function:DoLotto()
 
 	format(gstr, sizeof(gstr), "~g~~h~~<~ Lottery Information ~>~~n~~w~Buy a lotto in any 24/7 shop (/247) inside use /lotto <1-75>~n~~r~~h~Jackpot: $%s - Draw starts in 5 minutes!", number_format(lotto_jackpot));
 
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(!IsPlayerAvail(i)) continue;
 		InfoTD_MSG(i, 15000, gstr);
@@ -28571,7 +28571,7 @@ function:LottoDraw()
 	format(gstr2, sizeof(gstr2), "~g~~h~~<~ Lottery Information ~>~~n~~w~Numbers have been drawn. Current jackpot is: $%s - Drawn number: %i~n~~b~~h~~h~", number_format(lotto_jackpot), lotto_number);
 	
 	new bool:found = false;
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(!IsPlayerAvail(i)) continue;
 	    if(PlayerData[i][DrawnNumber] == lotto_number)
@@ -28590,13 +28590,13 @@ function:LottoDraw()
 	
 	if(!found) strcat(gstr2, "No winner this round!");
 	
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(!IsPlayerAvail(i)) continue;
 		InfoTD_MSG(i, 15000, gstr2);
 	}
 	
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
         PlayerData[i][DrawnNumber] = -1;
 	}
@@ -28701,7 +28701,7 @@ GetPVNameByModelId(modelid)
 	new bool:found = false,
 		modelname[32];
 
-	for(new i = 0; i < sizeof(PVMatrix); i++)
+	for___loop(new i = 0; i < sizeof(PVMatrix); i++)
 	{
 	    if(PVMatrix[i][pv_modelid] == modelid)
 	    {
@@ -28716,7 +28716,7 @@ GetPVNameByModelId(modelid)
 
 GetPVPriceByModelId(modelid)
 {
-	for(new i = 0; i < sizeof(PVMatrix); i++)
+	for___loop(new i = 0; i < sizeof(PVMatrix); i++)
 	{
 	    if(PVMatrix[i][pv_modelid] == modelid)
 	    {
@@ -28782,7 +28782,7 @@ function:OnNCReceive(playerid)
 	{
 	    new tmp[128], string[1024], oldname[25], newname[25];
 	    strcat(string, ""white"Displaying last 10 Name Change Records:\n\n");
-	    for(new i = 0; i < rows; i++)
+	    for___loop(new i = 0; i < rows; i++)
 	    {
 	        cache_get_row(i, 1, oldname, pSQL, sizeof(oldname));
 	        cache_get_row(i, 2, newname, pSQL, sizeof(newname));
@@ -28805,7 +28805,7 @@ function:OnNCReceive2(playerid, name[])
 	    new tmp[128], string[1024], oldname[25], newname[25];
 	    format(tmp, sizeof(tmp), ""white"%i Name Change Records for %s\n\n", rows, name);
 	    strcat(string, tmp);
-	    for(new i = 0; i < rows; i++)
+	    for___loop(new i = 0; i < rows; i++)
 	    {
 	        cache_get_row(i, 1, oldname, pSQL, sizeof(oldname));
 	        cache_get_row(i, 2, newname, pSQL, sizeof(newname));
@@ -28821,7 +28821,7 @@ function:OnNCReceive2(playerid, name[])
 
 GetNearestHouse(playerid)
 {
-	for(new i = 0; i < houseid; i++)
+	for___loop(new i = 0; i < houseid; i++)
 	{
 	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, HouseData[i][E_x], HouseData[i][E_y], HouseData[i][E_z])) continue;
 
@@ -28833,7 +28833,7 @@ GetNearestHouse(playerid)
 GetHouseIdByPlayerSlotSel(playerid)
 {
 	new idx = 0;
-	for(new i = 0; i < houseid; i++)
+	for___loop(new i = 0; i < houseid; i++)
 	{
         if(!strcmp(HouseData[i][Owner], __GetName(playerid), true) && HouseData[i][sold] == 1)
         {
@@ -28850,7 +28850,7 @@ GetHouseIdByPlayerSlotSel(playerid)
 GetBusinessSlotBySelection(playerid)
 {
 	new idx = 0;
-	for(new r = 0; r < MAX_BUSINESSES; r++)
+	for___loop(new r = 0; r < MAX_BUSINESSES; r++)
 	{
         if(!strcmp(BusinessData[r][e_owner], __GetName(playerid), true) && BusinessData[r][e_sold] == 1)
         {
@@ -28939,7 +28939,7 @@ ExitPlayer(playerid)
 	    }
 	    case BUYCAR:
 	    {
-		    for(new i = 0; i < CAR_SHOPS; i++)
+		    for___loop(new i = 0; i < CAR_SHOPS; i++)
 		    {
 		        if(gLastMap[playerid] == g_CarShops[i][e_pickup])
 		        {
@@ -28977,7 +28977,7 @@ ExitPlayer(playerid)
 		case HOUSE:
 		{
 		    new bool:found = false;
-			for(new i = 0; i < houseid; i++)
+			for___loop(new i = 0; i < houseid; i++)
 			{
 		    	if(GetPlayerInterior(playerid) == HouseIntTypes[HouseData[i][interior]][interior] && GetPlayerVirtualWorld(playerid) == (HouseData[i][e_id] + 1000))
 				{
@@ -29179,7 +29179,7 @@ ExitPlayer(playerid)
 			{
 			    KillTimer(FalloutData[I_tCountdown]);
 
-				for(new i = 0; i < MAX_PLAYERS; i++)
+				for___loop(new i = 0; i < MAX_PLAYERS; i++)
 				{
 				    if(gTeam[i] == FALLOUT)
 				    {
@@ -29296,7 +29296,7 @@ function:OnGangRenameAttempt(playerid, newgangname[], newgangtag[])
 	}
 	else
 	{
-	    for(new i = 0; i < gzoneid; i++)
+	    for___loop(new i = 0; i < gzoneid; i++)
 	    {
 	        if(GZoneData[i][e_localgang] == PlayerData[playerid][e_gangid])
 	        {
@@ -29315,7 +29315,7 @@ function:OnGangRenameAttempt(playerid, newgangname[], newgangtag[])
 	        }
 	    }
 	
-	    for(new i = 0; i < MAX_PLAYERS; i++)
+	    for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	    {
 	        if(PlayerData[i][e_gangid] == PlayerData[playerid][e_gangid] || PlayerData[i][TmpGangID] == PlayerData[playerid][e_gangid])
 	        {
@@ -29348,7 +29348,7 @@ function:OnBoostReceive(playerid, namehash)
 	
 	if(rows > 0)
 	{
-	    for(new i = 0; i < rows; i++)
+	    for___loop(new i = 0; i < rows; i++)
 	    {
 	        new bool:set = true;
 	        
@@ -29413,7 +29413,7 @@ function:p_medkit(playerid)
 GetPlayerBusinessEarnings(playerid)
 {
 	new __int32 = 0;
-	for(new r = 0; r < MAX_BUSINESSES; r++)
+	for___loop(new r = 0; r < MAX_BUSINESSES; r++)
 	{
 	    if(strcmp(BusinessData[r][e_owner], __GetName(playerid), true)) continue;
 	    
@@ -29425,7 +29425,7 @@ GetPlayerBusinessEarnings(playerid)
 GetBusinessEarnings(r)
 {
 	new __int32 = 0;
-	for(new i = 0; i < sizeof(BusinessLevelMatrix); i++)
+	for___loop(new i = 0; i < sizeof(BusinessLevelMatrix); i++)
 	{
 		if(i == (BusinessData[r][e_level] - 1))
 		{
@@ -29450,7 +29450,7 @@ GetPlayerBusinessCount(const name[])
 GetCNRCops()
 {
 	new count = 0;
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if(GetPVarInt(i, "Cop"))
 		{
@@ -29463,7 +29463,7 @@ GetCNRCops()
 GetCNRRobbers()
 {
 	new count = 0;
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if(GetPVarInt(i, "Robber"))
 		{
@@ -29615,7 +29615,7 @@ function:OnIpLookUp(playerid, ip[])
 
 	if(rows > 0)
 	{
-	    for(new i = 0; i < rows; i++)
+	    for___loop(new i = 0; i < rows; i++)
 	    {
 			new buffer[MAX_PLAYER_NAME+1];
 			cache_get_row(i, 0, buffer, pSQL, sizeof(buffer));
@@ -29673,7 +29673,7 @@ PrepareRace()
 	g_RaceArray[E_rCPs] = dini_Int(file, "rTotalRaceCPs");
 	g_RaceArray[E_DeployTime] = dini_Int(file, "rDeployTime");
 
-	for(new i = 0; i < RACE_MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < RACE_MAX_PLAYERS; i++)
 	{
 	    format(gstr, sizeof(gstr), "vPosX_%i", i);
 	    g_RaceVehCoords[i][0] = dini_Float(file, gstr);
@@ -29685,7 +29685,7 @@ PrepareRace()
 	    g_RaceVehCoords[i][3] = dini_Float(file, gstr);
 	}
 	
-	for(new i = 0; i < g_RaceArray[E_rCPs]; i++)
+	for___loop(new i = 0; i < g_RaceArray[E_rCPs]; i++)
 	{
 	    format(gstr, sizeof(gstr), "CP_%i_PosX", i);
 	    g_RaceCPs[i][0] = dini_Float(file, gstr);
@@ -29792,7 +29792,7 @@ function:CountTillRace()
 	    case 1..5:
 	    {
 			format(gstr, sizeof(gstr), "~y~RACE STARTING IN~n~~p~- %i -~n~~y~SECONDS", g_RaceCountDown);
-			for(new i = 0; i < MAX_PLAYERS; i++)
+			for___loop(new i = 0; i < MAX_PLAYERS; i++)
 			{
 			    if(!IsPlayerConnected(i)) continue;
 			    if(gTeam[i] == gRACE)
@@ -29816,7 +29816,7 @@ StartRace()
     g_RaceStatus = RaceStatus_Active;
     g_RaceTick = GetTickCountEx();
 
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(!IsPlayerConnected(i)) continue;
 	    if(gTeam[i] == gRACE)
@@ -29862,7 +29862,7 @@ function:StopRace()
     g_RaceFinishCount = 0;
     g_iRaceEnd = 0;
     
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(!IsPlayerConnected(i)) continue;
 	    if(gTeam[i] == gRACE)
@@ -29910,7 +29910,7 @@ function:Race_End()
 	
 	format(gstr, sizeof(gstr), "~w~Still ~p~%i ~w~seconds left!", g_iRaceEnd);
 
-    for(new i = 0; i < MAX_PLAYERS; i++)
+    for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
         if(gTeam[i] == gRACE)
 		{
@@ -29988,13 +29988,13 @@ Race_CalculatePosition()
 
 	static const OFFSET_VALUE = 10000;
 
-	for(new i = 0; i < sizeof(tmp_RacePosition); i++)
+	for___loop(new i = 0; i < sizeof(tmp_RacePosition); i++)
 	{
 	    tmp_RacePosition[i][RP_iPlayer] = INVALID_PLAYER_ID;
 	    tmp_RacePosition[i][RP_iValue] = -(i + 1);
 	}
 
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
 	{
         if(IsPlayerConnected(i) && gTeam[i] == gRACE)
 		{
@@ -30022,7 +30022,7 @@ Race_CalculatePosition()
 
 	SortDeepArray(tmp_RacePosition, RP_iValue, .order = SORT_DESC);
 
-	for(new i = 0; i < sizeof(tmp_RacePosition); i++)
+	for___loop(new i = 0; i < sizeof(tmp_RacePosition); i++)
 	{
         if(tmp_RacePosition[i][RP_iPlayer] != INVALID_PLAYER_ID)
 		{
@@ -30034,7 +30034,7 @@ Race_CalculatePosition()
 
 DestroyPlayerVehicles(playerid, bool:minigames = false)
 {
-	for(new obj = 0; obj < 13; obj++)
+	for___loop(new obj = 0; obj < 13; obj++)
 	{
 	    if(hVIPVehObj[playerid][obj] != -1)
 	    {
@@ -30178,7 +30178,7 @@ ResetPlayerVars(playerid)
 	GunGame_Player[playerid][pw] = true;
 	strmid(LastPlayerText[playerid], " ", 0, 144, 144);
 
-	for(new i = 0; E_PLAYER_ACH_DATA:i < E_PLAYER_ACH_DATA; i++)
+	for___loop(new i = 0; E_PLAYER_ACH_DATA:i < E_PLAYER_ACH_DATA; i++)
 	{
 	    PlayerAchData[playerid][E_PLAYER_ACH_DATA:i][0] = 0;
 	}
@@ -30385,7 +30385,7 @@ SetSpawnInfoEx(playerid, team, skin, Float:x, Float:y, Float:z, Float:Angle)
 GunGamePlayers()
 {
 	new count = 0;
-	for(new i = 0; i < MAX_PLAYERS; i++) {
+	for___loop(new i = 0; i < MAX_PLAYERS; i++) {
 	    if(gTeam[i] == GUNGAME) {
 	        ++count;
 		}
@@ -30678,7 +30678,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 	    {
 	        if(cache_get_row_count() > 0)
 	        {
-				for(new i = 0; i < cache_get_row_count(); i++)
+				for___loop(new i = 0; i < cache_get_row_count(); i++)
 				{
 				    PlayerAchData[playerid][E_PLAYER_ACH_DATA:cache_get_row_int(i, 0)][0] = 1;
 				    PlayerAchData[playerid][E_PLAYER_ACH_DATA:cache_get_row_int(i, 0)][1] = cache_get_row_int(i, 1);
@@ -30691,7 +30691,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 	    {
 	        if(cache_get_row_count() > 0)
 	        {
-	            for(new i = 0; i < cache_get_row_count() && i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
+	            for___loop(new i = 0; i < cache_get_row_count() && i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
 	            {
 					new r = cache_get_row_int(i, 1);
 					
@@ -30714,7 +30714,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 	    {
 	        if(cache_get_row_count() > 0)
 	        {
-				for(new i = 0; i < cache_get_row_count() && i < MAX_PLAYER_PVS; i++)
+				for___loop(new i = 0; i < cache_get_row_count() && i < MAX_PLAYER_PVS; i++)
 				{
 				    new r = cache_get_row_int(i, 1);
 				    
@@ -30724,7 +30724,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 				    PlayerPVData[playerid][r][e_color1] = cache_get_row_int(i, 5);
 				    PlayerPVData[playerid][r][e_color2] = cache_get_row_int(i, 6);
 				    
-				    for(new m = 0; m < 17; m++)
+				    for___loop(new m = 0; m < 17; m++)
 				    {
 				        PlayerPVData[playerid][r][e_mods][m] = cache_get_row_int(i, m + 7);
 				    }
@@ -31006,7 +31006,7 @@ IsValidSkin(skinid)
 
 __GetPlayerID(const playername[])
 {
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for___loop(new i = 0; i < MAX_PLAYERS; i++)
     {
     	if(IsPlayerConnected(i))
       	{
@@ -31100,7 +31100,7 @@ GetVehicleNameById(vehicleid)
 ResetPlayerPV(playerid)
 {
     PVSelect[playerid] = -1;
-	for(new i = 0; i < MAX_PLAYER_PVS; i++)
+	for___loop(new i = 0; i < MAX_PLAYER_PVS; i++)
 	{
 		PlayerPVData[playerid][i][e_vehicleid] = -1;
 		PlayerPVData[playerid][i][e_labelid] = Text3D:-1;
@@ -31110,7 +31110,7 @@ ResetPlayerPV(playerid)
 	    PlayerPVData[playerid][i][e_color2] = 0;
  	    PlayerPVData[playerid][i][e_neon1] = -1;
 	    PlayerPVData[playerid][i][e_neon2] = -1;
-		for(new r = 0; r < 17; r++)
+		for___loop(new r = 0; r < 17; r++)
 	    {
             PlayerPVData[playerid][i][e_mods][r] = 0;
 	    }
@@ -31120,7 +31120,7 @@ ResetPlayerPV(playerid)
 
 ResetPlayerToy(playerid)
 {
-	for(new i = 0; i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
+	for___loop(new i = 0; i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
 	{
 		PlayerToyData[playerid][i][toy_model] = 0;
 		PlayerToyData[playerid][i][toy_bone] = 1;
@@ -31138,7 +31138,7 @@ ResetPlayerToy(playerid)
 
 RemovePlayerToy(playerid)
 {
-	for(new i = 0; i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
+	for___loop(new i = 0; i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
 	{
 	    if(IsPlayerAttachedObjectSlotUsed(playerid, i))
 	    {
@@ -31149,7 +31149,7 @@ RemovePlayerToy(playerid)
 
 AttachPlayerToy(playerid)
 {
-	for(new i = 0; i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
+	for___loop(new i = 0; i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
 	{
 	    if(PlayerToyData[playerid][i][toy_model] != 0)
 	    {
@@ -31179,7 +31179,7 @@ SetPlayerPosEx(playerid, Float:X, Float:Y, Float:Z)
 GetCommandName(cmdtext[])
 {
 	new space = -1;
-	for(new i, l = strlen(cmdtext); i < l; i++)
+	for___loop(new i, l = strlen(cmdtext); i < l; i++)
 	{
 	    if(cmdtext[i] == ' ')
 	    {
