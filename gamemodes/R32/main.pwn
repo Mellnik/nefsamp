@@ -59,6 +59,10 @@
 #include <server_map_patches>
 #include <server_map_vehicles>
 
+#define for___loop(%1;%2;%3) \
+	PrintAmxBacktrace(); \
+	for(%1;%2;%3)
+
 native IsValidVehicle(vehicleid); // undefined in a_samp.inc
 native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 
@@ -89,7 +93,7 @@ native gpci(playerid, serial[], maxlen); // undefined in a_samp.inc
 #else
 #define CURRENT_VERSION                 "PTS:Build 32"
 #endif
-#define HOTFIX_REV                      "Hotfix #0"
+#define HOTFIX_REV                      "Hotfix #1"
 #define SAMP_VERSION                    "SA-MP 0.3z-R3"
 #define MAX_REPORTS 					(7)
 #define MAX_ADS                         (10)
@@ -2559,8 +2563,8 @@ public OnGameModeInit()
 	#else
 	Log(LOG_INIT, "Build Configuration: Development");
 	#endif
-	Log(LOG_INIT, "MySQL: Logging: LOG_ERROR | LOG_WARNING");
-	mysql_log(LOG_ERROR | LOG_WARNING, LOG_TYPE_TEXT);
+	Log(LOG_INIT, "MySQL: Logging: LOG_ALL");
+	mysql_log(LOG_ALL, LOG_TYPE_TEXT);
 	
     MySQL_Connect();
 	MySQL_CleanUp();
@@ -4120,7 +4124,7 @@ public OnQueryError(errorid, error[], callback[], query[], connectionHandle)
 {
 	Log(LOG_FAIL, "OnQueryError(%i, %s, %s, %s, %i)", errorid, error, callback, query, connectionHandle);
 
-    PrintAmxBacktrace();
+    //PrintAmxBacktrace();
 	return 1;
 }
 
@@ -6511,6 +6515,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 		{
 		    new Float:POS[3];
 		    GetPlayerPos(playerid, POS[0], POS[1], POS[2]);
+		    
 		    if(POS[1] < -1301.4 && POS[1] > -1303.2417 && POS[0] < 1786.2131 && POS[0] > 1784.1555)
 		    {
 		        ShowElevatorDialog(playerid);
@@ -7610,7 +7615,7 @@ YCMD:fallout(playerid, params[], help)
 	    
 	    fallout_reset_gametime();
 	    fallout_buildmap();
-	    fallout_startgame();
+	    fallout_start_game();
 	    fallout_setplayer(playerid);
 	    
 		g_FalloutStatus = e_Fallout_Startup;
@@ -21871,7 +21876,7 @@ MySQL_RegisterAccount(playerid, register, password[])
 
 function:OnPlayerRegister(playerid, namehash, register, password[], playername[], ip_address[])
 {
-    PrintAmxBacktrace();
+    //PrintAmxBacktrace();
 
 	mysql_format(pSQL, gstr2, sizeof(gstr2), "UPDATE `accounts` SET `hash` = SHA1('%e'), `ip` = '%s' WHERE `name` = '%s';", password, ip_address, playername);
 	mysql_tquery(pSQL, gstr2);
@@ -26766,7 +26771,7 @@ ShowPlayerInfoTextdraws(playerid)
 fallout_buildmap()
 {
 	Log(LOG_WORLD, "fallout_buildmap()");
-	PrintAmxBacktrace();
+	//PrintAmxBacktrace();
 
 	for(new i = 0; i < 101; i++)
 	{
@@ -26885,10 +26890,10 @@ fallout_buildmap()
 	return 1;
 }
 
-fallout_startgame()
+fallout_start_game()
 {
-	Log(LOG_WORLD, "fallout_startgame()");
-	PrintAmxBacktrace();
+	Log(LOG_WORLD, "fallout_start_game()");
+	//PrintAmxBacktrace();
 	
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -26921,7 +26926,7 @@ fallout_setplayer(playerid)
 fallout_cancel()
 {
 	Log(LOG_WORLD, "fallout_cancel()");
-	PrintAmxBacktrace();
+	//PrintAmxBacktrace();
 	
     CurrentFalloutPlayers = 0;
 	g_FalloutStatus = e_Fallout_Inactive;
@@ -27073,6 +27078,7 @@ function:fallout_solarfall()
 	if(FalloutData[I_iNumberout][objectid] != -1)
 		goto start;
 
+    FalloutData[I_iShake][objectid] = 0;
 	FalloutData[I_iNumberout][objectid] = 0;
 	FalloutData[I_iShaketimer][objectid] = SetTimerEx("fallout_squareshake", 100, true, "i", objectid);
 	return 1;
@@ -27090,7 +27096,7 @@ function:fallout_start_falling()
 function:fallout_decidewinners()
 {
 	Log(LOG_WORLD, "fallout_decidewinners()");
-	PrintAmxBacktrace();
+	//PrintAmxBacktrace();
 	
 	g_FalloutStatus = e_Fallout_Inactive;
 
@@ -27189,6 +27195,7 @@ function:fallout_squareshake(objectid)
 
 			KillTimer(FalloutData[I_iShaketimer][objectid]);
 		}
+		default: KillTimer(FalloutData[I_iShaketimer][objectid]);
 	}
 
 	FalloutData[I_iShake][objectid]++;
@@ -29574,7 +29581,7 @@ function:OnOfflineBanAttempt2(playerid, ban[], reason[])
 		AdminMSG(COLOR_RED, gstr);
 		Log(LOG_PLAYER, gstr);
 
-        PrintAmxBacktrace();
+        //PrintAmxBacktrace();
 
         SCM(playerid, -1, ""er"Player has been banned!");
 	}

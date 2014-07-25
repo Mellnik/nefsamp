@@ -26989,6 +26989,8 @@ function:fallout_losegame()
 
 function:fallout_countdown()
 {
+    Log(LOG_WORLD, "fallout_countdown()");
+    
 	if(--FalloutData[I_iCount] <= 0)
 	{
 		KillTimer(FalloutData[I_tCountdown]);
@@ -27198,6 +27200,8 @@ function:fallout_squareshake(objectid)
 
 fallout_get_playercount()
 {
+	Log(LOG_WORLD, "fallout_get_playercount()");
+	
 	new count = 0;
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
