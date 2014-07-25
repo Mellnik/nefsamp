@@ -24,7 +24,7 @@
 #pragma dynamic 8192
 
 #define IS_RELEASE_BUILD (true)
-#define INC_ENVIRONMENT (false)
+#define INC_ENVIRONMENT (true)
 #define IRC_CONNECT (true)
 #define WINTER_EDITION (false) // Requires FS ferriswheelfair.amx
 
@@ -714,6 +714,7 @@ enum E_PLAYER_DATA // Prefixes: i = Integer, s = String, b = bool, f = Float, p 
 	bool:bVIPLInv,
 	bool:bIsDead,
 	bool:bShowToys,
+	bool:bAllowPlayerTeleport,
 	bool:bFrozen,
 	bool:bAllowSpawn,
  	bool:bDuty,
@@ -8912,6 +8913,11 @@ YCMD:duel(playerid, params[], help)
             SetCameraBehindPlayer(playerid);
             SetCameraBehindPlayer(PlayerData[playerid][DuelRequestRecv]);
             
+            SetPlayerHealth(playerid, 99.0);
+            SetPlayerArmour(playerid, 99.0);
+            SetPlayerHealth(PlayerData[playerid][DuelRequestRecv], 99.0);
+            SetPlayerArmour(PlayerData[playerid][DuelRequestRecv], 99.0);
+            
 			// Closing open dialogs in order to avoid some exploits.
 			ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
 			ShowPlayerDialog(PlayerData[playerid][DuelRequestRecv], -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
@@ -10467,6 +10473,7 @@ YCMD:go(playerid, params[], help)
 			if(PlayerData[player][e_level] != 0) return SCM(playerid, -1, ""er"You can't teleport to admins");
             if(PlayerData[player][bGWarMode]) return SCM(playerid, -1, ""er"This player is in Gang War");
             if(GetPVarInt(player, "doingStunt") != 0) return SCM(playerid, -1, ""er"Player is doing stunts");
+            if(!PlayerData[player][bAllowPlayerTeleport] && PlayerData[playerid][e_level] == 0) return SCM(playerid, -1, ""er"Player disabled teleports");
             if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 
 			new Float:POS[3];
@@ -16394,6 +16401,25 @@ YCMD:toggletoys(playerid, params[], help)
 	}
 
 	PlayerData[playerid][bShowToys] = !PlayerData[playerid][bShowToys];
+	return 1;
+}
+
+YCMD:toggletp(playerid, params[], help)
+{
+	if(!islogged(playerid)) return notlogged(playerid);
+
+    PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
+
+	if(PlayerData[playerid][bAllowPlayerTeleport])
+	{
+	    player_notice(playerid, "Teleport:", "~r~OFF");
+	}
+	else if(!PlayerData[playerid][bAllowPlayerTeleport])
+	{
+	    player_notice(playerid, "Toys:", "~r~ON");
+	}
+
+	PlayerData[playerid][bAllowPlayerTeleport] = !PlayerData[playerid][bAllowPlayerTeleport];
 	return 1;
 }
 
@@ -23033,6 +23059,7 @@ server_initialize()
     Command_AddAltNamed("xmas", "christmas");
     Command_AddAltNamed("xmas", "christ");
 	#endif
+	Command_AddAltNamed("toggletp", "togtp");
 	Command_AddAltNamed("spectate", "spec");
 	Command_AddAltNamed("togglegc", "toggc");
 	Command_AddAltNamed("lock", "carlock");
@@ -25911,13 +25938,14 @@ function:ProcessTick()
 			 			GetPlayerHealth(PlayerData[i][SpecID], hp);
 						GetPlayerArmour(PlayerData[i][SpecID], ar);
 						
-						format(gstr, sizeof(gstr), "~n~~n~~n~~n~~n~~n~~n~~w~%s - id:%i~n~hp:%0.1f ar:%0.1f $%s~n~Godmode: %s",
+						format(gstr, sizeof(gstr), "~n~~n~~n~~n~~n~~n~~n~~w~%s - id:%i~n~hp:%0.1f ar:%0.1f $%s~n~Godmode:%s VIP:%s",
 							__GetName(PlayerData[i][SpecID]),
 							PlayerData[i][SpecID],
 							hp,
 							ar,
 							number_format((GetPlayerMoneyEx(PlayerData[i][SpecID]) + PlayerData[PlayerData[i][SpecID]][e_bank])),
-							PlayerData[PlayerData[i][SpecID]][bGod] ? ("Yes") : ("No"));
+							PlayerData[PlayerData[i][SpecID]][bGod] ? ("Yes") : ("No"),
+							PlayerData[PlayerData[i][SpecID]][e_vip] == 1 ? ("Yes") : ("No"));
 							
 						GameTextForPlayer(i, gstr, 30000, 3);
 					}
@@ -27507,7 +27535,7 @@ function:ShowDialog(playerid, dialogid)
 		}
 	    case CLOSE_GANG_DIALOG:
 	    {
-	        ShowPlayerDialog(playerid, CLOSE_GANG_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" :: Close Gang", ""white"If you want to close your gang write click on 'Close'\nelse 'Cancel'", "Close", "Cancel");
+	        ShowPlayerDialog(playerid, CLOSE_GANG_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" :: Close Gang", ""white"If you want to destroy your gang right click\non 'Close' else 'Cancel'", "Close", "Cancel");
 	    }
 	    case GANG_KICK_DIALOG:
 	    {
@@ -29231,13 +29259,16 @@ function:OnGangRenameAttempt(playerid, newgangname[], newgangtag[])
 				UpdateDynamic3DTextLabelText(GZoneData[i][e_labelid], WHITE, text);
 	        }
 	    }
-	
+
+	    format(gstr, sizeof(gstr), ""nef_yellow"Gang:"white" %s", newgangname);
 	    for(new i = 0; i < MAX_PLAYERS; i++)
 	    {
 	        if(PlayerData[i][e_gangid] == PlayerData[playerid][e_gangid] || PlayerData[i][TmpGangID] == PlayerData[playerid][e_gangid])
 	        {
 	            strmid(PlayerData[i][GangName], newgangname, 0, 21, 21);
 	            strmid(PlayerData[i][GangTag], newgangtag, 0, 5, 5);
+	            
+	            UpdateDynamic3DTextLabelText(PlayerData[i][GangLabel], WHITE, gstr);
 	        }
 	    }
 	    
@@ -31017,6 +31048,7 @@ ResetPlayerVars(playerid)
 	PlayerData[playerid][bVIPLInv] = false;
 	PlayerData[playerid][bIsDead] = false;
 	PlayerData[playerid][bShowToys] = true;
+	PlayerData[playerid][bAllowPlayerTeleport] = true;
 	PlayerData[playerid][bFrozen] = false;
 	PlayerData[playerid][bAllowSpawn] = false;
  	PlayerData[playerid][bDuty] = false;
