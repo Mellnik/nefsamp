@@ -92,7 +92,7 @@ Float:GetDistance3D(Float:x1, Float:y1, Float:z1, Float:x2, Float:y2, Float:z2);
 #else
 #define CURRENT_VERSION                 "PTS:Build 33"
 #endif
-#define HOTFIX_REV                      "Hotfix #0"
+#define HOTFIX_REV                      "Hotfix #1"
 #define SAMP_VERSION                    "SA-MP 0.3z-R3"
 #define MAX_REPORTS 					(7)
 #define MAX_ADS                         (10)
@@ -3503,24 +3503,24 @@ public OnPlayerDisconnect(playerid, reason)
 public e_COMMAND_ERRORS:OnPlayerCommandReceived(playerid, cmdtext[], e_COMMAND_ERRORS:success)
 {
 	if(PlayerData[playerid][bOpenSeason])
-		return COMMAND_OK;
+		return COMMAND_DENIED;
 	
 	if(PlayerData[playerid][bIsDead])
 	{
 	    SCM(playerid, -1, ""er"You can't use commands while being dead!");
-	    return COMMAND_OK;
+	    return COMMAND_DENIED;
 	}
 	
 	if(PlayerData[playerid][ExitType] != EXIT_FIRST_SPAWNED)
 	{
 	    SCM(playerid, -1, ""er"You need to spawn to use commands!");
-	    return COMMAND_OK;
+	    return COMMAND_DENIED;
 	}
 	
 	if((PlayerData[playerid][iCoolDownCommand] + COOLDOWN_CMD) >= GetTickCountEx())
 	{
 		player_notice(playerid, "1 command per second", "");
-	    return COMMAND_OK;
+	    return COMMAND_DENIED;
 	}
 
 	if(PlayerData[playerid][bFrozen])
@@ -3532,7 +3532,7 @@ public e_COMMAND_ERRORS:OnPlayerCommandReceived(playerid, cmdtext[], e_COMMAND_E
 	        default:
 			{
 			    SCM(playerid, -1, ""er"You can't use this command while you are frozen!");
-				return COMMAND_OK;
+				return COMMAND_DENIED;
    			}
 	    }
 	}
@@ -3561,7 +3561,7 @@ public e_COMMAND_ERRORS:OnPlayerCommandReceived(playerid, cmdtext[], e_COMMAND_E
 	if(PlayerData[playerid][bLoadMap])
 	{
 	    player_notice(playerid, "Please wait for the map to load", "");
-	    return COMMAND_OK;
+	    return COMMAND_DENIED;
 	}
 	
 	PlayerData[playerid][iCoolDownCommand] = GetTickCountEx();
@@ -3586,9 +3586,8 @@ public e_COMMAND_ERRORS:OnPlayerCommandPerformed(playerid, cmdtext[], e_COMMAND_
     fwrite(hFile, gstr2);
     fclose(hFile);
 
-	return
-		SrvStat[0]++,
-		COMMAND_OK;
+    SrvStat[0]++;
+	return COMMAND_OK;
 }
 
 public OnVehicleMod(playerid, vehicleid, componentid)
@@ -8942,6 +8941,9 @@ YCMD:duel(playerid, params[], help)
             SetPlayerArmour(playerid, 99.0);
             SetPlayerHealth(PlayerData[playerid][DuelRequestRecv], 99.0);
             SetPlayerArmour(PlayerData[playerid][DuelRequestRecv], 99.0);
+            
+            PlayerData[playerid][bwSuspect] |= SUSPECT_VALID_ARMOR;
+            PlayerData[PlayerData[playerid][DuelRequestRecv]][bwSuspect] |= SUSPECT_VALID_ARMOR;
             
 			// Closing open dialogs in order to avoid some exploits.
 			ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
@@ -17281,7 +17283,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	            {
 	                if(PlayerData[i][DuelRequest] == playerid)
 	                {
-			        	global_broadcast(">> Duel request canceled by %s(%i)", __GetName(playerid), playerid);
+			        	format(gstr, sizeof(gstr), ">> Duel request cancelled by %s(%i)", __GetName(playerid), playerid);
+			        	SCM(i, NEF_RED, gstr);
 			        	
 	                    PlayerData[i][DuelRequest] = INVALID_PLAYER_ID;
 	                }
