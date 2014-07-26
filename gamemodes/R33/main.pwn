@@ -16444,7 +16444,7 @@ YCMD:toggletp(playerid, params[], help)
 	}
 	else if(!PlayerData[playerid][bAllowPlayerTeleport])
 	{
-	    player_notice(playerid, "Toys:", "~g~ON");
+	    player_notice(playerid, "Teleport:", "~g~ON");
 	}
 
 	PlayerData[playerid][bAllowPlayerTeleport] = !PlayerData[playerid][bAllowPlayerTeleport];
