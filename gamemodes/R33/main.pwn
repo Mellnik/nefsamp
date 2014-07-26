@@ -11,7 +11,7 @@
 
 /* Build Dependencies
 || SA-MP Server 0.3z-R3
-|| YSI Library 4.0 beta
+|| YSI Library 3.2
 || sscanf Plugin 2.8.1
 || Streamer Plugin v2.7.2
 || MySQL Plugin R39-2
@@ -28,20 +28,21 @@
 #define IRC_CONNECT (true)
 #define WINTER_EDITION (false) // Requires FS ferriswheelfair.amx
 #define _YSI_NO_VERSION_CHECK
-#define MAX_COMMANDS (768)
+#define YSI_IS_SERVER
 
 #include <a_samp>   		
 #include <a_http>           // API Requests
 #undef MAX_PLAYERS
 #define MAX_PLAYERS (400)
 #include <amx\os>
-#include <YSI_Data\y_iterate>
-#include <YSI_Visual\y_commands>
-#include <YSI_Coding\y_stringhash>
-#include <YSI_Coding\y_va>
+#include <YSI\y_iterate>
+#include <YSI\y_stringhash>
+#include <YSI\y_commands>
+#include <YSI\y_master>
+#include <YSI\y_va>
 #include <sscanf2>
 #include <streamer>
-#include <a_mysql_R38>
+#include <a_mysql_R39-2>
 #include <irc>
 #include <a_zones>          // V2.0
 #include <mSelection>       // 1.1 R3
@@ -92,7 +93,7 @@ Float:GetDistance3D(Float:x1, Float:y1, Float:z1, Float:x2, Float:y2, Float:z2);
 #else
 #define CURRENT_VERSION                 "PTS:Build 33"
 #endif
-#define HOTFIX_REV                      "Hotfix #1"
+#define HOTFIX_REV                      "Hotfix #2"
 #define SAMP_VERSION                    "SA-MP 0.3z-R3"
 #define MAX_REPORTS 					(7)
 #define MAX_ADS                         (10)
@@ -3500,27 +3501,27 @@ public OnPlayerDisconnect(playerid, reason)
 	return 1;
 }
 
-public e_COMMAND_ERRORS:OnPlayerCommandReceived(playerid, cmdtext[], e_COMMAND_ERRORS:success)
+public OnPlayerCommandReceived(playerid, cmdtext[])
 {
 	if(PlayerData[playerid][bOpenSeason])
-		return COMMAND_DENIED;
-	
+		return 0;
+
 	if(PlayerData[playerid][bIsDead])
 	{
 	    SCM(playerid, -1, ""er"You can't use commands while being dead!");
-	    return COMMAND_DENIED;
+	    return 0;
 	}
-	
+
 	if(PlayerData[playerid][ExitType] != EXIT_FIRST_SPAWNED)
 	{
 	    SCM(playerid, -1, ""er"You need to spawn to use commands!");
-	    return COMMAND_DENIED;
+	    return 0;
 	}
-	
+
 	if((PlayerData[playerid][iCoolDownCommand] + COOLDOWN_CMD) >= GetTickCountEx())
 	{
 		player_notice(playerid, "1 command per second", "");
-	    return COMMAND_DENIED;
+	    return 0;
 	}
 
 	if(PlayerData[playerid][bFrozen])
@@ -3532,7 +3533,7 @@ public e_COMMAND_ERRORS:OnPlayerCommandReceived(playerid, cmdtext[], e_COMMAND_E
 	        default:
 			{
 			    SCM(playerid, -1, ""er"You can't use this command while you are frozen!");
-				return COMMAND_DENIED;
+				return 0;
    			}
 	    }
 	}
@@ -3561,22 +3562,18 @@ public e_COMMAND_ERRORS:OnPlayerCommandReceived(playerid, cmdtext[], e_COMMAND_E
 	if(PlayerData[playerid][bLoadMap])
 	{
 	    player_notice(playerid, "Please wait for the map to load", "");
-	    return COMMAND_DENIED;
+	    return 0;
 	}
 	
 	PlayerData[playerid][iCoolDownCommand] = GetTickCountEx();
-	
+
 	CancelEdit(playerid);
 	// Closing open dialogs in order to avoid some exploits.
 	ShowPlayerDialog(playerid, -1, DIALOG_STYLE_LIST, "Close", "Close", "Close", "Close");
-
-	if(success == COMMAND_UNDEFINED) {
-	    player_notice(playerid, "Unknown command", "Type ~y~/c ~w~for all commands");
-	}
-	return COMMAND_OK;
+	return 1;
 }
 
-public e_COMMAND_ERRORS:OnPlayerCommandPerformed(playerid, cmdtext[], e_COMMAND_ERRORS:success)
+public OnPlayerCommandPerformed(playerid, cmdtext[], success)
 {
     new File:hFile = fopen("/Log/cmdlog.txt", io_append),
         time[3];
@@ -3586,8 +3583,12 @@ public e_COMMAND_ERRORS:OnPlayerCommandPerformed(playerid, cmdtext[], e_COMMAND_
     fwrite(hFile, gstr2);
     fclose(hFile);
 
-    SrvStat[0]++;
-	return COMMAND_OK;
+	if(!success) {
+	    player_notice(playerid, "Unknown command", "Type ~y~/c ~w~for all commands");
+	} else {
+	    SrvStat[0]++;
+	}
+	return 1;
 }
 
 public OnVehicleMod(playerid, vehicleid, componentid)
