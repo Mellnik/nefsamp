@@ -93,7 +93,7 @@ Float:GetDistance3D(Float:x1, Float:y1, Float:z1, Float:x2, Float:y2, Float:z2);
 #else
 #define CURRENT_VERSION                 "PTS:Build 33"
 #endif
-#define HOTFIX_REV                      "Hotfix #2"
+#define HOTFIX_REV                      "Hotfix #3"
 #define SAMP_VERSION                    "SA-MP 0.3z-R3"
 #define MAX_REPORTS 					(7)
 #define MAX_ADS                         (10)
@@ -8305,6 +8305,7 @@ YCMD:enter(playerid, params[], help)
 
 YCMD:sellgc(playerid, params[], help)
 {
+	if(playerid) return SCM(playerid, -1, ""er"This command has been disabled due to massive abuse. Thank you, []ThE_$uRvivoR[].");
     if(!islogged(playerid)) return notlogged(playerid);
 	if(PlayerData[playerid][e_credits] <= 0) return SCM(playerid, -1, ""er"You don't own any GC!");
 
@@ -8317,14 +8318,14 @@ YCMD:sellgc(playerid, params[], help)
     if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 	if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 
-	if(money < 10000 || money > 100000000)
+	if(money < 100000 || money > 50000000)
 	{
-	    return SCM(playerid, -1, ""er"$10,000 - $100,000,000!");
+	    return SCM(playerid, -1, ""er"$100,000 - $50,000,000!");
 	}
 	
-	if(gc < 10 || gc > 1000000)
+	if(gc < 1000 || gc > 10000)
 	{
-	    return SCM(playerid, -1, ""er"GC: 10 - $1,000,000!");
+	    return SCM(playerid, -1, ""er"GC: 1,000 - 10,000!");
 	}
 	
 	if(gc > PlayerData[playerid][e_credits]) return SCM(playerid, -1, ""er"You don't have that much GC.");
@@ -8356,6 +8357,7 @@ YCMD:sellgc(playerid, params[], help)
 
 YCMD:buygc(playerid, params[], help)
 {
+    if(playerid) return SCM(playerid, -1, ""er"This command has been disabled due to massive abuse. Thank you, []ThE_$uRvivoR[].");
     if(!islogged(playerid)) return notlogged(playerid);
     
 	if(PlayerData[playerid][GCPlayer] == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"No one has offered you GC yet.");
