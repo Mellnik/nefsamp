@@ -11476,6 +11476,7 @@ YCMD:gcapture(playerid, params[], help)
 		    if(!IsPlayerAvail(ii)) continue;
 		    if(PlayerData[ii][e_gangid] != GZoneData[i][e_attacker]) continue;
 		    if(IsPlayerOnDesktop(ii, 2500)) continue;
+		    if(!PlayerData[ii][bGWarMode]) continue;
 		    
 			GetPlayerPos(ii, POS[0], POS[1], POS[2]);
 
@@ -28060,8 +28061,7 @@ PushTeleportIntput(playerid, teleport_category, input)
 
 	string[0] = '/';
 	strcat(string, Teleports[teleport_category][input], sizeof(string));
-	
-	format(string, sizeof(string), "/%s", Teleports[teleport_category][input]);
+
 	Command_ReProcess(playerid, string, false);
 }
 
