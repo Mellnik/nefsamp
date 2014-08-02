@@ -10,10 +10,10 @@
 \*======================================================================*/
 
 /* Build Dependencies
-|| SA-MP Server 0.3z-R3
+|| SA-MP Server 0.3z-R2
 || YSI Library 3.2
 || sscanf Plugin 2.8.1
-|| Streamer Plugin v2.7.2
+|| Streamer Plugin v2.7
 || MySQL Plugin R39-2
 || IRC Plugin 1.4.5
 ||
@@ -21,7 +21,7 @@
 ||
 */
 
-#pragma dynamic 8192
+#pragma dynamic 8192        // for md-sort
 
 #define IS_RELEASE_BUILD (true)
 #define INC_ENVIRONMENT (true)
@@ -93,8 +93,8 @@ Float:GetDistance3D(Float:x1, Float:y1, Float:z1, Float:x2, Float:y2, Float:z2);
 #else
 #define CURRENT_VERSION                 "PTS:Build 33"
 #endif
-#define HOTFIX_REV                      "Hotfix #3"
-#define SAMP_VERSION                    "SA-MP 0.3z-R3"
+#define HOTFIX_REV                      "Hotfix #4"
+#define SAMP_VERSION                    "SA-MP 0.3z-R2"
 #define MAX_REPORTS 					(7)
 #define MAX_ADS                         (10)
 #define MAX_GANG_NAME					(20)
@@ -1721,9 +1721,9 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
 	lotto_number,
 	lotto_jackpot,
 	bool:bLottoActive = false,
-	Teleports[MAX_TELE_CATEGORIES][50][26],
-	Teleport_Index[MAX_TELE_CATEGORIES],
-	TeleportDialogString[MAX_TELE_CATEGORIES][2048],
+	g_Teleports[MAX_TELE_CATEGORIES][50][26],
+	g_Teleport_Index[MAX_TELE_CATEGORIES],
+	g_TeleportDialogString[MAX_TELE_CATEGORIES][2048],
 	SrvStat[4],
 	sPVCategory[512],
 	mathsAnswered = -1,
@@ -2621,10 +2621,10 @@ public OnGameModeInit()
 	
 	new teleports = 0;
 	for(new i = 0; i < MAX_TELE_CATEGORIES; i++)
-	    teleports += Teleport_Index[i];
+	    teleports += g_Teleport_Index[i];
 	    
 	Log(LOG_INIT, "Teleports: %i (%i,%i,%i,%i,%i,%i,%i,%i,%i,%i)", teleports,
-		Teleport_Index[0], Teleport_Index[1], Teleport_Index[2], Teleport_Index[3], Teleport_Index[4], Teleport_Index[5], Teleport_Index[6], Teleport_Index[7], Teleport_Index[8], Teleport_Index[9]);
+		g_Teleport_Index[0], g_Teleport_Index[1], g_Teleport_Index[2], g_Teleport_Index[3], g_Teleport_Index[4], g_Teleport_Index[5], g_Teleport_Index[6], g_Teleport_Index[7], g_Teleport_Index[8], g_Teleport_Index[9]);
 		
     Log(LOG_INIT, "Server successfully loaded");
 	return 1;
@@ -19109,43 +19109,43 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		        {
 		            case 0: // Parkours
 		            {
-						ShowPlayerDialog(playerid, TELE_DIALOG + 1, DIALOG_STYLE_LIST, ""nef" :: Teleports > Parkours", TeleportDialogString[0], "Select", "Back");
+						ShowPlayerDialog(playerid, TELE_DIALOG + 1, DIALOG_STYLE_LIST, ""nef" :: Teleports > Parkours", g_TeleportDialogString[0], "Select", "Back");
 		            }
 		            case 1: // Stunting
 		            {
-						ShowPlayerDialog(playerid, TELE_DIALOG + 2, DIALOG_STYLE_LIST, ""nef" :: Teleports > Stunts", TeleportDialogString[1], "Select", "Back");
+						ShowPlayerDialog(playerid, TELE_DIALOG + 2, DIALOG_STYLE_LIST, ""nef" :: Teleports > Stunts", g_TeleportDialogString[1], "Select", "Back");
 					}
 		            case 2: // basejump
 		            {
-						ShowPlayerDialog(playerid, TELE_DIALOG + 3, DIALOG_STYLE_LIST, ""nef" :: Teleports > Basejump/Skydive", TeleportDialogString[2], "Select", "Back");
+						ShowPlayerDialog(playerid, TELE_DIALOG + 3, DIALOG_STYLE_LIST, ""nef" :: Teleports > Basejump/Skydive", g_TeleportDialogString[2], "Select", "Back");
 					}
 		            case 3: // vehicle jumps
 		            {
-						ShowPlayerDialog(playerid, TELE_DIALOG + 4, DIALOG_STYLE_LIST, ""nef" :: Teleports > Vehicle Jumps", TeleportDialogString[3], "Select", "Back");
+						ShowPlayerDialog(playerid, TELE_DIALOG + 4, DIALOG_STYLE_LIST, ""nef" :: Teleports > Vehicle Jumps", g_TeleportDialogString[3], "Select", "Back");
 					}
 		            case 4: // fun maps
 		            {
-						ShowPlayerDialog(playerid, TELE_DIALOG + 5, DIALOG_STYLE_LIST, ""nef" :: Teleports > Fun Maps", TeleportDialogString[4], "Select", "Back");
+						ShowPlayerDialog(playerid, TELE_DIALOG + 5, DIALOG_STYLE_LIST, ""nef" :: Teleports > Fun Maps", g_TeleportDialogString[4], "Select", "Back");
 					}
 		            case 5: // specials
 		            {
-						ShowPlayerDialog(playerid, TELE_DIALOG + 6, DIALOG_STYLE_LIST, ""nef" :: Teleports > Specials", TeleportDialogString[5], "Select", "Back");
+						ShowPlayerDialog(playerid, TELE_DIALOG + 6, DIALOG_STYLE_LIST, ""nef" :: Teleports > Specials", g_TeleportDialogString[5], "Select", "Back");
 					}
 					case 6: // Vehicle Tuning
 					{
-					    ShowPlayerDialog(playerid, TELE_DIALOG + 7, DIALOG_STYLE_LIST, ""nef" :: Teleports > Vehicle Tuning", TeleportDialogString[6], "Select", "Back");
+					    ShowPlayerDialog(playerid, TELE_DIALOG + 7, DIALOG_STYLE_LIST, ""nef" :: Teleports > Vehicle Tuning", g_TeleportDialogString[6], "Select", "Back");
 					}
 					case 7: // Cities
 					{
-					    ShowPlayerDialog(playerid, TELE_DIALOG + 8, DIALOG_STYLE_LIST, ""nef" :: Teleports > Cities", TeleportDialogString[7], "Select", "Back");
+					    ShowPlayerDialog(playerid, TELE_DIALOG + 8, DIALOG_STYLE_LIST, ""nef" :: Teleports > Cities", g_TeleportDialogString[7], "Select", "Back");
 					}
 					case 8: // Hotspots
 					{
-					    ShowPlayerDialog(playerid, TELE_DIALOG + 9, DIALOG_STYLE_LIST, ""nef" :: Teleports > Hotspots", TeleportDialogString[8], "Select", "Back");
+					    ShowPlayerDialog(playerid, TELE_DIALOG + 9, DIALOG_STYLE_LIST, ""nef" :: Teleports > Hotspots", g_TeleportDialogString[8], "Select", "Back");
 					}
 					case 9: // Drifts
 					{
-					    ShowPlayerDialog(playerid, TELE_DIALOG + 10, DIALOG_STYLE_LIST, ""nef" :: Teleports > Drifts", TeleportDialogString[9], "Select", "Back");
+					    ShowPlayerDialog(playerid, TELE_DIALOG + 10, DIALOG_STYLE_LIST, ""nef" :: Teleports > Drifts", g_TeleportDialogString[9], "Select", "Back");
 					}
 		        }
 		    }
@@ -28050,19 +28050,24 @@ AddTeleport(teleport_category, const teleport_name[], const teleport_cmd[], Floa
 
 	format(buffer, sizeof(buffer), "%s (/%s)\n", teleport_name, teleport_cmd);
 	
-	strcat(TeleportDialogString[teleport_category], buffer);
-    strmid(Teleports[teleport_category][Teleport_Index[teleport_category]++], teleport_cmd, 0, 26, 26);
+	strcat(g_TeleportDialogString[teleport_category], buffer);
+    strmid(g_Teleports[teleport_category][g_Teleport_Index[teleport_category]++], teleport_cmd, 0, 26, 26);
     return 1;
 }
 
 PushTeleportIntput(playerid, teleport_category, input)
 {
+	if(teleport_category < 0 || teleport_category > MAX_TELEPORT_CATEGORIES)
+	    return 0;
+
 	new string[32];
 
 	string[0] = '/';
-	strcat(string, Teleports[teleport_category][input], sizeof(string));
+	strcat(string, g_Teleports[teleport_category][input], sizeof(string));
 
-	Command_ReProcess(playerid, string, false);
+    Command_ReProcess(playerid, string, false);
+
+	return 1;
 }
 
 function:hidevTD(playerid)
@@ -28369,7 +28374,7 @@ function:Maths()
 		}
 	}
 	format(mathsCurrent, sizeof(mathsCurrent), "%i%s%i%s%i", NR1, FOP1, NR2, FOP2, NR3);
-	format(gstr2, sizeof(gstr2), ""RED_E""SVRSC" [MATHS] "white"Calculate %s and write /answer <answer> "YELLOW_E"(Score: 4 | Money: $%s)", mathsCurrent, number_format(mathsAward));
+	format(gstr2, sizeof(gstr2), ""SVRSC" "RED_E"[MATHS] "white"Calculate %s and write /answer <answer> "YELLOW_E"(Score: 4 | Money: $%s)", mathsCurrent, number_format(mathsAward));
 	SCMToAll(-1, gstr2);
 	return 1;
 }
