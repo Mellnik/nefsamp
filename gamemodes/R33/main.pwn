@@ -8305,7 +8305,7 @@ YCMD:enter(playerid, params[], help)
 
 YCMD:sellgc(playerid, params[], help)
 {
-	if(playerid) return SCM(playerid, -1, ""er"This command has been disabled due to massive abuse. Thank you, []ThE_$uRvivoR[].");
+	if(playerid) return SCM(playerid, -1, ""er"This command has been disabled due to massive abuse.");
     if(!islogged(playerid)) return notlogged(playerid);
 	if(PlayerData[playerid][e_credits] <= 0) return SCM(playerid, -1, ""er"You don't own any GC!");
 
@@ -8357,7 +8357,7 @@ YCMD:sellgc(playerid, params[], help)
 
 YCMD:buygc(playerid, params[], help)
 {
-    if(playerid) return SCM(playerid, -1, ""er"This command has been disabled due to massive abuse. Thank you, []ThE_$uRvivoR[].");
+    if(playerid) return SCM(playerid, -1, ""er"This command has been disabled due to massive abuse.");
     if(!islogged(playerid)) return notlogged(playerid);
     
 	if(PlayerData[playerid][GCPlayer] == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"No one has offered you GC yet.");
