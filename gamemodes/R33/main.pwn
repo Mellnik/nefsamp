@@ -19,6 +19,11 @@
 ||
 || Build specific:
 ||
+||
+|| Script limits:
+|| Max teleports per category: 32
+|| Max teleport command name: 15
+||
 */
 
 #pragma dynamic 8192        // for md-sort
@@ -144,7 +149,8 @@ Float:GetDistance3D(Float:x1, Float:y1, Float:z1, Float:x2, Float:y2, Float:z2);
 #define RESPAWN_TIME                    (60)
 #define SCM SendClientMessage
 #define SCMToAll SendClientMessageToAll
-#define MAX_TELE_CATEGORIES             (10)
+#define MAX_TELE_CATEGORIES             (9)
+#define MAX_TELES_PER_CATEGORY          (32)
 #define CAR_SHOPS                       (3)
 #define RGBA(%1,%2,%3,%4) (((((%1) & 0xff) << 24) | (((%2) & 0xff) << 16) | (((%3) & 0xff) << 8) | ((%4) & 0xff)))
 #define UpperToLower(%1) for(new ToLowerChar; ToLowerChar < strlen(%1); ToLowerChar++) if(%1[ToLowerChar] > 64 && %1[ToLowerChar] < 91) %1[ToLowerChar] += 32
@@ -1721,8 +1727,8 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
 	lotto_number,
 	lotto_jackpot,
 	bool:bLottoActive = false,
-	g_Teleports[MAX_TELE_CATEGORIES][50][26],
-	g_Teleport_Index[MAX_TELE_CATEGORIES],
+	g_Teleports[MAX_TELE_CATEGORIES][MAX_TELES_PER_CATEGORY][16],
+	g_TeleportIndex[MAX_TELE_CATEGORIES],
 	g_TeleportDialogString[MAX_TELE_CATEGORIES][2048],
 	SrvStat[4],
 	sPVCategory[512],
@@ -2621,10 +2627,10 @@ public OnGameModeInit()
 	
 	new teleports = 0;
 	for(new i = 0; i < MAX_TELE_CATEGORIES; i++)
-	    teleports += g_Teleport_Index[i];
+	    teleports += g_TeleportIndex[i];
 	    
 	Log(LOG_INIT, "Teleports: %i (%i,%i,%i,%i,%i,%i,%i,%i,%i,%i)", teleports,
-		g_Teleport_Index[0], g_Teleport_Index[1], g_Teleport_Index[2], g_Teleport_Index[3], g_Teleport_Index[4], g_Teleport_Index[5], g_Teleport_Index[6], g_Teleport_Index[7], g_Teleport_Index[8], g_Teleport_Index[9]);
+		g_TeleportIndex[0], g_TeleportIndex[1], g_TeleportIndex[2], g_TeleportIndex[3], g_TeleportIndex[4], g_TeleportIndex[5], g_TeleportIndex[6], g_TeleportIndex[7], g_TeleportIndex[8]);
 		
     Log(LOG_INIT, "Server successfully loaded");
 	return 1;
@@ -9610,7 +9616,7 @@ YCMD:setbcash(playerid, params[], help)
 				SCM(playerid, YELLOW, gstr);
 			}
 			
-			format(gstr, sizeof(gstr), ""red"Adm: %s(%i) has been given bank $%i by %s(%i)", __GetName(player), player, amount, __GetName(playerid), playerid);
+			format(gstr, sizeof(gstr), ""red"Adm: %s(%i) bank cash was set to $%i by %s(%i)", __GetName(player), player, amount, __GetName(playerid), playerid);
 			admin_broadcast(-1, gstr);
 			print(gstr);
 			
@@ -13255,7 +13261,7 @@ YCMD:god(playerid, params[], help)
 			
 	        new Float:HP;
 	        GetPlayerHealth(playerid, HP);
-			if(HP < 40 && !silent) return GameTextForPlayer(playerid, "~b~~h~~h~Your health may not be below 40!", 2000, 3);
+			if(HP < 30 && !silent) return player_notice(playerid, "~b~~h~Can't activate god,", "~b~~h~Health below 30");
 	        SetPVarInt(playerid, "HadGod", 1);
 		    SCM(playerid, COLOR_RED, ""nef" "GREY_E"You have enabled god-mode. You will now have infinite health in stunt zones.");
 			SCM(playerid, COLOR_RED, "> "YELLOW_E"You will not be able to use weapons with godmode enabled, type /god again to disable.");
@@ -19107,87 +19113,79 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		    {
 		        switch(listitem)
 		        {
-		            case 0: // Parkours
+		            case 0: // Stunt Zones
 		            {
-						ShowPlayerDialog(playerid, TELE_DIALOG + 1, DIALOG_STYLE_LIST, ""nef" :: Teleports > Parkours", g_TeleportDialogString[0], "Select", "Back");
+						ShowPlayerDialog(playerid, TELE_DIALOG + 1, DIALOG_STYLE_LIST, ""nef" :: Teleports > Stunt Zones", g_TeleportDialogString[0], "Select", "Back");
 		            }
-		            case 1: // Stunting
+		            case 1: // Jumps
 		            {
-						ShowPlayerDialog(playerid, TELE_DIALOG + 2, DIALOG_STYLE_LIST, ""nef" :: Teleports > Stunts", g_TeleportDialogString[1], "Select", "Back");
+						ShowPlayerDialog(playerid, TELE_DIALOG + 2, DIALOG_STYLE_LIST, ""nef" :: Teleports > Jumps", g_TeleportDialogString[1], "Select", "Back");
 					}
-		            case 2: // basejump
+		            case 2: // Fun Maps
 		            {
-						ShowPlayerDialog(playerid, TELE_DIALOG + 3, DIALOG_STYLE_LIST, ""nef" :: Teleports > Basejump/Skydive", g_TeleportDialogString[2], "Select", "Back");
+						ShowPlayerDialog(playerid, TELE_DIALOG + 3, DIALOG_STYLE_LIST, ""nef" :: Teleports > Fun Maps", g_TeleportDialogString[2], "Select", "Back");
 					}
-		            case 3: // vehicle jumps
+		            case 3: // Challenges/Parkours
 		            {
-						ShowPlayerDialog(playerid, TELE_DIALOG + 4, DIALOG_STYLE_LIST, ""nef" :: Teleports > Vehicle Jumps", g_TeleportDialogString[3], "Select", "Back");
+						ShowPlayerDialog(playerid, TELE_DIALOG + 4, DIALOG_STYLE_LIST, ""nef" :: Teleports > Challenges/Parkours", g_TeleportDialogString[3], "Select", "Back");
 					}
-		            case 4: // fun maps
+		            case 4: // Specials
 		            {
-						ShowPlayerDialog(playerid, TELE_DIALOG + 5, DIALOG_STYLE_LIST, ""nef" :: Teleports > Fun Maps", g_TeleportDialogString[4], "Select", "Back");
+						ShowPlayerDialog(playerid, TELE_DIALOG + 5, DIALOG_STYLE_LIST, ""nef" :: Teleports > Specials", g_TeleportDialogString[4], "Select", "Back");
 					}
-		            case 5: // specials
+		            case 5: // Hotspots
 		            {
-						ShowPlayerDialog(playerid, TELE_DIALOG + 6, DIALOG_STYLE_LIST, ""nef" :: Teleports > Specials", g_TeleportDialogString[5], "Select", "Back");
+						ShowPlayerDialog(playerid, TELE_DIALOG + 6, DIALOG_STYLE_LIST, ""nef" :: Teleports > Hotspots", g_TeleportDialogString[5], "Select", "Back");
 					}
-					case 6: // Vehicle Tuning
+					case 6: // Drifts
 					{
-					    ShowPlayerDialog(playerid, TELE_DIALOG + 7, DIALOG_STYLE_LIST, ""nef" :: Teleports > Vehicle Tuning", g_TeleportDialogString[6], "Select", "Back");
+					    ShowPlayerDialog(playerid, TELE_DIALOG + 7, DIALOG_STYLE_LIST, ""nef" :: Teleports > Drifts", g_TeleportDialogString[6], "Select", "Back");
 					}
-					case 7: // Cities
+					case 7: // Tune Shops
 					{
-					    ShowPlayerDialog(playerid, TELE_DIALOG + 8, DIALOG_STYLE_LIST, ""nef" :: Teleports > Cities", g_TeleportDialogString[7], "Select", "Back");
+					    ShowPlayerDialog(playerid, TELE_DIALOG + 8, DIALOG_STYLE_LIST, ""nef" :: Teleports > Tune Shops", g_TeleportDialogString[7], "Select", "Back");
 					}
-					case 8: // Hotspots
+					case 8: // Cities
 					{
-					    ShowPlayerDialog(playerid, TELE_DIALOG + 9, DIALOG_STYLE_LIST, ""nef" :: Teleports > Hotspots", g_TeleportDialogString[8], "Select", "Back");
-					}
-					case 9: // Drifts
-					{
-					    ShowPlayerDialog(playerid, TELE_DIALOG + 10, DIALOG_STYLE_LIST, ""nef" :: Teleports > Drifts", g_TeleportDialogString[9], "Select", "Back");
+					    ShowPlayerDialog(playerid, TELE_DIALOG + 9, DIALOG_STYLE_LIST, ""nef" :: Teleports > Cities", g_TeleportDialogString[8], "Select", "Back");
 					}
 		        }
 		    }
-		    case TELE_DIALOG +1: // parkours
+		    case TELE_DIALOG + 1: // Stunt Zones
 		    {
 		        PushTeleportIntput(playerid, 0, listitem);
 		    }
-		    case TELE_DIALOG +2: // Stunting
+		    case TELE_DIALOG + 2: // Jumps
 		    {
 		        PushTeleportIntput(playerid, 1, listitem);
 		    }
-		    case TELE_DIALOG +3: //base jumps
+		    case TELE_DIALOG + 3: // Fun Maps
 		    {
 		        PushTeleportIntput(playerid, 2, listitem);
 		    }
-		    case TELE_DIALOG +4: // vehicle jumps
+		    case TELE_DIALOG + 4: // Challenges/Parkours
 		    {
 		        PushTeleportIntput(playerid, 3, listitem);
 		    }
-		    case TELE_DIALOG +5: // other fun maps
+		    case TELE_DIALOG + 5: // Specials
 		    {
 		        PushTeleportIntput(playerid, 4, listitem);
 		    }
-		    case TELE_DIALOG +6: // specials
+		    case TELE_DIALOG + 6: // Hotspots
 		    {
 		        PushTeleportIntput(playerid, 5, listitem);
 		    }
-		    case TELE_DIALOG +7: // Vehicle Tuning
+		    case TELE_DIALOG + 7: // Drifts
 		    {
 		        PushTeleportIntput(playerid, 6, listitem);
 		    }
-		    case TELE_DIALOG +8: // Cities
+		    case TELE_DIALOG + 8: // Tune Shops
 		    {
 		        PushTeleportIntput(playerid, 7, listitem);
 		    }
-		    case TELE_DIALOG +9: // Hotspots
+		    case TELE_DIALOG + 9: // Cities
 		    {
 		        PushTeleportIntput(playerid, 8, listitem);
-		    }
-		    case TELE_DIALOG +10: // Hotspots
-		    {
-		        PushTeleportIntput(playerid, 9, listitem);
 		    }
 	        case GMENU_DIALOG:
 	        {
@@ -20349,7 +20347,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
  		        Command_ReProcess(playerid, "/help", false);
  		        return true;
  		    }
- 		    case TELE_DIALOG + 1..TELE_DIALOG + 10:
+ 		    case TELE_DIALOG + 1..TELE_DIALOG + 9:
  		    {
  		        ShowDialog(playerid, TELE_DIALOG);
  		        return true;
@@ -25629,7 +25627,7 @@ function:QueueProcess()
 		{
 		    PlayerData[i][e_payday] = 60;
 		    
-		    if((PlayerData[i][e_bank] + PlayerData[i][e_money]) > 100000000)
+		    if((PlayerData[i][e_bank] + PlayerData[i][e_money]) > 25000000)
 		    {
 		        continue;
 		    }
@@ -27630,9 +27628,7 @@ function:ShowDialog(playerid, dialogid)
 		}
 		case TELE_DIALOG:
 		{
-		    ShowPlayerDialog(playerid, TELE_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Teleports", "Stunt Zones\nJumps\nFun Maps\nChallenges\nSpecials\nHotspots\nDrifts\nTune Shops\nCities", "Select", "Cancel");
-		    
-			//ShowPlayerDialog(playerid, TELE_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Teleports", "Parkours\nStunts\nBasejump/Skydive\nVehicle Jumps\nFun Maps\nSpecials\nVehicle Tuning\nCities\nHotspots\nDrifts", "Select", "Cancel");
+		    ShowPlayerDialog(playerid, TELE_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Teleports", "Stunt Zones\nJumps\nFun Maps\nChallenges/Parkours\nSpecials\nHotspots\nDrifts\nTune Shops\nCities", "Select", "Cancel");
 		}
 		case VMENU_DIALOG:
 		{
@@ -28043,22 +28039,29 @@ AddTeleport(teleport_category, const teleport_name[], const teleport_cmd[], Floa
 {
 	new buffer[70];
 	
-	format(buffer, sizeof(buffer), ""nef"\n%s (/%s)", teleport_name, teleport_cmd);
-	
 	if(create_label)
+	{
+	    format(buffer, sizeof(buffer), ""nef"\n%s (/%s)", teleport_name, teleport_cmd);
 		CreateDynamic3DTextLabel(buffer, -1, x, y, z + 0.50, 40.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1);
-
-	format(buffer, sizeof(buffer), "%s (/%s)\n", teleport_name, teleport_cmd);
+	}
 	
+	format(buffer, sizeof(buffer), "%s (/%s)\n", teleport_name, teleport_cmd);
 	strcat(g_TeleportDialogString[teleport_category], buffer);
-    strmid(g_Teleports[teleport_category][g_Teleport_Index[teleport_category]++], teleport_cmd, 0, 26, 26);
+	
+    strmid(g_Teleports[teleport_category][g_TeleportIndex[teleport_category]++], teleport_cmd, 0, 15, 15);
     return 1;
 }
 
 PushTeleportIntput(playerid, teleport_category, input)
 {
-	if(teleport_category < 0 || teleport_category > MAX_TELEPORT_CATEGORIES)
+	if(teleport_category < 0 || teleport_category > MAX_TELE_CATEGORIES)
 	    return 0;
+	    
+	if(input < 0 || input > MAX_TELES_PER_CATEGORY)
+	{
+		Log(LOG_FAIL, "Invalid teleport index, PushTeleportIntput(%i, %i, %i)", playerid, teleport_category, input);
+	    return 0;
+	}
 
 	new string[32];
 
