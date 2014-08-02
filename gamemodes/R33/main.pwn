@@ -3473,7 +3473,7 @@ public OnPlayerDisconnect(playerid, reason)
         {
             if(gTeam[i] != gDUEL)
             {
-	        	format(gstr, sizeof(gstr), ">> %s(%i) canceled the duel request! Reason: Disconnect", __GetName(playerid), playerid);
+	        	format(gstr, sizeof(gstr), ">> %s(%i) canceled the duel request! Reason: Disconnected", __GetName(playerid), playerid);
 	        	SCM(i, NEF_RED, gstr);
 
 	        	PlayerData[i][DuelRequestRecv] = INVALID_PLAYER_ID;
@@ -8305,7 +8305,7 @@ YCMD:enter(playerid, params[], help)
 
 YCMD:sellgc(playerid, params[], help)
 {
-	if(playerid) return SCM(playerid, -1, ""er"This command has been disabled due to massive abuse. Thank you, []ThE_$uRvivoR[].");
+	if(playerid) return SCM(playerid, -1, ""er"This command has been disabled due to massive abuse.");
     if(!islogged(playerid)) return notlogged(playerid);
 	if(PlayerData[playerid][e_credits] <= 0) return SCM(playerid, -1, ""er"You don't own any GC!");
 
@@ -8357,7 +8357,7 @@ YCMD:sellgc(playerid, params[], help)
 
 YCMD:buygc(playerid, params[], help)
 {
-    if(playerid) return SCM(playerid, -1, ""er"This command has been disabled due to massive abuse. Thank you, []ThE_$uRvivoR[].");
+    if(playerid) return SCM(playerid, -1, ""er"This command has been disabled due to massive abuse.");
     if(!islogged(playerid)) return notlogged(playerid);
     
 	if(PlayerData[playerid][GCPlayer] == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"No one has offered you GC yet.");
@@ -11077,7 +11077,7 @@ YCMD:kick(playerid, params[], help)
 		
 		if(IsPlayerAvail(player) && player != playerid && PlayerData[player][e_level] != MAX_ADMIN_LEVEL)
 		{
-			format(gstr, sizeof(gstr), ""yellow"** "red"%s(%i) has been kicked by Admin %s(%i) [Reason: %s]", __GetName(player), player, __GetName(playerid), playerid, reason);
+			format(gstr, sizeof(gstr), ""SVRSC""yellow"** "red"%s(%i) has been kicked by Admin %s(%i) [Reason: %s]", __GetName(player), player, __GetName(playerid), playerid, reason);
 			SCMToAll(YELLOW, gstr);
 			print(gstr);
 			
@@ -11121,7 +11121,7 @@ YCMD:mute(playerid, params[], help)
 				return SCM(playerid, -1, ""er"This player is already muted");
 			}
 
-	    	format(gstr, sizeof(gstr), ""yellow"** "red"%s(%i) has been muted by Admin %s(%i) for %i seconds [Reason: %s]", __GetName(player), player, __GetName(playerid), playerid, time, reason);
+	    	format(gstr, sizeof(gstr), ""SVRSC""yellow"** "red"%s(%i) has been muted by Admin %s(%i) for %i seconds [Reason: %s]", __GetName(player), player, __GetName(playerid), playerid, time, reason);
             SCMToAll(YELLOW, gstr);
             print(gstr);
             
@@ -11166,7 +11166,7 @@ YCMD:unmute(playerid, params[], help)
 			KillTimer(PlayerData[player][tMute]);
 			SCM(player, NEF_YELLOW, "You have been unmuted!");
 
-			format(gstr, sizeof(gstr), ""yellow"** "red"%s(%i) has been unmuted by Admin %s(%i)", __GetName(player), player, __GetName(playerid), playerid);
+			format(gstr, sizeof(gstr), ""SVRSC""yellow"** "red"%s(%i) has been unmuted by Admin %s(%i)", __GetName(player), player, __GetName(playerid), playerid);
 			SCMToAll(RED, gstr);
 			
   			format(gstr, sizeof(gstr), "4MUTE:3 %s(%i) has been unmuted by %s", __GetName(player), player, __GetName(playerid));
@@ -12258,7 +12258,7 @@ YCMD:ban(playerid, params[], help)
 				} else {
 				    MySQL_BanIP(__GetIP(player));
 				    
-				    format(gstr, sizeof(gstr), ""yellow"** "red"%s(%i) has been banned by Admin %s(%i) [Reason: %s]", __GetName(player), player, __GetName(playerid), playerid, reason);
+				    format(gstr, sizeof(gstr), ""SVRSC""yellow"** "red"%s(%i) has been banned by Admin %s(%i) [Reason: %s]", __GetName(player), player, __GetName(playerid), playerid, reason);
 				    format(amsg, sizeof(amsg), "[ADMIN CHAT] "LG_E"IP banned of %s [EXPIRES: NEVER, REASON: %s]", __GetName(player), reason);
 				}
 
@@ -15971,7 +15971,7 @@ YCMD:answer(playerid, params[], help)
 		return true;
 	}
 
-	format(str, sizeof(str), ""RED_E"[MATHS] :: {%06x}%s(%i) "white"has correctly answered %s (answer: %i) winning 4 score and $%s!", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, mathsCurrent, answer, number_format(mathsAward));
+	format(str, sizeof(str), ""SVRSC" "RED_E"[MATHS] :: {%06x}%s(%i) "white"has correctly answered %s (answer: %i) winning 4 score and $%s!", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, mathsCurrent, answer, number_format(mathsAward));
 	SCMToAll(-1, str);
 
 	GivePlayerScoreEx(playerid, 4, true, true);
@@ -26305,7 +26305,7 @@ function:ProcessTick()
 						gang_broadcast(GZoneData[i][e_attacker], gstr);
 						gang_broadcast(GZoneData[i][e_attacker], ""gang_sign" "r_besch" The gang gained 5 gang score and each member $20,000 who were tied.");
 
-						format(gstr, sizeof(gstr), ""orange"Gang %s captured zone '%s' and gained their reward", GetGangNameByID(GZoneData[i][e_attacker]), GZoneData[i][e_zonename]);
+						format(gstr, sizeof(gstr), ""SVRSC" "orange"Gang %s captured zone '%s' and gained their reward", GetGangNameByID(GZoneData[i][e_attacker]), GZoneData[i][e_zonename]);
 						SCMToAll(-1, gstr);
 						SCMToAll(-1, ""orange"This zone is now locked for 2 hours and cannot be attacked during that time!");
 
@@ -26319,13 +26319,13 @@ function:ProcessTick()
 						gang_broadcast(GZoneData[i][e_attacker], gstr);
 						gang_broadcast(GZoneData[i][e_attacker], ""gang_sign" "r_besch" The gang gained 10 gang score and each member $20,000 who were tied.");
 
-						format(gstr, sizeof(gstr), ""orange"Gang %s captured zone '%s' which was territory of %s", GetGangNameByID(GZoneData[i][e_attacker]), GZoneData[i][e_zonename], GetGangNameByID(GZoneData[i][e_defender]));
+						format(gstr, sizeof(gstr), ""SVRSC" "orange"Gang %s captured zone '%s' which was territory of %s", GetGangNameByID(GZoneData[i][e_attacker]), GZoneData[i][e_zonename], GetGangNameByID(GZoneData[i][e_defender]));
 						SCMToAll(-1, gstr);
 						SCMToAll(-1, ""orange"This zone is now locked for 2 hours and cannot be attacked during that time!");
 
 						MySQL_UpdateGangScore(GZoneData[i][e_attacker], 10);
 						
-                        format(gstr, sizeof(gstr), ""gang_sign" "r_besch" '%s' was captured by the gang %s!", GZoneData[i][e_zonename], GetGangNameByID(GZoneData[i][e_attacker]));
+                        format(gstr, sizeof(gstr), ""SVRSC" "gang_sign" "r_besch" '%s' was captured by the gang %s!", GZoneData[i][e_zonename], GetGangNameByID(GZoneData[i][e_attacker]));
 						gang_broadcast(GZoneData[i][e_defender], gstr);
 						
 						Iter_Remove(iterGangWar, GZoneData[i][e_attacker]);
@@ -28369,7 +28369,7 @@ function:Maths()
 		}
 	}
 	format(mathsCurrent, sizeof(mathsCurrent), "%i%s%i%s%i", NR1, FOP1, NR2, FOP2, NR3);
-	format(gstr2, sizeof(gstr2), ""RED_E"[MATHS] "white"Calculate %s and write /answer <answer> "YELLOW_E"(Score: 4 | Money: $%s)", mathsCurrent, number_format(mathsAward));
+	format(gstr2, sizeof(gstr2), ""RED_E""SVRSC" [MATHS] "white"Calculate %s and write /answer <answer> "YELLOW_E"(Score: 4 | Money: $%s)", mathsCurrent, number_format(mathsAward));
 	SCMToAll(-1, gstr2);
 	return 1;
 }
