@@ -25616,6 +25616,7 @@ function:QueueProcess()
 	{
 	    if(!IsPlayerAvail(i))
 			continue;
+			
 	    if(IsPlayerOnDesktop(i, 30000))
 			continue;
 	
@@ -25626,11 +25627,6 @@ function:QueueProcess()
 		else if(PlayerData[i][e_payday] <= 1)
 		{
 		    PlayerData[i][e_payday] = 60;
-		    
-		    if((PlayerData[i][e_bank] + PlayerData[i][e_money]) > 25000000)
-		    {
-		        continue;
-		    }
 		    
 		    new string0[100],
 				string1[100],
@@ -25644,15 +25640,22 @@ function:QueueProcess()
 
 			GameTextForPlayer(i, "~g~~h~~h~PayDay~n~~w~Paycheck", 6000, 1);
 
-			format(string0, sizeof(string0), "Bank Balance before PayDay: "green"$%s", number_format(PlayerData[i][e_bank]));
-			format(string1, sizeof(string1), "Bank Interest Gained: "green"$%s", number_format(interest));
+		    if((PlayerData[i][e_bank] + PlayerData[i][e_money]) < 50000000)
+		    {
+				format(string0, sizeof(string0), "Bank balance before PayDay: "green"$%s", number_format(PlayerData[i][e_bank]));
+				format(string1, sizeof(string1), "Bank interest gained: "green"$%s", number_format(interest));
 
-			if(PlayerData[i][e_vip] == 1)
-			{
-	        	format(string4, sizeof(string4), "Bank Interest Gained "lb_e"(VIP BOOST)"white": "green"$%s", number_format(vipinterest));
-	        }
-	        else format(string4, sizeof(string4), "Bank Interest Gained "lb_e"(VIP BOOST)"white": "red"---");
-
+				if(PlayerData[i][e_vip] == 1)
+		        	format(string4, sizeof(string4), "Bank interest gained "lb_e"(VIP BOOST)"white": "green"$%s", number_format(vipinterest));
+		        else
+					format(string4, sizeof(string4), "Bank interest gained "lb_e"(VIP BOOST)"white": "red"---");
+		    }
+		    else
+		    {
+		        interest = 0;
+                vipinterest = 0;
+			}
+			
 			if(GetPlayerBusinessCount(__GetName(i)) > 0)
 			{
 			    b_vipearnings = floatround(GetPlayerBusinessEarnings(i) / 2.5);
@@ -25665,18 +25668,21 @@ function:QueueProcess()
 			}
 			else
 			{
-				format(string3, sizeof(string3), "Business earnings: "red"---");
+				format(string3, sizeof(string3), "Business earnings: "red"--- (You don't own any business)");
 				format(string5, sizeof(string5), "Business earnings "lb_e"(VIP BOOST)"white": "red"---");
 			}
 
 			PlayerData[i][e_bank] = PlayerData[i][e_bank] + interest + GetPlayerBusinessEarnings(i) + vipinterest + b_vipearnings;
 
-			format(string2, sizeof(string2), "Bank Balance after PayDay: "green"$%s", number_format(PlayerData[i][e_bank]));
+			format(string2, sizeof(string2), "Bank balance after PayDay: "green"$%s", number_format(PlayerData[i][e_bank]));
 
 			SCM(i, -1, ""green"|--------------------"yellow"PAY-DAY"green"-------------------|");
-			SCM(i, WHITE, string0);
-			SCM(i, WHITE, string1);
-			SCM(i, WHITE, string4);
+		    if((PlayerData[i][e_bank] + PlayerData[i][e_money]) < 50000000)
+		    {
+				SCM(i, WHITE, string0);
+				SCM(i, WHITE, string1);
+				SCM(i, WHITE, string4);
+			}
 			SCM(i, WHITE, string3);
 			SCM(i, WHITE, string5);
 			SCM(i, WHITE, string2);
