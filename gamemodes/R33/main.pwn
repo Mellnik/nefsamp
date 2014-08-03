@@ -3660,6 +3660,12 @@ public OnPlayerGiveDamage(playerid, damagedid, Float:amount, weaponid, bodypart)
 
 public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY, Float:fZ)
 {
+	/* ANTI FAKE DATA */
+	if(weaponid == 0) {
+		Log(LOG_SUSPECT, "OPWS triggered by %i using %i, %i, %i", playerid, weaponid, hittype, hitid);
+	    return 0;
+	}
+	
 	/* ANTI PROAIM.CS EXPERIMENTAL */
 	if(!(PlayerData[playerid][bwSuspect] & SUSPECT_PROAIM)) {
 		if(hittype == BULLET_HIT_TYPE_PLAYER) {
@@ -3695,7 +3701,6 @@ public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY
 	    if(hitid != INVALID_PLAYER_ID) {
 	        if(PlayerData[hitid][bGod]) {
 	            player_notice(playerid, "Player has /god enabled", "");
-			    return 0;
 	        }
 	    }
 	}
