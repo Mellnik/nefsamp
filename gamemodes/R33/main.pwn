@@ -8698,11 +8698,17 @@ YCMD:lock(playerid, params[], help)
 			
 			if(vehicle != -1)
 			{
-		        new vengine, vlights, valarm, vdoors, vbonnet, vboot, vobjective;
-		        GetVehicleParamsEx(vehicle, vengine, vlights, valarm, vdoors, vbonnet, vboot, vobjective);
-		        SetVehicleParamsEx(vehicle, vengine, vlights, valarm, !vdoors, vbonnet, vboot, vobjective);
+			    new vehicle_params[7];
+			    GetVehicleParamsEx(vehicle, vehicle_params[0], vehicle_params[1], vehicle_params[2], vehicle_params[3], vehicle_params[4], vehicle_params[5], vehicle_params[6]);
+			    
+			    if(vehicle_params[3] == -1)
+			        vehicle_params[3] = 1;
+				else
+					vehicle_params[3] = vehicle_params[3] == 0 ? 1 : 0;
+			    
+		        SetVehicleParamsEx(vehicle, vehicle_params[0], vehicle_params[1], vehicle_params[2], vehicle_params[3], vehicle_params[4], vehicle_params[5], vehicle_params[6]);
 
-		        player_notice(playerid, "Vehicle:", vdoors == 1 ? ("~r~Unlocked") : ("~g~Locked"));
+		        player_notice(playerid, "Vehicle:~n~", vehicle_params[3] == 0 ? ("~r~~h~Unlocked") : ("~g~~h~Locked"));
 		        PlayerPlaySound(playerid, 1027, 0.0, 0.0, 0.0);
 		        return 1;
 			}
