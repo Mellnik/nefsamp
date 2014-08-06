@@ -35,10 +35,10 @@
 #define _YSI_NO_VERSION_CHECK
 #define YSI_IS_SERVER
 
-#include <a_samp>   		
-#include <a_http>           // API Requests
+#include <a_samp>
 #undef MAX_PLAYERS
 #define MAX_PLAYERS (400)
+#include <a_http>           // API Requests
 #include <amx\os>
 #include <YSI\y_iterate>
 #include <YSI\y_stringhash>
@@ -93,6 +93,9 @@ Float:GetDistance3D(Float:x1, Float:y1, Float:z1, Float:x2, Float:y2, Float:z2);
 #define SVRFORUM                        "forum.nefserver.net"
 #define SERVER_IP                       "31.204.152.218:7777"
 #define HOSTNAME                        " 	      ..:: NEF ::.. ×Stunt/DM/Race/Minigames×"
+#define NEF_VERSION_MAJOR               33
+#define NEF_VERSION_MINOR               0
+#define NEF_VERSION_PATCH               4
 #if IS_RELEASE_BUILD == true
 #define CURRENT_VERSION                 "Build 33"
 #else
@@ -1500,7 +1503,7 @@ new const StaffLevels[MAX_ADMIN_LEVEL + 1][E_STAFF_LEVELS] =
     {5, "Executive Administrator", "Executive Administration", "{0069ff}"}
 };
 
-new const PVCategorys[11][] =
+new const g_sCustomCarCategories[11][] =
 {
 	/*0*/{"Lowriders"},
 	/*1*/{"Sport Vehicles"},
@@ -1686,7 +1689,7 @@ new const HouseIntTypes[15][e_house_type] =
 new Iterator:RaceJoins<MAX_PLAYERS>,
 	Iterator:DerbyVoters<MAX_PLAYERS>,
 	Iterator:PlayerIgnore[MAX_PLAYERS]<MAX_PLAYERS>,
-	Iterator:LottoNumbersUsed<75>,
+	Iterator:itterLottoNumberPool<75>,
 	Iterator:iterGangWar<1000>,
 	Float:g_RaceVehCoords[RACE_MAX_PLAYERS][4],
 	Float:g_RaceCPs[RACE_MAX_CHECKPOINTS][3],
@@ -1721,28 +1724,21 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
 	g_RaceVehicle[MAX_PLAYERS],
 	g_RacePosition[MAX_PLAYERS],
 	m_PlayerRecord,
-	g_CarShops[CAR_SHOPS][E_CAR_SHOP],
+	g_CustomCarShops[CAR_SHOPS][E_CAR_SHOP],
 	gstr[144],
 	gstr2[255],
-	lotto_number,
-	lotto_jackpot,
+	g_LottoNumber,
+	g_LottoJackpot,
 	bool:bLottoActive = false,
 	g_Teleports[MAX_TELE_CATEGORIES][MAX_TELES_PER_CATEGORY][16],
 	g_TeleportIndex[MAX_TELE_CATEGORIES],
 	g_TeleportDialogString[MAX_TELE_CATEGORIES][2048],
-	SrvStat[4],
-	sPVCategory[512],
+	g_ServerStats[4],
+	g_sCustomCarCategory[512],
 	mathsAnswered = -1,
 	mathsCurrent[14],
 	mathsAnswer,
 	mathsAward,
-	engine,
- 	lights,
- 	alarm,
- 	doors,
- 	bonnet,
- 	boot,
- 	objective,
 	bool:IsMellnikGateMoving = false,
 	bool:IsMellnikRampMoving = false,
 	MellnikGate,
@@ -3592,7 +3588,7 @@ public OnPlayerCommandPerformed(playerid, cmdtext[], success)
 	if(!success) {
 	    player_notice(playerid, "Unknown command", "Type ~y~/c ~w~for all commands");
 	} else {
-	    SrvStat[0]++;
+	    g_ServerStats[0]++;
 	}
 	return 1;
 }
@@ -4346,7 +4342,7 @@ public OnPlayerText(playerid, text[])
 		}
 	}
 
-    SrvStat[1]++;
+    g_ServerStats[1]++;
 
 	if(PlayerData[playerid][e_level] >= 1 && PlayerData[playerid][bDuty] && text[0] == '#')
 	{
@@ -4529,7 +4525,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 
 	if(IsPlayerAvail(killerid))
 	{
-	    SrvStat[3]++;
+	    g_ServerStats[3]++;
 		PlayerData[killerid][e_kills]++;
  		GivePlayerMoneyEx(playerid, -250);
 
@@ -5912,14 +5908,14 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 
 			for(new i = 0; i < CAR_SHOPS; i++)
 			{
-			    if(pickupid == g_CarShops[i][e_pickup])
+			    if(pickupid == g_CustomCarShops[i][e_pickup])
 			    {
 			        LoadMap(playerid);
 			        SetPlayerInterior(playerid, 15);
 			        SetPlayerPosEx(playerid, -1405.5538, 989.1526, floatadd(1049.0078, 3.0));
 			        ResetPlayerWeapons(playerid);
 			        gTeam[playerid] = BUYCAR;
-			        gLastMap[playerid] = g_CarShops[i][e_pickup];
+			        gLastMap[playerid] = g_CustomCarShops[i][e_pickup];
 			        return 1;
 			    }
 			}
@@ -5942,7 +5938,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 		    {
 			    for(new i = 0; i < CAR_SHOPS; i++)
 			    {
-			        if(gLastMap[playerid] == g_CarShops[i][e_pickup])
+			        if(gLastMap[playerid] == g_CustomCarShops[i][e_pickup])
 			        {
 						SetPlayerInterior(playerid, 0);
 					    SetPlayerPos(playerid, g_CarShopLocations[i][0] - 2.0, g_CarShopLocations[i][1] - 2.0, g_CarShopLocations[i][2] + 0.5);
@@ -15932,10 +15928,10 @@ YCMD:lotto(playerid, params[], help)
 	}
 	
 	if(lotto < 1 || lotto > 75) return SCM(playerid, -1, ""er"Invalid lotto number");
-	if(Iter_Contains(LottoNumbersUsed, lotto)) return SCM(playerid, -1, ""er"This lotto number is already in use!");
+	if(Iter_Contains(itterLottoNumberPool, lotto)) return SCM(playerid, -1, ""er"This lotto number is already in use!");
 	
 	PlayerData[playerid][DrawnNumber] = lotto;
-	Iter_Add(LottoNumbersUsed, PlayerData[playerid][DrawnNumber]);
+	Iter_Add(itterLottoNumberPool, PlayerData[playerid][DrawnNumber]);
 	
 	GivePlayerMoneyEx(playerid, -500);
 	
@@ -18464,58 +18460,68 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        {
 	            switch(listitem) // "Engine control\nLight control\nAlarm\nBonnet\nBoot"
 	            {
-					case 0: ShowPlayerDialog(playerid, VCONTROL_DIALOG+1, DIALOG_STYLE_MSGBOX, ""white"VCS > Toggle engine", ""white"Do you want to start or stop your engine?", "Start", "Stop");
-                    case 1: ShowPlayerDialog(playerid, VCONTROL_DIALOG+2, DIALOG_STYLE_MSGBOX, ""white"VCS > Toggle lights", ""white"Do you want to enable or disable your lights?\n\nNOTE: Lights are only visible at night.", "Enable", "Disable");
-                    case 2: ShowPlayerDialog(playerid, VCONTROL_DIALOG+3, DIALOG_STYLE_MSGBOX, ""white"VCS > Toggle alarm", ""white"Do you want to enable or disable your alarm?\n\nNOTE: The alarm will not reset itself when it's over,\nyou'll need to reset it by yourself.", "Enable", "Disable");
-                    case 3: ShowPlayerDialog(playerid, VCONTROL_DIALOG+4, DIALOG_STYLE_MSGBOX, ""white"VCS > Toggle bonnet", ""white"Do you want to open or close your bonnet?", "Open", "Close");
-                    case 4: ShowPlayerDialog(playerid, VCONTROL_DIALOG+5, DIALOG_STYLE_MSGBOX, ""white"VCS > Toggle boot", ""white"Do you want to open or close your boot?", "Open", "Close");
+					case 0: ShowPlayerDialog(playerid, VCONTROL_DIALOG + 1, DIALOG_STYLE_MSGBOX, ""white"VCS > Toggle engine", ""white"Do you want to start or stop your engine?", "Start", "Stop");
+                    case 1: ShowPlayerDialog(playerid, VCONTROL_DIALOG + 2, DIALOG_STYLE_MSGBOX, ""white"VCS > Toggle lights", ""white"Do you want to enable or disable your lights?\n\nNOTE: Lights are only visible at night.", "Enable", "Disable");
+                    case 2: ShowPlayerDialog(playerid, VCONTROL_DIALOG + 3, DIALOG_STYLE_MSGBOX, ""white"VCS > Toggle alarm", ""white"Do you want to enable or disable your alarm?\n\nNOTE: The alarm will not reset itself when it's over,\nyou'll need to reset it by yourself.", "Enable", "Disable");
+                    case 3: ShowPlayerDialog(playerid, VCONTROL_DIALOG + 4, DIALOG_STYLE_MSGBOX, ""white"VCS > Toggle bonnet", ""white"Do you want to open or close your bonnet?", "Open", "Close");
+                    case 4: ShowPlayerDialog(playerid, VCONTROL_DIALOG + 5, DIALOG_STYLE_MSGBOX, ""white"VCS > Toggle boot", ""white"Do you want to open or close your boot?", "Open", "Close");
 	            }
 	            return true;
 	        }
-	        case VCONTROL_DIALOG+1:
+	        case VCONTROL_DIALOG + 1:
 	        {
      			if(GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
 				{
 				    return SCM(playerid, -1, ""er"You must be a driver in a vehicle to use vehicle control!");
 				}
-     			GetVehicleParamsEx(GetPlayerVehicleID(playerid), engine, lights, alarm, doors, bonnet, boot, objective);
-            	SetVehicleParamsEx(GetPlayerVehicleID(playerid), 1, lights, alarm, doors, bonnet, boot, objective);
+				new vehicle_params[7],
+				    vehicle = GetPlayerVehicleID(playerid);
+     			GetVehicleParamsEx(vehicle, vehicle_params[0], vehicle_params[1], vehicle_params[2], vehicle_params[3], vehicle_params[4], vehicle_params[5], vehicle_params[6]);
+            	SetVehicleParamsEx(vehicle, 1, vehicle_params[1], vehicle_params[2], vehicle_params[3], vehicle_params[4], vehicle_params[5], vehicle_params[6]);
 	        }
-	        case VCONTROL_DIALOG+2:
+	        case VCONTROL_DIALOG + 2:
 	        {
      			if(GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
 				{
 				    return SCM(playerid, -1, ""er"You must be a driver in a vehicle to use vehicle control!");
 				}
-				GetVehicleParamsEx(GetPlayerVehicleID(playerid), engine, lights, alarm, doors, bonnet, boot, objective);
-				SetVehicleParamsEx(GetPlayerVehicleID(playerid), engine, 1, alarm, doors, bonnet, boot, objective);
+				new vehicle_params[7],
+				    vehicle = GetPlayerVehicleID(playerid);
+     			GetVehicleParamsEx(vehicle, vehicle_params[0], vehicle_params[1], vehicle_params[2], vehicle_params[3], vehicle_params[4], vehicle_params[5], vehicle_params[6]);
+				SetVehicleParamsEx(vehicle, vehicle_params[0], 1, vehicle_params[2], vehicle_params[3], vehicle_params[4], vehicle_params[5], vehicle_params[6]);
 	        }
-	        case VCONTROL_DIALOG+3:
+	        case VCONTROL_DIALOG + 3:
 	        {
      			if(GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
 				{
 				    return SCM(playerid, -1, ""er"You must be a driver in a vehicle to use vehicle control!");
 				}
-				GetVehicleParamsEx(GetPlayerVehicleID(playerid), engine, lights, alarm, doors, bonnet, boot, objective);
-				SetVehicleParamsEx(GetPlayerVehicleID(playerid), engine, lights, 1, doors, bonnet, boot, objective);
+				new vehicle_params[7],
+				    vehicle = GetPlayerVehicleID(playerid);
+     			GetVehicleParamsEx(vehicle, vehicle_params[0], vehicle_params[1], vehicle_params[2], vehicle_params[3], vehicle_params[4], vehicle_params[5], vehicle_params[6]);
+				SetVehicleParamsEx(vehicle, vehicle_params[0], vehicle_params[1], 1, vehicle_params[3], vehicle_params[4], vehicle_params[5], vehicle_params[6]);
 	        }
-	        case VCONTROL_DIALOG+4:
+	        case VCONTROL_DIALOG + 4:
 	        {
      			if(GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
 				{
 				    return SCM(playerid, -1, ""er"You must be a driver in a vehicle to use vehicle control!");
 				}
-				GetVehicleParamsEx(GetPlayerVehicleID(playerid), engine, lights, alarm, doors, bonnet, boot, objective);
-				SetVehicleParamsEx(GetPlayerVehicleID(playerid), engine, lights, alarm, doors, 1, boot, objective);
+				new vehicle_params[7],
+				    vehicle = GetPlayerVehicleID(playerid);
+     			GetVehicleParamsEx(vehicle, vehicle_params[0], vehicle_params[1], vehicle_params[2], vehicle_params[3], vehicle_params[4], vehicle_params[5], vehicle_params[6]);
+				SetVehicleParamsEx(vehicle, vehicle_params[0], vehicle_params[1], vehicle_params[2], vehicle_params[3], 1, vehicle_params[5], vehicle_params[6]);
 	        }
-	        case VCONTROL_DIALOG+5:
+	        case VCONTROL_DIALOG + 5:
 	        {
      			if(GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
 				{
 				    return SCM(playerid, -1, ""er"You must be a driver in a vehicle to use vehicle control!");
 				}
-				GetVehicleParamsEx(GetPlayerVehicleID(playerid), engine, lights, alarm, doors, bonnet, boot, objective);
-				SetVehicleParamsEx(GetPlayerVehicleID(playerid), engine, lights, alarm, doors, bonnet, 1, objective);
+				new vehicle_params[7],
+				    vehicle = GetPlayerVehicleID(playerid);
+     			GetVehicleParamsEx(vehicle, vehicle_params[0], vehicle_params[1], vehicle_params[2], vehicle_params[3], vehicle_params[4], vehicle_params[5], vehicle_params[6]);
+				SetVehicleParamsEx(vehicle, vehicle_params[0], vehicle_params[1], vehicle_params[2], vehicle_params[3], vehicle_params[4], 1, vehicle_params[6]);
 	        }
 	        case NAME_CHANGE_DIALOG:
 	        {
@@ -19977,7 +19983,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			    
 			    PVCatSel[playerid] = listitem;
 			    
-			    format(gstr, sizeof(gstr), ""nef" :: Custom cars > %s", PVCategorys[listitem]);
+			    format(gstr, sizeof(gstr), ""nef" :: Custom cars > %s", g_sCustomCarCategories[listitem]);
 			    ShowPlayerDialog(playerid, CARBUY_DIALOG + 1, DIALOG_STYLE_LIST, gstr, string, "Select", "Back");
 			    return true;
 			}
@@ -20292,50 +20298,60 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
  		    {
  		        ShowDialog(playerid, CM_DIALOG);
  		    }
-	        case VCONTROL_DIALOG+1:
+	        case VCONTROL_DIALOG + 1:
 	        {
      			if(GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
 				{
 				    return SCM(playerid, -1, ""er"You must be a driver in a vehicle to use vehicle control!");
 				}
-     			GetVehicleParamsEx(GetPlayerVehicleID(playerid), engine, lights, alarm, doors, bonnet, boot, objective);
-            	SetVehicleParamsEx(GetPlayerVehicleID(playerid), 0, lights, alarm, doors, bonnet, boot, objective);
+				new vehicle_params[7],
+				    vehicle = GetPlayerVehicleID(playerid);
+     			GetVehicleParamsEx(vehicle, vehicle_params[0], vehicle_params[1], vehicle_params[2], vehicle_params[3], vehicle_params[4], vehicle_params[5], vehicle_params[6]);
+            	SetVehicleParamsEx(vehicle, 0, vehicle_params[1], vehicle_params[2], vehicle_params[3], vehicle_params[4], vehicle_params[5], vehicle_params[6]);
 	        }
-	        case VCONTROL_DIALOG+2:
+	        case VCONTROL_DIALOG + 2:
 	        {
      			if(GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
 				{
 				    return SCM(playerid, -1, ""er"You must be a driver in a vehicle to use vehicle control!");
 				}
-				GetVehicleParamsEx(GetPlayerVehicleID(playerid), engine, lights, alarm, doors, bonnet, boot, objective);
-				SetVehicleParamsEx(GetPlayerVehicleID(playerid), engine, 0, alarm, doors, bonnet, boot, objective);
+				new vehicle_params[7],
+				    vehicle = GetPlayerVehicleID(playerid);
+     			GetVehicleParamsEx(vehicle, vehicle_params[0], vehicle_params[1], vehicle_params[2], vehicle_params[3], vehicle_params[4], vehicle_params[5], vehicle_params[6]);
+				SetVehicleParamsEx(vehicle, vehicle_params[0], 0, vehicle_params[2], vehicle_params[3], vehicle_params[4], vehicle_params[5], vehicle_params[6]);
 	        }
-	        case VCONTROL_DIALOG+3:
+	        case VCONTROL_DIALOG + 3:
 	        {
      			if(GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
 				{
 				    return SCM(playerid, -1, ""er"You must be a driver in a vehicle to use vehicle control!");
 				}
-				GetVehicleParamsEx(GetPlayerVehicleID(playerid), engine, lights, alarm, doors, bonnet, boot, objective);
-				SetVehicleParamsEx(GetPlayerVehicleID(playerid), engine, lights, 0, doors, bonnet, boot, objective);
+				new vehicle_params[7],
+				    vehicle = GetPlayerVehicleID(playerid);
+     			GetVehicleParamsEx(vehicle, vehicle_params[0], vehicle_params[1], vehicle_params[2], vehicle_params[3], vehicle_params[4], vehicle_params[5], vehicle_params[6]);
+				SetVehicleParamsEx(vehicle, vehicle_params[0], vehicle_params[1], 0, vehicle_params[3], vehicle_params[4], vehicle_params[5], vehicle_params[6]);
 	        }
-	        case VCONTROL_DIALOG+4:
+	        case VCONTROL_DIALOG + 4:
 	        {
      			if(GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
 				{
 				    return SCM(playerid, -1, ""er"You must be a driver in a vehicle to use vehicle control!");
 				}
-				GetVehicleParamsEx(GetPlayerVehicleID(playerid), engine, lights, alarm, doors, bonnet, boot, objective);
-				SetVehicleParamsEx(GetPlayerVehicleID(playerid), engine, lights, alarm, doors, 0, boot, objective);
+				new vehicle_params[7],
+				    vehicle = GetPlayerVehicleID(playerid);
+     			GetVehicleParamsEx(vehicle, vehicle_params[0], vehicle_params[1], vehicle_params[2], vehicle_params[3], vehicle_params[4], vehicle_params[5], vehicle_params[6]);
+				SetVehicleParamsEx(vehicle, vehicle_params[0], vehicle_params[1], vehicle_params[2], vehicle_params[3], 0, vehicle_params[5], vehicle_params[6]);
 	        }
-	        case VCONTROL_DIALOG+5:
+	        case VCONTROL_DIALOG + 5:
 	        {
      			if(GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
 				{
 				    return SCM(playerid, -1, ""er"You must be a driver in a vehicle to use vehicle control!");
 				}
-				GetVehicleParamsEx(GetPlayerVehicleID(playerid), engine, lights, alarm, doors, bonnet, boot, objective);
-				SetVehicleParamsEx(GetPlayerVehicleID(playerid), engine, lights, alarm, doors, bonnet, 0, objective);
+				new vehicle_params[7],
+				    vehicle = GetPlayerVehicleID(playerid);
+     			GetVehicleParamsEx(vehicle, vehicle_params[0], vehicle_params[1], vehicle_params[2], vehicle_params[3], vehicle_params[4], vehicle_params[5], vehicle_params[6]);
+				SetVehicleParamsEx(vehicle, vehicle_params[0], vehicle_params[1], vehicle_params[2], vehicle_params[3], vehicle_params[4], 0, vehicle_params[6]);
 	        }
  		    case GMENU_DIALOG + 1:
  		    {
@@ -21415,7 +21431,7 @@ SkipLogin(playerid)
 		format(gstr, sizeof(gstr), "~y~[] ~w~%i", PlayerData[playerid][e_wanteds]);
 		PlayerTextDrawSetString(playerid, TXTWantedsTD[playerid], gstr);
 
-		SrvStat[2]++;
+		g_ServerStats[2]++;
 
         mysql_format(pSQL, gstr, sizeof(gstr), "UPDATE `online` SET `name` = '%e' WHERE `name` = '%e';", newname, oldname);
         mysql_tquery(pSQL, gstr);
@@ -21879,7 +21895,7 @@ function:OnPlayerRegister(playerid, namehash, register, password[], playername[]
 			PlayerData[playerid][ConnectTime] = gettime();
 		    PlayerData[playerid][bAllowSpawn] = true;
 		    PlayerData[playerid][bLogged] = true;
-            SrvStat[2]++;
+            g_ServerStats[2]++;
 
 			format(gstr, sizeof gstr, "["SVRSC"] %s(%i) "GREEN_E"has registered, making the server have a total of "LB2_E"%i "GREEN_E"players registered.", __GetName(playerid), playerid, cache_insert_id());
 			SCMToAll(COLOR_PINK, gstr);
@@ -21906,7 +21922,7 @@ function:OnPlayerRegister(playerid, namehash, register, password[], playername[]
 		else if(register == REGISTER_ONLINE)
 		{
 		    PlayerData[playerid][bLogged] = true;
-            SrvStat[2]++;
+            g_ServerStats[2]++;
 
 			format(gstr, sizeof gstr, "["SVRSC"] %s(%i) "GREEN_E"has registered, making the server have a total of "LB2_E"%i "GREEN_E"players registered.", __GetName(playerid), playerid, cache_insert_id());
 			SCMToAll(COLOR_PINK, gstr);
@@ -23070,10 +23086,10 @@ server_initialize()
 	for(new i = 1; i < MAX_REPORTS; i++)
 		Reports[i] = "<none>";
 
-	for(new i = 0; i < sizeof(PVCategorys); i++)
+	for(new i = 0; i < sizeof(g_sCustomCarCategories); i++)
 	{
-	    format(gstr, sizeof(gstr), "%s\n", PVCategorys[i]);
-	    strcat(sPVCategory, gstr);
+	    format(gstr, sizeof(gstr), "%s\n", g_sCustomCarCategories[i]);
+	    strcat(g_sCustomCarCategory, gstr);
 	}
 	
 	for(new i = 0; i < MAX_GZONES; i++)
@@ -23388,9 +23404,9 @@ server_load_visuals()
 
 	for(new i = 0; i < CAR_SHOPS; i++)
 	{
-		g_CarShops[i][e_pickup] = CreateDynamicPickup(1559, 23, g_CarShopLocations[i][0], g_CarShopLocations[i][1], g_CarShopLocations[i][2], 0, -1, -1, 200.0);
-		g_CarShops[i][e_mapicon] = CreateDynamicMapIcon(g_CarShopLocations[i][0], g_CarShopLocations[i][1], g_CarShopLocations[i][2], 55, 1, 0, -1, -1, 200.0);
-		g_CarShops[i][e_3dlabel] = CreateDynamic3DTextLabel(""white"["nef_green"Custom car shop"white"]", 1, g_CarShopLocations[i][0], g_CarShopLocations[i][1], g_CarShopLocations[i][2] + 0.5, 300.0);
+		g_CustomCarShops[i][e_pickup] = CreateDynamicPickup(1559, 23, g_CarShopLocations[i][0], g_CarShopLocations[i][1], g_CarShopLocations[i][2], 0, -1, -1, 200.0);
+		g_CustomCarShops[i][e_mapicon] = CreateDynamicMapIcon(g_CarShopLocations[i][0], g_CarShopLocations[i][1], g_CarShopLocations[i][2], 55, 1, 0, -1, -1, 200.0);
+		g_CustomCarShops[i][e_3dlabel] = CreateDynamic3DTextLabel(""white"["nef_green"Custom car shop"white"]", 1, g_CarShopLocations[i][0], g_CarShopLocations[i][1], g_CarShopLocations[i][2] + 0.5, 300.0);
 	}
 
     g_AdminLCTo = CreateDynamicPickup(1559, 23, 1805.7494,-1302.6721,120.2656);
@@ -27474,7 +27490,7 @@ function:ShowDialog(playerid, dialogid)
 	    {
 	        new string[680];
 	        format(string, sizeof(string), "%s since %s. During that time...\n\n... "yellow_e"%i "white"commands have been performed\n... "yellow_e"%i "white"chat messages have been sent\n... "yellow_e"%i "white"new players have registered\n... "yellow_e"%i "white"players have been murdered",
-				GetUptime(), UTConvert(StartTime), SrvStat[0], SrvStat[1], SrvStat[2], SrvStat[3]);
+				GetUptime(), UTConvert(StartTime), g_ServerStats[0], g_ServerStats[1], g_ServerStats[2], g_ServerStats[3]);
 				
 			format(gstr2, sizeof(gstr2), "\n\nStreamed client objects: %i\nTotal map obejcts: %i\nServer FPS: %i\nPlayer record: %i", Streamer_CountVisibleItems(playerid, STREAMER_TYPE_OBJECT), Streamer_CountItems(STREAMER_TYPE_OBJECT), GetServerTickRate(), m_PlayerRecord);
 	        strcat(string, gstr2);
@@ -27675,7 +27691,7 @@ function:ShowDialog(playerid, dialogid)
 		}
 		case CARBUY_DIALOG:
 		{
-  			ShowPlayerDialog(playerid, CARBUY_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Custom car shop", sPVCategory, "Select", "Cancel");
+  			ShowPlayerDialog(playerid, CARBUY_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Custom car shop", g_sCustomCarCategory, "Select", "Cancel");
 		}
 		case GMENU_DIALOG:
 		{
@@ -28543,12 +28559,12 @@ IRC_SetUp(bool:restart = false)
 
 function:DoLotto()
 {
-	Iter_Clear(LottoNumbersUsed);
-	lotto_number = random(75) + 1;
-	lotto_jackpot = 200000 + random(100000);
+	Iter_Clear(itterLottoNumberPool);
+	g_LottoNumber = random(75) + 1;
+	g_LottoJackpot = 200000 + random(100000);
 	bLottoActive = true;
 
-	format(gstr, sizeof(gstr), "~g~~h~~<~ Lottery Information ~>~~n~~w~Buy a lotto in any 24/7 shop (/247) inside use /lotto <1-75>~n~~r~~h~Jackpot: $%s - Draw starts in 5 minutes!", number_format(lotto_jackpot));
+	format(gstr, sizeof(gstr), "~g~~h~~<~ Lottery Information ~>~~n~~w~Buy a lotto in any 24/7 shop (/247) inside use /lotto <1-75>~n~~r~~h~Jackpot: $%s - Draw starts in 5 minutes!", number_format(g_LottoJackpot));
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -28564,20 +28580,20 @@ function:LottoDraw()
 {
     bLottoActive = false;
 
-	format(gstr2, sizeof(gstr2), "~g~~h~~<~ Lottery Information ~>~~n~~w~Numbers have been drawn. Current jackpot is: $%s - Drawn number: %i~n~~b~~h~~h~", number_format(lotto_jackpot), lotto_number);
+	format(gstr2, sizeof(gstr2), "~g~~h~~<~ Lottery Information ~>~~n~~w~Numbers have been drawn. Current jackpot is: $%s - Drawn number: %i~n~~b~~h~~h~", number_format(g_LottoJackpot), g_LottoNumber);
 	
 	new bool:found = false;
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(!IsPlayerAvail(i)) continue;
-	    if(PlayerData[i][DrawnNumber] == lotto_number)
+	    if(PlayerData[i][DrawnNumber] == g_LottoNumber)
 	    {
-			format(gstr, sizeof(gstr), "We have a winner! %s(%i) has lotto %i and won the jackpot!", __GetName(i), i, lotto_number, number_format(lotto_jackpot));
+			format(gstr, sizeof(gstr), "We have a winner! %s(%i) has lotto %i and won the jackpot!", __GetName(i), i, g_LottoNumber, number_format(g_LottoJackpot));
 	        strcat(gstr2, gstr);
-	        GivePlayerMoneyEx(i, lotto_jackpot, true, true);
+	        GivePlayerMoneyEx(i, g_LottoJackpot, true, true);
 	        PlayerPlaySound(i, 5448, 0, 0, 0);
 	        player_notice(i, "~g~~h~~h~You won the lotto jackpot!", "", 4000);
-	 		format(gstr, sizeof(gstr), "5%s(%i)3 won the lottery! Prize: $%s", __GetName(i), i, number_format(lotto_jackpot));
+	 		format(gstr, sizeof(gstr), "5%s(%i)3 won the lottery! Prize: $%s", __GetName(i), i, number_format(g_LottoJackpot));
 	        IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 	        found = true;
 	        break;
@@ -28937,7 +28953,7 @@ ExitPlayer(playerid)
 	    {
 		    for(new i = 0; i < CAR_SHOPS; i++)
 		    {
-		        if(gLastMap[playerid] == g_CarShops[i][e_pickup])
+		        if(gLastMap[playerid] == g_CustomCarShops[i][e_pickup])
 		        {
 					SetPlayerInterior(playerid, 0);
 				    SetPlayerPos(playerid, g_CarShopLocations[i][0] - 2.0, g_CarShopLocations[i][1] - 2.0, g_CarShopLocations[i][2] + 0.5);
