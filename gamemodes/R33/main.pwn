@@ -638,6 +638,7 @@ enum SUSPECT:(<<= 1)
 {
 	SUSPECT_VALID_ARMOR = 1,
 	SUSPECT_PROAIM,
+	SUSPECT_CRASHER_OPWS,
 	SUSPECT_IMMUNE
 };
 
@@ -3659,6 +3660,7 @@ public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY
 	/* ANTI FAKE DATA */
 	if(weaponid == 0) {
 		Log(LOG_SUSPECT, "OPWS triggered by %i using %i, %i, %i", playerid, weaponid, hittype, hitid);
+		PlayerData[playerid][bwSuspect] |= SUSPECT_CRASHER_OPWS;
 	    return 0;
 	}
 	
@@ -9720,6 +9722,10 @@ YCMD:suspect(playerid, params[], help)
    			if(PlayerData[i][bwSuspect] & SUSPECT_PROAIM) {
    			    format(tmpstring, sizeof(tmpstring), "%i) %s(%i) - AC_SUSPECT_PROAIM\n", ++count, __GetName(i), i);
    			    strcat(finstring, tmpstring);
+   			}
+   			if(PlayerData[i][bwSuspect] & SUSPECT_CRASHER_OPWS) {
+   			    format(tmpstring, sizeof(tmpstring), "%i) %s(%i) - AC_SUSPECT_CRASHER_OPWS\n", ++count, __GetName(i), i);
+				strcat(finstring, tmpstring);
    			}
 		}
 		
