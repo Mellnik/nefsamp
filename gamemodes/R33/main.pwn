@@ -95,13 +95,13 @@ Float:GetDistance3D(Float:x1, Float:y1, Float:z1, Float:x2, Float:y2, Float:z2);
 #define HOSTNAME                        " 	      ..:: NEF ::.. ×Stunt/DM/Race/Minigames×"
 #define NEF_VERSION_MAJOR               33
 #define NEF_VERSION_MINOR               0
-#define NEF_VERSION_PATCH               4
+#define NEF_VERSION_PATCH               5
 #if IS_RELEASE_BUILD == true
 #define CURRENT_VERSION                 "Build 33"
 #else
 #define CURRENT_VERSION                 "PTS:Build 33"
 #endif
-#define HOTFIX_REV                      "Hotfix #4"
+#define HOTFIX_REV                      "Hotfix #5"
 #define SAMP_VERSION                    "SA-MP 0.3z-R2"
 #define MAX_REPORTS 					(7)
 #define MAX_ADS                         (10)
@@ -9753,7 +9753,7 @@ YCMD:onlinefix(playerid, params[], help)
 	        if(IsPlayerConnected(i))
 	        {
 				format(gstr, sizeof(gstr), "INSERT INTO `online` VALUES (NULL, '%s', '%s', UNIX_TIMESTAMP());", __GetName(i), __GetIP(i));
-				mysql_tquery(pSQL, gstr, "", "");
+				mysql_pquery(pSQL, gstr);
 	        }
 	    }
 	    
@@ -22253,19 +22253,18 @@ Elevator_Initialize()
 
 	Label_Elevator = Create3DTextLabel("Press 'F' to use elevator", NEF_YELLOW, 1784.9822, -1302.0426, 13.6491, 4.0, 0, 1);
 
-	new string[128],
-		Float:z;
+	new Float:z;
 
 	for(new i = 0; i < sizeof(Obj_FloorDoors); i++)
 	{
 	    Obj_FloorDoors[i][0] = CreateObject(18757, X_DOOR_CLOSED, -1303.171142, GetDoorsZCoordForFloor(i), 0.000000, 0.000000, 270.000000);
 		Obj_FloorDoors[i][1] = CreateObject(18756, X_DOOR_CLOSED, -1303.171142, GetDoorsZCoordForFloor(i), 0.000000, 0.000000, 270.000000);
 
-		format(string, sizeof(string), "%s\nPress 'F' to call Elevator", FloorNames[i]);
+		format(gstr, sizeof(gstr), "%s\nPress 'F' to call Elevator", FloorNames[i]);
 
 		z = (i == 0) ? (13.4713) : (13.4713 + 8.7396 + ((i-1) * 5.45155));
 
-		Label_Floors[i] = CreateDynamic3DTextLabel(string, RED, 1783.9799, -1300.7660, z, 10.5, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, 0);
+		Label_Floors[i] = CreateDynamic3DTextLabel(gstr, RED, 1783.9799, -1300.7660, z, 10.5, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, 0);
 	}
 
 	Floor_OpenDoors(0);
