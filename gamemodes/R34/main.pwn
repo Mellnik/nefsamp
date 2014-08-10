@@ -21839,7 +21839,7 @@ MySQL_DestroyGang(playerid, gangname[])
 MySQL_GangRename(playerid, newgangname[], newgangtag[])
 {
 	mysql_format(pSQL, gstr2, sizeof(gstr2), "SELECT `ID` FROM `gangs` WHERE `GangName` = '%e';", newgangname);
-	mysql_pquery(pSQL, gstr2, "OnGangRenameAttempt", "iss", playerid, newgangname, newgangtag);
+	mysql_pquery(pSQL, gstr2, "OnGangRenameAttempt", "issi", playerid, newgangname, newgangtag, YHash(__GetName(playerid)));
 }
 
 MySQL_RegisterAccount(playerid, register, password[])
@@ -23069,13 +23069,6 @@ server_initialize()
 	SendRconCommand("weburl "SVRURLWWW"");
     SetGameModeText("TdmDerbyRaceCNRFunStuntFreeroam");
 	SendRconCommand("mapname "SVRSC" "CURRENT_VERSION"");
-	SendRconCommand("playertimeout 8000");
-	SendRconCommand("ackslimit 4000");
-	SendRconCommand("messageslimit 520");
-	SendRconCommand("messageholelimit 1900");
-	SendRconCommand("rcon 0");
-	SendRconCommand("maxnpc 0");
-	SendRconCommand("chatlogging 0");
 	
 	EnableVehicleFriendlyFire();
 	ShowPlayerMarkers(1);
@@ -29309,8 +29302,11 @@ GetCredits(playerid)
 	return c;
 }
 
-function:OnGangRenameAttempt(playerid, newgangname[], newgangtag[])
+function:OnGangRenameAttempt(playerid, newgangname[], newgangtag[], namehash)
 {
+	if(namehash != YHash(__GetName(playerid)))
+	    return 0;
+
 	if(cache_get_row_count() > 0)
 	{
 		SCM(playerid, -1, ""er"This gang name is already in use");
