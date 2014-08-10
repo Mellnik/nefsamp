@@ -1,6 +1,6 @@
 /*======================================================================*\
 || #################################################################### ||
-|| # Project New Evolution Freeroam - Build 33           			  # ||
+|| # Project New Evolution Freeroam - Build 34           			  # ||
 || # ---------------------------------------------------------------- # ||
 || # Copyright (c)2011-2014 New Evolution Freeroam  				  # ||
 || # Created by Mellnik                                               # ||
@@ -10,11 +10,11 @@
 \*======================================================================*/
 
 /* Build Dependencies
-|| SA-MP Server 0.3z-R2
+|| SA-MP Server 0.3z-R3
 || YSI Library 3.2
 || sscanf Plugin 2.8.1
-|| Streamer Plugin v2.7
-|| MySQL Plugin R39-2
+|| Streamer Plugin v2.7.3
+|| MySQL Plugin R38
 || IRC Plugin 1.4.5
 ||
 || Build specific:
@@ -47,7 +47,7 @@
 #include <YSI\y_va>
 #include <sscanf2>
 #include <streamer>
-#include <a_mysql_R39-2>
+#include <a_mysql_R38>
 #include <irc>
 #include <a_zones>          // V2.0
 #include <mSelection>       // 1.1 R3
@@ -91,18 +91,18 @@ Float:GetDistance3D(Float:x1, Float:y1, Float:z1, Float:x2, Float:y2, Float:z2);
 #define SVRURL                          "nefserver.net"
 #define SVRURLWWW                       "www.nefserver.net"
 #define SVRFORUM                        "forum.nefserver.net"
-#define SERVER_IP                       "31.204.152.218:7777"
+#define SERVER_IP                       "31.204.153.110:7777"
 #define HOSTNAME                        " 	      ..:: NEF ::.. ×Stunt/DM/Race/Minigames×"
-#define NEF_VERSION_MAJOR               33
+#define NEF_VERSION_MAJOR               34
 #define NEF_VERSION_MINOR               0
-#define NEF_VERSION_PATCH               5
+#define NEF_VERSION_PATCH               0
 #if IS_RELEASE_BUILD == true
-#define CURRENT_VERSION                 "Build 33"
+#define CURRENT_VERSION                 "Build 34"
 #else
-#define CURRENT_VERSION                 "PTS:Build 33"
+#define CURRENT_VERSION                 "PTS:Build 34"
 #endif
-#define HOTFIX_REV                      "Hotfix #5"
-#define SAMP_VERSION                    "SA-MP 0.3z-R2"
+#define HOTFIX_REV                      "Hotfix #0"
+#define SAMP_VERSION                    "SA-MP 0.3z-R3"
 #define MAX_REPORTS 					(7)
 #define MAX_ADS                         (10)
 #define MAX_GANG_NAME					(20)
