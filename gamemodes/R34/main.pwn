@@ -1567,7 +1567,7 @@ static const g_SAZones[][SAZONE_MAIN] = {  // Majority of names and area coordin
 	{"Whetstone",                   {-2997.40,-2892.90,-242.90,-1213.90,-1115.50,900.00}}
 };
 
-static const szRandomInfoTXTs[14][] =
+static const g_szRandomTdMessages[14][] =
 {
     "~w~Need a ~b~~h~vehicle~w~? Spawn one using ~r~~h~/v~w~!",
 	"~w~Don't wanna get killed? Type ~g~~h~~h~/god",
@@ -1585,7 +1585,7 @@ static const szRandomInfoTXTs[14][] =
 	"~w~Challenge your friends in ~r~~h~~h~/duel"
 };
 
-static const BusinessTypes[5][] =
+static const g_szBusinessTypes[5][] =
 {
 	"Loan Sharks",
 	"Robbery",
@@ -1594,7 +1594,7 @@ static const BusinessTypes[5][] =
 	"Meth Lab"
 };
 
-new const ServerMSGS[15][] =
+static const g_szRandomServerMessages[15][] =
 {
 	""yellow_e"- Server - "LB2_E"Visit our site: "SVRURLWWW"",
 	""yellow_e"- Server - "LB2_E"Join Minigames for money and score - /help",
@@ -1613,7 +1613,7 @@ new const ServerMSGS[15][] =
 	""yellow_e"- Server - "LB2_E"Get your own car at /vs which you can tune!"
 };
 
-new const stock GangCarLevels[7][2] =
+static const stock GangCarLevels[7][2] =
 {
 	{567, 500},
 	{517, 1000},
@@ -1840,7 +1840,7 @@ new Derby_Map9Spawns[MAX_DERBY_PLAYERS][e_derby_map9_data] =
 	{4507.0502, -1796.4394, 3.5054, 120.5433, false}
 };
 
-new const GangPositions[8][e_gang_pos] =
+static const g_szGangRanks[8][e_gang_pos] =
 {
 	{"None"},
 	{"Junior Member"},
@@ -1852,7 +1852,7 @@ new const GangPositions[8][e_gang_pos] =
 	{"Gang Founder"}
 };
 
-new const StaffLevels[MAX_ADMIN_LEVEL + 1][E_STAFF_LEVELS] =
+static const g_szStaffLevelNames[MAX_ADMIN_LEVEL + 1][E_STAFF_LEVELS] =
 {
 	{0, "Player", "Players", "{FFFFFF}"},
 	{1, "Junior Administrator", "Junior Administration", "{1607a1}"},
@@ -1862,7 +1862,7 @@ new const StaffLevels[MAX_ADMIN_LEVEL + 1][E_STAFF_LEVELS] =
     {5, "Executive Administrator", "Executive Administration", "{0069ff}"}
 };
 
-new const g_sCustomCarCategories[11][] =
+static const g_sCustomCarCategories[11][] =
 {
 	/*0*/{"Lowriders"},
 	/*1*/{"Sport Vehicles"},
@@ -1877,7 +1877,7 @@ new const g_sCustomCarCategories[11][] =
  	/*10*/{"Aircraft"}
 };
 
-new const BusinessLevelMatrix[21][e_prop_matrix] =
+static const BusinessLevelMatrix[21][e_prop_matrix] =
 {
 	{1, 0, 1000},
 	{2, 5000, 1250},
@@ -1902,7 +1902,7 @@ new const BusinessLevelMatrix[21][e_prop_matrix] =
 	{20, 2000000, 30000}
 };
 
-new const PVMatrix[101][e_pv_matrix] =
+static const PVMatrix[101][e_pv_matrix] =
 {
 	{0, 536, 595000, "Blade"},
 	{0, 575, 390000, "Broadway"},
@@ -2008,7 +2008,7 @@ new const PVMatrix[101][e_pv_matrix] =
 };
 
 // Toy slots, pvs slots, house slots, house obj slots, business slot, instant namechange, medkit x20, medkit x100, money boost x2, money boost x3, scoreboost x2, scoreboost x3
-new const CreditsProductMatrix[14][e_credits_matrix] =
+static const CreditsProductMatrix[14][e_credits_matrix] =
 {
 	{"Toy slot", 1000, 1, "Permanent", "This item expands your toy slots by 1.You can have 10 toy slots at most."},
     {"Custom car slot", 1500, 1, "Permanent", "This item expands your private vehicle slots by 1.\nYou can have 8 pv slots at most."},
@@ -2026,7 +2026,7 @@ new const CreditsProductMatrix[14][e_credits_matrix] =
 	{"Reset K/D", 3500, 1, "Permanent", "This item sets your kills and deaths to 0. Be careful you can't undo it."}
 };
 
-new const HouseIntTypes[15][e_house_type] =
+static const g_HouseInteriorTypes[15][e_house_type] =
 {
     {1, 244.411987, 305.032989, 999.148437, "Barrack", 30000}, //0 			// 7, klein billig aber gut
     {2, 225.756989, 1240.000000, 1082.149902, "Standard", 1000000}, //1 				// 1, billig haus
@@ -2043,6 +2043,396 @@ new const HouseIntTypes[15][e_house_type] =
 	{7, 225.630997, 1022.479980, 1084.069946, "Big Villa", 2000000}, //12			// 3, big villa
 	{5, 1267.663208, -781.323242, 1091.906250, "Madd Doggs Mansion", 3000000}, 	//13		// 5, muss raus exec // jetzt ist maddog drinne
 	{1, 2535.83, -1674.32, 1015.50, "Sweets House", 100000}
+};
+
+static const Float:FloorZOffsets[21] =
+{
+    0.0,
+    8.5479,
+    13.99945,
+    19.45100,
+    24.90255,
+    30.35410,
+    35.80565,
+    41.25720,
+    46.70875,
+    52.16030,
+    57.61185,
+    63.06340,
+    68.51495,
+    73.96650,
+    79.41805,
+    84.86960,
+    90.32115,
+    95.77270,
+    101.22425,
+    106.67580,
+    112.12735
+};
+
+static const FloorNames[21][] =
+{
+	"Ground Floor",
+	"First Floor",
+	"Second Floor",
+	"Third Floor",
+	"Fourth Floor",
+	"Fifth Floor",
+	"Sixth Floor",
+	"Seventh Floor",
+	"Eighth Floor",
+	"Ninth Floor",
+	"Tenth Floor",
+	"Eleventh Floor",
+	"Twelfth Floor",
+	"Thirteenth Floor",
+	"Fourteenth Floor",
+	"Fifteenth Floor",
+	"Sixteenth Floor",
+	"Seventeenth Floor",
+	"Eighteenth Floor",
+	"Admin Headquarter O.o",
+	"Penthouse (not really)"
+};
+
+static const xCharacters[][] =
+{
+    "A", "B", "C", "D", "E", "F", "G", "H", "J", "K", "L", "M",
+	"N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+    "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "m",
+	"n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"
+};
+
+static const GunGame_Weapons[] =
+{
+	23,	22, 27, 26, 29, 32, 30, 31, 38, 33, 34, 35, 36, 24
+};
+
+static const Float:Minigun_Spawns[10][4] =
+{
+	{38.1505, 1564.5778, 12.7500, 132.2755},
+	{8.7437, 1549.5354, 12.7560, 55.1620},
+	{-33.0755, 1519.6864, 12.7560, 287.5538},
+	{-38.9135, 1488.4835, 12.7500, 315.2241},
+	{-16.4189, 1478.1693, 12.7500, 307.5128},
+	{4.4626, 1506.1968, 16.5952, 347.8221},
+	{28.7336, 1517.8481, 12.7560, 121.7190},
+	{9.5176, 1560.8956, 12.7500, 217.7807},
+	{16.0684, 1552.2834, 28.2681, 151.2032},
+	{-4.4292, 1508.5903, 20.0397, 338.7700}
+};
+static const Float:Minigun2_Spawns[19][4] =
+{
+	{2566.7075,1682.9153,10.8203,267.6416},
+	{2632.4512,1658.9364,10.8203,356.0025},
+	{2628.0430,1663.1805,26.9442,353.4489},
+	{2635.4561,1683.8428,15.0390,97.4765},
+	{2622.8230,1717.2472,11.0234,354.7022},
+	{2604.3816,1733.9994,10.8203,89.9564},
+	{2605.7612,1766.4749,10.8203,270.1014},
+	{2596.8813,1823.4506,10.8203,268.5347},
+	{2596.9121,1889.5470,11.0312,94.6564},
+	{2549.2439,1883.8960,18.8093,177.6437},
+	{2535.0269,1787.8772,26.3558,274.1513},
+	{2546.2554,1775.0450,18.8093,269.4512},
+	{2589.8413,1649.2517,30.6641,357.1855},
+	{2653.4441,1681.2477,19.7100,90.5597},
+	{2652.6572,1823.1228,26.3242,92.1265},
+	{2651.3879,1889.4817,18.8092,359.6923},
+	{2632.0039,1918.0391,20.3243,177.6673},
+	{2598.1194,1900.5646,23.6854,172.0273},
+	{2561.9282,1897.9984,10.8222,263.8113}
+};
+static const Float:Sniper_Spawns[14][4] =
+{
+	{-1528.3020, -330.2366, 267.8116, 182.4561},
+	{-1503.6364, -340.5645, 265.9578, 205.9406},
+	{-1496.8945, -396.1531, 265.9578, 15.2601},
+	{-1526.2155, -444.1110, 265.9578, 5.7962},
+	{-1545.0111, -405.7469, 265.9578, 270.0850},
+	{-1550.2539, -390.3828, 273.7288, 91.6521},
+	{-1607.9478, -392.2644, 267.1663, 74.1264},
+	{-1644.1897, -394.3685, 273.4054, 269.7141},
+	{-1613.9907, -381.9904, 273.4054, 3.3222},
+	{-1619.4110, -397.6560, 273.4254, 272.8892},
+	{-1565.0505, -304.0998, 271.3497, 85.3634},
+	{-1571.2914, -301.3372, 271.3497, 265.8995},
+	{-1550.1138, -307.6401, 270.5767, 52.7860},
+	{-1560.4999, -317.0979, 285.0981, 163.2189}
+};
+static const Float:RocketDM_Spawns[8][4] =
+{
+	{-1073.5320,-657.2906,59.5660,182.2739},
+	{-1077.9768,-613.3954,50.5078,187.6731},
+	{-1112.2423,-628.5490,50.5078,230.9135},
+	{-1111.1577,-656.5370,59.6051,258.1738},
+	{-1100.4790,-735.2442,59.5487,301.0774},
+	{-1055.5299,-735.7858,59.6239,332.7244},
+	{-1039.2628,-700.3466,64.5321,8.7347},
+	{-1058.5487,-696.2102,67.1242,89.5754}
+};
+static const Float:GunGame_Spawns[9][4] =
+{
+	{133.2702, 2076.2271, 70.1628, 182.0589},
+	{157.3591, 2062.8499, 67.4000, 85.6672},
+	{134.7271, 2052.1414, 72.1535, 346.4713},
+	{128.3802, 2049.6685, 88.4781, 8.9248},
+	{110.9025, 2050.5190, 73.0875, 2.9044},
+	{115.5225, 2063.9746, 65.2181, 314.8837},
+	{130.2743, 2101.7676, 61.6595, 195.0075},
+	{135.0822, 2041.0424, 65.1818, 86.6981},
+	{121.3894, 2036.3778, 69.1681, 331.7290}
+};
+static const Float:BG_M1_T1_Spawns[4][4] =
+{
+	{-455.7792, -58.5108, 59.8029, 139.7756},
+	{-435.4336, -56.8861, 58.8833, 97.0126},
+	{-440.3568, -77.4319, 59.0455, 116.2910},
+	{-455.1911, -70.1563, 59.7096, 136.2704}
+};
+static const Float:BG_M1_T2_Spawns[4][4] =
+{
+	{-578.6148, -180.4718, 78.7617, 320.9920},
+	{-583.2191, -170.5733, 79.2114, 320.99205},
+	{-571.3069, -183.6573, 78.4063, 251.5899},
+	{-557.7114, -181.2337, 78.4047, 339.2187}
+};
+static const Float:BG_M2_T1_Spawns[4][4] =
+{
+	{566.4445, -2441.1155, 3.2606, 90.0},
+	{557.8643, -2439.3618, 3.2606, 90.0},
+	{558.2055, -2431.5737, 3.2606, 90.0},
+	{566.3401, -2428.1511, 3.2606, 90.0}
+};
+static const Float:BG_M2_T2_Spawns[4][4] =
+{
+	{692.2197, -2430.2900, 3.2606, 90.0},
+	{683.4767, -2429.1997, 3.2606, 90.0},
+	{685.1592, -2439.1643, 3.2606, 90.0},
+	{691.5789, -2437.9065, 3.2606, 90.0}
+};
+static const Float:BG_M3_T1_Spawns[4][4] =
+{
+	{-2180.0020, -266.4913, 36.5156, 277.7783},
+	{-2180.3604, -260.0984, 36.5156, 281.6340},
+	{-2183.8555, -265.5697, 36.5156, 281.6340},
+	{-2183.7983, -262.1465, 40.7195, 266.1907}
+};
+static const Float:BG_M3_T2_Spawns[4][4] =
+{
+	{-2187.3665, -209.5552, 36.5156, 182.4175},
+	{-2183.3145, -214.3069, 36.5156, 182.4175},
+	{-2188.1506, -223.1832, 36.5156, 182.4175},
+	{-2183.5532, -223.9128, 36.5156, 87.0773}
+};
+static const Float:BG_M4_T1_Spawns[4][4] =
+{
+	{673.8533, -2399.7190, 107.1669, 270.3580},
+	{685.6569, -2407.2200, 107.1804, 356.2215},
+	{712.4095, -2400.4097, 106.9510, 83.4871},
+	{663.0553, -2398.7061, 111.9654, 269.9614}
+};
+static const Float:BG_M4_T2_Spawns[4][4] =
+{
+	{722.7262, -2304.8560, 107.9041, 130.8066},
+	{721.2896, -2319.1465, 107.6767, 84.8891},
+	{709.2130, -2304.4978, 107.8904, 194.9510},
+	{708.6271, -2315.9961, 107.7215, 160.2499}
+};
+static const Float:BG_M5_T1_Spawns[4][4] =
+{
+	{1804.2432, -2994.2014, 6.1094, 177.3439},
+	{1807.2275, -2998.5554, 6.1044, 133.5295},
+	{1794.2000, -2997.5786, 8.7994, 221.8594},
+	{1788.9626, -2984.6211, 6.9992, 227.8387}
+};
+static const Float:BG_M5_T2_Spawns[4][4] =
+{
+	{1844.8651, -3067.3420, 19.2294, 18.9314},
+	{1843.7288, -3058.2097, 14.0106, 26.2922},
+	{1852.3188, -3045.4287, 6.0944, 34.0036},
+	{1826.1392, -3048.5820, 6.1044, 41.0139}
+};
+static const Float:BG_M6_T1_Spawns[4][4] =
+{
+	{2157.8413, 4025.3105, 92.5781, 90.0},
+	{2118.6831, 3990.2087, 76.8234, 90.0},
+	{2098.3066, 4061.2534, 76.5134, 90.0},
+	{2136.7742, 4041.2144, 76.5134, 90.0}
+};
+static const Float:BG_M6_T2_Spawns[4][4] =
+{
+	{2016.4438, 4042.5627, 92.5781, 90.0},
+	{2037.7231, 4054.4719, 80.9250, 90.0},
+	{2034.2903, 4009.7451, 76.5134, 90.0},
+	{2056.8708, 3975.7813, 84.1782, 90.0}
+};
+static const Float:DuelMaps[3][2][4] =
+{
+	{
+		{1144.1377, 1529.8433, 52.4003, 87.1090},
+		{1049.4922, 1529.3169, 52.4077, 271.6640}
+	},
+	{
+		{-2220.6504, 640.9958, 49.4492, 270.8222},
+		{-2176.0908, 641.5275, 49.4375, 89.4239}
+	},
+	{
+	    {-22.3681, 1353.8052, 11.7029, 180.0},
+	    {29.7761, 1375.0975, 10.6471, 0.0}
+	}
+};
+static const DuelWeapons[15] =
+{
+    4, 9, 16, 22, 24, 25, 26, 27, 28, 29, 30, 31, 32, 34, 35
+};
+static const Float:WorldSpawns[4][4] =
+{
+	{341.8535, -1852.6327, 8.2618, 90.2136}, // /beach
+	{-1196.3280, -17.4523, 15.8281, 42.5799}, // /sfa
+	{386.0204, 2541.1179, 19.0953, 181.2326}, // /aa
+	{-2330.8264, -1636.1765, 485.6543, 265.8250} // /mc
+};
+static const Float:g_ArmorPickups[16][3] =
+{
+	{352.8291, 2431.7050, 17.6194},
+	{-1865.9051, 63.9332, 15.3537},
+	{-1706.3911, -5.0743, 3.5489},
+	{2283.8637, 1570.6878, 11.0468},
+	{2402.2744, 2527.7585, 21.4463},
+	{-2452.2761, -1638.7027, 461.4188},
+	{1381.0902, -1659.5491, 13.4683},
+	{2043.9702, -1941.0736, 7.5484},
+	{2667.4177, -2561.4240, 2.7000},
+	{2545.7580, -1610.3024, 10.9728},
+	{2884.4536, 942.8223, 10.3225},
+	{2886.7478, 2807.7963, 18.1855},
+	{1936.7396, 2777.8854, 10.3662},
+	{874.3151, 2717.5383, 20.1042},
+	{795.4474, 854.0259, 9.0281},
+	{-669.9799, 972.6474, 11.683}
+};
+static const Float:g_CarShopLocations[CAR_SHOPS][4] =
+{
+	{2131.2915, -1144.3942, 24.7986, 291.9600},
+	{-1639.0990, 1202.4598, 7.2247, 68.4220},
+	{2106.9548, 1403.5167, 11.1395, 89.2744}
+};
+static const Float:g_CarShopTelePos[CAR_SHOPS][4] =
+{
+	{2107.1802, 1378.5853, 10.8618, 1.2502},
+	{2127.6726, -1129.2881, 25.5523, 175.3369},
+	{-1622.3246, 1198.9712, 7.0391, 68.1087}
+};
+static const Float:DM_MAP_1[2][4] =
+{
+	{1309.0240, 2110.4265, 11.0156, 316.7284},
+	{1383.8239, 2185.6218, 11.0234, 137.8134}
+};
+static const Float:DM_MAP_2[2][4] =
+{
+	{-2226.4497, 2348.3804, 4.9922, 114.9160},
+	{-2232.0962, 2400.4670, 2.4852, 221.4737}
+};
+static const Float:DM_MAP_3[2][4] =
+{
+	{1050.2189, 1024.4153, 11.0000, 327.1479},
+	{1114.4515, 1097.1134, 10.2734, 141.6762}
+};
+static const Float:DM_MAP_4[2][4] =
+{
+	{2609.7583, 2831.2527, 10.8203, 97.2059},
+	{2553.1912, 2824.4099, 10.8203, 283.9544}
+};
+
+static const szPlayerColors[511] =
+{
+	0x000022FF, 0x000044FF, 0x000066FF, 0x000088FF, 0x0000AAFF, 0x0000CCFF, 0x0000EEFF,
+	0x002200FF, 0x002222FF, 0x002244FF, 0x002266FF, 0x002288FF, 0x0022AAFF, 0x0022CCFF, 0x0022EEFF,
+	0x004400FF, 0x004422FF, 0x004444FF, 0x004466FF, 0x004488FF, 0x0044AAFF, 0x0044CCFF, 0x0044EEFF,
+	0x006600FF, 0x006622FF, 0x006644FF, 0x006666FF, 0x006688FF, 0x0066AAFF, 0x0066CCFF, 0x0066EEFF,
+	0x008800FF, 0x008822FF, 0x008844FF, 0x008866FF, 0x008888FF, 0x0088AAFF, 0x0088CCFF, 0x0088EEFF,
+	0x00AA00FF, 0x00AA22FF, 0x00AA44FF, 0x00AA66FF, 0x00AA88FF, 0x00AAAAFF, 0x00AACCFF, 0x00AAEEFF,
+	0x00CC00FF, 0x00CC22FF, 0x00CC44FF, 0x00CC66FF, 0x00CC88FF, 0x00CCAAFF, 0x00CCCCFF, 0x00CCEEFF,
+	0x00EE00FF, 0x00EE22FF, 0x00EE44FF, 0x00EE66FF, 0x00EE88FF, 0x00EEAAFF, 0x00EECCFF, 0x00EEEEFF,
+	0x220000FF, 0x220022FF, 0x220044FF, 0x220066FF, 0x220088FF, 0x2200AAFF, 0x2200CCFF, 0x2200FFFF,
+	0x222200FF, 0x222222FF, 0x222244FF, 0x222266FF, 0x222288FF, 0x2222AAFF, 0x2222CCFF, 0x2222EEFF,
+	0x224400FF, 0x224422FF, 0x224444FF, 0x224466FF, 0x224488FF, 0x2244AAFF, 0x2244CCFF, 0x2244EEFF,
+	0x226600FF, 0x226622FF, 0x226644FF, 0x226666FF, 0x226688FF, 0x2266AAFF, 0x2266CCFF, 0x2266EEFF,
+	0x228800FF, 0x228822FF, 0x228844FF, 0x228866FF, 0x228888FF, 0x2288AAFF, 0x2288CCFF, 0x2288EEFF,
+	0x22AA00FF, 0x22AA22FF, 0x22AA44FF, 0x22AA66FF, 0x22AA88FF, 0x22AAAAFF, 0x22AACCFF, 0x22AAEEFF,
+	0x22CC00FF, 0x22CC22FF, 0x22CC44FF, 0x22CC66FF, 0x22CC88FF, 0x22CCAAFF, 0x22CCCCFF, 0x22CCEEFF,
+	0x22EE00FF, 0x22EE22FF, 0x22EE44FF, 0x22EE66FF, 0x22EE88FF, 0x22EEAAFF, 0x22EECCFF, 0x22EEEEFF,
+	0x440000FF, 0x440022FF, 0x440044FF, 0x440066FF, 0x440088FF, 0x4400AAFF, 0x4400CCFF, 0x4400FFFF,
+	0x442200FF, 0x442222FF, 0x442244FF, 0x442266FF, 0x442288FF, 0x4422AAFF, 0x4422CCFF, 0x4422EEFF,
+	0x444400FF, 0x444422FF, 0x444444FF, 0x444466FF, 0x444488FF, 0x4444AAFF, 0x4444CCFF, 0x4444EEFF,
+	0x446600FF, 0x446622FF, 0x446644FF, 0x446666FF, 0x446688FF, 0x4466AAFF, 0x4466CCFF, 0x4466EEFF,
+	0x448800FF, 0x448822FF, 0x448844FF, 0x448866FF, 0x448888FF, 0x4488AAFF, 0x4488CCFF, 0x4488EEFF,
+	0x44AA00FF, 0x44AA22FF, 0x44AA44FF, 0x44AA66FF, 0x44AA88FF, 0x44AAAAFF, 0x44AACCFF, 0x44AAEEFF,
+	0x44CC00FF, 0x44CC22FF, 0x44CC44FF, 0x44CC66FF, 0x44CC88FF, 0x44CCAAFF, 0x44CCCCFF, 0x44CCEEFF,
+	0x44EE00FF, 0x44EE22FF, 0x44EE44FF, 0x44EE66FF, 0x44EE88FF, 0x44EEAAFF, 0x44EECCFF, 0x44EEEEFF,
+	0x660000FF, 0x660022FF, 0x660044FF, 0x660066FF, 0x660088FF, 0x6600AAFF, 0x6600CCFF, 0x6600FFFF,
+	0x662200FF, 0x662222FF, 0x662244FF, 0x662266FF, 0x662288FF, 0x6622AAFF, 0x6622CCFF, 0x6622EEFF,
+	0x664400FF, 0x664422FF, 0x664444FF, 0x664466FF, 0x664488FF, 0x6644AAFF, 0x6644CCFF, 0x6644EEFF,
+	0x666600FF, 0x666622FF, 0x666644FF, 0x666666FF, 0x666688FF, 0x6666AAFF, 0x6666CCFF, 0x6666EEFF,
+	0x668800FF, 0x668822FF, 0x668844FF, 0x668866FF, 0x668888FF, 0x6688AAFF, 0x6688CCFF, 0x6688EEFF,
+	0x66AA00FF, 0x66AA22FF, 0x66AA44FF, 0x66AA66FF, 0x66AA88FF, 0x66AAAAFF, 0x66AACCFF, 0x66AAEEFF,
+	0x66CC00FF, 0x66CC22FF, 0x66CC44FF, 0x66CC66FF, 0x66CC88FF, 0x66CCAAFF, 0x66CCCCFF, 0x66CCEEFF,
+	0x66EE00FF, 0x66EE22FF, 0x66EE44FF, 0x66EE66FF, 0x66EE88FF, 0x66EEAAFF, 0x66EECCFF, 0x66EEEEFF,
+	0x880000FF, 0x880022FF, 0x880044FF, 0x880066FF, 0x880088FF, 0x8800AAFF, 0x8800CCFF, 0x8800FFFF,
+	0x882200FF, 0x882222FF, 0x882244FF, 0x882266FF, 0x882288FF, 0x8822AAFF, 0x8822CCFF, 0x8822EEFF,
+	0x884400FF, 0x884422FF, 0x884444FF, 0x884466FF, 0x884488FF, 0x8844AAFF, 0x8844CCFF, 0x8844EEFF,
+	0x886600FF, 0x886622FF, 0x886644FF, 0x886666FF, 0x886688FF, 0x8866AAFF, 0x8866CCFF, 0x8866EEFF,
+	0x888800FF, 0x888822FF, 0x888844FF, 0x888866FF, 0x888888FF, 0x8888AAFF, 0x8888CCFF, 0x8888EEFF,
+	0x88AA00FF, 0x88AA22FF, 0x88AA44FF, 0x88AA66FF, 0x88AA88FF, 0x88AAAAFF, 0x88AACCFF, 0x88AAEEFF,
+	0x88CC00FF, 0x88CC22FF, 0x88CC44FF, 0x88CC66FF, 0x88CC88FF, 0x88CCAAFF, 0x88CCCCFF, 0x88CCEEFF,
+	0x88EE00FF, 0x88EE22FF, 0x88EE44FF, 0x88EE66FF, 0x88EE88FF, 0x88EEAAFF, 0x88EECCFF, 0x88EEEEFF,
+	0xAA0000FF, 0xAA0022FF, 0xAA0044FF, 0xAA0066FF, 0xAA0088FF, 0xAA00AAFF, 0xAA00CCFF, 0xAA00FFFF,
+	0xAA2200FF, 0xAA2222FF, 0xAA2244FF, 0xAA2266FF, 0xAA2288FF, 0xAA22AAFF, 0xAA22CCFF, 0xAA22EEFF,
+	0xAA4400FF, 0xAA4422FF, 0xAA4444FF, 0xAA4466FF, 0xAA4488FF, 0xAA44AAFF, 0xAA44CCFF, 0xAA44EEFF,
+	0xAA6600FF, 0xAA6622FF, 0xAA6644FF, 0xAA6666FF, 0xAA6688FF, 0xAA66AAFF, 0xAA66CCFF, 0xAA66EEFF,
+	0xAA8800FF, 0xAA8822FF, 0xAA8844FF, 0xAA8866FF, 0xAA8888FF, 0xAA88AAFF, 0xAA88CCFF, 0xAA88EEFF,
+	0xAAAA00FF, 0xAAAA22FF, 0xAAAA44FF, 0xAAAA66FF, 0xAAAA88FF, 0xAAAAAAFF, 0xAAAACCFF, 0xAAAAEEFF,
+	0xAACC00FF, 0xAACC22FF, 0xAACC44FF, 0xAACC66FF, 0xAACC88FF, 0xAACCAAFF, 0xAACCCCFF, 0xAACCEEFF,
+	0xAAEE00FF, 0xAAEE22FF, 0xAAEE44FF, 0xAAEE66FF, 0xAAEE88FF, 0xAAEEAAFF, 0xAAEECCFF, 0xAAEEEEFF,
+	0xCC0000FF, 0xCC0022FF, 0xCC0044FF, 0xCC0066FF, 0xCC0088FF, 0xCC00AAFF, 0xCC00CCFF, 0xCC00FFFF,
+	0xCC2200FF, 0xCC2222FF, 0xCC2244FF, 0xCC2266FF, 0xCC2288FF, 0xCC22AAFF, 0xCC22CCFF, 0xCC22EEFF,
+	0xCC4400FF, 0xCC4422FF, 0xCC4444FF, 0xCC4466FF, 0xCC4488FF, 0xCC44AAFF, 0xCC44CCFF, 0xCC44EEFF,
+	0xCC6600FF, 0xCC6622FF, 0xCC6644FF, 0xCC6666FF, 0xCC6688FF, 0xCC66AAFF, 0xCC66CCFF, 0xCC66EEFF,
+	0xCC8800FF, 0xCC8822FF, 0xCC8844FF, 0xCC8866FF, 0xCC8888FF, 0xCC88AAFF, 0xCC88CCFF, 0xCC88EEFF,
+	0xCCAA00FF, 0xCCAA22FF, 0xCCAA44FF, 0xCCAA66FF, 0xCCAA88FF, 0xCCAAAAFF, 0xCCAACCFF, 0xCCAAEEFF,
+	0xCCCC00FF, 0xCCCC22FF, 0xCCCC44FF, 0xCCCC66FF, 0xCCCC88FF, 0xCCCCAAFF, 0xCCCCCCFF, 0xCCCCEEFF,
+	0xCCEE00FF, 0xCCEE22FF, 0xCCEE44FF, 0xCCEE66FF, 0xCCEE88FF, 0xCCEEAAFF, 0xCCEECCFF, 0xCCEEEEFF,
+	0xEE0000FF, 0xEE0022FF, 0xEE0044FF, 0xEE0066FF, 0xEE0088FF, 0xEE00AAFF, 0xEE00CCFF, 0xEE00FFFF,
+	0xEE2200FF, 0xEE2222FF, 0xEE2244FF, 0xEE2266FF, 0xEE2288FF, 0xEE22AAFF, 0xEE22CCFF, 0xEE22EEFF,
+	0xEE4400FF, 0xEE4422FF, 0xEE4444FF, 0xEE4466FF, 0xEE4488FF, 0xEE44AAFF, 0xEE44CCFF, 0xEE44EEFF,
+	0xEE6600FF, 0xEE6622FF, 0xEE6644FF, 0xEE6666FF, 0xEE6688FF, 0xEE66AAFF, 0xEE66CCFF, 0xEE66EEFF,
+	0xEE8800FF, 0xEE8822FF, 0xEE8844FF, 0xEE8866FF, 0xEE8888FF, 0xEE88AAFF, 0xEE88CCFF, 0xEE88EEFF,
+	0xEEAA00FF, 0xEEAA22FF, 0xEEAA44FF, 0xEEAA66FF, 0xEEAA88FF, 0xEEAAAAFF, 0xEEAACCFF, 0xEEAAEEFF,
+	0xEECC00FF, 0xEECC22FF, 0xEECC44FF, 0xEECC66FF, 0xEECC88FF, 0xEECCAAFF, 0xEECCCCFF, 0xEECCEEFF,
+	0xEEEE00FF, 0xEEEE22FF, 0xEEEE44FF, 0xEEEE66FF, 0xEEEE88FF, 0xEEEEAAFF, 0xEEEECCFF, 0xEEEEEEFF
+};
+
+static const VehicleNames[212][] =
+{
+	{"Landstalker"},{"Bravura"},{"Buffalo"},{"Linerunner"},{"Perrenial"},{"Sentinel"},{"Dumper"},{"Firetruck"},{"Trashmaster"},{"Stretch"},
+	{"Manana"},{"Infernus"},{"Voodoo"},{"Pony"},{"Mule"},{"Cheetah"},{"Ambulance"},{"Leviathan"},{"Moonbeam"},{"Esperanto"},{"Taxi"},
+	{"Washington"},{"Bobcat"},{"Mr Whoopee"},{"BF Injection"},{"Ohdude"},{"Premier"},{"Enforcer"},{"Securicar"},{"Banshee"},{"Predator"},{"Bus"},
+	{"faggot"},{"Barracks"},{"Hotknife"},{"Trailer 1"},{"Previon"},{"Coach"},{"Cabbie"},{"Stallion"},{"Rumpo"},{"RC Bandit"},{"Romero"},{"Packer"},
+	{"Monster"},{"Admiral"},{"Squalo"},{"Seasparrow"},{"Pizzaboy"},{"Tram"},{"Trailer 2"},{"Turismo"},{"Speeder"},{"Reefer"},{"Tropic"},{"Flatbed"},
+	{"Yankee"},{"Caddy"},{"Solair"},{"Berkley's RC Van"},{"Skimmer"},{"PCJ-600"},{"Faggio"},{"Freeway"},{"RC Baron"},{"RC Raider"},{"Glendale"},{"Oceanic"},
+	{"Sanchez"},{"Sparrow"},{"Patriot"},{"Quad"},{"Coastguard"},{"Dinghy"},{"Hermes"},{"Sabre"},{"Rustler"},{"ZR-350"},{"Walton"},{"Regina"},{"Comet"},
+	{"BMX"},{"Burrito"},{"Camper"},{"Marquis"},{"Baggage"},{"Dozer"},{"Maverick"},{"News Chopper"},{"Rancher"},{"FBI Rancher"},{"Virgo"},{"Greenwood"},
+	{"Jetmax"},{"Hotring"},{"Sandking"},{"Blista Compact"},{"Police Maverick"},{"Boxville"},{"Benson"},{"Mesa"},{"RC Goblin"},{"Hotring Racer A"},
+	{"Hotring Racer B"},{"Bloodring Banger"},{"Rancher"},{"Super GT"},{"Elegant"},{"Journey"},{"Bike"},{"Mountain Bike"},{"Beagle"},{"Cropdust"},{"Stunt"},
+	{"Tanker"},{"Roadtrain"},{"Nebula"},{"Majestic"},{"Buccaneer"},{"Shamal"},{"Jumpjet"},{"FCR-900"},{"NRG-500"},{"HPV1000"},{"Cement Truck"},{"Tow Truck"},
+	{"Fortune"},{"Cadrona"},{"FBI Truck"},{"Willard"},{"Forklift"},{"Tractor"},{"Combine"},{"Feltzer"},{"Remington"},{"Slamvan"},{"Blade"},{"Freight"},
+	{"Brownstreak"},{"Vortex"},{"Vincent"},{"Bullet"},{"Clover"},{"Sadler"},{"Firetruck LA"},{"Hustler"},{"Intruder"},{"Primo"},{"Cargobob"},{"Tampa"},{"Sunrise"},{"Merit"},
+	{"Utility"},{"Nevada"},{"Yosemite"},{"Windsor"},{"Monster A"},{"Monster B"},{"Uranus"},{"Jester"},{"Sultan"},{"Stratum"},{"Elegy"},{"Raindance"},{"RC Tiger"},
+	{"Flash"},{"Tahoma"},{"Savanna"},{"Bandito"},{"Freight Flat"},{"Streak Carriage"},{"Kart"},{"Mower"},{"Duneride"},{"Sweeper"},{"Broadway"},{"Tornado"},{"AT-400"},
+	{"DFT-30"},{"Huntley"},{"Stafford"},{"BF-400"},{"Newsvan"},{"Tug"},{"Trailer 3"},{"Emperor"},{"Wayfarer"},{"Euros"},{"Hotdog"},{"Club"},{"Freight Carriage"},
+	{"Trailer 3"},{"Andromada"},{"Dodo"},{"RC Cam"},{"Launch"},{"Police Car (LSPD)"},{"Police Car (SFPD)"},{"Police Car (LVPD)"},{"Police Ranger"},{"Picador"},{"S.W.A.T. Van"},
+	{"Alpha"},{"Phoenix"},{"Glendale"},{"Sadler"},{"Luggage Trailer A"},{"Luggage Trailer B"},{"Stair Trailer"},{"Boxville"},{"Farm Plow"},{"Utility Trailer"}
 };
 
 new Iterator:RaceJoins<MAX_PLAYERS>,
@@ -2261,396 +2651,6 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
 	T_RocketDMPlayers = 0,
 	T_ServerPlayers = 0,
 	T_SawnPlayers = 0;
-	
-new const Float:FloorZOffsets[21] =
-{
-    0.0,
-    8.5479,
-    13.99945,
-    19.45100,
-    24.90255,
-    30.35410,
-    35.80565,
-    41.25720,
-    46.70875,
-    52.16030,
-    57.61185,
-    63.06340,
-    68.51495,
-    73.96650,
-    79.41805,
-    84.86960,
-    90.32115,
-    95.77270,
-    101.22425,
-    106.67580,
-    112.12735
-};
-
-new const FloorNames[21][] =
-{
-	"Ground Floor",
-	"First Floor",
-	"Second Floor",
-	"Third Floor",
-	"Fourth Floor",
-	"Fifth Floor",
-	"Sixth Floor",
-	"Seventh Floor",
-	"Eighth Floor",
-	"Ninth Floor",
-	"Tenth Floor",
-	"Eleventh Floor",
-	"Twelfth Floor",
-	"Thirteenth Floor",
-	"Fourteenth Floor",
-	"Fifteenth Floor",
-	"Sixteenth Floor",
-	"Seventeenth Floor",
-	"Eighteenth Floor",
-	"Admin Headquarter O.o",
-	"Penthouse (not really)"
-};
-
-new const xCharacters[][] =
-{
-    "A", "B", "C", "D", "E", "F", "G", "H", "J", "K", "L", "M",
-	"N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
-    "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "m",
-	"n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"
-};
-
-new GunGame_Weapons[] =
-{
-	23,	22, 27, 26, 29, 32, 30, 31, 38, 33, 34, 35, 36, 24
-};
-
-new Float:Minigun_Spawns[10][4] =
-{
-	{38.1505, 1564.5778, 12.7500, 132.2755},
-	{8.7437, 1549.5354, 12.7560, 55.1620},
-	{-33.0755, 1519.6864, 12.7560, 287.5538},
-	{-38.9135, 1488.4835, 12.7500, 315.2241},
-	{-16.4189, 1478.1693, 12.7500, 307.5128},
-	{4.4626, 1506.1968, 16.5952, 347.8221},
-	{28.7336, 1517.8481, 12.7560, 121.7190},
-	{9.5176, 1560.8956, 12.7500, 217.7807},
-	{16.0684, 1552.2834, 28.2681, 151.2032},
-	{-4.4292, 1508.5903, 20.0397, 338.7700}
-};
-new Float:Minigun2_Spawns[19][4] =
-{
-	{2566.7075,1682.9153,10.8203,267.6416},
-	{2632.4512,1658.9364,10.8203,356.0025},
-	{2628.0430,1663.1805,26.9442,353.4489},
-	{2635.4561,1683.8428,15.0390,97.4765},
-	{2622.8230,1717.2472,11.0234,354.7022},
-	{2604.3816,1733.9994,10.8203,89.9564},
-	{2605.7612,1766.4749,10.8203,270.1014},
-	{2596.8813,1823.4506,10.8203,268.5347},
-	{2596.9121,1889.5470,11.0312,94.6564},
-	{2549.2439,1883.8960,18.8093,177.6437},
-	{2535.0269,1787.8772,26.3558,274.1513},
-	{2546.2554,1775.0450,18.8093,269.4512},
-	{2589.8413,1649.2517,30.6641,357.1855},
-	{2653.4441,1681.2477,19.7100,90.5597},
-	{2652.6572,1823.1228,26.3242,92.1265},
-	{2651.3879,1889.4817,18.8092,359.6923},
-	{2632.0039,1918.0391,20.3243,177.6673},
-	{2598.1194,1900.5646,23.6854,172.0273},
-	{2561.9282,1897.9984,10.8222,263.8113}
-};
-new Float:Sniper_Spawns[14][4] =
-{
-	{-1528.3020, -330.2366, 267.8116, 182.4561},
-	{-1503.6364, -340.5645, 265.9578, 205.9406},
-	{-1496.8945, -396.1531, 265.9578, 15.2601},
-	{-1526.2155, -444.1110, 265.9578, 5.7962},
-	{-1545.0111, -405.7469, 265.9578, 270.0850},
-	{-1550.2539, -390.3828, 273.7288, 91.6521},
-	{-1607.9478, -392.2644, 267.1663, 74.1264},
-	{-1644.1897, -394.3685, 273.4054, 269.7141},
-	{-1613.9907, -381.9904, 273.4054, 3.3222},
-	{-1619.4110, -397.6560, 273.4254, 272.8892},
-	{-1565.0505, -304.0998, 271.3497, 85.3634},
-	{-1571.2914, -301.3372, 271.3497, 265.8995},
-	{-1550.1138, -307.6401, 270.5767, 52.7860},
-	{-1560.4999, -317.0979, 285.0981, 163.2189}
-};
-new Float:RocketDM_Spawns[8][4] =
-{
-	{-1073.5320,-657.2906,59.5660,182.2739},
-	{-1077.9768,-613.3954,50.5078,187.6731},
-	{-1112.2423,-628.5490,50.5078,230.9135},
-	{-1111.1577,-656.5370,59.6051,258.1738},
-	{-1100.4790,-735.2442,59.5487,301.0774},
-	{-1055.5299,-735.7858,59.6239,332.7244},
-	{-1039.2628,-700.3466,64.5321,8.7347},
-	{-1058.5487,-696.2102,67.1242,89.5754}
-};
-new Float:GunGame_Spawns[9][4] =
-{
-	{133.2702, 2076.2271, 70.1628, 182.0589},
-	{157.3591, 2062.8499, 67.4000, 85.6672},
-	{134.7271, 2052.1414, 72.1535, 346.4713},
-	{128.3802, 2049.6685, 88.4781, 8.9248},
-	{110.9025, 2050.5190, 73.0875, 2.9044},
-	{115.5225, 2063.9746, 65.2181, 314.8837},
-	{130.2743, 2101.7676, 61.6595, 195.0075},
-	{135.0822, 2041.0424, 65.1818, 86.6981},
-	{121.3894, 2036.3778, 69.1681, 331.7290}
-};
-new Float:BG_M1_T1_Spawns[4][4] =
-{
-	{-455.7792, -58.5108, 59.8029, 139.7756},
-	{-435.4336, -56.8861, 58.8833, 97.0126},
-	{-440.3568, -77.4319, 59.0455, 116.2910},
-	{-455.1911, -70.1563, 59.7096, 136.2704}
-};
-new Float:BG_M1_T2_Spawns[4][4] =
-{
-	{-578.6148, -180.4718, 78.7617, 320.9920},
-	{-583.2191, -170.5733, 79.2114, 320.99205},
-	{-571.3069, -183.6573, 78.4063, 251.5899},
-	{-557.7114, -181.2337, 78.4047, 339.2187}
-};
-new Float:BG_M2_T1_Spawns[4][4] =
-{
-	{566.4445, -2441.1155, 3.2606, 90.0},
-	{557.8643, -2439.3618, 3.2606, 90.0},
-	{558.2055, -2431.5737, 3.2606, 90.0},
-	{566.3401, -2428.1511, 3.2606, 90.0}
-};
-new Float:BG_M2_T2_Spawns[4][4] =
-{
-	{692.2197, -2430.2900, 3.2606, 90.0},
-	{683.4767, -2429.1997, 3.2606, 90.0},
-	{685.1592, -2439.1643, 3.2606, 90.0},
-	{691.5789, -2437.9065, 3.2606, 90.0}
-};
-new Float:BG_M3_T1_Spawns[4][4] =
-{
-	{-2180.0020, -266.4913, 36.5156, 277.7783},
-	{-2180.3604, -260.0984, 36.5156, 281.6340},
-	{-2183.8555, -265.5697, 36.5156, 281.6340},
-	{-2183.7983, -262.1465, 40.7195, 266.1907}
-};
-new Float:BG_M3_T2_Spawns[4][4] =
-{
-	{-2187.3665, -209.5552, 36.5156, 182.4175},
-	{-2183.3145, -214.3069, 36.5156, 182.4175},
-	{-2188.1506, -223.1832, 36.5156, 182.4175},
-	{-2183.5532, -223.9128, 36.5156, 87.0773}
-};
-new Float:BG_M4_T1_Spawns[4][4] =
-{
-	{673.8533, -2399.7190, 107.1669, 270.3580},
-	{685.6569, -2407.2200, 107.1804, 356.2215},
-	{712.4095, -2400.4097, 106.9510, 83.4871},
-	{663.0553, -2398.7061, 111.9654, 269.9614}
-};
-new Float:BG_M4_T2_Spawns[4][4] =
-{
-	{722.7262, -2304.8560, 107.9041, 130.8066},
-	{721.2896, -2319.1465, 107.6767, 84.8891},
-	{709.2130, -2304.4978, 107.8904, 194.9510},
-	{708.6271, -2315.9961, 107.7215, 160.2499}
-};
-new Float:BG_M5_T1_Spawns[4][4] =
-{
-	{1804.2432, -2994.2014, 6.1094, 177.3439},
-	{1807.2275, -2998.5554, 6.1044, 133.5295},
-	{1794.2000, -2997.5786, 8.7994, 221.8594},
-	{1788.9626, -2984.6211, 6.9992, 227.8387}
-};
-new Float:BG_M5_T2_Spawns[4][4] =
-{
-	{1844.8651, -3067.3420, 19.2294, 18.9314},
-	{1843.7288, -3058.2097, 14.0106, 26.2922},
-	{1852.3188, -3045.4287, 6.0944, 34.0036},
-	{1826.1392, -3048.5820, 6.1044, 41.0139}
-};
-new Float:BG_M6_T1_Spawns[4][4] =
-{
-	{2157.8413, 4025.3105, 92.5781, 90.0},
-	{2118.6831, 3990.2087, 76.8234, 90.0},
-	{2098.3066, 4061.2534, 76.5134, 90.0},
-	{2136.7742, 4041.2144, 76.5134, 90.0}
-};
-new Float:BG_M6_T2_Spawns[4][4] =
-{
-	{2016.4438, 4042.5627, 92.5781, 90.0},
-	{2037.7231, 4054.4719, 80.9250, 90.0},
-	{2034.2903, 4009.7451, 76.5134, 90.0},
-	{2056.8708, 3975.7813, 84.1782, 90.0}
-};
-new Float:DuelMaps[3][2][4] =
-{
-	{
-		{1144.1377, 1529.8433, 52.4003, 87.1090},
-		{1049.4922, 1529.3169, 52.4077, 271.6640}
-	},
-	{
-		{-2220.6504, 640.9958, 49.4492, 270.8222},
-		{-2176.0908, 641.5275, 49.4375, 89.4239}
-	},
-	{
-	    {-22.3681, 1353.8052, 11.7029, 180.0},
-	    {29.7761, 1375.0975, 10.6471, 0.0}
-	}
-};
-new const DuelWeapons[15] =
-{
-    4, 9, 16, 22, 24, 25, 26, 27, 28, 29, 30, 31, 32, 34, 35
-};
-new Float:WorldSpawns[4][4] =
-{
-	{341.8535, -1852.6327, 8.2618, 90.2136}, // /beach
-	{-1196.3280, -17.4523, 15.8281, 42.5799}, // /sfa
-	{386.0204, 2541.1179, 19.0953, 181.2326}, // /aa
-	{-2330.8264, -1636.1765, 485.6543, 265.8250} // /mc
-};
-new Float:g_ArmorPickups[16][3] =
-{
-	{352.8291, 2431.7050, 17.6194},
-	{-1865.9051, 63.9332, 15.3537},
-	{-1706.3911, -5.0743, 3.5489},
-	{2283.8637, 1570.6878, 11.0468},
-	{2402.2744, 2527.7585, 21.4463},
-	{-2452.2761, -1638.7027, 461.4188},
-	{1381.0902, -1659.5491, 13.4683},
-	{2043.9702, -1941.0736, 7.5484},
-	{2667.4177, -2561.4240, 2.7000},
-	{2545.7580, -1610.3024, 10.9728},
-	{2884.4536, 942.8223, 10.3225},
-	{2886.7478, 2807.7963, 18.1855},
-	{1936.7396, 2777.8854, 10.3662},
-	{874.3151, 2717.5383, 20.1042},
-	{795.4474, 854.0259, 9.0281},
-	{-669.9799, 972.6474, 11.683}
-};
-new Float:g_CarShopLocations[CAR_SHOPS][4] =
-{
-	{2131.2915, -1144.3942, 24.7986, 291.9600},
-	{-1639.0990, 1202.4598, 7.2247, 68.4220},
-	{2106.9548, 1403.5167, 11.1395, 89.2744}
-};
-new Float:g_CarShopTelePos[CAR_SHOPS][4] =
-{
-	{2107.1802, 1378.5853, 10.8618, 1.2502},
-	{2127.6726, -1129.2881, 25.5523, 175.3369},
-	{-1622.3246, 1198.9712, 7.0391, 68.1087}
-};
-new Float:DM_MAP_1[2][4] =
-{
-	{1309.0240, 2110.4265, 11.0156, 316.7284},
-	{1383.8239, 2185.6218, 11.0234, 137.8134}
-};
-new Float:DM_MAP_2[2][4] =
-{
-	{-2226.4497, 2348.3804, 4.9922, 114.9160},
-	{-2232.0962, 2400.4670, 2.4852, 221.4737}
-};
-new Float:DM_MAP_3[2][4] =
-{
-	{1050.2189, 1024.4153, 11.0000, 327.1479},
-	{1114.4515, 1097.1134, 10.2734, 141.6762}
-};
-new const Float:DM_MAP_4[2][4] =
-{
-	{2609.7583, 2831.2527, 10.8203, 97.2059},
-	{2553.1912, 2824.4099, 10.8203, 283.9544}
-};
-
-new const szPlayerColors[511] =
-{
-	0x000022FF, 0x000044FF, 0x000066FF, 0x000088FF, 0x0000AAFF, 0x0000CCFF, 0x0000EEFF,
-	0x002200FF, 0x002222FF, 0x002244FF, 0x002266FF, 0x002288FF, 0x0022AAFF, 0x0022CCFF, 0x0022EEFF,
-	0x004400FF, 0x004422FF, 0x004444FF, 0x004466FF, 0x004488FF, 0x0044AAFF, 0x0044CCFF, 0x0044EEFF,
-	0x006600FF, 0x006622FF, 0x006644FF, 0x006666FF, 0x006688FF, 0x0066AAFF, 0x0066CCFF, 0x0066EEFF,
-	0x008800FF, 0x008822FF, 0x008844FF, 0x008866FF, 0x008888FF, 0x0088AAFF, 0x0088CCFF, 0x0088EEFF,
-	0x00AA00FF, 0x00AA22FF, 0x00AA44FF, 0x00AA66FF, 0x00AA88FF, 0x00AAAAFF, 0x00AACCFF, 0x00AAEEFF,
-	0x00CC00FF, 0x00CC22FF, 0x00CC44FF, 0x00CC66FF, 0x00CC88FF, 0x00CCAAFF, 0x00CCCCFF, 0x00CCEEFF,
-	0x00EE00FF, 0x00EE22FF, 0x00EE44FF, 0x00EE66FF, 0x00EE88FF, 0x00EEAAFF, 0x00EECCFF, 0x00EEEEFF,
-	0x220000FF, 0x220022FF, 0x220044FF, 0x220066FF, 0x220088FF, 0x2200AAFF, 0x2200CCFF, 0x2200FFFF,
-	0x222200FF, 0x222222FF, 0x222244FF, 0x222266FF, 0x222288FF, 0x2222AAFF, 0x2222CCFF, 0x2222EEFF,
-	0x224400FF, 0x224422FF, 0x224444FF, 0x224466FF, 0x224488FF, 0x2244AAFF, 0x2244CCFF, 0x2244EEFF,
-	0x226600FF, 0x226622FF, 0x226644FF, 0x226666FF, 0x226688FF, 0x2266AAFF, 0x2266CCFF, 0x2266EEFF,
-	0x228800FF, 0x228822FF, 0x228844FF, 0x228866FF, 0x228888FF, 0x2288AAFF, 0x2288CCFF, 0x2288EEFF,
-	0x22AA00FF, 0x22AA22FF, 0x22AA44FF, 0x22AA66FF, 0x22AA88FF, 0x22AAAAFF, 0x22AACCFF, 0x22AAEEFF,
-	0x22CC00FF, 0x22CC22FF, 0x22CC44FF, 0x22CC66FF, 0x22CC88FF, 0x22CCAAFF, 0x22CCCCFF, 0x22CCEEFF,
-	0x22EE00FF, 0x22EE22FF, 0x22EE44FF, 0x22EE66FF, 0x22EE88FF, 0x22EEAAFF, 0x22EECCFF, 0x22EEEEFF,
-	0x440000FF, 0x440022FF, 0x440044FF, 0x440066FF, 0x440088FF, 0x4400AAFF, 0x4400CCFF, 0x4400FFFF,
-	0x442200FF, 0x442222FF, 0x442244FF, 0x442266FF, 0x442288FF, 0x4422AAFF, 0x4422CCFF, 0x4422EEFF,
-	0x444400FF, 0x444422FF, 0x444444FF, 0x444466FF, 0x444488FF, 0x4444AAFF, 0x4444CCFF, 0x4444EEFF,
-	0x446600FF, 0x446622FF, 0x446644FF, 0x446666FF, 0x446688FF, 0x4466AAFF, 0x4466CCFF, 0x4466EEFF,
-	0x448800FF, 0x448822FF, 0x448844FF, 0x448866FF, 0x448888FF, 0x4488AAFF, 0x4488CCFF, 0x4488EEFF,
-	0x44AA00FF, 0x44AA22FF, 0x44AA44FF, 0x44AA66FF, 0x44AA88FF, 0x44AAAAFF, 0x44AACCFF, 0x44AAEEFF,
-	0x44CC00FF, 0x44CC22FF, 0x44CC44FF, 0x44CC66FF, 0x44CC88FF, 0x44CCAAFF, 0x44CCCCFF, 0x44CCEEFF,
-	0x44EE00FF, 0x44EE22FF, 0x44EE44FF, 0x44EE66FF, 0x44EE88FF, 0x44EEAAFF, 0x44EECCFF, 0x44EEEEFF,
-	0x660000FF, 0x660022FF, 0x660044FF, 0x660066FF, 0x660088FF, 0x6600AAFF, 0x6600CCFF, 0x6600FFFF,
-	0x662200FF, 0x662222FF, 0x662244FF, 0x662266FF, 0x662288FF, 0x6622AAFF, 0x6622CCFF, 0x6622EEFF,
-	0x664400FF, 0x664422FF, 0x664444FF, 0x664466FF, 0x664488FF, 0x6644AAFF, 0x6644CCFF, 0x6644EEFF,
-	0x666600FF, 0x666622FF, 0x666644FF, 0x666666FF, 0x666688FF, 0x6666AAFF, 0x6666CCFF, 0x6666EEFF,
-	0x668800FF, 0x668822FF, 0x668844FF, 0x668866FF, 0x668888FF, 0x6688AAFF, 0x6688CCFF, 0x6688EEFF,
-	0x66AA00FF, 0x66AA22FF, 0x66AA44FF, 0x66AA66FF, 0x66AA88FF, 0x66AAAAFF, 0x66AACCFF, 0x66AAEEFF,
-	0x66CC00FF, 0x66CC22FF, 0x66CC44FF, 0x66CC66FF, 0x66CC88FF, 0x66CCAAFF, 0x66CCCCFF, 0x66CCEEFF,
-	0x66EE00FF, 0x66EE22FF, 0x66EE44FF, 0x66EE66FF, 0x66EE88FF, 0x66EEAAFF, 0x66EECCFF, 0x66EEEEFF,
-	0x880000FF, 0x880022FF, 0x880044FF, 0x880066FF, 0x880088FF, 0x8800AAFF, 0x8800CCFF, 0x8800FFFF,
-	0x882200FF, 0x882222FF, 0x882244FF, 0x882266FF, 0x882288FF, 0x8822AAFF, 0x8822CCFF, 0x8822EEFF,
-	0x884400FF, 0x884422FF, 0x884444FF, 0x884466FF, 0x884488FF, 0x8844AAFF, 0x8844CCFF, 0x8844EEFF,
-	0x886600FF, 0x886622FF, 0x886644FF, 0x886666FF, 0x886688FF, 0x8866AAFF, 0x8866CCFF, 0x8866EEFF,
-	0x888800FF, 0x888822FF, 0x888844FF, 0x888866FF, 0x888888FF, 0x8888AAFF, 0x8888CCFF, 0x8888EEFF,
-	0x88AA00FF, 0x88AA22FF, 0x88AA44FF, 0x88AA66FF, 0x88AA88FF, 0x88AAAAFF, 0x88AACCFF, 0x88AAEEFF,
-	0x88CC00FF, 0x88CC22FF, 0x88CC44FF, 0x88CC66FF, 0x88CC88FF, 0x88CCAAFF, 0x88CCCCFF, 0x88CCEEFF,
-	0x88EE00FF, 0x88EE22FF, 0x88EE44FF, 0x88EE66FF, 0x88EE88FF, 0x88EEAAFF, 0x88EECCFF, 0x88EEEEFF,
-	0xAA0000FF, 0xAA0022FF, 0xAA0044FF, 0xAA0066FF, 0xAA0088FF, 0xAA00AAFF, 0xAA00CCFF, 0xAA00FFFF,
-	0xAA2200FF, 0xAA2222FF, 0xAA2244FF, 0xAA2266FF, 0xAA2288FF, 0xAA22AAFF, 0xAA22CCFF, 0xAA22EEFF,
-	0xAA4400FF, 0xAA4422FF, 0xAA4444FF, 0xAA4466FF, 0xAA4488FF, 0xAA44AAFF, 0xAA44CCFF, 0xAA44EEFF,
-	0xAA6600FF, 0xAA6622FF, 0xAA6644FF, 0xAA6666FF, 0xAA6688FF, 0xAA66AAFF, 0xAA66CCFF, 0xAA66EEFF,
-	0xAA8800FF, 0xAA8822FF, 0xAA8844FF, 0xAA8866FF, 0xAA8888FF, 0xAA88AAFF, 0xAA88CCFF, 0xAA88EEFF,
-	0xAAAA00FF, 0xAAAA22FF, 0xAAAA44FF, 0xAAAA66FF, 0xAAAA88FF, 0xAAAAAAFF, 0xAAAACCFF, 0xAAAAEEFF,
-	0xAACC00FF, 0xAACC22FF, 0xAACC44FF, 0xAACC66FF, 0xAACC88FF, 0xAACCAAFF, 0xAACCCCFF, 0xAACCEEFF,
-	0xAAEE00FF, 0xAAEE22FF, 0xAAEE44FF, 0xAAEE66FF, 0xAAEE88FF, 0xAAEEAAFF, 0xAAEECCFF, 0xAAEEEEFF,
-	0xCC0000FF, 0xCC0022FF, 0xCC0044FF, 0xCC0066FF, 0xCC0088FF, 0xCC00AAFF, 0xCC00CCFF, 0xCC00FFFF,
-	0xCC2200FF, 0xCC2222FF, 0xCC2244FF, 0xCC2266FF, 0xCC2288FF, 0xCC22AAFF, 0xCC22CCFF, 0xCC22EEFF,
-	0xCC4400FF, 0xCC4422FF, 0xCC4444FF, 0xCC4466FF, 0xCC4488FF, 0xCC44AAFF, 0xCC44CCFF, 0xCC44EEFF,
-	0xCC6600FF, 0xCC6622FF, 0xCC6644FF, 0xCC6666FF, 0xCC6688FF, 0xCC66AAFF, 0xCC66CCFF, 0xCC66EEFF,
-	0xCC8800FF, 0xCC8822FF, 0xCC8844FF, 0xCC8866FF, 0xCC8888FF, 0xCC88AAFF, 0xCC88CCFF, 0xCC88EEFF,
-	0xCCAA00FF, 0xCCAA22FF, 0xCCAA44FF, 0xCCAA66FF, 0xCCAA88FF, 0xCCAAAAFF, 0xCCAACCFF, 0xCCAAEEFF,
-	0xCCCC00FF, 0xCCCC22FF, 0xCCCC44FF, 0xCCCC66FF, 0xCCCC88FF, 0xCCCCAAFF, 0xCCCCCCFF, 0xCCCCEEFF,
-	0xCCEE00FF, 0xCCEE22FF, 0xCCEE44FF, 0xCCEE66FF, 0xCCEE88FF, 0xCCEEAAFF, 0xCCEECCFF, 0xCCEEEEFF,
-	0xEE0000FF, 0xEE0022FF, 0xEE0044FF, 0xEE0066FF, 0xEE0088FF, 0xEE00AAFF, 0xEE00CCFF, 0xEE00FFFF,
-	0xEE2200FF, 0xEE2222FF, 0xEE2244FF, 0xEE2266FF, 0xEE2288FF, 0xEE22AAFF, 0xEE22CCFF, 0xEE22EEFF,
-	0xEE4400FF, 0xEE4422FF, 0xEE4444FF, 0xEE4466FF, 0xEE4488FF, 0xEE44AAFF, 0xEE44CCFF, 0xEE44EEFF,
-	0xEE6600FF, 0xEE6622FF, 0xEE6644FF, 0xEE6666FF, 0xEE6688FF, 0xEE66AAFF, 0xEE66CCFF, 0xEE66EEFF,
-	0xEE8800FF, 0xEE8822FF, 0xEE8844FF, 0xEE8866FF, 0xEE8888FF, 0xEE88AAFF, 0xEE88CCFF, 0xEE88EEFF,
-	0xEEAA00FF, 0xEEAA22FF, 0xEEAA44FF, 0xEEAA66FF, 0xEEAA88FF, 0xEEAAAAFF, 0xEEAACCFF, 0xEEAAEEFF,
-	0xEECC00FF, 0xEECC22FF, 0xEECC44FF, 0xEECC66FF, 0xEECC88FF, 0xEECCAAFF, 0xEECCCCFF, 0xEECCEEFF,
-	0xEEEE00FF, 0xEEEE22FF, 0xEEEE44FF, 0xEEEE66FF, 0xEEEE88FF, 0xEEEEAAFF, 0xEEEECCFF, 0xEEEEEEFF
-};
-
-new const VehicleNames[212][] =
-{
-	{"Landstalker"},{"Bravura"},{"Buffalo"},{"Linerunner"},{"Perrenial"},{"Sentinel"},{"Dumper"},{"Firetruck"},{"Trashmaster"},{"Stretch"},
-	{"Manana"},{"Infernus"},{"Voodoo"},{"Pony"},{"Mule"},{"Cheetah"},{"Ambulance"},{"Leviathan"},{"Moonbeam"},{"Esperanto"},{"Taxi"},
-	{"Washington"},{"Bobcat"},{"Mr Whoopee"},{"BF Injection"},{"Ohdude"},{"Premier"},{"Enforcer"},{"Securicar"},{"Banshee"},{"Predator"},{"Bus"},
-	{"faggot"},{"Barracks"},{"Hotknife"},{"Trailer 1"},{"Previon"},{"Coach"},{"Cabbie"},{"Stallion"},{"Rumpo"},{"RC Bandit"},{"Romero"},{"Packer"},
-	{"Monster"},{"Admiral"},{"Squalo"},{"Seasparrow"},{"Pizzaboy"},{"Tram"},{"Trailer 2"},{"Turismo"},{"Speeder"},{"Reefer"},{"Tropic"},{"Flatbed"},
-	{"Yankee"},{"Caddy"},{"Solair"},{"Berkley's RC Van"},{"Skimmer"},{"PCJ-600"},{"Faggio"},{"Freeway"},{"RC Baron"},{"RC Raider"},{"Glendale"},{"Oceanic"},
-	{"Sanchez"},{"Sparrow"},{"Patriot"},{"Quad"},{"Coastguard"},{"Dinghy"},{"Hermes"},{"Sabre"},{"Rustler"},{"ZR-350"},{"Walton"},{"Regina"},{"Comet"},
-	{"BMX"},{"Burrito"},{"Camper"},{"Marquis"},{"Baggage"},{"Dozer"},{"Maverick"},{"News Chopper"},{"Rancher"},{"FBI Rancher"},{"Virgo"},{"Greenwood"},
-	{"Jetmax"},{"Hotring"},{"Sandking"},{"Blista Compact"},{"Police Maverick"},{"Boxville"},{"Benson"},{"Mesa"},{"RC Goblin"},{"Hotring Racer A"},
-	{"Hotring Racer B"},{"Bloodring Banger"},{"Rancher"},{"Super GT"},{"Elegant"},{"Journey"},{"Bike"},{"Mountain Bike"},{"Beagle"},{"Cropdust"},{"Stunt"},
-	{"Tanker"},{"Roadtrain"},{"Nebula"},{"Majestic"},{"Buccaneer"},{"Shamal"},{"Jumpjet"},{"FCR-900"},{"NRG-500"},{"HPV1000"},{"Cement Truck"},{"Tow Truck"},
-	{"Fortune"},{"Cadrona"},{"FBI Truck"},{"Willard"},{"Forklift"},{"Tractor"},{"Combine"},{"Feltzer"},{"Remington"},{"Slamvan"},{"Blade"},{"Freight"},
-	{"Brownstreak"},{"Vortex"},{"Vincent"},{"Bullet"},{"Clover"},{"Sadler"},{"Firetruck LA"},{"Hustler"},{"Intruder"},{"Primo"},{"Cargobob"},{"Tampa"},{"Sunrise"},{"Merit"},
-	{"Utility"},{"Nevada"},{"Yosemite"},{"Windsor"},{"Monster A"},{"Monster B"},{"Uranus"},{"Jester"},{"Sultan"},{"Stratum"},{"Elegy"},{"Raindance"},{"RC Tiger"},
-	{"Flash"},{"Tahoma"},{"Savanna"},{"Bandito"},{"Freight Flat"},{"Streak Carriage"},{"Kart"},{"Mower"},{"Duneride"},{"Sweeper"},{"Broadway"},{"Tornado"},{"AT-400"},
-	{"DFT-30"},{"Huntley"},{"Stafford"},{"BF-400"},{"Newsvan"},{"Tug"},{"Trailer 3"},{"Emperor"},{"Wayfarer"},{"Euros"},{"Hotdog"},{"Club"},{"Freight Carriage"},
-	{"Trailer 3"},{"Andromada"},{"Dodo"},{"RC Cam"},{"Launch"},{"Police Car (LSPD)"},{"Police Car (SFPD)"},{"Police Car (LVPD)"},{"Police Ranger"},{"Picador"},{"S.W.A.T. Van"},
-	{"Alpha"},{"Phoenix"},{"Glendale"},{"Sadler"},{"Luggage Trailer A"},{"Luggage Trailer B"},{"Stair Trailer"},{"Boxville"},{"Farm Plow"},{"Utility Trailer"}
-};
 
 new pv_spoiler[20][0] =
 {
@@ -4299,7 +4299,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 					cache_get_row(i, 0, result, pSQL, sizeof(result));
 					rank = cache_get_row_int(i, 1, pSQL);
 
-					format(tmp, sizeof(tmp), "\n%i. %s (%s)", count + 1, result, GangPositions[rank][E_gang_pos_name]);
+					format(tmp, sizeof(tmp), "\n%i. %s (%s)", count + 1, result, g_szGangRanks[rank][E_gang_pos_name]);
 					strcat(tmpstring, tmp);
 
 					if(++count >= 50) break;
@@ -4431,7 +4431,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 		}
 		case THREAD_ASSIGN_RANK_2:
 		{
-		    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s's Rank has been assigned to %s", PlayerData[extraid][GangAssignRank], GangPositions[PlayerData[extraid][RankSelected]][E_gang_pos_name]);
+		    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s's Rank has been assigned to %s", PlayerData[extraid][GangAssignRank], g_szGangRanks[PlayerData[extraid][RankSelected]][E_gang_pos_name]);
 			gang_broadcast(PlayerData[extraid][e_gangid], gstr);
 
 			PlayerData[extraid][RankSelected] = 0;
@@ -6948,7 +6948,7 @@ public OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y,
 		if(h_id != -1)
 		{
 		    if(GetPlayerVirtualWorld(playerid) != (HouseData[h_id][e_id] + 1000)) return SCM(playerid, -1, ""er"You need to be in the house you selected!");
-			if(GetDistance3D(x, y, z, HouseIntTypes[HouseData[h_id][interior]][house_x], HouseIntTypes[HouseData[h_id][interior]][house_y], HouseIntTypes[HouseData[h_id][interior]][house_z]) > 200.0) return SCM(playerid, -1, ""er"You are not near your house");
+			if(GetDistance3D(x, y, z, g_HouseInteriorTypes[HouseData[h_id][interior]][house_x], g_HouseInteriorTypes[HouseData[h_id][interior]][house_y], g_HouseInteriorTypes[HouseData[h_id][interior]][house_z]) > 200.0) return SCM(playerid, -1, ""er"You are not near your house");
 
 	        player_notice(playerid, "House item position saved", "");
 	        MoveDynamicObject(objectid, x, y, z, 5.0, rx, ry, rz);
@@ -8527,9 +8527,9 @@ YCMD:enter(playerid, params[], help)
 			return SCM(playerid, -1, ""er"This house is locked");
 		}
 		
-	    SetPlayerInterior(playerid, HouseIntTypes[HouseData[i][interior]][interior]);
+	    SetPlayerInterior(playerid, g_HouseInteriorTypes[HouseData[i][interior]][interior]);
 		SetPlayerVirtualWorld(playerid, HouseData[i][e_id] + 1000);
-  		SetPlayerPos(playerid, HouseIntTypes[HouseData[i][interior]][house_x], HouseIntTypes[HouseData[i][interior]][house_y], HouseIntTypes[HouseData[i][interior]][house_z]);
+  		SetPlayerPos(playerid, g_HouseInteriorTypes[HouseData[i][interior]][house_x], g_HouseInteriorTypes[HouseData[i][interior]][house_y], g_HouseInteriorTypes[HouseData[i][interior]][house_z]);
 		gTeam[playerid] = HOUSE;
 		player_notice(playerid, "House entered", "type ~y~/exit ~w~to leave", 4000);
 		SCM(playerid, -1, ""er"Type /exit to leave the house");
@@ -8807,7 +8807,7 @@ YCMD:buy(playerid, params[], help)
 		strmid(HouseData[i][Owner], __GetName(playerid), 0, 25, 25);
 	    HouseData[i][sold] = 1;
 
-	    format(gstr, sizeof(gstr), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", __GetName(playerid), HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][e_score], HouseIntTypes[HouseData[i][interior]][intname]);
+	    format(gstr, sizeof(gstr), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", __GetName(playerid), HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][e_score], g_HouseInteriorTypes[HouseData[i][interior]][intname]);
 	    UpdateDynamic3DTextLabelText(HouseData[i][e_labelid], -1, gstr);
 	    DestroyDynamicMapIcon(HouseData[i][e_iconid]);
 	    DestroyDynamicPickup(HouseData[i][pickid]);
@@ -8881,7 +8881,7 @@ YCMD:sell(playerid, params[], help)
 			}
 		}
 
-	    format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][e_score], HouseIntTypes[HouseData[i][interior]][intname]);
+	    format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][e_score], g_HouseInteriorTypes[HouseData[i][interior]][intname]);
 	    UpdateDynamic3DTextLabelText(HouseData[i][e_labelid], -1, gstr);
 	    DestroyDynamicMapIcon(HouseData[i][e_iconid]);
 	    DestroyDynamicPickup(HouseData[i][pickid]);
@@ -8982,7 +8982,7 @@ YCMD:hlock(playerid, params[], help)
 	            PlayerPlaySound(playerid, 1027, 0.0, 0.0, 0.0);
 	            MySQL_SaveHouse(i);
 			}
-			else if(IsPlayerInRangeOfPoint(playerid, 100.0, HouseIntTypes[HouseData[i][interior]][house_x], HouseIntTypes[HouseData[i][interior]][house_y], HouseIntTypes[HouseData[i][interior]][house_z]) && GetPlayerInterior(playerid) == HouseIntTypes[HouseData[i][interior]][interior] && GetPlayerVirtualWorld(playerid) == (HouseData[i][e_id] + 1000))
+			else if(IsPlayerInRangeOfPoint(playerid, 100.0, g_HouseInteriorTypes[HouseData[i][interior]][house_x], g_HouseInteriorTypes[HouseData[i][interior]][house_y], g_HouseInteriorTypes[HouseData[i][interior]][house_z]) && GetPlayerInterior(playerid) == g_HouseInteriorTypes[HouseData[i][interior]][interior] && GetPlayerVirtualWorld(playerid) == (HouseData[i][e_id] + 1000))
 			{
 				found = true;
 				if(strcmp(HouseData[i][Owner], __GetName(playerid), true))
@@ -9434,23 +9434,23 @@ YCMD:adminhelp(playerid, params[], help)
 	{
 	    new string[1500];
 
-		format(gstr, sizeof(gstr), ""white"%s\n", StaffLevels[1][e_rank]);
+		format(gstr, sizeof(gstr), ""white"%s\n", g_szStaffLevelNames[1][e_rank]);
 		strcat(string, gstr);
 		strcat(string, "/suspect /asay /warn /slap /reports /spec /specoff /disarm\n/rplayers /dplayers /pweaps /getin /gotoxyza /spectators /caps\n/kick /mute /unmute /adminhq /ncrecords\n\n");
 
-		format(gstr, sizeof(gstr), "%s\n", StaffLevels[2][e_rank]);
+		format(gstr, sizeof(gstr), "%s\n", g_szStaffLevelNames[2][e_rank]);
 		strcat(string, gstr);
 		strcat(string, "/online /offline /onduty /offduty /akill /rv /day /togglegc\n/burn /move /tban /ban /cuff /uncuff /jail /unjail /unfreeze /readrules\n\n");
 		
-		format(gstr, sizeof(gstr), "%s\n", StaffLevels[3][e_rank]);
+		format(gstr, sizeof(gstr), "%s\n", g_szStaffLevelNames[3][e_rank]);
 		strcat(string, gstr);
 		strcat(string, "/freeze /eject /go /getip /get /mkick /clearchat /iplookup /dawn\n/night /giveweapon /connectbots /raceforcemap /deleterecord /nstats\n/tplayer\n\n");
 		
-		format(gstr, sizeof(gstr), "%s\n", StaffLevels[4][e_rank]);
+		format(gstr, sizeof(gstr), "%s\n", g_szStaffLevelNames[4][e_rank]);
 		strcat(string, gstr);
 		strcat(string, "/unban /oban /sethealth /healall /announce /armorall /cashfall\n/scorefall /announce2\n\n");
 		
-		format(gstr, sizeof(gstr), "%s\n", StaffLevels[5][e_rank]);
+		format(gstr, sizeof(gstr), "%s\n", g_szStaffLevelNames[5][e_rank]);
 		strcat(string, gstr);
 		strcat(string, "/onlinefix /setcash /setbcash /setscore /gdestroy /addcash /addscore\n/resetrc /hreset /breset /hsetprice /hsetscore\n/setbizzlevel /hcreate /bcreate /createstore /gzonecreate");
 
@@ -11752,7 +11752,7 @@ YCMD:gcapture(playerid, params[], help)
 				}
 			}
 
-			format(gstr, sizeof(gstr), ""gang_sign" "r_besch" %s %s(%i) re-captured zone '%s' which was under attack.", GangPositions[PlayerData[playerid][e_gangrank]][E_gang_pos_name], __GetName(playerid), playerid, GZoneData[i][e_zonename]);
+			format(gstr, sizeof(gstr), ""gang_sign" "r_besch" %s %s(%i) re-captured zone '%s' which was under attack.", g_szGangRanks[PlayerData[playerid][e_gangrank]][E_gang_pos_name], __GetName(playerid), playerid, GZoneData[i][e_zonename]);
 			gang_broadcast(GZoneData[i][e_defender], gstr);
 
 			MySQL_UpdateGangScore(GZoneData[i][e_localgang], 5);
@@ -13188,11 +13188,11 @@ YCMD:admins(playerid, params[], help)
 	    {
 	        if(IsPlayerOnDesktop(i))
 	        {
-				format(gstr, sizeof(gstr), "* %s(%i) (%s) [AFK]\n", __GetName(i), i, StaffLevels[PlayerData[i][e_level]][e_rank]);
+				format(gstr, sizeof(gstr), "* %s(%i) (%s) [AFK]\n", __GetName(i), i, g_szStaffLevelNames[PlayerData[i][e_level]][e_rank]);
 			}
 			else
 			{
-			    format(gstr, sizeof(gstr), "* %s(%i) (%s)\n", __GetName(i), i, StaffLevels[PlayerData[i][e_level]][e_rank]);
+			    format(gstr, sizeof(gstr), "* %s(%i) (%s)\n", __GetName(i), i, g_szStaffLevelNames[PlayerData[i][e_level]][e_rank]);
 			}
 			strcat(finstring, gstr);
 			count++;
@@ -14008,7 +14008,7 @@ YCMD:hsetprice(playerid, params[], help)
 
 	    HouseData[i][price] = hprice;
 
- 	   	format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][e_score], HouseIntTypes[HouseData[i][interior]][intname]);
+ 	   	format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][e_score], g_HouseInteriorTypes[HouseData[i][interior]][intname]);
 	    UpdateDynamic3DTextLabelText(HouseData[i][e_labelid], -1, gstr);
 	    MySQL_SaveHouse(i);
 
@@ -14038,7 +14038,7 @@ YCMD:hsetscore(playerid, params[], help)
 
 	    HouseData[i][e_score] = hscore;
 
- 	   	format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][e_score], HouseIntTypes[HouseData[i][interior]][intname]);
+ 	   	format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][e_score], g_HouseInteriorTypes[HouseData[i][interior]][intname]);
 	    UpdateDynamic3DTextLabelText(HouseData[i][e_labelid], -1, gstr);
 	    MySQL_SaveHouse(i);
 
@@ -14092,7 +14092,7 @@ YCMD:hreset(playerid, params[], help)
         
 		MySQL_SaveHouse(i, true);
 
-	    format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][e_score], HouseIntTypes[HouseData[i][interior]][intname]);
+	    format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][e_score], g_HouseInteriorTypes[HouseData[i][interior]][intname]);
 	    UpdateDynamic3DTextLabelText(HouseData[i][e_labelid], -1, gstr);
 	    DestroyDynamicMapIcon(HouseData[i][e_iconid]);
 	    DestroyDynamicPickup(HouseData[i][pickid]);
@@ -14126,9 +14126,9 @@ YCMD:setbizzlevel(playerid, params[], help)
 		BusinessData[r][e_level] = blevel;
 		
 		if(BusinessData[r][e_sold]) {
-	        format(gstr, sizeof(gstr), ""business_mark"\nID: %i\nOwner: %s\nType: %s\nLevel: %i", BusinessData[r][e_id], BusinessData[r][e_owner], BusinessTypes[_:BusinessData[r][e_type]], BusinessData[r][e_level]);
+	        format(gstr, sizeof(gstr), ""business_mark"\nID: %i\nOwner: %s\nType: %s\nLevel: %i", BusinessData[r][e_id], BusinessData[r][e_owner], g_szBusinessTypes[_:BusinessData[r][e_type]], BusinessData[r][e_level]);
 		} else {
-		    format(gstr, sizeof(gstr), ""business_mark"\n"nef_green"FOR SALE! Type /bbuy"white"\nID: %i\nType: %s\nLevel: %i", BusinessData[r][e_id], BusinessTypes[_:BusinessData[r][e_type]], BusinessData[r][e_level]);
+		    format(gstr, sizeof(gstr), ""business_mark"\n"nef_green"FOR SALE! Type /bbuy"white"\nID: %i\nType: %s\nLevel: %i", BusinessData[r][e_id], g_szBusinessTypes[_:BusinessData[r][e_type]], BusinessData[r][e_level]);
 		}
 		
 		UpdateDynamic3DTextLabelText(BusinessData[r][e_label_id], -1, gstr);
@@ -17356,7 +17356,7 @@ function:OnPlayerNameChangeRequest(playerid, newname[])
 
                     strmid(HouseData[i][Owner], newname, 0, 25, 25);
 
-				    format(query, sizeof(query), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", __GetName(playerid), HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][e_score], HouseIntTypes[HouseData[i][interior]][intname]);
+				    format(query, sizeof(query), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", __GetName(playerid), HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][e_score], g_HouseInteriorTypes[HouseData[i][interior]][intname]);
 				    UpdateDynamic3DTextLabelText(HouseData[i][e_labelid], -1, query);
 				    MySQL_SaveHouse(i);
 				}
@@ -17368,7 +17368,7 @@ function:OnPlayerNameChangeRequest(playerid, newname[])
 
                 strmid(BusinessData[r][e_owner], newname, 0, 25, 25);
 
-                format(gstr, sizeof(gstr), ""business_mark"\nID: %i\nOwner: %s\nType: %s\nLevel: %i", BusinessData[r][e_id], BusinessData[r][e_owner], BusinessTypes[_:BusinessData[r][e_type]], BusinessData[r][e_level]);
+                format(gstr, sizeof(gstr), ""business_mark"\nID: %i\nOwner: %s\nType: %s\nLevel: %i", BusinessData[r][e_id], BusinessData[r][e_owner], g_szBusinessTypes[_:BusinessData[r][e_type]], BusinessData[r][e_level]);
 			    UpdateDynamic3DTextLabelText(BusinessData[r][e_label_id], -1, gstr);
 			    orm_update(BusinessData[r][e_ormid]);
 			}
@@ -17618,7 +17618,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				if(r != -1) {
 				    player_notice(playerid, "Business type set", "");
 					BusinessData[r][e_type] = E_BUSINESS_TYPES:listitem;
-					format(gstr, sizeof(gstr), ""business_mark"\nID: %i\nOwner: %s\nType: %s\nLevel: %i", BusinessData[r][e_id], BusinessData[r][e_owner], BusinessTypes[_:BusinessData[r][e_type]], BusinessData[r][e_level]);
+					format(gstr, sizeof(gstr), ""business_mark"\nID: %i\nOwner: %s\nType: %s\nLevel: %i", BusinessData[r][e_id], BusinessData[r][e_owner], g_szBusinessTypes[_:BusinessData[r][e_type]], BusinessData[r][e_level]);
 					UpdateDynamic3DTextLabelText(BusinessData[r][e_label_id], -1, gstr);
 					orm_update(BusinessData[r][e_ormid]);
 				} else {
@@ -17657,7 +17657,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	                format(gstr, sizeof(gstr), ""nef" :: Business Level Upgrade > Slot: %i", PlayerData[playerid][BusinessIdSelected] + 1);
 					ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, gstr, gstr2, "OK", "");
                  	
-					format(gstr, sizeof(gstr), ""business_mark"\nID: %i\nOwner: %s\nType: %s\nLevel: %i", BusinessData[r][e_id], BusinessData[r][e_owner], BusinessTypes[_:BusinessData[r][e_type]], BusinessData[r][e_level]);
+					format(gstr, sizeof(gstr), ""business_mark"\nID: %i\nOwner: %s\nType: %s\nLevel: %i", BusinessData[r][e_id], BusinessData[r][e_owner], g_szBusinessTypes[_:BusinessData[r][e_type]], BusinessData[r][e_level]);
 					UpdateDynamic3DTextLabelText(BusinessData[r][e_label_id], -1, gstr);
 				    
 					orm_update(BusinessData[r][e_ormid]);
@@ -18726,7 +18726,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				
 				PlayerData[playerid][RankSelected] = listitem;
 				
-				format(gstr, sizeof(gstr), ""white"Now enter the name of the player who should get the rank:\n\nSelected Rank: %s", GangPositions[listitem][E_gang_pos_name]);
+				format(gstr, sizeof(gstr), ""white"Now enter the name of the player who should get the rank:\n\nSelected Rank: %s", g_szGangRanks[listitem][E_gang_pos_name]);
 				
 				ShowPlayerDialog(playerid, GANG_SET_RANK_DIALOG + 1, DIALOG_STYLE_INPUT, ""nef" :: Gang Rank Menu", gstr, "Next", "Cancel");
 	            return true;
@@ -18755,7 +18755,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 		  			MySQL_SaveAccount(ID, false, false);
 
-				    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s set %s's rank to %s", __GetName(playerid), __GetName(ID), GangPositions[PlayerData[playerid][RankSelected]][E_gang_pos_name]);
+				    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s set %s's rank to %s", __GetName(playerid), __GetName(ID), g_szGangRanks[PlayerData[playerid][RankSelected]][E_gang_pos_name]);
 					gang_broadcast(PlayerData[playerid][e_gangid], gstr);
 					
 					PlayerData[playerid][RankSelected] = 0;
@@ -19202,7 +19202,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        {
 				PlayerData[playerid][HouseIntSelected] = listitem;
 
-				format(gstr2, sizeof(gstr2), ""white"House Upgrade\n\n- Interior: %s\n- Price: $%s\n\nClick \"Upgrade\" in order to apply the new interior.\n"green"* "white"All House Items will be removed in this slot!", HouseIntTypes[listitem][intname], number_format(HouseIntTypes[listitem][price]));
+				format(gstr2, sizeof(gstr2), ""white"House Upgrade\n\n- Interior: %s\n- Price: $%s\n\nClick \"Upgrade\" in order to apply the new interior.\n"green"* "white"All House Items will be removed in this slot!", g_HouseInteriorTypes[listitem][intname], number_format(g_HouseInteriorTypes[listitem][price]));
 				ShowPlayerDialog(playerid, HOUSE_UPGRADE_DIALOG + 1, DIALOG_STYLE_MSGBOX, ""nef" :: House Upgrade", gstr2, "Upgrade", "Cancel");
 				return true;
 	        }
@@ -19213,7 +19213,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					player_notice(playerid, "Get out to upgrade the house", "");
 					return 1;
 				}
-	            if(GetPlayerMoneyEx(playerid) < HouseIntTypes[PlayerData[playerid][HouseIntSelected]][price])
+	            if(GetPlayerMoneyEx(playerid) < g_HouseInteriorTypes[PlayerData[playerid][HouseIntSelected]][price])
 	            {
 	                return SCM(playerid, -1, ""er"You can't afford that interior");
 	            }
@@ -19231,7 +19231,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 		            for(new pid = 0; pid < MAX_PLAYERS; pid++)
 		            {
-		                if(gTeam[pid] == HOUSE && GetPlayerInterior(pid) == HouseIntTypes[HouseData[h_id][interior]][interior] && GetPlayerVirtualWorld(pid) == (HouseData[h_id][e_id] + 1000))
+		                if(gTeam[pid] == HOUSE && GetPlayerInterior(pid) == g_HouseInteriorTypes[HouseData[h_id][interior]][interior] && GetPlayerVirtualWorld(pid) == (HouseData[h_id][e_id] + 1000))
 		                {
 		                    gTeam[pid] = FREEROAM;
 		                    SetPlayerPos(pid, HouseData[h_id][e_x], HouseData[h_id][e_y], HouseData[h_id][e_z]);
@@ -19251,12 +19251,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						}
 					}
 					
-	                GivePlayerMoneyEx(playerid, -HouseIntTypes[PlayerData[playerid][HouseIntSelected]][price]);
+	                GivePlayerMoneyEx(playerid, -g_HouseInteriorTypes[PlayerData[playerid][HouseIntSelected]][price]);
 	                HouseData[h_id][interior] = PlayerData[playerid][HouseIntSelected];
 	       			SetPlayerPos(playerid, HouseData[h_id][e_x], HouseData[h_id][e_y], HouseData[h_id][e_z]);
 					ResetPlayerWorld(playerid);
 					gTeam[playerid] = FREEROAM;
-	      		    format(gstr, sizeof(gstr), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", __GetName(playerid), HouseData[h_id][e_id], number_format(HouseData[h_id][price]), HouseData[h_id][e_score], HouseIntTypes[PlayerData[playerid][HouseIntSelected]][intname]);
+	      		    format(gstr, sizeof(gstr), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", __GetName(playerid), HouseData[h_id][e_id], number_format(HouseData[h_id][price]), HouseData[h_id][e_score], g_HouseInteriorTypes[PlayerData[playerid][HouseIntSelected]][intname]);
 	    			UpdateDynamic3DTextLabelText(HouseData[h_id][e_labelid], -1, gstr);
 	                MySQL_SaveHouse(h_id, true);
 	                MySQL_SaveAccount(playerid, false, false);
@@ -20668,7 +20668,7 @@ function:OnHouseLoadEx(index)
 		HouseData[index][sold] = cache_get_row_int(0, 8, pSQL);
 		HouseData[index][locked] = cache_get_row_int(0, 9, pSQL);
 
-		format(line, sizeof(line), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[index][e_id], number_format(HouseData[index][price]), HouseData[index][e_score], HouseIntTypes[HouseData[index][interior]][intname]);
+		format(line, sizeof(line), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[index][e_id], number_format(HouseData[index][price]), HouseData[index][e_score], g_HouseInteriorTypes[HouseData[index][interior]][intname]);
 
 		HouseData[index][e_labelid] = CreateDynamic3DTextLabel(line, (HouseData[index][sold]) ? (0xFF0000FF) : (0x00FF00FF), HouseData[index][e_x], HouseData[index][e_y], floatadd(HouseData[index][e_z], 0.3), 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 30.0);
 		HouseData[index][pickid] = CreateDynamicPickup((HouseData[index][sold]) ? (1272) : (1273), 1, HouseData[index][e_x], HouseData[index][e_y], HouseData[index][e_z], -1, -1, -1, 30.0);
@@ -20705,11 +20705,11 @@ function:OnHouseLoad()
 
 			if(!HouseData[houseid][sold])
 			{
-			    format(gstr2, sizeof(gstr2), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[houseid][e_id], number_format(HouseData[houseid][price]), HouseData[houseid][e_score], HouseIntTypes[HouseData[houseid][interior]][intname]);
+			    format(gstr2, sizeof(gstr2), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[houseid][e_id], number_format(HouseData[houseid][price]), HouseData[houseid][e_score], g_HouseInteriorTypes[HouseData[houseid][interior]][intname]);
 			}
 			else
 			{
-			    format(gstr2, sizeof(gstr2), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[houseid][Owner], HouseData[houseid][e_id], number_format(HouseData[houseid][price]), HouseData[houseid][e_score], HouseIntTypes[HouseData[houseid][interior]][intname]);
+			    format(gstr2, sizeof(gstr2), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[houseid][Owner], HouseData[houseid][e_id], number_format(HouseData[houseid][price]), HouseData[houseid][e_score], g_HouseInteriorTypes[HouseData[houseid][interior]][intname]);
 
 				for(new ii = 0; ii < MAX_HOUSE_OBJECTS; ii++)
 				{
@@ -20777,9 +20777,9 @@ SetupBusiness(slot)
 	new r = slot;
 
 	if(BusinessData[r][e_sold]) {
-        format(gstr2, sizeof(gstr2), ""business_mark"\nID: %i\nOwner: %s\nType: %s\nLevel: %i", BusinessData[r][e_id], BusinessData[r][e_owner], BusinessTypes[_:BusinessData[r][e_type]], BusinessData[r][e_level]);
+        format(gstr2, sizeof(gstr2), ""business_mark"\nID: %i\nOwner: %s\nType: %s\nLevel: %i", BusinessData[r][e_id], BusinessData[r][e_owner], g_szBusinessTypes[_:BusinessData[r][e_type]], BusinessData[r][e_level]);
 	} else {
-	    format(gstr2, sizeof(gstr2), ""business_mark"\n"nef_green"FOR SALE! Type /bbuy"white"\nID: %i\nType: %s\nLevel: %i", BusinessData[r][e_id], BusinessTypes[_:BusinessData[r][e_type]], BusinessData[r][e_level]);
+	    format(gstr2, sizeof(gstr2), ""business_mark"\n"nef_green"FOR SALE! Type /bbuy"white"\nID: %i\nType: %s\nLevel: %i", BusinessData[r][e_id], g_szBusinessTypes[_:BusinessData[r][e_type]], BusinessData[r][e_level]);
 	}
 	
 	BusinessData[r][e_label_id] = CreateDynamic3DTextLabel(gstr2, WHITE, BusinessData[r][e_pos][0], BusinessData[r][e_pos][1], BusinessData[r][e_pos][2], 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 50.0);
@@ -27842,7 +27842,7 @@ function:ShowDialog(playerid, dialogid)
 
 function:server_random_broadcast()
 {
-    SCMToAll(WHITE, ServerMSGS[random(sizeof(ServerMSGS))]);
+    SCMToAll(WHITE, g_szRandomServerMessages[random(sizeof(g_szRandomServerMessages))]);
 	return 1;
 }
 
@@ -29048,7 +29048,7 @@ ExitPlayer(playerid)
 		    new bool:found = false;
 			for(new i = 0; i < houseid; i++)
 			{
-		    	if(GetPlayerInterior(playerid) == HouseIntTypes[HouseData[i][interior]][interior] && GetPlayerVirtualWorld(playerid) == (HouseData[i][e_id] + 1000))
+		    	if(GetPlayerInterior(playerid) == g_HouseInteriorTypes[HouseData[i][interior]][interior] && GetPlayerVirtualWorld(playerid) == (HouseData[i][e_id] + 1000))
 				{
 				    found = true;
 				    
@@ -29573,7 +29573,7 @@ islogged(playerid)
 
 function:RandomTXTInfo()
 {
-	TextDrawSetString(TXTRandomInfo, szRandomInfoTXTs[random(sizeof(szRandomInfoTXTs))]);
+	TextDrawSetString(TXTRandomInfo, g_szRandomTdMessages[random(sizeof(g_szRandomTdMessages))]);
 	return 1;
 }
 
@@ -30456,7 +30456,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 
 				if(PlayerData[playerid][e_level] > 0)
 				{
-					format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"Successfully logged in. (Level: %s)", StaffLevels[PlayerData[playerid][e_level]][e_rank]);
+					format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"Successfully logged in. (Level: %s)", g_szStaffLevelNames[PlayerData[playerid][e_level]][e_rank]);
 					SCM(playerid, -1, gstr2);
 		   		}
 		   		else
@@ -30502,7 +30502,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
  			    format(gstr, sizeof(gstr), ""nef_yellow"Gang:"white" %s", PlayerData[playerid][GangName]);
 				PlayerData[playerid][GangLabel] = CreateDynamic3DTextLabel(gstr, -1, 0.0, 0.0, 0.5, 20.0, playerid, INVALID_VEHICLE_ID, 1, -1, -1, -1, 20.0);
 
-			    format(gstr, sizeof(gstr), ""gang_sign" "grey"%s %s(%i) logged in!", GangPositions[PlayerData[playerid][e_gangrank]][E_gang_pos_name], __GetName(playerid), playerid);
+			    format(gstr, sizeof(gstr), ""gang_sign" "grey"%s %s(%i) logged in!", g_szGangRanks[PlayerData[playerid][e_gangrank]][E_gang_pos_name], __GetName(playerid), playerid);
 				gang_broadcast(PlayerData[playerid][e_gangid], gstr);
 			}
 	        return 1;
