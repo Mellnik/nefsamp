@@ -2973,7 +2973,8 @@ public OnGameModeInit()
 	{
 		SetVehicleNumberPlate(i, "{F81414}NEF");
 		SetVehicleToRespawn(i);
-		if(IsComponentIdCompatible(GetVehicleModel(i), 1010)) AddVehicleComponent(i, 1010);
+		if(IsComponentIdCompatible(GetVehicleModel(i), 1010))
+			AddVehicleComponent(i, 1010);
 		ChangeVehicleColor(i, (random(128) + 127), (random(128) + 127));
 	}
 	
@@ -2990,13 +2991,13 @@ public OnGameModeInit()
 
 public OnGameModeExit()
 {
+    DestroyElevator();
+
 	Log(LOG_EXIT, "MySQL: Garbage cleanup");
     MySQL_CleanUp();
     
 	mysql_stat(gstr2, pSQL, sizeof(gstr2));
 	Log(LOG_EXIT, "MySQL: %s", gstr2);
-	
-	DestroyElevator();
 
 	Log(LOG_EXIT, "MySQL: Closing");
  	mysql_close(pSQL);
@@ -20915,18 +20916,6 @@ GetGZonesByGang(id)
 	return count;
 }
 
-function:LoadHouses()
-{
-	mysql_tquery(pSQL, "SELECT * FROM `houses`;", "OnHouseLoad", "");
-	return 1;
-}
-
-LoadBusinesses()
-{
-	ResetBusiness();
-	mysql_tquery(pSQL, "SELECT * FROM `businesses`;", "OnBusinessLoad");
-}
-
 ResetBusiness(slot = -1)
 {
 	if(slot == -1)
@@ -20966,9 +20955,22 @@ ResetBusiness(slot = -1)
 	return 1;
 }
 
-function:LoadGZones()
+LoadGZones()
 {
-	mysql_tquery(pSQL, "SELECT * FROM `gzones`;", "OnGangZoneLoad", "");
+	mysql_tquery(pSQL, "SELECT * FROM `gzones`;", "OnGangZoneLoad");
+	return 1;
+}
+
+LoadHouses()
+{
+	mysql_tquery(pSQL, "SELECT * FROM `houses`;", "OnHouseLoad");
+	return 1;
+}
+
+LoadBusinesses()
+{
+	ResetBusiness();
+	mysql_tquery(pSQL, "SELECT * FROM `businesses`;", "OnBusinessLoad");
 	return 1;
 }
 
