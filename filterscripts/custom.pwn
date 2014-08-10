@@ -12,7 +12,7 @@
 #define FILTERSCRIPT
 
 #include <a_samp>       // 0.3z-R3
-#include <streamer>     // v2.7.3
+#include <streamer>     // v2.7
 
 public OnFilterScriptInit()
 {

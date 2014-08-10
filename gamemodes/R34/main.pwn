@@ -13,9 +13,8 @@
 || SA-MP Server 0.3z-R3
 || YSI Library 3.2
 || sscanf Plugin 2.8.1
-|| Streamer Plugin v2.7.3
+|| Streamer Plugin v2.7
 || MySQL Plugin R38
-|| IRC Plugin 1.4.5
 ||
 || Build specific:
 ||
@@ -23,14 +22,15 @@
 || Script limits:
 || Max teleports per category: 32
 || Max teleport command name: 15
-||
+|| Max businesses: 700
+|| Max gang zones: 65
+|| Max houses: 600
 */
 
 #pragma dynamic 8192        // for md-sort
 
 #define IS_RELEASE_BUILD (true)
 #define INC_ENVIRONMENT (true)
-#define IRC_CONNECT (true)
 #define WINTER_EDITION (false) // Requires FS ferriswheelfair.amx
 #define _YSI_NO_VERSION_CHECK
 #define YSI_IS_SERVER
@@ -48,7 +48,6 @@
 #include <sscanf2>
 #include <streamer>
 #include <a_mysql_R38>
-#include <irc>
 #include <a_zones>          // V2.0
 #include <mSelection>       // 1.1 R3
 #include <Dini>         	// 1.6
@@ -255,7 +254,7 @@ Float:GetDistance3D(Float:x1, Float:y1, Float:z1, Float:x2, Float:y2, Float:z2);
 #define COLOR_CNR_PRO_ROBBER            0xFF3200FF
 
 // GWARS
-#define MAX_GZONES						(80)
+#define MAX_GZONES						(65)
 #define MAX_GZONES_PER_GANG             (15)
 #define GZONE_SIZE                      (70.0)
 #define COLOR_HOSTILE                   (0x95133499)
@@ -263,7 +262,7 @@ Float:GetDistance3D(Float:x1, Float:y1, Float:z1, Float:x2, Float:y2, Float:z2);
 #define COLOR_NONE                      (0xFFFFFFAA)
 
 // Houses
-#define MAX_HOUSES 						(1000)
+#define MAX_HOUSES 						(600)
 #define MAX_PLAYER_HOUSES 				(5)
 #define MAX_HOUSE_OBJECTS               (10)
 
@@ -305,22 +304,6 @@ Float:GetDistance3D(Float:x1, Float:y1, Float:z1, Float:x2, Float:y2, Float:z2);
 	%2 = floatround(%0, floatround_tozero); \
 	%3 = floatround(floatmul(%0 - %2, 60), floatround_tozero); \
 	%4 = floatround(floatmul(floatmul(%0 - %2, 60) - %3, 1000), floatround_tozero)
-
-// IRC
-#if IS_RELEASE_BUILD == true
-#define IRC_SERVER                      "exnet.nl.irc.tl"
-#define IRC_PORT                        (6667)
-#define IRC_CHANNEL     				"#nef"
-#define IRC_NICKSERV            		"NickServ"
-#define IRC_MAX_BOTS                    (5)
-#else
-#define IRC_SERVER                      "exnet.nl.irc.tl"
-#define IRC_PORT                        (6667)
-#define IRC_CHANNEL     				"#nef.beta"
-#define IRC_NICKSERV            		"NickServ"
-#define IRC_MAX_BOTS                    (5)
-#endif
-#define IRC_PLUGIN_VERSION              "v1.4.5"
 
 // Colors
 #define SEMI_TRANS                      (0x0A0A0A55)
@@ -1902,9 +1885,7 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
 	T_JPDMPlayers = 0,
 	T_RocketDMPlayers = 0,
 	T_ServerPlayers = 0,
-	T_SawnPlayers = 0,
-	IRC_Bots[IRC_MAX_BOTS],
-	IRC_GroupID;
+	T_SawnPlayers = 0;
 	
 new const Float:FloorZOffsets[21] =
 {
@@ -2595,7 +2576,6 @@ public OnGameModeInit()
     ExecDerbyVotingTimer();
     ExecBGVotingTimer();
     race_fetch_data();
-    IRC_SetUp();
 	LoadStores();
 	LoadGZones();
 	LoadHouses();
@@ -2640,10 +2620,6 @@ public OnGameModeExit()
     
 	mysql_stat(gstr2, pSQL, sizeof(gstr2));
 	Log(LOG_EXIT, "MySQL: %s", gstr2);
-
-	Log(LOG_EXIT, "IRC: Closing");
-    IRC_QuitBots();
-    IRC_DestroyGroup(IRC_GroupID);
 	
 	DestroyElevator();
 
@@ -3496,11 +3472,6 @@ public OnPlayerDisconnect(playerid, reason)
  	
 	SetPlayerScoreEx(playerid, 0);
 	SetPlayerTeam(playerid, NO_TEAM);
-	
-	static const reasonMsg[3][] = {"Timeout", "Leaving", "Kicked/Banned"};
-	
-	format(gstr, sizeof(gstr), "02[%i] 03*** %s has left the server. (%s)", playerid, __GetName(playerid), reasonMsg[reason]);
-	IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 	return 1;
 }
 
@@ -4319,9 +4290,6 @@ public OnPlayerText(playerid, text[])
 			format(gstr, sizeof(gstr), "["vlila"REACTION"white"]: {%06x}%s(%i) "white"has won the reaction test in %2i.%03i seconds!", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, second, rtime);
 		    SCMToAll(WHITE, gstr);
 
-			format(gstr, sizeof(gstr), "3,1ReactionTest:4 %s(%i) has won the reaction test in %2i.%03i seconds!", __GetName(playerid), playerid, second, rtime);
-			IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
-
 		    format(gstr, sizeof(gstr), "» You have earned $%s + %i score.", number_format(xCash), xScore);
 		    SCM(playerid, GREEN, gstr);
 
@@ -4385,9 +4353,6 @@ public OnPlayerText(playerid, text[])
 
 	format(gstr, sizeof(gstr), "%s", text);
 	SetPlayerChatBubble(playerid, gstr, WHITE, 50.0, 7000);
-
-	format(gstr2, sizeof(gstr2), "02[%i] 07%s: %s", playerid, __GetName(playerid), gstr);
-    IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr2);
 
 	if(PlayerData[playerid][e_gangrank] != 0)
 	{
@@ -5098,62 +5063,6 @@ public OnPlayerDeath(playerid, killerid, reason)
 			}
 		}
 	}
-
-	new reasonMsg[32];
-	if(killerid != INVALID_PLAYER_ID)
-	{
-		switch(reason)
-		{
-			case 0: reasonMsg = "Unarmed";
-			case 1: reasonMsg = "Brass Knuckles";
-			case 2: reasonMsg = "Golf Club";
-			case 3: reasonMsg = "Night Stick";
-			case 4: reasonMsg = "Knife";
-			case 5: reasonMsg = "Baseball Bat";
-			case 6: reasonMsg = "Shovel";
-			case 7: reasonMsg = "Pool Cue";
-			case 8: reasonMsg = "Katana";
-			case 9: reasonMsg = "Chainsaw";
-			case 10: reasonMsg = "Dildo";
-			case 11: reasonMsg = "Dildo";
-			case 12: reasonMsg = "Vibrator";
-			case 13: reasonMsg = "Vibrator";
-			case 14: reasonMsg = "Flowers";
-			case 15: reasonMsg = "Cane";
-			case 22: reasonMsg = "Pistol";
-			case 23: reasonMsg = "Silenced Pistol";
-			case 24: reasonMsg = "Desert Eagle";
-			case 25: reasonMsg = "Shotgun";
-			case 26: reasonMsg = "Sawn-off Shotgun";
-			case 27: reasonMsg = "Combat Shotgun";
-			case 28: reasonMsg = "MAC-10";
-			case 29: reasonMsg = "MP5";
-			case 30: reasonMsg = "AK-47";
-			case 31: reasonMsg = "M4";
-			case 32: reasonMsg = "TEC-9";
-			case 33: reasonMsg = "Country Rifle";
-			case 34: reasonMsg = "Sniper Rifle";
-			case 37: reasonMsg = "Fire";
-			case 38: reasonMsg = "Minigun";
-			case 41: reasonMsg = "Spray Can";
-			case 42: reasonMsg = "Fire Extinguisher";
-			case 49: reasonMsg = "Vehicle Collision";
-			case 50: reasonMsg = "Vehicle Collision";
-			case 51: reasonMsg = "Explosion";
-			default: reasonMsg = "Unknown";
-		}
-		format(gstr, sizeof(gstr), "04*** %s killed %s. (%s)", __GetName(killerid), __GetName(playerid), reasonMsg);
-	}
-	else
-	{
-		switch(reason)
-		{
-			case 53: format(gstr, sizeof(gstr), "04*** %s died. (Drowned)", __GetName(playerid));
-			case 54: format(gstr, sizeof(gstr), "04*** %s died. (Collision)", __GetName(playerid));
-			default: format(gstr, sizeof(gstr), "04*** %s died.", __GetName(playerid));
-		}
-	}
-	IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 	return 1;
 }
 
@@ -6719,61 +6628,6 @@ public OnPlayerEditAttachedObject(playerid, response, index, modelid, boneid, Fl
     }
     return 1;
 }
-
-// Commands
-#if IRC_CONNECT == true
-IRCCMD:say(botid, channel[], user[], host[], params[])
-{
-	if(IRC_IsVoice(botid, channel, user))
-	{
-		if(!isnull(params))
-		{
-			if(!IsAd(params))
-			{
-				format(gstr, sizeof(gstr), "02*** %s on IRC: %s", user, params);
-				IRC_GroupSay(IRC_GroupID, channel, gstr);
-				format(gstr, sizeof(gstr), "*** [IRC] %s: %s", user, params);
-				SCMToAll(GREY, gstr);
-				printf("[IRC] (%s)%s(%i): %s", host, user, botid, params);
-			}
-		}
-	}
-	return 1;
-}
-
-IRCCMD:playerlist(botid, channel[], user[], host[], params[])
-{
-	if(IRC_IsVoice(botid, channel, user))
-	{
-		for(new i = 0; i < MAX_PLAYERS; i++)
-		{
-		    if(IsPlayerConnected(i))
-		    {
-		        format(gstr, sizeof(gstr), "2%s(%i)", __GetName(i), i);
-		        IRC_Say(botid, user, gstr);
-		    }
-		}
-	}
-	return 1;
-}
-
-IRCCMD:cc(botid, channel[], user[], host[], params[])
-{
-   	if(IRC_IsHalfop(botid, channel, user))
-	{
-		for(new i = 0; i < 21; i++)
-		{
-		    SCMToAll(COLOR_SYSTEM, " ");
-		}
-		
-		format(gstr, sizeof(gstr), "Administrator %s(IRC) has cleared the chat!", user);
-		SCMToAll(COLOR_STEELBLUE, gstr);
-		format(gstr, sizeof(gstr), "4Server: 2Administrator %s(IRC) cleared the chat", user);
-		IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
-	}
-	return 1;
-}
-#endif
 
 YCMD:beach(playerid, params[], help)
 {
@@ -8400,9 +8254,6 @@ YCMD:buygc(playerid, params[], help)
 	    format(gstr, sizeof(gstr), ""orange"[NEF] %s(%i) has sold their %sGC to %s(%i) for $%s", __GetName(PlayerData[playerid][GCPlayer]), PlayerData[playerid][GCPlayer], number_format(PlayerData[playerid][GCOffer]), __GetName(playerid), playerid, number_format(PlayerData[playerid][GCPrice]));
 	    SCMToAll(-1, gstr);
 	    print(gstr);
-
-		format(gstr, sizeof(gstr), "3,1GC:4 %s(%i) has sold their %sGC to %s(%i) for $%s", __GetName(PlayerData[playerid][GCPlayer]), PlayerData[playerid][GCPlayer], number_format(PlayerData[playerid][GCOffer]), __GetName(playerid), playerid, number_format(PlayerData[playerid][GCPrice]));
-		IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 
 	    PlayerData[playerid][GCPlayer] = INVALID_PLAYER_ID;
 	    PlayerData[playerid][GCOffer] = 0;
@@ -10838,17 +10689,11 @@ YCMD:warn(playerid, params[], help)
 				SCMToAll(-1, gstr);
 				print(gstr);
 				KickEx(player);
-				
-	   			format(gstr, sizeof(gstr), "4Server: 2%s has been kicked. 1[Reason: %s] [Warning: %i/%i]", __GetName(player), reason, PlayerData[player][Warnings], MAX_WARNINGS);
-				IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 			}
 			else
 			{
 				format(gstr, sizeof(gstr), ""yellow"** "red"Admin %s(%i) has given %s(%i) a warning. [Reason: %s] [Warning: %i/%i]", __GetName(playerid), playerid, __GetName(player), player, reason, PlayerData[player][Warnings], MAX_WARNINGS);
 				SCMToAll(-1, gstr);
-				
-	   			format(gstr, sizeof(gstr), "4Server: 2Admin %s(%i) has given %s(%i) a warning. [Reason: %s] [Warning: %i/%i]", __GetName(playerid), playerid, __GetName(player), player, reason, PlayerData[player][Warnings], MAX_WARNINGS);
-				IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 			}
 		}
 		else
@@ -11100,9 +10945,6 @@ YCMD:kick(playerid, params[], help)
 			SCMToAll(YELLOW, gstr);
 			print(gstr);
 			
-			format(gstr, sizeof(gstr), "4Server: 2Admin %s(%i) has kicked %s(%i) 1(Reason: %s)", __GetName(playerid), playerid, __GetName(player), player, reason);
-			IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
-			
   			KickEx(player);
 		}
 		else
@@ -11146,9 +10988,6 @@ YCMD:mute(playerid, params[], help)
             
 			PlayerData[player][tMute] = SetTimerEx("player_unmute", time * 1000, false, "ii", player, YHash(__GetName(player)));
 			PlayerData[player][bMuted] = true;
-
-			format(gstr, sizeof(gstr), "4MUTE:3 %s(%i) has been muted for %i seconds by %s for %s", __GetName(player), player, time, __GetName(playerid), reason);
-			IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 		}
 		else
 		{
@@ -11187,9 +11026,6 @@ YCMD:unmute(playerid, params[], help)
 
 			format(gstr, sizeof(gstr), ""SVRSC""yellow"** "red"%s(%i) has been unmuted by Admin %s(%i)", __GetName(player), player, __GetName(playerid), playerid);
 			SCMToAll(RED, gstr);
-			
-  			format(gstr, sizeof(gstr), "4MUTE:3 %s(%i) has been unmuted by %s", __GetName(player), player, __GetName(playerid));
-			IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 		}
 		else
 		{
@@ -12196,9 +12032,6 @@ YCMD:tban(playerid, params[], help)
 
 	    		ShowPlayerDialog(player, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Notice", gstr2, "OK", "");
 
-				format(gstr, sizeof(gstr), "4Server: 2Admin %s(%i) has banned %s(%i) 1(Reason: %s)", __GetName(playerid), playerid, __GetName(player), player, reason);
-				IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
-
                 KickEx(player);
 			}
 			else
@@ -12292,9 +12125,6 @@ YCMD:ban(playerid, params[], help)
 					"Permanent");
 					
 	    		ShowPlayerDialog(player, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Notice", gstr2, "OK", "");
-
-				format(gstr, sizeof(gstr), "4Server: 2Admin %s(%i) has banned %s(%i) 1(Reason: %s)", __GetName(playerid), playerid, __GetName(player), player, reason);
-				IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 
                 KickEx(player);
 			}
@@ -12532,24 +12362,6 @@ YCMD:rplayers(playerid, params[], help)
 	return 1;
 }
 
-YCMD:connectbots(playerid, params[], help)
-{
-	if(PlayerData[playerid][e_level] >= 3)
-	{
-	    #if IRC_CONNECT == true
-		IRC_QuitBots();
-		IRC_SetUp(true);
-	    #endif
-		
-		SCM(playerid, -1, ""er"All IRC bots have been checked and if needed reconnected");
-	}
-	else
-	{
-		SCM(playerid, -1, NO_PERM);
-	}
-	return 1;
-}
-
 YCMD:jail(playerid, params[], help)
 {
 	if(PlayerData[playerid][e_level] >= 2)
@@ -12610,9 +12422,6 @@ YCMD:jail(playerid, params[], help)
 			format(gstr, sizeof(gstr), ""yellow"** "red"%s(%i) has been jailed by Admin %s(%i) for %i seconds [Reason: %s]", __GetName(player), player, __GetName(playerid), playerid, time, reason);
 			SCMToAll(-1, gstr);
 			print(gstr);
-
-			format(gstr, sizeof(gstr), "4Server: 2Administrator %s(%i) jailed %s(%i) for %d seconds. (Reason: %s)", __GetName(playerid), playerid, __GetName(player), player, time, reason);
-			IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 		}
 		else
 		{
@@ -12658,8 +12467,6 @@ YCMD:unjail(playerid, params[], help)
 
 			format(gstr, sizeof(gstr), "Administrator %s(%i) has unjailed %s(%i)", __GetName(playerid), playerid, __GetName(player), player);
 			SCMToAll(COLOR_STEELBLUE, gstr);
-			format(gstr, sizeof(gstr), "4Administrator %s(%i) has unjailed %s(%i)", __GetName(playerid), playerid, __GetName(player), player);
-			IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 		}
 		else
 		{
@@ -14090,10 +13897,10 @@ YCMD:hcreate(playerid, params[], help)
 
 	extract params -> new h_price, h_score, h_int; else
 	{
-	    return SCM(playerid, NEF_GREEN, "Usage: /hcreate <price> <score> <int id>");
+	    return SCM(playerid, NEF_GREEN, "Usage: /hcreate <price> <score> <interior>");
 	}
 
-	if(h_int > 13 || h_int < 0) return SCM(playerid, -1, ""er"Interior 0-13");
+	if(h_int > 13 || h_int < 0) return SCM(playerid, -1, ""er"Interior 0 - 13");
 	if(h_score > 1000000 || h_score < 1) return SCM(playerid, -1, ""er"Score 1 - 1,000,000");
 	if(h_price > 1000000000 || h_price < 1) return SCM(playerid, -1, ""er"Price 1 - 1,000,000,000");
 
@@ -16157,29 +15964,6 @@ YCMD:unignore(playerid, params[], help)
 	return true;
 }
 
-YCMD:irc(playerid, params[], help)
-{
-	new msg[144];
-	if(sscanf(params, "s[143]", msg))
-	{
-	    SCM(playerid, NEF_GREEN, "Usage: /irc <message>");
-        SCM(playerid, NEF_GREEN, "Sends a message to IRC");
-		return 1;
-	}
-	
-	if(IsAd(msg))
-	{
-	    SCM(playerid, RED, "Advertising is not allowed!");
-	    return 1;
-	}
-	
-	format(gstr, sizeof(gstr), "3*** %s(%i) to IRC: 4%s", __GetName(playerid), playerid, msg);
-	IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
-	format(gstr, sizeof(gstr), "Message sent to IRC: "YELLOW_E"%s", msg);
-	SCM(playerid, COLOR_RED, gstr);
-	return 1;
-}
-
 YCMD:tpm(playerid, params[], help)
 {
 	if(GetPVarInt(playerid, "inCNR") == 0)
@@ -17240,9 +17024,6 @@ function:OnPlayerNameChangeRequest(playerid, newname[])
 			format(query, sizeof(query), ""nef" %s(%i) has changed their name to %s", oldname, playerid, newname);
 			SCMToAll(-1, query);
 			
-			format(query, sizeof(query), "2Server: 3 %s(%i)4 has changed their name to %s", oldname, playerid, newname);
-			IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, query),
-			
 			MySQL_SaveAccount(playerid);
         }
         else
@@ -17923,8 +17704,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						SetPVarInt(playerid, "Robber", 0);
 						SetPVarInt(playerid, "Cop", 1);
 
-  						format(string, sizeof(string), "4CNR3 %s(%i) has joined the Cops in the cops and robbers minigame.", __GetName(playerid), playerid);
-						IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, string);
   	    				format(string, sizeof(string), ""cnr_sign" "ORANGE_E"%s(%i) has joined the "LB_E"Cops "ORANGE_E"in the /CNR minigame.", __GetName(playerid), playerid);
   	    				SCMToAll(-1, string);
 			    		SCM(playerid, -1, ""nef" You have joined the LVPD!");
@@ -17968,8 +17747,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						SetPVarInt(playerid, "Robber", 1);
 						SetPVarInt(playerid, "Cop", 0);
 
-  						format(string, sizeof(string), "4CNR3 %s(%i) has joined the Robbers in the cops and robbers minigame.", __GetName(playerid), playerid);
-						IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, string);
   	    				format(string, sizeof(string), ""cnr_sign" "ORANGE_E"%s(%i) has joined the "LB_E"Robbers "ORANGE_E"in the /CNR minigame.", __GetName(playerid), playerid);
   	    				SCMToAll(-1, string);
 						PreloadAnimLib(playerid, "SHOP");
@@ -18019,8 +17796,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						SetPVarInt(playerid, "Robber", 1);
 						SetPVarInt(playerid, "Cop", 0);
 
-  						format(string, sizeof(string), "4CNR3 %s(%i) has joined the Pro Robbers in the cops and robbers minigame.", __GetName(playerid), playerid);
-						IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, string);
   	    				format(string, sizeof(string), ""cnr_sign" "ORANGE_E"%s(%i) has joined the "RED_E"Pro Robbers "ORANGE_E"in the /CNR minigame.", __GetName(playerid), playerid);
   	    				SCMToAll(-1, string);
 						PreloadAnimLib(playerid, "SHOP");
@@ -18058,8 +17833,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						SetPVarInt(playerid, "Robber", 0);
 						SetPVarInt(playerid, "Cop", 3);
 
-  						format(string, sizeof(string), "4CNR3 %s(%i) has joined the Army in the cops and robbers minigame.", __GetName(playerid), playerid);
-						IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, string);
 						format(string, sizeof(string), ""cnr_sign" "ORANGE_E"%s(%i) has joined the "PURPLE_E"Army "ORANGE_E"in the /CNR minigame.", __GetName(playerid), playerid);
   	    				SCMToAll(-1, string);
 			    		SCM(playerid, -1, ""nef" You have joined the Army Task Force!");
@@ -18096,8 +17869,6 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
   	    				SetPVarInt(playerid, "Robber", 0);
 						SetPVarInt(playerid, "Cop", 2);
 
-  						format(string, sizeof(string), "4CNR3 %s(%i) has joined the Swat in the cops and robbers minigame.", __GetName(playerid), playerid);
-						IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, string);
 						format(string, sizeof(string), ""cnr_sign" "ORANGE_E"%s(%i) has joined the "BLUE_E"Swat "ORANGE_E"in the /CNR minigame.", __GetName(playerid), playerid);
   	    				SCMToAll(-1, string);
 			    		SCM(playerid, -1, ""nef" You have joined the SWAT TEAM!");
@@ -20493,46 +20264,6 @@ public OnDynamicObjectMoved(objectid)
 	return 1;
 }
 
-#if IRC_CONNECT == true
-public IRC_OnConnect(botid, ip[], port)
-{
-    Log(LOG_ONLINE, "IRC_OnConnect: Bot ID %d connected to %s:%d", botid, ip, port);
-    IRC_JoinChannel(botid, IRC_CHANNEL);
-    IRC_AddToGroup(IRC_GroupID, botid);
-    return 1;
-}
-
-public IRC_OnDisconnect(botid, ip[], port, reason[])
-{
-    Log(LOG_ONLINE, "IRC_OnDisconnect: Bot ID %d disconnected from %s:%d (%s)", botid, ip, port, reason);
-	IRC_RemoveFromGroup(IRC_GroupID, botid);
-	return 1;
-}
-
-public IRC_OnUserRequestCTCP(botid, user[], host[], message[])
-{
-	Log(LOG_ONLINE, "IRC_OnUserRequestCTCP (Bot ID %d): User %s (%s) sent CTCP request: %s", botid, user, host, message);
-	// Someone sent a CTCP VERSION request
-	if (!strcmp(message, "VERSION"))
-	{
-		IRC_ReplyCTCP(botid, user, "VERSION SA-MP IRC Plugin v" #IRC_PLUGIN_VERSION "");
-	}
-	return 1;
-}
-
-public IRC_OnConnectAttempt(botid, ip[], port)
-{
-	Log(LOG_ONLINE, "IRC_OnConnectAttempt(%i, %s, %i)", botid, ip, port);
-	return 1;
-}
-
-public IRC_OnConnectAttemptFail(botid, ip[], port, reason[])
-{
-	Log(LOG_ONLINE, "IRC_OnConnectAttemptFail(%i, %s, %i, %s)", botid, ip, port, reason);
-	return 1;
-}
-#endif
-
 function:OnHouseLoadEx(index)
 {
 	new rows, fields;
@@ -21912,9 +21643,6 @@ function:OnPlayerRegister(playerid, namehash, register, password[], playername[]
 			format(gstr, sizeof gstr, "["SVRSC"] %s(%i) "GREEN_E"has registered, making the server have a total of "LB2_E"%i "GREEN_E"players registered.", __GetName(playerid), playerid, cache_insert_id());
 			SCMToAll(COLOR_PINK, gstr);
 
-			format(gstr, sizeof(gstr), "5,9- RegServ -3,0 %s(%i) has registered making the server have a total of %i players registered.", __GetName(playerid), playerid, cache_insert_id());
-			IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
-
 			format(gstr, sizeof(gstr), "~b~~h~~h~Welcome to "SVRSC", ~r~~h~~h~%s~b~~h~~h~!~n~~b~~h~~h~You have successfully registered and logged in!", __GetName(playerid));
 			InfoTD_MSG(playerid, 5000, gstr);
 
@@ -21938,8 +21666,7 @@ function:OnPlayerRegister(playerid, namehash, register, password[], playername[]
 
 			format(gstr, sizeof gstr, "["SVRSC"] %s(%i) "GREEN_E"has registered, making the server have a total of "LB2_E"%i "GREEN_E"players registered.", __GetName(playerid), playerid, cache_insert_id());
 			SCMToAll(COLOR_PINK, gstr);
-			format(gstr, sizeof(gstr), "5,9- RegServ -3,0 %s(%i) has registered making the server have a total of %i players registered.", __GetName(playerid), playerid, cache_insert_id());
-			IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
+
 			format(gstr, sizeof(gstr), "~b~~h~~h~Welcome to "SVRSC", ~r~~h~~h~%s~b~~h~~h~!~n~~b~~h~~h~You have successfully registered and logged in!", __GetName(playerid));
 			InfoTD_MSG(playerid, 5000, gstr);
 
@@ -28507,58 +28234,6 @@ function:InfoTD_Hide(playerid)
 	PlayerTextDrawHide(playerid, TXTInfoTD[playerid]);
 }
 
-IRC_QuitBots()
-{
-    IRC_Quit(IRC_Bots[0]);
-    IRC_Quit(IRC_Bots[1]);
-    IRC_Quit(IRC_Bots[2]);
-    IRC_Quit(IRC_Bots[3]);
-    IRC_Quit(IRC_Bots[4]);
-}
-
-IRC_SetUp(bool:restart = false)
-{
-	#if IRC_CONNECT == true
-    if(!restart) IRC_GroupID = IRC_CreateGroup();
-    
-    #if IS_RELEASE_BUILD == true
-	IRC_Bots[0] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]Floatround", "["SVRSC"]Floatround", "foatround", false, "31.204.152.218", "");
-	IRC_SetIntData(IRC_Bots[0], E_IRC_CONNECT_DELAY, 1);
-	
-	IRC_Bots[1] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]Inyaface", "["SVRSC"]Inyaface", "inyaface", false, "31.204.152.218", "");
-	IRC_SetIntData(IRC_Bots[1], E_IRC_CONNECT_DELAY, 7);
-	
-	IRC_Bots[2] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]SS_FatGuy", "["SVRSC"]SS_FatGuy", "ss_fatguy", false, "31.204.152.218", "");
-	IRC_SetIntData(IRC_Bots[2], E_IRC_CONNECT_DELAY, 17);
-	
-	IRC_Bots[3] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]TrainRider", "["SVRSC"]TrainRider", "trainrider", false, "31.204.152.218", "");
-	IRC_SetIntData(IRC_Bots[3], E_IRC_CONNECT_DELAY, 27);
-	
-	IRC_Bots[4] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]CrazyLilMan", "["SVRSC"]CrazyLilMan", "crazylilman", false, "31.204.152.218", "");
-	IRC_SetIntData(IRC_Bots[4], E_IRC_CONNECT_DELAY, 39);
-	
-	#else
-	
-	IRC_Bots[0] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]Floatround_BETA", "["SVRSC"]Floatround_BETA", "foatround_BETA", false, "31.204.152.218", "");
-	IRC_SetIntData(IRC_Bots[0], E_IRC_CONNECT_DELAY, 1);
-
-	IRC_Bots[1] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]Inyaface_BETA", "["SVRSC"]Inyaface_BETA", "inyaface_BETA", false, "31.204.152.218", "");
-	IRC_SetIntData(IRC_Bots[1], E_IRC_CONNECT_DELAY, 7);
-
-	IRC_Bots[2] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]SS_FatGuy_BETA", "["SVRSC"]SS_FatGuy_BETA", "ss_fatguy_BETA", false, "31.204.152.218", "");
-	IRC_SetIntData(IRC_Bots[2], E_IRC_CONNECT_DELAY, 17);
-
-	IRC_Bots[3] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]TrainRider_BETA", "["SVRSC"]TrainRider_BETA", "trainrider_BETA", false, "31.204.152.218", "");
-	IRC_SetIntData(IRC_Bots[3], E_IRC_CONNECT_DELAY, 27);
-
-	IRC_Bots[4] = IRC_Connect(IRC_SERVER, IRC_PORT, "["SVRSC"]CrazyLilMan_BETA", "["SVRSC"]CrazyLilMan_BETA", "crazylilman_BETA", false, "31.204.152.218", "");
-	IRC_SetIntData(IRC_Bots[4], E_IRC_CONNECT_DELAY, 39);
-	#endif
-	#else
-	#pragma unused restart
-	#endif
-}
-
 function:DoLotto()
 {
 	Iter_Clear(itterLottoNumberPool);
@@ -28595,8 +28270,6 @@ function:LottoDraw()
 	        GivePlayerMoneyEx(i, g_LottoJackpot, true, true);
 	        PlayerPlaySound(i, 5448, 0, 0, 0);
 	        player_notice(i, "~g~~h~~h~You won the lotto jackpot!", "", 4000);
-	 		format(gstr, sizeof(gstr), "5%s(%i)3 won the lottery! Prize: $%s", __GetName(i), i, number_format(g_LottoJackpot));
-	        IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 	        found = true;
 	        break;
 	    }
@@ -30424,14 +30097,6 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 				{
                     format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"VIP %s(%i) logged in!", __GetName(playerid), playerid);
                     SCMToAll(-1, gstr2);
-                    
-					format(gstr2, sizeof(gstr2), "02[%i] 03*** VIP %s has joined the server.", playerid, __GetName(playerid));
-					IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr2);
-				}
-				else
-				{
-					format(gstr2, sizeof(gstr2), "02[%i] 03*** %s has joined the server.", playerid, __GetName(playerid));
-					IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr2);
 				}
 
 				mysql_format(pSQL, gstr, sizeof(gstr), "SELECT * FROM `queue` WHERE `Extra` = '%e';", __GetName(playerid));
@@ -30779,8 +30444,6 @@ NewMinigameJoin(playerid, const minigame[], const cmd[])
 {
 	format(gstr, sizeof(gstr), ""r_besch"[JOIN] {D2D2AB}%s(%i) just joined %s [/%s]", __GetName(playerid), playerid, minigame, cmd);
 	SCMToAll(-1, gstr);
-	format(gstr, sizeof(gstr), "3,1JOIN:4 %s(%i) just joined %s [/%s]", __GetName(playerid), playerid, minigame, cmd);
-	IRC_GroupSay(IRC_GroupID, IRC_CHANNEL, gstr);
 }
 
 NewMapEvent(playerid, const cmd[])
