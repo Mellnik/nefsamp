@@ -11,7 +11,7 @@
 
 #define FILTERSCRIPT
 
-#include <a_samp>       // 0.3z-R3
+#include <a_samp>       // 0.3z-R4
 #include <streamer>     // v2.7
 
 public OnFilterScriptInit()

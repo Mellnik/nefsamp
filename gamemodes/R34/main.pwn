@@ -9,15 +9,20 @@
 || #################################################################### ||
 \*======================================================================*/
 
-/* Build Dependencies
-|| SA-MP Server 0.3z-R3
+/*
+|| Build Dependencies:
+|| SA-MP Server 0.3z-R4
 || YSI Library 3.2
 || sscanf Plugin 2.8.1
 || Streamer Plugin v2.7
 || MySQL Plugin R38
 ||
-|| Build specific:
+|| Build notes:
 ||
+||
+|| Database changes:
+|| SET TYPE float TO 14,4 ALL
+|| new gang table layout: id(mediumint, 8, unsigned), gname(varchar, 20), gtag(varchar, 4), gscore(int, 10, unsigned), gcolor(int, 10), gcar(smallint, 5, unsigned), gtop(int, 10, unsigned)
 ||
 || Script limits:
 || Max teleports per category: 32
@@ -770,7 +775,7 @@ enum E_PLAYER_DATA // Prefixes: i = Integer, s = String, b = bool, f = Float, p 
 	BusinessIdSelected,
 	DrawnNumber,
 	ExitType,
-	MedkitTime,
+	iMedkitTime,
 	GCPlayer,
 	GCNameHash,
 	GCOffer,
@@ -4570,7 +4575,17 @@ public OnPlayerUpdate(playerid)
 	return 1;
 }
 
-public OnUnoccupiedVehicleUpdate(vehicleid, playerid, passenger_seat, Float:new_x, Float:new_y, Float:new_z)
+public OnTrailerUpdate(playerid, vehicleid)
+{
+	if(playerid != INVALID_PLAYER_ID) {
+	    if(PlayerData[playerid][bOpenSeason]) {
+	        return 0;
+	    }
+	}
+	return 1;
+}
+
+public OnUnoccupiedVehicleUpdate(vehicleid, playerid, passenger_seat, Float:new_x, Float:new_y, Float:new_z, Float:vel_x, Float:vel_y, Float:vel_z)
 {
 	if(playerid != INVALID_PLAYER_ID) {
 	    if(PlayerData[playerid][bOpenSeason]) {
@@ -11784,7 +11799,6 @@ YCMD:gzones(playerid, params[], help)
     if(PlayerData[playerid][e_gangid] == 0) return SCM(playerid, -1, ""er"You aren't in any gang");
     
 	new str[1024], count = 0;
-
 	for(new i = 0; i < gzoneid; i++)
 	{
 	    if(PlayerData[playerid][e_gangid] == GZoneData[i][e_localgang])
@@ -11812,6 +11826,7 @@ YCMD:gwars(playerid, params[], help)
 {
 	new str[512], count = 0;
 	strcat(str, ""white"");
+	
 	for(new i = 0; i < gzoneid; i++)
 	{
 	    if(GZoneData[i][e_underattack])
@@ -15613,12 +15628,12 @@ YCMD:mk(playerid, params[], help)
 	    return SCM(playerid, -1, ""er"You are already at full health");
 	}
 	
-	PlayerData[playerid][MedkitTime] = 50;
+	PlayerData[playerid][iMedkitTime] = 50;
 	PlayerData[playerid][e_medkits]--;
 	
 	PlayerPlaySound(playerid, 1052, 0.0, 0.0, 0.0);
 	
-	PlayerData[playerid][tMedkit] = SetTimerEx("p_medkit", 200, true, "i", playerid);
+	PlayerData[playerid][tMedkit] = SetTimerEx("player_medkit_charge", 200, true, "i", playerid);
 	
 	InfoTD_MSG(playerid, 2500, "~y~~h~Medkit used!");
 	PlayerData[playerid][tickLastMedkit] = tick;
@@ -29451,9 +29466,9 @@ function:OnBoostReceive(playerid, namehash)
 	return 1;
 }
 
-function:p_medkit(playerid)
+function:player_medkit_charge(playerid)
 {
-	if(PlayerData[playerid][MedkitTime] > 0)
+	if(PlayerData[playerid][iMedkitTime] > 0)
 	{
 	    if(!IsPlayerConnected(playerid))
 	    {
@@ -29476,7 +29491,7 @@ function:p_medkit(playerid)
 		SetPlayerHealth(playerid, health + 1.0);
 		SetPlayerChatBubble(playerid, ""green"Used 1 Medkit!", -1, 15.0, 200);
 		
-		PlayerData[playerid][MedkitTime]--;
+		PlayerData[playerid][iMedkitTime]--;
 	}
 	else
 	{
@@ -31233,7 +31248,7 @@ ResetPlayerVars(playerid)
 	PlayerData[playerid][e_credits] = 0;
 	PlayerData[playerid][e_medkits] = 0;
 	PlayerData[playerid][tMedkit] = -1;
-	PlayerData[playerid][MedkitTime] = 0;
+	PlayerData[playerid][iMedkitTime] = 0;
 	PlayerData[playerid][e_payday] = 60;
   	PlayerData[playerid][e_houses] = 0;
 	PlayerData[playerid][GCPlayer] = INVALID_PLAYER_ID;
