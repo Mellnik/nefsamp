@@ -22,7 +22,7 @@
 ||
 || Database changes:
 || SET TYPE float TO 14,4 ALL
-|| new gang table layout: id(mediumint, 8, unsigned), gname(varchar, 20), gtag(varchar, 4), gscore(int, 10, unsigned), gcolor(int, 10), gcar(smallint, 5, unsigned), gtop(int, 10, unsigned)
+|| new gang table layout: id(mediumint, 8, unsigned), gname(varchar, 20), gtag(varchar, 4), gscore(int, 10, unsigned), gcolor(int, 10), gcar(smallint, 5, unsigned), gtop(int, 10, unsigned), date(int, 10, unsigned)
 ||
 || Script limits:
 || Max teleports per category: 32
@@ -4277,7 +4277,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				    }
 				}
 
-				format(gstr, sizeof(gstr), "DELETE FROM `gangs` WHERE `ID` = %i LIMIT 1;", gangid);
+				format(gstr, sizeof(gstr), "DELETE FROM `gangs` WHERE `id` = %i LIMIT 1;", gangid);
 				mysql_tquery(pSQL, gstr);
 
 				format(gstr, sizeof(gstr), ""server_sign" "r_besch"Admin %s(%i) has destroyed gang %s", __GetName(extraid), extraid, gangname);
@@ -12208,8 +12208,8 @@ YCMD:gcolor(playerid, params[], help)
 		
 		new col = RGBA(r, g, b, 255);
 
-		format(gstr, sizeof(gstr), "UPDATE `gangs` SET `Color` = %i WHERE `ID` = %i;", col, PlayerData[playerid][e_gangid]);
-		mysql_tquery(pSQL, gstr, "", "");
+		format(gstr, sizeof(gstr), "UPDATE `gangs` SET `gcolor` = %i WHERE `id` = %i LIMIT 1;", col, PlayerData[playerid][e_gangid]);
+		mysql_tquery(pSQL, gstr);
 
 	    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s set the gang color to {%06x}NEW COLOR", __GetName(playerid), col >>> 8);
 		gang_broadcast(PlayerData[playerid][e_gangid], gstr);
@@ -12231,7 +12231,7 @@ YCMD:gcar(playerid, params[], help)
 	        if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't spawn a car now");
 	        if(IsPlayerInRangeOfPoint(playerid, 65.0, 1797.3141, -1302.0978, 120.2659) && PlayerData[playerid][e_level] < 1) return SCM(playerid, -1, ""er"Can't spawn vehicle at this place!");
 	        
-	        format(gstr, sizeof(gstr), "SELECT `Vehicle` FROM `gangs` WHERE `ID` = %i LIMIT 1;", PlayerData[playerid][e_gangid]);
+	        format(gstr, sizeof(gstr), "SELECT `gcar` FROM `gangs` WHERE `id` = %i LIMIT 1;", PlayerData[playerid][e_gangid]);
 			new Cache:res = mysql_query(pSQL, gstr);
 			
 			if(cache_get_row_count(pSQL) != 0)
@@ -12284,8 +12284,8 @@ YCMD:gcar(playerid, params[], help)
 
 			if(gcar != -1)
 			{
-				format(gstr, sizeof(gstr), "UPDATE `gangs` SET `Vehicle` = %i WHERE `ID` = %i;", gcar, PlayerData[playerid][e_gangid]);
-				mysql_pquery(pSQL, gstr, "", "");
+				format(gstr, sizeof(gstr), "UPDATE `gangs` SET `gcar` = %i WHERE `id` = %i LIMIT 1;", gcar, PlayerData[playerid][e_gangid]);
+				mysql_pquery(pSQL, gstr);
 
 			    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s set the gang vehicle to %s", __GetName(playerid), VehicleNames[gcar - 400]);
 				gang_broadcast(PlayerData[playerid][e_gangid], gstr);
@@ -15023,7 +15023,7 @@ YCMD:gangs(playerid, params[], help)
 
 YCMD:gtop(playerid, params[], help)
 {
-	mysql_tquery(pSQL, "SELECT `GangName`, `GangTag`, `GangScore`, `Color` FROM `gangs` ORDER BY `GangScore` DESC LIMIT 30;", "OnGTopReceived", "i", playerid);
+	mysql_pquery(pSQL, "SELECT `gname`, `gtag`, `gscore`, `gcolor` FROM `gangs` ORDER BY `gscore` DESC LIMIT 30;", "OnGTopReceived", "i", playerid);
 	return 1;
 }
 
@@ -18831,7 +18831,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				    }
 				}
 
-				format(gstr, sizeof(gstr), "DELETE FROM `gangs` WHERE `ID` = %i LIMIT 1;", PlayerData[playerid][e_gangid]);
+				format(gstr, sizeof(gstr), "DELETE FROM `gangs` WHERE `id` = %i LIMIT 1;", PlayerData[playerid][e_gangid]);
 				mysql_tquery(pSQL, gstr);
 
 			    PlayerData[playerid][bGangInvite] = false;
@@ -20904,7 +20904,7 @@ SyncGangZones(playerid)
 
 GetGangNameByID(id)
 {
-	format(gstr, sizeof(gstr), "SELECT `GangName` FROM `gangs` WHERE `ID` = %i LIMIT 1;", id);
+	format(gstr, sizeof(gstr), "SELECT `gname` FROM `gangs` WHERE `id` = %i LIMIT 1;", id);
 	new Cache:res = mysql_query(pSQL, gstr), name[21];
 	if(cache_get_row_count(pSQL) != 0)
 	{
@@ -21794,13 +21794,13 @@ vip_broadcast(color, const msg[])
 
 MySQL_FetchGangInfo(playerid, gangid)
 {
-	format(gstr, sizeof(gstr), "SELECT * FROM `gangs` WHERE `ID` = %i LIMIT 1;", gangid);
+	format(gstr, sizeof(gstr), "SELECT * FROM `gangs` WHERE `id` = %i LIMIT 1;", gangid);
 	mysql_tquery(pSQL, gstr, "OnQueryFinish", "siii", gstr, THREAD_FETCH_GANG_INFO, playerid, pSQL);
 }
 
 MySQL_UpdateGangScore(gangid, value)
 {
-	format(gstr2, sizeof(gstr2), "UPDATE `gangs` SET `GangScore` = `GangScore` + %i, `Top` = `Top` + %i WHERE `ID` = %i LIMIT 1;", value, value, gangid);
+	format(gstr2, sizeof(gstr2), "UPDATE `gangs` SET `gscore` = `gscore` + %i, `gtop` = `gtop` + %i WHERE `id` = %i LIMIT 1;", value, value, gangid);
 	mysql_pquery(pSQL, gstr2);
 }
 
@@ -21830,7 +21830,7 @@ MySQL_LoadPlayerPVs(playerid)
 
 MySQL_LoadPlayerGang(playerid)
 {
-	format(gstr2, sizeof(gstr2), "SELECT `GangName`, `GangTag` FROM `gangs` WHERE `ID` = %i LIMIT 1;", PlayerData[playerid][e_gangid]);
+	format(gstr2, sizeof(gstr2), "SELECT `gname`, `gtag` FROM `gangs` WHERE `id` = %i LIMIT 1;", PlayerData[playerid][e_gangid]);
 	mysql_pquery(pSQL, gstr2, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_GANG_LOAD);
 }
 
@@ -21950,25 +21950,25 @@ MySQL_BanIP(const ip[])
 
 MySQL_ExistGang(playerid)
 {
-	format(gstr, sizeof(gstr), "SELECT `ID` FROM `gangs` WHERE `GangName` = '%s' LIMIT 1;", PlayerData[playerid][GangName]);
+	format(gstr, sizeof(gstr), "SELECT `id` FROM `gangs` WHERE `gname` = '%s' LIMIT 1;", PlayerData[playerid][GangName]);
 	mysql_tquery(pSQL, gstr, "OnQueryFinish", "siii", gstr, THREAD_GANG_EXIST, playerid, pSQL);
 }
 
 MySQL_CreateGang(playerid)
 {
-    format(gstr2, sizeof(gstr2), "INSERT INTO `gangs` VALUES (NULL, '%s', '%s', 0, %i, -84215197, 0, 0);", PlayerData[playerid][GangName], PlayerData[playerid][GangTag], gettime());
+    format(gstr2, sizeof(gstr2), "INSERT INTO `gangs` VALUES (NULL, '%s', '%s', 0, -84215197, 0, 0, UNIX_TIMESTAMP());", PlayerData[playerid][GangName], PlayerData[playerid][GangTag]);
     mysql_tquery(pSQL, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_CREATE_GANG, playerid, pSQL);
 }
 
 MySQL_DestroyGang(playerid, gangname[])
 {
-	format(gstr2, sizeof(gstr2), "SELECT `ID`, `GangName` FROM `gangs` WHERE `GangName` = '%s';", gangname);
+	format(gstr2, sizeof(gstr2), "SELECT `id`, `gname` FROM `gangs` WHERE `gname` = '%s';", gangname);
 	mysql_tquery(pSQL, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_GANG_DESTROY, playerid, pSQL);
 }
 
 MySQL_GangRename(playerid, newgangname[], newgangtag[])
 {
-	mysql_format(pSQL, gstr2, sizeof(gstr2), "SELECT `ID` FROM `gangs` WHERE `GangName` = '%e';", newgangname);
+	mysql_format(pSQL, gstr2, sizeof(gstr2), "SELECT `id` FROM `gangs` WHERE `gname` = '%e';", newgangname);
 	mysql_pquery(pSQL, gstr2, "OnGangRenameAttempt", "issi", playerid, newgangname, newgangtag, YHash(__GetName(playerid)));
 }
 
@@ -29416,7 +29416,7 @@ function:OnGangRenameAttempt(playerid, newgangname[], newgangtag[], namehash)
 	        }
 	    }
 	    
-	    mysql_format(pSQL, gstr2, sizeof(gstr2), "UPDATE `gangs` SET `GangName` = '%s', `GangTag` = '%s' WHERE `ID` = %i LIMIT 1;", newgangname, newgangtag, PlayerData[playerid][e_gangid]);
+	    mysql_format(pSQL, gstr2, sizeof(gstr2), "UPDATE `gangs` SET `gname` = '%s', `gtag` = '%s' WHERE `id` = %i LIMIT 1;", newgangname, newgangtag, PlayerData[playerid][e_gangid]);
 	    mysql_pquery(pSQL, gstr2);
 	    
 	    format(gstr2, sizeof(gstr2), ""gang_sign" "r_besch"Gang Founder %s(%i) changed the gang's name to [%s]%s", __GetName(playerid), playerid, newgangtag, newgangname);
