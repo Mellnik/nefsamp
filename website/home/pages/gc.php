@@ -47,5 +47,5 @@
 	</form>
 	</div>
 	<br>
-		<a class="neflink" href="http://forum.nefserver.net/showthread.php?1692-Gold-Credits">Gold Credits information topic.</a>
+		<a class="neflink" href="http://forum.nefserver.net/showthread.php?1692-Gold-Credits">Gold Credits information thread</a>
 	</div>

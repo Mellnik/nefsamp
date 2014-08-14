@@ -2935,8 +2935,8 @@ public OnGameModeInit()
 	Log(LOG_INIT, "MySQL: Logging: LOG_ERROR | LOG_WARNING");
 	mysql_log(LOG_ERROR | LOG_WARNING, LOG_TYPE_TEXT);
 	
-    MySQL_Connect();
-	MySQL_CleanUp();
+    SQL_Connect();
+	SQL_CleanUp();
 
 	#if INC_ENVIRONMENT == true
     BuildServerMap();
@@ -2999,7 +2999,7 @@ public OnGameModeExit()
     DestroyElevator();
 
 	Log(LOG_EXIT, "MySQL: Garbage cleanup");
-    MySQL_CleanUp();
+    SQL_CleanUp();
     
 	mysql_stat(gstr2, pSQL, sizeof(gstr2));
 	Log(LOG_EXIT, "MySQL: %s", gstr2);
@@ -3620,7 +3620,7 @@ public OnPlayerDisconnect(playerid, reason)
 
    	if(PlayerData[playerid][ExitType] == EXIT_FIRST_SPAWNED && PlayerData[playerid][bLogged])
 	{
-	    MySQL_SaveAccount(playerid);
+	    SQL_SaveAccount(playerid);
 	    
 		switch(gTeam[playerid])
 		{
@@ -4249,7 +4249,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 						format(gstr2, sizeof(gstr2), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: ---\n"orange"Type /gwar to start an attack!", GZoneData[i][e_id], GZoneData[i][e_zonename]);
 						UpdateDynamic3DTextLabelText(GZoneData[i][e_labelid], WHITE, gstr2);
 
-						MySQL_SaveGangZone(i);
+						SQL_SaveGangZone(i);
 				    }
 				}
 
@@ -4265,7 +4265,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 					        PlayerData[i][e_gangrank] = GANG_POS_NONE;
 					        PlayerData[i][GangName][0] = '\0';
 							PlayerData[i][GangTag][0] = '\0';
-							MySQL_SaveAccount(i, false, false);
+							SQL_SaveAccount(i, false, false);
 					 		if(PlayerData[i][GangLabel] != Text3D:-1)
 							{
 							    DestroyDynamic3DTextLabel(PlayerData[i][GangLabel]);
@@ -4378,7 +4378,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 
             GivePlayerMoneyEx(extraid, -500000);
 
-			MySQL_SaveAccount(extraid, false, false);
+			SQL_SaveAccount(extraid, false, false);
 
 			format(gstr, sizeof(gstr), ""nef" "yellow_e"%s(%i) has created a new gang: '"nef_yellow"%s"white"'", __GetName(extraid), extraid, PlayerData[extraid][GangName]);
             SCMToAll(-1, gstr);
@@ -4423,7 +4423,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 					    return SCM(extraid, -1, ""er"Player is already this rank!");
 					}
 
-					MySQL_FinalRankAssign(extraid);
+					SQL_FinalRankAssign(extraid);
 				}
 				else
 				{
@@ -4456,7 +4456,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				}
 				else
 		        {
-					MySQL_FinalGangKick(extraid);
+					SQL_FinalGangKick(extraid);
 				}
 			}
 			else
@@ -4479,7 +4479,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 
 			if(rows == 0)
 	 		{
-				MySQL_CreateGang(extraid);
+				SQL_CreateGang(extraid);
 			}
 			else
 			{
@@ -5130,7 +5130,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 			  	// Nur Kills bei FREEROAM werten für GangScore
 			 	if(PlayerData[killerid][e_gangrank] > 0 && PlayerData[playerid][e_gangid] != PlayerData[killerid][e_gangid])
 				{
-				  	MySQL_UpdateGangScore(PlayerData[killerid][e_gangid], 1);
+				  	SQL_UpdateGangScore(PlayerData[killerid][e_gangid], 1);
 			 	}
 	        }
 	    }
@@ -6974,7 +6974,7 @@ public OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y,
 	        DestroyDynamic3DTextLabel(HouseData[h_id][E_Obj_Label][PlayerData[playerid][houseobj_selected]]);
 	        HouseData[h_id][E_Obj_Label][PlayerData[playerid][houseobj_selected]] = CreateDynamic3DTextLabel(str, LIGHT_YELLOW, x, y, z+0.5, 3.5, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, HouseData[h_id][e_id] + 1000);
 	        
-			MySQL_SaveHouse(h_id, true);
+			SQL_SaveHouse(h_id, true);
 		}
 		else player_notice(playerid, "Couldn't find the house in that slot", "Report on forums", 5000);
     }
@@ -8629,8 +8629,8 @@ YCMD:buygc(playerid, params[], help)
 		PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
 		PlayerPlaySound(PlayerData[playerid][GCPlayer], 1057, 0.0, 0.0, 0.0);
 
-        MySQL_SaveAccount(playerid, false, false);
-		MySQL_SaveAccount(PlayerData[playerid][GCPlayer], false, false);
+        SQL_SaveAccount(playerid, false, false);
+		SQL_SaveAccount(PlayerData[playerid][GCPlayer], false, false);
 
 	    format(gstr2, sizeof(gstr2), "INSERT INTO `sells` VALUES (NULL, 2, %i, %i, %i, %i);", PlayerData[playerid][GCOffer], PlayerData[playerid][GCPrice], PlayerData[PlayerData[playerid][GCPlayer]][e_accountid], PlayerData[playerid][e_accountid]);
 	    mysql_tquery(pSQL, gstr2, "", "");
@@ -8711,7 +8711,7 @@ YCMD:bbuy(playerid, params[], help)
 		player_notice(playerid, "SUCCESS!", "");
         PlayerPlaySound(playerid, 1149, 0.0, 0.0, 0.0);
         GivePlayerMoneyEx(playerid, -1500000);
-        MySQL_SaveAccount(playerid, false, false);
+        SQL_SaveAccount(playerid, false, false);
 		
 	    format(gstr, sizeof(gstr), ""nef" "yellow_e"%s(%i) bought the business %i!", __GetName(playerid), playerid, BusinessData[r][e_id]);
 	    SCMToAll(-1, gstr);
@@ -8832,8 +8832,8 @@ YCMD:buy(playerid, params[], help)
 	    HouseData[i][date] = gettime();
 	    PlayerData[playerid][e_houses]++;
 	    player_notice(playerid, "House bought", "");
-	    MySQL_SaveHouse(i);
-	    MySQL_SaveAccount(playerid, false, false);
+	    SQL_SaveHouse(i);
+	    SQL_SaveAccount(playerid, false, false);
 	    PlayerData[playerid][tickLastBuy] = tick;
 	    PlayerPlaySound(playerid, 1149, 0.0, 0.0, 0.0);
 	    format(gstr, sizeof(gstr), ""nef" "yellow_e"%s(%i) bought the house %i for $%s!", __GetName(playerid), playerid, HouseData[i][e_id], number_format(HouseData[i][price]));
@@ -8906,8 +8906,8 @@ YCMD:sell(playerid, params[], help)
 	    HouseData[i][date] = 0;
 	    GivePlayerMoneyEx(playerid, floatround(HouseData[i][price] / 4));
 	    player_notice(playerid, "House sold", "");
-	    MySQL_SaveHouse(i, true);
-	    MySQL_SaveAccount(playerid, false, false);
+	    SQL_SaveHouse(i, true);
+	    SQL_SaveAccount(playerid, false, false);
 	    PlayerData[playerid][tickLastSell] = tick;
 	    PlayerPlaySound(playerid, 1149, 0.0, 0.0, 0.0);
 	    format(gstr, sizeof(gstr), ""nef" "yellow_e"%s(%i) sold the house %i for $%s!", __GetName(playerid), playerid, HouseData[i][e_id], number_format(floatround(HouseData[i][price] / 4)));
@@ -8995,7 +8995,7 @@ YCMD:hlock(playerid, params[], help)
 
 	   			HouseData[i][locked] = (HouseData[i][locked]) ? (0) : (1);
 	            PlayerPlaySound(playerid, 1027, 0.0, 0.0, 0.0);
-	            MySQL_SaveHouse(i);
+	            SQL_SaveHouse(i);
 			}
 			else if(IsPlayerInRangeOfPoint(playerid, 100.0, g_HouseInteriorTypes[HouseData[i][interior]][house_x], g_HouseInteriorTypes[HouseData[i][interior]][house_y], g_HouseInteriorTypes[HouseData[i][interior]][house_z]) && GetPlayerInterior(playerid) == g_HouseInteriorTypes[HouseData[i][interior]][interior] && GetPlayerVirtualWorld(playerid) == (HouseData[i][e_id] + 1000))
 			{
@@ -9013,7 +9013,7 @@ YCMD:hlock(playerid, params[], help)
 
 	            HouseData[i][locked] = HouseData[i][locked] ? 0 : 1;
 	            PlayerPlaySound(playerid, 1027, 0.0, 0.0, 0.0);
-	            MySQL_SaveHouse(i);
+	            SQL_SaveHouse(i);
 			}
 			else continue;
 		}
@@ -11502,7 +11502,7 @@ YCMD:grename(playerid, params[], help)
 	new gangtag[5];
 	mysql_escape_string(buff2, gangtag, pSQL, 5);
 
-	MySQL_GangRename(playerid, gangname, gangtag);
+	SQL_GangRename(playerid, gangname, gangtag);
 	return 1;
 }
 
@@ -11581,7 +11581,7 @@ YCMD:gzonereset(playerid, params[], help)
         	format(gstr2, sizeof(gstr2), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: ---\n"orange"Type /gwar to start an attack!", GZoneData[i][e_id], GZoneData[i][e_zonename]);
 			UpdateDynamic3DTextLabelText(GZoneData[i][e_labelid], WHITE, gstr2);
 	        
-			MySQL_SaveGangZone(i);
+			SQL_SaveGangZone(i);
 	        
 	        for(new ii = 0; ii < MAX_PLAYERS; ii++)
 	        {
@@ -11618,7 +11618,7 @@ YCMD:gdestroy(playerid, params[], help)
 		}
 		new escape[21];
 		mysql_escape_string(to_destroy, escape, pSQL, 21);
-		MySQL_DestroyGang(playerid, escape);
+		SQL_DestroyGang(playerid, escape);
 	}
 	else
 	{
@@ -11696,7 +11696,7 @@ YCMD:gcreate(playerid, params[], help)
 	mysql_escape_string(ttmp, PlayerData[playerid][GangTag], pSQL, 5);
 
     PlayerData[playerid][tickLastGCreate] = tick;
-    MySQL_ExistGang(playerid);
+    SQL_ExistGang(playerid);
 	return 1;
 }
 
@@ -11770,7 +11770,7 @@ YCMD:gcapture(playerid, params[], help)
 			format(gstr, sizeof(gstr), ""gang_sign" "r_besch" %s %s(%i) re-captured zone '%s' which was under attack.", g_szGangRanks[PlayerData[playerid][e_gangrank]][E_gang_pos_name], __GetName(playerid), playerid, GZoneData[i][e_zonename]);
 			gang_broadcast(GZoneData[i][e_defender], gstr);
 
-			MySQL_UpdateGangScore(GZoneData[i][e_localgang], 5);
+			SQL_UpdateGangScore(GZoneData[i][e_localgang], 5);
 
 			Iter_Remove(iterGangWar, GZoneData[i][e_attacker]);
 			Iter_Remove(iterGangWar, GZoneData[i][e_localgang]);
@@ -11782,7 +11782,7 @@ YCMD:gcapture(playerid, params[], help)
 			GZoneData[i][e_defender] = 0;
 			GZoneData[i][e_locked] = gettime() + 1800;
 			
-			MySQL_SaveGangZone(i);
+			SQL_SaveGangZone(i);
 		}
 	    break;
 	}
@@ -12097,7 +12097,7 @@ YCMD:gjoin(playerid, params[], help)
 	PlayerData[playerid][e_gangid] = PlayerData[playerid][TmpGangID];
 	PlayerData[playerid][TmpGangID] = 0;
 
-    MySQL_SaveAccount(playerid, false, false);
+    SQL_SaveAccount(playerid, false, false);
 
 	format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s(%i) has joined the gang!", __GetName(playerid), playerid);
 	gang_broadcast(PlayerData[playerid][e_gangid], gstr);
@@ -12145,7 +12145,7 @@ YCMD:gleave(playerid, params[], help)
     PlayerData[playerid][GangTag][0] = '\0';
  	PlayerData[playerid][e_gangrank] = GANG_POS_NONE;
 
-    MySQL_SaveAccount(playerid, false, false);
+    SQL_SaveAccount(playerid, false, false);
     SyncGangZones(playerid);
 	if(PlayerData[playerid][GangLabel] != Text3D:-1)
 	{
@@ -12412,7 +12412,7 @@ YCMD:tban(playerid, params[], help)
 			    new amsg[144];
 			    if(!islogged(player)) return SCM(playerid, -1, ""er"Player is not registered");
 			    
-			    MySQL_BanAccount(__GetName(player), __GetName(playerid), reason, gettime() + (time * 60));
+			    SQL_BanAccount(__GetName(player), __GetName(playerid), reason, gettime() + (time * 60));
 
 				format(gstr, sizeof(gstr), ""yellow"** "red"%s(%i) has been banned by Admin %s(%i) [Reason: %s] [Time: %i mins]", __GetName(player), player, __GetName(playerid), playerid, reason, time);
 				format(amsg, sizeof(amsg), "[ADMIN CHAT] "LG_E"Account banned of %s [EXPIRES: %s, REASON: %s]", __GetName(player), UTConvert(gettime() + (time * 60)), reason);
@@ -12499,13 +12499,13 @@ YCMD:ban(playerid, params[], help)
 			{
 			    new amsg[144];
 			    if(islogged(player)) { // Ban registered player
-                	MySQL_BanAccount(__GetName(player), __GetName(playerid), reason);
-                    MySQL_BanIP(__GetIP(player));
+                	SQL_BanAccount(__GetName(player), __GetName(playerid), reason);
+                    SQL_BanIP(__GetIP(player));
                     
                     format(gstr, sizeof(gstr), ""yellow"** "red"%s(%i) has been banned by Admin %s(%i) [Reason: %s]", __GetName(player), player, __GetName(playerid), playerid, reason);
                     format(amsg, sizeof(amsg), "[ADMIN CHAT] "LG_E"Account and IP banned of %s [EXPIRES: NEVER, REASON: %s]", __GetName(player), reason);
 				} else {
-				    MySQL_BanIP(__GetIP(player));
+				    SQL_BanIP(__GetIP(player));
 				    
 				    format(gstr, sizeof(gstr), ""SVRSC""yellow"** "red"%s(%i) has been banned by Admin %s(%i) [Reason: %s]", __GetName(player), player, __GetName(playerid), playerid, reason);
 				    format(amsg, sizeof(amsg), "[ADMIN CHAT] "LG_E"IP banned of %s [EXPIRES: NEVER, REASON: %s]", __GetName(player), reason);
@@ -13813,7 +13813,7 @@ YCMD:setadminlevel(playerid, params[], help)
 			else
 				GameTextForPlayer(player, "Demoted", 5000, 3);
 			
-			MySQL_SaveAccount(playerid, false, false);
+			SQL_SaveAccount(playerid, false, false);
 			format(gstr, sizeof(gstr), "You have made %s Level %i at %i:%i:%i", __GetName(player), alevel, time[0], time[1], time[2]);
 			SCM(playerid, BLUE, gstr);
 			format(gstr, sizeof(gstr), "Admin %s has made %s Level %i at %i:%i:%i", __GetName(playerid), __GetName(player), alevel, time[0], time[1], time[2]);
@@ -14025,7 +14025,7 @@ YCMD:hsetprice(playerid, params[], help)
 
  	   	format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][e_score], g_HouseInteriorTypes[HouseData[i][interior]][intname]);
 	    UpdateDynamic3DTextLabelText(HouseData[i][e_labelid], -1, gstr);
-	    MySQL_SaveHouse(i);
+	    SQL_SaveHouse(i);
 
 		player_notice(playerid, "House price has been set", "");
 	    break;
@@ -14055,7 +14055,7 @@ YCMD:hsetscore(playerid, params[], help)
 
  	   	format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][e_score], g_HouseInteriorTypes[HouseData[i][interior]][intname]);
 	    UpdateDynamic3DTextLabelText(HouseData[i][e_labelid], -1, gstr);
-	    MySQL_SaveHouse(i);
+	    SQL_SaveHouse(i);
 
 		player_notice(playerid, "House score has been set", "");
 	    break;
@@ -14081,7 +14081,7 @@ YCMD:hreset(playerid, params[], help)
 		{
 	        PlayerData[player][e_houses]--;
 	        SCM(player, -1, "An admin destroyed your house!");
-			MySQL_SaveAccount(player, false, false);
+			SQL_SaveAccount(player, false, false);
 		}
 		else
 		{
@@ -14105,7 +14105,7 @@ YCMD:hreset(playerid, params[], help)
 			}
 		}
         
-		MySQL_SaveHouse(i, true);
+		SQL_SaveHouse(i, true);
 
 	    format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][e_score], g_HouseInteriorTypes[HouseData[i][interior]][intname]);
 	    UpdateDynamic3DTextLabelText(HouseData[i][e_labelid], -1, gstr);
@@ -15593,7 +15593,7 @@ YCMD:changepass(playerid, params[], help)
 		return 1;
 	}
 
-    MySQL_UpdatePlayerPass(playerid, gstr);
+    SQL_UpdatePlayerPass(playerid, gstr);
 	PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
     format(gstr2, sizeof(gstr2), ""server_sign" "r_besch"You have successfully changed your password to %s", gstr);
 	SCM(playerid, -1, gstr2);
@@ -17170,7 +17170,7 @@ YCMD:ar(playerid, params[], help)
 				    
 				 	if(PlayerData[i][e_gangrank] > 0 && PlayerData[i][e_gangid] != PlayerData[playerid][e_gangid])
 					{
-					  	MySQL_UpdateGangScore(PlayerData[playerid][e_gangid], 1);
+					  	SQL_UpdateGangScore(PlayerData[playerid][e_gangid], 1);
 				 	}
 	    		}
     		}
@@ -17373,7 +17373,7 @@ function:OnPlayerNameChangeRequest(playerid, newname[])
 
 				    format(query, sizeof(query), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", __GetName(playerid), HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][e_score], g_HouseInteriorTypes[HouseData[i][interior]][intname]);
 				    UpdateDynamic3DTextLabelText(HouseData[i][e_labelid], -1, query);
-				    MySQL_SaveHouse(i);
+				    SQL_SaveHouse(i);
 				}
             }
 
@@ -17421,7 +17421,7 @@ function:OnPlayerNameChangeRequest(playerid, newname[])
 			format(query, sizeof(query), ""nef" %s(%i) has changed their name to %s", oldname, playerid, newname);
 			SCMToAll(-1, query);
 			
-			MySQL_SaveAccount(playerid);
+			SQL_SaveAccount(playerid);
         }
         else
         {
@@ -18768,7 +18768,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 			  		PlayerData[ID][e_gangrank] = PlayerData[playerid][RankSelected];
 
-		  			MySQL_SaveAccount(ID, false, false);
+		  			SQL_SaveAccount(ID, false, false);
 
 				    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s set %s's rank to %s", __GetName(playerid), __GetName(ID), g_szGangRanks[PlayerData[playerid][RankSelected]][E_gang_pos_name]);
 					gang_broadcast(PlayerData[playerid][e_gangid], gstr);
@@ -18777,7 +18777,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				}
 				else
 				{
-				    MySQL_AssignRankIfExist(playerid);
+				    SQL_AssignRankIfExist(playerid);
 	            }
 	            return true;
 	        }
@@ -18802,7 +18802,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						format(gstr2, sizeof(gstr2), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: ---\n"orange"Type /gwar to start an attack!", GZoneData[i][e_id], GZoneData[i][e_zonename]);
 						UpdateDynamic3DTextLabelText(GZoneData[i][e_labelid], WHITE, gstr2);
 
-						MySQL_SaveGangZone(i);
+						SQL_SaveGangZone(i);
 				    }
 				}
 
@@ -18818,7 +18818,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					        PlayerData[i][e_gangrank] = GANG_POS_NONE;
 					        PlayerData[i][GangName][0] = '\0';
 							PlayerData[i][GangTag][0] = '\0';
-							MySQL_SaveAccount(i, false, false);
+							SQL_SaveAccount(i, false, false);
 					 		if(PlayerData[i][GangLabel] != Text3D:-1)
 							{
 							    DestroyDynamic3DTextLabel(PlayerData[i][GangLabel]);
@@ -18839,7 +18839,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			    PlayerData[playerid][e_gangrank] = GANG_POS_NONE;
 			    PlayerData[playerid][GangName][0] = '\0';
 				PlayerData[playerid][GangTag][0] = '\0';
-                MySQL_SaveAccount(playerid, false, false);
+                SQL_SaveAccount(playerid, false, false);
 
                 SyncGangZones(playerid);
 
@@ -18875,7 +18875,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					PlayerData[ID][e_gangid] = 0;
 			  		PlayerData[ID][e_gangrank] = 0;
 
-		  			MySQL_SaveAccount(ID, false, false);
+		  			SQL_SaveAccount(ID, false, false);
 
 					if(PlayerData[ID][GangLabel] != Text3D:-1)
 					{
@@ -18892,7 +18892,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			  	}
 			  	else
 			  	{
-					MySQL_KickFromGangIfExist(playerid);
+					SQL_KickFromGangIfExist(playerid);
 				}
 				return true;
 	        }
@@ -19273,8 +19273,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					gTeam[playerid] = FREEROAM;
 	      		    format(gstr, sizeof(gstr), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", __GetName(playerid), HouseData[h_id][e_id], number_format(HouseData[h_id][price]), HouseData[h_id][e_score], g_HouseInteriorTypes[PlayerData[playerid][HouseIntSelected]][intname]);
 	    			UpdateDynamic3DTextLabelText(HouseData[h_id][e_labelid], -1, gstr);
-	                MySQL_SaveHouse(h_id, true);
-	                MySQL_SaveAccount(playerid, false, false);
+	                SQL_SaveHouse(h_id, true);
+	                SQL_SaveAccount(playerid, false, false);
 	                SCM(playerid, GREEN, "Successfully upgraded the interior!");
                 }
                 else player_notice(playerid, "Couldn't find the house in that slot", "Report on forums", 5000);
@@ -19384,11 +19384,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		        {
 		            case 0:
 		            {
-						MySQL_FetchGangInfo(playerid, PlayerData[playerid][e_gangid]);
+						SQL_FetchGangInfo(playerid, PlayerData[playerid][e_gangid]);
 		            }
 		            case 1:
 		            {
-		                MySQL_FetchGangMemberNames(playerid, PlayerData[playerid][e_gangid]);
+		                SQL_FetchGangMemberNames(playerid, PlayerData[playerid][e_gangid]);
 		            }
 		            case 2:
 		            {
@@ -19611,7 +19611,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					return SkipRegistration(playerid);
 				}
-			    MySQL_RegisterAccount(playerid, REGISTER_CONNECT, password);
+			    SQL_RegisterAccount(playerid, REGISTER_CONNECT, password);
 			    return true;
 			}
 			case REGISTER_DIALOG + 1:
@@ -19625,7 +19625,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 					return SCM(playerid, -1, ""er"Wrong input");
 				}
-			    MySQL_RegisterAccount(playerid, REGISTER_ONLINE, password);
+			    SQL_RegisterAccount(playerid, REGISTER_ONLINE, password);
 			    return true;
 			}
 			case STREAM_DIALOG:
@@ -20134,7 +20134,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
                         strmid(PlayerPVData[playerid][PVVMenuSel[playerid]][e_plate], "Plate", 0, 13, 13);
                         
-                        MySQL_SaveAccount(playerid, false, true);
+                        SQL_SaveAccount(playerid, false, true);
                         
                         player_notice(playerid, "Vehicle sold", "");
 					}
@@ -21489,8 +21489,8 @@ AutoLogin(playerid)
     PlayerData[playerid][bLogged] = true;
     PlayerData[playerid][ExitType] = EXIT_LOGGED;
     
-    MySQL_UpdateAccount(playerid);
-    MySQL_LoadAccount(playerid);
+    SQL_UpdateAccount(playerid);
+    SQL_LoadAccount(playerid);
 	return 1;
 }
 
@@ -21791,61 +21791,61 @@ vip_broadcast(color, const msg[])
 	}
 }
 
-MySQL_FetchGangInfo(playerid, gangid)
+SQL_FetchGangInfo(playerid, gangid)
 {
 	format(gstr, sizeof(gstr), "SELECT * FROM `gangs` WHERE `id` = %i LIMIT 1;", gangid);
 	mysql_tquery(pSQL, gstr, "OnQueryFinish", "siii", gstr, THREAD_FETCH_GANG_INFO, playerid, pSQL);
 }
 
-MySQL_UpdateGangScore(gangid, value)
+SQL_UpdateGangScore(gangid, value)
 {
 	format(gstr2, sizeof(gstr2), "UPDATE `gangs` SET `gscore` = `gscore` + %i, `gtop` = `gtop` + %i WHERE `id` = %i LIMIT 1;", value, value, gangid);
 	mysql_pquery(pSQL, gstr2);
 }
 
-MySQL_LoadAccount(playerid)
+SQL_LoadAccount(playerid)
 {
 	mysql_format(pSQL, gstr2, sizeof(gstr2), "SELECT * FROM `accounts` WHERE `name` = '%e' LIMIT 1;", __GetName(playerid));
 	mysql_tquery(pSQL, gstr2, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_LOAD);
 }
 
-MySQL_LoadPlayerAchs(playerid)
+SQL_LoadPlayerAchs(playerid)
 {
 	mysql_format(pSQL, gstr, sizeof(gstr), "SELECT `type`, `unlockdate` FROM `achievements` WHERE `id` = %i;", PlayerData[playerid][e_accountid]);
 	mysql_pquery(pSQL, gstr, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_ACHS_LOAD);
 }
 
-MySQL_LoadPlayerToys(playerid)
+SQL_LoadPlayerToys(playerid)
 {
 	mysql_format(pSQL, gstr, sizeof(gstr), "SELECT * FROM `toys` WHERE `id` = %i LIMIT 10;", PlayerData[playerid][e_accountid]);
 	mysql_pquery(pSQL, gstr, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_TOYS_LOAD);
 }
 
-MySQL_LoadPlayerPVs(playerid)
+SQL_LoadPlayerPVs(playerid)
 {
 	mysql_format(pSQL, gstr, sizeof(gstr), "SELECT * FROM `vehicles` WHERE `id` = %i;", PlayerData[playerid][e_accountid]);
 	mysql_pquery(pSQL, gstr, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_PVS_LOAD);
 }
 
-MySQL_LoadPlayerGang(playerid)
+SQL_LoadPlayerGang(playerid)
 {
 	format(gstr2, sizeof(gstr2), "SELECT `gname`, `gtag` FROM `gangs` WHERE `id` = %i LIMIT 1;", PlayerData[playerid][e_gangid]);
 	mysql_pquery(pSQL, gstr2, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_GANG_LOAD);
 }
 
-MySQL_AssignRankIfExist(playerid)
+SQL_AssignRankIfExist(playerid)
 {
   	mysql_format(pSQL, gstr2, sizeof(gstr2), "SELECT `gangrank` FROM `accounts` WHERE `gangid` = %i AND `name` = '%e';", PlayerData[playerid][e_gangid], PlayerData[playerid][GangAssignRank]);
   	mysql_tquery(pSQL, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_ASSIGN_RANK, playerid, pSQL);
 }
 
-MySQL_KickFromGangIfExist(playerid)
+SQL_KickFromGangIfExist(playerid)
 {
   	mysql_format(pSQL, gstr2, sizeof(gstr2), "SELECT `gangrank` FROM `accounts` WHERE `gangid` = %i AND `name` = '%e';", PlayerData[playerid][e_gangid], PlayerData[playerid][GangKickMem]);
   	mysql_tquery(pSQL, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_KICK_FROM_GANG, playerid, pSQL);
 }
 
-MySQL_SaveAccount(playerid, bool:toys = true, bool:pv = true)
+SQL_SaveAccount(playerid, bool:toys = true, bool:pv = true)
 {
     if(!islogged(playerid)) return 1;
     
@@ -21929,49 +21929,49 @@ MySQL_SaveAccount(playerid, bool:toys = true, bool:pv = true)
     return 1;
 }
 
-MySQL_UpdatePlayerPass(playerid, const hash[])
+SQL_UpdatePlayerPass(playerid, const hash[])
 {
 	mysql_format(pSQL, gstr2, sizeof(gstr2), "UPDATE `accounts` SET `hash` = SHA1('%e') WHERE `name` = '%e' LIMIT 1;", hash, __GetName(playerid));
  	mysql_pquery(pSQL, gstr2);
 }
 
-MySQL_FetchGangMemberNames(playerid, gangid)
+SQL_FetchGangMemberNames(playerid, gangid)
 {
 	format(gstr, sizeof(gstr), "SELECT `name`, `gangrank` FROM `accounts` WHERE `gangid` = %i ORDER BY `gangrank` DESC;", gangid);
 	mysql_tquery(pSQL, gstr, "OnQueryFinish", "siii", gstr, THREAD_FETCH_GANG_MEMBER_NAMES, playerid, pSQL);
 }
 
-MySQL_BanIP(const ip[])
+SQL_BanIP(const ip[])
 {
  	mysql_format(pSQL, gstr, sizeof(gstr), "INSERT INTO `blacklist` VALUES (NULL, '%e');", ip);
  	mysql_pquery(pSQL, gstr);
 }
 
-MySQL_ExistGang(playerid)
+SQL_ExistGang(playerid)
 {
 	format(gstr, sizeof(gstr), "SELECT `id` FROM `gangs` WHERE `gname` = '%s' LIMIT 1;", PlayerData[playerid][GangName]);
 	mysql_tquery(pSQL, gstr, "OnQueryFinish", "siii", gstr, THREAD_GANG_EXIST, playerid, pSQL);
 }
 
-MySQL_CreateGang(playerid)
+SQL_CreateGang(playerid)
 {
     format(gstr2, sizeof(gstr2), "INSERT INTO `gangs` VALUES (NULL, '%s', '%s', 0, -84215197, 0, 0, UNIX_TIMESTAMP());", PlayerData[playerid][GangName], PlayerData[playerid][GangTag]);
     mysql_tquery(pSQL, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_CREATE_GANG, playerid, pSQL);
 }
 
-MySQL_DestroyGang(playerid, gangname[])
+SQL_DestroyGang(playerid, gangname[])
 {
 	format(gstr2, sizeof(gstr2), "SELECT `id`, `gname` FROM `gangs` WHERE `gname` = '%s';", gangname);
 	mysql_tquery(pSQL, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_GANG_DESTROY, playerid, pSQL);
 }
 
-MySQL_GangRename(playerid, newgangname[], newgangtag[])
+SQL_GangRename(playerid, newgangname[], newgangtag[])
 {
 	mysql_format(pSQL, gstr2, sizeof(gstr2), "SELECT `id` FROM `gangs` WHERE `gname` = '%e';", newgangname);
 	mysql_pquery(pSQL, gstr2, "OnGangRenameAttempt", "issi", playerid, newgangname, newgangtag, YHash(__GetName(playerid)));
 }
 
-MySQL_RegisterAccount(playerid, register, password[])
+SQL_RegisterAccount(playerid, register, password[])
 {
 	PlayerData[playerid][e_lastlogin] = gettime();
 	PlayerData[playerid][e_lastnc] = 0;
@@ -22054,8 +22054,8 @@ function:OnPlayerRegister(playerid, namehash, register, password[], playername[]
 
 			PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
 
-			MySQL_SaveAccount(playerid, false, false);
-			MySQL_UpdateAccount(playerid);
+			SQL_SaveAccount(playerid, false, false);
+			SQL_UpdateAccount(playerid);
 		}
 		else if(register == REGISTER_ONLINE)
 		{
@@ -22068,14 +22068,14 @@ function:OnPlayerRegister(playerid, namehash, register, password[], playername[]
 			format(gstr, sizeof(gstr), "~b~~h~~h~Welcome to "SVRSC", ~r~~h~~h~%s~b~~h~~h~!~n~~b~~h~~h~You have successfully registered and logged in!", __GetName(playerid));
 			InfoTD_MSG(playerid, 5000, gstr);
 
-            MySQL_SaveAccount(playerid, false, false);
-			MySQL_UpdateAccount(playerid);
+            SQL_SaveAccount(playerid, false, false);
+			SQL_UpdateAccount(playerid);
 		}
 	}
 	return 1;
 }
 
-MySQL_UpdateAccount(playerid)
+SQL_UpdateAccount(playerid)
 {
     if(PlayerData[playerid][bLogged])
     {
@@ -22084,19 +22084,19 @@ MySQL_UpdateAccount(playerid)
 	}
 }
 
-MySQL_BanAccount(account[], admin[], reason[], lift = 0)
+SQL_BanAccount(account[], admin[], reason[], lift = 0)
 {
     mysql_format(pSQL, gstr2, sizeof(gstr2), "INSERT INTO `bans` VALUES (NULL, '%e', '%e', '%e', %i, UNIX_TIMESTAMP());", account, admin, reason, lift);
     mysql_pquery(pSQL, gstr2);
 }
 
-MySQL_SaveGangZone(id)
+SQL_SaveGangZone(id)
 {
 	format(gstr, sizeof(gstr), "UPDATE `gzones` SET `localgang` = %i, `locked` = %i WHERE `id` = %i;", GZoneData[id][e_localgang], GZoneData[id][e_locked], GZoneData[id][e_id]);
 	mysql_pquery(pSQL, gstr);
 }
 
-MySQL_SaveHouse(house, bool:save_items = false)
+SQL_SaveHouse(house, bool:save_items = false)
 {
     new query[1024];
     
@@ -22145,24 +22145,24 @@ MySQL_SaveHouse(house, bool:save_items = false)
 	mysql_tquery(pSQL, "COMMIT;");
 }
 
-MySQL_FinalGangKick(playerid)
+SQL_FinalGangKick(playerid)
 {
 	mysql_format(pSQL, gstr2, sizeof(gstr2), "UPDATE `accounts` SET `gangid` = 0, `gangrank` = 0 WHERE `name` = '%e' LIMIT 1;", PlayerData[playerid][GangKickMem]);
 	mysql_tquery(pSQL, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_KICK_FROM_GANG_2, playerid, pSQL);
 }
 
-MySQL_FinalRankAssign(playerid)
+SQL_FinalRankAssign(playerid)
 {
 	mysql_format(pSQL, gstr2, sizeof(gstr2), "UPDATE `accounts` SET `gangrank` = %i WHERE `name` = '%e' LIMIT 1;", PlayerData[playerid][RankSelected], PlayerData[playerid][GangAssignRank]);
 	mysql_tquery(pSQL, gstr2, "OnQueryFinish", "siii", gstr2, THREAD_ASSIGN_RANK_2, playerid, pSQL);
 }
 
-MySQL_CleanUp()
+SQL_CleanUp()
 {
 	mysql_tquery(pSQL, "TRUNCATE TABLE `online`;");
 }
 
-MySQL_Connect()
+SQL_Connect()
 {
     pSQL = mysql_connect(SQL_HOST, SQL_USER, SQL_DATA, SQL_PASS, SQL_PORT, true);
 
@@ -24534,7 +24534,7 @@ CreateFinalCar(playerid, pv_slot)
 
     ShowPlayerDialog(playerid, 5003, DIALOG_STYLE_MSGBOX, ""white"Vehicle bought!", ""white"You can now use these commands:\n\n/pv\n/lock\n/unlock", "OK", "");
 
-	MySQL_SaveAccount(playerid, false, true);
+	SQL_SaveAccount(playerid, false, true);
     return 1;
 }
 
@@ -25878,7 +25878,7 @@ function:OnQueueReceived()
 
 						format(gstr2, sizeof(gstr2), "~r~~h~~h~You were given ~b~~h~~h~%sGC ~r~~h~~h~!", number_format(credits));
 						InfoTD_MSG(playerid, 10000, gstr2);
-						MySQL_SaveAccount(playerid);
+						SQL_SaveAccount(playerid);
 		            }
 		            else
 		            {
@@ -25971,7 +25971,7 @@ function:OnQueueReceived()
 						SCM(playerid, -1, ""server_sign" "r_besch"You received VIP status + $1,000,000 bank money + 2 PV Slots + 1 House Slot + 1 Bizz Slot!");
 
 						InfoTD_MSG(playerid, 10000, "~r~~h~~h~You received VIP status + $1,000,000 bank money + 2 PV Slots + 1 House Slot + 1 Bizz Slot!");
-						MySQL_SaveAccount(playerid);
+						SQL_SaveAccount(playerid);
 		            }
 		            else
 		            {
@@ -26463,7 +26463,7 @@ function:ProcessTick()
 						SCMToAll(-1, gstr);
 						SCMToAll(-1, ""orange"This zone is now locked for 2 hours and cannot be attacked during that time!");
 
-						MySQL_UpdateGangScore(GZoneData[i][e_attacker], 5);
+						SQL_UpdateGangScore(GZoneData[i][e_attacker], 5);
 						
 						Iter_Remove(iterGangWar, GZoneData[i][e_attacker]);
 					}
@@ -26477,7 +26477,7 @@ function:ProcessTick()
 						SCMToAll(-1, gstr);
 						SCMToAll(-1, ""orange"This zone is now locked for 2 hours and cannot be attacked during that time!");
 
-						MySQL_UpdateGangScore(GZoneData[i][e_attacker], 10);
+						SQL_UpdateGangScore(GZoneData[i][e_attacker], 10);
 						
                         format(gstr, sizeof(gstr), ""SVRSC" "gang_sign" "r_besch" '%s' was captured by the gang %s!", GZoneData[i][e_zonename], GetGangNameByID(GZoneData[i][e_attacker]));
 						gang_broadcast(GZoneData[i][e_defender], gstr);
@@ -26515,7 +26515,7 @@ function:ProcessTick()
 					GZoneData[i][e_locked] = gettime() + 7200;
 				}
 				
-				MySQL_SaveGangZone(i);
+				SQL_SaveGangZone(i);
 			}
 		}
 	}
@@ -29662,11 +29662,11 @@ function:OnOfflineBanAttempt2(playerid, ban[], reason[])
 		new Cache:cache = mysql_query(pSQL, gstr);
 		
 		if(cache_get_row_count() == 0)
-		    MySQL_BanIP(ip);
+		    SQL_BanIP(ip);
 		
 		cache_delete(cache);
 
-		MySQL_BanAccount(ban, __GetName(playerid), reason);
+		SQL_BanAccount(ban, __GetName(playerid), reason);
 		
 		format(gstr, sizeof(gstr), "[ADMIN CHAT] "LG_E"Account and IP (o)banned of %s [EXPIRES: NEVER, REASON: %s] by %s", ban, reason, __GetName(playerid));
 		admin_broadcast(COLOR_RED, gstr);
@@ -30455,12 +30455,12 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 				PlayerData[playerid][ConnectTime] = gettime();
 				
 				if(PlayerData[playerid][e_gangid] != 0) {
-					MySQL_LoadPlayerGang(playerid);
+					SQL_LoadPlayerGang(playerid);
 				}
 				
-				MySQL_LoadPlayerAchs(playerid);
-				MySQL_LoadPlayerToys(playerid);
-				MySQL_LoadPlayerPVs(playerid);
+				SQL_LoadPlayerAchs(playerid);
+				SQL_LoadPlayerToys(playerid);
+				SQL_LoadPlayerPVs(playerid);
 
   			 	SetPlayerScoreEx(playerid, PlayerData[playerid][e_score]);
 			 	SetPlayerMoneyEx(playerid, PlayerData[playerid][e_money]);
@@ -30589,8 +30589,8 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 				PlayerData[playerid][bLogged] = true;
                 PlayerData[playerid][ExitType] = EXIT_LOGGED;
 
-				MySQL_UpdateAccount(playerid);
-				MySQL_LoadAccount(playerid);
+				SQL_UpdateAccount(playerid);
+				SQL_LoadAccount(playerid);
 			}
 			else
 			{
