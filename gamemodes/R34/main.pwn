@@ -105,7 +105,7 @@ Float:GetDistance3D(Float:x1, Float:y1, Float:z1, Float:x2, Float:y2, Float:z2);
 #define CURRENT_VERSION                 "PTS:Build 34"
 #endif
 #define HOTFIX_REV                      "Hotfix #0"
-#define SAMP_VERSION                    "SA-MP 0.3z-R3"
+#define SAMP_VERSION                    "SA-MP 0.3z-R4"
 #define MAX_REPORTS 					(7)
 #define MAX_GANG_NAME					(20)
 #define MIN_GANG_NAME					(4)
@@ -8559,7 +8559,7 @@ YCMD:enter(playerid, params[], help)
 
 YCMD:sellgc(playerid, params[], help)
 {
-	if(playerid) return SCM(playerid, -1, ""er"This command has been disabled due to massive abuse.");
+    if(PlayerData[playerid][e_vip] == 0) return Command_ReProcess(playerid, "/vip", false);
     if(!islogged(playerid)) return notlogged(playerid);
 	if(PlayerData[playerid][e_credits] <= 0) return SCM(playerid, -1, ""er"You don't own any GC!");
 
@@ -8611,7 +8611,6 @@ YCMD:sellgc(playerid, params[], help)
 
 YCMD:buygc(playerid, params[], help)
 {
-    if(playerid) return SCM(playerid, -1, ""er"This command has been disabled due to massive abuse.");
     if(!islogged(playerid)) return notlogged(playerid);
     
 	if(PlayerData[playerid][GCPlayer] == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"No one has offered you GC yet.");
