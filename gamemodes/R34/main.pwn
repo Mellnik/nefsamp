@@ -20797,11 +20797,11 @@ SetupBusiness(slot)
 	    format(gstr2, sizeof(gstr2), ""business_mark"\n"nef_green"FOR SALE! Type /bbuy"white"\nID: %i\nType: %s\nLevel: %i", BusinessData[r][e_id], g_szBusinessTypes[_:BusinessData[r][e_type]], BusinessData[r][e_level]);
 	}
 	
-	BusinessData[r][e_label_id] = CreateDynamic3DTextLabel(gstr2, WHITE, BusinessData[r][e_pos][0], BusinessData[r][e_pos][1], BusinessData[r][e_pos][2], 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 50.0);
-    BusinessData[r][e_pickup_id] = CreateDynamicPickup(1274, 1, BusinessData[r][e_pos][0], BusinessData[r][e_pos][1], BusinessData[r][e_pos][2], 0, -1, -1, 50.0);
+	BusinessData[r][e_label_id] = CreateDynamic3DTextLabel(gstr2, WHITE, BusinessData[r][e_pos][0], BusinessData[r][e_pos][1], BusinessData[r][e_pos][2], 30.0, .worldid = 0);
+    BusinessData[r][e_pickup_id] = CreateDynamicPickup(1274, 1, BusinessData[r][e_pos][0], BusinessData[r][e_pos][1], BusinessData[r][e_pos][2], .worldid = 0, .streamdistance = 50.0);
     
 	if(!BusinessData[r][e_sold]) {
-	    BusinessData[r][e_icon_id] = CreateDynamicMapIcon(BusinessData[r][e_pos][0], BusinessData[r][e_pos][1], BusinessData[r][e_pos][2], 52, 1, 0, -1, -1, 150.0);
+	    BusinessData[r][e_icon_id] = CreateDynamicMapIcon(BusinessData[r][e_pos][0], BusinessData[r][e_pos][1], BusinessData[r][e_pos][2], 52, 1, .worldid = 0, .streamdistance = 150.0);
 	}
 	return 1;
 }
@@ -30369,14 +30369,14 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 			}
 			else
 			{
-		        mysql_format(pSQL, gstr2, sizeof(gstr2), "SELECT COUNT(`id`) FROM `accounts` WHERE `serial` = '%e' AND `regdate` > (UNIX_TIMESTAMP() - 1800);", __GetSerial(playerid));
+		        mysql_format(pSQL, gstr2, sizeof(gstr2), "SELECT COUNT(`id`) FROM `accounts` WHERE `serial` = '%e' AND `regdate` > (UNIX_TIMESTAMP() - 2000);", __GetSerial(playerid));
 		        mysql_pquery(pSQL, gstr2, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUST_VERIFY_REGISTER + 1);
 			}
 			return 1;
 	    }
 	    case ACCOUNT_REQUST_VERIFY_REGISTER + 1:
 	    {
-	        if(cache_get_row_int(0, 0) > 5)
+	        if(cache_get_row_int(0, 0) > 4)
 	        {
 	            Log(LOG_PLAYER, "%i, %s serial accounts found, kicking (%s, %i)", cache_get_row_int(0, 0), __GetSerial(playerid), __GetName(playerid), playerid);
 				Kick(playerid);
