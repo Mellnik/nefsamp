@@ -1,5 +1,4 @@
-<?php 
-
+<?php
 if(!in_array($_SERVER['REMOTE_ADDR'], array('31.204.152.218', '127.0.0.1'))) 
 {
 	header("HTTP/1.1 403 Forbidden");
@@ -25,6 +24,7 @@ switch($_GET['a'])
 		$output .= $row[3] . "\n\n{969696}Posted on " . date("F d, Y", $row[4]);
 		
 		echo strip_tags($output);
+		break;
 	}
 }
 ?>
