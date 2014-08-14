@@ -11516,47 +11516,54 @@ YCMD:gzonecreate(playerid, params[], help)
 		return SCM(playerid, -1, NO_PERM);
 	}
 
-    new c = 0;
-	for(new i = 0; i < gzoneid; i++)
-	{
-		c++;
+	new count = 0;
+	for(new i = 0; i < MAX_GZONES; i++) {
+	    if(GZoneData[i][e_ormid] != ORM:-1) {
+			++count;
+	    }
 	}
 	
-	if(c >= MAX_GZONES) return SCM(playerid, -1, ""er"Max. GZones reached.");
+	if(count >= MAX_GZONES) {
+	    return SCM(playerid, -1, ""er"Max gang zones reached");
+	}
+
+	new r = -1;
+	for(new i = 0; i < MAX_GZONES; i++) {
+	    if(GZoneData[i][e_ormid] == ORM:-1) {
+	        r = i;
+	        break;
+	    }
+	}
+
+	if(r == -1) return SCM(playerid, -1, ""er"No free gang zone slot");
 
 	new tmp[41];
 	if(sscanf(params, "s[40]", tmp))
 	{
 	    return SCM(playerid, NEF_GREEN, "Usage: /gzonecreate <zone name>");
 	}
-	new zonename[40];
-	mysql_escape_string(tmp, zonename, pSQL, sizeof(zonename));
 	
-    strmid(GZoneData[gzoneid][e_zname], zonename, 0, 40, 40);
-
-    new Float:POS[3];
-    GetPlayerPos(playerid, POS[0], POS[1], POS[2]);
-
-    GZoneData[gzoneid][e_x] = POS[0];
-    GZoneData[gzoneid][e_y] = POS[1];
-    GZoneData[gzoneid][e_z] = POS[2];
-
-	GZoneData[gzoneid][e_localgang] = 0;
-	GZoneData[gzoneid][e_locked] = gettime();
-    GZoneData[gzoneid][e_underattack] = false;
-
-	format(gstr2, sizeof(gstr2), "INSERT INTO `gzones` VALUES (NULL, '%s', %f, %f, %f, %i, %i);",
-		GZoneData[gzoneid][e_zname],
-		GZoneData[gzoneid][e_x],
-		GZoneData[gzoneid][e_y],
-		GZoneData[gzoneid][e_z],
-		GZoneData[gzoneid][e_localgang],
-		GZoneData[gzoneid][e_locked]);
-		
-	mysql_tquery(pSQL, gstr2, "", "");
-    mysql_tquery(pSQL, "SELECT * FROM `gzones` ORDER BY `id` DESC LIMIT 1;", "OnGangZoneLoadEx", "i", gzoneid);
+	new zname[40];
+	mysql_escape_string(tmp, zname, pSQL, sizeof(zname));
+	
+	GetPlayerPos(playerid, GZoneData[r][e_pos][0], GZoneData[r][e_pos][1], GZoneData[r][e_pos][2]);
+    strmid(GZoneData[r][e_zname], zname, 0, 40, 40);
+	GZoneData[r][e_localgang] = 0;
+	GZoneData[r][e_locked] = gettime();
+    GZoneData[r][e_underattack] = false;
     
-    gzoneid++;
+	new ORM:ormid = GZoneData[r][e_ormid] = orm_create("gzones");
+	
+    orm_addvar_int(ormid, GZoneData[r][e_id], "id");
+    orm_addvar_string(ormid, GZoneData[r][e_zname], 40, "zname");
+    orm_addvar_float(ormid, GZoneData[r][e_pos][0], "xpos");
+    orm_addvar_float(ormid, GZoneData[r][e_pos][1], "ypos");
+    orm_addvar_float(ormid, GZoneData[r][e_pos][2], "zpos");
+    orm_addvar_int(ormid, GZoneData[r][e_localgang], "localgang");
+    orm_addvar_int(ormid, GZoneData[r][e_locked], "locked");
+	    
+	orm_setkey(ormid, "id");
+	orm_insert(ormid, "OnGangZoneLoadEx", "i", r);
 	return 1;
 }
 
@@ -20809,27 +20816,17 @@ SetupBusiness(slot)
 	return 1;
 }
 
-function:OnGangZoneLoadEx(gindex)
+function:OnGangZoneLoadEx(slot)
 {
-	new rows, fields;
-	cache_get_data(rows, fields, pSQL);
-
-	if(rows > 0)
-	{
-	    GZoneData[gindex][e_id] = cache_get_row_int(0, 0, pSQL);
-
-        format(gstr2, sizeof(gstr2), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: ---\n"orange"Type /gwar to start an attack!", GZoneData[gindex][e_id], GZoneData[gindex][e_zname]);
-
-        GZoneData[gindex][e_labelid] = CreateDynamic3DTextLabel(gstr2, WHITE, GZoneData[gindex][e_x], GZoneData[gindex][e_y], GZoneData[gindex][e_z] + 0.3, 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 50.0);
-        GZoneData[gindex][e_iconid] = CreateDynamicMapIcon(GZoneData[gindex][e_x], GZoneData[gindex][e_y], GZoneData[gindex][e_z], 19, 1, 0, -1, -1, 250.0);
-        GZoneData[gindex][e_zoneid] = GangZoneCreate(GZoneData[gindex][e_x] - GZONE_SIZE, GZoneData[gindex][e_y] - GZONE_SIZE, GZoneData[gindex][e_x] + GZONE_SIZE, GZoneData[gindex][e_y] + GZONE_SIZE);
-        GZoneData[gindex][e_checkid] = CreateDynamicCP(GZoneData[gindex][e_x], GZoneData[gindex][e_y], GZoneData[gindex][e_z], 7.0, 0, -1, -1, 60.0);
-		GZoneData[gindex][e_sphereid] = CreateDynamicRectangle(GZoneData[gindex][e_x] - GZONE_SIZE, GZoneData[gindex][e_y] - GZONE_SIZE, GZoneData[gindex][e_x] + GZONE_SIZE, GZoneData[gindex][e_y] + GZONE_SIZE);
-
-        GangZoneShowForAll(GZoneData[gindex][e_zoneid], COLOR_NONE);
-
-        gindex++;
-	}
+    format(gstr2, sizeof(gstr2), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: ---\n"orange"Type /gwar to start an attack!", GZoneData[slot][e_id], GZoneData[slot][e_zname]);
+    
+    GZoneData[slot][e_labelid] = CreateDynamic3DTextLabel(gstr2, WHITE, GZoneData[slot][e_pos][0], GZoneData[slot][e_pos][1], GZoneData[slot][e_pos][2] + 0.3, 30.0, .worldid = 0, .streamdistance = 30.0);
+    GZoneData[slot][e_iconid] = CreateDynamicMapIcon(GZoneData[slot][e_pos][0], GZoneData[slot][e_pos][1], GZoneData[slot][e_pos][2], 19, 1, .worldid = 0, .streamdistance = 240.0);
+	GZoneData[slot][e_zoneid] = GangZoneCreate(GZoneData[slot][e_pos][0] - GZONE_SIZE, GZoneData[slot][e_y] - GZONE_SIZE, GZoneData[slot][e_pos][0] + GZONE_SIZE, GZoneData[slot][e_pos][1] + GZONE_SIZE);
+    GZoneData[slot][e_checkid] = CreateDynamicCP(GZoneData[slot][e_pos][0], GZoneData[slot][e_pos][1], GZoneData[slot][e_pos][2], 7.0, .worldid = 0, .streamdistance = 50.0);
+    GZoneData[slot][e_sphereid] = CreateDynamicRectangle(GZoneData[slot][e_pos][0] - GZONE_SIZE, GZoneData[slot][e_pos][1] - GZONE_SIZE, GZoneData[slot][e_pos][0] + GZONE_SIZE, GZoneData[slot][e_pos][1] + GZONE_SIZE, .worldid = 0);
+    
+    GangZoneShowForAll(GZoneData[slot][e_zoneid], COLOR_NONE);
 	return 1;
 }
 
