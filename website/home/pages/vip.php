@@ -9,5 +9,5 @@
 	</form>
 	</div>
 	<br>
-		Complete list of VIP can be found on the <a class="neflink" href="http://forum.nefserver.net/showthread.php?799-Very-Important-Players-%28VIPs%29">NEF forums</a>.
+		Complete list of VIP features can be found on the <a class="neflink" href="http://forum.nefserver.net/showthread.php?799-Very-Important-Players-%28VIPs%29">NEF forums</a>
 	</div>
