@@ -6707,7 +6707,7 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 		format(gstr, sizeof(gstr), "%s", GetVehicleNameById(vID));
 		PlayerTextDrawSetString(playerid, vTD[playerid], gstr);
 		PlayerTextDrawShow(playerid, vTD[playerid]);
-		PlayerData[playerid][tTDhandle] = SetTimerEx("hidevTD", 3000, false, "i", playerid);
+		PlayerData[playerid][tTDhandle] = SetTimerEx("player_hide_vehicle_td", 3000, false, "i", playerid);
 	}
 	
     if(gTeam[playerid] == DERBY)
@@ -19354,39 +19354,39 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		    }
 		    case TELE_DIALOG + 1: // Stunt Zones
 		    {
-		        PushTeleportIntput(playerid, 0, listitem);
+		        PushTeleportInput(playerid, 0, listitem);
 		    }
 		    case TELE_DIALOG + 2: // Jumps
 		    {
-		        PushTeleportIntput(playerid, 1, listitem);
+		        PushTeleportInput(playerid, 1, listitem);
 		    }
 		    case TELE_DIALOG + 3: // Fun Maps
 		    {
-		        PushTeleportIntput(playerid, 2, listitem);
+		        PushTeleportInput(playerid, 2, listitem);
 		    }
 		    case TELE_DIALOG + 4: // Challenges/Parkours
 		    {
-		        PushTeleportIntput(playerid, 3, listitem);
+		        PushTeleportInput(playerid, 3, listitem);
 		    }
 		    case TELE_DIALOG + 5: // Specials
 		    {
-		        PushTeleportIntput(playerid, 4, listitem);
+		        PushTeleportInput(playerid, 4, listitem);
 		    }
 		    case TELE_DIALOG + 6: // Hotspots
 		    {
-		        PushTeleportIntput(playerid, 5, listitem);
+		        PushTeleportInput(playerid, 5, listitem);
 		    }
 		    case TELE_DIALOG + 7: // Drifts
 		    {
-		        PushTeleportIntput(playerid, 6, listitem);
+		        PushTeleportInput(playerid, 6, listitem);
 		    }
 		    case TELE_DIALOG + 8: // Tune Shops
 		    {
-		        PushTeleportIntput(playerid, 7, listitem);
+		        PushTeleportInput(playerid, 7, listitem);
 		    }
 		    case TELE_DIALOG + 9: // Cities
 		    {
-		        PushTeleportIntput(playerid, 8, listitem);
+		        PushTeleportInput(playerid, 8, listitem);
 		    }
 	        case GMENU_DIALOG:
 	        {
@@ -20816,20 +20816,6 @@ SetupBusiness(slot)
 	return 1;
 }
 
-function:OnGangZoneLoadEx(slot)
-{
-    format(gstr2, sizeof(gstr2), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: ---\n"orange"Type /gwar to start an attack!", GZoneData[slot][e_id], GZoneData[slot][e_zname]);
-    
-    GZoneData[slot][e_labelid] = CreateDynamic3DTextLabel(gstr2, WHITE, GZoneData[slot][e_pos][0], GZoneData[slot][e_pos][1], GZoneData[slot][e_pos][2] + 0.3, 30.0, .worldid = 0, .streamdistance = 30.0);
-    GZoneData[slot][e_iconid] = CreateDynamicMapIcon(GZoneData[slot][e_pos][0], GZoneData[slot][e_pos][1], GZoneData[slot][e_pos][2], 19, 1, .worldid = 0, .streamdistance = 240.0);
-	GZoneData[slot][e_zoneid] = GangZoneCreate(GZoneData[slot][e_pos][0] - GZONE_SIZE, GZoneData[slot][e_y] - GZONE_SIZE, GZoneData[slot][e_pos][0] + GZONE_SIZE, GZoneData[slot][e_pos][1] + GZONE_SIZE);
-    GZoneData[slot][e_checkid] = CreateDynamicCP(GZoneData[slot][e_pos][0], GZoneData[slot][e_pos][1], GZoneData[slot][e_pos][2], 7.0, .worldid = 0, .streamdistance = 50.0);
-    GZoneData[slot][e_sphereid] = CreateDynamicRectangle(GZoneData[slot][e_pos][0] - GZONE_SIZE, GZoneData[slot][e_pos][1] - GZONE_SIZE, GZoneData[slot][e_pos][0] + GZONE_SIZE, GZoneData[slot][e_pos][1] + GZONE_SIZE, .worldid = 0);
-    
-    GangZoneShowForAll(GZoneData[slot][e_zoneid], COLOR_NONE);
-	return 1;
-}
-
 function:OnGangZoneLoad()
 {
 	new rows = cache_get_row_count(),
@@ -20868,6 +20854,20 @@ function:OnGangZoneLoad()
 	cache_set_active(data, pSQL);
 	Log(LOG_INIT, "%i gang zones loaded in %i microseconds", gzoneid, cache_get_query_exec_time(UNIT_MICROSECONDS));
 	cache_delete(data);
+	return 1;
+}
+
+function:OnGangZoneLoadEx(slot)
+{
+    format(gstr2, sizeof(gstr2), ""gwars_mark"\nID: %i\nZone: %s\nControlled by: ---\n"orange"Type /gwar to start an attack!", GZoneData[slot][e_id], GZoneData[slot][e_zname]);
+
+    GZoneData[slot][e_labelid] = CreateDynamic3DTextLabel(gstr2, WHITE, GZoneData[slot][e_pos][0], GZoneData[slot][e_pos][1], GZoneData[slot][e_pos][2] + 0.3, 30.0, .worldid = 0, .streamdistance = 30.0);
+    GZoneData[slot][e_iconid] = CreateDynamicMapIcon(GZoneData[slot][e_pos][0], GZoneData[slot][e_pos][1], GZoneData[slot][e_pos][2], 19, 1, .worldid = 0, .streamdistance = 240.0);
+	GZoneData[slot][e_zoneid] = GangZoneCreate(GZoneData[slot][e_pos][0] - GZONE_SIZE, GZoneData[slot][e_y] - GZONE_SIZE, GZoneData[slot][e_pos][0] + GZONE_SIZE, GZoneData[slot][e_pos][1] + GZONE_SIZE);
+    GZoneData[slot][e_checkid] = CreateDynamicCP(GZoneData[slot][e_pos][0], GZoneData[slot][e_pos][1], GZoneData[slot][e_pos][2], 7.0, .worldid = 0, .streamdistance = 50.0);
+    GZoneData[slot][e_sphereid] = CreateDynamicRectangle(GZoneData[slot][e_pos][0] - GZONE_SIZE, GZoneData[slot][e_pos][1] - GZONE_SIZE, GZoneData[slot][e_pos][0] + GZONE_SIZE, GZoneData[slot][e_pos][1] + GZONE_SIZE, .worldid = 0);
+
+    GangZoneShowForAll(GZoneData[slot][e_zoneid], COLOR_NONE);
 	return 1;
 }
 
@@ -28198,14 +28198,14 @@ AddTeleport(teleport_category, const teleport_name[], const teleport_cmd[], Floa
     return 1;
 }
 
-PushTeleportIntput(playerid, teleport_category, input)
+PushTeleportInput(playerid, teleport_category, input)
 {
 	if(teleport_category < 0 || teleport_category > MAX_TELE_CATEGORIES)
 	    return 0;
 	    
 	if(input < 0 || input > MAX_TELES_PER_CATEGORY)
 	{
-		Log(LOG_FAIL, "Invalid teleport index, PushTeleportIntput(%i, %i, %i)", playerid, teleport_category, input);
+		Log(LOG_FAIL, "Invalid teleport index, PushTeleportInput(%i, %i, %i)", playerid, teleport_category, input);
 	    return 0;
 	}
 
@@ -28215,11 +28215,10 @@ PushTeleportIntput(playerid, teleport_category, input)
 	strcat(string, g_Teleports[teleport_category][input], sizeof(string));
 
     Command_ReProcess(playerid, string, false);
-
 	return 1;
 }
 
-function:hidevTD(playerid)
+function:player_hide_vehicle_td(playerid)
 {
 	PlayerTextDrawHide(playerid, vTD[playerid]);
 	PlayerData[playerid][bVehicleInfo] = false;
