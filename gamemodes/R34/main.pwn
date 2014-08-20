@@ -12,7 +12,7 @@
 /*
 || Build Dependencies:
 || SA-MP Server 0.3z-R4
-|| YSI Library 3.2
+|| YSI Library 3.1
 || sscanf Plugin 2.8.1
 || Streamer Plugin v2.7
 || MySQL Plugin R38
