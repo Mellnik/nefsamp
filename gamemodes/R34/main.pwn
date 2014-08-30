@@ -18,7 +18,7 @@
 || MySQL Plugin R38
 ||
 || Build notes:
-||
+|| compile -d3 with crashdetect
 ||
 || Database changes:
 || SET TYPE float TO 14,4 ALL
@@ -35,7 +35,7 @@
 #pragma dynamic 8192        // for md-sort
 
 #define IS_RELEASE_BUILD (true)
-#define INC_ENVIRONMENT (false)
+#define INC_ENVIRONMENT (true)
 #define WINTER_EDITION (false) // Requires FS ferriswheelfair.amx
 #define _YSI_NO_VERSION_CHECK
 #define YSI_IS_SERVER
@@ -75,7 +75,7 @@ Float:GetDoorsZCoordForFloor(floorid);
 Float:GetDistance3D(Float:x1, Float:y1, Float:z1, Float:x2, Float:y2, Float:z2);
 
 // MySQL
-#define SQL_HOST   						"127.0.0.1"
+#define SQL_HOST   						"::1"
 #define SQL_PORT                        (3306)
 #if IS_RELEASE_BUILD == true
 #define SQL_USER   						"nefserver"
