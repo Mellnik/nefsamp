@@ -4012,6 +4012,13 @@ public OnPlayerGiveDamage(playerid, damagedid, Float:amount, weaponid, bodypart)
 
 public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY, Float:fZ)
 {
+	/* Bullet Crasher http://forum.sa-mp.com/showthread.php?t=535559 */
+	if(hittype == BULLET_HIT_TYPE_PLAYER) {
+	    if( !( -20.0 <= fX <= 20.0 ) || !( -20.0 <= fY <= 20.0 ) || !( -20.0 <= fZ <= 20.0 ) ) {
+		    return 0;
+  		}
+	}
+
 	/* ANTI FAKE DATA */
 	if(weaponid == 0) {
 		Log(LOG_SUSPECT, "OPWS triggered by %i using %i, %i, %i", playerid, weaponid, hittype, hitid);
@@ -20851,8 +20858,9 @@ function:OnGangZoneLoad()
         GZoneData[r][e_iconid] = CreateDynamicMapIcon(GZoneData[r][e_pos][0], GZoneData[r][e_pos][1], GZoneData[r][e_pos][2], 19, 1, .worldid = 0, .streamdistance = 240.0);
 		GZoneData[r][e_zoneid] = GangZoneCreate(GZoneData[r][e_pos][0] - GZONE_SIZE, GZoneData[r][e_pos][1] - GZONE_SIZE, GZoneData[r][e_pos][0] + GZONE_SIZE, GZoneData[r][e_pos][1] + GZONE_SIZE);
         GZoneData[r][e_checkid] = CreateDynamicCP(GZoneData[r][e_pos][0], GZoneData[r][e_pos][1], GZoneData[r][e_pos][2], 7.0, .worldid = 0, .streamdistance = 50.0);
-        GZoneData[r][e_sphereid] = CreateDynamicRectangle(GZoneData[r][e_pos][0] - GZONE_SIZE, GZoneData[r][e_pos][1] - GZONE_SIZE, GZoneData[r][e_pos][0] + GZONE_SIZE, GZoneData[r][e_pos][1] + GZONE_SIZE, .worldid = 0);
+        GZoneData[r][e_sphereid] = CreateDynamicCube(GZoneData[r][e_pos][0] - GZONE_SIZE, GZoneData[r][e_pos][1] - GZONE_SIZE, GZoneData[r][e_pos][2], GZoneData[r][e_pos][0] + GZONE_SIZE, GZoneData[r][e_pos][1] + GZONE_SIZE, GZoneData[r][e_pos][2] + GZONE_SIZE, .worldid = 0);
 	}
+	
 	cache_set_active(data, pSQL);
 	Log(LOG_INIT, "%i gang zones loaded in %i microseconds", r, cache_get_query_exec_time(UNIT_MICROSECONDS));
 	cache_delete(data);
@@ -20867,9 +20875,9 @@ function:OnGangZoneLoadEx(slot)
     GZoneData[slot][e_iconid] = CreateDynamicMapIcon(GZoneData[slot][e_pos][0], GZoneData[slot][e_pos][1], GZoneData[slot][e_pos][2], 19, 1, .worldid = 0, .streamdistance = 240.0);
 	GZoneData[slot][e_zoneid] = GangZoneCreate(GZoneData[slot][e_pos][0] - GZONE_SIZE, GZoneData[slot][e_pos][1] - GZONE_SIZE, GZoneData[slot][e_pos][0] + GZONE_SIZE, GZoneData[slot][e_pos][1] + GZONE_SIZE);
     GZoneData[slot][e_checkid] = CreateDynamicCP(GZoneData[slot][e_pos][0], GZoneData[slot][e_pos][1], GZoneData[slot][e_pos][2], 7.0, .worldid = 0, .streamdistance = 50.0);
-    GZoneData[slot][e_sphereid] = CreateDynamicRectangle(GZoneData[slot][e_pos][0] - GZONE_SIZE, GZoneData[slot][e_pos][1] - GZONE_SIZE, GZoneData[slot][e_pos][0] + GZONE_SIZE, GZoneData[slot][e_pos][1] + GZONE_SIZE, .worldid = 0);
+    GZoneData[slot][e_sphereid] = GZoneData[slot][e_sphereid] = CreateDynamicCube(GZoneData[slot][e_pos][0] - GZONE_SIZE, GZoneData[slot][e_pos][1] - GZONE_SIZE, GZoneData[slot][e_pos][2], GZoneData[slot][e_pos][0] + GZONE_SIZE, GZoneData[slot][e_pos][1] + GZONE_SIZE, GZoneData[slot][e_pos][2] + GZONE_SIZE, .worldid = 0);
 
-    GangZoneShowForAll(GZoneData[slot][e_zoneid], COLOR_NONE);
+	GangZoneShowForAll(GZoneData[slot][e_zoneid], COLOR_NONE);
 	return 1;
 }
 
