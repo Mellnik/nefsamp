@@ -985,7 +985,7 @@ enum E_GZONE_DATA
 	e_pickupid,
 	e_checkid,
 	e_zoneid,
-	e_sphereid
+	e_areaid
 };
 
 enum E_HOUSE_DATA
@@ -4107,10 +4107,12 @@ public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY
 	
 	/* HITSOUND */
 	if(hittype == BULLET_HIT_TYPE_PLAYER) {
-		if(weaponid >= 22) {
-		    if(gTeam[playerid] == DM || gTeam[playerid] == SNIPER || gTeam[playerid] == gDUEL) {
-		        PlayerPlaySound(playerid, 17802, 0.0, 0.0, 0.0);
-		    }
+	    if(hitid != INVALID_PLAYER_ID) {
+			if(weaponid >= 22) {
+			    if(gTeam[playerid] == DM || gTeam[playerid] == SNIPER || gTeam[playerid] == gDUEL) {
+			        PlayerPlaySound(playerid, 17802, 0.0, 0.0, 0.0);
+			    }
+			}
 		}
 	}
 
@@ -5471,11 +5473,12 @@ public OnPlayerDeath(playerid, killerid, reason)
 
 public OnPlayerEnterDynamicArea(playerid, areaid)
 {
-	if(gTeam[playerid] != FREEROAM) return 1;
+	if(gTeam[playerid] != FREEROAM)
+		return 1;
 	
 	for(new r = 0; r < MAX_GZONES; r++)
 	{
-	    if(GZoneData[r][e_localgang] == PlayerData[playerid][e_gangid] && GZoneData[r][e_underattack] && areaid == GZoneData[r][e_sphereid])
+	    if(GZoneData[r][e_localgang] == PlayerData[playerid][e_gangid] && GZoneData[r][e_underattack] && areaid == GZoneData[r][e_areaid])
 	    {
 	        // Player entered GWAR
 			player_notice(playerid, "Gang War entered", "Type ~y~/gcapture ~w~near the flag");
@@ -5483,7 +5486,7 @@ public OnPlayerEnterDynamicArea(playerid, areaid)
 			break;
 		}
 
-		if(GZoneData[r][e_sphereid] == areaid && GZoneData[r][e_underattack] && GZoneData[r][e_localgang] != PlayerData[playerid][e_gangid] && GZoneData[r][e_attacker] != PlayerData[playerid][e_gangid])
+		if(GZoneData[r][e_areaid] == areaid && GZoneData[r][e_underattack] && GZoneData[r][e_localgang] != PlayerData[playerid][e_gangid] && GZoneData[r][e_attacker] != PlayerData[playerid][e_gangid])
 		{
 		    if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
 			{
@@ -5505,14 +5508,17 @@ public OnPlayerEnterDynamicArea(playerid, areaid)
 
 public OnPlayerLeaveDynamicArea(playerid, areaid)
 {
-	for(new r = 0; r < MAX_GZONES; r++)
+	if(PlayerData[playerid][bGWarMode])
 	{
-	    if(GZoneData[r][e_localgang] == PlayerData[playerid][e_gangid] && GZoneData[r][e_underattack] && areaid == GZoneData[r][e_sphereid] && PlayerData[playerid][bGWarMode])
-	    {
-	        // Player left GWAR
-            SCM(playerid, -1, ""orange"You have left the gang zone! Get back fast and defend it!");
-            ResetPlayerGWarMode(playerid, false);
-            break;
+		for(new r = 0; r < MAX_GZONES; r++)
+		{
+		    if(GZoneData[r][e_localgang] == PlayerData[playerid][e_gangid] && GZoneData[r][e_underattack] && areaid == GZoneData[r][e_areaid])
+		    {
+		        // Player left GWAR
+	            SCM(playerid, -1, ""orange"You have left the gang zone, get back fast and defend it!");
+	            ResetPlayerGWarMode(playerid, false);
+	            break;
+			}
 		}
 	}
 	return 1;
@@ -10747,7 +10753,7 @@ YCMD:jetpack(playerid, params[], help)
 		    if(!GZoneData[r][e_underattack])
 				continue;
 
-		    if(IsPointInDynamicArea(GZoneData[r][e_sphereid], POS[0], POS[1], POS[2]))
+		    if(IsPointInDynamicArea(GZoneData[r][e_areaid], POS[0], POS[1], POS[2]))
 		        return player_notice(playerid, "Failed to spawn jetpack", "Not allowed in gang zone");
 		}
 	}
@@ -11750,7 +11756,7 @@ YCMD:gcapture(playerid, params[], help)
 		    
 			GetPlayerPos(ii, POS[0], POS[1], POS[2]);
 
-			if(IsPointInDynamicArea(GZoneData[r][e_sphereid], POS[0], POS[1], POS[2]))
+			if(IsPointInDynamicArea(GZoneData[r][e_areaid], POS[0], POS[1], POS[2]))
 			{
 			    Iter_Add(Players, ii);
 			}
@@ -20858,7 +20864,7 @@ function:OnGangZoneLoad()
         GZoneData[r][e_iconid] = CreateDynamicMapIcon(GZoneData[r][e_pos][0], GZoneData[r][e_pos][1], GZoneData[r][e_pos][2], 19, 1, .worldid = 0, .streamdistance = 240.0);
 		GZoneData[r][e_zoneid] = GangZoneCreate(GZoneData[r][e_pos][0] - GZONE_SIZE, GZoneData[r][e_pos][1] - GZONE_SIZE, GZoneData[r][e_pos][0] + GZONE_SIZE, GZoneData[r][e_pos][1] + GZONE_SIZE);
         GZoneData[r][e_checkid] = CreateDynamicCP(GZoneData[r][e_pos][0], GZoneData[r][e_pos][1], GZoneData[r][e_pos][2], 7.0, .worldid = 0, .streamdistance = 50.0);
-        GZoneData[r][e_sphereid] = CreateDynamicCube(GZoneData[r][e_pos][0] - GZONE_SIZE, GZoneData[r][e_pos][1] - GZONE_SIZE, GZoneData[r][e_pos][2], GZoneData[r][e_pos][0] + GZONE_SIZE, GZoneData[r][e_pos][1] + GZONE_SIZE, GZoneData[r][e_pos][2] + GZONE_SIZE, .worldid = 0);
+        GZoneData[r][e_areaid] = CreateDynamicCube(GZoneData[r][e_pos][0] - GZONE_SIZE, GZoneData[r][e_pos][1] - GZONE_SIZE, GZoneData[r][e_pos][2], GZoneData[r][e_pos][0] + GZONE_SIZE, GZoneData[r][e_pos][1] + GZONE_SIZE, GZoneData[r][e_pos][2] + GZONE_SIZE, .worldid = 0);
 	}
 	
 	cache_set_active(data, pSQL);
@@ -20875,7 +20881,7 @@ function:OnGangZoneLoadEx(slot)
     GZoneData[slot][e_iconid] = CreateDynamicMapIcon(GZoneData[slot][e_pos][0], GZoneData[slot][e_pos][1], GZoneData[slot][e_pos][2], 19, 1, .worldid = 0, .streamdistance = 240.0);
 	GZoneData[slot][e_zoneid] = GangZoneCreate(GZoneData[slot][e_pos][0] - GZONE_SIZE, GZoneData[slot][e_pos][1] - GZONE_SIZE, GZoneData[slot][e_pos][0] + GZONE_SIZE, GZoneData[slot][e_pos][1] + GZONE_SIZE);
     GZoneData[slot][e_checkid] = CreateDynamicCP(GZoneData[slot][e_pos][0], GZoneData[slot][e_pos][1], GZoneData[slot][e_pos][2], 7.0, .worldid = 0, .streamdistance = 50.0);
-    GZoneData[slot][e_sphereid] = GZoneData[slot][e_sphereid] = CreateDynamicCube(GZoneData[slot][e_pos][0] - GZONE_SIZE, GZoneData[slot][e_pos][1] - GZONE_SIZE, GZoneData[slot][e_pos][2], GZoneData[slot][e_pos][0] + GZONE_SIZE, GZoneData[slot][e_pos][1] + GZONE_SIZE, GZoneData[slot][e_pos][2] + GZONE_SIZE, .worldid = 0);
+    GZoneData[slot][e_areaid] = GZoneData[slot][e_areaid] = CreateDynamicCube(GZoneData[slot][e_pos][0] - GZONE_SIZE, GZoneData[slot][e_pos][1] - GZONE_SIZE, GZoneData[slot][e_pos][2], GZoneData[slot][e_pos][0] + GZONE_SIZE, GZoneData[slot][e_pos][1] + GZONE_SIZE, GZoneData[slot][e_pos][2] + GZONE_SIZE, .worldid = 0);
 
 	GangZoneShowForAll(GZoneData[slot][e_zoneid], COLOR_NONE);
 	return 1;
@@ -21655,9 +21661,9 @@ CarSpawner(playerid, model, respawn_delay = -1, bool:spawnzone_check = true)
 		{
 		    if(!GZoneData[r][e_underattack]) continue;
 		    
-		    if(IsPointInDynamicArea(GZoneData[r][e_sphereid], POS[0], POS[1], POS[2]))
+		    if(IsPointInDynamicArea(GZoneData[r][e_areaid], POS[0], POS[1], POS[2]))
 		    {
-		        player_notice(playerid, "Failed to spawn hydra", "Not allowed in the gang zone");
+		        player_notice(playerid, "Failed to spawn hydra", "Not allowed in a gang zone");
 		        return 0;
 		    }
 		}
