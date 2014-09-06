@@ -2990,7 +2990,7 @@ public OnGameModeInit()
 	for(new i = 0; i < MAX_TELE_CATEGORIES; i++)
 	    teleports += g_TeleportIndex[i];
 	    
-	Log(LOG_INIT, "Teleports: %i (%i,%i,%i,%i,%i,%i,%i,%i,%i,%i)", teleports,
+	Log(LOG_INIT, "Teleports: %i (%i,%i,%i,%i,%i,%i,%i,%i,%i)", teleports,
 		g_TeleportIndex[0], g_TeleportIndex[1], g_TeleportIndex[2], g_TeleportIndex[3], g_TeleportIndex[4], g_TeleportIndex[5], g_TeleportIndex[6], g_TeleportIndex[7], g_TeleportIndex[8]);
 		
     Log(LOG_INIT, "Server successfully loaded");
@@ -4646,13 +4646,6 @@ public OnPlayerText(playerid, text[])
 	if(bGlobalShutdown)
 	    return 0;
 
-	if(!strcmp(text, LastPlayerText[playerid], true))
-	{
-	    player_notice(playerid, "Do not repeat yourself", "");
-	    return 0;
-	}
-	strmid(LastPlayerText[playerid], text, 0, 144, 144);
-
 	if((PlayerData[playerid][iCoolDownChat] + COOLDOWN_CHAT) >= GetTickCountEx())
 	{
 		player_notice(playerid, "1 message every second", "");
@@ -4661,6 +4654,13 @@ public OnPlayerText(playerid, text[])
 
 	if(strfind(text, "/q", true) != -1 || strfind(text, "/ q", true) != -1 || strfind(text, "/quit", true) != -1 || strfind(text, "/ quit", true) != -1)
   		return 0;
+
+	if(!strcmp(text, LastPlayerText[playerid], true))
+	{
+	    player_notice(playerid, "Do not repeat yourself", "");
+	    return 0;
+	}
+	strmid(LastPlayerText[playerid], text, 0, 144, 144);
 
     new File:hFile = fopen("/Log/chatlog.txt", io_append),
         time[3];
@@ -11530,7 +11530,7 @@ YCMD:gzonecreate(playerid, params[], help)
 			++count;
 	    }
 	}
-	
+
 	if(count >= MAX_GZONES) {
 	    return SCM(playerid, -1, ""er"Max gang zones reached");
 	}
@@ -18871,20 +18871,20 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        }
 	        case GANG_KICK_DIALOG:
 	        {
+	            if(strlen(inputtext) > MAX_PLAYER_NAME+1 || strlen(inputtext) < 3) return SCM(playerid, -1, ""er"Player doesn't exist");
+	            if(sscanf(inputtext, "s[26]", PlayerData[playerid][GangKickMem])) return SCM(playerid, -1, ""er"Player doesn't exist");
+
 			    if(!strcmp(__GetName(playerid), inputtext, true))
 			    {
 			        return SCM(playerid, -1, ""er"You can't kick yourself");
 			    }
-	        
-	            if(strlen(inputtext) > MAX_PLAYER_NAME+1 || strlen(inputtext) < 3) return SCM(playerid, -1, ""er"Player doesn't exist");
-	            if(sscanf(inputtext, "s[26]", PlayerData[playerid][GangKickMem])) return SCM(playerid, -1, ""er"Player doesn't exist");
+
 	            mysql_escape_string(PlayerData[playerid][GangKickMem], PlayerData[playerid][GangKickMem], pSQL, MAX_PLAYER_NAME+1);
 
-		  		new ID = __GetPlayerID(PlayerData[playerid][GangKickMem]);
-
-		  		if(ID != INVALID_PLAYER_ID)
+		  		new ID = INVALID_PLAYER_ID;
+		  		if((ID = __GetPlayerID(PlayerData[playerid][GangKickMem])) != INVALID_PLAYER_ID)
 		  		{
-					if(!IsPlayerAvail(ID)) return SCM(playerid, -1, ""er"Spieler ist not available");
+					if(!IsPlayerAvail(ID)) return SCM(playerid, -1, ""er"Player is not available");
 		        	if(PlayerData[ID][e_gangid] != PlayerData[playerid][e_gangid]) return SCM(playerid, -1, ""er"This player is not in your gang!");
 		        	if(PlayerData[ID][e_gangrank] == GANG_POS_FOUNDER) return SCM(playerid, -1, ""er"You cannot kick other leaders!");
 
@@ -20932,6 +20932,21 @@ GetGZonesByGang(id)
 	return count;
 }
 
+ResetGZones()
+{
+	for(new r = 0; r < MAX_GZONES; r++)
+	{
+	    GZoneData[r][e_ormid] = ORM:-1;
+        GZoneData[r][e_id] = 0;
+        GZoneData[r][e_zname] = '\0';
+        GZoneData[r][e_localgang] = 0;
+        GZoneData[r][e_locked] = 0;
+        GZoneData[r][e_underattack] = false;
+        GZoneData[r][e_attacker] = 0;
+        GZoneData[r][e_defender] = 0;
+	}
+}
+
 ResetBusiness(slot = -1)
 {
 	if(slot == -1)
@@ -20973,6 +20988,7 @@ ResetBusiness(slot = -1)
 
 LoadGZones()
 {
+    ResetGZones();
 	mysql_tquery(pSQL, "SELECT * FROM `gzones`;", "OnGangZoneLoad");
 	return 1;
 }
@@ -30658,7 +30674,6 @@ IsPlayerAvail(playerid)
 	{
 	    return 1;
 	}
-	
 	return 0;
 }
 
