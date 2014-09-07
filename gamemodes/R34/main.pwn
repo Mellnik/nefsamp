@@ -4242,7 +4242,7 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 	            cache_get_row(0, 1, gangname, pSQL, sizeof(gangname));
 	            gangid = cache_get_row_int(0, 0, pSQL);
 	            
-				if(Iter_Contains(iterGangWar, gangid)) return SCM(extraid, -1, ""er"You can't close this gang as they are involved in a gang war.");
+				if(Iter_Contains(iterGangWar, gangid)) return SCM(extraid, -1, ""er"You can't close your gang since there is a gang war going on.");
 
 				format(gstr, sizeof(gstr), "UPDATE `accounts` SET `gangrank` = 0, `gangid` = 0 WHERE `gangid` = %i;", gangid);
 				mysql_tquery(pSQL, gstr);
@@ -11794,7 +11794,7 @@ YCMD:gcapture(playerid, params[], help)
 			format(gstr, sizeof(gstr), ""gang_sign" "r_besch" %s %s(%i) re-captured zone '%s' which was under attack.", g_szGangRanks[PlayerData[playerid][e_gangrank]][E_gang_pos_name], __GetName(playerid), playerid, GZoneData[r][e_zname]);
 			gang_broadcast(GZoneData[r][e_defender], gstr);
 
-			SQL_UpdateGangScore(GZoneData[r][e_localgang], 5);
+			SQL_UpdateGangScore(GZoneData[r][e_localgang], 4);
 
 			Iter_Remove(iterGangWar, GZoneData[r][e_attacker]);
 			Iter_Remove(iterGangWar, GZoneData[r][e_localgang]);
@@ -11818,8 +11818,8 @@ YCMD:gzones(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
 
-    if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode. Use /exit");
     if(PlayerData[playerid][e_gangid] == 0) return SCM(playerid, -1, ""er"You aren't in any gang");
+    if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
     
 	new str[1024], count = 0;
 	for(new r = 0; r < MAX_GZONES; r++)
@@ -12086,7 +12086,8 @@ YCMD:gdeny(playerid, params[], help)
     if(!islogged(playerid)) return notlogged(playerid);
     
     if(PlayerData[playerid][e_gangid] != 0) return SCM(playerid, -1, ""er"You are already in a gang!");
-    if(!PlayerData[playerid][bGangInvite]) return SCM(playerid, -1, ""er"You haven't been invited!");
+    if(!PlayerData[playerid][bGangInvite]) return SCM(playerid, -1, ""er"You haven't been invited by any gang");
+    
     PlayerData[playerid][TmpGangID] = 0;
     PlayerData[playerid][e_gangid] = 0;
     PlayerData[playerid][e_gangrank] = GANG_POS_NONE;
@@ -12102,8 +12103,8 @@ YCMD:gclose(playerid, params[], help)
     if(!islogged(playerid)) return notlogged(playerid);
     
     if(PlayerData[playerid][e_gangid] == 0) return SCM(playerid, -1, ""er"You aren't in any gang!");
-    if(PlayerData[playerid][e_gangrank] != GANG_POS_FOUNDER) return SCM(playerid, -1, ""er"You have to be the gang Founder!");
-	if(Iter_Contains(iterGangWar, PlayerData[playerid][e_gangid])) return SCM(playerid, -1, ""er"You can't close your gang while being in a Gang War!");
+    if(PlayerData[playerid][e_gangrank] != GANG_POS_FOUNDER) return SCM(playerid, -1, ""er"You have to be the gang's founder!");
+	if(Iter_Contains(iterGangWar, PlayerData[playerid][e_gangid])) return SCM(playerid, -1, ""er"You can't close your gang since there is a gang war going on");
 
 	ShowDialog(playerid, CLOSE_GANG_DIALOG);
 	return 1;
@@ -12114,7 +12115,7 @@ YCMD:gjoin(playerid, params[], help)
     if(!islogged(playerid)) return notlogged(playerid);
     
     if(PlayerData[playerid][e_gangid] != 0) return SCM(playerid, -1, ""er"You are already in a gang!");
-    if(!PlayerData[playerid][bGangInvite]) return SCM(playerid, -1, ""er"You did not get any invitations!");
+    if(!PlayerData[playerid][bGangInvite]) return SCM(playerid, -1, ""er"You haven't been invited by any gang");
     
 	PlayerData[playerid][bGangInvite] = false;
 	PlayerData[playerid][e_gangrank] = GANG_POS_JUNIOR_MEMBER;
@@ -12156,9 +12157,9 @@ YCMD:gleave(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
     
-    if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode. Use /exit");
     if(PlayerData[playerid][e_gangid] == 0) return SCM(playerid, -1, ""er"You aren't in any gang");
-    if(PlayerData[playerid][e_gangrank] == GANG_POS_FOUNDER) return SCM(playerid, -1, ""er"You can't leave a gang as Founder");
+    if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
+	if(PlayerData[playerid][e_gangrank] == GANG_POS_FOUNDER) return SCM(playerid, -1, ""er"You can't leave a gang as Founder");
 		
 	format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s(%i) has left the gang", __GetName(playerid), playerid);
     gang_broadcast(PlayerData[playerid][e_gangid], gstr);
@@ -12665,11 +12666,8 @@ YCMD:shutdown(playerid, params[], help)
 	if(PlayerData[playerid][e_level] == MAX_ADMIN_LEVEL && IsPlayerAdmin(playerid))
 	{
 	    bGlobalShutdown = true;
-	    
-	    for(new i = 0; i < MAX_PLAYERS; i++)
-	    {
-	        SCM(i, -1, "Server restart! Restart your game. IP: samp.nefserver.net:7777");
-	    }
+
+		SCMToAll(-1, "Server restart! Restart your game. IP: samp.nefserver.net:7777");
 	    
 	    SetTimer("server_init_shutdown", 3000, false);
  	}
