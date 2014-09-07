@@ -3,11 +3,11 @@
 		</div>
 
 		<br>
-		
+
 		<div align="center">
 
 			<font size="5">
-			<b>SA-MP Server: <a class="neflink" href="samp://samp.nefserver.net:7777">samp.nefserver.net:7777</a> (31.204.152.218:7777)</b>
+			<b>SA-MP Server: <a class="neflink" href="samp://samp.nefserver.net:7777">samp.nefserver.net:7777</a> (31.204.153.110:7777)</b>
 			</font>
 			<br>
 			Server Location: Amsterdam, NL (Europe)
@@ -19,7 +19,7 @@
 			<div id="smallbox">
 			<font size="5"><b>Top gangs of the week</b></font>
 			<?php
-			$q = $mysqli->query("SELECT `GangName`, `Top` FROM `gangs` ORDER BY `Top` DESC LIMIT 3;");
+			$q = $mysqli->query("SELECT `gname`, `gtop` FROM `gangs` ORDER BY `gtop` DESC LIMIT 3;");
 			$iter = 0;
 			while($row = $q->fetch_row())
 			{
