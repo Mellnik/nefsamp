@@ -9,7 +9,7 @@ if(!in_array($_SERVER['REMOTE_ADDR'], array('109.70.3.48', '109.70.3.146', '109.
 $dbuser	= "nefserver";
 $dbpass	= "t2t0.SZth-zTruhJpR(7ucr8?u";
 $dbname	= "nefserver";
-$connect = mysql_connect("127.0.0.1", $dbuser, $dbpass);
+$connect = mysql_connect("localhost", $dbuser, $dbpass);
 $select	= mysql_select_db($dbname, $connect);
 
 $message_id	= $_GET['message_id'];

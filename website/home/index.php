@@ -45,7 +45,7 @@ include("inc/function.inc.php");
 				<?php
 					$num_players = 0;
 					
-					$servers = array(
+					/*$servers = array(
 						array(
 						'id' => 'kf1',
 						'type' => 'killingfloor',
@@ -89,16 +89,16 @@ include("inc/function.inc.php");
 					
 					try {
 						$data = $gq->requestData();
-						$num_players += $data['kf1']['playercount'];
-						$num_players += $data['kf2']['playercount'];
-						$num_players += $data['kf3']['playercount'];
-						$num_players += $data['kf4']['playercount'];
-						$num_players += $data['kf5']['playercount'];
+						//$num_players += $data['kf1']['playercount'];
+						//$num_players += $data['kf2']['playercount'];
+						//$num_players += $data['kf3']['playercount'];
+						//$num_players += $data['kf4']['playercount'];
+						//$num_players += $data['kf5']['playercount'];
 					}
 
 					catch (GameQ_Exception $e) {
 						echo 'An error occurred.';
-					}
+					}*/
 					
 					$query = $mysqli->query("SELECT COUNT(`id`) FROM `online`;");
 					$row = $query->fetch_row();

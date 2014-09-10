@@ -18622,8 +18622,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			        SCM(playerid, RED, "Advertising is not allowed!");
 			        return 1;
 				}
-	            
-	            if(strfind("admin", text, true) != -1 || strfind("staff", text, true) != -1 || strfind("mod", text, true) != 1 || strfind("administrator", text, true) != 1)
+
+	            if(strfind(text, "admin", true) != -1 || strfind("staff", text, true) != -1 || strfind("mod", text, true) != 1 || strfind("administrator", text, true) != 1)
 	            {
 	                return SCM(playerid, -1, ""er"Don't enter following words: admin, staff, mod");
 	            }

@@ -2,7 +2,7 @@
 header("Content-Type: image/gif");
 
 include("../inc/mysql.inc.php");
-include("../inc/functions.inc.php");
+include("../inc/function.inc.php");
 
 $user = trim($_REQUEST['user']);
 
@@ -21,15 +21,16 @@ if($stmt->num_rows == 1)
 	$bank = number_format($bank);
 	$time /= 3600;
 	
-	if($gangid != 0)
-	{
-		$query = $mysqli->query("SELECT `GangTag` FROM `gangs` WHERE `ID` = $gangid;");
+	if($gangid != 0) {
+		$query = $mysqli->query("SELECT `gtag` FROM `gangs` WHERE `id` = $gangid;");
 		$row = $query->fetch_row();
 		
 		$gangid = $row[0];
 	}
-	else $gangid = "---";
-
+	else {
+		$gangid = "---";
+	}
+	
 	$img = imagecreatefrompng("img/samp00.png");
 
 	$white = imagecolorallocate($img, 204, 204, 204);
