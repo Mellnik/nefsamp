@@ -32,9 +32,9 @@ $connect = mysql_connect("localhost", $dbuser, $dbpass);
 $select	= mysql_select_db($dbname, $connect);
 
 $txn_id = mysql_real_escape_string($_POST['txn_id']);
-$item_num = mysql_real_escape_string($_POST['item_number1']);
+$item_num = mysql_real_escape_string($_POST['item_number']);
 $receiver = mysql_real_escape_string($_POST['custom']);
-$payment = mysql_real_escape_string($_POST['mc_gross1']);
+$payment = mysql_real_escape_string($_POST['mc_gross']);
 $payment_status = $_POST['payment_status'];
 
 if(strcmp($result, "VERIFIED") == 0) {

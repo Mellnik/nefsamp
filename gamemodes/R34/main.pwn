@@ -83,7 +83,7 @@ Float:GetDistance3D(Float:x1, Float:y1, Float:z1, Float:x2, Float:y2, Float:z2);
 #define SQL_DATA   						"nefserver"
 #else
 #define SQL_USER   						"nefdev"
-#define SQL_PASS   						"83Qhrb8e7ghRfvb7tgbfsds"
+#define SQL_PASS   						"83Qhfdawdfrb-.a7ghb7tgbfsds"
 #define SQL_DATA                        "nefdev"
 #endif
 
