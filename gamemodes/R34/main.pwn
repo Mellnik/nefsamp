@@ -23652,7 +23652,7 @@ server_load_visuals()
 	CreateObject(11237, 217.10001, -1999.30005, 37.10000,   0.00000, 0.00000, 220.00000, 350.0);
 	// beach end*/
     
-    AddTeleport(4, "Gold Credits", "gc", 1858.1874,-1466.7080,13.3981);
+    AddTeleport(4, "Gold Credits", "gc", 654.5861, -1867.3845, 5.5861);
 	AddTeleport(6, "Drift", "drift", -344.308, 1528.474, 75.159);
 	AddTeleport(6, "Drift City", "dc", 3431.8589, 484.3132, 1788.7490);
 	AddTeleport(6, "Drift Island", "df", 3075.9263,-3153.9749,49.1486);
