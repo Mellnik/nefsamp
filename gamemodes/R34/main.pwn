@@ -14,7 +14,7 @@
 || SA-MP Server 0.3z-R4
 || YSI Library 3.1
 || sscanf Plugin 2.8.1
-|| Streamer Plugin v2.7
+|| Streamer Plugin v2.7.4
 || MySQL Plugin R38
 ||
 || Build notes:
@@ -44,6 +44,7 @@
 #undef MAX_PLAYERS
 #define MAX_PLAYERS (400)
 #include <a_http>           // API Requests
+#include <crashdetect>
 #include <amx\os>
 #include <YSI\y_iterate>
 #include <YSI\y_stringhash>
