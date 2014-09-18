@@ -4348,9 +4348,9 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 				cache_get_row(0, 1, gangname, pSQL, sizeof(gangname));
 				cache_get_row(0, 2, gangtag, pSQL, sizeof(gangtag));
 				score = cache_get_row_int(0, 3, pSQL);
-				udate = cache_get_row_int(0, 4, pSQL);
-				color = cache_get_row_int(0, 5, pSQL);
-				gcar = cache_get_row_int(0, 6, pSQL);
+				color = cache_get_row_int(0, 4, pSQL);
+				gcar = cache_get_row_int(0, 5, pSQL);
+				udate = cache_get_row_int(0, 7, pSQL);
 
 				for(new i = 0; i < MAX_PLAYERS; i++)
 				{
