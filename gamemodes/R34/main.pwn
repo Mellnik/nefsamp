@@ -99,13 +99,13 @@ Float:GetDistance3D(Float:x1, Float:y1, Float:z1, Float:x2, Float:y2, Float:z2);
 #define HOSTNAME                        " 	      ..:: NEF ::.. ×Stunt/DM/Race/Minigames×"
 #define NEF_VERSION_MAJOR               34
 #define NEF_VERSION_MINOR               0
-#define NEF_VERSION_PATCH               0
+#define NEF_VERSION_PATCH               1
 #if IS_RELEASE_BUILD == true
 #define CURRENT_VERSION                 "Build 34"
 #else
 #define CURRENT_VERSION                 "PTS:Build 34"
 #endif
-#define HOTFIX_REV                      "Hotfix #0"
+#define HOTFIX_REV                      "Hotfix #1"
 #define SAMP_VERSION                    "SA-MP 0.3z-R4"
 #define MAX_REPORTS 					(7)
 #define MAX_GANG_NAME					(20)
@@ -13753,9 +13753,8 @@ YCMD:cd(playerid, params[], help)
     
     tVIPCountdown = SetTimer("server_vip_countdown", 1000, true);
     
-    new str[255];
-   	format(str, sizeof(str), ""nef" VIP {%06x}%s(%i) "white"has started a countdown!", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid);
-	SCMToAll(-1, str);
+   	format(gstr, sizeof(gstr), ""nef" VIP {%06x}%s(%i) "white"has started a countdown!", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid);
+	SCMToAll(-1, gstr);
 	
 	PlayerData[playerid][tickLastCD] = tick;
 	return 1;
@@ -15051,7 +15050,7 @@ function:OnGTopReceived(playerid)
 	
 	if(rows > 0)
 	{
-	    new tmp[21], tmp2[5], finstring[2048], tmpstring[128];
+	    new tmp[21], tmp2[5], finstring[2048];
 	    strcat(finstring, ""white"");
 	    for(new i = 0; i < rows; i++)
 	    {
@@ -15060,10 +15059,10 @@ function:OnGTopReceived(playerid)
 	        new col = cache_get_row_int(i, 3, pSQL);
 	        if(col != 0)
 	        {
-	        	format(tmpstring, sizeof(tmpstring), "{%06x}%i - [%s]%s [%i]\n", col >>> 8, i + 1, tmp2, tmp, cache_get_row_int(i, 2, pSQL));
+	        	format(gstr, sizeof(gstr), "{%06x}%i - [%s]%s [%i]\n", col >>> 8, i + 1, tmp2, tmp, cache_get_row_int(i, 2, pSQL));
 			}
-			else format(tmpstring, sizeof(tmpstring), ""white"%i - [%s]%s [%i]\n", i + 1, tmp2, tmp, cache_get_row_int(i, 2, pSQL));
-			strcat(finstring, tmpstring);
+			else format(gstr, sizeof(gstr), ""white"%i - [%s]%s [%i]\n", i + 1, tmp2, tmp, cache_get_row_int(i, 2, pSQL));
+			strcat(finstring, gstr);
 	    }
 	    ShowPlayerDialog(playerid, TOP_GANGS_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" :: Top Gangs", finstring, "OK", "");
 	}
@@ -16184,7 +16183,6 @@ YCMD:answer(playerid, params[], help)
 	    return SCM(playerid, NEF_GREEN, "Usage: /answer <answer>");
 	}
 	
-	new str[255];
 	if(mathsAnswered == -1)
 	{
 	    SCM(playerid, -1, ""RED_E"[MATHS] "white"Sorry, no maths is in progress!");
@@ -16195,25 +16193,25 @@ YCMD:answer(playerid, params[], help)
 	{
 	    if(answer == mathsAnswer)
 	    {
-	    	format(str, sizeof(str), ""RED_E"[MATHS] "white"Sorry, you're too late, although your answer(%i) would have been right!", answer);
+	    	format(gstr, sizeof(gstr), ""RED_E"[MATHS] "white"Sorry, you're too late, although your answer(%i) would have been right!", answer);
 		}
 		else
 		{
-		    format(str, sizeof(str), ""RED_E"[MATHS] "white"Sorry, you're too late, even though your answer(%i) would have been wrong!", answer);
+		    format(gstr, sizeof(gstr), ""RED_E"[MATHS] "white"Sorry, you're too late, even though your answer(%i) would have been wrong!", answer);
 		}
-		SCM(playerid, -1, str);
+		SCM(playerid, -1, gstr);
 	    return true;
 	}
 
 	if(answer > mathsAnswer || answer < mathsAnswer)
 	{
-	    format(str, sizeof(str), ""RED_E"[MATHS] "white"Sorry, your answer(%i) to %s is wrong!", answer, mathsCurrent);
-	    SCM(playerid, -1, str);
+	    format(gstr, sizeof(gstr), ""RED_E"[MATHS] "white"Sorry, your answer(%i) to %s is wrong!", answer, mathsCurrent);
+	    SCM(playerid, -1, gstr);
 		return true;
 	}
 
-	format(str, sizeof(str), ""SVRSC" "RED_E"[MATHS] :: {%06x}%s(%i) "white"has correctly answered %s (answer: %i) winning 4 score and $%s!", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, mathsCurrent, answer, number_format(mathsAward));
-	SCMToAll(-1, str);
+	format(gstr, sizeof(gstr), ""SVRSC" "RED_E"[MATHS] :: {%06x}%s(%i) "white"has correctly answered %s (answer: %i) winning 4 score and $%s!", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, mathsCurrent, answer, number_format(mathsAward));
+	SCMToAll(-1, gstr);
 
 	GivePlayerScoreEx(playerid, 4, true, true);
 	GivePlayerMoneyEx(playerid, mathsAward, true, true);
@@ -19057,19 +19055,15 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	                }
 	                case 6: // how to earn score
 	                {
-						new cstring[255];
+						strcat(gstr, ""white"To earn score and money you can join various minigames. For each kill or objective\nyou will receive a certain amount of money and score.\nCheck /minigames for a list of all minigames.\n\nYou can also freeroam and kill people for money and score.");
 
-						strcat(cstring, ""white"To earn score and money you can join various minigames. For each kill or objective\nyou will receive a certain amount of money and score.\nCheck /minigames for a list of all minigames.\n\nYou can also freeroam and kill people for money and score.");
-
-						ShowPlayerDialog(playerid, HELP_DIALOG + 5, DIALOG_STYLE_MSGBOX, ""nef" :: How to earn score and money", cstring, "OK", "Back");
+						ShowPlayerDialog(playerid, HELP_DIALOG + 5, DIALOG_STYLE_MSGBOX, ""nef" :: How to earn score and money", gstr, "OK", "Back");
 	                }
 	                case 7: // what to do here
 	                {
-						new cstring[255];
+						strcat(gstr, ""white"On "SVRNAME" you will never be bored. If you like to play with and\nagainst others join a minigame (/minigames).\nExplore our map and teleports (/t)\nYou can design your character with our toy system (/toy).");
 
-						strcat(cstring, ""white"On "SVRNAME" you will never be bored. If you like to play with and\nagainst others join a minigame (/minigames).\nExplore our map and teleports (/t)\nYou can design your character with our toy system (/toy).");
-
-						ShowPlayerDialog(playerid, HELP_DIALOG + 6, DIALOG_STYLE_MSGBOX, ""nef" :: What to do here", cstring, "OK", "Back");
+						ShowPlayerDialog(playerid, HELP_DIALOG + 6, DIALOG_STYLE_MSGBOX, ""nef" :: What to do here", gstr, "OK", "Back");
 	                }
 	                case 8: Command_ReProcess(playerid, "/credits", false);
 	                case 9: Command_ReProcess(playerid, "/vip", false);
@@ -19778,15 +19772,14 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				    }
 				    case 1: // change bone
 					{
-					    new finstring[750],
-							string[128];
+					    new finstring[750];
 							
-						format(string, sizeof(string), ""nef" :: Player Toys > Slot %i > Change Bone", PlayerData[playerid][toy_selected] + 1);
+						format(gstr, sizeof(gstr), ""nef" :: Player Toys > Slot %i > Change Bone", PlayerData[playerid][toy_selected] + 1);
 
 					    strcat(finstring, "Spine\nHead\nLeft upper arm\nRight upper arm\nLeft hand\nRight hand\nLeft thigh\nRight thigh\nLeft foot\nRight foot");
 					    strcat(finstring, "\nRight calf\nLeft calf\nLeft forearm\nRight forearm\nLeft clavicle\nRight clavicle\nNeck\nJaw");
 
-					    ShowPlayerDialog(playerid, TOY_DIALOG + 2, DIALOG_STYLE_LIST, string, finstring, "Select", "Cancel");
+					    ShowPlayerDialog(playerid, TOY_DIALOG + 2, DIALOG_STYLE_LIST, gstr, finstring, "Select", "Cancel");
 					}
 					case 2: // remove toy
 					{
@@ -21563,8 +21556,7 @@ SkipLogin(playerid)
 		return Kick(playerid);
 	}
 	
-	new string[255],
-	    number = random(998) + 1,
+	new number = random(998) + 1,
 	    newname[26],
 	    oldname[26];
 	    
@@ -21577,8 +21569,8 @@ SkipLogin(playerid)
 	{
 	    GetPlayerName(playerid, PlayerData[playerid][e_name], MAX_PLAYER_NAME + 1);
 			
-		format(string, sizeof(string), ""white"Your name has been changed to %s because you failed to log in.\n\n"nef_yellow"Please restart the game if this is incorrect.", newname);
-		ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef"", string, "OK", "");
+		format(gstr, sizeof(gstr), ""white"Your name has been changed to %s because you failed to log in.\n\n"nef_yellow"Please restart the game if this is incorrect.", newname);
+		ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef"", gstr, "OK", "");
 		
 	    PlayerData[playerid][e_regdate] = gettime();
 		PlayerData[playerid][e_payday] = 60;
@@ -23636,9 +23628,9 @@ server_load_visuals()
 	//CreateDynamicObject(18102, 386.79163, -1807.13257, 20.75563,   0.00000, 0.00000, -245.76001);
 	// login obj end
 	
-	CreateObject(986, 1385.98, 2643.14, 11.81,   0.00, 0.00, 90.13); // Robbers Gate
-	Gate[0] = CreateObject(976, 1397.24, 2694.51, 9.91,   0.00, 0.00, 269.23);
-	Gate[1] = CreateObject(976, 1397.24, 2693.86, 9.91,   0.00, 0.00, 90.07);
+	CreateObject(986, 1385.98, 2643.14, 11.81, 0.00, 0.00, 90.13); // Robbers Gate
+	Gate[0] = CreateObject(976, 1397.24, 2694.51, 9.91, 0.00, 0.00, 269.23);
+	Gate[1] = CreateObject(976, 1397.24, 2693.86, 9.91, 0.00, 0.00, 90.07);
 
 	/*// gehört zu beach
 	CreateDynamicObject(10771, 224.30000, -2004.00000, 4.10000,   0.00000, 0.00000, 220.00000);
@@ -25584,16 +25576,15 @@ function:Derby()
 					}
 
 					new money = (3500 * CurrentDerbyPlayers),
-						score = floatround(floatdiv(2 * CurrentDerbyPlayers, 1.5)),
-						string[128];
+						score = floatround(floatdiv(2 * CurrentDerbyPlayers, 1.5));
 
 			    	GivePlayerMoneyEx(i, money, true, true);
 			    	GivePlayerScoreEx(i, score, true, true);
 			    	
 			    	PlayerData[i][bDerbyWinner] = false;
 			    	
-			    	format(string, sizeof(string), "%s won the Derby and earned "nef_yellow"$%s", __GetName(i), number_format(money));
-					derby_broadcast(string);
+			    	format(gstr, sizeof(gstr), "%s won the Derby and earned "nef_yellow"$%s", __GetName(i), number_format(money));
+					derby_broadcast(gstr);
 	   			}
 				SetPlayerDerbyStaticMeshes(i);
 	      		ShowDialog(i, DERBY_VOTING_DIALOG);
@@ -27500,7 +27491,7 @@ function:ShowDialog(playerid, dialogid)
 		}
 	    case DIALOG_UPGRADE_BUSINESS:
 	    {
-	        new string[512], tmp[255];
+	        new string[512];
 	        
 	        new r = GetBusinessSlotBySelection(playerid);
 	        
@@ -27509,25 +27500,25 @@ function:ShowDialog(playerid, dialogid)
 			    
 			    if(BusinessData[r][e_level] >= MAX_BUSINESS_LEVEL)
 			    {
-				    format(tmp, sizeof(tmp), "%i\nCurrent Business Earnings: $%s\n\nThis business reached it's max. level!", BusinessData[r][e_level], number_format(GetBusinessEarnings(r)));
-					strcat(string, tmp);
+				    format(gstr, sizeof(gstr), "%i\nCurrent Business Earnings: $%s\n\nThis business reached it's max. level!", BusinessData[r][e_level], number_format(GetBusinessEarnings(r)));
+					strcat(string, gstr);
 			    }
 			    else
 			    {
-				    format(tmp, sizeof(tmp), "%i\nCurrent Business Earnings: $%s\nEarnings in next level: $%s\n\nUpgrade now for "yellow_e"$%s"white"!",
+				    format(gstr, sizeof(gstr), "%i\nCurrent Business Earnings: $%s\nEarnings in next level: $%s\n\nUpgrade now for "yellow_e"$%s"white"!",
 						BusinessData[r][e_level],
 						number_format(GetBusinessEarnings(r)),
 						number_format(BusinessLevelMatrix[BusinessData[r][e_level]][E_bearnings]),
 						number_format(BusinessLevelMatrix[BusinessData[r][e_level]][E_bupgradeprice]));
-					strcat(string, tmp);
+					strcat(string, gstr);
 				}
 				
-	 	        format(tmp, sizeof(tmp), ""nef" :: Business Level Upgrade > Slot: %i", PlayerData[playerid][BusinessIdSelected] + 1);
+	 	        format(gstr, sizeof(gstr), ""nef" :: Business Level Upgrade > Slot: %i", PlayerData[playerid][BusinessIdSelected] + 1);
 
 	            if(BusinessData[r][e_level] == MAX_BUSINESS_LEVEL) {
-					ShowPlayerDialog(playerid, DIALOG_UPGRADE_BUSINESS, DIALOG_STYLE_MSGBOX, tmp, string, "Back", "");
+					ShowPlayerDialog(playerid, DIALOG_UPGRADE_BUSINESS, DIALOG_STYLE_MSGBOX, gstr, string, "Back", "");
 				} else {
-	                ShowPlayerDialog(playerid, DIALOG_UPGRADE_BUSINESS, DIALOG_STYLE_MSGBOX, tmp, string, "Upgrade", "Back");
+	                ShowPlayerDialog(playerid, DIALOG_UPGRADE_BUSINESS, DIALOG_STYLE_MSGBOX, gstr, string, "Upgrade", "Back");
 				}
 			} else {
                 player_notice(playerid, "Couldn't find the business in that slot", "Report on forums", 4000);
@@ -27676,12 +27667,11 @@ function:ShowDialog(playerid, dialogid)
 		}
 	    case HOUSE_UPGRADE_DIALOG:
 	    {
-	        new string[512],
-				string2[256];
+	        new string[512];
 
 			format(string, sizeof(string), "Barrack\nStandard\nAdvanced Standard\nRyders House\nBunker House\nUnderground\nNice Small Hotel Room\nCJs House");
-			format(string2, sizeof(string2), "\nLuxury House\nStrip Club\nEntire Motel\nSmall Villa\nBig Villa\nMadd Doggs Mansion\nSweets House");
-			strcat(string, string2);
+			format(gstr, sizeof(gstr), "\nLuxury House\nStrip Club\nEntire Motel\nSmall Villa\nBig Villa\nMadd Doggs Mansion\nSweets House");
+			strcat(string, gstr);
 
 	        ShowPlayerDialog(playerid, HOUSE_UPGRADE_DIALOG, DIALOG_STYLE_LIST, ""nef" :: House Upgrade", string, "Select", "Cancel");
 	    }
@@ -28204,7 +28194,6 @@ function:StartRobbery(playerid, namehash)
 {
 	if(IsPlayerConnected(playerid) && YHash(__GetName(playerid)) == namehash)
 	{
-		new str[255];
 		if(GetPVarInt(playerid, "InStore") == 0)
 		{
 			KillTimer(PlayerData[playerid][tRobbery]);
@@ -28214,8 +28203,8 @@ function:StartRobbery(playerid, namehash)
 			PlayerData[playerid][iRobberyCount] = 0;
 			return true;
 		}
-	 	PlayerData[playerid][iRobberyCount]--;
-	  	if(PlayerData[playerid][iRobberyCount] == 0)
+
+	  	if(--PlayerData[playerid][iRobberyCount] <= 0)
 		{
 			KillTimer(PlayerData[playerid][tRobbery]);
 			RemovePlayerAttachedObject(playerid, 4);
@@ -28231,40 +28220,40 @@ function:StartRobbery(playerid, namehash)
 			{
 				case 0:
 				{
-					format(str, sizeof(str), "Server: {%06x}%s(%i) "LB_E"has robbed the %s and got away with "LG_E"$13,000", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, GetStoreName(playerid));
-					SCMToAll(COLOR_RED, str);
+					format(gstr, sizeof(gstr), "Server: {%06x}%s(%i) "LB_E"has robbed the %s and got away with "LG_E"$13,000", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, GetStoreName(playerid));
+					SCMToAll(COLOR_RED, gstr);
 					GameTextForPlayer(playerid, "~w~You have robbed ~g~$13,000", 5000, 3);
 					SCM(playerid, COLOR_WHITE, ""nef" "ORANGE_E"You have succussfully completed the robbery and got away with "LG_E"$13,000");
 					GivePlayerMoneyEx(playerid, 13000, true, true);
 				}
 				case 1:
 				{
-					format(str, sizeof(str), "Server: {%06x}%s(%i) "LB_E"has robbed the %s and got away with "LG_E"$10,000", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, GetStoreName(playerid));
-					SCMToAll(COLOR_RED, str);
+					format(gstr, sizeof(gstr), "Server: {%06x}%s(%i) "LB_E"has robbed the %s and got away with "LG_E"$10,000", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, GetStoreName(playerid));
+					SCMToAll(COLOR_RED, gstr);
 					GameTextForPlayer(playerid, "~w~You have robbed ~g~$10,000", 5000, 3);
 					SCM(playerid, COLOR_WHITE, ""nef" "ORANGE_E"You have succussfully completed the robbery and got away with "LG_E"$10,000");
 					GivePlayerMoneyEx(playerid, 10000, true, true);
 				}
 				case 2:
 				{
-					format(str, sizeof(str), "Server: {%06x}%s(%i) "LB_E"has robbed the %s and got away with "LG_E"$5,000", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, GetStoreName(playerid));
-					SCMToAll(COLOR_RED, str);
+					format(gstr, sizeof(gstr), "Server: {%06x}%s(%i) "LB_E"has robbed the %s and got away with "LG_E"$5,000", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, GetStoreName(playerid));
+					SCMToAll(COLOR_RED, gstr);
 					GameTextForPlayer(playerid, "~w~You have robbed ~g~$5,000", 5000, 3);
 					SCM(playerid, COLOR_WHITE, ""nef" "ORANGE_E"You have succussfully completed the robbery and got away with "LG_E"$5,000");
 					GivePlayerMoneyEx(playerid, 5000, true, true);
 				}
 				case 3:
 				{
-					format(str, sizeof(str), "Server: {%06x}%s(%i) "LB_E"has robbed the %s and got away with "LG_E"$8,000", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, GetStoreName(playerid));
-					SCMToAll(COLOR_RED, str);
+					format(gstr, sizeof(gstr), "Server: {%06x}%s(%i) "LB_E"has robbed the %s and got away with "LG_E"$8,000", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, GetStoreName(playerid));
+					SCMToAll(COLOR_RED, gstr);
 					GameTextForPlayer(playerid, "~w~You have robbed ~g~$8,000", 5000, 3);
 					SCM(playerid, COLOR_WHITE, ""nef" "ORANGE_E"You have succussfully completed the robbery and got away with "LG_E"$8,000");
 					GivePlayerMoneyEx(playerid, 8000, true, true);
 				}
 				case 4:
 				{
-					format(str, sizeof(str), "Server: {%06x}%s(%i) "LB_E"has robbed the %s and got away with "LG_E"$3,000", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, GetStoreName(playerid));
-					SCMToAll(COLOR_RED, str);
+					format(gstr, sizeof(gstr), "Server: {%06x}%s(%i) "LB_E"has robbed the %s and got away with "LG_E"$3,000", GetColorEx(playerid) >>> 8, __GetName(playerid), playerid, GetStoreName(playerid));
+					SCMToAll(COLOR_RED, gstr);
 					GameTextForPlayer(playerid, "~w~You have robbed ~g~$3,000", 5000, 3);
 					SCM(playerid, COLOR_WHITE, ""nef" "ORANGE_E"You have succussfully completed the robbery and got away with "LG_E"$3,000");
 					GivePlayerMoneyEx(playerid, 3000, true, true);
@@ -28279,8 +28268,8 @@ function:StartRobbery(playerid, namehash)
 		}
 		else
 		{
-			format(str, sizeof(str),"~w~~b~robbery in progress~n~~w~stay in the store~n~~r~%i ~w~seconds left.", PlayerData[playerid][iRobberyCount]);
-			GameTextForPlayer(playerid, str, 2000, 3);
+			format(gstr, sizeof(gstr),"~w~~b~robbery in progress~n~~w~stay in the store~n~~r~%i ~w~seconds left.", PlayerData[playerid][iRobberyCount]);
+			GameTextForPlayer(playerid, gstr, 2000, 3);
 		}
 	}
 	else
