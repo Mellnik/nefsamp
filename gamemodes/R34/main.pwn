@@ -13433,7 +13433,7 @@ YCMD:vip(playerid, params[], help)
 	strcat(string, ""nef_yellow"Very Important Player (VIP)\n\n"yellow_e"Features:"white"\n Access to VIP vehicles in /v\n $1,000,000 to your bank (/bank)\n");
 	strcat(string, " 2 PV slots + 1 house/bizz slot\n");
 	strcat(string, " VIP Chat (/p)\n 100\% armor on spawn\n Jetpack spawn (/jetpack)\n Hydra spawn (/hydra)\n");
-	strcat(string, " Countdown command (/cd)\n Namechange all 30 days (/changename)\n Open/Close Mellnik's Gate (/opengate /closegate)");
+	strcat(string, " Countdown command (/cd)\n Namechange all 14 days (/changename)\n Open/Close Mellnik's Gate (/opengate /closegate)");
 	strcat(string, "\n Spectate players (/spec)\n More interest each PayDay\n Access to VIP Forums\n Access to Beta Changelogs\n Rainbow effect (/rainbow)\n Custom label (/label)\n");
 	strcat(string, " Get listed in /vips and /admins\n Namechange lookup (/ncrecords)\n Play as "BLUE_E"SWAT "white"in CNR");
 	strcat(string, "\n Message to all players when joining the server\n Vehicle Control System (/vcs)\n VIP Lounge (/vipl)\n VIP Lounge Invite (/vipli)\n Direct spawn in /adminhq\n Access to VIP private vehicles");
