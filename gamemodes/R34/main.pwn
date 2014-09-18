@@ -18619,7 +18619,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			        return 1;
 				}
 
-	            if(strfind(text, "admin", true) != -1 || strfind("staff", text, true) != -1 || strfind("mod", text, true) != 1 || strfind("administrator", text, true) != 1)
+	            if(strfind(text, "admin", true) != -1 || strfind(text, "staff", true) != -1 || strfind(text, "mod", true) != -1 || strfind(text, "administrator", true) != -1)
 	            {
 	                return SCM(playerid, -1, ""er"Don't enter following words: admin, staff, mod");
 	            }
