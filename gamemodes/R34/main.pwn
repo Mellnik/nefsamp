@@ -3162,18 +3162,16 @@ public OnPlayerSpawn(playerid)
         }
 	    case STORE:
 	    {
-			ResetPlayerWorld(playerid);
 			gTeam[playerid] = FREEROAM;
-   			RandomSpawn(playerid);
+			ResetPlayerWorld(playerid);
+			RandomSpawn(playerid);
    			RandomWeapons(playerid);
 	    }
 	    case BUYCAR:
 	    {
+			gTeam[playerid] = FREEROAM;
 			SetPlayerInterior(playerid, 0);
 		    SetPlayerPosEx(playerid, 1798.0952, -1410.8192, floatadd(13.5458, 4.5));
-		    RandomWeapons(playerid);
-			gTeam[playerid] = FREEROAM;
-
 			RandomWeapons(playerid);
 
 			if(GetPVarInt(playerid, "HadGod") == 1) Command_ReProcess(playerid, "/god silent", false);
@@ -3335,9 +3333,9 @@ public OnPlayerSpawn(playerid)
 		}
 		case HOUSE:
 		{
-			RandomSpawn(playerid);
-  			RandomWeapons(playerid);
 			ResetPlayerWorld(playerid);
+			RandomSpawn(playerid);
+			RandomWeapons(playerid);
 			gTeam[playerid] = FREEROAM;
 		}
 		case GUNGAME:
@@ -3641,7 +3639,6 @@ public OnPlayerDisconnect(playerid, reason)
 		                gTeam[i] = FREEROAM;
 		                ResetPlayerWorld(i);
 		                RandomSpawn(i, true);
-		                ResetPlayerWeapons(i);
 		                RandomWeapons(i);
 		                
 		                PlayerData[i][DuelRequestRecv] = INVALID_PLAYER_ID;
@@ -3666,7 +3663,6 @@ public OnPlayerDisconnect(playerid, reason)
 
 							ResetPlayerWorld(i);
 							RandomSpawn(i, true);
-				            ResetPlayerWeapons(i);
 				            RandomWeapons(i);
 
 				            found = true;
@@ -4978,7 +4974,6 @@ public OnPlayerDeath(playerid, killerid, reason)
 		            
 					ResetPlayerWorld(i);
 					RandomSpawn(i, true);
-		            ResetPlayerWeapons(i);
 		            RandomWeapons(i);
 		            
 		            found = true;
@@ -5007,7 +5002,6 @@ public OnPlayerDeath(playerid, killerid, reason)
 
 						ResetPlayerWorld(i);
 						RandomSpawn(i, true);
-			            ResetPlayerWeapons(i);
 			            RandomWeapons(i);
 
 			            found = true;
@@ -8304,6 +8298,7 @@ YCMD:l(playerid, params[], help)
 	{
 		SetVehiclePos(GetPlayerVehicleID(playerid), PlayerData[playerid][sX], PlayerData[playerid][sY], PlayerData[playerid][sZ]+0.2);
 		SetVehicleZAngle(GetPlayerVehicleID(playerid), PlayerData[playerid][sA]);
+		LinkVehicleToInterior(GetPlayerVehicleID(playerid), 0);
 	}
 	else
 	{
@@ -13481,12 +13476,12 @@ YCMD:god(playerid, params[], help)
 		if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't use god now");
 	    if(PlayerData[playerid][bGod])
 	    {
+			PlayerData[playerid][bGod] = false;
 	        SetPVarInt(playerid, "HadGod", 0);
 	 		SCM(playerid, COLOR_RED, ""nef" "GREY_E"You have disabled god-mode. You can now lose health in stunt zones.");
 			SCM(playerid, COLOR_RED, "> "YELLOW_E"You can now freely use weapons.");
 	        TextDrawHideForPlayer(playerid, TXTGodTD);
 	        SetPlayerHealth(playerid, 100.0);
-	        PlayerData[playerid][bGod] = false;
 	        RandomWeapons(playerid);
 	    }
 	    else
@@ -22642,85 +22637,6 @@ RandomBGSpawn(playerid, Map, Team)
 	return 1;
 }
 
-IsNumeric(string[])
-{
-	for(new i = 0, j = strlen(string); i < j; i++)
-	{
-		if(string[i] > '9' || string[i] < '0') return 0;
-	}
-	return 1;
-}
-
-RandomWeapons(playerid)
-{
-	ResetPlayerWeapons(playerid);
-
-	if(PlayerData[playerid][bGod]) return 1;
-
-	switch(random(8)) // melee
-	{
-	    case 0: GivePlayerWeapon(playerid, 2, 1);
-	    case 1: GivePlayerWeapon(playerid, 3, 1);
-	    case 2: GivePlayerWeapon(playerid, 4, 1);
-	    case 3: GivePlayerWeapon(playerid, 5, 1);
-	    case 4: GivePlayerWeapon(playerid, 6, 1);
-	    case 5: GivePlayerWeapon(playerid, 7, 1);
-	    case 6: GivePlayerWeapon(playerid, 8, 1);
-	    case 7: GivePlayerWeapon(playerid, 9, 1);
-	}
-
-	switch(random(3)) // pistol
-	{
-	    case 0: GivePlayerWeapon(playerid, 22, 99999);
-	    case 1: GivePlayerWeapon(playerid, 23, 99999);
-	    case 2: GivePlayerWeapon(playerid, 24, 99999);
-	}
-
-	switch(random(3)) // shotgun
-	{
-	    case 0: GivePlayerWeapon(playerid, 25, 99999);
-	    case 1: GivePlayerWeapon(playerid, 26, 99999);
-	    case 2: GivePlayerWeapon(playerid, 27, 99999);
-	}
-
-	switch(random(3)) // mp
-	{
-	    case 0: GivePlayerWeapon(playerid, 28, 99999);
-	    case 1: GivePlayerWeapon(playerid, 29, 99999);
-	    case 2: GivePlayerWeapon(playerid, 32, 99999);
-	}
-
-	switch(random(2)) //assault
-	{
-	    case 0: GivePlayerWeapon(playerid, 30, 99999);
-	    case 1: GivePlayerWeapon(playerid, 31, 99999);
-	}
-
-	switch(random(2)) // rifle
-	{
-	    case 0: GivePlayerWeapon(playerid, 33, 99999);
-	    case 1: GivePlayerWeapon(playerid, 34, 99999);
-	}
-
-	switch(random(6)) // heavy
-	{
-	    case 2: GivePlayerWeapon(playerid, 37, 99999);
-	}
-
-	switch(random(3)) // nade
-	{
-	    case 2: GivePlayerWeapon(playerid, 16, 3);
-	}
-
-	switch(random(5))
-	{
-	    case 1: GivePlayerWeapon(playerid, 41, 50);
-	    case 2: GivePlayerWeapon(playerid, 42, 50);
-	    case 3: GivePlayerWeapon(playerid, 43, 1);
-	}
-    return 1;
-}
-
 server_load_textdraws()
 {
     new count = GetTickCountEx();
@@ -26218,11 +26134,11 @@ function:ProcessTick()
 							format(gstr, sizeof(gstr), "%s(%i) went AFK for too long!", __GetName(i), i);
 							fallout_broadcast(gstr);
 
+							gTeam[i] = FREEROAM;
 							PlayerData[i][bFalloutLost] = true;
 							HidePlayerFalloutTextdraws(i);
 							CurrentFalloutPlayers--;
 							ResetPlayerWorld(i);
-							gTeam[i] = FREEROAM;
 							RandomSpawn(i, true);
 							RandomWeapons(i);
 				        }
@@ -29064,12 +28980,12 @@ ExitPlayer(playerid)
 	    case MINIGUN, SNIPER, ROCKETDM, MINIGUN2:
 	    {
 			gTeam[playerid] = FREEROAM;
-			ResetPlayerWeapons(playerid);
-			RandomWeapons(playerid);
-			RandomSpawn(playerid, true);
-			ResetPlayerWorld(playerid);
+			
 			ShowPlayerInfoTextdraws(playerid);
-
+			ResetPlayerWorld(playerid);
+			RandomSpawn(playerid, true);
+			RandomWeapons(playerid);
+			
 			if(GetPVarInt(playerid, "HadGod") == 1) Command_ReProcess(playerid, "/god silent", false);
 			SetPVarInt(playerid, "doingStunt", 0);
 			PlayerData[playerid][tickJoin_bmx] = 0;
@@ -29103,15 +29019,16 @@ ExitPlayer(playerid)
 		}
 		case gBG_VOTING:
 		{
+			gTeam[playerid] = FREEROAM;
+		
 		    HidePlayerBGTextdraws(playerid);
 		    SetPlayerColor(playerid, szPlayerColors[random(sizeof(szPlayerColors))]);
 		    SetPlayerTeam(playerid, NO_TEAM);
-		    gTeam[playerid] = FREEROAM;
 			SetCameraBehindPlayer(playerid);
 			TogglePlayerControllable(playerid, true);
-			RandomSpawn(playerid, true);
 			RandomWeapons(playerid);
 			ResetPlayerWorld(playerid);
+			RandomSpawn(playerid, true);
 			SetPlayerHealth(playerid, 100.0);
 			SetPlayerSkin(playerid, GetPVarInt(playerid, "LastSkin"));
 
@@ -29122,14 +29039,15 @@ ExitPlayer(playerid)
 		}
 		case gBG_TEAM1:
 		{
+		    BGTeam1Players--;
+		    gTeam[playerid] = FREEROAM;
+		
 		    HidePlayerBGTextdraws(playerid);
 		    SetPlayerColor(playerid, szPlayerColors[random(sizeof(szPlayerColors))]);
 			SetPlayerTeam(playerid, NO_TEAM);
-		    BGTeam1Players--;
-		    gTeam[playerid] = FREEROAM;
+			ResetPlayerWorld(playerid);
 			RandomSpawn(playerid, true);
 			RandomWeapons(playerid);
-			ResetPlayerWorld(playerid);
 			SetPlayerHealth(playerid, 100.0);
 			SetPlayerSkin(playerid, GetPVarInt(playerid, "LastSkin"));
 
@@ -29140,14 +29058,15 @@ ExitPlayer(playerid)
 		}
 		case gBG_TEAM2:
 		{
+		    BGTeam2Players--;
+		    gTeam[playerid] = FREEROAM;
+		
 		    HidePlayerBGTextdraws(playerid);
 		    SetPlayerColor(playerid, szPlayerColors[random(sizeof(szPlayerColors))]);
 		    SetPlayerTeam(playerid, NO_TEAM);
-		    BGTeam2Players--;
-		    gTeam[playerid] = FREEROAM;
+			ResetPlayerWorld(playerid);
 			RandomSpawn(playerid, true);
 			RandomWeapons(playerid);
-			ResetPlayerWorld(playerid);
 			SetPlayerHealth(playerid, 100.0);
 			SetPlayerSkin(playerid, GetPVarInt(playerid, "LastSkin"));
 
@@ -29159,9 +29078,10 @@ ExitPlayer(playerid)
 		case DM, WAR, gSAWN:
 		{
 			gTeam[playerid] = FREEROAM;
+			
+			ResetPlayerWorld(playerid);
 			RandomWeapons(playerid);
 			RandomSpawn(playerid, true);
-			ResetPlayerWorld(playerid);
 			HidePlayerDMTextdraws(playerid);
 
 			if(GetPVarInt(playerid, "HadGod") == 1) Command_ReProcess(playerid, "/god silent", false);
@@ -29194,16 +29114,14 @@ ExitPlayer(playerid)
 			TogglePlayerControllable(playerid, true);
 			SetCameraBehindPlayer(playerid);
 			ResetPlayerWorld(playerid);
-			RandomWeapons(playerid);
 			RandomSpawn(playerid, true);
+			RandomWeapons(playerid);
             ToggleSpeedo(playerid, false);
 
 			g_CPProgress[playerid] = 0;
 
 			HidePlayerRaceTextdraws(playerid);
             DisablePlayerRaceCheckpoint(playerid);
-
-			ResetPlayerWorld(playerid);
 			
 		    if(GetPVarInt(playerid, "HadGod") == 1) Command_ReProcess(playerid, "/god silent", false);
 		    SetPVarInt(playerid, "doingStunt", 0);
@@ -29220,6 +29138,7 @@ ExitPlayer(playerid)
 			TogglePlayerControllable(playerid, true);
 			RandomSpawn(playerid, true);
 			RandomWeapons(playerid);
+			
 		    gTeam[playerid] = FREEROAM;
 		    
 		    Streamer_ToggleItemUpdate(playerid, STREAMER_TYPE_MAP_ICON, 1);
@@ -29267,14 +29186,14 @@ ExitPlayer(playerid)
 		case FALLOUT:
 		{
 			gTeam[playerid] = FREEROAM;
-
+		    CurrentFalloutPlayers--;
+            PlayerData[playerid][bFalloutLost] = true;
+			
 		    TogglePlayerControllable(playerid, true);
+			ResetPlayerWorld(playerid);
 		    RandomSpawn(playerid, true);
 		    RandomWeapons(playerid);
 		    HidePlayerFalloutTextdraws(playerid);
-		    ResetPlayerWorld(playerid);
-		    CurrentFalloutPlayers--;
-            PlayerData[playerid][bFalloutLost] = true;
 
 			if(fallout_get_playercount() < 2)
 			{
@@ -29285,10 +29204,10 @@ ExitPlayer(playerid)
 				    if(gTeam[i] == FALLOUT)
 				    {
 				    	TogglePlayerControllable(i, true);
+						ResetPlayerWorld(i);
 					    RandomSpawn(i, true);
 					    RandomWeapons(i);
 					    HidePlayerFalloutTextdraws(i);
-					    ResetPlayerWorld(i);
 					    fallout_broadcast("Fallout has been canceled!");
                         gTeam[i] = FREEROAM;
 					}
@@ -29303,12 +29222,12 @@ ExitPlayer(playerid)
 		}
 		case GUNGAME:
 		{
-		    ResetPlayerWorld(playerid);
   			gTeam[playerid] = FREEROAM;
 
+			ResetPlayerWorld(playerid);
 	    	RandomSpawn(playerid, true);
+			SetCameraBehindPlayer(playerid);
 	    	RandomWeapons(playerid);
-	    	SetCameraBehindPlayer(playerid);
 	    	HidePlayerGunGameTextdraws(playerid);
 
 	    	if(GetPVarInt(playerid, "HadGod") == 1) Command_ReProcess(playerid, "/god silent", false);
@@ -31387,4 +31306,83 @@ GetPlayer2DZone(playerid, zone[], len)
 		}
 	}
 	return 0;
+}
+
+IsNumeric(string[])
+{
+	for(new i = 0, j = strlen(string); i < j; i++)
+	{
+		if(string[i] > '9' || string[i] < '0') return 0;
+	}
+	return 1;
+}
+
+RandomWeapons(playerid)
+{
+	ResetPlayerWeapons(playerid);
+
+	if(PlayerData[playerid][bGod]) return 1;
+
+	switch(random(8)) // melee
+	{
+	    case 0: GivePlayerWeapon(playerid, 2, 1);
+	    case 1: GivePlayerWeapon(playerid, 3, 1);
+	    case 2: GivePlayerWeapon(playerid, 4, 1);
+	    case 3: GivePlayerWeapon(playerid, 5, 1);
+	    case 4: GivePlayerWeapon(playerid, 6, 1);
+	    case 5: GivePlayerWeapon(playerid, 7, 1);
+	    case 6: GivePlayerWeapon(playerid, 8, 1);
+	    case 7: GivePlayerWeapon(playerid, 9, 1);
+	}
+
+	switch(random(3)) // pistol
+	{
+	    case 0: GivePlayerWeapon(playerid, 22, 99999);
+	    case 1: GivePlayerWeapon(playerid, 23, 99999);
+	    case 2: GivePlayerWeapon(playerid, 24, 99999);
+	}
+
+	switch(random(3)) // shotgun
+	{
+	    case 0: GivePlayerWeapon(playerid, 25, 99999);
+	    case 1: GivePlayerWeapon(playerid, 26, 99999);
+	    case 2: GivePlayerWeapon(playerid, 27, 99999);
+	}
+
+	switch(random(3)) // mp
+	{
+	    case 0: GivePlayerWeapon(playerid, 28, 99999);
+	    case 1: GivePlayerWeapon(playerid, 29, 99999);
+	    case 2: GivePlayerWeapon(playerid, 32, 99999);
+	}
+
+	switch(random(2)) //assault
+	{
+	    case 0: GivePlayerWeapon(playerid, 30, 99999);
+	    case 1: GivePlayerWeapon(playerid, 31, 99999);
+	}
+
+	switch(random(2)) // rifle
+	{
+	    case 0: GivePlayerWeapon(playerid, 33, 99999);
+	    case 1: GivePlayerWeapon(playerid, 34, 99999);
+	}
+
+	switch(random(6)) // heavy
+	{
+	    case 2: GivePlayerWeapon(playerid, 37, 99999);
+	}
+
+	switch(random(3)) // nade
+	{
+	    case 2: GivePlayerWeapon(playerid, 16, 3);
+	}
+
+	switch(random(5))
+	{
+	    case 1: GivePlayerWeapon(playerid, 41, 50);
+	    case 2: GivePlayerWeapon(playerid, 42, 50);
+	    case 3: GivePlayerWeapon(playerid, 43, 1);
+	}
+    return 1;
 }
