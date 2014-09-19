@@ -11876,13 +11876,9 @@ YCMD:gwars(playerid, params[], help)
 	    }
 	}
 	if(count > 0)
-	{
 		ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, "Ongoing Gang Wars", str, "OK", "");
-	}
 	else
-	{
 	    ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, "Ongoing Gang Wars", ""white"There are no Gang Wars at the moment", "OK", "");
-	}
 	return 1;
 }
 
@@ -11924,78 +11920,63 @@ YCMD:gwar(playerid, params[], help)
 		    return ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" Gang War", ""white"You can't attack this zone because your gang is already\ninvloved in another Gang War!", "OK", "");
 		}
 		
-		if(GZoneData[r][e_localgang] == 0)
-		{
-		    GZoneData[r][e_underattack] = true;
-		    GZoneData[r][e_attacker] = PlayerData[playerid][e_gangid];
-		    GZoneData[r][e_timeleft] = 60;
-		    GZoneData[r][e_defender] = 0;
-		    
-		    format(gstr, sizeof(gstr), "Gang War: %s~n~Defend the Gang Zone!~n~~n~~n~Timeleft: 1:00", GZoneData[r][e_zname]);
-		    TextDrawSetString(GZoneData[r][e_txtid], gstr);
-		    
-		    new count = 0;
-		    for(new ii = 0; ii < MAX_PLAYERS; ii++)
-		    {
-		        if(PlayerData[ii][e_gangid] == PlayerData[playerid][e_gangid] && IsPlayerAvail(ii))
-		        {
-		            if(IsPlayerInRangeOfPoint(ii, 30.0, GZoneData[r][e_pos][0], GZoneData[r][e_pos][1], GZoneData[r][e_pos][2]))
-		            {
-		        		TextDrawShowForPlayer(ii, GZoneData[r][e_txtid]);
-		        		SetPlayerGWarMode(ii);
-		        		
-		        		++count;
-					}
-				}
-			}
-
-			if(count == 1)
-		    	format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s(%i) is capturing the zone: '%s' %i member has been tied!", __GetName(playerid), playerid, GZoneData[r][e_zname], count);
-			else
-                format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s(%i) is capturing the zone: '%s' %i members have been tied!", __GetName(playerid), playerid, GZoneData[r][e_zname], count);
-                
-			gang_broadcast(PlayerData[playerid][e_gangid], gstr);
-			
-			format(gstr, sizeof(gstr), ""orange"%s(%i) has started capturing the zone '%s' with %i gang member(s)!", __GetName(playerid), playerid, GZoneData[r][e_zname], count);
-			SCMToAll(-1, gstr);
-			
-			Iter_Add(iterGangWar, PlayerData[playerid][e_gangid]);
-		}
-		else
+		if(GZoneData[r][e_localgang] != 0)
 		{
 			if(Iter_Contains(iterGangWar, GZoneData[r][e_localgang]))
 			{
 			    return ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" Gang War", ""white"You can't attack this zone because the opposing gang\nis already invloved in another Gang War!", "OK", "");
 			}
+		}
 		
-		    GZoneData[r][e_underattack] = true;
-		    GZoneData[r][e_attacker] = PlayerData[playerid][e_gangid];
+		Iter_Add(iterGangWar, PlayerData[playerid][e_gangid]);
+		
+		GZoneData[r][e_underattack] = true;
+		GZoneData[r][e_attacker] = PlayerData[playerid][e_gangid];
+		
+	    new count = 0;
+	    for(new ii = 0; ii < MAX_PLAYERS; ii++)
+	    {
+	        if(PlayerData[ii][e_gangid] == PlayerData[playerid][e_gangid] && IsPlayerAvail(ii))
+	        {
+	            if(IsPlayerInRangeOfPoint(ii, GZONE_SIZE, GZoneData[r][e_pos][0], GZoneData[r][e_pos][1], GZoneData[r][e_pos][2]))
+	            {
+	        		TextDrawShowForPlayer(ii, GZoneData[r][e_txtid]);
+	        		SetPlayerGWarMode(ii);
+
+	        		count++;
+				}
+			}
+		}
+	
+		if(GZoneData[r][e_localgang] == 0)
+		{
+		    GZoneData[r][e_timeleft] = 60;
+		    GZoneData[r][e_defender] = 0;
+		    
+		    format(gstr, sizeof(gstr), "Gang War: %s~n~Defend the Gang Zone!~n~~n~~n~Timeleft: 1:00", GZoneData[r][e_zname]);
+		    TextDrawSetString(GZoneData[r][e_txtid], gstr);
+
+			if(count == 1)
+		    	format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s(%i) is capturing the zone: '%s' %i member has been tied!", __GetName(playerid), playerid, GZoneData[r][e_zname], count);
+			else
+                format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s(%i) is capturing the zone: '%s' %i members have been tied!", __GetName(playerid), playerid, GZoneData[r][e_zname], count);
+			gang_broadcast(PlayerData[playerid][e_gangid], gstr);
+			
+			format(gstr, sizeof(gstr), ""orange"%s(%i) has started capturing the zone '%s' with %i gang member(s)!", __GetName(playerid), playerid, GZoneData[r][e_zname], count);
+			SCMToAll(-1, gstr);
+		}
+		else
+		{
 		    GZoneData[r][e_timeleft] = 150;
 		    GZoneData[r][e_defender] = GZoneData[r][e_localgang];
 
 		    format(gstr, sizeof(gstr), "Gang War: %s~n~Defend the Gang Zone!~n~~n~~n~Timeleft: 2:30", GZoneData[r][e_zname]);
 		    TextDrawSetString(GZoneData[r][e_txtid], gstr);
-		    
-		    new count = 0;
-		    for(new ii = 0; ii < MAX_PLAYERS; ii++)
-		    {
-		        if(PlayerData[ii][e_gangid] == PlayerData[playerid][e_gangid] && IsPlayerAvail(ii))
-		        {
-		            if(IsPlayerInRangeOfPoint(ii, 30.0, GZoneData[r][e_pos][0], GZoneData[r][e_pos][1], GZoneData[r][e_pos][2]))
-		            {
-		        		TextDrawShowForPlayer(ii, GZoneData[r][e_txtid]);
-		        		SetPlayerGWarMode(ii);
-
-		        		count++;
-					}
-				}
-			}
 
 			if(count == 1)
 		    	format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s(%i) is capturing the zone: '%s' %i member has been tied!", __GetName(playerid), playerid, GZoneData[r][e_zname], count);
 			else
 			    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"%s(%i) is capturing the zone: '%s' %i members have been tied!", __GetName(playerid), playerid, GZoneData[r][e_zname], count);
-			    
 			gang_broadcast(PlayerData[playerid][e_gangid], gstr);
 
 		    format(gstr, sizeof(gstr), ""gang_sign" "r_besch"Gang %s started a war against your gang at %s!", GetGangNameByID(PlayerData[playerid][e_gangid]), GZoneData[r][e_zname]);
@@ -12004,7 +11985,6 @@ YCMD:gwar(playerid, params[], help)
 			format(gstr, sizeof(gstr), ""orange"%s(%i) has started capturing the zone '%s' with %i gang member(s)!", __GetName(playerid), playerid, GZoneData[r][e_zname], count);
 			SCMToAll(-1, gstr);
 		    
-		    Iter_Add(iterGangWar, PlayerData[playerid][e_gangid]);
 		    Iter_Add(iterGangWar, GZoneData[r][e_localgang]);
 		}
 	    break;
