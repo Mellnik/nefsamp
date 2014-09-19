@@ -27,4 +27,4 @@
 typedef void (*logprintf_t)(const char*, ...);
 extern logprintf_t logprintf;
 
-#endif
+#endif /* _MAIN_H_ */

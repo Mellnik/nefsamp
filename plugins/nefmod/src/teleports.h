@@ -11,17 +11,31 @@
 
 #pragma once
 
-#ifndef _NATIVES_H_
-#define _NATIVES_H_
+#ifndef _TELEPORTS_H_
+#define _TELEPORTS_H_
+
+#include <string>
+#include <vector>
 
 #include "main.h"
+#include "singleton.h"
 
-namespace Native
+#define MAX_TELE_CATEGORIES 9
+
+class Teleports
 {
-	cell AMX_NATIVE_CALL AddTeleport(AMX *amx, cell *params);
-	cell AMX_NATIVE_CALL ProcessTeleportRequest(AMX *amx, cell *params);
-	cell AMX_NATIVE_CALL ResolveHostname(AMX *amx, cell *params);
-	cell AMX_NATIVE_CALL UnixtimeToDate(AMX *amx, cell *params);
+public:
+	Teleports(int32_t Category, const char *Name, const char *Command, float x, float y, float z);
+	~Teleports();
+	
+	void GetPosition(float &x, float &y, float &z);
+
+private:
+	int32_t Category;
+	std::string Name;
+	std::string Command;
+	
+	float Position[3];
 };
 
-#endif /* _NATIVES_H_ */
+#endif /* _TELEPORTS_H_ */

@@ -11,6 +11,7 @@
 
 /*
 || Build Dependencies:
+|| NEFMOD Core 1.0
 || SA-MP Server 0.3z-R4
 || YSI Library 3.1
 || sscanf Plugin 2.8.1
@@ -43,6 +44,7 @@
 #undef MAX_PLAYERS
 #define MAX_PLAYERS (400)
 #include <a_http>           // API Requests
+#include <nefmod>
 #include <crashdetect>
 #include <amx\os>
 #include <YSI\y_iterate>
@@ -28142,8 +28144,11 @@ AddTeleport(teleport_category, const teleport_name[], const teleport_cmd[], Floa
 
 PushTeleportInput(playerid, teleport_category, input)
 {
-	if(teleport_category < 0 || teleport_category > MAX_TELE_CATEGORIES)
-	    return 0;
+	if (NC_ProcessTeleportInput(playerid, teleport_category, input) == 0)
+	{
+		return 0;
+	}
+
 	    
 	if(input < 0 || input > MAX_TELES_PER_CATEGORY)
 	{

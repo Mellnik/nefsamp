@@ -1,7 +1,7 @@
 GPP = g++
 GCC = gcc
 OUTPUT = "bin/nefmod.so"
-COMPILER_FLAGS = -c -m32 -fPIC -O3 -DLINUX -w -I./include/ -I./include/SDK/amx/
+COMPILER_FLAGS = -std=c++0x -c -m32 -fPIC -O3 -DLINUX -w -I./include/ -I./include/SDK/amx/
 LIBRARIES = -lrt
 
 all: compile clean

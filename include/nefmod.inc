@@ -14,8 +14,8 @@
 #endif
 #define _nefmod_included
 
-native AddTeleport();
-native ProcessTeleportRequest(playerid);
+native NC_AddTeleport(tp_category, const tp_name[], const tp_cmd[], Float:x, Float:y, Float:z);
+native NC_ProcessTeleportRequest(playerid, tp_category, input);
 
-native ResolveHostname(dest[], hostname[], len = sizeof(dest));
-native UnixtimeToDate(dest[], unixtime, len = sizeof(dest));
+native NC_ResolveHostname(dest[], hostname[], len = sizeof(dest));
+native NC_UnixtimeToDate(dest[], unixtime, len = sizeof(dest));

@@ -35,7 +35,7 @@ PLUGIN_EXPORT bool PLUGIN_CALL Load(void **ppData)
 PLUGIN_EXPORT void PLUGIN_CALL Unload()
 {
 	Plugin::Destroy();
-	logprintf("[NEFMOD] Plugin unloaded.");
+	logprintf("[NEFMOD] Core unloaded.");
 }
 
 PLUGIN_EXPORT void PLUGIN_CALL ProcessTick()
@@ -45,7 +45,10 @@ PLUGIN_EXPORT void PLUGIN_CALL ProcessTick()
 
 AMX_NATIVE_INFO nefmod_natives[] =
 {
-	{"ResolveHostname", Native::ResolveHostname},
+	{"NC_AddTeleport", Native::AddTeleport},	
+	{"NC_ProcessTeleportRequest", Native::ProcessTeleportRequest},	
+	{"NC_ResolveHostname", Native::ResolveHostname},
+	{"NC_UnixtimeToDate", Native::UnixtimeToDate},
 	{NULL, NULL}
 };
 

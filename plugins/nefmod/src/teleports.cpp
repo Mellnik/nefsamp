@@ -9,19 +9,21 @@
 || #################################################################### ||
 \*======================================================================*/
 
-#pragma once
+#include "teleports.h"
 
-#ifndef _NATIVES_H_
-#define _NATIVES_H_
-
-#include "main.h"
-
-namespace Native
+Teleports::Teleports(int32_t Category, const char *Name, const char *Command, float x, float y, float z)
 {
-	cell AMX_NATIVE_CALL AddTeleport(AMX *amx, cell *params);
-	cell AMX_NATIVE_CALL ProcessTeleportRequest(AMX *amx, cell *params);
-	cell AMX_NATIVE_CALL ResolveHostname(AMX *amx, cell *params);
-	cell AMX_NATIVE_CALL UnixtimeToDate(AMX *amx, cell *params);
-};
+	this->Name.assign(Name);
+	this->Command.assign(Command);
+	this->Category = Category;
+	this->Position[0] = x;
+	this->Position[0] = y;
+	this->Position[0] = z;
+}
 
-#endif /* _NATIVES_H_ */
+void Teleports::GetPosition(float &x, float &y, float &z)
+{
+	x = this->Position[0];
+	y = this->Position[1];
+	z = this->Position[2];
+}

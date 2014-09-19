@@ -33,4 +33,4 @@ private:
 	std::list<AMX *> amx_List;
 };
 
-#endif
+#endif /* _PLUGIN_H_ */

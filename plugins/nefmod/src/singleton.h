@@ -45,4 +45,4 @@ public:
 template <class T>
 T* CSingleton<T>::m_Instance = NULL;
 
-#endif // _SINGLETON_H_
+#endif /* _SINGLETON_H_ */
