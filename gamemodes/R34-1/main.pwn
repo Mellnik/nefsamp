@@ -28,6 +28,7 @@
 || Max businesses: 700
 || Max gang zones: 65
 || Max houses: 600
+|| Gang name: 4-20 chars
 */
 
 #pragma dynamic 8192        // for md-sort
@@ -99,9 +100,9 @@ Float:GetDistance3D(Float:x1, Float:y1, Float:z1, Float:x2, Float:y2, Float:z2);
 #define NEF_VERSION_MINOR               1
 #define NEF_VERSION_PATCH               0
 #if IS_RELEASE_BUILD == true
-#define CURRENT_VERSION                 "Build 34"
+#define CURRENT_VERSION                 "Build 34-1"
 #else
-#define CURRENT_VERSION                 "PTS:Build 34"
+#define CURRENT_VERSION                 "PTS:Build 34-1"
 #endif
 #define HOTFIX_REV                      "Hotfix #0"
 #define SAMP_VERSION                    "SA-MP 0.3z-R4"
@@ -28112,7 +28113,7 @@ GetVehicleModelSeats(modelid)
 
 AddTeleport(teleport_category, const teleport_name[], const teleport_cmd[], Float:x, Float:y, Float:z, bool:create_label = true)
 {
-	new buffer[70];
+	new buffer[100];
 	
 	if(create_label)
 	{
@@ -28122,6 +28123,18 @@ AddTeleport(teleport_category, const teleport_name[], const teleport_cmd[], Floa
 	
 	format(buffer, sizeof(buffer), "%s (/%s)\n", teleport_name, teleport_cmd);
 	strcat(g_TeleportDialogString[teleport_category], buffer);
+	
+	if (g_TeleportIndex[teleport_category]++ >= MAX_TELES_PER_CATEGORY)
+	{
+		Log(LOG_FAIL, "Too many teles in category %i (%s) MAX_TELES_PER_CATEGORY %i , %i", teleport_category, teleport_cmd, MAX_TELES_PER_CATEGORY, g_TeleportIndex[teleport_category]);
+		SendRconCommand("exit");
+	}
+	
+	if (strlen(teleport_cmd) > 15)
+	{
+		Log(LOG_FAIL, "Teleport name too big %i %s", teleport_category, teleport_cmd);
+		SendRconCommand("exit");
+	}
 	
     strmid(g_Teleports[teleport_category][g_TeleportIndex[teleport_category]++], teleport_cmd, 0, 15, 15);
     return 1;
@@ -28141,7 +28154,7 @@ PushTeleportInput(playerid, teleport_category, input)
 	new string[32];
 
 	string[0] = '/';
-	strcat(string, g_Teleports[teleport_category][input], sizeof(string));
+	strcat(string, g_Teleports[teleport_category][input], sizeof(string)); // Crash?!
 
     Command_ReProcess(playerid, string, false);
 	return 1;
