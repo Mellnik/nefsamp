@@ -28,7 +28,7 @@
 || Max teleports per category: 32
 || Max teleport command name: 15
 || Max businesses: 700
-|| Max gang zones: 65
+|| Max gang zones: 63
 || Max houses: 600
 || Gang name: 4-20 chars
 */
@@ -259,7 +259,7 @@ Float:GetDistance3D(Float:x1, Float:y1, Float:z1, Float:x2, Float:y2, Float:z2);
 #define COLOR_CNR_PRO_ROBBER            0xFF3200FF
 
 // GWARS
-#define MAX_GZONES						(65)
+#define MAX_GZONES						(63)
 #define MAX_GZONES_PER_GANG             (15)
 #define GZONE_SIZE                      (70.0)
 #define COLOR_HOSTILE                   (0x95133499)
@@ -4241,7 +4241,8 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 
 				for(new r = 0; r < MAX_GZONES; r++)
 				{
-				    if(GZoneData[r][e_ormid] == ORM:-1) continue;
+				    if(GZoneData[r][e_ormid] == ORM:-1)
+						continue;
 				    
 				    if(GZoneData[r][e_localgang] == gangid)
 				    {
@@ -5468,6 +5469,9 @@ public OnPlayerEnterDynamicArea(playerid, areaid)
 	
 	for(new r = 0; r < MAX_GZONES; r++)
 	{
+	    if(GZoneData[r][e_ormid] == ORM:-1)
+	        continue;
+	        
 	    if(GZoneData[r][e_localgang] == PlayerData[playerid][e_gangid] && GZoneData[r][e_underattack] && areaid == GZoneData[r][e_areaid])
 	    {
 	        // Player entered GWAR
@@ -5502,6 +5506,9 @@ public OnPlayerLeaveDynamicArea(playerid, areaid)
 	{
 		for(new r = 0; r < MAX_GZONES; r++)
 		{
+	 	    if(GZoneData[r][e_ormid] == ORM:-1)
+		        continue;
+	        
 		    if(GZoneData[r][e_localgang] == PlayerData[playerid][e_gangid] && GZoneData[r][e_underattack] && areaid == GZoneData[r][e_areaid])
 		    {
 		        // Player left GWAR
@@ -8278,6 +8285,9 @@ YCMD:l(playerid, params[], help)
 	
 	for(new r = 0; r < MAX_GZONES; r++)
 	{
+	    if(GZoneData[r][e_ormid] == ORM:-1)
+	        continue;
+	        
 	    if(GZoneData[r][e_underattack] && (GZoneData[r][e_localgang] == PlayerData[playerid][e_gangid] || GZoneData[r][e_attacker] == PlayerData[playerid][e_gangid]))
 	    {
 	        if(GZONE_SIZE + 100.0 > GetDistance3D(PlayerData[playerid][sX], PlayerData[playerid][sY], PlayerData[playerid][sZ], GZoneData[r][e_pos][0], GZoneData[r][e_pos][1], GZoneData[r][e_pos][2]))
@@ -10741,6 +10751,9 @@ YCMD:jetpack(playerid, params[], help)
 
 		for(new r = 0; r < MAX_GZONES; r++)
 		{
+		    if(GZoneData[r][e_ormid] == ORM:-1)
+		        continue;
+
 		    if(!GZoneData[r][e_underattack])
 				continue;
 
@@ -11579,6 +11592,9 @@ YCMD:gzonereset(playerid, params[], help)
 		new bool:bFound = false;
 		for(new r = 0; r < MAX_GZONES; r++)
 	    {
+	  	    if(GZoneData[r][e_ormid] == ORM:-1)
+		        continue;
+		        
 		    if(!IsPlayerInRangeOfPoint(playerid, 7.0, GZoneData[r][e_pos][0], GZoneData[r][e_pos][1], GZoneData[r][e_pos][2])) continue;
 	        bFound = true;
 	        
@@ -11725,6 +11741,9 @@ YCMD:gcapture(playerid, params[], help)
 	new bool:bFound = false;
 	for(new r = 0; r < MAX_GZONES; r++)
 	{
+	    if(GZoneData[r][e_ormid] == ORM:-1)
+	        continue;
+	        
 	    if(!IsPlayerInRangeOfPoint(playerid, 7.0, GZoneData[r][e_pos][0], GZoneData[r][e_pos][1], GZoneData[r][e_pos][2])) continue;
         bFound = true;
 
@@ -11815,6 +11834,9 @@ YCMD:gzones(playerid, params[], help)
 	new str[1024], count = 0;
 	for(new r = 0; r < MAX_GZONES; r++)
 	{
+	    if(GZoneData[r][e_ormid] == ORM:-1)
+	        continue;
+	        
 	    if(PlayerData[playerid][e_gangid] == GZoneData[r][e_localgang])
 	    {
 	        format(gstr, sizeof(gstr), "\n%i - %s", ++count, GZoneData[r][e_zname]);
@@ -11843,6 +11865,9 @@ YCMD:gwars(playerid, params[], help)
 	
 	for(new r = 0; r < MAX_GZONES; r++)
 	{
+	    if(GZoneData[r][e_ormid] == ORM:-1)
+	        continue;
+	        
 	    if(GZoneData[r][e_underattack])
 	    {
 	        format(gstr, sizeof(gstr), "%s is attacking zone '%s'\n", GetGangNameByID(GZoneData[r][e_attacker]), GZoneData[r][e_zname]);
@@ -11872,6 +11897,9 @@ YCMD:gwar(playerid, params[], help)
 	new bool:bFound = false;
 	for(new r = 0; r < MAX_GZONES; r++)
 	{
+	    if(GZoneData[r][e_ormid] == ORM:-1)
+	        continue;
+	        
 	    if(!IsPlayerInRangeOfPoint(playerid, 7.0, GZoneData[r][e_pos][0], GZoneData[r][e_pos][1], GZoneData[r][e_pos][2])) continue;
         bFound = true;
 
@@ -12010,6 +12038,9 @@ ResetPlayerGWarMode(playerid, bool:msg = true)
     
     for(new r = 0; r < MAX_GZONES; r++)
     {
+	    if(GZoneData[r][e_ormid] == ORM:-1)
+	        continue;
+	        
         TextDrawHideForPlayer(playerid, GZoneData[r][e_txtid]);
     }
     
@@ -18801,6 +18832,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				for(new r = 0; r < MAX_GZONES; r++)
 				{
+				    if(GZoneData[r][e_ormid] == ORM:-1)
+				        continue;
+	        
 				    if(GZoneData[r][e_localgang] == PlayerData[playerid][e_gangid])
 				    {
 						GZoneData[r][e_timeleft] = 0;
@@ -20873,6 +20907,9 @@ SyncGangZones(playerid)
 {
 	for(new r = 0; r < MAX_GZONES; r++)
 	{
+	    if(GZoneData[r][e_ormid] == ORM:-1)
+	        continue;
+	
 	    if(GZoneData[r][e_localgang] == 0)
 	    {
 	        GangZoneShowForPlayer(playerid, GZoneData[r][e_zoneid], COLOR_NONE);
@@ -20912,6 +20949,9 @@ GetGZonesByGang(id)
 	new count = 0;
 	for(new r = 0; r < MAX_GZONES; r++)
 	{
+	    if(GZoneData[r][e_ormid] == ORM:-1)
+	        continue;
+	        
 	    if(GZoneData[r][e_localgang] == id)
 	    {
 	        ++count;
@@ -20932,6 +20972,7 @@ ResetGZones()
         GZoneData[r][e_underattack] = false;
         GZoneData[r][e_attacker] = 0;
         GZoneData[r][e_defender] = 0;
+		GZoneData[r][e_pickupid] = -1;
 	}
 }
 
@@ -21640,7 +21681,11 @@ CarSpawner(playerid, model, respawn_delay = -1, bool:spawnzone_check = true)
 	    
 		for(new r = 0; r < MAX_GZONES; r++)
 		{
-		    if(!GZoneData[r][e_underattack]) continue;
+	 	    if(GZoneData[r][e_ormid] == ORM:-1)
+		        continue;
+	        
+		    if(!GZoneData[r][e_underattack])
+				continue;
 		    
 		    if(IsPointInDynamicArea(GZoneData[r][e_areaid], POS[0], POS[1], POS[2]))
 		    {
@@ -23140,9 +23185,6 @@ server_initialize()
 	    format(gstr, sizeof(gstr), "%s\n", g_sCustomCarCategories[i]);
 	    strcat(g_sCustomCarCategory, gstr);
 	}
-	
-	for(new r = 0; r < MAX_GZONES; r++)
-		GZoneData[r][e_underattack] = false;
 		
 	// Other stuff to initialize TODO: Overhaul spawns using polygons
     g_SpawnAreas[0] = CreateDynamicSphere(341.8535, -1852.6327, 6.8569, 25.0); // <- beach sphere
@@ -26271,6 +26313,9 @@ function:ProcessTick()
 
 	for(new r = 0; r < MAX_GZONES; r++)
 	{
+	    if(GZoneData[r][e_ormid] == ORM:-1)
+	        continue;
+	        
         if(GZoneData[r][e_locked] > utime) {
             if(GZoneData[r][e_pickupid] == -1) {
                 GZoneData[r][e_pickupid] = CreateDynamicPickup(1314, 23, GZoneData[r][e_pos][0], GZoneData[r][e_pos][1], GZoneData[r][e_pos][2], 0, -1, -1);
@@ -26297,20 +26342,23 @@ function:ProcessTick()
 			else if(GZoneData[r][e_timeleft] <= 0)
 			{
 			    new Iterator:Players<MAX_PLAYERS>;
-			    for(new ii = 0; ii < MAX_PLAYERS; ii++)
+			    for(new it = 0; it < MAX_PLAYERS; it++)
 			    {
-			        if(IsPlayerAvail(ii) && PlayerData[ii][e_gangid] == GZoneData[r][e_attacker] && PlayerData[ii][bGWarMode])
+			        if(IsPlayerAvail(it) && PlayerData[it][e_gangid] == GZoneData[r][e_attacker] && PlayerData[it][bGWarMode])
 			        {
-			            if(!IsPlayerInRangeOfPoint(ii, GZONE_SIZE, GZoneData[r][e_pos][0], GZoneData[r][e_pos][1], GZoneData[r][e_pos][2]) || IsPlayerOnDesktop(ii, 50000)) continue;
-                        if(IsPlayerOnDesktop(ii, 2500)) continue;
+						if(!IsPlayerInDynamicArea(it, GZoneData[r][e_areaid]))
+						    continue;
 
-			            Iter_Add(Players, ii);
+                        if(IsPlayerOnDesktop(it, 2500))
+							continue;
+
+			            Iter_Add(Players, it);
 			        }
 			    }
 
-			    if(Iter_Count(Players) == 0)
+			    if(Iter_Count(Players) == 0) // No attackers around
 			    {
-			        if(GZoneData[r][e_defender] == 0)
+			        if(GZoneData[r][e_defender] == 0) // Zone must have been whitnessed
 			        {
 					    format(gstr, sizeof(gstr), ""gang_sign" "r_besch" Your gang failed to capture '%s' as there are no alive players around!", GZoneData[r][e_zname]);
 						gang_broadcast(GZoneData[r][e_attacker], gstr);
@@ -29300,6 +29348,9 @@ function:OnGangRenameAttempt(playerid, newgangname[], newgangtag[], namehash)
 	{
 	    for(new r = 0; r < MAX_GZONES; r++)
 	    {
+	 	    if(GZoneData[r][e_ormid] == ORM:-1)
+		        continue;
+	        
 	        if(GZoneData[r][e_localgang] == PlayerData[playerid][e_gangid])
 	        {
 	            new text[144];
