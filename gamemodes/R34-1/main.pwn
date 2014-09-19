@@ -24,6 +24,7 @@
 || Database changes:
 ||
 || Script limits:
+|| Max teleport categories: 9
 || Max teleports per category: 32
 || Max teleport command name: 15
 || Max businesses: 700
@@ -34,8 +35,8 @@
 
 #pragma dynamic 8192        // for md-sort
 
-#define IS_RELEASE_BUILD (true)
-#define INC_ENVIRONMENT (true)
+#define IS_RELEASE_BUILD (false)
+#define INC_ENVIRONMENT (false)
 #define WINTER_EDITION (false) // Requires FS ferriswheelfair.amx
 #define _YSI_NO_VERSION_CHECK
 #define YSI_IS_SERVER
@@ -157,8 +158,6 @@ Float:GetDistance3D(Float:x1, Float:y1, Float:z1, Float:x2, Float:y2, Float:z2);
 #define SCM SendClientMessage
 #define SCMToAll SendClientMessageToAll
 #define MAX_ZONE_NAME                   (28)
-#define MAX_TELE_CATEGORIES             (9)
-#define MAX_TELES_PER_CATEGORY          (32)
 #define CAR_SHOPS                       (3)
 #define RGBA(%1,%2,%3,%4) (((((%1) & 0xff) << 24) | (((%2) & 0xff) << 16) | (((%3) & 0xff) << 8) | ((%4) & 0xff)))
 #define UpperToLower(%1) for(new ToLowerChar; ToLowerChar < strlen(%1); ToLowerChar++) if(%1[ToLowerChar] > 64 && %1[ToLowerChar] < 91) %1[ToLowerChar] += 32
@@ -2749,8 +2748,6 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
 	g_LottoNumber,
 	g_LottoJackpot,
 	bool:bLottoActive = false,
-	g_Teleports[MAX_TELE_CATEGORIES][MAX_TELES_PER_CATEGORY][16],
-	g_TeleportIndex[MAX_TELE_CATEGORIES],
 	g_TeleportDialogString[MAX_TELE_CATEGORIES][2048],
 	g_ServerStats[4],
 	g_sCustomCarCategory[512],
@@ -2983,18 +2980,15 @@ public OnGameModeInit()
 	{
 		SetVehicleNumberPlate(i, "{F81414}NEF");
 		SetVehicleToRespawn(i);
+		
 		if(IsComponentIdCompatible(GetVehicleModel(i), 1010))
 			AddVehicleComponent(i, 1010);
+			
 		ChangeVehicleColor(i, (random(128) + 127), (random(128) + 127));
 	}
 	
-	new teleports = 0;
-	for(new i = 0; i < MAX_TELE_CATEGORIES; i++)
-	    teleports += g_TeleportIndex[i];
-	    
-	Log(LOG_INIT, "Teleports: %i (%i,%i,%i,%i,%i,%i,%i,%i,%i)", teleports,
-		g_TeleportIndex[0], g_TeleportIndex[1], g_TeleportIndex[2], g_TeleportIndex[3], g_TeleportIndex[4], g_TeleportIndex[5], g_TeleportIndex[6], g_TeleportIndex[7], g_TeleportIndex[8]);
-		
+	NC_OutputTeleportInfo();
+	
     Log(LOG_INIT, "Server successfully loaded");
 	return 1;
 }
@@ -28115,53 +28109,33 @@ GetVehicleModelSeats(modelid)
 
 AddTeleport(teleport_category, const teleport_name[], const teleport_cmd[], Float:x, Float:y, Float:z, bool:create_label = true)
 {
-	new buffer[100];
-	
 	if(create_label)
 	{
-	    format(buffer, sizeof(buffer), ""nef"\n%s (/%s)", teleport_name, teleport_cmd);
-		CreateDynamic3DTextLabel(buffer, -1, x, y, z + 0.50, 40.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1);
+	    format(gstr, sizeof(gstr), ""nef"\n%s (/%s)", teleport_name, teleport_cmd);
+		CreateDynamic3DTextLabel(gstr, -1, x, y, z + 0.50, 40.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1);
 	}
 	
-	format(buffer, sizeof(buffer), "%s (/%s)\n", teleport_name, teleport_cmd);
-	strcat(g_TeleportDialogString[teleport_category], buffer);
+	gstr[0] = '\0';
+	format(gstr, sizeof(gstr), "%s (/%s)\n", teleport_name, teleport_cmd);
+	strcat(g_TeleportDialogString[teleport_category], gstr);
 	
-	if (g_TeleportIndex[teleport_category]++ >= MAX_TELES_PER_CATEGORY)
+	if(NC_AddTeleport(teleport_category, teleport_name, teleport_cmd, x, y, z) == 0)
 	{
-		Log(LOG_FAIL, "Too many teles in category %i (%s) MAX_TELES_PER_CATEGORY %i , %i", teleport_category, teleport_cmd, MAX_TELES_PER_CATEGORY, g_TeleportIndex[teleport_category]);
-		SendRconCommand("exit");
+	    Log(LOG_FAIL, "NC_AddTeleport returned 0");
+	    SendRconCommand("exit");
 	}
-	
-	if (strlen(teleport_cmd) > 15)
-	{
-		Log(LOG_FAIL, "Teleport name too big %i %s", teleport_category, teleport_cmd);
-		SendRconCommand("exit");
-	}
-	
-    strmid(g_Teleports[teleport_category][g_TeleportIndex[teleport_category]++], teleport_cmd, 0, 15, 15);
     return 1;
 }
 
 PushTeleportInput(playerid, teleport_category, input)
 {
-	if (NC_ProcessTeleportInput(playerid, teleport_category, input) == 0)
+	new string[32];
+	if(NC_ProcessTeleportRequest(teleport_category, input, string, sizeof(string)) == 0)
 	{
 		return 0;
 	}
-
-	    
-	if(input < 0 || input > MAX_TELES_PER_CATEGORY)
-	{
-		Log(LOG_FAIL, "Invalid teleport index, PushTeleportInput(%i, %i, %i)", playerid, teleport_category, input);
-	    return 0;
-	}
-
-	new string[32];
-
-	string[0] = '/';
-	strcat(string, g_Teleports[teleport_category][input], sizeof(string)); // Crash?!
-
-    Command_ReProcess(playerid, string, false);
+	
+	Command_ReProcess(playerid, string, false);
 	return 1;
 }
 

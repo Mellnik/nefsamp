@@ -14,11 +14,16 @@
 Teleports::Teleports(int32_t Category, const char *Name, const char *Command, float x, float y, float z)
 {
 	this->Name.assign(Name);
-	this->Command.assign(Command);
+	this->Command.append(Command);
 	this->Category = Category;
 	this->Position[0] = x;
-	this->Position[0] = y;
-	this->Position[0] = z;
+	this->Position[1] = y;
+	this->Position[2] = z;
+}
+
+const char *Teleports::GetCommandName()
+{
+	return this->Command.c_str();
 }
 
 void Teleports::GetPosition(float &x, float &y, float &z)
