@@ -28,7 +28,7 @@ PLUGIN_EXPORT bool PLUGIN_CALL Load(void **ppData)
 	pAMXFunctions = ppData[PLUGIN_DATA_AMX_EXPORTS];
 	logprintf = (logprintf_t)ppData[PLUGIN_DATA_LOGPRINTF];
 
-	logprintf("[NEFMOD] Core successfully loaded "PLUGIN_VERSION".");
+	logprintf("[NEFMOD] Core successfully loaded "PLUGIN_VERSION"");
 	return true;
 }
 

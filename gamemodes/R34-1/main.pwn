@@ -35,8 +35,8 @@
 
 #pragma dynamic 8192        // for md-sort
 
-#define IS_RELEASE_BUILD (false)
-#define INC_ENVIRONMENT (false)
+#define IS_RELEASE_BUILD (true)
+#define INC_ENVIRONMENT (true)
 #define WINTER_EDITION (false) // Requires FS ferriswheelfair.amx
 #define _YSI_NO_VERSION_CHECK
 #define YSI_IS_SERVER
@@ -26295,7 +26295,7 @@ function:ProcessTick()
 	{
 	    if(GZoneData[r][e_ormid] == ORM:-1)
 	        continue;
-	        
+
         if(GZoneData[r][e_locked] > utime) {
             if(GZoneData[r][e_pickupid] == -1) {
                 GZoneData[r][e_pickupid] = CreateDynamicPickup(1314, 23, GZoneData[r][e_pos][0], GZoneData[r][e_pos][1], GZoneData[r][e_pos][2], 0, -1, -1);
@@ -26309,7 +26309,7 @@ function:ProcessTick()
 				}
             }
 		}
-	
+
 		if(GZoneData[r][e_underattack])
 		{
 			if(GZoneData[r][e_timeleft] > 0)
