@@ -78,7 +78,6 @@ cell AMX_NATIVE_CALL Native::ProcessTeleportRequest(AMX *amx, cell *params)
 	cell *amx_Addr = NULL;
 	amx_GetAddr(amx, params[3], &amx_Addr);
 	amx_SetString(amx_Addr, tp_rel->GetCommandName(), 0, 0, params[4] > 0 ? params[4] : std::strlen(tp_rel->GetCommandName()) + 1);
-	logprintf("Teleport routed through nefmod %i, %i", params[1], params[2]);
 	return 1;
 }
 

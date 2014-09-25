@@ -4005,8 +4005,8 @@ public OnPlayerGiveDamage(playerid, damagedid, Float:amount, weaponid, bodypart)
 public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY, Float:fZ)
 {
 	/* Bullet Crasher http://forum.sa-mp.com/showthread.php?t=535559 */
-	if(hittype == BULLET_HIT_TYPE_PLAYER) {
-	    if( !( -20.0 <= fX <= 20.0 ) || !( -20.0 <= fY <= 20.0 ) || !( -20.0 <= fZ <= 20.0 ) ) {
+	if(hittype != BULLET_HIT_TYPE_NONE) {
+	    if( !( -1000.0 <= fX <= 1000.0 ) || !( -1000.0 <= fY <= 1000.0 ) || !( -1000.0 <= fZ <= 1000.0 ) ) {
 		    return 0;
   		}
 	}
