@@ -1,6 +1,6 @@
 /*======================================================================*\
 || #################################################################### ||
-|| # Project New Evolution Freeroam - Build 34-1           			  # ||
+|| # Project New Evolution Freeroam - Build 34-2           			  # ||
 || # ---------------------------------------------------------------- # ||
 || # Copyright (c)2011-2014 New Evolution Freeroam  				  # ||
 || # Created by Mellnik                                               # ||
@@ -11,7 +11,7 @@
 
 /*
 || Build Dependencies:
-|| NEFMOD Core 1.0
+|| NEFMOD Core 1.2
 || SA-MP Server 0.3z-R4
 || YSI Library 3.1
 || sscanf Plugin 2.8.1
@@ -103,9 +103,9 @@ Float:GetDistance3D(Float:x1, Float:y1, Float:z1, Float:x2, Float:y2, Float:z2);
 #define NEF_VERSION_MINOR               1
 #define NEF_VERSION_PATCH               0
 #if IS_RELEASE_BUILD == true
-#define CURRENT_VERSION                 "Build 34-1"
+#define CURRENT_VERSION                 "Build 34-2"
 #else
-#define CURRENT_VERSION                 "PTS:Build 34-1"
+#define CURRENT_VERSION                 "PTS:Build 34-2"
 #endif
 #define HOTFIX_REV                      "Hotfix #0"
 #define SAMP_VERSION                    "SA-MP 0.3z-R4"
@@ -2743,7 +2743,6 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
 	g_RacePosition[MAX_PLAYERS],
 	m_PlayerRecord,
 	g_CustomCarShops[CAR_SHOPS][E_CAR_SHOP],
-	g_cmdString[32],
 	gstr[144],
 	gstr2[255],
 	g_LottoNumber,
@@ -28153,14 +28152,13 @@ AddTeleport(teleport_category, const teleport_name[], const teleport_cmd[], Floa
 
 PushTeleportInput(playerid, teleport_category, input)
 {
-	if(NC_ProcessTeleportRequest(teleport_category, input, g_cmdString, sizeof(g_cmdString)) == 0)
+	new string[32];
+	if(NC_ProcessTeleportRequest(teleport_category, input, string, sizeof(string)) == 0)
 	{
-	    printf("NC_ProcessTeleportRequest returned 0");
-	    PrintAmxBacktrace();
 		return 0;
 	}
 	
-	Command_ReProcess(playerid, g_cmdString, false);
+	Command_ReProcess(playerid, string, false);
 	return 1;
 }
 

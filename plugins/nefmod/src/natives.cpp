@@ -60,7 +60,7 @@ cell AMX_NATIVE_CALL Native::ProcessTeleportRequest(AMX *amx, cell *params)
 {
 	static const unsigned ParamCount = 4;
 	PARAM_CHECK(ParamCount, "NC_ProcessTeleportRequest");
-	
+	logprintf("ProcessTeleportRequest");
 	if (params[1] < 0 || params[1] > MAX_TELE_CATEGORIES)
 	{
 		logprintf("[NEFMOD] Invalid tp category");
@@ -72,12 +72,18 @@ cell AMX_NATIVE_CALL Native::ProcessTeleportRequest(AMX *amx, cell *params)
 		logprintf("[NEFMOD] Invalid input exceeds restrictions, %i, %i", params[1], params[2]);
 		return 0;
 	}
-	
+	logprintf("ProcessTeleportRequest2");
 	auto tp_rel = g_mTeleports[params[1]][params[2]];
-	
+	logprintf("ProcessTeleportRequest3");
 	cell *amx_Addr = NULL;
 	amx_GetAddr(amx, params[3], &amx_Addr);
+	if (amx_Addr == NULL)
+	{
+		logprintf("[NEFMOD] CRASH DETECTED!!! amx_Addr = NULL from amx_GetAddr WHAT THE F BOOOOM!");
+		return 0;
+	}
 	amx_SetString(amx_Addr, tp_rel->GetCommandName(), 0, 0, params[4] > 0 ? params[4] : std::strlen(tp_rel->GetCommandName()) + 1);
+	logprintf("ProcessTeleportRequest4");
 	return 1;
 }
 

@@ -16,7 +16,7 @@
 
 #include <SDK/plugin.h>
 
-#define PLUGIN_VERSION "1.1"
+#define PLUGIN_VERSION "1.2"
 #define PARAM_CHECK(c, n) \
 	if(params[0] != (c * 4)) \
 	{ \
