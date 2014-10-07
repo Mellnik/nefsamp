@@ -2743,6 +2743,7 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
 	g_RacePosition[MAX_PLAYERS],
 	m_PlayerRecord,
 	g_CustomCarShops[CAR_SHOPS][E_CAR_SHOP],
+	g_cmdString[32],
 	gstr[144],
 	gstr2[255],
 	g_LottoNumber,
@@ -20860,7 +20861,7 @@ function:OnGangZoneLoad()
         GZoneData[r][e_iconid] = CreateDynamicMapIcon(GZoneData[r][e_pos][0], GZoneData[r][e_pos][1], GZoneData[r][e_pos][2], 19, 1, .worldid = 0, .streamdistance = 240.0);
 		GZoneData[r][e_zoneid] = GangZoneCreate(GZoneData[r][e_pos][0] - GZONE_SIZE, GZoneData[r][e_pos][1] - GZONE_SIZE, GZoneData[r][e_pos][0] + GZONE_SIZE, GZoneData[r][e_pos][1] + GZONE_SIZE);
         GZoneData[r][e_checkid] = CreateDynamicCP(GZoneData[r][e_pos][0], GZoneData[r][e_pos][1], GZoneData[r][e_pos][2], 7.0, .worldid = 0, .streamdistance = 50.0);
-        GZoneData[r][e_areaid] = CreateDynamicCube(GZoneData[r][e_pos][0] - GZONE_SIZE, GZoneData[r][e_pos][1] - GZONE_SIZE, GZoneData[r][e_pos][2], GZoneData[r][e_pos][0] + GZONE_SIZE, GZoneData[r][e_pos][1] + GZONE_SIZE, GZoneData[r][e_pos][2] + GZONE_SIZE, .worldid = 0);
+        GZoneData[r][e_areaid] = CreateDynamicCuboid(GZoneData[r][e_pos][0] - GZONE_SIZE, GZoneData[r][e_pos][1] - GZONE_SIZE, GZoneData[r][e_pos][2], GZoneData[r][e_pos][0] + GZONE_SIZE, GZoneData[r][e_pos][1] + GZONE_SIZE, GZoneData[r][e_pos][2] + GZONE_SIZE, .worldid = 0);
 	}
 	
 	cache_set_active(data, pSQL);
@@ -20877,7 +20878,7 @@ function:OnGangZoneLoadEx(slot)
     GZoneData[slot][e_iconid] = CreateDynamicMapIcon(GZoneData[slot][e_pos][0], GZoneData[slot][e_pos][1], GZoneData[slot][e_pos][2], 19, 1, .worldid = 0, .streamdistance = 240.0);
 	GZoneData[slot][e_zoneid] = GangZoneCreate(GZoneData[slot][e_pos][0] - GZONE_SIZE, GZoneData[slot][e_pos][1] - GZONE_SIZE, GZoneData[slot][e_pos][0] + GZONE_SIZE, GZoneData[slot][e_pos][1] + GZONE_SIZE);
     GZoneData[slot][e_checkid] = CreateDynamicCP(GZoneData[slot][e_pos][0], GZoneData[slot][e_pos][1], GZoneData[slot][e_pos][2], 7.0, .worldid = 0, .streamdistance = 50.0);
-    GZoneData[slot][e_areaid] = GZoneData[slot][e_areaid] = CreateDynamicCube(GZoneData[slot][e_pos][0] - GZONE_SIZE, GZoneData[slot][e_pos][1] - GZONE_SIZE, GZoneData[slot][e_pos][2], GZoneData[slot][e_pos][0] + GZONE_SIZE, GZoneData[slot][e_pos][1] + GZONE_SIZE, GZoneData[slot][e_pos][2] + GZONE_SIZE, .worldid = 0);
+    GZoneData[slot][e_areaid] = GZoneData[slot][e_areaid] = CreateDynamicCuboid(GZoneData[slot][e_pos][0] - GZONE_SIZE, GZoneData[slot][e_pos][1] - GZONE_SIZE, GZoneData[slot][e_pos][2], GZoneData[slot][e_pos][0] + GZONE_SIZE, GZoneData[slot][e_pos][1] + GZONE_SIZE, GZoneData[slot][e_pos][2] + GZONE_SIZE, .worldid = 0);
 
 	GangZoneShowForAll(GZoneData[slot][e_zoneid], COLOR_NONE);
 	return 1;
@@ -28152,13 +28153,14 @@ AddTeleport(teleport_category, const teleport_name[], const teleport_cmd[], Floa
 
 PushTeleportInput(playerid, teleport_category, input)
 {
-	new string[32];
-	if(NC_ProcessTeleportRequest(teleport_category, input, string, sizeof(string)) == 0)
+	if(NC_ProcessTeleportRequest(teleport_category, input, g_cmdString, sizeof(g_cmdString)) == 0)
 	{
+	    printf("NC_ProcessTeleportRequest returned 0");
+	    PrintAmxBacktrace();
 		return 0;
 	}
 	
-	Command_ReProcess(playerid, string, false);
+	Command_ReProcess(playerid, g_cmdString, false);
 	return 1;
 }
 

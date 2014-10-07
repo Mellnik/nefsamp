@@ -2743,7 +2743,6 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
 	g_RacePosition[MAX_PLAYERS],
 	m_PlayerRecord,
 	g_CustomCarShops[CAR_SHOPS][E_CAR_SHOP],
-	g_cmdString[32],
 	gstr[144],
 	gstr2[255],
 	g_LottoNumber,
@@ -28153,14 +28152,13 @@ AddTeleport(teleport_category, const teleport_name[], const teleport_cmd[], Floa
 
 PushTeleportInput(playerid, teleport_category, input)
 {
-	if(NC_ProcessTeleportRequest(teleport_category, input, g_cmdString, sizeof(g_cmdString)) == 0)
+	new string[32];
+	if(NC_ProcessTeleportRequest(teleport_category, input, string, sizeof(string)) == 0)
 	{
-	    printf("NC_ProcessTeleportRequest returned 0");
-	    PrintAmxBacktrace();
 		return 0;
 	}
 	
-	Command_ReProcess(playerid, g_cmdString, false);
+	Command_ReProcess(playerid, string, false);
 	return 1;
 }
 
