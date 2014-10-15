@@ -25,3 +25,5 @@ native NC_ProcessTeleportRequest(tp_category, input, dest[], len = sizeof(dest))
 native NC_OutputTeleportInfo();
 
 native NC_UnixtimeToDate(dest[], unixtime, len = sizeof(dest));
+
+native NC_StringReplace(const transform[], const from[], const to[], dest[], len = sizeof(dest));

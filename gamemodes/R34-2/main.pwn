@@ -28162,6 +28162,7 @@ AddTeleport(teleport_category, const teleport_name[], const teleport_cmd[], Floa
 
 PushTeleportInput(playerid, teleport_category, input)
 {
+    g_cmdString[0] = '\0';
 	if(NC_ProcessTeleportRequest(teleport_category, input, g_cmdString, sizeof(g_cmdString)) == 0)
 	{
 	    printf("NC_ProcessTeleportRequest returned 0");
@@ -29339,18 +29340,15 @@ function:OnGangRenameAttempt(playerid, newgangname[], newgangtag[], namehash)
 	        
 	        if(GZoneData[r][e_localgang] == PlayerData[playerid][e_gangid])
 	        {
-	            new text[144];
-	            GetDynamic3DTextLabelText(GZoneData[r][e_labelid], text, sizeof(text));
+	            new tmp[144];
+	            gstr[0] = '\0';
+	            tmp[0] = '\0';
 
-	            new pos = strfind(text, PlayerData[playerid][GangName], true);
+	            GetDynamic3DTextLabelText(GZoneData[r][e_labelid], gstr, sizeof(gstr));
 
-	            if(pos == -1)
-					continue;
-					
-				strdel(text, pos, pos + strlen(PlayerData[playerid][GangName]));
-				strins(text, newgangname, pos, sizeof(text));
+				NC_StringReplace(gstr, PlayerData[playerid][GangName], newgangname, tmp, sizeof(tmp));
 
-				UpdateDynamic3DTextLabelText(GZoneData[r][e_labelid], WHITE, text);
+				UpdateDynamic3DTextLabelText(GZoneData[r][e_labelid], WHITE, tmp);
 	        }
 	    }
 

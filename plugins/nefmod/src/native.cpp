@@ -60,7 +60,7 @@ cell AMX_NATIVE_CALL Native::ProcessTeleportRequest(AMX *amx, cell *params)
 {
 	static const unsigned ParamCount = 4;
 	PARAM_CHECK(ParamCount, "NC_ProcessTeleportRequest");
-	logprintf("ProcessTeleportRequest called.");
+
 	if (params[1] < 0 || params[1] > MAX_TELE_CATEGORIES)
 	{
 		logprintf("[NEFMOD] Invalid tp category");
@@ -81,7 +81,7 @@ cell AMX_NATIVE_CALL Native::ProcessTeleportRequest(AMX *amx, cell *params)
 	amx_GetAddr(amx, params[3], &amx_Addr);
 	if (amx_Addr == NULL)
 	{
-		logprintf("[NEFMOD] [debug] CRASH DETECTED!!! amx_Addr = NULL from amx_GetAddr");
+		logprintf("[NEFMOD] [debug] CRASH DETECTED!!! amx_Addr = NULL from amx_GetAddr in ProcessTeleportRequest");
 		return 0;
 	}
 	
@@ -113,4 +113,44 @@ cell AMX_NATIVE_CALL Native::UnixtimeToDate(AMX *amx, cell *params)
 	}
 	
 	return 1;
+}
+
+/* NC_StringReplace(const transform[], const from[], const to[], dest[], len = sizeof(dest)) */
+cell AMX_NATIVE_CALL Native::StringReplace(AMX *amx, cell *params)
+{
+	static const unsigned ParamCount = 5;
+	PARAM_CHECK(ParamCount, "NC_StringReplace");
+	
+	char *_arg1 = NULL, *_arg2 = NULL, *_arg3 = NULL;
+	amx_StrParam(amx, params[1], _arg1);
+	amx_StrParam(amx, params[2], _arg2);
+	amx_StrParam(amx, params[3], _arg3);
+	
+	if (_arg1 == NULL || _arg2 == NULL || _arg3 == NULL)
+	{
+		logprintf("[NEFMOD] Could not retrieve strings in StringReplace (NULL).");
+		return 0;
+	}
+	
+	std::string transform(_arg1);
+	std::string from(_arg2);
+	std::string to(_arg3);
+	
+	size_t begin = transform.find(from);
+	if (begin == std::string::npos)
+		return -1;
+	
+	transform.erase(begin, from.length());
+	transform.insert(begin, to);
+	
+	cell *amx_Addr = NULL;
+	amx_GetAddr(amx, params[4], &amx_Addr);
+	if (amx_Addr == NULL)
+	{
+		logprintf("[NEFMOD] [debug] CRASH DETECTED!!! amx_Addr = NULL from amx_GetAddr in StringReplace");
+		return -1;
+	}
+	
+	amx_SetString(amx_Addr, transform.c_str(), 0, 0, params[5] > 0 ? params[5] : transform.length() + 1);
+	return static_cast<cell>(begin);
 }
