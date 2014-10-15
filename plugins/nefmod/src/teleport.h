@@ -38,8 +38,10 @@ public:
 		this->Position[2] = z;
 	}
 	
-	const char *GetCommandName();
-	void GetPosition(float &x, float &y, float &z);
+	const char *GetCommandName()
+	{
+		return Command.c_str();
+	}
 	
 private:
 	int32_t Category;
@@ -62,20 +64,9 @@ public:
 	
 	~Teleport() { }
 	
-	void AddTeleport(int32_t category, Teleport_t *tp)
-	{
-		m_Teleports[category].push_back(tp);
-	}
-	
-	int32_t GetCategorySize(int32_t category)
-	{
-		return m_Teleports[category].size();
-	}
-	
-	Teleport_t *GetTeleport(int32_t category, int32_t port)
-	{
-		return m_Teleports[category][port];
-	}
+	void AddTeleport(int32_t category, Teleport_t *tp);
+	int32_t GetCategorySize(int32_t category);
+	Teleport_t *GetTeleport(int32_t category, int32_t port);
 	
 private:
 	std::vector<Teleport_t *> m_Teleports[MAX_TELE_CATEGORIES];

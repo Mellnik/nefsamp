@@ -37,7 +37,7 @@
 
 #pragma dynamic 8192        // for md-sort
 
-#define IS_RELEASE_BUILD (true)
+#define IS_RELEASE_BUILD (false)
 #define INC_ENVIRONMENT (true)
 #define WINTER_EDITION (false) // Requires FS ferriswheelfair.amx
 #define _YSI_NO_VERSION_CHECK
@@ -2710,7 +2710,7 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
 	Iterator:DerbyVoters<MAX_PLAYERS>,
 	Iterator:PlayerIgnore[MAX_PLAYERS]<MAX_PLAYERS>,
 	Iterator:itterLottoNumberPool<75>,
-	Iterator:iterGangWar<1000>,
+	Iterator:iterGangWar<3000>,
 	Float:g_RaceVehCoords[RACE_MAX_PLAYERS][4],
 	Float:g_RaceCPs[RACE_MAX_CHECKPOINTS][3],
 	g_DerbyFreezePool = DERBY_FREEZE_TIME / DERBY_FREEZE_INTERVAL,
