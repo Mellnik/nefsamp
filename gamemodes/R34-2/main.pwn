@@ -37,7 +37,7 @@
 
 #pragma dynamic 8192        // for md-sort
 
-#define IS_RELEASE_BUILD (false)
+#define IS_RELEASE_BUILD (true)
 #define INC_ENVIRONMENT (true)
 #define WINTER_EDITION (false) // Requires FS ferriswheelfair.amx
 #define _YSI_NO_VERSION_CHECK
@@ -11446,7 +11446,7 @@ YCMD:unmute(playerid, params[], help)
 			SCM(player, NEF_YELLOW, "You have been unmuted!");
 
 			format(gstr, sizeof(gstr), ""SVRSC""yellow"** "red"%s(%i) has been unmuted by Admin %s(%i)", __GetName(player), player, __GetName(playerid), playerid);
-			SCMToAll(RED, gstr);
+			SCMToAll(YELLOW, gstr);
 		}
 		else
 		{
@@ -11939,7 +11939,7 @@ YCMD:gwar(playerid, params[], help)
 	    new count = 0;
 	    for(new ii = 0; ii < MAX_PLAYERS; ii++)
 	    {
-	        if(PlayerData[ii][e_gangid] == PlayerData[playerid][e_gangid] && IsPlayerAvail(ii))
+	        if(PlayerData[ii][e_gangid] == PlayerData[playerid][e_gangid] && IsPlayerAvail(ii) && gTeam[ii] != SPEC)
 	        {
 	            if(IsPlayerInRangeOfPoint(ii, GZONE_SIZE, GZoneData[r][e_pos][0], GZoneData[r][e_pos][1], GZoneData[r][e_pos][2]))
 	            {
@@ -26454,7 +26454,7 @@ function:ProcessTick()
 					        {
 					    		ResetPlayerGWarMode(it);
 							}
-							if(PlayerData[it][e_gangid] == GZoneData[r][e_attacker])
+							if(PlayerData[it][e_gangid] == GZoneData[r][e_attacker] && gTeam[it] != SPEC)
 							{
 							    GivePlayerMoneyEx(it, CashReward);
 							}
