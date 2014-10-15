@@ -13,10 +13,12 @@
 || Build Dependencies:
 || NEFMOD Core 1.2
 || SA-MP Server 0.3z-R4
-|| YSI Library 3.1
+|| YSI Library 3.1.133
 || sscanf Plugin 2.8.1
 || Streamer Plugin v2.7.4
 || MySQL Plugin R38
+|| CrashDetect 4.15
+|| amx_assembly Library .318
 ||
 || Build notes:
 || compile -d3 with crashdetect
@@ -20861,7 +20863,14 @@ function:OnGangZoneLoad()
         GZoneData[r][e_iconid] = CreateDynamicMapIcon(GZoneData[r][e_pos][0], GZoneData[r][e_pos][1], GZoneData[r][e_pos][2], 19, 1, .worldid = 0, .streamdistance = 240.0);
 		GZoneData[r][e_zoneid] = GangZoneCreate(GZoneData[r][e_pos][0] - GZONE_SIZE, GZoneData[r][e_pos][1] - GZONE_SIZE, GZoneData[r][e_pos][0] + GZONE_SIZE, GZoneData[r][e_pos][1] + GZONE_SIZE);
         GZoneData[r][e_checkid] = CreateDynamicCP(GZoneData[r][e_pos][0], GZoneData[r][e_pos][1], GZoneData[r][e_pos][2], 7.0, .worldid = 0, .streamdistance = 50.0);
-        GZoneData[r][e_areaid] = CreateDynamicCuboid(GZoneData[r][e_pos][0] - GZONE_SIZE, GZoneData[r][e_pos][1] - GZONE_SIZE, GZoneData[r][e_pos][2], GZoneData[r][e_pos][0] + GZONE_SIZE, GZoneData[r][e_pos][1] + GZONE_SIZE, GZoneData[r][e_pos][2] + GZONE_SIZE, .worldid = 0);
+        GZoneData[r][e_areaid] = CreateDynamicCuboid(
+								/* minx */ GZoneData[r][e_pos][0] - GZONE_SIZE,
+								/* miny */ GZoneData[r][e_pos][1] - GZONE_SIZE,
+								/* minz */ GZoneData[r][e_pos][2],
+								/* maxx */ GZoneData[r][e_pos][0] + GZONE_SIZE,
+								/* maxy */ GZoneData[r][e_pos][1] + GZONE_SIZE,
+								/* maxz */ GZoneData[r][e_pos][2] + GZONE_SIZE,
+								.worldid = 0);
 	}
 	
 	cache_set_active(data, pSQL);
