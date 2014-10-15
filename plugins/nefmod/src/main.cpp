@@ -12,7 +12,8 @@
 #include <cstdlib>
 
 #include "plugin.h"
-#include "natives.h"
+#include "native.h"
+#include "teleport.h"
 #include "main.h"
 
 logprintf_t logprintf;
@@ -28,17 +29,21 @@ PLUGIN_EXPORT bool PLUGIN_CALL Load(void **ppData)
 	pAMXFunctions = ppData[PLUGIN_DATA_AMX_EXPORTS];
 	logprintf = (logprintf_t)ppData[PLUGIN_DATA_LOGPRINTF];
 
+	pPlugin.reset(new Plugin());
+	pTeleport.reset(new Teleport());
+	
 	logprintf("[NEFMOD] Core successfully loaded "PLUGIN_VERSION"");
 	return true;
 }
 
 PLUGIN_EXPORT void PLUGIN_CALL Unload()
 {
-	Plugin::Destroy();
+	pPlugin.reset();
+	pTeleport.reset();
 	logprintf("[NEFMOD] Core unloaded.");
 }
 
-AMX_NATIVE_INFO nefmod_natives[] =
+const AMX_NATIVE_INFO PluginNatives[] =
 {
 	{"NC_AddTeleport", Native::AddTeleport},	
 	{"NC_ProcessTeleportRequest", Native::ProcessTeleportRequest},	
@@ -49,12 +54,12 @@ AMX_NATIVE_INFO nefmod_natives[] =
 
 PLUGIN_EXPORT int PLUGIN_CALL AmxLoad(AMX *amx)
 {
-	Plugin::Get()->AddAmx(amx);
-	return amx_Register(amx, nefmod_natives, -1);
+	pPlugin->AddAmx(amx);
+	return amx_Register(amx, PluginNatives, -1);
 }
 
 PLUGIN_EXPORT int PLUGIN_CALL AmxUnload(AMX *amx)
 {
-	Plugin::Get()->EraseAmx(amx);
+	pPlugin->EraseAmx(amx);
 	return AMX_ERR_NONE;
 }

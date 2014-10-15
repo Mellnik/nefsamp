@@ -14,12 +14,12 @@
 #ifndef _PLUGIN_H_
 #define _PLUGIN_H_
 
+#include <memory>
 #include <list>
 
 #include "main.h"
-#include "singleton.h"
 
-class Plugin : public CSingleton<Plugin>
+class Plugin
 {
 public:
 	Plugin() { }
@@ -32,5 +32,7 @@ public:
 private:
 	std::list<AMX *> amx_List;
 };
+
+extern std::unique_ptr<Plugin> pPlugin;
 
 #endif /* _PLUGIN_H_ */

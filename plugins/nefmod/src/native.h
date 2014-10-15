@@ -11,38 +11,17 @@
 
 #pragma once
 
-#ifndef _SINGLETON_H_
-#define _SINGLETON_H_
+#ifndef _NATIVE_H_
+#define _NATIVE_H_
 
-#include <cstdlib>
+#include "main.h"
 
-template<class T>
-class CSingleton
+namespace Native
 {
-protected:
-	static T *m_Instance;
+	cell AMX_NATIVE_CALL AddTeleport(AMX *amx, cell *params);
+	cell AMX_NATIVE_CALL ProcessTeleportRequest(AMX *amx, cell *params);
+	cell AMX_NATIVE_CALL OutputTeleportInfo(AMX *amx, cell *params);
+	cell AMX_NATIVE_CALL UnixtimeToDate(AMX *amx, cell *params);
+}
 
-public:
-	virtual ~CSingleton() { }
-
-	inline static T *Get()
-	{
-		if (m_Instance == NULL)
-			m_Instance = new T;
-		return m_Instance;
-	}
-
-	inline static void Destroy()
-	{
-		if (m_Instance != NULL)
-		{
-			delete m_Instance;
-			m_Instance = NULL;
-		}
-	}
-};
-
-template <class T>
-T* CSingleton<T>::m_Instance = NULL;
-
-#endif /* _SINGLETON_H_ */
+#endif /* _NATIVE_H_ */

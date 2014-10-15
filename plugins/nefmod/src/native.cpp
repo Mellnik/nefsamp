@@ -12,10 +12,8 @@
 #include <cstring>
 #include <limits>
 
-#include "natives.h"
-#include "teleports.h"
-
-std::vector<Teleports *> g_mTeleports[MAX_TELE_CATEGORIES];
+#include "native.h"
+#include "teleport.h"
 
 /* NC_AddTeleport(tp_category, const tp_name[], const tp_cmd[], Float:x, Float:y, Float:z) */
 cell AMX_NATIVE_CALL Native::AddTeleport(AMX *amx, cell *params)
@@ -25,13 +23,13 @@ cell AMX_NATIVE_CALL Native::AddTeleport(AMX *amx, cell *params)
 	
 	if (params[1] < 0 || params[1] >= MAX_TELE_CATEGORIES)
 	{
-		logprintf("[NEFMOD] Invalid tp category");
+		logprintf("[NEFMOD] Invalid teleport category.");
 		return 0;
 	}
 	
 	if (g_mTeleports[params[1]].size() >= MAX_TELES_PER_CATEGORY)
 	{
-		logprintf("[NEFMOD] Teleport category %i full", params[1]);
+		logprintf("[NEFMOD] Teleport category %i max capacity reached.", params[1]);
 		return 0;
 	}
 	
@@ -41,17 +39,17 @@ cell AMX_NATIVE_CALL Native::AddTeleport(AMX *amx, cell *params)
 	
 	if (tp_name == NULL || tp_cmd == NULL)
 	{
-		logprintf("[NEFMOD] Could not retrieve strings in AddTeleport");
+		logprintf("[NEFMOD] Could not retrieve strings in AddTeleport (NULL).");
 		return 0;
 	}
 	
 	if (std::strlen(tp_cmd) > MAX_TELE_COMMAND_NAME)
 	{
-		logprintf("[NEFMOD] tp_cmd %s size too large (%i)", tp_cmd, std::strlen(tp_cmd));
+		logprintf("[NEFMOD] tp_cmd %s size overflow (%i). Allowed: %i.", tp_cmd, std::strlen(tp_cmd), MAX_TELE_COMMAND_NAME);
 		return 0;
 	}
 	
-	g_mTeleports[params[1]].push_back(new Teleports(params[1], tp_name, tp_cmd, amx_ftoc(params[4]), amx_ftoc(params[5]), amx_ftoc(params[6])));
+	pTeleport->AddTeleport((int32_t)params[1], new Teleport_t(params[1], tp_name, tp_cmd, amx_ftoc(params[4]), amx_ftoc(params[5]), amx_ftoc(params[6])));
 	return 1;
 }
 
@@ -60,7 +58,7 @@ cell AMX_NATIVE_CALL Native::ProcessTeleportRequest(AMX *amx, cell *params)
 {
 	static const unsigned ParamCount = 4;
 	PARAM_CHECK(ParamCount, "NC_ProcessTeleportRequest");
-	logprintf("ProcessTeleportRequest");
+	logprintf("ProcessTeleportRequest called.");
 	if (params[1] < 0 || params[1] > MAX_TELE_CATEGORIES)
 	{
 		logprintf("[NEFMOD] Invalid tp category");
@@ -72,17 +70,20 @@ cell AMX_NATIVE_CALL Native::ProcessTeleportRequest(AMX *amx, cell *params)
 		logprintf("[NEFMOD] Invalid input exceeds restrictions, %i, %i", params[1], params[2]);
 		return 0;
 	}
+	
 	logprintf("ProcessTeleportRequest2");
-	auto tp_rel = g_mTeleports[params[1]][params[2]];
+	auto ReqTeleport = pTeleport->GetTeleport(params[1], params[2]);
 	logprintf("ProcessTeleportRequest3");
+	
 	cell *amx_Addr = NULL;
 	amx_GetAddr(amx, params[3], &amx_Addr);
 	if (amx_Addr == NULL)
 	{
-		logprintf("[NEFMOD] CRASH DETECTED!!! amx_Addr = NULL from amx_GetAddr WHAT THE F BOOOOM!");
+		logprintf("[NEFMOD] [debug] CRASH DETECTED!!! amx_Addr = NULL from amx_GetAddr");
 		return 0;
 	}
-	amx_SetString(amx_Addr, tp_rel->GetCommandName(), 0, 0, params[4] > 0 ? params[4] : std::strlen(tp_rel->GetCommandName()) + 1);
+	
+	amx_SetString(amx_Addr, ReqTeleport->GetCommandName(), 0, 0, params[4] > 0 ? params[4] : std::strlen(ReqTeleport->GetCommandName()) + 1);
 	logprintf("ProcessTeleportRequest4");
 	return 1;
 }
@@ -90,9 +91,9 @@ cell AMX_NATIVE_CALL Native::ProcessTeleportRequest(AMX *amx, cell *params)
 /* NC_OutputTeleportInfo() */
 cell AMX_NATIVE_CALL Native::OutputTeleportInfo(AMX *amx, cell *params)
 {
-	for(uint32_t i = 0; i < MAX_TELE_CATEGORIES; ++i)
+	for (uint32_t i = 0; i < MAX_TELE_CATEGORIES; ++i)
 	{
-		logprintf("[NEFMOD] TP Category %i: %i tps", i, g_mTeleports[i].size());
+		logprintf("[NEFMOD] TP Category %i: %i TPs", i, pTeleport->GetCategorySize(i));
 	}
 	return 1;
 }
@@ -111,4 +112,3 @@ cell AMX_NATIVE_CALL Native::UnixtimeToDate(AMX *amx, cell *params)
 	
 	return 1;
 }
-

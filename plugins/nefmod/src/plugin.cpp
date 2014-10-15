@@ -11,6 +11,8 @@
 
 #include "plugin.h"
 
+std::unique_ptr<Plugin> pPlugin;
+
 void Plugin::AddAmx(AMX *amx)
 {
 	amx_List.push_back(amx);
@@ -18,7 +20,7 @@ void Plugin::AddAmx(AMX *amx)
 
 void Plugin::EraseAmx(AMX *amx)
 {
-	for (std::list<AMX *>::iterator i = amx_List.begin(); i != amx_List.end(); ++i) 
+	for (auto i = amx_List.begin(); i != amx_List.end(); ++i) 
 	{
 		if (*i == amx) 
 		{

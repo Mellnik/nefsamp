@@ -14,6 +14,8 @@
 #endif
 #define _nefmod_included
 
+/* v1.2 */
+
 #define MAX_TELE_CATEGORIES 9
 #define MAX_TELES_PER_CATEGORY 32
 #define MAX_TELE_COMMAND_NAME 16
