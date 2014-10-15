@@ -20863,14 +20863,15 @@ function:OnGangZoneLoad()
         GZoneData[r][e_iconid] = CreateDynamicMapIcon(GZoneData[r][e_pos][0], GZoneData[r][e_pos][1], GZoneData[r][e_pos][2], 19, 1, .worldid = 0, .streamdistance = 240.0);
 		GZoneData[r][e_zoneid] = GangZoneCreate(GZoneData[r][e_pos][0] - GZONE_SIZE, GZoneData[r][e_pos][1] - GZONE_SIZE, GZoneData[r][e_pos][0] + GZONE_SIZE, GZoneData[r][e_pos][1] + GZONE_SIZE);
         GZoneData[r][e_checkid] = CreateDynamicCP(GZoneData[r][e_pos][0], GZoneData[r][e_pos][1], GZoneData[r][e_pos][2], 7.0, .worldid = 0, .streamdistance = 50.0);
-        GZoneData[r][e_areaid] = CreateDynamicCuboid(
-								/* minx */ GZoneData[r][e_pos][0] - GZONE_SIZE,
-								/* miny */ GZoneData[r][e_pos][1] - GZONE_SIZE,
-								/* minz */ GZoneData[r][e_pos][2],
-								/* maxx */ GZoneData[r][e_pos][0] + GZONE_SIZE,
-								/* maxy */ GZoneData[r][e_pos][1] + GZONE_SIZE,
-								/* maxz */ GZoneData[r][e_pos][2] + GZONE_SIZE,
-								.worldid = 0);
+		GZoneData[r][e_areaid] = CreateDynamicSphere(GZoneData[r][e_pos][0], GZoneData[r][e_pos][1], GZoneData[r][e_pos][2], GZONE_SIZE, .worldid = 0);
+        //GZoneData[r][e_areaid] = CreateDynamicCuboid(
+								/* minx */ //GZoneData[r][e_pos][0] - GZONE_SIZE,
+								/* miny */ //GZoneData[r][e_pos][1] - GZONE_SIZE,
+								/* minz */ //GZoneData[r][e_pos][2],
+								/* maxx */ //GZoneData[r][e_pos][0] + GZONE_SIZE,
+								/* maxy */ //GZoneData[r][e_pos][1] + GZONE_SIZE,
+								/* maxz */ //GZoneData[r][e_pos][2] + GZONE_SIZE,
+								//.worldid = 0);
 	}
 	
 	cache_set_active(data, pSQL);
@@ -20887,7 +20888,8 @@ function:OnGangZoneLoadEx(slot)
     GZoneData[slot][e_iconid] = CreateDynamicMapIcon(GZoneData[slot][e_pos][0], GZoneData[slot][e_pos][1], GZoneData[slot][e_pos][2], 19, 1, .worldid = 0, .streamdistance = 240.0);
 	GZoneData[slot][e_zoneid] = GangZoneCreate(GZoneData[slot][e_pos][0] - GZONE_SIZE, GZoneData[slot][e_pos][1] - GZONE_SIZE, GZoneData[slot][e_pos][0] + GZONE_SIZE, GZoneData[slot][e_pos][1] + GZONE_SIZE);
     GZoneData[slot][e_checkid] = CreateDynamicCP(GZoneData[slot][e_pos][0], GZoneData[slot][e_pos][1], GZoneData[slot][e_pos][2], 7.0, .worldid = 0, .streamdistance = 50.0);
-    GZoneData[slot][e_areaid] = GZoneData[slot][e_areaid] = CreateDynamicCuboid(GZoneData[slot][e_pos][0] - GZONE_SIZE, GZoneData[slot][e_pos][1] - GZONE_SIZE, GZoneData[slot][e_pos][2], GZoneData[slot][e_pos][0] + GZONE_SIZE, GZoneData[slot][e_pos][1] + GZONE_SIZE, GZoneData[slot][e_pos][2] + GZONE_SIZE, .worldid = 0);
+	GZoneData[slot][e_areaid] = CreateDynamicSphere(GZoneData[slot][e_pos][0], GZoneData[slot][e_pos][1], GZoneData[slot][e_pos][2], GZONE_SIZE, .worldid = 0);
+	//GZoneData[slot][e_areaid] = GZoneData[slot][e_areaid] = CreateDynamicCuboid(GZoneData[slot][e_pos][0] - GZONE_SIZE, GZoneData[slot][e_pos][1] - GZONE_SIZE, GZoneData[slot][e_pos][2], GZoneData[slot][e_pos][0] + GZONE_SIZE, GZoneData[slot][e_pos][1] + GZONE_SIZE, GZoneData[slot][e_pos][2] + GZONE_SIZE, .worldid = 0);
 
 	GangZoneShowForAll(GZoneData[slot][e_zoneid], COLOR_NONE);
 	return 1;
