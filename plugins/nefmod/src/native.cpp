@@ -27,7 +27,7 @@ cell AMX_NATIVE_CALL Native::AddTeleport(AMX *amx, cell *params)
 		return 0;
 	}
 	
-	if (g_mTeleports[params[1]].size() >= MAX_TELES_PER_CATEGORY)
+	if (pTeleport->GetCategorySize(params[1]) >= MAX_TELES_PER_CATEGORY)
 	{
 		logprintf("[NEFMOD] Teleport category %i max capacity reached.", params[1]);
 		return 0;
@@ -49,7 +49,9 @@ cell AMX_NATIVE_CALL Native::AddTeleport(AMX *amx, cell *params)
 		return 0;
 	}
 	
-	pTeleport->AddTeleport((int32_t)params[1], new Teleport_t(params[1], tp_name, tp_cmd, amx_ftoc(params[4]), amx_ftoc(params[5]), amx_ftoc(params[6])));
+	Teleport_t *tp = new Teleport_t(params[1], tp_name, tp_cmd, amx_ftoc(params[4]), amx_ftoc(params[5]), amx_ftoc(params[6]));
+	
+	pTeleport->AddTeleport((int32_t)params[1], tp);
 	return 1;
 }
 

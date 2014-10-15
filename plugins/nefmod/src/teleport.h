@@ -24,45 +24,45 @@
 #define MAX_TELES_PER_CATEGORY 32
 #define MAX_TELE_COMMAND_NAME 16
 
+struct Teleport_t
+{
+public:
+	Teleport_t(int32_t Category, const char *Name, const char *Command, float x, float y, float z)
+	{
+		this->Command = "/";
+		this->Name.assign(Name);
+		this->Command.append(Command);
+		this->Category = Category;
+		this->Position[0] = x;
+		this->Position[1] = y;
+		this->Position[2] = z;
+	}
+	
+	const char *GetCommandName();
+	void GetPosition(float &x, float &y, float &z);
+	
+private:
+	int32_t Category;
+	std::string Name;
+	std::string Command;
+	
+	float Position[3];
+};
+
 class Teleport
 {
 public:
 	Teleport() 
 	{ 
-		for (int32_t = 0; i < MAX_TELE_CATEGORIES; ++i)
+		for (int32_t i = 0; i < MAX_TELE_CATEGORIES; ++i)
 		{
-			m_Teleports.reserve(MAX_TELES_PER_CATEGORY);
+			m_Teleports[i].reserve(MAX_TELES_PER_CATEGORY);
 		}
 	}
 	
 	~Teleport() { }
-
-	struct Teleport_t
-	{
-	public:
-		Teleport_t(int32_t Category, const char *Name, const char *Command, float x, float y, float z)
-		{
-			this->Command = "/";
-			this->Name.assign(Name);
-			this->Command.append(Command);
-			this->Category = Category;
-			this->Position[0] = x;
-			this->Position[1] = y;
-			this->Position[2] = z;
-		}
-		
-		const char *GetCommandName();
-		void GetPosition(float &x, float &y, float &z);
-		
-	private:
-		int32_t Category;
-		std::string Name;
-		std::string Command;
-		
-		float Position[3];
-	};
 	
-	void AddTeleport(int32_t category, Teleport_t tp)
+	void AddTeleport(int32_t category, Teleport_t *tp)
 	{
 		m_Teleports[category].push_back(tp);
 	}
