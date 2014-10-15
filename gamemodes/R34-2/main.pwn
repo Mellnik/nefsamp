@@ -13953,7 +13953,7 @@ YCMD:race(playerid, params[], help)
         }
         case RaceStatus_Inactive:
         {
-            player_notice(playerid, "NO RACE ACTIVE", "");
+            player_notice(playerid, "NO ACTIVE RACE", "");
         }
         case RaceStatus_Active:
         {
@@ -13969,7 +13969,7 @@ YCMD:race(playerid, params[], help)
 		}
 		else
 		{
-		    if(g_RacePlayerCount == RACE_MAX_PLAYERS) return SCM(playerid, -1, ""er"Race reached it's max players");
+		    if(g_RacePlayerCount >= RACE_MAX_PLAYERS) return SCM(playerid, -1, ""er"Race reached it's max players");
 		    
 		    CheckPlayerGod(playerid);
 
@@ -29930,11 +29930,7 @@ function:race_stop()
 
 function:race_end()
 {
-	if(--g_iRaceEnd <= 0)
-	{
-	    return race_stop();
-	}
-	if(g_RacePlayerCount <= 0)
+	if(--g_iRaceEnd <= 0 || g_RacePlayerCount <= 0)
 	{
 	    return race_stop();
 	}
@@ -30014,18 +30010,18 @@ race_calculate_position()
 	new cp,
 	    vehicleid,
 		Float:POS[4],
-	    c,
+	    c = 0,
 		tmp_RacePosition[12][e_race_position];
 
 	static const OFFSET_VALUE = 10000;
 
-	for(new i = 0; i < sizeof(tmp_RacePosition); i++)
+	for(new i = 0; i < RACE_MAX_PLAYERS; i++)
 	{
 	    tmp_RacePosition[i][RP_iPlayer] = INVALID_PLAYER_ID;
 	    tmp_RacePosition[i][RP_iValue] = -(i + 1);
 	}
 
-	for(new i = 0; i < MAX_PLAYERS; i++)
+	for(new i = 0; i < MAX_PLAYERS && c < RACE_MAX_PLAYERS; i++)
 	{
         if(IsPlayerConnected(i) && gTeam[i] == gRACE)
 		{
@@ -30053,7 +30049,7 @@ race_calculate_position()
 
 	SortDeepArray(tmp_RacePosition, RP_iValue, .order = SORT_DESC);
 
-	for(new i = 0; i < sizeof(tmp_RacePosition); i++)
+	for(new i = 0; i < RACE_MAX_PLAYERS; i++)
 	{
         if(tmp_RacePosition[i][RP_iPlayer] != INVALID_PLAYER_ID)
 		{
