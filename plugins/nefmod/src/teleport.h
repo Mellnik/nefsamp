@@ -14,6 +14,7 @@
 #ifndef _TELEPORT_H_
 #define _TELEPORT_H_
 
+#include <string.h>
 #include <string>
 #include <vector>
 #include <memory>
@@ -22,26 +23,25 @@
 
 #define MAX_TELE_CATEGORIES 9
 #define MAX_TELES_PER_CATEGORY 32
-#define MAX_TELE_COMMAND_NAME 16
+#define MAX_TELE_COMMAND_NAME 17
 
 struct Teleport_t
 {
 public:
 	Teleport_t(int32_t Category, const char *Name, const char *Command, float x, float y, float z)
 	{
-		this->Command = "/";
 		this->Name.assign(Name);
+		this->Command = "/";
 		this->Command.append(Command);
 		this->Category = Category;
 		this->Position[0] = x;
 		this->Position[1] = y;
 		this->Position[2] = z;
+	
+		strncpy(CCommand, this->Command.c_str(), MAX_TELE_COMMAND_NAME);
 	}
 	
-	const char *GetCommandName()
-	{
-		return Command.c_str();
-	}
+	char CCommand[MAX_TELE_COMMAND_NAME + 1];
 	
 private:
 	int32_t Category;

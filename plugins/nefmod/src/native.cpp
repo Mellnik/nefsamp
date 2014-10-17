@@ -73,9 +73,7 @@ cell AMX_NATIVE_CALL Native::ProcessTeleportRequest(AMX *amx, cell *params)
 		return 0;
 	}
 	
-	logprintf("ProcessTeleportRequest2");
 	auto ReqTeleport = pTeleport->GetTeleport(params[1], params[2]);
-	logprintf("ProcessTeleportRequest3");
 	
 	cell *amx_Addr = NULL;
 	amx_GetAddr(amx, params[3], &amx_Addr);
@@ -85,8 +83,7 @@ cell AMX_NATIVE_CALL Native::ProcessTeleportRequest(AMX *amx, cell *params)
 		return 0;
 	}
 	
-	amx_SetString(amx_Addr, ReqTeleport->GetCommandName(), 0, 0, params[4] > 0 ? params[4] : std::strlen(ReqTeleport->GetCommandName()) + 1);
-	logprintf("ProcessTeleportRequest4");
+	amx_SetString(amx_Addr, ReqTeleport->CCommand, 0, 0, params[4] > 0 ? params[4] : std::strlen(ReqTeleport->CCommand) + 1);
 	return 1;
 }
 
