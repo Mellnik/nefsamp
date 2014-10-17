@@ -75,6 +75,12 @@ cell AMX_NATIVE_CALL Native::ProcessTeleportRequest(AMX *amx, cell *params)
 	
 	auto ReqTeleport = pTeleport->GetTeleport(params[1], params[2]);
 	
+	if (ReqTeleport == NULL || ReqTeleport == nullptr)
+	{
+		logprintf("[NEFMOD] [debug] CRASH DETECTED!!! ReqTeleport == NULL");
+		return 0;
+	}
+	
 	cell *amx_Addr = NULL;
 	amx_GetAddr(amx, params[3], &amx_Addr);
 	if (amx_Addr == NULL)
@@ -90,7 +96,7 @@ cell AMX_NATIVE_CALL Native::ProcessTeleportRequest(AMX *amx, cell *params)
 /* NC_OutputTeleportInfo() */
 cell AMX_NATIVE_CALL Native::OutputTeleportInfo(AMX *amx, cell *params)
 {
-	for (uint32_t i = 0; i < MAX_TELE_CATEGORIES; ++i)
+	for (int32_t i = 0; i < MAX_TELE_CATEGORIES; ++i)
 	{
 		logprintf("[NEFMOD] TP Category %i: %i TPs", i, pTeleport->GetCategorySize(i));
 	}
