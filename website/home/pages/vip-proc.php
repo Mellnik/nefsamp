@@ -54,17 +54,18 @@
 			
  			<div style="vertical-align: middle; display: table-cell; padding-left: 10px;">
 			<b><font size="2">PayGol (Phone)</font></b>
-			<script src="http://www.paygol.com/micropayment/js/paygol.js" type="text/javascript"></script>
-			<form name="pg_frm">
-			<input type="hidden" name="pg_serviceid" value="55506">
-			<input type="hidden" name="pg_currency" value="USD">
-			<input type="hidden" name="pg_name" value="New Evolution Freeroam VIP">
-			<input type="hidden" name="pg_custom" value="<?php echo($player); ?>">
-			<input type="hidden" name="pg_price" value="15">
-			<input type="hidden" name="pg_return_url" value="http://nefserver.net/vip-complete">
-			<input type="hidden" name="pg_cancel_url" value="http://nefserver.net/vip">
-			<input type="image" name="pg_button" class="paygol" src="http://www.paygol.com/micropayment/img/buttons/125/black_en_pbm.png" border="0" alt="Make payments with PayGol: the easiest way!" title="Make payments with PayGol: the easiest way!" onClick="pg_reDirect(this.form)">
+			
+			<form name="pg_frm" method="post" action="https://www.paygol.com/pay" >
+			   <input type="hidden" name="pg_serviceid" value="55506">
+			   <input type="hidden" name="pg_currency" value="USD">
+			   <input type="hidden" name="pg_name" value="New Evolution Freeroam VIP">
+			   <input type="hidden" name="pg_custom" value="">
+			   <input type="hidden" name="pg_price" value="15">
+			   <input type="hidden" name="pg_return_url" value="http://www.nefserver.net/vip-complete/">
+			   <input type="hidden" name="pg_cancel_url" value="http://nefserver.net/vip/">
+			   <input type="image" name="pg_button" src="https://www.paygol.com/micropayment/buttons/en/white.png" border="0" alt="Make payments with PayGol: the easiest way!" title="Make payments with PayGol: the easiest way!" >    
 			</form>
+			
 			</div>
 			</div>
 			</div>
