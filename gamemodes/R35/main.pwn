@@ -2997,8 +2997,6 @@ public OnGameModeInit()
 
 public OnGameModeExit()
 {
-    DestroyElevator();
-
 	Log(LOG_EXIT, "MySQL: Garbage cleanup");
     SQL_CleanUp();
     
@@ -6522,8 +6520,8 @@ public OnObjectMoved(objectid)
 	    Floor_OpenDoors(ElevatorFloor);
 
 	    GetObjectPos(Obj_Elevator, POS[0], POS[1], POS[2]);
-        Label_Elevator = CreateDynamic3DTextLabel("Press '"vgreen"F"white"' to use elevator", -1, 1784.9822, -1302.0426, floatsub(POS[2], 0.9), 5.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, -1, -1, -1, 5.0);
-
+        Label_Elevator = CreateDynamic3DTextLabel("Press '"vgreen"F"white"' to use elevator", -1, 1784.9822, -1302.0426, floatsub(POS[2], 0.9), 5.0, .testlos = 1, .worldid = 0);
+		
 	    ElevatorState = ELEVATOR_STATE_WAITING;
 	    SetTimer("Elevator_TurnToIdle", ELEVATOR_WAIT_TIME, false);
 	}
@@ -22411,7 +22409,7 @@ Elevator_Initialize()
 	Obj_ElevatorDoors[0] = CreateObject(18757, X_DOOR_CLOSED, -1303.459472, GROUND_Z_COORD, 0.000000, 0.000000, 270.000000);
 	Obj_ElevatorDoors[1] = CreateObject(18756, X_DOOR_CLOSED, -1303.459472, GROUND_Z_COORD, 0.000000, 0.000000, 270.000000);
 
-	Label_Elevator = Create3DTextLabel("Press 'F' to use elevator", NEF_YELLOW, 1784.9822, -1302.0426, 13.6491, 4.0, 0, 1);
+	Label_Elevator = CreateDynamic3DTextLabel("Press 'F' to use elevator", NEF_YELLOW, 1784.9822, -1302.0426, 13.6491, 5.0, .testlos = 1, .worldid = 0);
 
 	new Float:z;
 
@@ -22422,29 +22420,13 @@ Elevator_Initialize()
 
 		format(gstr, sizeof(gstr), "%s\nPress 'F' to call Elevator", FloorNames[i]);
 
-		z = (i == 0) ? (13.4713) : (13.4713 + 8.7396 + ((i-1) * 5.45155));
+		z = (i == 0) ? (13.4713) : (13.4713 + 8.7396 + ((i - 1) * 5.45155));
 
 		Label_Floors[i] = CreateDynamic3DTextLabel(gstr, RED, 1783.9799, -1300.7660, z, 10.5, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, 0);
 	}
 
 	Floor_OpenDoors(0);
 	Elevator_OpenDoors();
-	return 1;
-}
-
-DestroyElevator()
-{
-	DestroyObject(Obj_Elevator);
-	DestroyObject(Obj_ElevatorDoors[0]);
-	DestroyObject(Obj_ElevatorDoors[1]);
-	Delete3DTextLabel(Label_Elevator);
-
-	for(new i = 0; i < sizeof(Obj_FloorDoors); i++)
-	{
-	    DestroyObject(Obj_FloorDoors[i][0]);
-		DestroyObject(Obj_FloorDoors[i][1]);
-		DestroyDynamic3DTextLabel(Label_Floors[i]);
-	}
 	return 1;
 }
 
@@ -22492,7 +22474,7 @@ Elevator_MoveToFloor(floorid)
 	MoveObject(Obj_Elevator, 1786.678100, -1303.459472, GetElevatorZCoordForFloor(floorid), 0.5);
     MoveObject(Obj_ElevatorDoors[0], X_DOOR_CLOSED, -1303.459472, GetDoorsZCoordForFloor(floorid), 0.5);
     MoveObject(Obj_ElevatorDoors[1], X_DOOR_CLOSED, -1303.459472, GetDoorsZCoordForFloor(floorid), 0.5);
-    Delete3DTextLabel(Label_Elevator);
+    DestroyDynamic3DTextLabel(Label_Elevator);
 
 	ElevatorBoostTimer = SetTimerEx("Elevator_Boost", 2000, false, "i", floorid);
 	return 1;
