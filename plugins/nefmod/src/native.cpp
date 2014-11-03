@@ -115,6 +115,20 @@ cell AMX_NATIVE_CALL Native::UnixtimeToDate(AMX *amx, cell *params)
 		return 0;
 	}
 	
+	std::time_t unixt = params[2];
+	struct tm *ntime = localtime(&unixt);
+	
+	char date[50];
+	std::strftime(date, sizeof(date), "%d/%m/%Y %H:%M:%S", ntime);
+	
+	cell *amx_Addr = NULL;
+	amx_GetAddr(amx, params[1], &amx_Addr);
+	if (amx_Addr == NULL)
+	{
+		logprintf("[NEFMOD] [debug] CRASH DETECTED! amx_Addr = NULL from amx_GetAddr in UnixtimeToDate");
+		return 0;
+	}
+	amx_SetString(amx_Addr, date, 0, 0, params[3] > 0 ? params[3] : sizeof(date));
 	return 1;
 }
 
@@ -150,7 +164,7 @@ cell AMX_NATIVE_CALL Native::StringReplace(AMX *amx, cell *params)
 	amx_GetAddr(amx, params[4], &amx_Addr);
 	if (amx_Addr == NULL)
 	{
-		logprintf("[NEFMOD] [debug] CRASH DETECTED!!! amx_Addr = NULL from amx_GetAddr in StringReplace");
+		logprintf("[NEFMOD] [debug] CRASH DETECTED! amx_Addr = NULL from amx_GetAddr in StringReplace");
 		return -1;
 	}
 	
