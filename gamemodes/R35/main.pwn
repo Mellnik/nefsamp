@@ -1,6 +1,6 @@
 /*======================================================================*\
 || #################################################################### ||
-|| # Project New Evolution Freeroam - Build 34-2           			  # ||
+|| # Project New Evolution Freeroam - Build 35           			  # ||
 || # ---------------------------------------------------------------- # ||
 || # Copyright (c)2011-2014 New Evolution Freeroam  				  # ||
 || # Created by Mellnik                                               # ||
@@ -11,7 +11,7 @@
 
 /*
 || Build Dependencies:
-|| NEFMOD Core 1.2
+|| NEFMOD Core 1.3.0
 || SA-MP Server 0.3z-R4
 || YSI Library 3.1.133
 || sscanf Plugin 2.8.1
@@ -101,13 +101,10 @@ Float:GetDistance3D(Float:x1, Float:y1, Float:z1, Float:x2, Float:y2, Float:z2);
 #define SVRFORUM                        "forum.nefserver.net"
 #define SERVER_IP                       "31.204.153.110:7777"
 #define HOSTNAME                        " 	      ..:: NEF ::.. ×Stunt/DM/Race/Minigames×"
-#define NEF_VERSION_MAJOR               34
-#define NEF_VERSION_MINOR               1
-#define NEF_VERSION_PATCH               0
 #if IS_RELEASE_BUILD == true
-#define CURRENT_VERSION                 "Build 34-2"
+#define CURRENT_VERSION                 "Build 35"
 #else
-#define CURRENT_VERSION                 "PTS:Build 34-2"
+#define CURRENT_VERSION                 "PTS:Build 35"
 #endif
 #define HOTFIX_REV                      "Hotfix #0"
 #define SAMP_VERSION                    "SA-MP 0.3z-R4"
