@@ -2902,7 +2902,7 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
  	bool:IsCountDownRunning = false,
  	tVIPCountdown = -1,
  	veh_cnr[101],
- 	Gate[2],
+ 	g_CNR_RobberGate[2],
  	pArrests[MAX_PLAYERS],
  	T_RacePlayers = 0,
 	T_DerbyPlayers = 0,
@@ -2940,6 +2940,8 @@ public OnGameModeInit()
     SQL_Connect();
 	SQL_CleanUp();
 
+	Streamer_SetTickRate(40);
+	
 	#if INC_ENVIRONMENT == true
     BuildServerMap();
     BuildServerMap2();
@@ -5905,10 +5907,10 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 		{
 			if(GetPVarInt(playerid, "Robber") == 1)
 	  		{
-	  			MoveObject(Gate[0], 1397.24, 2688.04, 9.91, 2);
-	  			MoveObject(Gate[1], 1397.24, 2701.15, 9.91, 2);
-
-				SetTimer("MoveGate", 3000, false);
+				MoveDynamicObject(g_CNR_RobberGate[0], 1397.24, 2688.04, 9.91, 2);
+				MoveDynamicObject(g_CNR_RobberGate[0], 1397.24, 2701.15, 9.91, 2);
+				
+				SetTimer("CNR_RobberGateMoveBack", 3000, false);
 				GameTextForPlayer(playerid, "~g~~h~~h~Gate Opening..", 2000, 5);
 	  		}
 	  		else SCM(playerid, COLOR_RED, ">> "ORANGE_E"Only the Robbers class can open this gate!");
@@ -23654,9 +23656,9 @@ server_load_visuals()
 	//CreateDynamicObject(18102, 386.79163, -1807.13257, 20.75563,   0.00000, 0.00000, -245.76001);
 	// login obj end
 	
-	CreateObject(986, 1385.98, 2643.14, 11.81, 0.00, 0.00, 90.13); // Robbers Gate
-	Gate[0] = CreateObject(976, 1397.24, 2694.51, 9.91, 0.00, 0.00, 269.23);
-	Gate[1] = CreateObject(976, 1397.24, 2693.86, 9.91, 0.00, 0.00, 90.07);
+	CreateDynamicObject(986, 1385.98, 2643.14, 11.81, 0.00, 0.00, 90.13); // Robbers Gate
+	g_CNR_RobberGate[0] = CreateDynamicObject(976, 1397.24, 2694.51, 9.91, 0.00, 0.00, 269.23);
+	g_CNR_RobberGate[1] = CreateDynamicObject(976, 1397.24, 2693.86, 9.91, 0.00, 0.00, 90.07);
 
 	/*// gehört zu beach
 	CreateDynamicObject(10771, 224.30000, -2004.00000, 4.10000,   0.00000, 0.00000, 220.00000);
@@ -28353,11 +28355,11 @@ GetStoreName(playerid)
 	return store_name;
 }
 
-function:MoveGate(playerid)
+function:CNR_RobberGateMoveBack(playerid)
 {
 	// Return gate back to Original pos.
-	MoveObject(Gate[0], 1397.24, 2694.51, 9.91, 3);
-	MoveObject(Gate[1], 1397.24, 2693.86, 9.91, 3);
+	MoveDynamicObject(g_CNR_RobberGate[0], 1397.24, 2694.51, 9.91, 3);
+	MoveDynamicObject(g_CNR_RobberGate[1], 1397.24, 2693.86, 9.91, 3);
 	return 1;
 }
 
