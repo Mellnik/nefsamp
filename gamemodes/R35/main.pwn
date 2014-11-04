@@ -28,7 +28,7 @@
 || Script limits:
 || Max teleport categories: 9
 || Max teleports per category: 32
-|| Max teleport command name: 15
+|| Max teleport command name: 17
 || Max businesses: 700
 || Max gang zones: 63
 || Max houses: 600
@@ -3089,13 +3089,13 @@ public OnPlayerRequestSpawn(playerid)
 
 public OnPlayerSpawn(playerid)
 {
-    if(PlayerData[playerid][bShowToys] && !PlayerData[playerid][bFirstSpawn]) AttachPlayerToy(playerid);
+    if(PlayerData[playerid][bShowToys] && !PlayerData[playerid][bFirstSpawn]) AttachPlayerToys(playerid);
     
     if(PlayerData[playerid][bFirstSpawn])
     {
         PlayerData[playerid][bFirstSpawn] = false;
 		PlayerData[playerid][bAllowSpawn] = false;
-		AttachPlayerToy(playerid);
+		AttachPlayerToys(playerid);
 		ResetPlayerWorld(playerid);
 		PlayerData[playerid][ExitType] = EXIT_FIRST_SPAWNED;
 		SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
@@ -6987,7 +6987,20 @@ public OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y,
 	        format(str, sizeof(str), "/hmenu to edit\nSlot ID: %i - Item ID: %i", PlayerData[playerid][houseobj_selected] + 1, HouseData[h_id][E_Obj_Model][PlayerData[playerid][houseobj_selected]]);
 	        DestroyDynamic3DTextLabel(HouseData[h_id][E_Obj_Label][PlayerData[playerid][houseobj_selected]]);
 	        HouseData[h_id][E_Obj_Label][PlayerData[playerid][houseobj_selected]] = CreateDynamic3DTextLabel(str, LIGHT_YELLOW, x, y, z+0.5, 3.5, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, HouseData[h_id][e_id] + 1000);
-	        
+	        /* OPTIMIZATION?:
+			Streamer_SetFloatData(STREAMER_TYPE_3D_TEXT_LABEL,
+                HouseData[h_id][E_Obj_Label][PlayerData[playerid][houseobj_selected]],
+                E_STREAMER_X,
+                x);
+			Streamer_SetFloatData(STREAMER_TYPE_3D_TEXT_LABEL,
+                HouseData[h_id][E_Obj_Label][PlayerData[playerid][houseobj_selected]],
+                E_STREAMER_Y,
+                y);
+			Streamer_SetFloatData(STREAMER_TYPE_3D_TEXT_LABEL,
+                HouseData[h_id][E_Obj_Label][PlayerData[playerid][houseobj_selected]],
+                E_STREAMER_Z,
+                z);
+		 */
 			SQL_SaveHouse(h_id, true);
 		}
 		else player_notice(playerid, "Couldn't find the house in that slot", "Report on forums", 5000);
@@ -7012,6 +7025,7 @@ public OnPlayerEditAttachedObject(playerid, response, index, modelid, boneid, Fl
         PlayerToyData[playerid][index][toy_sx] = fScaleX;
         PlayerToyData[playerid][index][toy_sy] = fScaleY;
         PlayerToyData[playerid][index][toy_sz] = fScaleZ;
+        /* RE-SET THE TOY DATA FOR THE PLAYER?   RemovePlayerAttachedObject*/
     }
     else
     {
@@ -16644,12 +16658,12 @@ YCMD:toggletoys(playerid, params[], help)
 
 	if(PlayerData[playerid][bShowToys])
 	{
-	    RemovePlayerToy(playerid);
+	    RemovePlayerToys(playerid);
 	    player_notice(playerid, "Toys:", "~r~OFF");
 	}
 	else if(!PlayerData[playerid][bShowToys])
 	{
-	    AttachPlayerToy(playerid);
+	    AttachPlayerToys(playerid);
 	    player_notice(playerid, "Toys:", "~g~ON");
 	}
 
@@ -30897,7 +30911,7 @@ ResetPlayerToy(playerid)
 	}
 }
 
-RemovePlayerToy(playerid)
+RemovePlayerToys(playerid)
 {
 	for(new i = 0; i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
 	{
@@ -30908,7 +30922,7 @@ RemovePlayerToy(playerid)
 	}
 }
 
-AttachPlayerToy(playerid)
+AttachPlayerToys(playerid)
 {
 	for(new i = 0; i < MAX_PLAYER_ATTACHED_OBJECTS; i++)
 	{
