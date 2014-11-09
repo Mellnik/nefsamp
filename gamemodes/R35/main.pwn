@@ -22906,7 +22906,7 @@ server_load_textdraws()
 	TextDrawSetProportional(TXTWelcome[1], 1);
 	TextDrawSetSelectable(TXTWelcome[1], 0);
 
-	TXTWelcome[2] = TextDrawCreate(438.000000, 172.000000, "Welcome to "SVRSC" Check out these~n~commands:~n~~n~  ~g~~h~~h~/rules~n~  ~r~~h~~h~/cmds~n~  ~p~/help~n~~n~~w~How do I earn money and score?");
+	TXTWelcome[2] = TextDrawCreate(438.000000, 172.000000, "Welcome to "SVRSC"! Check out these~n~commands:~n~~n~  ~g~~h~~h~/rules~n~  ~r~~h~~h~/commands~n~  ~p~/help~n~~n~~w~How do I earn money and score?");
 	TextDrawBackgroundColor(TXTWelcome[2], 168430202);
 	TextDrawFont(TXTWelcome[2], 1);
 	TextDrawLetterSize(TXTWelcome[2], 0.229999, 1.099997);
@@ -22915,7 +22915,7 @@ server_load_textdraws()
 	TextDrawSetProportional(TXTWelcome[2], 1);
 	TextDrawSetSelectable(TXTWelcome[2], 0);
 
-	TXTWelcome[3] = TextDrawCreate(438.000000, 243.000000, "~n~~n~  ~b~~h~~h~See /help for more information.~n~~n~~w~Discuss on our forums!~n~~n~  ~p~Visit "SVRFORUM"");
+	TXTWelcome[3] = TextDrawCreate(438.000000, 243.000000, "~n~~n~  ~b~~h~~h~See /help for server guides.~n~~n~~w~Stay connected on our forums!~n~~n~  ~p~Visit "SVRFORUM"");
 	TextDrawBackgroundColor(TXTWelcome[3], 168430202);
 	TextDrawFont(TXTWelcome[3], 1);
 	TextDrawLetterSize(TXTWelcome[3], 0.229999, 1.099997);
