@@ -15,6 +15,22 @@
 #include "native.h"
 #include "teleport.h"
 
+/* NC_Init(nc_version) */
+cell AMX_NATIVE_CALL Native::Init(AMX *amx, cell *params)
+{
+	static const unsigned ParamCount = 1;
+	PARAM_CHECK(ParamCount, "NC_Init");
+	
+	int32_t clientVersion = params[1];
+	
+	if (clientVersion != CORE_VERSION)
+	{
+		logprintf("[NEFMOD] Version mismatch 0x%X, expect 0x%X.", clientVersion, CORE_VERSION);
+		return 0;
+	}	
+	return 1;
+}
+
 /* NC_AddTeleport(tp_category, const tp_name[], const tp_cmd[], Float:x, Float:y, Float:z) */
 cell AMX_NATIVE_CALL Native::AddTeleport(AMX *amx, cell *params)
 {

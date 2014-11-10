@@ -18,6 +18,7 @@
 
 namespace Native
 {
+	cell AMX_NATIVE_CALL Init(AMX *amx, cell *params);
 	cell AMX_NATIVE_CALL AddTeleport(AMX *amx, cell *params);
 	cell AMX_NATIVE_CALL GetTeleportDialogString(AMX *amx, cell *params);
 	cell AMX_NATIVE_CALL ProcessTeleportRequest(AMX *amx, cell *params);

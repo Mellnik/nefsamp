@@ -11,7 +11,7 @@
 
 /*
 || Build Dependencies:
-|| NEFMOD Core 1.3.0
+|| NEFMOD Core, latest
 || SA-MP Server 0.3z-R4
 || YSI Library 3.1.133
 || sscanf Plugin 2.8.1
@@ -2934,6 +2934,17 @@ public OnGameModeInit()
 	Log(LOG_INIT, "Build config: Development");
 	#endif
 	Log(LOG_INIT, "Operating on %s", GetOS() == OS_LINUX ? ("Linux") : ("Windows"));
+	
+	if(NC_Init(CORE_VERSION) == 0)
+	{
+	    Log(LOG_INIT, "NC_Init failed, exiting.");
+	    SendRconCommand("exit");
+	}
+	else
+	{
+	    Log(LOG_INIT, "NEFMOD Core (0x%X) attached.", CORE_VERSION);
+	}
+	
 	Log(LOG_INIT, "MySQL: Logging: LOG_ERROR | LOG_WARNING");
 	mysql_log(LOG_ERROR | LOG_WARNING, LOG_TYPE_TEXT);
 	

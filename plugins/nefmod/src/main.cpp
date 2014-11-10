@@ -32,7 +32,7 @@ PLUGIN_EXPORT bool PLUGIN_CALL Load(void **ppData)
 	pPlugin.reset(new Plugin());
 	pTeleport.reset(new Teleport());
 	
-	logprintf("[NEFMOD] Core successfully loaded "PLUGIN_VERSION"");
+	logprintf("[NEFMOD] Core (0x%X) successfully loaded.", CORE_VERSION);
 	return true;
 }
 
@@ -45,7 +45,8 @@ PLUGIN_EXPORT void PLUGIN_CALL Unload()
 
 const AMX_NATIVE_INFO PluginNatives[] =
 {
-	{"NC_AddTeleport", Native::AddTeleport},	
+	{"NC_Init", Native::Init},
+	{"NC_AddTeleport", Native::AddTeleport},
 	{"NC_ProcessTeleportRequest", Native::ProcessTeleportRequest},
 	{"NC_GetTeleportDialogString", Native::GetTeleportDialogString},
 	{"NC_OutputTeleportInfo", Native::OutputTeleportInfo},
