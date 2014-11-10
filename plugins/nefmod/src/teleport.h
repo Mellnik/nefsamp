@@ -68,6 +68,8 @@ public:
 	int32_t GetCategorySize(int32_t category);
 	Teleport_t *GetTeleport(int32_t category, int32_t port);
 	
+	char g_TeleportDialogString[MAX_TELE_CATEGORIES][2048];
+	
 private:
 	std::vector<Teleport_t *> m_Teleports[MAX_TELE_CATEGORIES];
 };

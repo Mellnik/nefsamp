@@ -67,6 +67,11 @@ cell AMX_NATIVE_CALL Native::AddTeleport(AMX *amx, cell *params)
 	
 	Teleport_t *tp = new Teleport_t(params[1], tp_name, tp_cmd, amx_ftoc(params[4]), amx_ftoc(params[5]), amx_ftoc(params[6]));
 	
+	std::strcat(pTeleport->g_TeleportDialogString[params[1]], tp_name);
+	std::strcat(pTeleport->g_TeleportDialogString[params[1]], "(/");
+	std::strcat(pTeleport->g_TeleportDialogString[params[1]], tp_cmd);
+	std::strcat(pTeleport->g_TeleportDialogString[params[1]], "\n");
+	
 	pTeleport->AddTeleport((int32_t)params[1], tp);
 	return 1;
 }
@@ -83,6 +88,15 @@ cell AMX_NATIVE_CALL Native::GetTeleportDialogString(AMX *amx, cell *params)
 		return 0;
 	}
 	
+	cell *amx_Addr = NULL;
+	amx_GetAddr(amx, params[2], &amx_Addr);
+	if (amx_Addr == NULL)
+	{
+		logprintf("[NEFMOD] [debug] CRASH DETECTED! amx_Addr = NULL from amx_GetAddr in GetTeleportDialogString");
+		return 0;
+	}
+	
+	amx_SetString(amx_Addr, pTeleport->g_TeleportDialogString[params[1]], 0, 0, params[3] > 0 ? params[3] : std::strlen(pTeleport->g_TeleportDialogString[params[1]]) + 1);
 	return 1;
 }
 
@@ -108,7 +122,7 @@ cell AMX_NATIVE_CALL Native::ProcessTeleportRequest(AMX *amx, cell *params)
 	
 	if (ReqTeleport == NULL || ReqTeleport == nullptr)
 	{
-		logprintf("[NEFMOD] [debug] CRASH DETECTED!!! ReqTeleport == NULL");
+		logprintf("[NEFMOD] [debug] CRASH DETECTED! ReqTeleport == NULL");
 		return 0;
 	}
 	
@@ -116,7 +130,7 @@ cell AMX_NATIVE_CALL Native::ProcessTeleportRequest(AMX *amx, cell *params)
 	amx_GetAddr(amx, params[3], &amx_Addr);
 	if (amx_Addr == NULL)
 	{
-		logprintf("[NEFMOD] [debug] CRASH DETECTED!!! amx_Addr = NULL from amx_GetAddr in ProcessTeleportRequest");
+		logprintf("[NEFMOD] [debug] CRASH DETECTED! amx_Addr = NULL from amx_GetAddr in ProcessTeleportRequest");
 		return 0;
 	}
 	

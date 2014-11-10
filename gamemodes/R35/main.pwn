@@ -2742,13 +2742,13 @@ new Iterator:RaceJoins<MAX_PLAYERS>,
 	g_RacePosition[MAX_PLAYERS],
 	m_PlayerRecord,
 	g_CustomCarShops[CAR_SHOPS][E_CAR_SHOP],
+    g_dialogTpString[2048],
 	g_cmdString[32],
 	gstr[144],
 	gstr2[255],
 	g_LottoNumber,
 	g_LottoJackpot,
 	bool:bLottoActive = false,
-	g_TeleportDialogString[MAX_TELE_CATEGORIES][2048],
 	g_ServerStats[4],
 	g_sCustomCarCategory[512],
 	mathsAnswered = -1,
@@ -19356,35 +19356,35 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		            }
 		            case 1: // Jumps
 		            {
-						ShowPlayerDialog(playerid, TELE_DIALOG + 2, DIALOG_STYLE_LIST, ""nef" :: Teleports > Jumps", g_TeleportDialogString[1], "Select", "Back");
+						ShowPlayerDialog(playerid, TELE_DIALOG + 2, DIALOG_STYLE_LIST, ""nef" :: Teleports > Jumps", GetTeleportDialogString(1), "Select", "Back");
 					}
 		            case 2: // Fun Maps
 		            {
-						ShowPlayerDialog(playerid, TELE_DIALOG + 3, DIALOG_STYLE_LIST, ""nef" :: Teleports > Fun Maps", g_TeleportDialogString[2], "Select", "Back");
+						ShowPlayerDialog(playerid, TELE_DIALOG + 3, DIALOG_STYLE_LIST, ""nef" :: Teleports > Fun Maps", GetTeleportDialogString(2), "Select", "Back");
 					}
 		            case 3: // Challenges/Parkours
 		            {
-						ShowPlayerDialog(playerid, TELE_DIALOG + 4, DIALOG_STYLE_LIST, ""nef" :: Teleports > Challenges/Parkours", g_TeleportDialogString[3], "Select", "Back");
+						ShowPlayerDialog(playerid, TELE_DIALOG + 4, DIALOG_STYLE_LIST, ""nef" :: Teleports > Challenges/Parkours", GetTeleportDialogString(3), "Select", "Back");
 					}
 		            case 4: // Specials
 		            {
-						ShowPlayerDialog(playerid, TELE_DIALOG + 5, DIALOG_STYLE_LIST, ""nef" :: Teleports > Specials", g_TeleportDialogString[4], "Select", "Back");
+						ShowPlayerDialog(playerid, TELE_DIALOG + 5, DIALOG_STYLE_LIST, ""nef" :: Teleports > Specials", GetTeleportDialogString(4), "Select", "Back");
 					}
 		            case 5: // Hotspots
 		            {
-						ShowPlayerDialog(playerid, TELE_DIALOG + 6, DIALOG_STYLE_LIST, ""nef" :: Teleports > Hotspots", g_TeleportDialogString[5], "Select", "Back");
+						ShowPlayerDialog(playerid, TELE_DIALOG + 6, DIALOG_STYLE_LIST, ""nef" :: Teleports > Hotspots", GetTeleportDialogString(5), "Select", "Back");
 					}
 					case 6: // Drifts
 					{
-					    ShowPlayerDialog(playerid, TELE_DIALOG + 7, DIALOG_STYLE_LIST, ""nef" :: Teleports > Drifts", g_TeleportDialogString[6], "Select", "Back");
+					    ShowPlayerDialog(playerid, TELE_DIALOG + 7, DIALOG_STYLE_LIST, ""nef" :: Teleports > Drifts", GetTeleportDialogString(6), "Select", "Back");
 					}
 					case 7: // Tune Shops
 					{
-					    ShowPlayerDialog(playerid, TELE_DIALOG + 8, DIALOG_STYLE_LIST, ""nef" :: Teleports > Tune Shops", g_TeleportDialogString[7], "Select", "Back");
+					    ShowPlayerDialog(playerid, TELE_DIALOG + 8, DIALOG_STYLE_LIST, ""nef" :: Teleports > Tune Shops", GetTeleportDialogString(7), "Select", "Back");
 					}
 					case 8: // Cities
 					{
-					    ShowPlayerDialog(playerid, TELE_DIALOG + 9, DIALOG_STYLE_LIST, ""nef" :: Teleports > Cities", g_TeleportDialogString[8], "Select", "Back");
+					    ShowPlayerDialog(playerid, TELE_DIALOG + 9, DIALOG_STYLE_LIST, ""nef" :: Teleports > Cities", GetTeleportDialogString(8), "Select", "Back");
 					}
 		        }
 		    }
@@ -28156,10 +28156,6 @@ AddTeleport(teleport_category, const teleport_name[], const teleport_cmd[], Floa
 		CreateDynamic3DTextLabel(gstr, -1, x, y, z + 0.50, 40.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1);
 	}
 	
-	gstr[0] = '\0';
-	format(gstr, sizeof(gstr), "%s (/%s)\n", teleport_name, teleport_cmd);
-	strcat(g_TeleportDialogString[teleport_category], gstr);
-	
 	if(NC_AddTeleport(teleport_category, teleport_name, teleport_cmd, x, y, z) == 0)
 	{
 	    Log(LOG_FAIL, "NC_AddTeleport returned 0");
@@ -28170,13 +28166,15 @@ AddTeleport(teleport_category, const teleport_name[], const teleport_cmd[], Floa
 
 GetTeleportDialogString(teleport_category)
 {
-    if(NC_GetTeleportDialogString(teleport_category, dest[], sizeof()) == 0)
+    g_dialogTpString[0] = '\0';
+    if(NC_GetTeleportDialogString(teleport_category, g_dialogTpString, sizeof(g_dialogTpString)) == 0)
 	{
 	    printf("NC_GetTeleportDialogString returned 0");
 	    PrintAmxBacktrace();
-		return 0;
+	    strmid(g_dialogTpString, "DEAD", 0, sizeof(g_dialogTpString), sizeof(g_dialogTpString));
+		return g_dialogTpString;
 	}
-	return string....
+	return g_dialogTpString;
 }
 
 PushTeleportInput(playerid, teleport_category, input)
@@ -28326,8 +28324,9 @@ function:StartRobbery(playerid, namehash)
 
 GetStoreName(playerid)
 {
-	static store_names[10][] =
+	static store_names[11][] =
 	{
+	    "UNKNOWN_STORE",
 		"24/7 in Roca Escalente",
 		"24/7 in Strip",
 		"Casino in Strip",
@@ -28341,9 +28340,9 @@ GetStoreName(playerid)
 	};
 
 	if(GetPVarInt(playerid, "InStore") < 1 || GetPVarInt(playerid, "InStore") > 10)
-		return "UNKNOWN_STORE";
+		return store_names[0];
 		
-	return store_names[GetPVarInt(playerid, "InStore") - 1];
+	return store_names[GetPVarInt(playerid, "InStore")];
 }
 
 function:CNR_RobberGateMoveBack(playerid)
