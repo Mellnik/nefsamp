@@ -59,7 +59,7 @@
 			   <input type="hidden" name="pg_serviceid" value="55506">
 			   <input type="hidden" name="pg_currency" value="USD">
 			   <input type="hidden" name="pg_name" value="New Evolution Freeroam VIP">
-			   <input type="hidden" name="pg_custom" value="">
+			   <input type="hidden" name="pg_custom" value="<?php echo($player); ?>">
 			   <input type="hidden" name="pg_price" value="15">
 			   <input type="hidden" name="pg_return_url" value="http://www.nefserver.net/vip-complete/">
 			   <input type="hidden" name="pg_cancel_url" value="http://nefserver.net/vip/">
