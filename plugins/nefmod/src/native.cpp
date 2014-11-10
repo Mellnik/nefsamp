@@ -55,6 +55,21 @@ cell AMX_NATIVE_CALL Native::AddTeleport(AMX *amx, cell *params)
 	return 1;
 }
 
+/* NC_GetTeleportDialogString(tp_category, dest[], len = sizeof(dest)) */
+cell AMX_NATIVE_CALL Native::GetTeleportDialogString(AMX *amx, cell *params)
+{
+	static const unsigned ParamCount = 3;
+	PARAM_CHECK(ParamCount, "NC_GetTeleportDialogString");
+	
+	if (params[1] < 0 || params[1] >= MAX_TELE_CATEGORIES)
+	{
+		logprintf("[NEFMOD] Invalid teleport category.");
+		return 0;
+	}
+	
+	return 1;
+}
+
 /* NC_ProcessTeleportRequest(tp_category, input, dest[], len = sizeof(dest)) */
 cell AMX_NATIVE_CALL Native::ProcessTeleportRequest(AMX *amx, cell *params)
 {

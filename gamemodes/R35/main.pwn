@@ -19341,7 +19341,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		        {
 		            case 0: // Stunt Zones
 		            {
-						ShowPlayerDialog(playerid, TELE_DIALOG + 1, DIALOG_STYLE_LIST, ""nef" :: Teleports > Stunt Zones", g_TeleportDialogString[0], "Select", "Back");
+						ShowPlayerDialog(playerid, TELE_DIALOG + 1, DIALOG_STYLE_LIST, ""nef" :: Teleports > Stunt Zones", GetTeleportDialogString(0), "Select", "Back");
 		            }
 		            case 1: // Jumps
 		            {
@@ -28155,6 +28155,17 @@ AddTeleport(teleport_category, const teleport_name[], const teleport_cmd[], Floa
 	    SendRconCommand("exit");
 	}
     return 1;
+}
+
+GetTeleportDialogString(teleport_category)
+{
+    if(NC_GetTeleportDialogString(teleport_category, dest[], sizeof()) == 0)
+	{
+	    printf("NC_GetTeleportDialogString returned 0");
+	    PrintAmxBacktrace();
+		return 0;
+	}
+	return string....
 }
 
 PushTeleportInput(playerid, teleport_category, input)
