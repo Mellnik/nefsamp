@@ -11,6 +11,7 @@
 
 #include <cstring>
 #include <limits>
+#include <ctime>
 
 #include "native.h"
 #include "teleport.h"
