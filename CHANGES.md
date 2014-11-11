@@ -1,6 +1,13 @@
 New Evolution Freeroam SA-MP Server
 ===================================
 
+Build 35
+--------
+- Fixed /t dialog bug.
+- Fixed death delay exploit in minigames (Report by chocolaterain).
+- /admins now requires 100 score to view.
+- Global streamer update set to 40ms for more fluid streaming.
+
 Build 34
 --------
 - Fixed interest system generating wrong values.
