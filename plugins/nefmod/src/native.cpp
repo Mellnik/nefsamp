@@ -69,9 +69,9 @@ cell AMX_NATIVE_CALL Native::AddTeleport(AMX *amx, cell *params)
 	Teleport_t *tp = new Teleport_t(params[1], tp_name, tp_cmd, amx_ftoc(params[4]), amx_ftoc(params[5]), amx_ftoc(params[6]));
 	
 	std::strcat(pTeleport->g_TeleportDialogString[params[1]], tp_name);
-	std::strcat(pTeleport->g_TeleportDialogString[params[1]], "(/");
+	std::strcat(pTeleport->g_TeleportDialogString[params[1]], " (/");
 	std::strcat(pTeleport->g_TeleportDialogString[params[1]], tp_cmd);
-	std::strcat(pTeleport->g_TeleportDialogString[params[1]], "\n");
+	std::strcat(pTeleport->g_TeleportDialogString[params[1]], ")\n");
 	
 	pTeleport->AddTeleport((int32_t)params[1], tp);
 	return 1;

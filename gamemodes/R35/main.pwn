@@ -2943,7 +2943,7 @@ public OnGameModeInit()
 	}
 	else
 	{
-	    Log(LOG_INIT, "NEFMOD Core (0x%X) attached.", CORE_VERSION);
+	    Log(LOG_INIT, "NEFMOD Core (0x%x) attached.", CORE_VERSION);
 	}
 	
 	Log(LOG_INIT, "MySQL: Logging: LOG_ERROR | LOG_WARNING");
@@ -22239,7 +22239,7 @@ SQL_Connect()
 
     if(mysql_errno(pSQL) == 0)
     {
-		Log(LOG_INIT, "MySQL: Connected @ "SQL_HOST":%i", SQL_PORT);
+		Log(LOG_INIT, "MySQL: Connected @ ["SQL_HOST"]:%i", SQL_PORT);
     }
     else
     {
@@ -23676,9 +23676,9 @@ server_load_visuals()
 	//CreateDynamicObject(18102, 386.79163, -1807.13257, 20.75563,   0.00000, 0.00000, -245.76001);
 	// login obj end
 	
-	CreateDynamicObject(986, 1385.98, 2643.14, 11.81, 0.00, 0.00, 90.13); // Robbers Gate
-	g_CNR_RobberGate[0] = CreateDynamicObject(976, 1397.24, 2694.51, 9.91, 0.00, 0.00, 269.23);
-	g_CNR_RobberGate[1] = CreateDynamicObject(976, 1397.24, 2693.86, 9.91, 0.00, 0.00, 90.07);
+	CreateDynamicObject(986, 1385.98, 2643.14, 11.81, 0.00, 0.00, .streamdistance = 90.13); // Robbers Gate
+	g_CNR_RobberGate[0] = CreateDynamicObject(976, 1397.24, 2694.51, 9.91, 0.00, 0.00, .streamdistance = 269.23);
+	g_CNR_RobberGate[1] = CreateDynamicObject(976, 1397.24, 2693.86, 9.91, 0.00, 0.00, .streamdistance = 90.07);
 
 	/*// gehört zu beach
 	CreateDynamicObject(10771, 224.30000, -2004.00000, 4.10000,   0.00000, 0.00000, 220.00000);
