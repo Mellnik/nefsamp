@@ -241,6 +241,7 @@ Float:GetDistance3D(Float:x1, Float:y1, Float:z1, Float:x2, Float:y2, Float:z2);
 #define BG_VOTING_TIME                  (15000)
 
 // Fallout
+#define FALLOUT_OBJECTS                 (100)
 #define FALLOUT_WORLD                   (121212)
 #define DEFAULT_FALLOUT_TIME            (240)
 
@@ -1138,10 +1139,10 @@ enum e_derby_map9_data
 
 enum E_FALLOUT_DATA
 {
-	I_iShaketimer[101],
-	I_iNumberout[101],
-	I_iObject[101],
-	I_iShake[101],
+	I_iShaketimer[FALLOUT_OBJECTS],
+	I_iNumberout[FALLOUT_OBJECTS],
+	I_iObject[FALLOUT_OBJECTS],
+	I_iShake[FALLOUT_OBJECTS],
 	I_tSolarfall,
 	I_tCountdown,
 	I_tLoseGame,
@@ -5253,7 +5254,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 	  	}
 		case MINIGUN, MINIGUN2:
 		{
-		    if(IsPlayerAvail(killerid))
+		    if(IsPlayerAvail(killerid) && (gTeam[killerid] == MINIGUN || gTeam[killerid] == MINIGUN2))
 		    {
 				GivePlayerScoreEx(killerid, 1, true, true);
 				GivePlayerMoneyEx(killerid, 2000, true, true);
@@ -5261,7 +5262,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 		}
 		case SNIPER:
 		{
-		    if(IsPlayerAvail(killerid))
+		    if(IsPlayerAvail(killerid) && gTeam[killerid] == SNIPER)
 		    {
 				GivePlayerScoreEx(killerid, 2, true, true);
 				GivePlayerMoneyEx(killerid, 3000, true, true);
@@ -5272,7 +5273,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 		}
 		case ROCKETDM:
 		{
-		    if(IsPlayerAvail(killerid))
+		    if(IsPlayerAvail(killerid) && gTeam[killerid] == ROCKETDM)
 		    {
 				GivePlayerScoreEx(killerid, 1, true, true);
 				GivePlayerMoneyEx(killerid, 2000, true, true);
@@ -5280,7 +5281,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 		}
 		case gBG_TEAM1:
 		{
-  		    if(IsPlayerAvail(killerid))
+  		    if(IsPlayerAvail(killerid) && gTeam[killerid] == gBG_TEAM1)
 		    {
 		        BGTeam2Kills++;
 		        GivePlayerScoreEx(killerid, 1, true, true);
@@ -5289,7 +5290,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 		}
 		case gBG_TEAM2:
 		{
-  		    if(IsPlayerAvail(killerid))
+  		    if(IsPlayerAvail(killerid) && gTeam[killerid] == gBG_TEAM2)
 		    {
 		        BGTeam1Kills++;
 		        GivePlayerScoreEx(killerid, 1, true, true);
@@ -5298,46 +5299,55 @@ public OnPlayerDeath(playerid, killerid, reason)
 		}
 		case DM, WAR, gSAWN:
 		{
-  		    if(IsPlayerAvail(killerid))
+  		    if(IsPlayerAvail(killerid) && killerid != INVALID_PLAYER_ID)
 		    {
-		        GivePlayerScoreEx(killerid, 1, true, true);
-				GivePlayerMoneyEx(killerid, 2500, true, true);
-				
-				new Float:health;
-				GetPlayerHealth(killerid, health);
-				
-				if(health < 90)
+				switch(gTeam[killerid])
 				{
-				    SetPlayerHealth(killerid, health + 5);
-                    SetPlayerChatBubble(killerid, ""green"+ 5 HP!", -1, 15.0, 2000);
+				    case DM, WAR, gSAWN:
+				    {
+				        GivePlayerScoreEx(killerid, 1, true, true);
+						GivePlayerMoneyEx(killerid, 2500, true, true);
+
+						new Float:health;
+						GetPlayerHealth(killerid, health);
+
+						if(health < 90)
+						{
+						    SetPlayerHealth(killerid, health + 5);
+		                    SetPlayerChatBubble(killerid, ""green"+ 5 HP!", -1, 15.0, 2000);
+						}
+				    }
 				}
 		    }
 		    SetPlayerWorldBounds(playerid, 20000.0000, -20000.0000, 20000.0000, -20000.0000);
 		}
 		case CNR:
 		{
-  		    if(IsPlayerAvail(killerid))
+		    if(gTeam[killerid] != INVALID_PLAYER_ID && gTeam[killerid] == CNR)
 		    {
-		        GivePlayerScoreEx(killerid, 2, true, true);
-				GivePlayerMoneyEx(killerid, 3000, true, true);
-		    }
-		    
-		    if(GetPVarInt(playerid, "Robber") == 1)
-		    {
-		        SetPlayerWantedLevel(playerid, GetPlayerWantedLevel(playerid) + 1);
-		    }
+	  		    if(IsPlayerAvail(killerid))
+			    {
+			        GivePlayerScoreEx(killerid, 2, true, true);
+					GivePlayerMoneyEx(killerid, 3000, true, true);
+			    }
+
+			    if(GetPVarInt(playerid, "Robber") == 1)
+			    {
+			        SetPlayerWantedLevel(playerid, GetPlayerWantedLevel(playerid) + 1);
+			    }
+			}
 		}
 		case GUNGAME:
 		{
 			GunGame_Player[playerid][dead] = true;
 
-			if(IsPlayerAvail(killerid))
+			if(IsPlayerAvail(killerid) && gTeam[killerid] == GUNGAME)
 			{
 		        GivePlayerScoreEx(killerid, 1, true, true);
 				GivePlayerMoneyEx(killerid, 2000, true, true);
 			}
 
-			if(killerid == INVALID_PLAYER_ID)
+			if(killerid == INVALID_PLAYER_ID || gTeam[killerid] != GUNGAME)
 			{
 				SetPlayerCameraPos(playerid, 179.2239, 2097.3289, 93.4786);
 				SetPlayerCameraLookAt(playerid, 178.3643, 2096.8113, 92.8986);
@@ -26877,20 +26887,11 @@ ShowPlayerInfoTextdraws(playerid)
 
 fallout_buildmap()
 {
-	for(new i = 0; i < 101; i++)
-	{
-		DestroyDynamicObject(FalloutData[I_iObject][i]);
-		FalloutData[I_iNumberout][i] = -1;
-		KillTimer(FalloutData[I_iShaketimer][i]);
-		FalloutData[I_iShake][i] = 0;
-	}
+    fallout_reset();
 
-    KillTimer(FalloutData[I_tSolarfall]);
-    KillTimer(FalloutData[I_tCountdown]);
-    KillTimer(FalloutData[I_tLoseGame]);
+    FalloutData[I_iCount] = 15;
 
-	new j;
-	FalloutData[I_iCount] = 15;
+	new j = 0;
 	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
 	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2477.7395, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
 	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2473.2869, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
@@ -27029,18 +27030,25 @@ fallout_cancel()
     CurrentFalloutPlayers = 0;
 	g_FalloutStatus = e_Fallout_Inactive;
 	
-	for(new i = 0; i < 101; i++)
+	fallout_reset();
+	return 1;
+}
+
+fallout_reset()
+{
+	for(new i = 0; i < FALLOUT_OBJECTS; i++)
 	{
-		DestroyDynamicObject(FalloutData[I_iObject][i]);
+	    if(IsValidDynamicObject(FalloutData[I_iObject][i]))
+			DestroyDynamicObject(FalloutData[I_iObject][i]);
+
 		FalloutData[I_iNumberout][i] = -1;
 		KillTimer(FalloutData[I_iShaketimer][i]);
 		FalloutData[I_iShake][i] = 0;
 	}
-	
-	KillTimer(FalloutData[I_tSolarfall]);
-	KillTimer(FalloutData[I_tCountdown]);
-	KillTimer(FalloutData[I_tLoseGame]);
-	return 1;
+
+    KillTimer(FalloutData[I_tSolarfall]);
+    KillTimer(FalloutData[I_tCountdown]);
+    KillTimer(FalloutData[I_tLoseGame]);
 }
 
 function:fallout_losegame()
@@ -27151,7 +27159,7 @@ function:fallout_solarfall()
 	new objectid,
 		go;
 		
-	for(new i = 0; i < 101; i++)
+	for(new i = 0; i < FALLOUT_OBJECTS; i++)
 		if(FalloutData[I_iNumberout][i] == -1)
 			go++;
 
@@ -27168,7 +27176,7 @@ function:fallout_solarfall()
 	}
 
 	start:
-	objectid = random(101);
+	objectid = random(FALLOUT_OBJECTS);
 
 	if(FalloutData[I_iNumberout][objectid] != -1)
 		goto start;
