@@ -37,7 +37,7 @@
 
 #pragma dynamic 8192        // for md-sort
 
-#define IS_RELEASE_BUILD (true)
+#define IS_RELEASE_BUILD (false)
 #define INC_ENVIRONMENT (true)
 #define WINTER_EDITION (false) // Requires FS ferriswheelfair.amx
 #define _YSI_NO_VERSION_CHECK
@@ -13252,6 +13252,9 @@ YCMD:pweaps(playerid, params[], help)
 
 YCMD:admins(playerid, params[], help)
 {
+	if(!IsPlayerAdmin(playerid) && GetPlayerScoreEx(playerid) < 100)
+	    return SCM(playerid, -1, ""er"This commands requires 100 score!");
+
 	new finstring[2048], count = 0;
 	format(finstring, sizeof(finstring), ""nef_yellow"Administrators:\n"white"");
 
@@ -19689,9 +19692,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				switch(listitem)
 		    	{
 	      			case 0: ShowPlayerDialog(playerid, STREAM_DIALOG+1, DIALOG_STYLE_LIST, ""nef" :: Streams > Streams > Electro", "#MUSIK.TRANCE - WWW.RAUTEMUSIK.FM\n:: Electro Radio :: all about electromusic", "Select", "Back");
-					case 1: ShowPlayerDialog(playerid, STREAM_DIALOG+2, DIALOG_STYLE_LIST, ""nef" :: Streams > Metal", "RockRadio1.Com - Classic Hard Rock and Heavy\n#MUSIK.METAL - WWW.RAUTEMUSIK.FM", "Select", "Back");
+					case 1: ShowPlayerDialog(playerid, STREAM_DIALOG+2, DIALOG_STYLE_LIST, ""nef" :: Streams > Metal", "RockRadio1.Com - Classic Hard Rock and Heavy\nidobi Howl", "Select", "Back");
 					case 2: ShowPlayerDialog(playerid, STREAM_DIALOG+3, DIALOG_STYLE_LIST, ""nef" :: Streams > Pop", "idobi Radio: New. Music.\nChartHits.FM - Top 40 Radio", "Select", "Back");
-					case 3: ShowPlayerDialog(playerid, STREAM_DIALOG+4, DIALOG_STYLE_LIST, ""nef" :: Streams > Hip Hop", "HOT 108 JAMZ - #1 FOR HIP HOP\nBlackBeats.FM - finest in blackbeats", "Select", "Back");
+					case 3: ShowPlayerDialog(playerid, STREAM_DIALOG+4, DIALOG_STYLE_LIST, ""nef" :: Streams > Hip Hop", "HOT 108 JAMZ - #1 FOR HIP HOP\nOne love Hip Hop Radio", "Select", "Back");
 					case 4: ShowPlayerDialog(playerid, STREAM_DIALOG+5, DIALOG_STYLE_LIST, ""nef" :: Streams > Rap", "POWERHITZ.COM - #1 FOR HITZ\nRADIOUP.COM - THE HITLIST", "Select", "Back");
 					case 5: ShowPlayerDialog(playerid, STREAM_DIALOG+6, DIALOG_STYLE_LIST, ""nef" :: Streams > Mainstream/Rock", "#MUSIK.MAIN - WWW.RAUTEMUSIK.FM - 24H\n181.FM - Kickin' Country", "Select", "Back");
 					case 6: ShowPlayerDialog(playerid, STREAM_DIALOG+7, DIALOG_STYLE_LIST, ""nef" :: Streams > Oldies", "181.FM - Good Time Oldies\n#MUSIK.GOLDIES - WWW.RAUTEMUSIK.FM", "Select", "Back");
@@ -19705,7 +19708,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				switch(listitem)
 		    	{
 		        	case 0: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=99195090");
-		        	case 1: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=108251");
+		        	case 1: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=215139");
     			}
 				return true;
 			}
@@ -19714,7 +19717,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				switch(listitem)
 		    	{
 		       		case 0: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=558051");
-		        	case 1: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=318248");
+		        	case 1: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=15810");
 				}
 				return true;
 			}
@@ -19732,7 +19735,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	  			switch(listitem)
 		    	{
 		        	case 0: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=8318");
-		        	case 1: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=7581");
+		        	case 1: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=288144");
 				}
 				return true;
 			}
@@ -19741,7 +19744,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				switch(listitem)
 			    {
 			        case 0: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=107949");
-			        case 1: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=83836");
+			        case 1: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=70545");
 				}
 				return true;
 			}
@@ -19749,7 +19752,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			{
 				switch(listitem)
 			    {
-			        case 0: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=38370");
+			        case 0: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=12337");
 			        case 1: PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=221956");
 				}
 				return true;
@@ -27721,7 +27724,7 @@ function:ShowDialog(playerid, dialogid)
 	    }
 		case STREAM_DIALOG:
 		{
-			ShowPlayerDialog(playerid, STREAM_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Audio Streams", "Electro\nMetal\nPop\nHip Hop\nRap\nRock\nOldies\nDubstep\n"grey"Your own stream", "Select", "Stop stream");
+			ShowPlayerDialog(playerid, STREAM_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Audio Streams", "Electro\nMetal\nPop\nHip Hop\nRap\nMainstream/Rock\nOldies\nDubstep\n"grey"Your own stream", "Select", "Stop stream");
 		}
 		case VEHICLE_PLATE_DIALOG:
   		{
