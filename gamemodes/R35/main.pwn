@@ -37,7 +37,7 @@
 
 #pragma dynamic 8192        // for md-sort
 
-#define IS_RELEASE_BUILD (false)
+#define IS_RELEASE_BUILD (true)
 #define INC_ENVIRONMENT (true)
 #define WINTER_EDITION (false) // Requires FS ferriswheelfair.amx
 #define _YSI_NO_VERSION_CHECK
@@ -1146,7 +1146,8 @@ enum E_FALLOUT_DATA
 	I_tSolarfall,
 	I_tCountdown,
 	I_tLoseGame,
-	I_iCount
+	I_iCount,
+	bool:I_iFirstShake
 };
 
 enum
@@ -5926,8 +5927,8 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 		{
 			if(GetPVarInt(playerid, "Robber") == 1)
 	  		{
-				MoveDynamicObject(g_CNR_RobberGate[0], 1397.24, 2688.04, 9.91, 2);
-				MoveDynamicObject(g_CNR_RobberGate[0], 1397.24, 2701.15, 9.91, 2);
+	  			MoveObject(g_CNR_RobberGate[0], 1397.24, 2688.04, 9.91, 2);
+	  			MoveObject(g_CNR_RobberGate[1], 1397.24, 2701.15, 9.91, 2);
 				
 				SetTimer("CNR_RobberGateMoveBack", 3000, false);
 				GameTextForPlayer(playerid, "~g~~h~~h~Gate Opening..", 2000, 5);
@@ -23676,9 +23677,9 @@ server_load_visuals()
 	//CreateDynamicObject(18102, 386.79163, -1807.13257, 20.75563,   0.00000, 0.00000, -245.76001);
 	// login obj end
 	
-	CreateDynamicObject(986, 1385.98, 2643.14, 11.81, 0.00, 0.00, .streamdistance = 90.13); // Robbers Gate
-	g_CNR_RobberGate[0] = CreateDynamicObject(976, 1397.24, 2694.51, 9.91, 0.00, 0.00, .streamdistance = 269.23);
-	g_CNR_RobberGate[1] = CreateDynamicObject(976, 1397.24, 2693.86, 9.91, 0.00, 0.00, .streamdistance = 90.07);
+	CreateObject(986, 1385.98, 2643.14, 11.81, 0.00, 0.00, 90.13); // Robbers Gate
+	g_CNR_RobberGate[0] = CreateObject(976, 1397.24, 2694.51, 9.91, 0.00, 0.00, 269.23);
+	g_CNR_RobberGate[1] = CreateObject(976, 1397.24, 2693.86, 9.91, 0.00, 0.00, 90.07);
 
 	/*// gehört zu beach
 	CreateDynamicObject(10771, 224.30000, -2004.00000, 4.10000,   0.00000, 0.00000, 220.00000);
@@ -26893,6 +26894,7 @@ fallout_buildmap()
     fallout_reset();
 
     FalloutData[I_iCount] = 15;
+	FalloutData[I_iFirstShake] = true;
 
 	new j = 0;
 	FalloutData[I_iObject][j++] = CreateDynamicObject(1697, 2482.1921, -1660.4783, 160.0000, 31.8000, 0.0000, 0.0000);
@@ -27179,7 +27181,12 @@ function:fallout_solarfall()
 	}
 
 	start:
-	objectid = random(FALLOUT_OBJECTS);
+	if(FalloutData[I_iFirstShake])
+	    objectid = 0;
+	else
+		objectid = random(FALLOUT_OBJECTS);
+
+    FalloutData[I_iFirstShake] = false;
 
 	if(FalloutData[I_iNumberout][objectid] != -1)
 		goto start;
@@ -28359,8 +28366,8 @@ GetStoreName(playerid)
 function:CNR_RobberGateMoveBack(playerid)
 {
 	// Return gate back to Original pos.
-	MoveDynamicObject(g_CNR_RobberGate[0], 1397.24, 2694.51, 9.91, 3);
-	MoveDynamicObject(g_CNR_RobberGate[1], 1397.24, 2693.86, 9.91, 3);
+	MoveObject(g_CNR_RobberGate[0], 1397.24, 2694.51, 9.91, 3);
+	MoveObject(g_CNR_RobberGate[1], 1397.24, 2693.86, 9.91, 3);
 	return 1;
 }
 
