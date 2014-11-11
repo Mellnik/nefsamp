@@ -729,7 +729,7 @@ enum E_PLAYER_DATA // Prefixes: i = Integer, s = String, b = bool, f = Float, p 
  	bool:bGangInvite,
  	bool:bFalloutLost,
 	bool:bStateSaved,
-	bool:bHasSpawn,
+	bool:bHasCustomSpawn,
 	bool:bFirstSpawn,
 	bool:bTextdraws,
 	bool:bRainbow,
@@ -1139,7 +1139,7 @@ enum e_derby_map9_data
 
 enum E_FALLOUT_DATA
 {
-	I_iShaketimer[FALLOUT_OBJECTS],
+	I_tShake[FALLOUT_OBJECTS],
 	I_iNumberout[FALLOUT_OBJECTS],
 	I_iObject[FALLOUT_OBJECTS],
 	I_iShake[FALLOUT_OBJECTS],
@@ -3130,7 +3130,7 @@ public OnPlayerSpawn(playerid)
         {
             ResetPlayerWorld(playerid);
             
-            /*if(PlayerData[playerid][bHasSpawn]) Moved to OPD system
+            /*if(PlayerData[playerid][bHasCustomSpawn]) Moved to OPD system
             {
         		SetPlayerPos(playerid, PlayerData[playerid][CSpawnX], PlayerData[playerid][CSpawnY], PlayerData[playerid][CSpawnZ]);
 			    SetPlayerFacingAngle(playerid, PlayerData[playerid][CSpawnA]);
@@ -5029,7 +5029,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 		}
 	    case FREEROAM:
 	    {
-            if(PlayerData[playerid][bHasSpawn] && !PlayerData[playerid][bGWarMode])
+            if(PlayerData[playerid][bHasCustomSpawn] && !PlayerData[playerid][bGWarMode])
             {
                 SetSpawnInfoEx(playerid, NO_TEAM, GetPlayerSkin(playerid), PlayerData[playerid][CSpawnX], PlayerData[playerid][CSpawnY], PlayerData[playerid][CSpawnZ], PlayerData[playerid][CSpawnA]);
             }
@@ -9701,7 +9701,7 @@ YCMD:setspawn(playerid, params[], help)
     
     GetPlayerPos(playerid, PlayerData[playerid][CSpawnX], PlayerData[playerid][CSpawnY], PlayerData[playerid][CSpawnZ]);
     GetPlayerFacingAngle(playerid, PlayerData[playerid][CSpawnA]);
-    PlayerData[playerid][bHasSpawn] = true;
+    PlayerData[playerid][bHasCustomSpawn] = true;
 
 	SCM(playerid, YELLOW, "You will now spawn here!");
 	PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
@@ -18983,9 +18983,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					}
 					case 4:
 					{
-					    if(PlayerData[playerid][bHasSpawn])
+					    if(PlayerData[playerid][bHasCustomSpawn])
 					    {
-					        PlayerData[playerid][bHasSpawn] = false;
+					        PlayerData[playerid][bHasCustomSpawn] = false;
 					    }
 					    else
 					    {
@@ -27042,7 +27042,7 @@ fallout_reset()
 			DestroyDynamicObject(FalloutData[I_iObject][i]);
 
 		FalloutData[I_iNumberout][i] = -1;
-		KillTimer(FalloutData[I_iShaketimer][i]);
+		KillTimer(FalloutData[I_tShake][i]);
 		FalloutData[I_iShake][i] = 0;
 	}
 
@@ -27182,7 +27182,7 @@ function:fallout_solarfall()
 		goto start;
 
 	FalloutData[I_iNumberout][objectid] = 0;
-	FalloutData[I_iShaketimer][objectid] = SetTimerEx("fallout_squareshake", 100, true, "i", objectid);
+	FalloutData[I_tShake][objectid] = SetTimerEx("fallout_squareshake", 100, true, "i", objectid);
 	return 1;
 }
 
@@ -27249,7 +27249,7 @@ function:fallout_squareshake(objectid)
 {
 	if(objectid == 0)
 	{
-		return KillTimer(FalloutData[I_iShaketimer][objectid]);
+		return KillTimer(FalloutData[I_tShake][objectid]);
 	}
 
 	switch(FalloutData[I_iShake][objectid])
@@ -27284,11 +27284,11 @@ function:fallout_squareshake(objectid)
 		{
   			SetDynamicObjectPos(FalloutData[I_iObject][objectid], floatsub(31.8, floatsub((FalloutData[I_iShake][objectid] * 2), 20)), 0, 0);
 		}
-		case 100:
+		default:
 		{
 			DestroyDynamicObject(FalloutData[I_iObject][objectid]);
 
-			KillTimer(FalloutData[I_iShaketimer][objectid]);
+			KillTimer(FalloutData[I_tShake][objectid]);
 		}
 	}
 
@@ -28020,7 +28020,7 @@ GetPlayerSettings(playerid)
     format(gstr, sizeof(gstr), ""white"4)\tColor\t\t{%06x}Color\n", GetColorEx(playerid) >>> 8);
     strcat(string, gstr);
 
-	if(!PlayerData[playerid][bHasSpawn])
+	if(!PlayerData[playerid][bHasCustomSpawn])
 	{
 	    format(gstr, sizeof(gstr), ""white"5)\tSpawn Place\t"vgreen"Default Random\n");
 	    strcat(string, gstr);
@@ -31135,7 +31135,7 @@ ResetPlayerVars(playerid)
  	PlayerData[playerid][bGangInvite] = false;
  	PlayerData[playerid][bFalloutLost] = true;
 	PlayerData[playerid][bStateSaved] = false;
-	PlayerData[playerid][bHasSpawn] = false;
+	PlayerData[playerid][bHasCustomSpawn] = false;
 	PlayerData[playerid][bFirstSpawn] = false;
 	PlayerData[playerid][bTextdraws] = true;
 	PlayerData[playerid][bRainbow] = false;
