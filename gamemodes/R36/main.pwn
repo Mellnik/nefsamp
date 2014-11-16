@@ -1,6 +1,6 @@
 /*======================================================================*\
 || #################################################################### ||
-|| # Project New Evolution Freeroam - Build 35           			  # ||
+|| # Project New Evolution Freeroam - Build 36           			  # ||
 || # ---------------------------------------------------------------- # ||
 || # Copyright (c)2011-2014 New Evolution Freeroam  				  # ||
 || # Created by Mellnik                                               # ||
@@ -102,9 +102,9 @@ Float:GetDistance3D(Float:x1, Float:y1, Float:z1, Float:x2, Float:y2, Float:z2);
 #define SERVER_IP                       "31.204.153.110:7777"
 #define HOSTNAME                        " 	      ..:: NEF ::.. ×Stunt/DM/Race/Minigames×"
 #if IS_RELEASE_BUILD == true
-#define CURRENT_VERSION                 "Build 35"
+#define CURRENT_VERSION                 "Build 36"
 #else
-#define CURRENT_VERSION                 "PTS:Build 35"
+#define CURRENT_VERSION                 "PTS:Build 36"
 #endif
 #define HOTFIX_REV                      "Hotfix #0"
 #define SAMP_VERSION                    "SA-MP 0.3z-R4"
