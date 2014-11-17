@@ -627,6 +627,8 @@ enum SUSPECT:(<<= 1)
 	SUSPECT_VALID_ARMOR = 1,
 	SUSPECT_PROAIM,
 	SUSPECT_CRASHER_OPWS,
+	SUSPECT_CRASHER_OVM,
+	SUSPECT_AIMBOT,
 	SUSPECT_IMMUNE
 };
 
@@ -3959,6 +3961,7 @@ public OnVehicleMod(playerid, vehicleid, componentid)
     if(GetPlayerInterior(playerid) == 0) // Crasher
     {
         Log(LOG_SUSPECT, "OnVehicleMod(%i, %i, %i) triggered by %s with world interior 0", playerid, vehicleid, componentid, __GetName(playerid));
+        PlayerData[playerid][bwSuspect] |= SUSPECT_CRASHER_OVM;
         return 0;
     }
 
@@ -3966,6 +3969,7 @@ public OnVehicleMod(playerid, vehicleid, componentid)
 	if(!IsComponentIdCompatible(model, componentid)) // Crasher
 	{
 	    Log(LOG_SUSPECT, "OnVehicleMod(%i, %i, %i) triggered by %s with invalid componentid using model %i", playerid, vehicleid, componentid, __GetName(playerid), model);
+	    PlayerData[playerid][bwSuspect] |= SUSPECT_CRASHER_OVM;
 		return 0;
 	}
 	
@@ -4012,14 +4016,55 @@ public OnPlayerTakeDamage(playerid, issuerid, Float:amount, weaponid, bodypart)
 
 public OnPlayerGiveDamage(playerid, damagedid, Float:amount, weaponid, bodypart)
 {
+	static const BodyParts[7][] =
+	{
+	    "Torso",
+	    "Groin",
+	    "Left_Arm",
+	    "Right_Arm",
+	    "Left_Leg",
+	    "Right_Leg",
+	    "Head"
+	};
+	
+	if(gTeam[playerid] == DM)
+	{
+		for(new i = 0; i < MAX_PLAYERS; i++)
+		{
+			if(gTeam[i] == SPEC && PlayerData[i][SpecID] == playerid)
+	   		{
+				if(bodypart < 3 || bodypart > 9)
+				    continue;
+				    
+	   		    format(gstr, sizeof(gstr), "%.02f DMG to ID:%i on %s", amount, damagedid, BodyParts[bodypart - 3]);
+	   		    PushDamageBox(i, gstr);
+			}
+		}
+	}
 	return 1;
 }
+/*
+ClearDamageBox(playerid)
+{
+
+}
+
+PushDamageBox(playerid, message[])
+{
+
+}
+
+DestoryDamageBox(playerid)
+{
+
+}*/
 
 public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY, Float:fZ)
 {
 	/* Bullet Crasher http://forum.sa-mp.com/showthread.php?t=535559 */
 	if(hittype != BULLET_HIT_TYPE_NONE) {
 	    if( !( -1000.0 <= fX <= 1000.0 ) || !( -1000.0 <= fY <= 1000.0 ) || !( -1000.0 <= fZ <= 1000.0 ) ) {
+	        PlayerData[playerid][bwSuspect] |= SUSPECT_CRASHER_OPWS;
 		    return 0;
   		}
 	}
@@ -10003,22 +10048,30 @@ YCMD:suspect(playerid, params[], help)
 				GetPlayerArmour(i, tmp);
 
 				if(tmp >= 1.0 && !(PlayerData[i][bwSuspect] & SUSPECT_VALID_ARMOR)) {
-	                format(tmpstring, sizeof(tmpstring), "%i) %s(%i) - AC_SUSPECT_ARMOR\n", ++count, __GetName(i), i);
+	                format(tmpstring, sizeof(tmpstring), "%i) %s(%i) - AC_ARMOR\n", ++count, __GetName(i), i);
 	                strcat(finstring, tmpstring);
 				}
 
                 /* JETPACK CHECK */
 				if(GetPlayerSpecialAction(i) == SPECIAL_ACTION_USEJETPACK) {
-	                format(tmpstring, sizeof(tmpstring), "%i) %s(%i) - AC_SUSPECT_JETPACK\n", ++count, __GetName(i), i);
+	                format(tmpstring, sizeof(tmpstring), "%i) %s(%i) - AC_JETPACK\n", ++count, __GetName(i), i);
 	                strcat(finstring, tmpstring);
 				}
 			}
    			if(PlayerData[i][bwSuspect] & SUSPECT_PROAIM) {
-   			    format(tmpstring, sizeof(tmpstring), "%i) %s(%i) - AC_SUSPECT_PROAIM\n", ++count, __GetName(i), i);
+   			    format(tmpstring, sizeof(tmpstring), "%i) %s(%i) - AC_PROAIM\n", ++count, __GetName(i), i);
    			    strcat(finstring, tmpstring);
    			}
    			if(PlayerData[i][bwSuspect] & SUSPECT_CRASHER_OPWS) {
-   			    format(tmpstring, sizeof(tmpstring), "%i) %s(%i) - AC_SUSPECT_CRASHER_OPWS\n", ++count, __GetName(i), i);
+   			    format(tmpstring, sizeof(tmpstring), "%i) %s(%i) - AC_CRASHER_OPWS\n", ++count, __GetName(i), i);
+				strcat(finstring, tmpstring);
+   			}
+   			if(PlayerData[i][bwSuspect] & SUSPECT_CRASHER_OVM) {
+   			    format(tmpstring, sizeof(tmpstring), "%i) %s(%i) - AC_CRASHER_OVM\n", ++count, __GetName(i), i);
+				strcat(finstring, tmpstring);
+   			}
+   			if(PlayerData[i][bwSuspect] & SUSPECT_AIMBOT) {
+   			    format(tmpstring, sizeof(tmpstring), "%i) %s(%i) - AC_AIMBOT\n", ++count, __GetName(i), i);
 				strcat(finstring, tmpstring);
    			}
 		}
