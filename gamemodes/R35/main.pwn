@@ -791,6 +791,8 @@ enum E_PLAYER_DATA // Prefixes: i = Integer, s = String, b = bool, f = Float, p 
 	Warnings,
 	RankSelected,
 	HitmanHit,
+	DmgMsg[10][64],
+	PlayerText:DmgBox[2],
 	Text3D:AdminDutyLabel,
 	Text3D:VIPLabel,
 	iLastChat,
@@ -4043,21 +4045,47 @@ public OnPlayerGiveDamage(playerid, damagedid, Float:amount, weaponid, bodypart)
 	}
 	return 1;
 }
-/*
+
+CreateDamageBox(playerid)
+{
+    ClearDamageBox(playerid);
+}
+
 ClearDamageBox(playerid)
 {
-
+	for(new i = 0; i < 10; i++)
+	{
+		PlayerData[playerid][DmgBox][i][0] = '\0';
+	}
+	_AssembleDamageBoxText(playerid);
 }
 
 PushDamageBox(playerid, message[])
 {
+    _AssembleDamageBoxText(playerid);
+}
 
+_AssembleDamageBoxText(playerid)
+{
+	new string[1024];
+	for(new i = 0; i < 10; i++)
+	{
+	    strcat(string, PlayerData[playerid][DmgBox][i]);
+	    strcat(string, "\n");
+	}
+    PlayerTextDrawSetString(playerid, PlayerData[playerid][DmgBox][1], string);
 }
 
 DestoryDamageBox(playerid)
 {
-
-}*/
+	if(PlayerData[playerid][DmgBox][0] != Text:-1)
+	{
+	    PlayerTextDrawDestroy(playerid, PlayerData[playerid][DmgBox][0]);
+	    PlayerTextDrawDestroy(playerid, PlayerData[playerid][DmgBox][1]);
+	    PlayerData[playerid][DmgBox][0] = Text:-1;
+	    PlayerData[playerid][DmgBox][1] = Text:-1;
+	}
+}
 
 public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY, Float:fZ)
 {
@@ -15463,6 +15491,7 @@ YCMD:specoff(playerid, params[], help)
 		    ResetPlayerWorld(playerid);
 		    PlayerData[playerid][SpecID] = INVALID_PLAYER_ID;
 			TogglePlayerSpectating(playerid, false);
+			DestoryDamageBox(playerid);
 		}
 		else
 		{
@@ -31162,6 +31191,7 @@ ResetPlayerVars(playerid)
 	GunGame_Player[playerid][dead] = true;
 	GunGame_Player[playerid][pw] = true;
 	strmid(LastPlayerText[playerid], " ", 0, 144, 144);
+    DestoryDamageBox(playerid);
 
 	for(new i = 0; E_PLAYER_ACH_DATA:i < E_PLAYER_ACH_DATA; i++)
 	{
