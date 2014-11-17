@@ -5282,7 +5282,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 		}
 		case gBG_TEAM1:
 		{
-  		    if(IsPlayerAvail(killerid) && gTeam[killerid] == gBG_TEAM1)
+  		    if(IsPlayerAvail(killerid) && gTeam[killerid] == gBG_TEAM2)
 		    {
 		        BGTeam2Kills++;
 		        GivePlayerScoreEx(killerid, 1, true, true);
@@ -5291,7 +5291,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 		}
 		case gBG_TEAM2:
 		{
-  		    if(IsPlayerAvail(killerid) && gTeam[killerid] == gBG_TEAM2)
+  		    if(IsPlayerAvail(killerid) && gTeam[killerid] == gBG_TEAM1)
 		    {
 		        BGTeam1Kills++;
 		        GivePlayerScoreEx(killerid, 1, true, true);
