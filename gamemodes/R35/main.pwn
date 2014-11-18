@@ -627,8 +627,6 @@ enum SUSPECT:(<<= 1)
 	SUSPECT_VALID_ARMOR = 1,
 	SUSPECT_PROAIM,
 	SUSPECT_CRASHER_OPWS,
-	SUSPECT_CRASHER_OVM,
-	SUSPECT_AIMBOT,
 	SUSPECT_IMMUNE
 };
 
@@ -791,8 +789,6 @@ enum E_PLAYER_DATA // Prefixes: i = Integer, s = String, b = bool, f = Float, p 
 	Warnings,
 	RankSelected,
 	HitmanHit,
-	DmgMsg[10][64],
-	PlayerText:DmgBox[2],
 	Text3D:AdminDutyLabel,
 	Text3D:VIPLabel,
 	iLastChat,
@@ -3963,7 +3959,6 @@ public OnVehicleMod(playerid, vehicleid, componentid)
     if(GetPlayerInterior(playerid) == 0) // Crasher
     {
         Log(LOG_SUSPECT, "OnVehicleMod(%i, %i, %i) triggered by %s with world interior 0", playerid, vehicleid, componentid, __GetName(playerid));
-        PlayerData[playerid][bwSuspect] |= SUSPECT_CRASHER_OVM;
         return 0;
     }
 
@@ -3971,7 +3966,6 @@ public OnVehicleMod(playerid, vehicleid, componentid)
 	if(!IsComponentIdCompatible(model, componentid)) // Crasher
 	{
 	    Log(LOG_SUSPECT, "OnVehicleMod(%i, %i, %i) triggered by %s with invalid componentid using model %i", playerid, vehicleid, componentid, __GetName(playerid), model);
-	    PlayerData[playerid][bwSuspect] |= SUSPECT_CRASHER_OVM;
 		return 0;
 	}
 	
@@ -4018,73 +4012,7 @@ public OnPlayerTakeDamage(playerid, issuerid, Float:amount, weaponid, bodypart)
 
 public OnPlayerGiveDamage(playerid, damagedid, Float:amount, weaponid, bodypart)
 {
-	static const BodyParts[7][] =
-	{
-	    "Torso",
-	    "Groin",
-	    "Left_Arm",
-	    "Right_Arm",
-	    "Left_Leg",
-	    "Right_Leg",
-	    "Head"
-	};
-	
-	if(gTeam[playerid] == DM)
-	{
-		for(new i = 0; i < MAX_PLAYERS; i++)
-		{
-			if(gTeam[i] == SPEC && PlayerData[i][SpecID] == playerid)
-	   		{
-				if(bodypart < 3 || bodypart > 9)
-				    continue;
-				    
-	   		    format(gstr, sizeof(gstr), "%.02f DMG to ID:%i on %s", amount, damagedid, BodyParts[bodypart - 3]);
-	   		    PushDamageBox(i, gstr);
-			}
-		}
-	}
 	return 1;
-}
-
-CreateDamageBox(playerid)
-{
-    ClearDamageBox(playerid);
-}
-
-ClearDamageBox(playerid)
-{
-	for(new i = 0; i < 10; i++)
-	{
-		PlayerData[playerid][DmgBox][i][0] = '\0';
-	}
-	_AssembleDamageBoxText(playerid);
-}
-
-PushDamageBox(playerid, message[])
-{
-    _AssembleDamageBoxText(playerid);
-}
-
-_AssembleDamageBoxText(playerid)
-{
-	new string[1024];
-	for(new i = 0; i < 10; i++)
-	{
-	    strcat(string, PlayerData[playerid][DmgBox][i]);
-	    strcat(string, "\n");
-	}
-    PlayerTextDrawSetString(playerid, PlayerData[playerid][DmgBox][1], string);
-}
-
-DestoryDamageBox(playerid)
-{
-	if(PlayerData[playerid][DmgBox][0] != Text:-1)
-	{
-	    PlayerTextDrawDestroy(playerid, PlayerData[playerid][DmgBox][0]);
-	    PlayerTextDrawDestroy(playerid, PlayerData[playerid][DmgBox][1]);
-	    PlayerData[playerid][DmgBox][0] = Text:-1;
-	    PlayerData[playerid][DmgBox][1] = Text:-1;
-	}
 }
 
 public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY, Float:fZ)
@@ -4092,7 +4020,6 @@ public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY
 	/* Bullet Crasher http://forum.sa-mp.com/showthread.php?t=535559 */
 	if(hittype != BULLET_HIT_TYPE_NONE) {
 	    if( !( -1000.0 <= fX <= 1000.0 ) || !( -1000.0 <= fY <= 1000.0 ) || !( -1000.0 <= fZ <= 1000.0 ) ) {
-	        PlayerData[playerid][bwSuspect] |= SUSPECT_CRASHER_OPWS;
 		    return 0;
   		}
 	}
@@ -5355,7 +5282,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 		}
 		case gBG_TEAM1:
 		{
-  		    if(IsPlayerAvail(killerid) && gTeam[killerid] == gBG_TEAM2)
+  		    if(IsPlayerAvail(killerid) && gTeam[killerid] == gBG_TEAM1)
 		    {
 		        BGTeam2Kills++;
 		        GivePlayerScoreEx(killerid, 1, true, true);
@@ -5364,7 +5291,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 		}
 		case gBG_TEAM2:
 		{
-  		    if(IsPlayerAvail(killerid) && gTeam[killerid] == gBG_TEAM1)
+  		    if(IsPlayerAvail(killerid) && gTeam[killerid] == gBG_TEAM2)
 		    {
 		        BGTeam1Kills++;
 		        GivePlayerScoreEx(killerid, 1, true, true);
@@ -10076,30 +10003,22 @@ YCMD:suspect(playerid, params[], help)
 				GetPlayerArmour(i, tmp);
 
 				if(tmp >= 1.0 && !(PlayerData[i][bwSuspect] & SUSPECT_VALID_ARMOR)) {
-	                format(tmpstring, sizeof(tmpstring), "%i) %s(%i) - AC_ARMOR\n", ++count, __GetName(i), i);
+	                format(tmpstring, sizeof(tmpstring), "%i) %s(%i) - AC_SUSPECT_ARMOR\n", ++count, __GetName(i), i);
 	                strcat(finstring, tmpstring);
 				}
 
                 /* JETPACK CHECK */
 				if(GetPlayerSpecialAction(i) == SPECIAL_ACTION_USEJETPACK) {
-	                format(tmpstring, sizeof(tmpstring), "%i) %s(%i) - AC_JETPACK\n", ++count, __GetName(i), i);
+	                format(tmpstring, sizeof(tmpstring), "%i) %s(%i) - AC_SUSPECT_JETPACK\n", ++count, __GetName(i), i);
 	                strcat(finstring, tmpstring);
 				}
 			}
    			if(PlayerData[i][bwSuspect] & SUSPECT_PROAIM) {
-   			    format(tmpstring, sizeof(tmpstring), "%i) %s(%i) - AC_PROAIM\n", ++count, __GetName(i), i);
+   			    format(tmpstring, sizeof(tmpstring), "%i) %s(%i) - AC_SUSPECT_PROAIM\n", ++count, __GetName(i), i);
    			    strcat(finstring, tmpstring);
    			}
    			if(PlayerData[i][bwSuspect] & SUSPECT_CRASHER_OPWS) {
-   			    format(tmpstring, sizeof(tmpstring), "%i) %s(%i) - AC_CRASHER_OPWS\n", ++count, __GetName(i), i);
-				strcat(finstring, tmpstring);
-   			}
-   			if(PlayerData[i][bwSuspect] & SUSPECT_CRASHER_OVM) {
-   			    format(tmpstring, sizeof(tmpstring), "%i) %s(%i) - AC_CRASHER_OVM\n", ++count, __GetName(i), i);
-				strcat(finstring, tmpstring);
-   			}
-   			if(PlayerData[i][bwSuspect] & SUSPECT_AIMBOT) {
-   			    format(tmpstring, sizeof(tmpstring), "%i) %s(%i) - AC_AIMBOT\n", ++count, __GetName(i), i);
+   			    format(tmpstring, sizeof(tmpstring), "%i) %s(%i) - AC_SUSPECT_CRASHER_OPWS\n", ++count, __GetName(i), i);
 				strcat(finstring, tmpstring);
    			}
 		}
@@ -15491,7 +15410,6 @@ YCMD:specoff(playerid, params[], help)
 		    ResetPlayerWorld(playerid);
 		    PlayerData[playerid][SpecID] = INVALID_PLAYER_ID;
 			TogglePlayerSpectating(playerid, false);
-			DestoryDamageBox(playerid);
 		}
 		else
 		{
@@ -31191,7 +31109,6 @@ ResetPlayerVars(playerid)
 	GunGame_Player[playerid][dead] = true;
 	GunGame_Player[playerid][pw] = true;
 	strmid(LastPlayerText[playerid], " ", 0, 144, 144);
-    DestoryDamageBox(playerid);
 
 	for(new i = 0; E_PLAYER_ACH_DATA:i < E_PLAYER_ACH_DATA; i++)
 	{
