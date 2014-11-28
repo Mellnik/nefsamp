@@ -37,9 +37,9 @@
 
 #pragma dynamic 8192        // for md-sort
 
-#define IS_RELEASE_BUILD (true)
+#define IS_RELEASE_BUILD (false)
 #define INC_ENVIRONMENT (true)
-#define WINTER_EDITION (false) // Requires FS ferriswheelfair.amx
+#define WINTER_EDITION (true) // Requires FS ferriswheelfair.amx
 #define _YSI_NO_VERSION_CHECK
 #define YSI_IS_SERVER
 
@@ -1043,7 +1043,7 @@ enum E_BUSINESS_DATA
 	e_pickup_id
 };
 
-enum e_prop_matrix
+enum e_buss_matrix
 {
 	E_blevel,
 	E_bupgradeprice,
@@ -1892,7 +1892,7 @@ static const g_sCustomCarCategories[11][] =
  	/*10*/{"Aircraft"}
 };
 
-static const BusinessLevelMatrix[21][e_prop_matrix] =
+static const BusinessLevelMatrix[21][e_buss_matrix] =
 {
 	{1, 0, 1000},
 	{2, 5000, 1250},
@@ -25817,6 +25817,7 @@ function:QueueProcess()
 {
 	mysql_pquery(pSQL, "SELECT * FROM `queue` WHERE `ExecutionDate` < UNIX_TIMESTAMP();", "OnQueueReceived", "");
 	
+	/* PAYDAY PROCESS */
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(!IsPlayerAvail(i))
@@ -25825,13 +25826,91 @@ function:QueueProcess()
 	    if(IsPlayerOnDesktop(i, 30000))
 			continue;
 	
-		if(PlayerData[i][e_payday] > 1)
+		if(PlayerData[i][e_payday] > 0)
 		{
 		    PlayerData[i][e_payday]--;
 		}
-		else if(PlayerData[i][e_payday] <= 1)
+		else if(PlayerData[i][e_payday] <= 0)
 		{
 		    PlayerData[i][e_payday] = 60;
+		    
+		    /* BANK INTEREST RULES:
+		    - less than $1kk + playing hours less than 35
+				1.5% of Bank Credit
+			- less than $1kk
+				1.0% of Bank Credit
+			- less than $5kk
+				0.5% of Bank Credit
+			- less than $10kk
+				0.25% of Bank Credit
+			- greater than $10kk
+				0.1% of Bank Credit
+
+			VIPs get 1/4 of the interests on top of it
+		    */
+
+			new Float:bmul;
+			new BankInterest,
+			    BankInterestVIP,
+			    BusinessInterest,
+			    BusinessInterestVIP;
+		    
+		    if(PlayerData[i][e_bank] > 0 && PlayerData[i][e_bank] < 1000000 && hours < 35)
+		        bmul = 1.5;
+		    else if(PlayerData[i][e_bank] > 0 && PlayerData[i][e_bank] < 1000000)
+		        bmul = 1.0;
+		    else if(PlayerData[i][e_bank] <= 5000000)
+		        bmul = 0.5;
+		    else if(PlayerData[i][e_bank] <= 10000000)
+		        bmul = 0.25;
+		    else if(PlayerData[i][e_bank] > 10000000)
+		        bmul = 0.25;
+		    else
+		        bmul = 0.0;
+
+            GameTextForPlayer(i, "~g~~h~~h~PayDay~n~~w~Paycheck", 6000, 1);
+			SCM(i, -1, ""green"|--------------------"yellow"PAY-DAY"green"-------------------|");
+            format(string0, sizeof(string0), "Bank balance before PayDay: "green"$%s", number_format(PlayerData[i][e_bank]));
+
+			if(bmul > 0.0)
+			{
+				BankInterest = floatround((PlayerData[i][e_bank] * bmul) / 100.0, floatround_round);
+			    BankInterestVIP = BankInterest / 2.5;
+			    
+				format(string1, sizeof(string1), "Bank interest gained: "green"$%s", number_format(interest));
+
+				if(PlayerData[i][e_vip] == 1)
+		        	format(string4, sizeof(string4), "Bank interest gained "lb_e"(VIP BOOST)"white": "green"$%s", number_format(vipinterest));
+		        else
+					format(string4, sizeof(string4), "Bank interest gained "lb_e"(VIP BOOST)"white": "red"---");
+			}
+			else
+			{
+			    BankInterest = 0;
+			    BankInterestVIP = 0;
+			}
+		    
+			if(GetPlayerBusinessCount(__GetName(i)) > 0)
+			{
+			    BusinessInterest = GetPlayerBusinessEarnings(i);
+			    BusinessInterestVIP = floatround(BusinessInterest / 2.5, floatround_round);
+			    
+			    format(string3, sizeof(string3), "Business earnings: "green"$%s", number_format(BusinessInterest));
+			    
+			   	if(PlayerData[i][e_vip] == 1)
+			   		format(string5, sizeof(string5), "Business earnings "lb_e"(VIP BOOST)"white": "green"$%s", number_format(BusinessInterestVIP));
+				else
+					format(string5, sizeof(string5), "Business earnings "lb_e"(VIP BOOST)"white": "red"---");
+			}
+			else
+			{
+				format(string3, sizeof(string3), "Business earnings: "red"--- (You don't own any business)");
+				format(string5, sizeof(string5), "Business earnings "lb_e"(VIP BOOST)"white": "red"---");
+			}
+			
+			format(string2, sizeof(string2), "Bank balance after PayDay: "green"$%s", number_format(PlayerData[i][e_bank]))
+			SCM(i, -1, ""green"|--------------------------------------------------|");
+		    
 		    
 		    new string0[100],
 				string1[100],

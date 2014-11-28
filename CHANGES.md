@@ -1,12 +1,16 @@
 New Evolution Freeroam SA-MP Server
 ===================================
 
-Build 36
+Build 36 (Winter Edition)
 --------
+- Enabled Winter Edition, join at /xmas :)
+- Added new gang page, showing all information about a certain gang.
 - Added bullet hit information to /spec for admins.
+- Improved /help information for new players.
 - Fixed TDM bug where you don't get any score.
 - Fixed dialog bug in custom car shops.
-- Fixed audiostreams at some places.
+- Fixed audiostreams in /radio and at dynamic places.
+- Fixed PayDay bugs; new rules applied.
 
 Build 35
 --------
