@@ -2709,10 +2709,10 @@ static const pv_lights[2][0] =
 	{1024}
 };
 
-new Iterator:RaceJoins<MAX_PLAYERS>,
-	Iterator:DerbyVoters<MAX_PLAYERS>,
-	Iterator:PlayerIgnore[MAX_PLAYERS]<MAX_PLAYERS>,
-	Iterator:itterLottoNumberPool<75>,
+new Iterator:iterRaceJoins<MAX_PLAYERS>,
+	Iterator:iterDerbyVoters<MAX_PLAYERS>,
+	Iterator:iterPlayerIgnore[MAX_PLAYERS]<MAX_PLAYERS>,
+	Iterator:iterLottoNumberPool<75>,
 	Iterator:iterGangWar<3000>,
 	Float:g_RaceVehCoords[RACE_MAX_PLAYERS][4],
 	Float:g_RaceCPs[RACE_MAX_CHECKPOINTS][3],
@@ -3836,9 +3836,9 @@ public OnPlayerDisconnect(playerid, reason)
     	    SCM(i, -1, ""red"Player disconnected!");
 		}
 
-  		if(Iter_Contains(PlayerIgnore[i], playerid))
+  		if(Iter_Contains(iterPlayerIgnore[i], playerid))
 	    {
-	        Iter_Remove(PlayerIgnore[i], playerid);
+	        Iter_Remove(iterPlayerIgnore[i], playerid);
 	    }
 	    
         if(PlayerData[i][DuelRequestRecv] == playerid)
@@ -10905,7 +10905,7 @@ YCMD:go(playerid, params[], help)
 			if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 			if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 			if(!IsPlayerAvail(player)) return SCM(playerid, -1, ""er"Player is not avialable");
-  			if(Iter_Contains(PlayerIgnore[player], playerid)) return SCM(playerid, -1, ""er"This player ignores you");
+  			if(Iter_Contains(iterPlayerIgnore[player], playerid)) return SCM(playerid, -1, ""er"This player ignores you");
 			if(player == playerid) return SCM(playerid, -1, ""er"You may not teleport to yourself");
 			if(gTeam[player] != FREEROAM) return SCM(playerid, -1, ""er"Player is currently unavailable to goto");
 			if(PlayerData[player][e_wanteds] != 0) return SCM(playerid, -1, ""er"This player has wanteds");
@@ -14070,7 +14070,7 @@ YCMD:race(playerid, params[], help)
     {
         case RaceStatus_StandBy:
         {
-            Iter_Clear(RaceJoins);
+            Iter_Clear(iterRaceJoins);
             g_RaceStatus = RaceStatus_StartUp;
             g_tRaceCounter = SetTimer("race_countdown", 1000, true);
         }
@@ -14086,7 +14086,7 @@ YCMD:race(playerid, params[], help)
     
     if(g_RaceStatus == RaceStatus_StartUp)
     {
-		if(Iter_Contains(RaceJoins, playerid))
+		if(Iter_Contains(iterRaceJoins, playerid))
 		{
 			SCM(playerid, -1, ""er"Please wait for the next race, you already joined this race round once!");
 		}
@@ -14097,7 +14097,7 @@ YCMD:race(playerid, params[], help)
 		    CheckPlayerGod(playerid);
 
 			Command_ReProcess(playerid, "/stopanims", false);
-			Iter_Add(RaceJoins, playerid);
+			Iter_Add(iterRaceJoins, playerid);
 			race_player_setup(playerid);
 			NewMinigameJoin(playerid, "Race", "race");
 		}
@@ -16292,10 +16292,10 @@ YCMD:lotto(playerid, params[], help)
 	}
 	
 	if(lotto < 1 || lotto > 75) return SCM(playerid, -1, ""er"Invalid lotto number");
-	if(Iter_Contains(itterLottoNumberPool, lotto)) return SCM(playerid, -1, ""er"This lotto number is already in use!");
+	if(Iter_Contains(iterLottoNumberPool, lotto)) return SCM(playerid, -1, ""er"This lotto number is already in use!");
 	
 	PlayerData[playerid][DrawnNumber] = lotto;
-	Iter_Add(itterLottoNumberPool, PlayerData[playerid][DrawnNumber]);
+	Iter_Add(iterLottoNumberPool, PlayerData[playerid][DrawnNumber]);
 	
 	GivePlayerMoneyEx(playerid, -500);
 	
@@ -16466,14 +16466,14 @@ YCMD:ignore(playerid, params[], help)
 	if(player == playerid) return SCM(playerid, -1, ""er"You cannot ignore yourself!");
 	if(PlayerData[player][e_level] > 0) return SCM(playerid, -1, ""er"You cannot ignore Admins!");
 
-	if(Iter_Contains(PlayerIgnore[playerid], player))
+	if(Iter_Contains(iterPlayerIgnore[playerid], player))
 	{
 		format(gstr, sizeof(gstr), ""er"You are already ignoring %s(%i)! Use /unignore to unignore.", __GetName(player), player);
 		SCM(playerid, -1, gstr);
 		return 1;
 	}
 
-	Iter_Add(PlayerIgnore[playerid], player);
+	Iter_Add(iterPlayerIgnore[playerid], player);
 
 	format(gstr, sizeof(gstr), "[IGNORE] %s(%i) is now ignored by you.", __GetName(player), player);
 	SCM(playerid, YELLOW, gstr);
@@ -16494,14 +16494,14 @@ YCMD:unignore(playerid, params[], help)
     if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 	if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 
-	if(!Iter_Contains(PlayerIgnore[playerid], player))
+	if(!Iter_Contains(iterPlayerIgnore[playerid], player))
 	{
 		format(gstr, sizeof(gstr), ""er"You aren't ignoring %s(%i)! Use /ignore to ignore.", __GetName(player), player);
 		SCM(playerid, -1, gstr);
 		return 1;
 	}
 
-	Iter_Remove(PlayerIgnore[playerid], player);
+	Iter_Remove(iterPlayerIgnore[playerid], player);
 
 	format(gstr, sizeof(gstr), "[IGNORE] %s(%i) is not ignored by you anymore.", __GetName(player), player);
 	SCM(playerid, YELLOW, gstr);
@@ -16657,7 +16657,7 @@ YCMD:pm(playerid, params[], help)
 	{
 	    return SCM(playerid, -1, ""er"You can't pm yourself");
 	}
-	if(Iter_Contains(PlayerIgnore[player], playerid))
+	if(Iter_Contains(iterPlayerIgnore[player], playerid))
 	{
 	    return SCM(playerid, -1, ""er"This player has blocked you from PMing him");
 	}
@@ -16722,7 +16722,7 @@ YCMD:r(playerid, params[], help)
 	{
 		return SCM(playerid, -1, ""er"Player is not connected!");
 	}
-	if(Iter_Contains(PlayerIgnore[lID], playerid))
+	if(Iter_Contains(iterPlayerIgnore[lID], playerid))
 	{
 	    return SCM(playerid, -1, ""er"This player has blocked you from PMing him");
 	}
@@ -19577,9 +19577,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        {
 				if(!IsDerbyRunning)
 				{
-				    if(Iter_Contains(DerbyVoters, playerid)) return SCM(playerid, -1, ""er"You already voted this round");
+				    if(Iter_Contains(iterDerbyVoters, playerid)) return SCM(playerid, -1, ""er"You already voted this round");
 				    
-				    Iter_Add(DerbyVoters, playerid);
+				    Iter_Add(iterDerbyVoters, playerid);
 				
 				    switch(listitem)
 				    {
@@ -23273,7 +23273,7 @@ server_initialize()
 	// Variable setting
     CurrentBGMap = BG_VOTING;
 	StartTime = gettime();
-	Iter_Init(PlayerIgnore);
+	Iter_Init(iterPlayerIgnore);
 	
 	for(new i = 1; i < MAX_REPORTS; i++)
 		Reports[i] = "<none>";
@@ -26644,7 +26644,7 @@ function:ClearDerbyVotes()
 	    DerbyMapVotes[i] = 0;
 	}
 	
-	Iter_Clear(DerbyVoters);
+	Iter_Clear(iterDerbyVoters);
 	return 1;
 }
 
@@ -28712,7 +28712,7 @@ function:InfoTD_Hide(playerid)
 
 function:DoLotto()
 {
-	Iter_Clear(itterLottoNumberPool);
+	Iter_Clear(iterLottoNumberPool);
 	g_LottoNumber = random(75) + 1;
 	g_LottoJackpot = 200000 + random(100000);
 	bLottoActive = true;
@@ -29865,7 +29865,7 @@ race_prepare()
 	    g_RaceCPs[i][2] = dini_Float(file, gstr);
 	}
 
-	Iter_Clear(RaceJoins);
+	Iter_Clear(iterRaceJoins);
 	
     g_rPosition = 0;
 	g_RaceTime = MAX_RACE_TIME;
@@ -31239,7 +31239,7 @@ ResetPlayerVars(playerid)
 	    PlayerAchData[playerid][E_PLAYER_ACH_DATA:i][0] = 0;
 	}
 
-    Iter_Clear(PlayerIgnore[playerid]);
+    Iter_Clear(iterPlayerIgnore[playerid]);
 
 	SetPVarInt(playerid, "LastID", INVALID_PLAYER_ID);
     SetPVarInt(playerid, "doingStunt", 0);
