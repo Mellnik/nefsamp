@@ -174,7 +174,7 @@ cell AMX_NATIVE_CALL Native::UnixtimeToDate(AMX *amx, cell *params)
 		logprintf("[NEFMOD] [debug] CRASH DETECTED! amx_Addr = NULL from amx_GetAddr in UnixtimeToDate");
 		return 0;
 	}
-	amx_SetString(amx_Addr, date, 0, 0, params[3] > 0 ? params[3] : sizeof(date));
+	amx_SetString(amx_Addr, date, 0, 0, params[3] > 0 ? params[3] : std::strlen(date));
 	return 1;
 }
 
