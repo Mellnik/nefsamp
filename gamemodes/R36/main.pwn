@@ -38,7 +38,7 @@
 #pragma dynamic 8192        // for md-sort
 
 #define IS_RELEASE_BUILD (false)
-#define INC_ENVIRONMENT (true)
+#define INC_ENVIRONMENT (false)
 #define WINTER_EDITION (true) // Requires FS ferriswheelfair.amx
 #define _YSI_NO_VERSION_CHECK
 #define YSI_IS_SERVER
@@ -791,7 +791,7 @@ enum E_PLAYER_DATA // Prefixes: i = Integer, s = String, b = bool, f = Float, p 
 	Warnings,
 	RankSelected,
 	HitmanHit,
-	DmgMsg[10][64],
+	DmgMsg[10],
 	PlayerText:DmgBox[2],
 	Text3D:AdminDutyLabel,
 	Text3D:VIPLabel,
@@ -4046,44 +4046,45 @@ public OnPlayerGiveDamage(playerid, damagedid, Float:amount, weaponid, bodypart)
 	return 1;
 }
 
-CreateDamageBox(playerid)
+stock CreateDamageBox(playerid)
 {
     ClearDamageBox(playerid);
 }
 
-ClearDamageBox(playerid)
+stock ClearDamageBox(playerid)
 {
 	for(new i = 0; i < 10; i++)
 	{
-		PlayerData[playerid][DmgBox][i][0] = '\0';
+		PlayerData[playerid][DmgMsg][i][0] = '\0';
 	}
 	_AssembleDamageBoxText(playerid);
 }
 
-PushDamageBox(playerid, message[])
+stock PushDamageBox(playerid, message[])
 {
+	#pragma unused message
     _AssembleDamageBoxText(playerid);
 }
 
-_AssembleDamageBoxText(playerid)
+stock _AssembleDamageBoxText(playerid)
 {
 	new string[1024];
 	for(new i = 0; i < 10; i++)
 	{
-	    strcat(string, PlayerData[playerid][DmgBox][i]);
+	    strcat(string, PlayerData[playerid][DmgMsg][i]);
 	    strcat(string, "\n");
 	}
     PlayerTextDrawSetString(playerid, PlayerData[playerid][DmgBox][1], string);
 }
 
-DestoryDamageBox(playerid)
+stock DestoryDamageBox(playerid)
 {
-	if(PlayerData[playerid][DmgBox][0] != Text:-1)
+	if(PlayerData[playerid][DmgBox][0] != PlayerText:-1)
 	{
 	    PlayerTextDrawDestroy(playerid, PlayerData[playerid][DmgBox][0]);
 	    PlayerTextDrawDestroy(playerid, PlayerData[playerid][DmgBox][1]);
-	    PlayerData[playerid][DmgBox][0] = Text:-1;
-	    PlayerData[playerid][DmgBox][1] = Text:-1;
+	    PlayerData[playerid][DmgBox][0] = PlayerText:-1;
+	    PlayerData[playerid][DmgBox][1] = PlayerText:-1;
 	}
 }
 
@@ -25816,8 +25817,8 @@ function:DerbyFallOver()
 function:QueueProcess()
 {
 	mysql_pquery(pSQL, "SELECT * FROM `queue` WHERE `ExecutionDate` < UNIX_TIMESTAMP();", "OnQueueReceived", "");
-	
-	/* PAYDAY PROCESS */
+
+    /* PAYDAY PROCESS */
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    if(!IsPlayerAvail(i))
@@ -25847,7 +25848,14 @@ function:QueueProcess()
 				0.1% of Bank Credit
 
 			VIPs get 1/4 of the interests on top of it
-		    */
+			*/
+
+		    new string0[100],
+				string1[100],
+				string2[100],
+				string3[100],
+				string4[100],
+				string5[100];
 
 			new Float:bmul;
 			new BankInterest,
@@ -25855,7 +25863,7 @@ function:QueueProcess()
 			    BusinessInterest,
 			    BusinessInterestVIP;
 		    
-		    if(PlayerData[i][e_bank] > 0 && PlayerData[i][e_bank] < 1000000 && hours < 35)
+		    if(PlayerData[i][e_bank] > 0 && PlayerData[i][e_bank] < 1000000 && PlayerData[i][e_time] < 126000)
 		        bmul = 1.5;
 		    else if(PlayerData[i][e_bank] > 0 && PlayerData[i][e_bank] < 1000000)
 		        bmul = 1.0;
@@ -25868,19 +25876,17 @@ function:QueueProcess()
 		    else
 		        bmul = 0.0;
 
-            GameTextForPlayer(i, "~g~~h~~h~PayDay~n~~w~Paycheck", 6000, 1);
-			SCM(i, -1, ""green"|--------------------"yellow"PAY-DAY"green"-------------------|");
             format(string0, sizeof(string0), "Bank balance before PayDay: "green"$%s", number_format(PlayerData[i][e_bank]));
 
 			if(bmul > 0.0)
 			{
 				BankInterest = floatround((PlayerData[i][e_bank] * bmul) / 100.0, floatround_round);
-			    BankInterestVIP = BankInterest / 2.5;
+			    BankInterestVIP = floatround(BankInterest / 2.5, floatround_round);
 			    
-				format(string1, sizeof(string1), "Bank interest gained: "green"$%s", number_format(interest));
+				format(string1, sizeof(string1), "Bank interest gained: "green"$%s", number_format(BankInterest));
 
 				if(PlayerData[i][e_vip] == 1)
-		        	format(string4, sizeof(string4), "Bank interest gained "lb_e"(VIP BOOST)"white": "green"$%s", number_format(vipinterest));
+		        	format(string4, sizeof(string4), "Bank interest gained "lb_e"(VIP BOOST)"white": "green"$%s", number_format(BankInterestVIP));
 		        else
 					format(string4, sizeof(string4), "Bank interest gained "lb_e"(VIP BOOST)"white": "red"---");
 			}
@@ -25908,60 +25914,13 @@ function:QueueProcess()
 				format(string5, sizeof(string5), "Business earnings "lb_e"(VIP BOOST)"white": "red"---");
 			}
 			
-			format(string2, sizeof(string2), "Bank balance after PayDay: "green"$%s", number_format(PlayerData[i][e_bank]))
-			SCM(i, -1, ""green"|--------------------------------------------------|");
-		    
-		    
-		    new string0[100],
-				string1[100],
-				string2[100],
-				string3[100],
-				string4[100],
-				string5[100],
-				interest = floatround(floatmul(floatdiv(PlayerData[i][e_bank], 2300.0), 7.0), floatround_round),
-				vipinterest = floatround(interest / 2.5),
-				b_vipearnings = 0;
-
-			GameTextForPlayer(i, "~g~~h~~h~PayDay~n~~w~Paycheck", 6000, 1);
-
-		    if((PlayerData[i][e_bank] + PlayerData[i][e_money]) < 50000000)
-		    {
-				format(string0, sizeof(string0), "Bank balance before PayDay: "green"$%s", number_format(PlayerData[i][e_bank]));
-				format(string1, sizeof(string1), "Bank interest gained: "green"$%s", number_format(interest));
-
-				if(PlayerData[i][e_vip] == 1)
-		        	format(string4, sizeof(string4), "Bank interest gained "lb_e"(VIP BOOST)"white": "green"$%s", number_format(vipinterest));
-		        else
-					format(string4, sizeof(string4), "Bank interest gained "lb_e"(VIP BOOST)"white": "red"---");
-		    }
-		    else
-		    {
-		        interest = 0;
-                vipinterest = 0;
-			}
+			PlayerData[i][e_bank] = PlayerData[i][e_bank] + BusinessInterest + BusinessInterestVIP + BankInterest + BankInterestVIP;
 			
-			if(GetPlayerBusinessCount(__GetName(i)) > 0)
-			{
-			    b_vipearnings = floatround(GetPlayerBusinessEarnings(i) / 2.5);
-			    format(string3, sizeof(string3), "Business earnings: "green"$%s", number_format(GetPlayerBusinessEarnings(i)));
-			   	if(PlayerData[i][e_vip] == 1)
-   				{
-			   		format(string5, sizeof(string5), "Business earnings "lb_e"(VIP BOOST)"white": "green"$%s", number_format(b_vipearnings));
-				}
-				else format(string5, sizeof(string5), "Business earnings "lb_e"(VIP BOOST)"white": "red"---");
-			}
-			else
-			{
-				format(string3, sizeof(string3), "Business earnings: "red"--- (You don't own any business)");
-				format(string5, sizeof(string5), "Business earnings "lb_e"(VIP BOOST)"white": "red"---");
-			}
-
-			PlayerData[i][e_bank] = PlayerData[i][e_bank] + interest + GetPlayerBusinessEarnings(i) + vipinterest + b_vipearnings;
-
 			format(string2, sizeof(string2), "Bank balance after PayDay: "green"$%s", number_format(PlayerData[i][e_bank]));
-
+			
+            GameTextForPlayer(i, "~g~~h~~h~PayDay~n~~w~Paycheck", 6000, 1);
 			SCM(i, -1, ""green"|--------------------"yellow"PAY-DAY"green"-------------------|");
-		    if((PlayerData[i][e_bank] + PlayerData[i][e_money]) < 50000000)
+		    if(bmul > 0.0)
 		    {
 				SCM(i, WHITE, string0);
 				SCM(i, WHITE, string1);
