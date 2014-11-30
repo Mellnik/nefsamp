@@ -5374,7 +5374,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 		}
 		case DM, WAR, gSAWN:
 		{
-  		    if(IsPlayerAvail(killerid) && killerid != INVALID_PLAYER_ID)
+  		    if(IsPlayerAvail(killerid))
 		    {
 				switch(gTeam[killerid])
 				{
@@ -5398,18 +5398,21 @@ public OnPlayerDeath(playerid, killerid, reason)
 		}
 		case CNR:
 		{
-		    if(gTeam[killerid] != INVALID_PLAYER_ID && gTeam[killerid] == CNR)
+		    if(gTeam[killerid] != INVALID_PLAYER_ID)
 		    {
-	  		    if(IsPlayerAvail(killerid))
-			    {
-			        GivePlayerScoreEx(killerid, 2, true, true);
-					GivePlayerMoneyEx(killerid, 3000, true, true);
-			    }
+		        if(gTeam[killerid] == CNR)
+		        {
+		  		    if(IsPlayerAvail(killerid))
+				    {
+				        GivePlayerScoreEx(killerid, 2, true, true);
+						GivePlayerMoneyEx(killerid, 3000, true, true);
+				    }
 
-			    if(GetPVarInt(playerid, "Robber") == 1)
-			    {
-			        SetPlayerWantedLevel(playerid, GetPlayerWantedLevel(playerid) + 1);
-			    }
+				    if(GetPVarInt(playerid, "Robber") == 1)
+				    {
+				        SetPlayerWantedLevel(playerid, GetPlayerWantedLevel(playerid) + 1);
+				    }
+				}
 			}
 		}
 		case GUNGAME:
@@ -21877,7 +21880,7 @@ derby_broadcast(const string[])
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(IsPlayerAvail(i) && (gTeam[i] == DERBY))
+		if(IsPlayerAvail(i) && gTeam[i] == DERBY)
 		{
 			SCM(i, -1, gstr);
 		}
