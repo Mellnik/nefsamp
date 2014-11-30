@@ -7238,7 +7238,7 @@ YCMD:mh(playerid, params[], help)
 {
 	if(PortPlayerMapVeh(playerid,-182.9842, -2245.7412, 31.1492, 125.6378, -182.9842, -2245.7412, 31.1492, 125.6378, "Mellnik's House", "mh"))
 	{
-	    PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=83836", -182.9842,-2245.7412,31.1492, 100.0, 1);
+	    PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=70545", -182.9842,-2245.7412,31.1492, 100.0, 1);
 	}
 	return 1;
 }
@@ -7246,7 +7246,7 @@ YCMD:ch(playerid, params[], help)
 {
 	if(PortPlayerMapVeh(playerid,2002.9380, -3656.5505, 5.4980, 90, 2002.9380, -3656.5505, 5.4980, 90, "Chris House", "ch"))
 	{
-	    PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=83836", 2002.9380, -3656.5505, 5.4980, 100.0, 1);
+	    PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=70545", 2002.9380, -3656.5505, 5.4980, 100.0, 1);
 	}
 	return 1;
 }
@@ -7254,7 +7254,7 @@ YCMD:ah(playerid, params[], help)
 {
 	if(PortPlayerMap(playerid, 3133.7415, -1107.2448, 2.1289, 352.5349, "Adam's House", "ah"))
 	{
-	    PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=83836", 3133.7415, -1107.2448, 2.1289, 100.0, 1);
+	    PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=70545", 3133.7415, -1107.2448, 2.1289, 100.0, 1);
 	}
 	return 1;
 }
@@ -7369,7 +7369,7 @@ YCMD:party(playerid, params[], help)
 {
     if(PortPlayerMap(playerid, -377.2038,2131.4634,133.1797,227.9924, "Party", "party"))
 	{
-	    PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=83836", -377.2038, 2131.4634, 133.1797, 50.0, 1);
+	    PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=70545", -377.2038, 2131.4634, 133.1797, 50.0, 1);
 	}
     return 1;
 }
@@ -13843,7 +13843,7 @@ YCMD:adminhq(playerid, params[], help)
 		format(gstr, sizeof(gstr), ""nef" Admin %s(%i) teleported to Admin's Headquarter! (/adminhq)", __GetName(playerid), playerid);
 		SCMToAll(-1, gstr);
 	 	ResetPlayerWorld(playerid);
-	 	PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=83836", 1797.3141, -1302.0978, 120.2659, 50.0, 1);
+	 	PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=70545", 1797.3141, -1302.0978, 120.2659, 50.0, 1);
 	}
 	else if(PlayerData[playerid][e_vip] == 1)
 	{
@@ -13851,7 +13851,7 @@ YCMD:adminhq(playerid, params[], help)
 		format(gstr, sizeof(gstr), ""nef" VIP %s(%i) teleported to Admin's Headquarter! (/adminhq)", __GetName(playerid), playerid);
 		SCMToAll(-1, gstr);
 	 	ResetPlayerWorld(playerid);
-	 	PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=83836", 1797.3141, -1302.0978, 120.2659, 50.0, 1);
+	 	PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=70545", 1797.3141, -1302.0978, 120.2659, 50.0, 1);
 	}
 	else
 	{
@@ -13859,7 +13859,7 @@ YCMD:adminhq(playerid, params[], help)
 		format(gstr, sizeof(gstr), ""nef" Player %s(%i) teleported to Admin's Headquarter! (/adminhq)", __GetName(playerid), playerid);
 		SCMToAll(-1, gstr);
 	    ResetPlayerWorld(playerid);
-		PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=83836", 1797.3141, -1302.0978, 120.2659, 50.0, 1);
+		PlayAudioStreamForPlayer(playerid, "http://yp.shoutcast.com/sbin/tunein-station.pls?id=70545", 1797.3141, -1302.0978, 120.2659, 50.0, 1);
 	}
 	return 1;
 }
@@ -25895,7 +25895,7 @@ function:QueueProcess()
 			    BankInterest = 0;
 			    BankInterestVIP = 0;
 			}
-		    
+
 			if(GetPlayerBusinessCount(__GetName(i)) > 0)
 			{
 			    BusinessInterest = GetPlayerBusinessEarnings(i);
