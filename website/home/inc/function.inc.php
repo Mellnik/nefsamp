@@ -22,6 +22,36 @@ function secondsToTime($seconds)
     return $obj;
 }
 
+function GetGangRankByLevel($level)
+{
+	$string = "None";
+	switch($level)
+	{
+		case 1:
+			$string = "Junior Member";
+			break;
+		case 2:
+			$string = "Member";
+			break;
+		case 3:
+			$string = "Senior Member";
+			break;
+		case 4:
+			$string = "Advisor";
+			break;
+		case 5:
+			$string = "Leader";
+			break;
+		case 6:
+			$string = "Co-Founder";
+			break;
+		case 7:
+			$string = "Founder";
+			break;
+	}
+	return $string;
+}
+
 function GetRankByLevel($level)
 {
 	$string = "Player";
