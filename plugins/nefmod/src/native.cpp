@@ -62,7 +62,7 @@ cell AMX_NATIVE_CALL Native::AddTeleport(AMX *amx, cell *params)
 	
 	if (std::strlen(tp_cmd) > MAX_TELE_COMMAND_NAME)
 	{
-		logprintf("[NEFMOD] tp_cmd %s size overflow (%i). Allowed: %i.", tp_cmd, std::strlen(tp_cmd), MAX_TELE_COMMAND_NAME);
+		logprintf("[NEFMOD] tp_cmd %s size overflow (%i), allowed: %i.", tp_cmd, std::strlen(tp_cmd), MAX_TELE_COMMAND_NAME);
 		return 0;
 	}
 	

@@ -19448,81 +19448,96 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        }
 		    case TELE_DIALOG:
 		    {
+				if(listitem < 0 || listitem > 8)
+					return true;
+
+				GetTeleportDialogString(listitem);
+					
 		        switch(listitem)
 		        {
 		            case 0: // Stunt Zones
 		            {
-						ShowPlayerDialog(playerid, TELE_DIALOG + 1, DIALOG_STYLE_LIST, ""nef" :: Teleports > Stunt Zones", GetTeleportDialogString(0), "Select", "Back");
+						ShowPlayerDialog(playerid, TELE_DIALOG + 1, DIALOG_STYLE_LIST, ""nef" :: Teleports > Stunt Zones", g_dialogTpString, "Select", "Back");
 		            }
 		            case 1: // Jumps
 		            {
-						ShowPlayerDialog(playerid, TELE_DIALOG + 2, DIALOG_STYLE_LIST, ""nef" :: Teleports > Jumps", GetTeleportDialogString(1), "Select", "Back");
+						ShowPlayerDialog(playerid, TELE_DIALOG + 2, DIALOG_STYLE_LIST, ""nef" :: Teleports > Jumps", g_dialogTpString, "Select", "Back");
 					}
 		            case 2: // Fun Maps
 		            {
-						ShowPlayerDialog(playerid, TELE_DIALOG + 3, DIALOG_STYLE_LIST, ""nef" :: Teleports > Fun Maps", GetTeleportDialogString(2), "Select", "Back");
+						ShowPlayerDialog(playerid, TELE_DIALOG + 3, DIALOG_STYLE_LIST, ""nef" :: Teleports > Fun Maps", g_dialogTpString, "Select", "Back");
 					}
 		            case 3: // Challenges/Parkours
 		            {
-						ShowPlayerDialog(playerid, TELE_DIALOG + 4, DIALOG_STYLE_LIST, ""nef" :: Teleports > Challenges/Parkours", GetTeleportDialogString(3), "Select", "Back");
+						ShowPlayerDialog(playerid, TELE_DIALOG + 4, DIALOG_STYLE_LIST, ""nef" :: Teleports > Challenges/Parkours", g_dialogTpString, "Select", "Back");
 					}
 		            case 4: // Specials
 		            {
-						ShowPlayerDialog(playerid, TELE_DIALOG + 5, DIALOG_STYLE_LIST, ""nef" :: Teleports > Specials", GetTeleportDialogString(4), "Select", "Back");
+						ShowPlayerDialog(playerid, TELE_DIALOG + 5, DIALOG_STYLE_LIST, ""nef" :: Teleports > Specials", g_dialogTpString, "Select", "Back");
 					}
 		            case 5: // Hotspots
 		            {
-						ShowPlayerDialog(playerid, TELE_DIALOG + 6, DIALOG_STYLE_LIST, ""nef" :: Teleports > Hotspots", GetTeleportDialogString(5), "Select", "Back");
+						ShowPlayerDialog(playerid, TELE_DIALOG + 6, DIALOG_STYLE_LIST, ""nef" :: Teleports > Hotspots", g_dialogTpString, "Select", "Back");
 					}
 					case 6: // Drifts
 					{
-					    ShowPlayerDialog(playerid, TELE_DIALOG + 7, DIALOG_STYLE_LIST, ""nef" :: Teleports > Drifts", GetTeleportDialogString(6), "Select", "Back");
+					    ShowPlayerDialog(playerid, TELE_DIALOG + 7, DIALOG_STYLE_LIST, ""nef" :: Teleports > Drifts", g_dialogTpString, "Select", "Back");
 					}
 					case 7: // Tune Shops
 					{
-					    ShowPlayerDialog(playerid, TELE_DIALOG + 8, DIALOG_STYLE_LIST, ""nef" :: Teleports > Tune Shops", GetTeleportDialogString(7), "Select", "Back");
+					    ShowPlayerDialog(playerid, TELE_DIALOG + 8, DIALOG_STYLE_LIST, ""nef" :: Teleports > Tune Shops", g_dialogTpString, "Select", "Back");
 					}
 					case 8: // Cities
 					{
-					    ShowPlayerDialog(playerid, TELE_DIALOG + 9, DIALOG_STYLE_LIST, ""nef" :: Teleports > Cities", GetTeleportDialogString(8), "Select", "Back");
+					    ShowPlayerDialog(playerid, TELE_DIALOG + 9, DIALOG_STYLE_LIST, ""nef" :: Teleports > Cities", g_dialogTpString, "Select", "Back");
 					}
 		        }
+				return true;
 		    }
 		    case TELE_DIALOG + 1: // Stunt Zones
 		    {
 		        PushTeleportInput(playerid, 0, listitem);
+				return 1;
 		    }
 		    case TELE_DIALOG + 2: // Jumps
 		    {
 		        PushTeleportInput(playerid, 1, listitem);
+				return 1;
 		    }
 		    case TELE_DIALOG + 3: // Fun Maps
 		    {
 		        PushTeleportInput(playerid, 2, listitem);
+				return 1;
 		    }
 		    case TELE_DIALOG + 4: // Challenges/Parkours
 		    {
 		        PushTeleportInput(playerid, 3, listitem);
+				return 1;
 		    }
 		    case TELE_DIALOG + 5: // Specials
 		    {
 		        PushTeleportInput(playerid, 4, listitem);
+				return 1;
 		    }
 		    case TELE_DIALOG + 6: // Hotspots
 		    {
 		        PushTeleportInput(playerid, 5, listitem);
+				return 1;
 		    }
 		    case TELE_DIALOG + 7: // Drifts
 		    {
 		        PushTeleportInput(playerid, 6, listitem);
+				return 1;
 		    }
 		    case TELE_DIALOG + 8: // Tune Shops
 		    {
 		        PushTeleportInput(playerid, 7, listitem);
+				return 1;
 		    }
 		    case TELE_DIALOG + 9: // Cities
 		    {
 		        PushTeleportInput(playerid, 8, listitem);
+				return 1;
 		    }
 	        case GMENU_DIALOG:
 	        {
@@ -20622,6 +20637,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
  		    case CM_DIALOG + 1 .. CM_DIALOG + 15:
  		    {
  		        ShowDialog(playerid, CM_DIALOG);
+				return 1;
  		    }
 	        case VCONTROL_DIALOG + 1:
 	        {
@@ -20633,6 +20649,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				    vehicle = GetPlayerVehicleID(playerid);
      			GetVehicleParamsEx(vehicle, vehicle_params[0], vehicle_params[1], vehicle_params[2], vehicle_params[3], vehicle_params[4], vehicle_params[5], vehicle_params[6]);
             	SetVehicleParamsEx(vehicle, 0, vehicle_params[1], vehicle_params[2], vehicle_params[3], vehicle_params[4], vehicle_params[5], vehicle_params[6]);
+				return 1;
 	        }
 	        case VCONTROL_DIALOG + 2:
 	        {
@@ -20644,6 +20661,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				    vehicle = GetPlayerVehicleID(playerid);
      			GetVehicleParamsEx(vehicle, vehicle_params[0], vehicle_params[1], vehicle_params[2], vehicle_params[3], vehicle_params[4], vehicle_params[5], vehicle_params[6]);
 				SetVehicleParamsEx(vehicle, vehicle_params[0], 0, vehicle_params[2], vehicle_params[3], vehicle_params[4], vehicle_params[5], vehicle_params[6]);
+				return 1;
 	        }
 	        case VCONTROL_DIALOG + 3:
 	        {
@@ -20655,6 +20673,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				    vehicle = GetPlayerVehicleID(playerid);
      			GetVehicleParamsEx(vehicle, vehicle_params[0], vehicle_params[1], vehicle_params[2], vehicle_params[3], vehicle_params[4], vehicle_params[5], vehicle_params[6]);
 				SetVehicleParamsEx(vehicle, vehicle_params[0], vehicle_params[1], 0, vehicle_params[3], vehicle_params[4], vehicle_params[5], vehicle_params[6]);
+				return 1;
 	        }
 	        case VCONTROL_DIALOG + 4:
 	        {
@@ -20666,6 +20685,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				    vehicle = GetPlayerVehicleID(playerid);
      			GetVehicleParamsEx(vehicle, vehicle_params[0], vehicle_params[1], vehicle_params[2], vehicle_params[3], vehicle_params[4], vehicle_params[5], vehicle_params[6]);
 				SetVehicleParamsEx(vehicle, vehicle_params[0], vehicle_params[1], vehicle_params[2], vehicle_params[3], 0, vehicle_params[5], vehicle_params[6]);
+				return 1;
 	        }
 	        case VCONTROL_DIALOG + 5:
 	        {
@@ -20677,6 +20697,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				    vehicle = GetPlayerVehicleID(playerid);
      			GetVehicleParamsEx(vehicle, vehicle_params[0], vehicle_params[1], vehicle_params[2], vehicle_params[3], vehicle_params[4], vehicle_params[5], vehicle_params[6]);
 				SetVehicleParamsEx(vehicle, vehicle_params[0], vehicle_params[1], vehicle_params[2], vehicle_params[3], vehicle_params[4], 0, vehicle_params[6]);
+				return 1;
 	        }
  		    case GMENU_DIALOG + 1:
  		    {
@@ -28308,19 +28329,19 @@ AddTeleport(teleport_category, const teleport_name[], const teleport_cmd[], Floa
 GetTeleportDialogString(teleport_category)
 {
     g_dialogTpString[0] = '\0';
+	
     if(NC_GetTeleportDialogString(teleport_category, g_dialogTpString, sizeof(g_dialogTpString)) == 0)
 	{
 	    printf("NC_GetTeleportDialogString returned 0");
 	    PrintAmxBacktrace();
 	    strmid(g_dialogTpString, "DEAD", 0, sizeof(g_dialogTpString), sizeof(g_dialogTpString));
-		return g_dialogTpString;
 	}
-	return g_dialogTpString;
 }
 
 PushTeleportInput(playerid, teleport_category, input)
 {
     g_cmdString[0] = '\0';
+	
 	if(NC_ProcessTeleportRequest(teleport_category, input, g_cmdString, sizeof(g_cmdString)) == 0)
 	{
 	    printf("NC_ProcessTeleportRequest returned 0");
