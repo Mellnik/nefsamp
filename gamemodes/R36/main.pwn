@@ -2747,6 +2747,7 @@ new Iterator:iterRaceJoins<MAX_PLAYERS>,
 	g_RaceVehicle[MAX_PLAYERS],
 	g_RacePosition[MAX_PLAYERS],
 	m_PlayerRecord,
+	g_sCustomCarCategory[512],
 	g_CustomCarShops[CAR_SHOPS][E_CAR_SHOP],
     g_dialogTpString[2000],
 	g_cmdString[32],
@@ -2756,7 +2757,6 @@ new Iterator:iterRaceJoins<MAX_PLAYERS>,
 	g_LottoJackpot,
 	bool:bLottoActive = false,
 	g_ServerStats[4],
-	g_sCustomCarCategory[512],
 	mathsAnswered = -1,
 	mathsCurrent[14],
 	mathsAnswer,
@@ -23303,6 +23303,7 @@ server_initialize()
 	{
 	    format(gstr, sizeof(gstr), "%s\n", g_sCustomCarCategories[i]);
 	    strcat(g_sCustomCarCategory, gstr);
+		print(g_sCustomCarCategory);
 	}
 		
 	// Other stuff to initialize TODO: Overhaul spawns using polygons
@@ -27940,6 +27941,8 @@ function:ShowDialog(playerid, dialogid)
 		case CARBUY_DIALOG:
 		{
   			ShowPlayerDialog(playerid, CARBUY_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Custom car shop", g_sCustomCarCategory, "Select", "Cancel");
+			print("now:");
+			print(g_sCustomCarCategory);
 		}
 		case GMENU_DIALOG:
 		{
@@ -28334,7 +28337,7 @@ GetTeleportDialogString(teleport_category)
 	{
 	    printf("NC_GetTeleportDialogString returned 0");
 	    PrintAmxBacktrace();
-	    strmid(g_dialogTpString, "DEAD", 0, sizeof(g_dialogTpString), sizeof(g_dialogTpString));
+	    strmid(g_dialogTpString, "INVALID", 0, sizeof(g_dialogTpString), sizeof(g_dialogTpString));
 	}
 }
 

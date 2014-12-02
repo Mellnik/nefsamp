@@ -14,7 +14,7 @@
 #endif
 #define _nefmod_included
 
-#define CORE_VERSION 0xA
+#define CORE_VERSION 0xB
 
 #define MAX_TELE_CATEGORIES 9
 #define MAX_TELES_PER_CATEGORY 32

@@ -4,7 +4,7 @@ New Evolution Freeroam SA-MP Server
 Build 36 (Winter Edition)
 --------
 - Enabled Winter Edition, join at /xmas :)
-- Added new gang page, showing all information about a certain gang.
+- Added new gang page, showing all information about a certain gang. Example: http://nefserver.net/gangs/Crackers
 - Added new tools for admins to catch cheaters.
 - Improved /help information for new players.
 - Fixed TDM bug where you don't get any score.
