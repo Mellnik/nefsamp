@@ -4,8 +4,8 @@ New Evolution Freeroam SA-MP Server
 Build 36 (Winter Edition)
 --------
 - Enabled Winter Edition, join at /xmas :)
-- Added cow milkshake vehicles to /xmas
-- Added new gang page, showing all information about a certain gang. Example: http://nefserver.net/gangs/Crackers
+- Added milkshake cows to /xmas. Waiting to be ridden!
+- Added new gang page, showing all information about a certain gang. Example: http://nefserver.net/gangs/Crackers as originally suggested by vEonz.
 - Added new tools for admins to catch cheaters.
 - Fixed TDM bug where you don't get any score.
 - Fixed dialog bug in custom car shops.

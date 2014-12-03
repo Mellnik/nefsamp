@@ -1627,6 +1627,17 @@ static const g_szRandomServerMessages[15][] =
 	""yellow_e"- Server - "LB2_E"Get your own car at /vs which you can tune!"
 };
 
+#if WINTER_EDITION == true
+static Float:g_CowCars[5][4] =
+{
+    {1082.0734, -1794.0173, 13.6664, 1.5867},
+    {1093.6932, -1780.2679, 13.5951, 90.2608},
+    {1051.3721, -1763.8722, 13.6411, 91.5142},
+    {1051.2327, -1770.2203, 13.6252, 117.5446},
+    {1014.6099, -1859.9781, 13.0385, 188.3820}
+};
+#endif
+
 static const stock GangCarLevels[7][2] =
 {
 	{567, 500},
@@ -23947,14 +23958,10 @@ server_load_visuals()
 	}
 
 	new veh_cow[5];
-	veh_cow[0] = AddStaticVehicleEx(457, 1009.2220, -1347.4849, 13.1439, 0.0000, 0, 0, RESPAWN_TIME);
-	veh_cow[1] = AddStaticVehicleEx(457, 1004.5997, -1347.3588, 13.2469, 0.0000, 1, 1, RESPAWN_TIME);
-	veh_cow[2] = AddStaticVehicleEx(457, 999.9300, -1347.4377, 13.2449, 0.0000, 3, 3, RESPAWN_TIME);
-	veh_cow[3] = AddStaticVehicleEx(457, 995.0709, -1347.3286, 13.2449, 0.0000, 256, 252, RESPAWN_TIME);
-	veh_cow[4] = AddStaticVehicleEx(457, 1014.5811, -1347.7090, 13.1439, 0.0000, 7, 6, RESPAWN_TIME);
-	
 	for(new i = 0; i < sizeof(veh_cow); i++)
 	{
+	    veh_cow[i] = AddStaticVehicleEx(451, g_CowCars[i][0], g_CowCars[i][1], g_CowCars[i][2], g_CowCars[i][3], 0, 0, RESPAWN_TIME);
+	    
 		AttachObjectToVehicle(veh_cow_obj[i][0], veh_cow[i], 0.000000, 3.250026, 1.904999, 0.000000, 0.000000, 93.884956); //Object Model: 16442 |
 		AttachObjectToVehicle(veh_cow_obj[i][1], veh_cow[i], 0.000000, -0.100000, 0.084999, 24.119995, 0.000000, -179.895095); //Object Model: 1458 |
 	}
