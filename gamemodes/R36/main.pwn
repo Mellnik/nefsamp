@@ -23962,8 +23962,8 @@ server_load_visuals()
 	{
 	    veh_cow[i] = AddStaticVehicleEx(451, g_CowCars[i][0], g_CowCars[i][1], g_CowCars[i][2], g_CowCars[i][3], 0, 0, RESPAWN_TIME);
 	    
-		AttachObjectToVehicle(veh_cow_obj[i][0], veh_cow[i], 0.000000, 3.250026, 1.904999, 0.000000, 0.000000, 93.884956); //Object Model: 16442 |
-		AttachObjectToVehicle(veh_cow_obj[i][1], veh_cow[i], 0.000000, -0.100000, 0.084999, 24.119995, 0.000000, -179.895095); //Object Model: 1458 |
+		AttachObjectToVehicle(veh_cow_obj[i][0], veh_cow[i], 0.000000, 3.250026, 2.2859988, 0.000000, 0.000000, 93.884956); //Object Model: 16442 |
+		AttachObjectToVehicle(veh_cow_obj[i][1], veh_cow[i], 0.000000, -0.100000, 0.1019988, 24.119995, 0.000000, -179.895095); //Object Model: 1458 |
 	}
 	#endif
 
