@@ -38,7 +38,7 @@
 #pragma dynamic 8192        // for md-sort
 
 #define IS_RELEASE_BUILD (false)
-#define INC_ENVIRONMENT (false)
+#define INC_ENVIRONMENT (true)
 #define WINTER_EDITION (true) // Requires FS ferriswheelfair.amx
 #define _YSI_NO_VERSION_CHECK
 #define YSI_IS_SERVER
@@ -628,7 +628,6 @@ enum SUSPECT:(<<= 1)
 	SUSPECT_PROAIM,
 	SUSPECT_CRASHER_OPWS,
 	SUSPECT_CRASHER_OVM,
-	SUSPECT_AIMBOT,
 	SUSPECT_IMMUNE
 };
 
@@ -10102,10 +10101,6 @@ YCMD:suspect(playerid, params[], help)
    			    format(tmpstring, sizeof(tmpstring), "%i) %s(%i) - AC_CRASHER_OVM\n", ++count, __GetName(i), i);
 				strcat(finstring, tmpstring);
    			}
-   			if(PlayerData[i][bwSuspect] & SUSPECT_AIMBOT) {
-   			    format(tmpstring, sizeof(tmpstring), "%i) %s(%i) - AC_AIMBOT\n", ++count, __GetName(i), i);
-				strcat(finstring, tmpstring);
-   			}
 		}
 		
 		if(count > 0) {
@@ -19136,7 +19131,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	            {
 	                case 0: // General Help
 	                {
-						new cstring[2048];
+						new cstring[1024];
 
 						strcat(cstring, ""red"» "nef_yellow"Commands:\n");
 						strcat(cstring, ""white"There are many commands, to get an overview use "yellow"/cmds\n\n");
@@ -19189,7 +19184,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	                }
 	                case 6: // how to earn score
 	                {
-						strcat(gstr, ""white"To earn score and money you can join various minigames. For each kill or objective\nyou will receive a certain amount of money and score.\nCheck /minigames for a list of all minigames.\n\nYou can also freeroam and kill people for money and score.");
+						strcat(gstr, ""white"To earn score and money you can join various minigames (/m). For each kill or objective\nyou will receive a certain amount of money and score.\nCheck /minigames for a list of all minigames.\n\nYou can also freeroam and kill people for money and score.");
 
 						ShowPlayerDialog(playerid, HELP_DIALOG + 5, DIALOG_STYLE_MSGBOX, ""nef" :: How to earn score and money", gstr, "OK", "Back");
 	                }
@@ -23942,6 +23937,28 @@ server_load_visuals()
     CreateDynamic3DTextLabel(""white"["yellow"Bank"white"]\nPress 'SPACE'", -1, 2311.63, -3.89, 26.74+0.5, 20.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, -1, -1, -1, 20.0);
 
     // Create3DTextLabel("{ffffff}You must to enter in the balloon to start it!\nIf you are in it, write "vgreen"'/ballonup'", 0xF67E0FF, 836.0856, -2000.4789, 14.7462, 40.0, 0);
+
+    #if WINTER_EDITION == true
+	new veh_cow_obj[5][2];
+	for(new i = 0; i < sizeof(veh_cow_obj); i++)
+	{
+		veh_cow_obj[i][0] = CreateObject(16442, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);//Wheelchair
+		veh_cow_obj[i][1] = CreateObject(1458, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);//Wheelchair
+	}
+
+	new veh_cow[5];
+	veh_cow[0] = AddStaticVehicleEx(457, 1009.2220, -1347.4849, 13.1439, 0.0000, 0, 0, RESPAWN_TIME);
+	veh_cow[1] = AddStaticVehicleEx(457, 1004.5997, -1347.3588, 13.2469, 0.0000, 1, 1, RESPAWN_TIME);
+	veh_cow[2] = AddStaticVehicleEx(457, 999.9300, -1347.4377, 13.2449, 0.0000, 3, 3, RESPAWN_TIME);
+	veh_cow[3] = AddStaticVehicleEx(457, 995.0709, -1347.3286, 13.2449, 0.0000, 256, 252, RESPAWN_TIME);
+	veh_cow[4] = AddStaticVehicleEx(457, 1014.5811, -1347.7090, 13.1439, 0.0000, 7, 6, RESPAWN_TIME);
+	
+	for(new i = 0; i < sizeof(veh_cow); i++)
+	{
+		AttachObjectToVehicle(veh_cow_obj[i][0], veh_cow[i], 0.000000, 3.250026, 1.904999, 0.000000, 0.000000, 93.884956); //Object Model: 16442 |
+		AttachObjectToVehicle(veh_cow_obj[i][1], veh_cow[i], 0.000000, -0.100000, 0.084999, 24.119995, 0.000000, -179.895095); //Object Model: 1458 |
+	}
+	#endif
 
 	//Cop Vehicles
 	veh_cnr[0] = AddStaticVehicleEx(598, 2285.7664, 2430.2393, 2.9800, 0.0000, -1, -1, RESPAWN_TIME);
