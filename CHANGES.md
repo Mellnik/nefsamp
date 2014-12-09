@@ -1,6 +1,15 @@
 New Evolution Freeroam SA-MP Server
 ===================================
 
+Build 37 (Winter Edition)
+--------
+- Added SUSPECT_FAKE_PACKETS and SUSPECT_AIMBOT.
+- Fixed bullet information textdraw for admins.
+- Added network statistics to spec textdraw for admins.
+- Added a new ban page to lookup specific players.
+- Bans now include serverside information; to be used in ban appeals.
+- Bans are now only valid if collected proof matches serverside information saved within the ban.
+
 Build 36 (Winter Edition)
 --------
 - Enabled Winter Edition, join at /xmas :)
