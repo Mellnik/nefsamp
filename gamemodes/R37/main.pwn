@@ -628,6 +628,8 @@ enum SUSPECT:(<<= 1)
 	SUSPECT_PROAIM,
 	SUSPECT_CRASHER_OPWS,
 	SUSPECT_CRASHER_OVM,
+	SUSPECT_FAKE_PACKETS,
+	SUSPECT_AIMBOT,
 	SUSPECT_IMMUNE
 };
 
@@ -3015,6 +3017,12 @@ public OnPlayerRequestClass(playerid, classid)
     if(bGlobalShutdown)
 		return 0;
 
+	if(classid > 300 || classid < 0)
+	{
+		PlayerData[playerid][bwSuspect] |= SUSPECT_FAKE_PACKETS;
+		Log(LOG_NET, "Invalid data in OnPlayerRequestClass(%i, %i)", playerid, classid);
+	}	
+	
 	if(PlayerData[playerid][ExitType] == EXIT_FIRST_SPAWNED)
 	{/*
 		SCM(playerid, -1, ""er"You are bugged in class selection. Please reconnect. "SERVER_IP"");
@@ -3970,6 +3978,12 @@ public OnVehicleMod(playerid, vehicleid, componentid)
 
 public OnVehiclePaintjob(playerid, vehicleid, paintjobid)
 {
+	if(vehicleid >= MAX_VEHICLES || vehicleid < 0 || paintjobid < 0)
+	{
+		PlayerData[playerid][bwSuspect] |= SUSPECT_FAKE_PACKETS;
+		Log(LOG_NET, "Invalid data in OnVehiclePaintjob(%i, %i, %i)", playerid, vehicleid, paintjobid);
+	}
+
 	if(PVSelect[playerid] != -1)
 	{
 	    if(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid] == vehicleid)
@@ -3982,6 +3996,12 @@ public OnVehiclePaintjob(playerid, vehicleid, paintjobid)
 
 public OnVehicleRespray(playerid, vehicleid, color1, color2)
 {
+	if(vehicleid >= MAX_VEHICLES || vehicleid < 0 || color1 < 0 || color2 < 0 || color1 > 255 || color2 > 255)
+	{
+		PlayerData[playerid][bwSuspect] |= SUSPECT_FAKE_PACKETS;
+		Log(LOG_NET, "Invalid data in OnVehicleRespray(%i, %i, %i, %i)", playerid, vehicleid, color1, color2);
+	}
+
 	if(PVSelect[playerid] != -1)
 	{
 	    if(PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid] == vehicleid)
@@ -3996,11 +4016,22 @@ public OnVehicleRespray(playerid, vehicleid, color1, color2)
 /* AUTHORITATIVE SERVER */
 public OnPlayerTakeDamage(playerid, issuerid, Float:amount, weaponid, bodypart)
 {
+	if(issuerid < 0 || (issuerid >= MAX_PLAYERS && issuerid != INVALID_PLAYER_ID) || weaponid < 0 || bodypart < 0 || weaponid > 201)
+	{
+		PlayerData[playerid][bwSuspect] |= SUSPECT_FAKE_PACKETS;
+		Log(LOG_NET, "Invalid data in OnPlayerTakeDamage(%i, %i, %f, %i, %i)", playerid, issuerid, amount, weaponid, bodypart);
+	}
 	return 1;
 }
 
 public OnPlayerGiveDamage(playerid, damagedid, Float:amount, weaponid, bodypart)
 {
+	if(damagedid < 0 || (damagedid >= MAX_PLAYERS && damagedid != INVALID_PLAYER_ID) || weaponid < 0 || bodypart < 0 || weaponid > 201)
+	{
+		PlayerData[playerid][bwSuspect] |= SUSPECT_FAKE_PACKETS;
+		Log(LOG_NET, "Invalid data in OnPlayerGiveDamage(%i, %i, %f, %i, %i)", playerid, damagedid, amount, weaponid, bodypart);
+	}
+
 	static const BodyParts[7][] =
 	{
 	    "Torso",
@@ -4576,6 +4607,12 @@ public OnQueryError(errorid, error[], callback[], query[], connectionHandle)
 
 public OnPlayerInteriorChange(playerid, newinteriorid, oldinteriorid)
 {
+	if(newinteriorid < 0 || oldinteriorid < 0 || newinteriorid > 128 || oldinteriorid > 128)
+	{
+		PlayerData[playerid][bwSuspect] |= SUSPECT_FAKE_PACKETS;
+		Log(LOG_NET, "Invalid data in OnPlayerInteriorChange(%i, %i, %i)", playerid, newinteriorid, oldinteriorid);
+	}
+	
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 		if(gTeam[i] == SPEC && PlayerData[i][SpecID] == playerid)
@@ -4654,6 +4691,12 @@ public OnPlayerUpdate(playerid)
 
 public OnTrailerUpdate(playerid, vehicleid)
 {
+	if(vehicleid < 0 || (vehicleid >= MAX_VEHICLES && vehicleid != INVALID_VEHICLE_ID))
+	{
+		PlayerData[playerid][bwSuspect] |= SUSPECT_FAKE_PACKETS;
+		Log(LOG_NET, "Invalid data in OnTrailerUpdate(%i, %i)", playerid, vehicleid);
+	}
+
 	if(playerid != INVALID_PLAYER_ID) {
 	    if(PlayerData[playerid][bOpenSeason]) {
 	        return 0;
@@ -4664,6 +4707,12 @@ public OnTrailerUpdate(playerid, vehicleid)
 
 public OnUnoccupiedVehicleUpdate(vehicleid, playerid, passenger_seat, Float:new_x, Float:new_y, Float:new_z, Float:vel_x, Float:vel_y, Float:vel_z)
 {
+	if(vehicleid >= MAX_VEHICLES || vehicleid < 0 || passenger_seat < 0 || passenger_seat > 255)
+	{
+		PlayerData[playerid][bwSuspect] |= SUSPECT_FAKE_PACKETS;
+		Log(LOG_NET, "Invalid data in OnUnoccupiedVehicleUpdate(%i, %i, %i)", vehicleid, playerid, passenger_seat);
+	}
+
 	if(playerid != INVALID_PLAYER_ID) {
 	    if(PlayerData[playerid][bOpenSeason]) {
 	        return 0;
@@ -4672,8 +4721,24 @@ public OnUnoccupiedVehicleUpdate(vehicleid, playerid, passenger_seat, Float:new_
 	return 1;
 }
 
+public OnPlayerEnterVehicle(playerid, vehicleid)
+{
+	if(vehicleid > MAX_VEHICLES || vehicleid < 0)
+	{
+		PlayerData[playerid][bwSuspect] |= SUSPECT_FAKE_PACKETS;
+		Log(LOG_NET, "Invalid data in OnPlayerEnterVehicle(%i, %i)", playerid, vehicleid);
+	}	
+	return 1;
+}
+
 public OnPlayerExitVehicle(playerid, vehicleid)
 {
+	if(vehicleid > MAX_VEHICLES || vehicleid < 0)
+	{
+		PlayerData[playerid][bwSuspect] |= SUSPECT_FAKE_PACKETS;
+		Log(LOG_NET, "Invalid data in OnPlayerExitVehicle(%i, %i)", playerid, vehicleid);
+	}	
+
 	if(gTeam[playerid] == DERBY || gTeam[playerid] == gRACE)
 	{
 	    if(ExitPlayer(playerid) == 0)
@@ -6194,6 +6259,12 @@ public OnPlayerEnterRaceCheckpoint(playerid)
 
 public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 {
+	if(pickupid >= 4096 || pickupid < 0)
+	{
+		PlayerData[playerid][bwSuspect] |= SUSPECT_FAKE_PACKETS;
+		Log(LOG_NET, "Invalid data in OnPlayerPickUpDynamicPickup(%i, %i)", playerid, pickupid, oldstate);
+	}
+
 	switch(gTeam[playerid])
 	{
 	    case FREEROAM:
@@ -6702,6 +6773,12 @@ public OnPlayerModelSelection(playerid, response, listid, modelid)
 
 public OnVehicleDamageStatusUpdate(vehicleid, playerid)
 {
+	if(vehicleid >= MAX_VEHICLES || vehicleid < 0)
+	{
+		PlayerData[playerid][bwSuspect] |= SUSPECT_FAKE_PACKETS;
+		Log(LOG_NET, "Invalid data in OnVehicleDamageStatusUpdate(%i, %i)", vehicleid, playerid);
+	}
+
 	if(gTeam[playerid] == FREEROAM && !PlayerData[playerid][bGWarMode])
 	{
     	SetVehicleHealth(vehicleid, 1000.0);
@@ -6744,11 +6821,22 @@ public OnVehicleDamageStatusUpdate(vehicleid, playerid)
 
 public OnPlayerEnterVehicle(playerid, vehicleid)
 {
+	if(vehicleid > MAX_VEHICLES || vehicleid < 0)
+	{
+		PlayerData[playerid][bwSuspect] |= SUSPECT_FAKE_PACKETS;
+		Log(LOG_NET, "Invalid data in OnPlayerEnterVehicle(%i, %i)", playerid, vehicleid);
+	}	
 	return 1;
 }
 
 public OnPlayerStateChange(playerid, newstate, oldstate)
 {
+	if(newstate > 256 || oldstate > 256 || newstate < 0 || oldstate < 0)
+	{
+		PlayerData[playerid][bwSuspect] |= SUSPECT_FAKE_PACKETS;
+		Log(LOG_NET, "Invalid data in OnPlayerStateChange(%i, %i, %i)", playerid, newstate, oldstate);
+	}
+	
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
  		if(gTeam[i] == SPEC && PlayerData[i][SpecID] == playerid)
@@ -17559,6 +17647,12 @@ function:OnPlayerNameChangeRequest(playerid, newname[])
 
 public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 {
+	if(listitem < 0 || dialogid >= 32000 || dialogid < -32000)
+	{
+		PlayerData[playerid][bwSuspect] |= SUSPECT_FAKE_PACKETS;
+		Log(LOG_NET, "Invalid data in OnDialogResponse(%i, %i, %i, %i)", playerid, dialogid, response, listitem);
+	}
+	
 	// Fixing dialog exploit
 	for(new i = 0, l = strlen(inputtext); i < l; i++)
 	{
