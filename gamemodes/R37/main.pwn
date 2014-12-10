@@ -1608,25 +1608,6 @@ static const g_szBusinessTypes[5][] =
 	"Meth Lab"
 };
 
-static const g_szRandomServerMessages[15][] =
-{
-	""yellow_e"- Server - "LB2_E"Visit our site: "SVRURLWWW"",
-	""yellow_e"- Server - "LB2_E"Join Minigames for money and score - /help",
-	""yellow_e"- Server - "LB2_E"Access your player preferences: /settings",
-	""yellow_e"- Server - "LB2_E"Get VIP (/vip) today! "SVRURLWWW"/vip",
-	""yellow_e"- Server - "LB2_E"Get VIP (/vip) today! "SVRURLWWW"/vip",
-	""yellow_e"- Server - "LB2_E"Get "SVRSC" Credits (/credits) today! "SVRURLWWW"/gc/",
-	""yellow_e"- Server - "LB2_E"Get "SVRSC" Credits (/credits) today! "SVRURLWWW"/gc/",
-	""yellow_e"- Server - "LB2_E"Join Minigames to earn money and score - /help",
-	""yellow_e"- Server - "LB2_E"Got suggestions? Post them on our forums! ("SVRFORUM")",
-	""yellow_e"- Server - "LB2_E"Use /report to report a player to the admins",
-	""yellow_e"- Server - "LB2_E"Get "SVRSC" Credits (/credits) today! "SVRURLWWW"/gc/",
-	""yellow_e"- Server - "LB2_E"Add "SVRSC" to your favlist! samp."SVRURL":7777",
-	""yellow_e"- Server - "LB2_E"Get VIP (/vip) today! "SVRURLWWW"/vip/",
-	""yellow_e"- Server - "LB2_E"Get your own car at /vs which you can tune!",
-	""yellow_e"- Server - "LB2_E"Get your own car at /vs which you can tune!"
-};
-
 #if WINTER_EDITION == true
 static Float:g_CowCars[5][4] =
 {
@@ -2118,14 +2099,6 @@ static const FloorNames[21][] =
 	"Eighteenth Floor",
 	"Admin Headquarter O.o",
 	"Penthouse (not really)"
-};
-
-static const xCharacters[][] =
-{
-    "A", "B", "C", "D", "E", "F", "G", "H", "J", "K", "L", "M",
-	"N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
-    "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "m",
-	"n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"
 };
 
 static const GunGame_Weapons[] =
@@ -23215,6 +23188,14 @@ function:xReactionProgress()
 
 function:xReactionTest()
 {
+	static const xCharacters[][] =
+	{
+		"A", "B", "C", "D", "E", "F", "G", "H", "J", "K", "L", "M",
+		"N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+		"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "m",
+		"n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"
+	};
+
     ReactionOn = true;
     
 	new xLength = (random(8) + 3),
@@ -23222,21 +23203,26 @@ function:xReactionTest()
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-	    if(IsPlayerConnected(i)) count++;
+	    if(IsPlayerConnected(i)) 
+			count++;
 	}
 
 	xCash = 250 * count;
 	xScore = (random(7) + 2);
 	format(xChars, sizeof(xChars), "");
+	
 	for(new i = 0; i < xLength; i++)
 	{
 		format(xChars, sizeof(xChars), "%s%s", xChars, xCharacters[random(sizeof(xCharacters))][0]);
 	}
+	
 	format(gstr, sizeof(gstr), "["vlila"REACTION"white"]: The first who types '"vlila"%s"white"' wins $%s + %i score", xChars, number_format(xCash), xScore);
 	SCMToAll(WHITE, gstr);
+	
 	tickReactionStart = GetTickCountEx();
 	KillTimer(tReactionTimer);
 	xTestBusy = true;
+	
 	SetTimer("xReactionProgress", 70000, false);
 	return 1;
 }
@@ -28006,7 +27992,26 @@ function:ShowDialog(playerid, dialogid)
 
 function:server_random_broadcast()
 {
-    SCMToAll(WHITE, g_szRandomServerMessages[random(sizeof(g_szRandomServerMessages))]);
+	static const szRandomServerMessages[15][] =
+	{
+		""yellow_e"- Server - "LB2_E"Visit our site: "SVRURLWWW"",
+		""yellow_e"- Server - "LB2_E"Join Minigames for money and score - /help",
+		""yellow_e"- Server - "LB2_E"Access your player preferences: /settings",
+		""yellow_e"- Server - "LB2_E"Get VIP (/vip) today! "SVRURLWWW"/vip",
+		""yellow_e"- Server - "LB2_E"Get VIP (/vip) today! "SVRURLWWW"/vip",
+		""yellow_e"- Server - "LB2_E"Get "SVRSC" Credits (/credits) today! "SVRURLWWW"/gc/",
+		""yellow_e"- Server - "LB2_E"Get "SVRSC" Credits (/credits) today! "SVRURLWWW"/gc/",
+		""yellow_e"- Server - "LB2_E"Join Minigames to earn money and score - /help",
+		""yellow_e"- Server - "LB2_E"Got suggestions? Post them on our forums! ("SVRFORUM")",
+		""yellow_e"- Server - "LB2_E"Use /report to report a player to the admins",
+		""yellow_e"- Server - "LB2_E"Get "SVRSC" Credits (/credits) today! "SVRURLWWW"/gc/",
+		""yellow_e"- Server - "LB2_E"Add "SVRSC" to your favlist! samp."SVRURL":7777",
+		""yellow_e"- Server - "LB2_E"Get VIP (/vip) today! "SVRURLWWW"/vip/",
+		""yellow_e"- Server - "LB2_E"Get your own car at /vs which you can tune!",
+		""yellow_e"- Server - "LB2_E"Get your own car at /vs which you can tune!"
+	};
+	
+    SCMToAll(WHITE, szRandomServerMessages[random(sizeof(szRandomServerMessages))]);
 	return 1;
 }
 
@@ -29718,7 +29723,25 @@ islogged(playerid)
 
 function:RandomTXTInfo()
 {
-	TextDrawSetString(TXTRandomInfo, g_szRandomTdMessages[random(sizeof(g_szRandomTdMessages))]);
+	static const szRandomTdMessages[14][] =
+	{
+		"~w~Need a ~b~~h~vehicle~w~? Spawn one using ~r~~h~/v~w~!",
+		"~w~Don't wanna get killed? Type ~g~~h~~h~/god",
+		"~w~Want access to ~y~bonus commands~w~? Check out ~r~~h~/premium~w~!",
+		"~w~Edit your server preferences and features using ~r~~h~/settings~w~!",
+		"~w~Flip your vehicle with the key ~g~~h~~h~'2'",
+		"~w~Join our ~r~~h~forums~w~! Register at ~b~~h~~h~"SVRURLWWW"~w~!",
+		"~w~Get some ~y~Gold Credits ~w~at "SVRURLWWW"/gc/",
+		"~w~Try our ~y~Cops and Robbers ~w~Minigame! ~y~/cnr",
+		"~w~Type ~g~~h~~h~/c ~b~~h~~h~/t~w~ for ~y~commands ~w~and ~y~teleports!",
+		"~w~Go to ~g~~h~~h~/vs ~w~and get your own car which you can tune!",
+		"~w~Join minigames to earn money and score! ~g~~h~~h~/m",
+		"~w~Spawn vehicles using ~r~~h~/v ~w~or ~r~~h~/car",
+		"~w~Edit your server preferences and features using ~r~/settings~w~!",
+		"~w~Challenge your friends in ~r~~h~~h~/duel"
+	};
+
+	TextDrawSetString(TXTRandomInfo, szRandomTdMessages[random(sizeof(szRandomTdMessages))]);
 	return 1;
 }
 
