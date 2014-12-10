@@ -3534,9 +3534,9 @@ public OnIncomingConnection(playerid, ip_address[], port)
 	
 	if(connections >= 3 && !IsWhitelisted(ip_address))
 	{
-	    BlockIpAddress(ip_address, 60000);
-	    Log(LOG_NET, "%i connections detected by (%s, %i, %i), hard ipban issued for 60 seconds", connections, ip_address, port, playerid);
-	    Kick(playerid);
+		Log(LOG_NET, "%i connections detected by (%s, %i, %i), hard ipban issued for 60 seconds", connections, ip_address, port, playerid);
+		Kick(playerid);
+		BlockIpAddress(ip_address, 60000);
 	}
 	return 1;
 }
