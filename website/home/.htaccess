@@ -4,8 +4,8 @@ RewriteBase /
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME} !-f
 
-RewriteRule ^players/([a-zA-Z0-9-/_.\[\]@$]+)/$ ?page=players&player=$1 [L,QSA]
-RewriteRule ^players/([a-zA-Z0-9-/_.\[\]@$]+)$ ?page=players&player=$1 [L,QSA]
-RewriteRule ^gangs/([a-zA-Z0-9-/_.\[\]@$]+)/$ ?page=gangs&gang=$1 [L,QSA]
-RewriteRule ^gangs/([a-zA-Z0-9-/_.\[\]@$]+)$ ?page=gangs&gang=$1 [L,QSA]
+RewriteRule ^players/([a-zA-Z0-9-/_.\[\]\(\)@$]+)/$ ?page=players&player=$1 [L,QSA]
+RewriteRule ^players/([a-zA-Z0-9-/_.\[\]\(\)@$]+)$ ?page=players&player=$1 [L,QSA]
+RewriteRule ^gangs/([a-zA-Z0-9-/_.\[\]\(\)@$]+)/$ ?page=gangs&gang=$1 [L,QSA]
+RewriteRule ^gangs/([a-zA-Z0-9-/_.\[\]\(\)@$]+)$ ?page=gangs&gang=$1 [L,QSA]
 RewriteRule ^([a-zA-Z0-9-]+)/?$ ?page=$1 [L,QSA]
