@@ -1583,24 +1583,6 @@ static const g_SAZones[][SAZONE_MAIN] = {  // Majority of names and area coordin
 	{"Whetstone",                   {-2997.40,-2892.90,-242.90,-1213.90,-1115.50,900.00}}
 };
 
-static const g_szRandomTdMessages[14][] =
-{
-    "~w~Need a ~b~~h~vehicle~w~? Spawn one using ~r~~h~/v~w~!",
-	"~w~Don't wanna get killed? Type ~g~~h~~h~/god",
-	"~w~Want access to ~y~bonus commands~w~? Check out ~r~~h~/premium~w~!",
-	"~w~Edit your server preferences and features using ~r~~h~/settings~w~!",
-	"~w~Flip your vehicle with the key ~g~~h~~h~'2'",
-	"~w~Join our ~r~~h~forums~w~! Register at ~b~~h~~h~"SVRURLWWW"~w~!",
-	"~w~Get some ~y~Gold Credits ~w~at "SVRURLWWW"/gc/",
-	"~w~Try our ~y~Cops and Robbers ~w~Minigame! ~y~/cnr",
-	"~w~Type ~g~~h~~h~/c ~b~~h~~h~/t~w~ for ~y~commands ~w~and ~y~teleports!",
-	"~w~Go to ~g~~h~~h~/vs ~w~and get your own car which you can tune!",
-    "~w~Join minigames to earn money and score! ~g~~h~~h~/m",
-	"~w~Spawn vehicles using ~r~~h~/v ~w~or ~r~~h~/car",
-	"~w~Edit your server preferences and features using ~r~/settings~w~!",
-	"~w~Challenge your friends in ~r~~h~~h~/duel"
-};
-
 static const g_szBusinessTypes[5][] =
 {
 	"Loan Sharks",
@@ -5446,15 +5428,12 @@ public OnPlayerDeath(playerid, killerid, reason)
 		}
 		case CNR:
 		{
-		    if(gTeam[killerid] != INVALID_PLAYER_ID)
+  		    if(IsPlayerAvail(killerid))
 		    {
 		        if(gTeam[killerid] == CNR)
 		        {
-		  		    if(IsPlayerAvail(killerid))
-				    {
-				        GivePlayerScoreEx(killerid, 2, true, true);
-						GivePlayerMoneyEx(killerid, 3000, true, true);
-				    }
+			        GivePlayerScoreEx(killerid, 2, true, true);
+					GivePlayerMoneyEx(killerid, 3000, true, true);
 
 				    if(GetPVarInt(playerid, "Robber") == 1)
 				    {
@@ -6262,7 +6241,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 	if(pickupid >= 4096 || pickupid < 0)
 	{
 		PlayerData[playerid][bwSuspect] |= SUSPECT_FAKE_PACKETS;
-		Log(LOG_NET, "Invalid data in OnPlayerPickUpDynamicPickup(%i, %i)", playerid, pickupid, oldstate);
+		Log(LOG_NET, "Invalid data in OnPlayerPickUpDynamicPickup(%i, %i)", playerid, pickupid);
 	}
 
 	switch(gTeam[playerid])
@@ -6816,16 +6795,6 @@ public OnVehicleDamageStatusUpdate(vehicleid, playerid)
 			}
 		}
 	}
-	return 1;
-}
-
-public OnPlayerEnterVehicle(playerid, vehicleid)
-{
-	if(vehicleid > MAX_VEHICLES || vehicleid < 0)
-	{
-		PlayerData[playerid][bwSuspect] |= SUSPECT_FAKE_PACKETS;
-		Log(LOG_NET, "Invalid data in OnPlayerEnterVehicle(%i, %i)", playerid, vehicleid);
-	}	
 	return 1;
 }
 
@@ -10171,6 +10140,10 @@ YCMD:suspect(playerid, params[], help)
    			}
    			if(PlayerData[i][bwSuspect] & SUSPECT_CRASHER_OVM) {
    			    format(tmpstring, sizeof(tmpstring), "%i) %s(%i) - AC_CRASHER_OVM\n", ++count, __GetName(i), i);
+				strcat(finstring, tmpstring);
+   			}
+   			if(PlayerData[i][bwSuspect] & SUSPECT_FAKE_PACKETS) {
+   			    format(tmpstring, sizeof(tmpstring), "%i) %s(%i) - AC_FAKE_PACKETS\n", ++count, __GetName(i), i);
 				strcat(finstring, tmpstring);
    			}
 		}
@@ -30898,6 +30871,9 @@ ResetPlayerWorld(playerid)
 
 IsPlayerAvail(playerid)
 {
+	if(playerid < 0 || playerid >= MAX_PLAYERS)
+	    return 0;
+
 	if(playerid == INVALID_PLAYER_ID)
 		return 0;
 
