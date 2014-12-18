@@ -24,6 +24,8 @@
 || compile -d3 with crashdetect
 ||
 || Database changes:
+|| ban table new layout:
+|| id, playername, adminname, reason, lift, date
 ||
 || Script limits:
 || Max teleport categories: 9
@@ -49,6 +51,7 @@
 #include <a_http>           // API Requests
 #include <nefmod>
 #include <crashdetect>
+#include <profiler>
 #include <amx\os>
 #include <YSI\y_iterate>
 #include <YSI\y_stringhash>
@@ -3592,7 +3595,7 @@ public OnPlayerConnect(playerid)
         
 		PlayAudioStreamForPlayer(playerid, "http://www.nefserver.net/s/NEFLogin.mp3");
 
-		mysql_format(pSQL, gstr, sizeof(gstr), "SELECT * FROM `bans` WHERE `PlayerName` = '%e' LIMIT 1;", __GetName(playerid));
+		mysql_format(pSQL, gstr, sizeof(gstr), "SELECT * FROM `bans` WHERE `playername` = '%e' LIMIT 1;", __GetName(playerid));
 		mysql_pquery(pSQL, gstr, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_BANNED);
  	}
  	return 1;
@@ -12506,7 +12509,7 @@ YCMD:unban(playerid, params[], help)
 		    return SCM(playerid, -1, ""er"You have specified invalid characters");
 		}
 
-	    format(gstr, sizeof(gstr), "SELECT `ID` FROM `bans` WHERE `PlayerName` = '%s' LIMIT 1;", escape);
+	    format(gstr, sizeof(gstr), "SELECT `id` FROM `bans` WHERE `playername` = '%s' LIMIT 1;", escape);
 	    mysql_pquery(pSQL, gstr, "OnUnbanAttempt", "is", playerid, escape);
 	}
 	else
@@ -12539,7 +12542,7 @@ YCMD:oban(playerid, params[], help)
 		    return SCM(playerid, -1, ""er"You have specified invalid characters");
 		}
 
-	    mysql_format(pSQL, player, sizeof(player), "SELECT `AdminName` FROM `bans` WHERE `PlayerName` = '%e' LIMIT 1;", escape);
+	    mysql_format(pSQL, player, sizeof(player), "SELECT `adminname` FROM `bans` WHERE `playername` = '%e' LIMIT 1;", escape);
 	    mysql_pquery(pSQL, player, "OnOfflineBanAttempt", "iss", playerid, escape, ereason);
 	}
 	else
@@ -29819,7 +29822,7 @@ function:OnUnbanAttempt(playerid, unban[])
 
 	if(rows > 0)
 	{
-	    format(gstr, sizeof(gstr), "DELETE FROM `bans` WHERE `PlayerName` = '%s' LIMIT 1;", unban);
+	    format(gstr, sizeof(gstr), "DELETE FROM `bans` WHERE `playername` = '%s' LIMIT 1;", unban);
 	    mysql_pquery(pSQL, gstr);
 	    
 	    format(gstr, sizeof(gstr), "SELECT `ip` FROM `accounts` WHERE `name` = '%s';", unban);
@@ -30512,7 +30515,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 				}
 				else if(iLift < gettime()) // Player is time banned, checking if ban ran out
 				{
-				    mysql_format(pSQL, gstr2, sizeof(gstr2), "DELETE FROM `bans` WHERE `PlayerName` = '%e' LIMIT 1;", __GetName(playerid)); // Delete time ban
+				    mysql_format(pSQL, gstr2, sizeof(gstr2), "DELETE FROM `bans` WHERE `playername` = '%e' LIMIT 1;", __GetName(playerid)); // Delete time ban
 				    mysql_pquery(pSQL, gstr2);
 
 				    SCM(playerid, -1, ""nef" Your time ban expired, you've been unbanned!");
