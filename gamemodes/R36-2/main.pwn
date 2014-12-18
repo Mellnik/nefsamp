@@ -3593,7 +3593,7 @@ public OnPlayerConnect(playerid)
 		PreloadAnimLib(playerid, "PED");
         ApplyAnimation(playerid, "DANCING", "DNCE_M_B", 4.0, 1, 0, 0, 0, -1);
         
-		PlayAudioStreamForPlayer(playerid, "http://www.nefserver.net/s/NEFLogin.mp3");
+		PlayAudioStreamForPlayer(playerid, "http://static.nefserver.net/NEFLogin.mp3");
 
 		mysql_format(pSQL, gstr, sizeof(gstr), "SELECT * FROM `bans` WHERE `playername` = '%e' LIMIT 1;", __GetName(playerid));
 		mysql_pquery(pSQL, gstr, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_BANNED);

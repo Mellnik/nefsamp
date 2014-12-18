@@ -4,7 +4,7 @@
 error_reporting(-1);
 ini_set("display_errors", 1);
 
-define("_SITE_", "http://nefserver.net");
+define("_SITE_", "https://nefserver.net");
 define("_FORUM_", "http://forum.nefserver.net");
 
 include("inc/mysql.inc.php");
@@ -17,7 +17,7 @@ include("inc/function.inc.php");
 		<meta charset="utf-8"/>
 		<meta name="keywords" content="nef, new evolution freeroam, nefserver, ngs, next, generation, stunting, stunt, race, drift, derby, fallout, gungame, tdm, dm, 31.204.152.218, 7777, nextgenstunting, gen, freeroam, roleplay, downgrade, upgrade, gta5, jc-mp, jc2-mp, 5-mp, sa-mp, sa:mp, samp, gta, san, andreas, sa, grand, theft, online, offline, skype, facebook, weapon, mellnik, twitter, spot, funny, awesome, xD, make, of, how, killing, server, death, match, fun, floor, cod, auto, multiplayer, modification, mod, gtanet, network, lan, internet, gtamultiplayer, gtamp, vice, city, 0.3z, «(—[—|, |—]—)», ·._.·´¯), (¯`·._.·, NEF 0.3x (R10)     «Stunt/Race/Freeroam/DM»" />
 		<meta name="description" content="New Evolution Freeroam is one of the most advanced SA-MP Stunt/DM/Race/Minigames/Freeroam servers." />
-		<link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Oswald" />
+		<link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Oswald" />
 		<link rel="stylesheet" type="text/css" href="/css/style.css" media="all" />
 		<link rel="icon" type="image/ico" href="/graphics/favicon.ico"/>
 		<style type="text/css">
