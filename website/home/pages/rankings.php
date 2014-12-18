@@ -169,7 +169,7 @@
 					
 					$contents = "";
 					$contents .= "<tr>";
-					$contents .= "<td><a class='neflink' href='/players/$player'>$player</a></td>";
+					$contents .= "<td><a class='neflink' href='/bans/$player'>$player</a></td>";
 					$contents .= "<td><a class='neflink' href='/players/$admin'>$admin</a></td>";
 					$contents .= "<td>$reason</td>";
 					$contents .= "<td>$duration</td>";

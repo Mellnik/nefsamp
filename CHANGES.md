@@ -13,7 +13,7 @@ Build 37 (Winter Edition)
 Build 36-2 (Winter Edition)
 ---------
 - Added SUSPECT_FAKE_PACKETS.
-- Added sanity checks.
+- Added sanity checks in some callbacks.
 - Added performance profiler.
 - Added ban page which contains all information about a specific ban. (http://nefserver.net/bans)
 
