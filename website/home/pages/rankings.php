@@ -156,10 +156,10 @@
 				
 				for(; $row = $query->fetch_assoc();)
 				{
-					$player = $row['PlayerName'];
-					$admin = $row['AdminName'];
-					$reason = $row['Reason'];
-					$date = date("d.m.Y H:i:s", $row['Date']);
+					$player = $row['playername'];
+					$admin = $row['adminname'];
+					$reason = $row['reason'];
+					$date = date("d.m.Y H:i:s", $row['date']);
 					
 					if($row['lift'] == 0) {
 						$duration = "Permanent";
