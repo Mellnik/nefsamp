@@ -2722,6 +2722,7 @@ new Iterator:iterRaceJoins<MAX_PLAYERS>,
 	g_CustomCarShops[CAR_SHOPS][E_CAR_SHOP],
     g_dialogTpString[2000],
 	g_cmdString[32],
+	gTime[6],
 	gint = 0,
 	gstr[144],
 	gstr2[255],
@@ -23646,7 +23647,7 @@ server_load_visuals()
     new count = GetTickCountEx();
     
 	bb_mcc = CreateDynamicObject(8323, -2322.76880, -1704.56067, 499.98999,   0.00000, 0.00000, 69.30000);
-	SetDynamicObjectMaterialText(bb_mcc, 0, "Welcome to New Evolution Freeroam!\nServer Realtime: \n"green"Players online: ", OBJECT_MATERIAL_SIZE_256x128, "Calibri", 0, 0, -32256, -16777216, OBJECT_MATERIAL_TEXT_ALIGN_LEFT);
+	SetDynamicObjectMaterialText(bb_mcc, 0, "Welcome to New Evolution Freeroam!\nServer time: \n"green"Players online: ", OBJECT_MATERIAL_SIZE_256x128, "Calibri", 0, 0, -32256, -16777216, OBJECT_MATERIAL_TEXT_ALIGN_LEFT);
 
     new object_id = CreateDynamicObject(11317, 1914.20313, -1377.58191, 26.29986,   0.00000, 0.00000, 91.91999); // Gold Credits Wang Cars
     SetDynamicObjectMaterial(object_id, 2, 19341, "egg_texts", "easter_egg01");
@@ -25930,6 +25931,11 @@ function:QueueProcess()
 {
 	mysql_pquery(pSQL, "SELECT * FROM `queue` WHERE `ExecutionDate` < UNIX_TIMESTAMP();", "OnQueueReceived", "");
 
+	getdate(gTime[0], gTime[1], gTime[2]);
+	gettime(gTime[3], gTime[4], gTime[5]);
+	format(gstr, sizeof(gstr), "worldtime %02i:%02i | %02i.%02i", gTime[3], gTime[4], gTime[2], gTime[1]);
+	SendRconCommand(gstr);
+
     /* PAYDAY PROCESS */
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -26264,13 +26270,8 @@ function:LogoSwitch()
 
 function:ProcessTick()
 {
-	static year, month, day, hour, minute, second, utime;
-	getdate(year, month, day);
-	gettime(hour, minute, second);
+	static utime;
 	utime = gettime();
-
-	format(gstr, sizeof(gstr), "worldtime %02i:%02i | %02i.%02i", hour, minute, day, month);
-	SendRconCommand(gstr);
 
 	if(g_RaceStatus == RaceStatus_Active)
 	{
@@ -26478,7 +26479,7 @@ function:ProcessTick()
 			}
 	    }
 	}
-                             
+	
 	format(gstr2, sizeof(gstr2), "~y~/derby ~r~~h~%i ~y~/cnr ~r~~h~%i ~y~/race ~r~~h~%i ~y~/tdm ~r~~h~%i ~y~/fallout ~r~~h~%i ~y~/gungame ~r~~h~%i ~y~/war ~r~~h~%i ~y~/mini ~r~~h~%i ~y~/sniper ~r~~h~%i ~y~/rocket ~r~~h~%i",
         T_DerbyPlayers,
         T_CNRPlayers,
@@ -26493,7 +26494,7 @@ function:ProcessTick()
 
 	TextDrawSetString(TXTFooter, gstr2);
 
-	format(gstr, sizeof(gstr), "Welcome to New Evolution Freeroam!\n\nServer Realtime: %02i:%02i | %02i.%02i\nPlayers online: %i", hour, minute, day, month, T_ServerPlayers);
+	format(gstr, sizeof(gstr), "Welcome to New Evolution Freeroam!\n\nServer time: %02i:%02i | %02i.%02i\nPlayers online: %i", gTime[3], gTime[4], gTime[2], gTime[1], T_ServerPlayers);
 	SetDynamicObjectMaterialText(bb_mcc, 0, gstr, OBJECT_MATERIAL_SIZE_256x128, "Calibri", 0, 0, -32256, -16777216, OBJECT_MATERIAL_TEXT_ALIGN_LEFT);
 
 	if(g_FalloutStatus != e_Fallout_Inactive)
