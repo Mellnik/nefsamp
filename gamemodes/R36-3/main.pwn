@@ -572,6 +572,7 @@ enum
 // Player Team
 enum
 {
+	gNONE,
 	FREEROAM,
 	DERBY,
  	gRACE,
@@ -3087,6 +3088,7 @@ public OnPlayerSpawn(playerid)
     
     if(PlayerData[playerid][bFirstSpawn])
     {
+        gTeam[playerid] = FREEROAM;
         PlayerData[playerid][bFirstSpawn] = false;
 		PlayerData[playerid][bAllowSpawn] = false;
 		AttachPlayerToys(playerid);
@@ -31369,7 +31371,7 @@ ToggleSpeedo(playerid, bool:toggle)
 
 ResetPlayerVars(playerid)
 {
-	gTeam[playerid] = FREEROAM;
+	gTeam[playerid] = gNONE;
 	CSG[playerid] = false;
     g_RaceVehicle[playerid] = -1;
  	GunGame_Player[playerid][level] = 0;
