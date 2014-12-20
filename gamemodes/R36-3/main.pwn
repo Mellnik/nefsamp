@@ -4479,7 +4479,6 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 
 			format(gstr, sizeof(gstr), ""nef" "yellow_e"%s(%i) has created a new gang: '"nef_yellow"%s"white"'", __GetName(extraid), extraid, PlayerData[extraid][GangName]);
             SCMToAll(-1, gstr);
-            print(gstr);
 
             ShowPlayerDialog(extraid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""white"Gang created!", ""white"You have the access to use the following:\n\n/gmenu\n/gcapture\n/gzones\n/ginvite\n/gkick\n/gwar\n/gclose\n\nPut "nef_yellow"! "white" before your msg to talk in gang chat", "OK", "");
 
@@ -8828,11 +8827,9 @@ YCMD:buygc(playerid, params[], help)
 	    SCM(playerid, -1, gstr);
 	    format(gstr, sizeof(gstr), ""blue"%s(%i) has accepted your offer. You sold %sGC for $%s", __GetName(playerid), playerid, number_format(PlayerData[playerid][GCOffer]), number_format(PlayerData[playerid][GCPrice]));
 	    SCM(PlayerData[playerid][GCPlayer], -1, gstr);
-        print(gstr);
 
 	    format(gstr, sizeof(gstr), ""orange"[NEF] %s(%i) has sold their %sGC to %s(%i) for $%s", __GetName(PlayerData[playerid][GCPlayer]), PlayerData[playerid][GCPlayer], number_format(PlayerData[playerid][GCOffer]), __GetName(playerid), playerid, number_format(PlayerData[playerid][GCPrice]));
 	    SCMToAll(-1, gstr);
-	    print(gstr);
 
 	    PlayerData[playerid][GCPlayer] = INVALID_PLAYER_ID;
 	    PlayerData[playerid][GCOffer] = 0;
@@ -10589,7 +10586,6 @@ YCMD:burn(playerid, params[], help)
 			SCM(playerid, BLUE, gstr);
 			format(gstr, sizeof(gstr), ""red"Adm: %s(%i) has been burnt by %s(%i)", __GetName(otherid), otherid, __GetName(playerid), playerid);
 			admin_broadcast(-1, gstr);
-			print(gstr);
 	    }
 		else
 		{
@@ -11284,7 +11280,6 @@ YCMD:warn(playerid, params[], help)
 			{
 				format(gstr, sizeof(gstr), ""yellow"** "red"%s(%i) has been kicked. [Reason: %s] [Warning: %i/%i] [Warn by: %s(%i)]", __GetName(player), player, reason, PlayerData[player][Warnings], MAX_WARNINGS, __GetName(playerid), playerid);
 				SCMToAll(-1, gstr);
-				print(gstr);
 				KickEx(player);
 			}
 			else
@@ -12625,8 +12620,6 @@ YCMD:tban(playerid, params[], help)
 
 				SCMToAll(-1, gstr);
                 admin_broadcast(COLOR_RED, amsg);
-				print(gstr);
-				print(amsg);
 
 	    		format(gstr2, sizeof(gstr2), ""red"You have been banned!"white"\n\nAdmin: %s\nReason: %s\nExpires: %s\n\nIf you think that you have been banned wrongly,\nwrite a ban appeal on "SVRFORUM"",
 					__GetName(playerid),
@@ -12719,8 +12712,6 @@ YCMD:ban(playerid, params[], help)
 
 				SCMToAll(-1, gstr);
                 admin_broadcast(COLOR_RED, amsg);
-				print(gstr);
-				print(amsg);
 
 	    		format(gstr2, sizeof(gstr2), ""red"You have been banned!"white"\n\nAdmin: %s\nReason: %s\nExpires: %s\n\nIf you think that you have been banned wrongly,\nwrite a ban appeal on "SVRFORUM"",
 					__GetName(playerid),
@@ -15597,7 +15588,6 @@ YCMD:freeze(playerid, params[], help)
 			
 			format(gstr, sizeof(gstr), ""red"Adm: %s(%i) has been frozen by %s(%i)", __GetName(player), player, __GetName(playerid), playerid);
 			admin_broadcast(-1, gstr);
-			print(gstr);
  		}
 		else
 		{
@@ -21952,7 +21942,7 @@ fallout_broadcast(const string[])
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(IsPlayerAvail(i) && gTeam[i] == FALLOUT)
+		if(gTeam[i] == FALLOUT)
 		{
 			SCM(i, GREY, gstr);
 		}
@@ -21965,7 +21955,7 @@ derby_broadcast(const string[])
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(IsPlayerAvail(i) && gTeam[i] == DERBY)
+		if(gTeam[i] == DERBY)
 		{
 			SCM(i, -1, gstr);
 		}
@@ -21978,7 +21968,7 @@ tdm_broadcast(const string[])
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(IsPlayerAvail(i) && (gTeam[i] == gBG_TEAM1 || gTeam[i] == gBG_VOTING || gTeam[i] == gBG_TEAM2))
+		if(gTeam[i] == gBG_TEAM1 || gTeam[i] == gBG_VOTING || gTeam[i] == gBG_TEAM2)
 		{
   			SCM(i, -1, gstr);
 		}
@@ -21991,7 +21981,7 @@ race_broadcast(const string[])
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(IsPlayerAvail(i) && gTeam[i] == gRACE)
+		if(gTeam[i] == gRACE)
 		{
 			SCM(i, -1, gstr);
 		}
@@ -22002,12 +21992,9 @@ gang_broadcast(gangid, const string[])
 {
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-	    if(IsPlayerAvail(i))
-	    {
-			if(PlayerData[i][e_gangid] == gangid && PlayerData[i][e_gangrank] != GANG_POS_NONE)
-			{
-				SCM(i, RED, string);
-			}
+		if(PlayerData[i][e_gangid] == gangid && PlayerData[i][e_gangrank] != GANG_POS_NONE)
+		{
+			SCM(i, RED, string);
 		}
 	}
 }
@@ -22017,7 +22004,7 @@ admin_broadcast(color, const string[], bool:beep = false, bool:gc = false)
 	new count = 0;
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(IsPlayerAvail(i) && PlayerData[i][e_level] >= 1)
+		if(PlayerData[i][e_level] >= 1)
 		{
 		    if(gc && PlayerData[i][bHideGC]) continue;
 		    
@@ -22033,7 +22020,7 @@ vip_broadcast(color, const msg[])
 {
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(IsPlayerAvail(i) && (PlayerData[i][e_vip] == 1 || PlayerData[i][e_level] > 0))
+		if(PlayerData[i][e_vip] == 1 || PlayerData[i][e_level] > 0)
 		{
 			SCM(i, color, msg);
 		}
@@ -23374,7 +23361,6 @@ server_initialize()
 	{
 	    format(gstr, sizeof(gstr), "%s\n", g_sCustomCarCategories[i]);
 	    strcat(g_sCustomCarCategory, gstr);
-		print(g_sCustomCarCategory);
 	}
 		
 	// Other stuff to initialize TODO: Overhaul spawns using polygons
@@ -28040,8 +28026,6 @@ function:ShowDialog(playerid, dialogid)
 		case CARBUY_DIALOG:
 		{
   			ShowPlayerDialog(playerid, CARBUY_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Custom car shop", g_sCustomCarCategory, "Select", "Cancel");
-			print("now:");
-			print(g_sCustomCarCategory);
 		}
 		case GMENU_DIALOG:
 		{
@@ -29126,9 +29110,13 @@ function:OnNCReceive2(playerid, name[])
 
 GetNearestHouse(playerid)
 {
+	new Float:fPOS[3];
+	GetPlayerPos(playerid, fPOS[0], fPOS[1], fPOS[2]);
+
 	for(new i = 0; i < houseid; i++)
 	{
-	    if(!IsPlayerInRangeOfPoint(playerid, 1.5, HouseData[i][e_x], HouseData[i][e_y], HouseData[i][e_z])) continue;
+	    if(GetDistance3D(fPOS[0], fPOS[1], fPOS[2], HouseData[i][e_x], HouseData[i][e_y], HouseData[i][e_z]) > 2.0) continue;
+	    //if(!IsPlayerInRangeOfPoint(playerid, 1.5, HouseData[i][e_x], HouseData[i][e_y], HouseData[i][e_z])) continue;
 
 	    return i;
 	}
