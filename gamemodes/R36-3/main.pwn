@@ -713,6 +713,8 @@ enum E_PLAYER_DATA // Prefixes: i = Integer, s = String, b = bool, f = Float, p 
   	tickLastChat,
   	tickLastPM,
   	tickPlayerUpdate,
+  	tickPlayerUpdateCalls,
+  	tickPlayerUpdateCalls2,
   	tickLastCD,
     tickJoin_bmx,
     tickLastBan,
@@ -2719,6 +2721,7 @@ new Iterator:iterRaceJoins<MAX_PLAYERS>,
 	g_CustomCarShops[CAR_SHOPS][E_CAR_SHOP],
     g_dialogTpString[2000],
 	g_cmdString[32],
+	gint = 0,
 	gstr[144],
 	gstr2[255],
 	g_LottoNumber,
@@ -4614,6 +4617,8 @@ public OnRconLoginAttempt(ip[], password[], success)
 public OnPlayerUpdate(playerid)
 {
     PlayerData[playerid][tickPlayerUpdate] = GetTickCountEx();
+    PlayerData[playerid][tickPlayerUpdateCalls]++;
+    PlayerData[playerid][tickPlayerUpdateCalls2]++;
 
 	switch(gTeam[playerid])
 	{
@@ -4642,31 +4647,40 @@ public OnPlayerUpdate(playerid)
 	    }
 	    case FREEROAM:
 	    {
-	        if(PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
+	        if(PlayerData[playerid][tickPlayerUpdateCalls2] >= 4)
 	        {
-		        switch(GetPlayerWeapon(playerid))
+		        if(PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 		        {
-		            case 38, 36, 35:
-		            {
-			            ResetPlayerWeapons(playerid);
-			            return 0;
-		            }
-		        }
+			        switch(GetPlayerWeapon(playerid))
+			        {
+			            case 38, 36, 35:
+			            {
+				            ResetPlayerWeapons(playerid);
+				            return 0;
+			            }
+			        }
+				}
+				PlayerData[playerid][tickPlayerUpdateCalls2] = 0;
 			}
 	    }
+	    default: PlayerData[playerid][tickPlayerUpdateCalls2] = 0;
 	}
-	
-    if(PlayerData[playerid][bSpeedo])
-    {
-        if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
-        {
-	        new Float:p[3], Float:sspeed, str[12];
-	        GetVehicleVelocity(GetPlayerVehicleID(playerid), p[0], p[1], p[2]);
-	        sspeed = 150 * (p[0] * p[0] + p[1] * p[1]/*+p[2]*p[2]*/);
-	        format(str, sizeof(str), "%.0f", sspeed);
 
-			PlayerTextDrawSetString(playerid, TXTSpeedo[playerid], str);
+	if(PlayerData[playerid][tickPlayerUpdateCalls] >= 10)
+	{
+	    if(PlayerData[playerid][bSpeedo])
+	    {
+	        if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
+	        {
+		        new Float:p[3], Float:sspeed, str[12];
+		        GetVehicleVelocity(GetPlayerVehicleID(playerid), p[0], p[1], p[2]);
+		        sspeed = 150 * (p[0] * p[0] + p[1] * p[1]/*+p[2]*p[2]*/);
+		        format(str, sizeof(str), "%.0f", sspeed);
+
+				PlayerTextDrawSetString(playerid, TXTSpeedo[playerid], str);
+			}
 		}
+		PlayerData[playerid][tickPlayerUpdateCalls] = 0;
 	}
 	return 1;
 }
@@ -31488,6 +31502,8 @@ ResetPlayerVars(playerid)
   	PlayerData[playerid][tickLastChat] = 0;
   	PlayerData[playerid][tickLastPM] = 0;
   	PlayerData[playerid][tickPlayerUpdate] = 0;
+  	PlayerData[playerid][tickPlayerUpdateCalls] = 0;
+  	PlayerData[playerid][tickPlayerUpdateCalls2] = 0;
   	PlayerData[playerid][tickLastCD] = 0;
     PlayerData[playerid][tickJoin_bmx] = 0;
     PlayerData[playerid][iKickBanIssued] = 0,
