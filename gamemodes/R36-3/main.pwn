@@ -4434,7 +4434,6 @@ function:OnQueryFinish(query[], resultid, extraid, connectionHandle)
 
 				for(new i = 0; i < MAX_PLAYERS; i++)
 				{
-				    if(!IsPlayerConnected(i)) continue;
 				    if(PlayerData[i][e_gangrank] == 0) continue;
 				    if(PlayerData[i][e_gangid] != PlayerData[extraid][e_gangid]) continue;
 				    if(count <= 20)
@@ -19005,7 +19004,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				for(new i = 0; i < MAX_PLAYERS; i++)
 				{
-				    if(IsPlayerConnected(i) && i != playerid)
+				    if(i != playerid)
 				    {
 				        if(PlayerData[i][e_gangid] == PlayerData[playerid][e_gangid] || PlayerData[i][TmpGangID] == PlayerData[playerid][e_gangid])
 				        {
@@ -23266,16 +23265,9 @@ function:xReactionTest()
 
     ReactionOn = true;
     
-	new xLength = (random(8) + 3),
-		count = 0;
+	new xLength = (random(8) + 3);
 
-	for(new i = 0; i < MAX_PLAYERS; i++)
-	{
-	    if(IsPlayerConnected(i)) 
-			count++;
-	}
-
-	xCash = 250 * count;
+	xCash = 250 * (T_ServerPlayers > 1 && T_ServerPlayers < MAX_PLAYERS) ? T_ServerPlayers : 30;
 	xScore = (random(7) + 2);
 	format(xChars, sizeof(xChars), "");
 	
@@ -24958,7 +24950,7 @@ function:StartDerbyMap1()
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    PlayerData[i][bDerbyWinner] = false;
-		if(gTeam[i] == DERBY && IsPlayerConnected(i))
+		if(gTeam[i] == DERBY)
 		{
 		    ClearAnimations(i);
 		    SetPlayerSpecialAction(i, SPECIAL_ACTION_NONE);
@@ -24990,7 +24982,7 @@ function:StartDerbyMap1()
 
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !PlayerData[i][bDerbyAFK])
+		if(gTeam[i] == DERBY && !PlayerData[i][bDerbyAFK])
 		{
 			PlayerData[i][bDerbyWinner] = true;
 			DerbyPlayers++;
@@ -25053,7 +25045,7 @@ function:StartDerbyMap2()
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    PlayerData[i][bDerbyWinner] = false;
-		if(gTeam[i] == DERBY && IsPlayerConnected(i))
+		if(gTeam[i] == DERBY)
   		{
 		    ClearAnimations(i);
 		    SetPlayerSpecialAction(i, SPECIAL_ACTION_NONE);
@@ -25085,7 +25077,7 @@ function:StartDerbyMap2()
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-  		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !PlayerData[i][bDerbyAFK])
+  		if(gTeam[i] == DERBY && !PlayerData[i][bDerbyAFK])
 		{
 			PlayerData[i][bDerbyWinner] = true;
 			DerbyPlayers++;
@@ -25148,7 +25140,7 @@ function:StartDerbyMap3()
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    PlayerData[i][bDerbyWinner] = false;
-		if(gTeam[i] == DERBY && IsPlayerConnected(i))
+		if(gTeam[i] == DERBY)
 		{
 		    ClearAnimations(i);
 		    SetPlayerSpecialAction(i, SPECIAL_ACTION_NONE);
@@ -25180,7 +25172,7 @@ function:StartDerbyMap3()
 
     for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !PlayerData[i][bDerbyAFK])
+		if(gTeam[i] == DERBY && !PlayerData[i][bDerbyAFK])
 		{
 			PlayerData[i][bDerbyWinner] = true;
 			DerbyPlayers++;
@@ -25243,7 +25235,7 @@ function:StartDerbyMap4()
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    PlayerData[i][bDerbyWinner] = false;
-		if(gTeam[i] == DERBY && IsPlayerConnected(i))
+		if(gTeam[i] == DERBY)
 		{
 		    ClearAnimations(i);
 		    SetPlayerSpecialAction(i, SPECIAL_ACTION_NONE);
@@ -25275,7 +25267,7 @@ function:StartDerbyMap4()
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !PlayerData[i][bDerbyAFK])
+		if(gTeam[i] == DERBY && !PlayerData[i][bDerbyAFK])
   		{
 			PlayerData[i][bDerbyWinner] = true;
 			DerbyPlayers++;
@@ -25338,7 +25330,7 @@ function:StartDerbyMap5()
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    PlayerData[i][bDerbyWinner] = false;
-		if(gTeam[i] == DERBY && IsPlayerConnected(i))
+		if(gTeam[i] == DERBY)
 		{
 		    ClearAnimations(i);
 		    SetPlayerSpecialAction(i, SPECIAL_ACTION_NONE);
@@ -25370,7 +25362,7 @@ function:StartDerbyMap5()
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !PlayerData[i][bDerbyAFK])
+		if(gTeam[i] == DERBY && !PlayerData[i][bDerbyAFK])
 		{
 			PlayerData[i][bDerbyWinner] = true;
 			DerbyPlayers++;
@@ -25433,7 +25425,7 @@ function:StartDerbyMap6()
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    PlayerData[i][bDerbyWinner] = false;
-		if(gTeam[i] == DERBY && IsPlayerConnected(i))
+		if(gTeam[i] == DERBY)
 		{
 		    ClearAnimations(i);
 		    SetPlayerSpecialAction(i, SPECIAL_ACTION_NONE);
@@ -25465,7 +25457,7 @@ function:StartDerbyMap6()
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !PlayerData[i][bDerbyAFK])
+		if(gTeam[i] == DERBY && !PlayerData[i][bDerbyAFK])
 		{
 			PlayerData[i][bDerbyWinner] = true;
 			DerbyPlayers++;
@@ -25518,7 +25510,7 @@ function:StartDerbyMap7()
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    PlayerData[i][bDerbyWinner] = false;
-		if(gTeam[i] == DERBY && IsPlayerConnected(i))
+		if(gTeam[i] == DERBY)
 		{
 		    ClearAnimations(i);
 		    SetPlayerSpecialAction(i, SPECIAL_ACTION_NONE);
@@ -25550,7 +25542,7 @@ function:StartDerbyMap7()
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !PlayerData[i][bDerbyAFK])
+		if(gTeam[i] == DERBY && !PlayerData[i][bDerbyAFK])
 		{
 			PlayerData[i][bDerbyWinner] = true;
 			DerbyPlayers++;
@@ -25603,7 +25595,7 @@ function:StartDerbyMap8()
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    PlayerData[i][bDerbyWinner] = false;
-		if(gTeam[i] == DERBY && IsPlayerConnected(i))
+		if(gTeam[i] == DERBY)
 		{
 		    ClearAnimations(i);
 		    SetPlayerSpecialAction(i, SPECIAL_ACTION_NONE);
@@ -25635,7 +25627,7 @@ function:StartDerbyMap8()
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !PlayerData[i][bDerbyAFK])
+		if(gTeam[i] == DERBY && !PlayerData[i][bDerbyAFK])
 		{
 			PlayerData[i][bDerbyWinner] = true;
 			DerbyPlayers++;
@@ -25688,7 +25680,7 @@ function:StartDerbyMap9()
  	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
 	    PlayerData[i][bDerbyWinner] = false;
-		if(gTeam[i] == DERBY && IsPlayerConnected(i))
+		if(gTeam[i] == DERBY)
 		{
 		    ClearAnimations(i);
 		    SetPlayerSpecialAction(i, SPECIAL_ACTION_NONE);
@@ -25720,7 +25712,7 @@ function:StartDerbyMap9()
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-		if(gTeam[i] == DERBY && IsPlayerConnected(i) && !PlayerData[i][bDerbyAFK])
+		if(gTeam[i] == DERBY && !PlayerData[i][bDerbyAFK])
 		{
 			PlayerData[i][bDerbyWinner] = true;
 			DerbyPlayers++;
@@ -30103,7 +30095,6 @@ function:race_countdown()
 			format(gstr, sizeof(gstr), "~y~RACE STARTING IN~n~~p~- %i -~n~~y~SECONDS", g_RaceCountDown);
 			for(new i = 0; i < MAX_PLAYERS; i++)
 			{
-			    if(!IsPlayerConnected(i)) continue;
 			    if(gTeam[i] == gRACE)
 			    {
 			    	GameTextForPlayer(i, gstr, 999, 3);
@@ -30127,7 +30118,6 @@ race_start()
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-	    if(!IsPlayerConnected(i)) continue;
 	    if(gTeam[i] == gRACE)
 	    {
 	        TogglePlayerControllable(i, true);
@@ -30173,7 +30163,6 @@ function:race_stop()
     
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-	    if(!IsPlayerConnected(i)) continue;
 	    if(gTeam[i] == gRACE)
 	    {
 			TogglePlayerControllable(i, true);
@@ -30301,7 +30290,7 @@ race_calculate_position()
 
 	for(new i = 0; i < MAX_PLAYERS && c < RACE_MAX_PLAYERS; i++)
 	{
-        if(IsPlayerConnected(i) && gTeam[i] == gRACE)
+        if(gTeam[i] == gRACE)
 		{
 			if((vehicleid = GetPlayerVehicleID(i)) != INVALID_VEHICLE_ID)
 			{
@@ -30872,17 +30861,16 @@ ResetPlayerWorld(playerid)
 
 IsPlayerAvail(playerid)
 {
-	if(playerid < 0 || playerid >= MAX_PLAYERS)
-	    return 0;
-
 	if(playerid == INVALID_PLAYER_ID)
 		return 0;
 
-	if(IsPlayerConnected(playerid) && PlayerData[playerid][ExitType] == EXIT_FIRST_SPAWNED)
-	{
-	    return 1;
-	}
-	return 0;
+	if(playerid < 0 || playerid >= MAX_PLAYERS)
+	    return 0;
+
+	if(!IsPlayerConnected(playerid) || PlayerData[playerid][ExitType] != EXIT_FIRST_SPAWNED)
+		return 0;
+		
+	return 1;
 }
 
 SollIchDirMaEtWatSagen()
