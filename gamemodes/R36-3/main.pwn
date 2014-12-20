@@ -573,7 +573,7 @@ enum
 enum
 {
 	gNONE,
-	FREEROAM,
+	gFREEROAM,
 	DERBY,
  	gRACE,
 	gBG_TEAM1,
@@ -3088,7 +3088,7 @@ public OnPlayerSpawn(playerid)
     
     if(PlayerData[playerid][bFirstSpawn])
     {
-        gTeam[playerid] = FREEROAM;
+        gTeam[playerid] = gFREEROAM;
         PlayerData[playerid][bFirstSpawn] = false;
 		PlayerData[playerid][bAllowSpawn] = false;
 		AttachPlayerToys(playerid);
@@ -3110,7 +3110,7 @@ public OnPlayerSpawn(playerid)
     }
     else switch(gTeam[playerid])
     {
-        case FREEROAM:
+        case gFREEROAM:
         {
             ResetPlayerWorld(playerid);
             
@@ -3153,14 +3153,14 @@ public OnPlayerSpawn(playerid)
         }
 	    case STORE:
 	    {
-			gTeam[playerid] = FREEROAM;
+			gTeam[playerid] = gFREEROAM;
 			ResetPlayerWorld(playerid);
 			RandomSpawn(playerid);
    			RandomWeapons(playerid);
 	    }
 	    case BUYCAR:
 	    {
-			gTeam[playerid] = FREEROAM;
+			gTeam[playerid] = gFREEROAM;
 			SetPlayerInterior(playerid, 0);
 		    SetPlayerPosEx(playerid, 1798.0952, -1410.8192, floatadd(13.5458, 4.5));
 			RandomWeapons(playerid);
@@ -3177,7 +3177,7 @@ public OnPlayerSpawn(playerid)
 			RandomWeapons(playerid);
 			player_notice(playerid, "No longer spectating", "");
 			
-			gTeam[playerid] = FREEROAM;
+			gTeam[playerid] = gFREEROAM;
 
 			if(GetPVarInt(playerid, "HadGod") == 1) Command_ReProcess(playerid, "/god silent", false);
         }
@@ -3327,7 +3327,7 @@ public OnPlayerSpawn(playerid)
 			ResetPlayerWorld(playerid);
 			RandomSpawn(playerid);
 			RandomWeapons(playerid);
-			gTeam[playerid] = FREEROAM;
+			gTeam[playerid] = gFREEROAM;
 		}
 		case GUNGAME:
   		{
@@ -3499,7 +3499,7 @@ public OnPlayerSpawn(playerid)
 		SetPlayerHealth(playerid, 99999.0);
 	}
 	
-	if(gTeam[playerid] == FREEROAM) PlayerTextDrawShow(playerid, TXTWantedsTD[playerid]);
+	if(gTeam[playerid] == gFREEROAM) PlayerTextDrawShow(playerid, TXTWantedsTD[playerid]);
     if(!PlayerData[playerid][bTextdraws]) Command_ReProcess(playerid, "/hidef", false);
 
     PlayerData[playerid][bIsDead] = false;
@@ -3627,7 +3627,7 @@ public OnPlayerDisconnect(playerid, reason)
 		            {
 		                global_broadcast("Duel canceled between %s and %s. Reason: Disconnect", __GetName(playerid), __GetName(i));
 
-		                gTeam[i] = FREEROAM;
+		                gTeam[i] = gFREEROAM;
 		                ResetPlayerWorld(i);
 		                RandomSpawn(i, true);
 		                RandomWeapons(i);
@@ -3647,7 +3647,7 @@ public OnPlayerDisconnect(playerid, reason)
 				        {
 				           	global_broadcast(">> Duel canceled between %s and %s. Reason: Disconnect", __GetName(playerid), __GetName(i));
 
-		 		            gTeam[i] = FREEROAM;
+		 		            gTeam[i] = gFREEROAM;
 
 				            PlayerData[i][DuelRequestRecv] = INVALID_PLAYER_ID;
 				            PlayerData[i][DuelRequest] = INVALID_PLAYER_ID;
@@ -3675,7 +3675,7 @@ public OnPlayerDisconnect(playerid, reason)
 		    {
 		        --g_RacePlayerCount;
 
-				gTeam[playerid] = FREEROAM;
+				gTeam[playerid] = gFREEROAM;
 				
 				if(g_RaceVehicle[playerid] != -1)
 				{
@@ -3715,7 +3715,7 @@ public OnPlayerDisconnect(playerid, reason)
 			case FALLOUT:
 			{
                 PlayerData[playerid][bFalloutLost] = true;
-				gTeam[playerid] = FREEROAM;
+				gTeam[playerid] = gFREEROAM;
 				CurrentFalloutPlayers--;
 
 				if(fallout_get_playercount() < 2)
@@ -3733,7 +3733,7 @@ public OnPlayerDisconnect(playerid, reason)
 						    ResetPlayerWorld(i);
 						    global_broadcast("Fallout has been canceled! Reason: %s disconnected.", __GetName(playerid));
 						    
-						    gTeam[i] = FREEROAM;
+						    gTeam[i] = gFREEROAM;
 					    }
 					}
 					
@@ -3752,7 +3752,7 @@ public OnPlayerDisconnect(playerid, reason)
 			    if(!PlayerData[playerid][bDerbyAFK])
 				{
 				    CurrentDerbyPlayers--;
-                    gTeam[playerid] = FREEROAM;
+                    gTeam[playerid] = gFREEROAM;
 			 		if(!IsDerbyRunning)
 				    {
 						if(CurrentDerbyPlayers < 2)
@@ -4149,7 +4149,7 @@ public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY
 	/* ANTI DRIVEBY SPAWNZONES */
 	if(hittype == BULLET_HIT_TYPE_PLAYER) {
 	    if(hitid != INVALID_PLAYER_ID) {
-            if(gTeam[hitid] == FREEROAM) {
+            if(gTeam[hitid] == gFREEROAM) {
 				if(GetPlayerVehicleSeat(playerid) == 0) {
 					for(new i = 0; i < sizeof(g_SpawnAreas); i++) {
 					    if(IsPlayerInDynamicArea(playerid, g_SpawnAreas[i])) {
@@ -4180,7 +4180,7 @@ public OnPlayerWeaponShot(playerid, weaponid, hittype, hitid, Float:fX, Float:fY
 	/* LAST HIT */
 	if(hittype == BULLET_HIT_TYPE_PLAYER) {
 	    if(hitid != INVALID_PLAYER_ID) {
-	        if(gTeam[hitid] == FREEROAM) {
+	        if(gTeam[hitid] == gFREEROAM) {
 	        	PlayerData[hitid][tickLastShot] = GetTickCountEx();
 			}
 		}
@@ -4647,7 +4647,7 @@ public OnPlayerUpdate(playerid)
 				}
 			}
 	    }
-	    case FREEROAM:
+	    case gFREEROAM:
 	    {
 	        if(PlayerData[playerid][tickPlayerUpdateCalls2] >= 4)
 	        {
@@ -5012,7 +5012,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 
 	if(killerid != INVALID_PLAYER_ID)
 	{
-		if(reason <= 46 && gTeam[killerid] == FREEROAM && IsPlayerConnected(killerid) && PlayerData[playerid][HitmanHit] > 0)
+		if(reason <= 46 && gTeam[killerid] == gFREEROAM && IsPlayerConnected(killerid) && PlayerData[playerid][HitmanHit] > 0)
 		{
 			format(gstr, sizeof(gstr), "%s(%i) killed %s(%i) and received $%s for a completed hit!", __GetName(killerid), killerid, __GetName(playerid), playerid, number_format(PlayerData[playerid][HitmanHit]));
 			SCMToAll(YELLOW, gstr);
@@ -5092,8 +5092,8 @@ public OnPlayerDeath(playerid, killerid, reason)
 		            GetPlayerHealth(i, HP);
 		            global_broadcast(">> DUEL: %s won the duel against %s and has %.2f HP left!", __GetName(i), __GetName(playerid), HP);
 		            
- 		            gTeam[i] = FREEROAM;
-		            gTeam[playerid] = FREEROAM;
+ 		            gTeam[i] = gFREEROAM;
+		            gTeam[playerid] = gFREEROAM;
 		            
 		            PlayerData[i][DuelRequestRecv] = INVALID_PLAYER_ID;
 		            PlayerData[playerid][DuelRequestRecv] = INVALID_PLAYER_ID;
@@ -5120,8 +5120,8 @@ public OnPlayerDeath(playerid, killerid, reason)
 			            GetPlayerHealth(i, HP);
 			            global_broadcast(">> DUEL: %s won the duel against %s and has %.2f HP left!", __GetName(i), __GetName(playerid), HP);
 
-	 		            gTeam[i] = FREEROAM;
-			            gTeam[playerid] = FREEROAM;
+	 		            gTeam[i] = gFREEROAM;
+			            gTeam[playerid] = gFREEROAM;
 
 			            PlayerData[i][DuelRequestRecv] = INVALID_PLAYER_ID;
 			            PlayerData[playerid][DuelRequestRecv] = INVALID_PLAYER_ID;
@@ -5148,7 +5148,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 			}
 		    RemoveFromRaceBuilder(playerid);
 		}
-	    case FREEROAM:
+	    case gFREEROAM:
 	    {
             if(PlayerData[playerid][bHasCustomSpawn] && !PlayerData[playerid][bGWarMode])
             {
@@ -5160,7 +5160,7 @@ public OnPlayerDeath(playerid, killerid, reason)
                 SetSpawnInfoEx(playerid, NO_TEAM, GetPlayerSkin(playerid), WorldSpawns[rand][0], WorldSpawns[rand][1], WorldSpawns[rand][2] + 3.0, WorldSpawns[rand][3]);
             }
 	    
-	        if(IsPlayerAvail(killerid) && playerid != killerid && gTeam[killerid] == FREEROAM)
+	        if(IsPlayerAvail(killerid) && playerid != killerid && gTeam[killerid] == gFREEROAM)
      		{
 			    PlayerData[killerid][e_wanteds]++;
 
@@ -5265,7 +5265,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 				format(gstr, sizeof(gstr), "~y~[] ~w~%i", PlayerData[playerid][e_wanteds]);
 				PlayerTextDrawSetString(playerid, TXTWantedsTD[playerid], gstr);
 				
-			  	// Nur Kills bei FREEROAM werten für GangScore
+			  	// Nur Kills bei gFREEROAM werten für GangScore
 			 	if(PlayerData[killerid][e_gangrank] > 0 && PlayerData[playerid][e_gangid] != PlayerData[killerid][e_gangid])
 				{
 				  	SQL_UpdateGangScore(PlayerData[killerid][e_gangid], 1);
@@ -5279,7 +5279,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 	    	format(gstr, sizeof(gstr), "%s(%i) has died!", __GetName(playerid), playerid);
 			race_broadcast(gstr);
 
-			gTeam[playerid] = FREEROAM;
+			gTeam[playerid] = gFREEROAM;
 
 			if(g_RaceVehicle[playerid] != -1)
 			{
@@ -5349,7 +5349,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 		    
 		    CurrentFalloutPlayers--;
             PlayerData[playerid][bFalloutLost] = true;
-            gTeam[playerid] = FREEROAM;
+            gTeam[playerid] = gFREEROAM;
 
 			if(fallout_get_playercount() < 2)
 			{
@@ -5366,7 +5366,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 					    ResetPlayerWorld(i);
 					    fallout_broadcast("Fallout has been canceled!");
 					    
-						gTeam[i] = FREEROAM;
+						gTeam[i] = gFREEROAM;
 				    }
 				}
 				
@@ -5606,7 +5606,7 @@ public OnPlayerDeath(playerid, killerid, reason)
 
 public OnPlayerEnterDynamicArea(playerid, areaid)
 {
-	if(gTeam[playerid] != FREEROAM)
+	if(gTeam[playerid] != gFREEROAM)
 		return 1;
 	
 	for(new r = 0; r < MAX_GZONES; r++)
@@ -6057,7 +6057,7 @@ public OnPlayerEnterDynamicCP(playerid, checkpointid)
 		}
 		case 35:
 		{
-			if(GetPlayerState(playerid) == PLAYER_STATE_ONFOOT && gTeam[playerid] == FREEROAM)
+			if(GetPlayerState(playerid) == PLAYER_STATE_ONFOOT && gTeam[playerid] == gFREEROAM)
 			{
 				ShowDialog(playerid, CM_DIALOG);
 			}
@@ -6262,7 +6262,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 
 	switch(gTeam[playerid])
 	{
-	    case FREEROAM:
+	    case gFREEROAM:
 	    {
 		    if(pickupid == mc_tp || pickupid == beach_tp)
 		    {
@@ -6392,7 +6392,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 			    SetPlayerPosition(playerid, -2622.6589,1406.2648,7.1016,178.5571);
 			    ResetPlayerWorld(playerid);
 			    PlayerPlaySound(playerid, 1069, 0, 0, 0);
-			    gTeam[playerid] = FREEROAM;
+			    gTeam[playerid] = gFREEROAM;
 			    return 1;
 			}
 		}
@@ -6407,7 +6407,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 						SetPlayerInterior(playerid, 0);
 					    SetPlayerPos(playerid, g_CarShopLocations[i][0] - 2.0, g_CarShopLocations[i][1] - 2.0, g_CarShopLocations[i][2] + 0.5);
 					    RandomWeapons(playerid);
-						gTeam[playerid] = FREEROAM;
+						gTeam[playerid] = gFREEROAM;
 						gLastMap[playerid] = 0;
 			            return 1;
 			        }
@@ -6473,7 +6473,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
    		    format(file, sizeof(file), "/Store/Banks/%i.ini", b);
   			if(pickupid == BankPickInt[b])
 			{
-				gTeam[playerid] = FREEROAM;
+				gTeam[playerid] = gFREEROAM;
 				SetPlayerPos(playerid, dini_Float(file, "SpawnOutX"), dini_Float(file, "SpawnOutY"), dini_Float(file, "SpawnOutZ"));
 		        SetPlayerFacingAngle(playerid, dini_Float(file, "SpawnOutAngle"));
 		        SetPlayerInterior(playerid, 0);
@@ -6487,7 +6487,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 		    format(file, sizeof(file), "/Store/Ammunations/%i.ini", a);
 			if(pickupid == AmmunationPickInt[a])
 			{
-			    gTeam[playerid] = FREEROAM;
+			    gTeam[playerid] = gFREEROAM;
 				SetPlayerPos(playerid, dini_Float(file, "SpawnOutX"), dini_Float(file, "SpawnOutY"), dini_Float(file, "SpawnOutZ"));
 		        SetPlayerFacingAngle(playerid, dini_Float(file, "SpawnOutAngle"));
 		        SetPlayerInterior(playerid, 0);
@@ -6501,7 +6501,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 		    format(file, sizeof(file), "/Store/BurgerShots/%i.ini", bs);
 			if(pickupid == BurgerPickInt[bs])
 			{
-			    gTeam[playerid] = FREEROAM;
+			    gTeam[playerid] = gFREEROAM;
 				SetPlayerPos(playerid, dini_Float(file, "SpawnOutX"), dini_Float(file, "SpawnOutY"), dini_Float(file, "SpawnOutZ"));
 		        SetPlayerFacingAngle(playerid, dini_Float(file, "SpawnOutAngle"));
 		        SetPlayerInterior(playerid, 0);
@@ -6515,7 +6515,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 		    format(file, sizeof(file), "/Store/CluckinBells/%i.ini", cb);
 			if(pickupid == CluckinBellPickInt[cb])
 			{
-			    gTeam[playerid] = FREEROAM;
+			    gTeam[playerid] = gFREEROAM;
 				SetPlayerPos(playerid, dini_Float(file, "SpawnOutX"), dini_Float(file, "SpawnOutY"), dini_Float(file, "SpawnOutZ"));
 		        SetPlayerFacingAngle(playerid, dini_Float(file, "SpawnOutAngle"));
 		        SetPlayerInterior(playerid, 0);
@@ -6529,7 +6529,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 		    format(file, sizeof(file), "/Store/WellStackedPizzas/%i.ini", ps);
 			if(pickupid == PizzaPickInt[ps])
 			{
-			    gTeam[playerid] = FREEROAM;
+			    gTeam[playerid] = gFREEROAM;
 				SetPlayerPos(playerid, dini_Float(file, "SpawnOutX"), dini_Float(file, "SpawnOutY"), dini_Float(file, "SpawnOutZ"));
 		        SetPlayerFacingAngle(playerid, dini_Float(file, "SpawnOutAngle"));
 		        SetPlayerInterior(playerid, 0);
@@ -6543,7 +6543,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 		    format(file, sizeof(file), "/Store/TwentyFourSeven/%i.ini", tfs);
 			if(pickupid == TFSPickInt[tfs])
 			{
-			    gTeam[playerid] = FREEROAM;
+			    gTeam[playerid] = gFREEROAM;
 				SetPlayerPos(playerid, dini_Float(file, "SpawnOutX"), dini_Float(file, "SpawnOutY"), dini_Float(file, "SpawnOutZ"));
 		        SetPlayerFacingAngle(playerid, dini_Float(file, "SpawnOutAngle"));
 		        SetPlayerInterior(playerid, 0);
@@ -6774,7 +6774,7 @@ public OnVehicleDamageStatusUpdate(vehicleid, playerid)
 		Log(LOG_NET, "Invalid data in OnVehicleDamageStatusUpdate(%i, %i)", vehicleid, playerid);
 	}
 
-	if(gTeam[playerid] == FREEROAM && !PlayerData[playerid][bGWarMode])
+	if(gTeam[playerid] == gFREEROAM && !PlayerData[playerid][bGWarMode])
 	{
     	SetVehicleHealth(vehicleid, 1000.0);
 		RepairVehicle(vehicleid);
@@ -6907,7 +6907,7 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 
 	if(GetPVarInt(playerid, "doingStunt") != 0) return 1;
 
-	if(gTeam[playerid] == FREEROAM)
+	if(gTeam[playerid] == gFREEROAM)
 	{
 	    if(IsPlayerInAnyVehicle(playerid) && GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
 	    {
@@ -8005,7 +8005,7 @@ YCMD:station(playerid, params[], help)
 
 YCMD:myskin(playerid, params[], help)
 {
-    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != gFREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
     if(IsPlayerInAnyVehicle(playerid)) return player_notice(playerid, "Exit your vehicle", "");
 
 	extract params -> new skin; else
@@ -8021,7 +8021,7 @@ YCMD:myskin(playerid, params[], help)
 
 YCMD:skins(playerid, params[], help)
 {
-    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != gFREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
     if(IsPlayerInAnyVehicle(playerid)) return player_notice(playerid, "Exit your vehicle", "");
 
     ShowModelSelectionMenu(playerid, skinlist, "Select Skin", 0x0500009C, 0x050000FF, 0xFAFAFA4D);
@@ -8054,7 +8054,7 @@ YCMD:fallout(playerid, params[], help)
 	}
 	
     if(gTeam[playerid] == FALLOUT) return SCM(playerid, -1, ""er"You are already in this minigame!");
-    if(gTeam[playerid] != FREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
+    if(gTeam[playerid] != gFREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
 	if(g_FalloutStatus == e_Fallout_Inactive)
 	{
@@ -8106,7 +8106,7 @@ YCMD:derby(playerid, params[], help)
 	}
 	
     if(gTeam[playerid] == DERBY) return SCM(playerid, -1, ""er"You are already in this minigame!");
-    if(gTeam[playerid] != FREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
+    if(gTeam[playerid] != gFREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 	
 	if(CurrentDerbyPlayers == MAX_DERBY_PLAYERS) return SCM(playerid, -1, ""er"Derby reached it's max Players!");
 
@@ -8153,7 +8153,7 @@ YCMD:war(playerid, params[], help)
 	}
 	
     if(gTeam[playerid] == WAR) return SCM(playerid, -1, ""er"You are already in this minigame!");
-    if(gTeam[playerid] != FREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
+    if(gTeam[playerid] != gFREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
     CheckPlayerGod(playerid);
 	
@@ -8200,7 +8200,7 @@ YCMD:dm(playerid, params[], help)
 	}
 
     if(gTeam[playerid] == DM && gLastMap[playerid] == DM_1) return SCM(playerid, -1, ""er"You are already in this minigame!");
-    if(gTeam[playerid] != FREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
+    if(gTeam[playerid] != gFREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
     CheckPlayerGod(playerid);
     Command_ReProcess(playerid, "/stopanims", false);
@@ -8234,7 +8234,7 @@ YCMD:dm2(playerid, params[], help)
 	}
 	
     if(gTeam[playerid] == DM && gLastMap[playerid] == DM_1) return SCM(playerid, -1, ""er"You are already in this minigame!");
-    if(gTeam[playerid] != FREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
+    if(gTeam[playerid] != gFREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
     CheckPlayerGod(playerid);
 	Command_ReProcess(playerid, "/stopanims", false);
@@ -8269,7 +8269,7 @@ YCMD:dm3(playerid, params[], help)
 	}
 	
     if(gTeam[playerid] == DM && gLastMap[playerid] == DM_1) return SCM(playerid, -1, ""er"You are already in this minigame!");
-    if(gTeam[playerid] != FREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
+    if(gTeam[playerid] != gFREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
     CheckPlayerGod(playerid);
     Command_ReProcess(playerid, "/stopanims", false);
@@ -8303,7 +8303,7 @@ YCMD:dm4(playerid, params[], help)
 	}
 	
     if(gTeam[playerid] == DM && gLastMap[playerid] == DM_1) return SCM(playerid, -1, ""er"You are already in this minigame!");
-    if(gTeam[playerid] != FREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
+    if(gTeam[playerid] != gFREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
     CheckPlayerGod(playerid);
     Command_ReProcess(playerid, "/stopanims", false);
@@ -8338,7 +8338,7 @@ YCMD:sawn(playerid, params[], help)
 	}
 
     if(gTeam[playerid] == gSAWN) return SCM(playerid, -1, ""er"You are already in this minigame!");
-    if(gTeam[playerid] != FREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
+    if(gTeam[playerid] != gFREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
     CheckPlayerGod(playerid);
     Command_ReProcess(playerid, "/stopanims", false);
@@ -8408,7 +8408,7 @@ YCMD:showf(playerid, params[], help)
 
 YCMD:flip(playerid, params[], help)
 {
-	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
+	if(gTeam[playerid] != gFREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 	if(GetPlayerState(playerid) != PLAYER_STATE_DRIVER) return SCM(playerid, -1, ""er"You must be a driver in a vehicle to flip it!");
 	
 	new veh, Float:angle;
@@ -8422,7 +8422,7 @@ YCMD:flip(playerid, params[], help)
 YCMD:s(playerid, params[], help)
 {
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
-    if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != gFREEROAM) return SCM(playerid, RED, NOT_AVAIL);
     if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't save your position now");
     
 	if(IsPlayerInAnyVehicle(playerid))
@@ -8444,7 +8444,7 @@ YCMD:s(playerid, params[], help)
 YCMD:l(playerid, params[], help)
 {
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
-	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
+	if(gTeam[playerid] != gFREEROAM) return SCM(playerid, RED, NOT_AVAIL);
     if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't load your position now");
 	if(!PlayerData[playerid][bStateSaved])
 	{
@@ -8488,14 +8488,14 @@ YCMD:l(playerid, params[], help)
 
 YCMD:t(playerid, params[], help)
 {
-	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
+	if(gTeam[playerid] != gFREEROAM) return SCM(playerid, RED, NOT_AVAIL);
  	ShowDialog(playerid, TELE_DIALOG);
 	return 1;
 }
 
 YCMD:parch(playerid, params[], help)
 {
-	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
+	if(gTeam[playerid] != gFREEROAM) return SCM(playerid, RED, NOT_AVAIL);
  	GivePlayerWeapon(playerid, 46, 1);
 	return 1;
 }
@@ -8687,7 +8687,7 @@ YCMD:elbow(playerid, params[], help)
 YCMD:sb(playerid, params[], help)
 {
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
-	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
+	if(gTeam[playerid] != gFREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 	if(PlayerData[playerid][bSpeedBoost])
     {
      	player_notice(playerid, "Speed Boost", "~r~OFF");
@@ -8704,7 +8704,7 @@ YCMD:sb(playerid, params[], help)
 YCMD:sj(playerid, params[], help)
 {
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
-	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
+	if(gTeam[playerid] != gFREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 	if(PlayerData[playerid][bSuperJump])
     {
      	player_notice(playerid, "Super Jump", "~r~OFF");
@@ -8720,7 +8720,7 @@ YCMD:sj(playerid, params[], help)
 
 YCMD:enter(playerid, params[], help)
 {
-	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
+	if(gTeam[playerid] != gFREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 
 	new i = -1;
 	if((i = GetNearestHouse(playerid)) != -1)
@@ -8846,7 +8846,7 @@ YCMD:buygc(playerid, params[], help)
 
 YCMD:bbuy(playerid, params[], help)
 {
-	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
+	if(gTeam[playerid] != gFREEROAM) return SCM(playerid, RED, NOT_AVAIL);
     if(!islogged(playerid)) return notlogged(playerid);
 
 	new tick = GetTickCountEx();
@@ -8912,7 +8912,7 @@ YCMD:bbuy(playerid, params[], help)
 
 YCMD:bsell(playerid, params[], help)
 {
-	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
+	if(gTeam[playerid] != gFREEROAM) return SCM(playerid, RED, NOT_AVAIL);
     if(!islogged(playerid)) return notlogged(playerid);
 
 	new tick = GetTickCountEx();
@@ -8967,7 +8967,7 @@ YCMD:bsell(playerid, params[], help)
 
 YCMD:buy(playerid, params[], help)
 {
-	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
+	if(gTeam[playerid] != gFREEROAM) return SCM(playerid, RED, NOT_AVAIL);
     if(!islogged(playerid)) return notlogged(playerid);
     
 	new tick = GetTickCountEx();
@@ -9039,7 +9039,7 @@ YCMD:buy(playerid, params[], help)
 
 YCMD:sell(playerid, params[], help)
 {
-	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
+	if(gTeam[playerid] != gFREEROAM) return SCM(playerid, RED, NOT_AVAIL);
     if(!islogged(playerid)) return notlogged(playerid);
     
 	new tick = GetTickCountEx();
@@ -9109,7 +9109,7 @@ YCMD:lock(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
     
-    if(gTeam[playerid] == FREEROAM)
+    if(gTeam[playerid] == gFREEROAM)
     {
 		if(GetPlayerState(playerid) == PLAYER_STATE_PASSENGER || GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
 		{
@@ -9154,7 +9154,7 @@ YCMD:lock(playerid, params[], help)
 
 YCMD:hlock(playerid, params[], help)
 {
-	if(gTeam[playerid] == FREEROAM || gTeam[playerid] == HOUSE)
+	if(gTeam[playerid] == gFREEROAM || gTeam[playerid] == HOUSE)
 	{
 		new tick = GetTickCountEx();
 
@@ -9224,7 +9224,7 @@ YCMD:gungame(playerid, params[], help)
 	}
 	
     if(gTeam[playerid] == GUNGAME) return SCM(playerid, -1, ""er"You are already in this minigame!");
-    if(gTeam[playerid] != FREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
+    if(gTeam[playerid] != gFREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
     CheckPlayerGod(playerid);
     Command_ReProcess(playerid, "/stopanims", false);
@@ -9264,7 +9264,7 @@ YCMD:cnr(playerid, params[], help)
 /*    if(gTeam[playerid] == CNR)
 		return player_notice(playerid, "You already joined CnR", "");
 
-	if(gTeam[playerid] != FREEROAM)
+	if(gTeam[playerid] != gFREEROAM)
 		return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 	
 	new robbers = 0, cops = 0;
@@ -9283,7 +9283,7 @@ YCMD:cnr(playerid, params[], help)
 	ShowPlayerDialog(playerid, CNR_DIALOG, DIALOG_STYLE_LIST, ""YELLOW_E"Choose your side", string, "Select", "Cancel");
 */
     if(gTeam[playerid] == CNR) return SCM(playerid, -1, ""er"You are already in this minigame!");
-    if(gTeam[playerid] != FREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
+    if(gTeam[playerid] != gFREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
 	new robbers = 0, cops = 0;
 	
@@ -9328,7 +9328,7 @@ YCMD:duel(playerid, params[], help)
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't join duels while being in a Gang War, type /exit");
     
     if(gTeam[playerid] == gDUEL) return SCM(playerid, -1, ""er"You are already dueling!");
-    if(gTeam[playerid] != FREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
+    if(gTeam[playerid] != gFREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
     
     new player;
     if(sscanf(params, "r", player))
@@ -9340,7 +9340,7 @@ YCMD:duel(playerid, params[], help)
         else
         {
             if(!IsPlayerAvail(PlayerData[playerid][DuelRequestRecv])) return SCM(playerid, -1, ""er"Player is not available");
-            if(gTeam[PlayerData[playerid][DuelRequestRecv]] != FREEROAM) return SCM(playerid, -1, ""er"Player is not in freeroam world");
+            if(gTeam[PlayerData[playerid][DuelRequestRecv]] != gFREEROAM) return SCM(playerid, -1, ""er"Player is not in freeroam world");
             if(IsPlayerOnDesktop(PlayerData[playerid][DuelRequestRecv], 1500)) return SCM(playerid, -1, ""er"Player is on desktop");
             if(PlayerData[PlayerData[playerid][DuelRequestRecv]][DuelRequest] != playerid) return SCM(playerid, -1, ""er"Error: Players do not match");
 
@@ -9434,7 +9434,7 @@ YCMD:tdm(playerid, params[], help)
 	}
 	
     if(gTeam[playerid] == gBG_VOTING || gTeam[playerid] == gBG_TEAM1 || gTeam[playerid] == gBG_TEAM2) return SCM(playerid, -1, ""er"You are already in this minigame!");
-    if(gTeam[playerid] != FREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
+    if(gTeam[playerid] != gFREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 	
     CheckPlayerGod(playerid);
     Command_ReProcess(playerid, "/stopanims", false);
@@ -9687,7 +9687,7 @@ YCMD:minigun(playerid, params[], help)
 {
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't join minigames while being in a Gang War, type /exit");
     if(gTeam[playerid] == MINIGUN) return SCM(playerid, -1, ""er"You are already in this minigame!");
-    if(gTeam[playerid] != FREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
+    if(gTeam[playerid] != gFREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
     CheckPlayerGod(playerid);
     Command_ReProcess(playerid, "/stopanims", false);
@@ -9709,7 +9709,7 @@ YCMD:minigun2(playerid, params[], help)
 {
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't join minigames while being in a Gang War, type /exit");
     if(gTeam[playerid] == MINIGUN2) return SCM(playerid, -1, ""er"You are already in this minigame!");
-    if(gTeam[playerid] != FREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
+    if(gTeam[playerid] != gFREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
     CheckPlayerGod(playerid);
     Command_ReProcess(playerid, "/stopanims", false);
@@ -9732,7 +9732,7 @@ YCMD:sniper(playerid, params[], help)
 {
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't join minigames while being in a Gang War, type /exit");
     if(gTeam[playerid] == MINIGUN) return SCM(playerid, -1, ""er"You are already in this minigame!");
-    if(gTeam[playerid] != FREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
+    if(gTeam[playerid] != gFREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
     CheckPlayerGod(playerid);
     Command_ReProcess(playerid, "/stopanims", false);
@@ -9755,7 +9755,7 @@ YCMD:rocketdm(playerid, params[], help)
 {
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't join minigames while being in a Gang War, type /exit");
     if(gTeam[playerid] == ROCKETDM) return SCM(playerid, -1, ""er"You are already in this minigame!");
-    if(gTeam[playerid] != FREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
+    if(gTeam[playerid] != gFREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
     CheckPlayerGod(playerid);
     Command_ReProcess(playerid, "/stopanims", false);
@@ -9797,7 +9797,7 @@ YCMD:bounties(playerid, params[], help)
 YCMD:ff(playerid, params[], help)
 {
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
-	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
+	if(gTeam[playerid] != gFREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 	
 	new Float:height;
 	if(sscanf(params, "f", height))
@@ -9829,7 +9829,7 @@ YCMD:setspawn(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
-    if(gTeam[playerid] != FREEROAM) return SCM(playerid, GREY, NOT_AVAIL);
+    if(gTeam[playerid] != gFREEROAM) return SCM(playerid, GREY, NOT_AVAIL);
     if(GetPlayerInterior(playerid) != 0) return SCM(playerid, GREY, ""er"Wrong interior");
     if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't use this command now");
     
@@ -9946,7 +9946,7 @@ YCMD:akill(playerid, params[], help)
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 
-	    if(gTeam[player] != FREEROAM) return SCM(playerid, -1, ""er"Can't kill player because he is in a minigame");
+	    if(gTeam[player] != gFREEROAM) return SCM(playerid, -1, ""er"Can't kill player because he is in a minigame");
 	    
  		if(IsPlayerAvail(player))
 		{
@@ -10447,7 +10447,7 @@ YCMD:offline(playerid, params[], help)
 
 YCMD:onduty(playerid, params[], help)
 {
-	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
+	if(gTeam[playerid] != gFREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 	if(PlayerData[playerid][e_level] >= 2)
 	{
 		if(!PlayerData[playerid][bDuty])
@@ -10519,7 +10519,7 @@ YCMD:eject(playerid, params[], help)
 			return SCM(playerid, -1, ""er"You cannot use this command on this admin");
 		}
 
-        if(IsPlayerAvail(player) && gTeam[player] == FREEROAM)
+        if(IsPlayerAvail(player) && gTeam[player] == gFREEROAM)
 		{
 			if(IsPlayerInAnyVehicle(player))
 			{
@@ -10722,7 +10722,7 @@ YCMD:car(playerid, params[], help)
 {
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
     
-	if(gTeam[playerid] == FREEROAM)
+	if(gTeam[playerid] == gFREEROAM)
 	{
 	    if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't spawn a car now");
 	    if(IsPlayerInRangeOfPoint(playerid, 65.0, 1797.3141, -1302.0978, 120.2659) && PlayerData[playerid][e_level] < 1) return SCM(playerid, -1, ""er"Can't spawn vehicle at this place!");
@@ -10749,7 +10749,7 @@ YCMD:locate(playerid, params[], help)
 
 	if(IsPlayerAvail(player))
 	{
-        if(gTeam[player] != FREEROAM) return SCM(playerid, -1, ""er"Player is in a minigame!");
+        if(gTeam[player] != gFREEROAM) return SCM(playerid, -1, ""er"Player is in a minigame!");
         if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 
 		new zone[MAX_ZONE_NAME],
@@ -10918,7 +10918,7 @@ YCMD:spectators(playerid, params[], help)
 YCMD:jetpack(playerid, params[], help)
 {
     if(PlayerData[playerid][e_vip] == 0) return Command_ReProcess(playerid, "/vip", false);
-	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
+	if(gTeam[playerid] != gFREEROAM) return SCM(playerid, RED, NOT_AVAIL);
     if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't use this command now");
 
 	if(PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL && PlayerData[playerid][bGWarMode])
@@ -10946,11 +10946,11 @@ YCMD:jetpack(playerid, params[], help)
 
 YCMD:go(playerid, params[], help)
 {
-    if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != gFREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 
 	if(PlayerData[playerid][e_level] == 0)
 	{
-	    if(gTeam[playerid] == FREEROAM)
+	    if(gTeam[playerid] == gFREEROAM)
 	    {
 		    new player;
 		 	if(sscanf(params, "r", player))
@@ -10963,7 +10963,7 @@ YCMD:go(playerid, params[], help)
 			if(!IsPlayerAvail(player)) return SCM(playerid, -1, ""er"Player is not avialable");
   			if(Iter_Contains(iterPlayerIgnore[player], playerid)) return SCM(playerid, -1, ""er"This player ignores you");
 			if(player == playerid) return SCM(playerid, -1, ""er"You may not teleport to yourself");
-			if(gTeam[player] != FREEROAM) return SCM(playerid, -1, ""er"Player is currently unavailable to goto");
+			if(gTeam[player] != gFREEROAM) return SCM(playerid, -1, ""er"Player is currently unavailable to goto");
 			if(PlayerData[player][e_wanteds] != 0) return SCM(playerid, -1, ""er"This player has wanteds");
 			if(PlayerData[player][e_level] != 0) return SCM(playerid, -1, ""er"You can't teleport to admins");
             if(PlayerData[player][bGWarMode]) return SCM(playerid, -1, ""er"This player is in Gang War");
@@ -11010,7 +11010,7 @@ YCMD:go(playerid, params[], help)
 		if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 		if(!IsPlayerAvail(player)) return SCM(playerid, -1, ""er"Player is not avialable");
-		if(gTeam[player] != FREEROAM) return SCM(playerid, -1, ""er"Player is currently unavailable to goto");
+		if(gTeam[player] != gFREEROAM) return SCM(playerid, -1, ""er"Player is currently unavailable to goto");
 		if(player == playerid) return SCM(playerid, -1, ""er"You may not teleport to yourself");
 		if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 		
@@ -11123,7 +11123,7 @@ YCMD:get(playerid, params[], help)
 	  	
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
-		if(gTeam[playerid] != FREEROAM) return SCM(playerid, -1, ""er"Not useable in minigames");
+		if(gTeam[playerid] != gFREEROAM) return SCM(playerid, -1, ""er"Not useable in minigames");
 		if(PlayerData[player][bIsDead]) return SCM(playerid, -1, ""er"Cannot teleport dead players");
 		if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 		
@@ -11132,7 +11132,7 @@ YCMD:get(playerid, params[], help)
 			return SCM(playerid, -1, ""er"You cannot use this command on this admin");
 		}
 		
-	 	if(IsPlayerAvail(player) && player != playerid && gTeam[player] == FREEROAM)
+	 	if(IsPlayerAvail(player) && player != playerid && gTeam[player] == gFREEROAM)
 	 	{
 	 	    if(PlayerData[player][bIsDead]) return SCM(playerid, -1, ""er"Cannot teleport dead players");
 	 	    
@@ -11185,7 +11185,7 @@ YCMD:tplayer(playerid, params[], help)
 
 	    if(fromplayer == INVALID_PLAYER_ID || toplayer == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player ids");
 		if(!IsPlayerConnected(fromplayer) || !IsPlayerConnected(toplayer)) return SCM(playerid, -1, ""er"One of them is not connected");
-		if(gTeam[fromplayer] != FREEROAM || gTeam[toplayer] != FREEROAM) return SCM(playerid, -1, ""er"One of them is not in freeroam");
+		if(gTeam[fromplayer] != gFREEROAM || gTeam[toplayer] != gFREEROAM) return SCM(playerid, -1, ""er"One of them is not in freeroam");
 		if(PlayerData[fromplayer][bIsDead] || PlayerData[toplayer][bIsDead]) return SCM(playerid, -1, ""er"One of them is dead");
 		if(playerid == fromplayer || playerid == toplayer) return SCM(playerid, -1, ""er"You can't use this command on yourself");
 		if(CSG[fromplayer] || CSG[toplayer]) return SCM(playerid, -1, ""er"Invalid player");
@@ -11321,7 +11321,7 @@ YCMD:mkick(playerid, params[], help)
  	 	if(IsPlayerAvail(player) && player != playerid && PlayerData[player][e_level] != MAX_ADMIN_LEVEL)
 	 	{
 	 	    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
-			if(gTeam[player] == FREEROAM)
+			if(gTeam[player] == gFREEROAM)
 			{
 			    return SCM(playerid, -1, ""er"Player isn't in any minigame");
 			}
@@ -11839,7 +11839,7 @@ YCMD:gcreate(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
     
-	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
+	if(gTeam[playerid] != gFREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 
 	new tick = GetTickCountEx();
 	if((PlayerData[playerid][tickLastGCreate] + COOLDOWN_CMD_GCREATE) >= tick)
@@ -11912,7 +11912,7 @@ YCMD:gcapture(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
 
-    if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != gFREEROAM) return SCM(playerid, RED, NOT_AVAIL);
     if(PlayerData[playerid][e_gangid] == 0) return SCM(playerid, -1, ""er"You aren't in any gang! Create a gang /gcreate or join one.");
     
 	new bool:bFound = false;
@@ -12063,7 +12063,7 @@ YCMD:gwar(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
 
-    if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != gFREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 	if(PlayerData[playerid][e_gangid] == 0) return SCM(playerid, -1, ""er"You aren't in any gang! Create a gang /gcreate or join one.");
 	if(PlayerData[playerid][e_gangrank] < GANG_POS_SENIOR_MEMBER) return SCM(playerid, -1, ""er"You you need to be at least Senior Member in your gang!");
 
@@ -12210,7 +12210,7 @@ YCMD:ginvite(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
     
-    if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != gFREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 
 	new tick = GetTickCountEx();
 	if(PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
@@ -12363,7 +12363,7 @@ YCMD:gsetrank(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
     
-    if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != gFREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 	if(PlayerData[playerid][e_gangid] == 0) return SCM(playerid, -1, ""er"You aren't in any gang");
     if(PlayerData[playerid][e_gangrank] < GANG_POS_LEADER) return SCM(playerid, -1, ""er"You have to be at least the gang leader to set ranks");
     
@@ -12375,7 +12375,7 @@ YCMD:gkick(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
 
-    if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != gFREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 
 	new tick = GetTickCountEx();
 	if((PlayerData[playerid][tickLastGKick] + COOLDOWN_CMD_GKICK) >= tick) return SCM(playerid, -1, ""er"Please wait a bit before kicking again!");
@@ -12427,7 +12427,7 @@ YCMD:gcar(playerid, params[], help)
     if(PlayerData[playerid][e_gangid] == 0) return SCM(playerid, -1, ""er"You aren't in any gang!");
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
 
-	if(gTeam[playerid] == FREEROAM)
+	if(gTeam[playerid] == gFREEROAM)
 	{
 	    if(isnull(params))
 	    {
@@ -12870,7 +12870,7 @@ YCMD:giveweapon(playerid, params[], help)
 		if(IsPlayerAvail(player))
 		{
 		    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
-	        if(gTeam[player] != FREEROAM) return SCM(playerid, -1, ""er"Player is in a minigame!");
+	        if(gTeam[player] != gFREEROAM) return SCM(playerid, -1, ""er"Player is in a minigame!");
 	        if(PlayerData[player][bGod] && PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL) return SCM(playerid, -1, ""er"You can't give players weapons who enabled GOD");
 
 			if(ammo_a < 0 || ammo_a > 10000)
@@ -12996,7 +12996,7 @@ YCMD:jail(playerid, params[], help)
 			    return 1;
 			}
 
-			if(gTeam[player] != FREEROAM)
+			if(gTeam[player] != gFREEROAM)
 			{
 				if(ExitPlayer(player) != 0)
 				{
@@ -13059,7 +13059,7 @@ YCMD:unjail(playerid, params[], help)
 			}
 
 			PlayerData[player][iJailTime] = 0;
-			gTeam[player] = FREEROAM;
+			gTeam[player] = gFREEROAM;
 			ResetPlayerWorld(player);
 			SpawnPlayer(player);
 
@@ -13172,7 +13172,7 @@ YCMD:rv(playerid, params[], help)
 	    for(new i = 0; i < MAX_PLAYERS; i++)
 	    {
 	        if(!IsPlayerAvail(i)) continue;
-	        if(!IsPlayerInAnyVehicle(i) && gTeam[i] == FREEROAM)
+	        if(!IsPlayerInAnyVehicle(i) && gTeam[i] == gFREEROAM)
 	        {
 	            DestroyPlayerVehicles(i);
 	        }
@@ -13275,12 +13275,12 @@ YCMD:getin(playerid, params[], help)
 
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
-		if(gTeam[playerid] != FREEROAM) return SCM(playerid, -1, ""er"Not useable in minigames");
+		if(gTeam[playerid] != gFREEROAM) return SCM(playerid, -1, ""er"Not useable in minigames");
 		if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 		
 		if(IsPlayerAvail(player))
 		{
-			if(player == playerid || gTeam[player] != FREEROAM)
+			if(player == playerid || gTeam[player] != gFREEROAM)
 			{
 			    return SCM(playerid, -1, ""er"Cannot get in that players vehicle");
 			}
@@ -13585,7 +13585,7 @@ YCMD:accept(playerid, params[], help)
 	    return SCM(playerid, -1, ""er"You got no invitation");
 	}
 	
-	if(gTeam[playerid] != FREEROAM)
+	if(gTeam[playerid] != gFREEROAM)
 	{
 	    Command_ReProcess(playerid, "/exit", false);
 	}
@@ -13631,7 +13631,7 @@ YCMD:hydra(playerid, params[], help)
     
 	if(PlayerData[playerid][e_vip] == 1)
 	{
-	    if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
+	    if(gTeam[playerid] != gFREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 	    if(IsPlayerInRangeOfPoint(playerid, 65.0, 1797.3141, -1302.0978, 120.2659) && PlayerData[playerid][e_level] < 1) return SCM(playerid, -1, ""er"Can't spawn vehicle at this place!");
 		
 		CarSpawner(playerid, 520, 120);
@@ -13657,7 +13657,7 @@ YCMD:god(playerid, params[], help)
 	    }
 	}
 	
-	if(gTeam[playerid] == FREEROAM)
+	if(gTeam[playerid] == gFREEROAM)
 	{
 		if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't use god now");
 	    if(PlayerData[playerid][bGod])
@@ -13894,7 +13894,7 @@ YCMD:v74(playerid, params[], help) // NRG
 
 YCMD:adminhq(playerid, params[], help)
 {
-    if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != gFREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 
 	if(PlayerData[playerid][e_level] > 0)
 	{
@@ -14120,7 +14120,7 @@ YCMD:race(playerid, params[], help)
 	}
 
     if(gTeam[playerid] == gRACE) return SCM(playerid, -1, ""er"You are already in this minigame!");
-    if(gTeam[playerid] != FREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
+    if(gTeam[playerid] != gFREEROAM) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave", "");
 
     switch(g_RaceStatus)
     {
@@ -15269,7 +15269,7 @@ YCMD:vcontrol(playerid, params[], help)
 {
     if(PlayerData[playerid][e_vip] == 1)
 	{
-	    if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
+	    if(gTeam[playerid] != gFREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 
 		if(GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
 		{
@@ -15351,7 +15351,7 @@ YCMD:trailer(playerid, params[], help)
 {
     if(PlayerData[playerid][e_vip] == 1)
 	{
-	    if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
+	    if(gTeam[playerid] != gFREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 	    
 		if(GetPlayerState(playerid) != PLAYER_STATE_DRIVER)
 		{
@@ -15430,7 +15430,7 @@ YCMD:vmenu(playerid, params[], help)
     if(!islogged(playerid)) return notlogged(playerid);
     
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
-    if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != gFREEROAM) return SCM(playerid, RED, NOT_AVAIL);
     if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You can't spawn a car now");
 	for(new ii = 0; ii < sizeof(g_SpawnAreas); ii++)
 	{
@@ -15447,11 +15447,11 @@ YCMD:vmenu(playerid, params[], help)
 YCMD:harefill(playerid, params[], help)
 {
     if(PlayerData[playerid][bGWarMode]) return SCM(playerid, -1, ""er"You can't use this command in Gang War mode, use /exit");
-	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
+	if(gTeam[playerid] != gFREEROAM) return SCM(playerid, RED, NOT_AVAIL);
     if(PlayerData[playerid][e_vip] == 1)
 	{
 	    if(PlayerData[playerid][bGod]) return SCM(playerid, -1, ""er"You need to disable GodMode first. (/god)");
-	    if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
+	    if(gTeam[playerid] != gFREEROAM) return SCM(playerid, RED, NOT_AVAIL);
 	    ShowDialog(playerid, HAREFILL_DIALOG);
 	}
 	else
@@ -15482,7 +15482,7 @@ YCMD:spectate(playerid, params[], help)
 			if(gTeam[otherid] == SPEC) return SCM(playerid, -1, ""er"Player is spectating someone else");
 			if(PlayerData[otherid][bIsDead]) return SCM(playerid, -1, ""er"Player is not alive");
 			if(GetPlayerState(otherid) == PLAYER_STATE_SPECTATING) return SCM(playerid, -1, ""er"Player is in spectating state");
-			if(gTeam[playerid] != FREEROAM && gTeam[playerid] != SPEC) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave first", "");
+			if(gTeam[playerid] != gFREEROAM && gTeam[playerid] != SPEC) return player_notice(playerid, "~w~Type ~y~/exit ~w~to leave first", "");
 
 			if(gTeam[playerid] != SPEC)
 			{
@@ -15586,7 +15586,7 @@ YCMD:freeze(playerid, params[], help)
 			{
 				return SCM(playerid, -1, ""er"You cannot use this command on an admin");
 			}
-			if(gTeam[player] != FREEROAM) return SCM(playerid, -1, ""er"Player is a minigame");
+			if(gTeam[player] != gFREEROAM) return SCM(playerid, -1, ""er"Player is a minigame");
 
 			SCM(player, RED, "You have been frozen by an admin");
 			SCM(playerid, RED, "Player has been frozen");
@@ -15667,7 +15667,7 @@ YCMD:clearchat(playerid, params[], help)
 
 YCMD:move(playerid, params[], help)
 {
-	if(gTeam[playerid] == FREEROAM)
+	if(gTeam[playerid] == gFREEROAM)
 	{
 	    if(GetPVarInt(playerid, "doingStunt") != 0) return SCM(playerid, -1, ""er"You cant use this command now!");
 		if(PlayerData[playerid][e_level] >= 2)
@@ -15739,7 +15739,7 @@ YCMD:move(playerid, params[], help)
 
 YCMD:cc(playerid, params[], help)
 {
-    if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != gFREEROAM) return SCM(playerid, RED, NOT_AVAIL);
     if(GetPlayerState(playerid) != PLAYER_STATE_DRIVER) return SCM(playerid, -1, ""er"You have to be in a vehicle");
 
     new color1, color2;
@@ -15977,7 +15977,7 @@ YCMD:healall(playerid, params[], help)
 	{
 	   	for(new i = 0; i < MAX_PLAYERS; i++)
  		{
-			if(IsPlayerAvail(i) && i != MAX_ADMIN_LEVEL && gTeam[i] == FREEROAM && !CSG[i])
+			if(IsPlayerAvail(i) && i != MAX_ADMIN_LEVEL && gTeam[i] == gFREEROAM && !CSG[i])
 			{
 				PlayerPlaySound(i, 1057, 0.0, 0.0, 0.0);
 				SetPlayerHealth(i, 100.0);
@@ -16002,7 +16002,7 @@ YCMD:armourall(playerid, params[], help)
 	{
 	   	for(new i = 0; i < MAX_PLAYERS; i++)
  		{
-			if(IsPlayerAvail(i) && i != MAX_ADMIN_LEVEL && gTeam[i] == FREEROAM && !CSG[i])
+			if(IsPlayerAvail(i) && i != MAX_ADMIN_LEVEL && gTeam[i] == gFREEROAM && !CSG[i])
 			{
 				PlayerPlaySound(i, 1057, 0.0, 0.0, 0.0);
 				SetPlayerArmour(i, 100.0);
@@ -16032,7 +16032,7 @@ YCMD:hmenu(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
     
-    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != gFREEROAM && gTeam[playerid] != HOUSE) return SCM(playerid, RED, NOT_AVAIL);
     new string[512], tmp[64];
     
     for(new i = 0; i < MAX_PLAYER_HOUSES; i++)
@@ -16063,7 +16063,7 @@ YCMD:bmenu(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
     
-    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != gFREEROAM && gTeam[playerid] != HOUSE) return SCM(playerid, RED, NOT_AVAIL);
     new string[512], tmp[64];
 
     for(new i = 0; i < MAX_PLAYER_BUSINESSES; i++)
@@ -16094,7 +16094,7 @@ YCMD:settings(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
     
-	if(gTeam[playerid] != FREEROAM) return SCM(playerid, RED, NOT_AVAIL);
+	if(gTeam[playerid] != gFREEROAM) return SCM(playerid, RED, NOT_AVAIL);
     ShowDialog(playerid, SETTINGS_DIALOG);
 	return 1;
 }
@@ -16861,7 +16861,7 @@ YCMD:toys(playerid, params[], help)
 {
     if(!islogged(playerid)) return notlogged(playerid);
     
-    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != gFREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL) return SCM(playerid, RED, NOT_AVAIL);
 	if(IsPlayerInAnyVehicle(playerid)) return SCM(playerid, -1, ""er"Please exit your vehicle first.");
 
 	new string[512], tmp[64];
@@ -17001,7 +17001,7 @@ YCMD:anims(playerid, params[], help)
 
 YCMD:stopanims(playerid, params[], help)
 {
-    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != gFREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
     SetPlayerSpecialAction(playerid, SPECIAL_ACTION_NONE);
     ClearAnimations(playerid);
 	return 1;
@@ -17009,7 +17009,7 @@ YCMD:stopanims(playerid, params[], help)
 
 YCMD:handsup(playerid, params[], help)
 {
-    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != gFREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
     player_notice(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
     
@@ -17019,7 +17019,7 @@ YCMD:handsup(playerid, params[], help)
 
 YCMD:cigar(playerid, params[], help)
 {
-    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != gFREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
     player_notice(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
     
@@ -17029,7 +17029,7 @@ YCMD:cigar(playerid, params[], help)
 
 YCMD:carry(playerid, params[], help)
 {
-    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != gFREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
     player_notice(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
     
@@ -17039,7 +17039,7 @@ YCMD:carry(playerid, params[], help)
 
 YCMD:piss(playerid, params[], help)
 {
-    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != gFREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
     player_notice(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
     
@@ -17050,7 +17050,7 @@ YCMD:piss(playerid, params[], help)
 
 YCMD:wank(playerid, params[], help)
 {
-    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != gFREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
     player_notice(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
     
@@ -17060,7 +17060,7 @@ YCMD:wank(playerid, params[], help)
 
 YCMD:crossarms(playerid, params[], help)
 {
-    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != gFREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
 
 	extract params -> new crossarms; else
 	{
@@ -17081,7 +17081,7 @@ YCMD:crossarms(playerid, params[], help)
 
 YCMD:sit(playerid, params[], help)
 {
-    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != gFREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
 
     extract params -> new sit; else
     {
@@ -17106,7 +17106,7 @@ YCMD:sit(playerid, params[], help)
 
 YCMD:dance(playerid, params[], help)
 {
-    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != gFREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
 
     extract params -> new dance; else
     {
@@ -17145,7 +17145,7 @@ YCMD:dance(playerid, params[], help)
 
 YCMD:vomit(playerid, params[], help)
 {
-    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != gFREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
     player_notice(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
     
@@ -17155,7 +17155,7 @@ YCMD:vomit(playerid, params[], help)
 
 YCMD:drunk(playerid, params[], help)
 {
-    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != gFREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
     player_notice(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
 
@@ -17165,7 +17165,7 @@ YCMD:drunk(playerid, params[], help)
 
 YCMD:wave(playerid, params[], help)
 {
-    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != gFREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
     player_notice(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
     
@@ -17175,7 +17175,7 @@ YCMD:wave(playerid, params[], help)
 
 YCMD:lay(playerid, params[], help)
 {
-    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != gFREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
     player_notice(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
     
@@ -17185,7 +17185,7 @@ YCMD:lay(playerid, params[], help)
 
 YCMD:smoke(playerid, params[], help)
 {
-    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != gFREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
     player_notice(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
     
@@ -17195,7 +17195,7 @@ YCMD:smoke(playerid, params[], help)
 
 YCMD:laugh(playerid, params[], help)
 {
-    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != gFREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
     player_notice(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
 
@@ -17205,7 +17205,7 @@ YCMD:laugh(playerid, params[], help)
 
 YCMD:fucku(playerid, params[], help)
 {
-    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
+    if(gTeam[playerid] != gFREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
     Command_ReProcess(playerid, "/stopanims", false);
     player_notice(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
 
@@ -17306,7 +17306,7 @@ YCMD:rob(playerid, params[], help)
 	}
 	else
 	{
-	    if(gTeam[playerid] != FREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
+	    if(gTeam[playerid] != gFREEROAM && gTeam[playerid] != HOUSE && gTeam[playerid] != VIPL && gTeam[playerid] != STORE) return SCM(playerid, RED, NOT_AVAIL);
 		Command_ReProcess(playerid, "/stopanims", false);
 		player_notice(playerid, "~w~Type ~y~/stopanim ~w~to quit", "");
 	    
@@ -17456,7 +17456,7 @@ YCMD:escape(playerid, params[], help)
 YCMD:w(playerid, params[], help)
 {
 	if(PlayerData[playerid][bGod]) return SCM(playerid, -1, ""er"You need to disable GodMode first. (/god)");
-	if(gTeam[playerid] == FREEROAM)
+	if(gTeam[playerid] == gFREEROAM)
 	{
 		ShowDialog(playerid, WEAPON_DIALOG);
 	}
@@ -17469,7 +17469,7 @@ YCMD:w(playerid, params[], help)
 
 YCMD:nos(playerid, params[], help)
 {
-    if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER && gTeam[playerid] == FREEROAM)
+    if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER && gTeam[playerid] == gFREEROAM)
     {
 		if(PVSelect[playerid] != -1)
 		{
@@ -17494,7 +17494,7 @@ YCMD:v(playerid, params[], help)
 	if(IsPlayerInRangeOfPoint(playerid, 50.0, -377.2038, 2131.4634, 133.1797) && PlayerData[playerid][e_level] < 2) return SCM(playerid, -1, ""er"Can't spawn vehicle at this place!");
 	if(strlen(params) > 29) return SCM(playerid, NEF_YELLOW, "I don't know that vehicle...");
 
-	if(gTeam[playerid] == FREEROAM)
+	if(gTeam[playerid] == gFREEROAM)
 	{
 	    if(IsNumeric(params))
 	    {
@@ -17681,8 +17681,8 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	            PlayerData[playerid][DuelLocation] = listitem + 1;
 	            
 	            if(!IsPlayerAvail(PlayerData[playerid][DuelRequest])) return PlayerData[playerid][DuelRequest] = INVALID_PLAYER_ID, SCM(playerid, -1, ""er"Player is not available");
-	            if(gTeam[PlayerData[playerid][DuelRequest]] != FREEROAM) return PlayerData[playerid][DuelRequest] = INVALID_PLAYER_ID, SCM(playerid, -1, ""er"Player is not in freeroam mode");
-	            if(gTeam[playerid] != FREEROAM) return PlayerData[playerid][DuelRequest] = INVALID_PLAYER_ID, player_notice(playerid, "You must be in Freeroam", "");
+	            if(gTeam[PlayerData[playerid][DuelRequest]] != gFREEROAM) return PlayerData[playerid][DuelRequest] = INVALID_PLAYER_ID, SCM(playerid, -1, ""er"Player is not in freeroam mode");
+	            if(gTeam[playerid] != gFREEROAM) return PlayerData[playerid][DuelRequest] = INVALID_PLAYER_ID, player_notice(playerid, "You must be in Freeroam", "");
 	            if(IsPlayerOnDesktop(PlayerData[playerid][DuelRequest])) return PlayerData[playerid][DuelRequest] = INVALID_PLAYER_ID, SCM(playerid, -1, ""er"Player is on desktop");
 	            if(playerid == PlayerData[playerid][DuelRequest]) return PlayerData[playerid][DuelRequest] = INVALID_PLAYER_ID, SCM(playerid, -1, ""er"You can't duel yourself");
 	            if(!islogged(PlayerData[playerid][DuelRequest])) return PlayerData[playerid][DuelRequest] = INVALID_PLAYER_ID, SCM(playerid, -1, ""er"Player does not have an account");
@@ -17803,7 +17803,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        }
 	        case DIALOG_BUSINESS + 1:
 	        {
-		        if(gTeam[playerid] != FREEROAM)
+		        if(gTeam[playerid] != gFREEROAM)
 				{
 					player_notice(playerid, "You can't upgrade it now", "Type ~y~/exit ~w~to leave");
 					return 1;
@@ -18577,7 +18577,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				{
 				    case 0:
 				    {
-				        if(gTeam[playerid] != FREEROAM)
+				        if(gTeam[playerid] != gFREEROAM)
 						{
 							player_notice(playerid, "You can't do this now", "Type ~y~/exit ~w~to leave");
 							return 1;
@@ -18596,7 +18596,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				    }
 				    case 1:
 				    {
-				        if(gTeam[playerid] != FREEROAM)
+				        if(gTeam[playerid] != gFREEROAM)
 						{
 							player_notice(playerid, "Get out to upgrade the house", "");
 							return 1;
@@ -19431,7 +19431,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        }
 	        case HOUSE_UPGRADE_DIALOG + 1:
 	        {
-		        if(gTeam[playerid] != FREEROAM)
+		        if(gTeam[playerid] != gFREEROAM)
 				{
 					player_notice(playerid, "Get out to upgrade the house", "");
 					return 1;
@@ -19456,7 +19456,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 		            {
 		                if(gTeam[pid] == HOUSE && GetPlayerInterior(pid) == g_HouseInteriorTypes[HouseData[h_id][interior]][interior] && GetPlayerVirtualWorld(pid) == (HouseData[h_id][e_id] + 1000))
 		                {
-		                    gTeam[pid] = FREEROAM;
+		                    gTeam[pid] = gFREEROAM;
 		                    SetPlayerPos(pid, HouseData[h_id][e_x], HouseData[h_id][e_y], HouseData[h_id][e_z]);
 							ResetPlayerWorld(pid);
 		                }
@@ -19478,7 +19478,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	                HouseData[h_id][interior] = PlayerData[playerid][HouseIntSelected];
 	       			SetPlayerPos(playerid, HouseData[h_id][e_x], HouseData[h_id][e_y], HouseData[h_id][e_z]);
 					ResetPlayerWorld(playerid);
-					gTeam[playerid] = FREEROAM;
+					gTeam[playerid] = gFREEROAM;
 	      		    format(gstr, sizeof(gstr), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", __GetName(playerid), HouseData[h_id][e_id], number_format(HouseData[h_id][price]), HouseData[h_id][e_score], g_HouseInteriorTypes[PlayerData[playerid][HouseIntSelected]][intname]);
 	    			UpdateDynamic3DTextLabelText(HouseData[h_id][e_labelid], -1, gstr);
 	                SQL_SaveHouse(h_id, true);
@@ -24696,7 +24696,7 @@ CreateFinalCar(playerid, pv_slot)
     TogglePlayerControllable(playerid, true);
     PutPlayerInVehicle(playerid, PlayerPVData[playerid][PVSelect[playerid]][e_vehicleid], 0);
     player_notice(playerid, "Custom car purchased", "");
-    gTeam[playerid] = FREEROAM;
+    gTeam[playerid] = gFREEROAM;
 
     RandomWeapons(playerid);
 
@@ -24708,7 +24708,7 @@ CreateFinalCar(playerid, pv_slot)
 
 PortPlayerMap(playerid, Float:X, Float:Y, Float:Z, Float:Angle, const mapname[], const cmd[], bool:populate = true)
 {
-	if(gTeam[playerid] != FREEROAM)
+	if(gTeam[playerid] != gFREEROAM)
 	{
 	    SCM(playerid, GREY, NOT_AVAIL);
 		return 0;
@@ -24738,7 +24738,7 @@ PortPlayerMap(playerid, Float:X, Float:Y, Float:Z, Float:Angle, const mapname[],
 
 PortPlayerMapVeh(playerid, Float:X, Float:Y, Float:Z, Float:Angle, Float:XVeh, Float:YVeh, Float:ZVeh, Float:AngleVeh, const mapname[], const cmd[], bool:populate = true)
 {
-	if(gTeam[playerid] != FREEROAM)
+	if(gTeam[playerid] != gFREEROAM)
 	{
 	    SCM(playerid, GREY, NOT_AVAIL);
 		return 0;
@@ -26297,7 +26297,7 @@ function:ProcessTick()
 			++T_ServerPlayers;
 			switch(gTeam[i])
 			{
-			    case FREEROAM:
+			    case gFREEROAM:
 			    {
 			        SavePos(i);
 			        
@@ -26405,7 +26405,7 @@ function:ProcessTick()
 							format(gstr, sizeof(gstr), "%s(%i) went AFK for too long!", __GetName(i), i);
 							fallout_broadcast(gstr);
 
-							gTeam[i] = FREEROAM;
+							gTeam[i] = gFREEROAM;
 							PlayerData[i][bFalloutLost] = true;
 							HidePlayerFalloutTextdraws(i);
 							CurrentFalloutPlayers--;
@@ -26461,7 +26461,7 @@ function:ProcessTick()
 				    {
 				        if(GetPVarInt(i, "JailedByAdmin") == 1)
 				        {
-				            gTeam[i] = FREEROAM;
+				            gTeam[i] = gFREEROAM;
 				        }
 				        else
 				        {
@@ -27308,7 +27308,7 @@ function:fallout_losegame()
 			format(gstr, sizeof(gstr), "%s(%i) fell over the glass bottom!", __GetName(i), i);
 			fallout_broadcast(gstr);
 
-            gTeam[i] = FREEROAM;
+            gTeam[i] = gFREEROAM;
 			PlayerData[i][bFalloutLost] = true;
 			CurrentFalloutPlayers--;
 			
@@ -27351,7 +27351,7 @@ function:fallout_countdown()
                     RandomSpawn(i, true);
 					RandomWeapons(i);
 					
-			        gTeam[i] = FREEROAM;
+			        gTeam[i] = gFREEROAM;
 			        
 			        global_broadcast("Fallout canceled due to lack of players!");
 			    }
@@ -27470,7 +27470,7 @@ function:fallout_decidewinners()
 				    GivePlayerAchievement(i, e_ach_deepimpact, "Deep Impact", "Congrats you earned $30,000!~n~and 10 score!~n~~w~Type /ach to view your achievements.");
 				}
 				
-				gTeam[i] = FREEROAM;
+				gTeam[i] = gFREEROAM;
 				SpawnPlayer(i);
 			}
 		}
@@ -29182,7 +29182,7 @@ ExitPlayer(playerid)
 	    }
 	    case CNR:
 	    {
-	        gTeam[playerid] = FREEROAM;
+	        gTeam[playerid] = gFREEROAM;
 
 			SetPVarInt(playerid, "Robber", 0);
 			SetPVarInt(playerid, "Cop", 0);
@@ -29211,7 +29211,7 @@ ExitPlayer(playerid)
 		{
  		    SetPlayerPos(playerid, -2623.6348, 1407.9154, 7.1016);
 		    ResetPlayerWorld(playerid);
-		    gTeam[playerid] = FREEROAM;
+		    gTeam[playerid] = gFREEROAM;
 		    PlayerPlaySound(playerid, 1069, 0, 0, 0);
 
 		    if(GetPVarInt(playerid, "HadGod") == 1) Command_ReProcess(playerid, "/god silent", false);
@@ -29224,7 +29224,7 @@ ExitPlayer(playerid)
 	        Command_ReProcess(playerid, "/specoff", false);
 	        return 0;
 	    }
-	    case FREEROAM:
+	    case gFREEROAM:
 	    {
 	        SCM(playerid, -1, ""er"You can't use this command now!");
 	        return 0;
@@ -29238,7 +29238,7 @@ ExitPlayer(playerid)
 					SetPlayerInterior(playerid, 0);
 				    SetPlayerPos(playerid, g_CarShopLocations[i][0] - 2.0, g_CarShopLocations[i][1] - 2.0, g_CarShopLocations[i][2] + 0.5);
 				    RandomWeapons(playerid);
-					gTeam[playerid] = FREEROAM;
+					gTeam[playerid] = gFREEROAM;
 					gLastMap[playerid] = 0;
 		        }
 		    }
@@ -29254,7 +29254,7 @@ ExitPlayer(playerid)
 	    }
 	    case MINIGUN, SNIPER, ROCKETDM, MINIGUN2:
 	    {
-			gTeam[playerid] = FREEROAM;
+			gTeam[playerid] = gFREEROAM;
 			
 			ShowPlayerInfoTextdraws(playerid);
 			ResetPlayerWorld(playerid);
@@ -29281,7 +29281,7 @@ ExitPlayer(playerid)
 			    	SetPlayerVirtualWorld(playerid, 0);
 			    	CancelEdit(playerid);
 			    	
-			    	gTeam[playerid] = FREEROAM;
+			    	gTeam[playerid] = gFREEROAM;
 			    	break;
 		    	}
 		    	else continue;
@@ -29294,7 +29294,7 @@ ExitPlayer(playerid)
 		}
 		case gBG_VOTING:
 		{
-			gTeam[playerid] = FREEROAM;
+			gTeam[playerid] = gFREEROAM;
 		
 		    HidePlayerBGTextdraws(playerid);
 		    SetPlayerColor(playerid, szPlayerColors[random(sizeof(szPlayerColors))]);
@@ -29315,7 +29315,7 @@ ExitPlayer(playerid)
 		case gBG_TEAM1:
 		{
 		    BGTeam1Players--;
-		    gTeam[playerid] = FREEROAM;
+		    gTeam[playerid] = gFREEROAM;
 		
 		    HidePlayerBGTextdraws(playerid);
 		    SetPlayerColor(playerid, szPlayerColors[random(sizeof(szPlayerColors))]);
@@ -29334,7 +29334,7 @@ ExitPlayer(playerid)
 		case gBG_TEAM2:
 		{
 		    BGTeam2Players--;
-		    gTeam[playerid] = FREEROAM;
+		    gTeam[playerid] = gFREEROAM;
 		
 		    HidePlayerBGTextdraws(playerid);
 		    SetPlayerColor(playerid, szPlayerColors[random(sizeof(szPlayerColors))]);
@@ -29352,7 +29352,7 @@ ExitPlayer(playerid)
 		}
 		case DM, WAR, gSAWN:
 		{
-			gTeam[playerid] = FREEROAM;
+			gTeam[playerid] = gFREEROAM;
 			
 			ResetPlayerWorld(playerid);
 			RandomWeapons(playerid);
@@ -29371,7 +29371,7 @@ ExitPlayer(playerid)
 	    	format(gstr, sizeof(gstr), "%s(%i) left the race!", __GetName(playerid), playerid);
 			race_broadcast(gstr);
 
-			gTeam[playerid] = FREEROAM;
+			gTeam[playerid] = gFREEROAM;
 
 			if(g_RaceVehicle[playerid] != -1)
 			{
@@ -29414,7 +29414,7 @@ ExitPlayer(playerid)
 			RandomSpawn(playerid, true);
 			RandomWeapons(playerid);
 			
-		    gTeam[playerid] = FREEROAM;
+		    gTeam[playerid] = gFREEROAM;
 		    
 		    Streamer_ToggleItemUpdate(playerid, STREAMER_TYPE_MAP_ICON, 1);
 		    Streamer_ToggleItemUpdate(playerid, STREAMER_TYPE_CP, 1);
@@ -29460,7 +29460,7 @@ ExitPlayer(playerid)
 		}
 		case FALLOUT:
 		{
-			gTeam[playerid] = FREEROAM;
+			gTeam[playerid] = gFREEROAM;
 		    CurrentFalloutPlayers--;
             PlayerData[playerid][bFalloutLost] = true;
 			
@@ -29484,7 +29484,7 @@ ExitPlayer(playerid)
 					    RandomWeapons(i);
 					    HidePlayerFalloutTextdraws(i);
 					    fallout_broadcast("Fallout has been canceled!");
-                        gTeam[i] = FREEROAM;
+                        gTeam[i] = gFREEROAM;
 					}
 				}
 				fallout_cancel();
@@ -29497,7 +29497,7 @@ ExitPlayer(playerid)
 		}
 		case GUNGAME:
 		{
-  			gTeam[playerid] = FREEROAM;
+  			gTeam[playerid] = gFREEROAM;
 
 			ResetPlayerWorld(playerid);
 	    	RandomSpawn(playerid, true);
@@ -30188,7 +30188,7 @@ function:race_stop()
 				g_RaceVehicle[i] = -1;
 			}
 			g_CPProgress[i] = 0;
-			gTeam[i] = FREEROAM;
+			gTeam[i] = gFREEROAM;
 			ResetPlayerWorld(i);
 			RandomWeapons(i);
 			HidePlayerRaceTextdraws(i);
@@ -30258,7 +30258,7 @@ RemoveFromRaceBuilder(playerid)
     Streamer_ToggleItemUpdate(playerid, STREAMER_TYPE_3D_TEXT_LABEL, 1);
     Streamer_Update(playerid);
     
-    gTeam[playerid] = FREEROAM;
+    gTeam[playerid] = gFREEROAM;
 }
 
 race_set_cp(playerid, PrevCP, NextCP, MaxCP, Type)
