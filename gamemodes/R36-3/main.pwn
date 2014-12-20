@@ -7217,7 +7217,7 @@ YCMD:mc(playerid, params[], help)
 }
 YCMD:sf(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid, -1990.6650, 136.9297, 27.3110, 0.6588, -1990.6650, 136.9297, 27.3110, 0.6588, "San Fierro", "sf");
+    PortPlayerMapVeh(playerid, -1990.6650, 136.9297, 27.3110, 0.6588, -1990.6650, 136.9297, 27.3110, 0.6588, "San Fierro", "sf", true, false);
     return 1;
 }
 YCMD:sfa(playerid, params[], help)
@@ -7232,22 +7232,22 @@ YCMD:lsa(playerid, params[], help)
 }
 YCMD:ls(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid, 2494.7476, -1666.6097, 13.3438, 88.1632, 2494.7476, -1666.6097, 13.3438, 88.1632, "Los Santos", "ls");
+    PortPlayerMapVeh(playerid, 2494.7476, -1666.6097, 13.3438, 88.1632, 2494.7476, -1666.6097, 13.3438, 88.1632, "Los Santos", "ls", true, false);
     return 1;
 }
 YCMD:lspd(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid, 1542.5554, -1674.7850, 13.5547, 92.8351,1536.0787,-1671.4823,13.3828,178.0104, "Los Santos Police Department", "lspd");
+    PortPlayerMapVeh(playerid, 1542.5554, -1674.7850, 13.5547, 92.8351,1536.0787,-1671.4823,13.3828,178.0104, "Los Santos Police Department", "lspd", true, false);
     return 1;
 }
 YCMD:lvpd(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid, 2290.5759,2421.3708,10.8203,178.5880,2289.8555,2414.7170,10.8222,269.7221, "Las Venturas Police Department", "lvpd");
+    PortPlayerMapVeh(playerid, 2290.5759,2421.3708,10.8203,178.5880,2289.8555,2414.7170,10.8222,269.7221, "Las Venturas Police Department", "lvpd", true, false);
     return 1;
 }
 YCMD:sfpd(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid, -1624.2128,674.2734,6.9573,219.9653,-1623.9940,674.0118,7.1875,219.9653, "San Fierro Police Department", "sfpd");
+    PortPlayerMapVeh(playerid, -1624.2128,674.2734,6.9573,219.9653,-1623.9940,674.0118,7.1875,219.9653, "San Fierro Police Department", "sfpd", true, false);
     return 1;
 }
 YCMD:dfun(playerid, params[], help)
@@ -7282,7 +7282,7 @@ YCMD:racemap2(playerid, params[], help)
 }
 YCMD:hayclimb(playerid, params[], help)
 {
-    PortPlayerMap(playerid, -1788.4408, 575.2750, 35.1641, 145.6224, "Hayclimb", "hayclimb");
+    PortPlayerMap(playerid, -1788.4408, 575.2750, 35.1641, 145.6224, "Hayclimb", "hayclimb", true, false);
     return 1;
 }
 YCMD:dfun2(playerid, params[], help)
@@ -7451,42 +7451,42 @@ YCMD:rc2(playerid, params[], help)
 }
 YCMD:a51(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid, 307.2482,2050.7505,17.6406,180.8353,307.2482,2050.7505,17.6406,180.8353, "Area 51", "a51");
+    PortPlayerMapVeh(playerid, 307.2482,2050.7505,17.6406,180.8353,307.2482,2050.7505,17.6406,180.8353, "Area 51", "a51", true, false);
     return 1;
 }
 YCMD:trans(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid, 1034.5165,-1039.7190,31.6651,272.5891,1034.5165,-1039.7190,31.6651,272.5891, "Transfender", "trans");
+    PortPlayerMapVeh(playerid, 1034.5165,-1039.7190,31.6651,272.5891,1034.5165,-1039.7190,31.6651,272.5891, "Transfender", "trans", true, false);
     return 1;
 }
 YCMD:trans2(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid, -1932.7380,228.3443,34.1563,88.9975,-1932.7380,228.3443,34.1563,88.9975, "Transfender 2", "trans2");
+    PortPlayerMapVeh(playerid, -1932.7380,228.3443,34.1563,88.9975,-1932.7380,228.3443,34.1563,88.9975, "Transfender 2", "trans2", true, false);
     return 1;
 }
 YCMD:trans3(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid, 2386.2788,1021.7114,10.8203,356.2733,2386.2788,1021.7114,10.8203,356.2733, "Transfender 3", "trans3");
+    PortPlayerMapVeh(playerid, 2386.2788,1021.7114,10.8203,356.2733,2386.2788,1021.7114,10.8203,356.2733, "Transfender 3", "trans3", true, false);
     return 1;
 }
 YCMD:lw(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid, 2645.5457,-2004.5851,13.3828,173.3082,2645.5457,-2004.5851,13.3828,173.3082, "Loco Low", "lw");
+    PortPlayerMapVeh(playerid, 2645.5457,-2004.5851,13.3828,173.3082,2645.5457,-2004.5851,13.3828,173.3082, "Loco Low", "lw", true, false);
     return 1;
 }
 YCMD:arch(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid, -2689.1001,217.8290,3.9509,92.1955,-2689.1001,217.8290,3.9509,92.1955, "Arch Wheel Angels", "arch");
+    PortPlayerMapVeh(playerid, -2689.1001,217.8290,3.9509,92.1955,-2689.1001,217.8290,3.9509,92.1955, "Arch Wheel Angels", "arch", true, false);
     return 1;
 }
 YCMD:ee(playerid, params[], help)
 {
-    PortPlayerMap(playerid, -2678.2119,1594.8811,217.2739,269.7218, "Easter Egg", "ee");
+    PortPlayerMap(playerid, -2678.2119,1594.8811,217.2739,269.7218, "Easter Egg", "ee", true, false);
     return 1;
 }
 YCMD:eej(playerid, params[], help)
 {
-    PortPlayerMap(playerid, -2662.6877,1595.1354,225.7578,92.7102, "Easter Egg Jump", "eej");
+    PortPlayerMap(playerid, -2662.6877,1595.1354,225.7578,92.7102, "Easter Egg Jump", "eej", true, false);
     return 1;
 }
 YCMD:qp2(playerid, params[], help)
@@ -7511,42 +7511,42 @@ YCMD:et(playerid, params[], help)
 }
 YCMD:lv(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid,2039.8860,1546.1112,10.4450,180.4970,2039.8860,1546.1112,10.4450,180.4970, "Las Venturas", "lv");
+    PortPlayerMapVeh(playerid,2039.8860,1546.1112,10.4450,180.4970,2039.8860,1546.1112,10.4450,180.4970, "Las Venturas", "lv", true, false);
     return 1;
 }
 YCMD:lva(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid,1320.6082,1268.7208,13.5903,2.6780,1338.3005,1275.2460,11.8100,358.8224, "Las Venturas Airport", "lva");
+    PortPlayerMapVeh(playerid,1320.6082,1268.7208,13.5903,2.6780,1338.3005,1275.2460,11.8100,358.8224, "Las Venturas Airport", "lva", true, false);
     return 1;
 }
 YCMD:bs(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid, 1207.7231,-920.2217,43.0507,204.3588,1215.8248,-937.2825,42.4353,97.1190, "Burger Shot", "bs");
+    PortPlayerMapVeh(playerid, 1207.7231,-920.2217,43.0507,204.3588,1215.8248,-937.2825,42.4353,97.1190, "Burger Shot", "bs", true, false);
     return 1;
 }
 YCMD:bs2(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid, 810.2364,-1632.6433,13.3906,247.2854,810.2364,-1632.6433,13.3906,247.2854, "Burger Shot 2", "bs2");
+    PortPlayerMapVeh(playerid, 810.2364,-1632.6433,13.3906,247.2854,810.2364,-1632.6433,13.3906,247.2854, "Burger Shot 2", "bs2", true, false);
     return 1;
 }
 YCMD:bs3(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid, 2447.1104,2024.7499,10.8203,5.7265,2447.1104,2024.7499,10.8203,5.7265, "Burger Shot 3", "bs3");
+    PortPlayerMapVeh(playerid, 2447.1104,2024.7499,10.8203,5.7265,2447.1104,2024.7499,10.8203,5.7265, "Burger Shot 3", "bs3", true, false);
     return 1;
 }
 YCMD:bs4(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid, -2314.1365,-143.7879,35.3203,178.6881,-2314.1365,-143.7879,35.3203,178.6881, "Burger Shot 4", "bs4");
+    PortPlayerMapVeh(playerid, -2314.1365,-143.7879,35.3203,178.6881,-2314.1365,-143.7879,35.3203,178.6881, "Burger Shot 4", "bs4", true, false);
     return 1;
 }
 YCMD:bs5(playerid, params[], help)
 {
-    PortPlayerMap(playerid, -1907.5175,834.4271,35.0156,140.9912, "Burger Shot 5", "bs5");
+    PortPlayerMap(playerid, -1907.5175,834.4271,35.0156,140.9912, "Burger Shot 5", "bs5", true, false);
     return 1;
 }
 YCMD:film(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid, 909.7761,-1221.2274,16.9766,271.1224,909.7761,-1221.2274,16.9766,271.1224, "Film Studios", "film");
+    PortPlayerMapVeh(playerid, 909.7761,-1221.2274,16.9766,271.1224,909.7761,-1221.2274,16.9766,271.1224, "Film Studios", "film", true, false);
     return 1;
 }
 YCMD:bmx(playerid, params[], help)
@@ -7565,37 +7565,37 @@ YCMD:bmx(playerid, params[], help)
 }
 YCMD:glen(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid, 1892.7002,-1165.8480,24.0390,226.6521,1892.7002,-1165.8480,24.0390,226.6521, "Glen Park", "glen");
+    PortPlayerMapVeh(playerid, 1892.7002,-1165.8480,24.0390,226.6521,1892.7002,-1165.8480,24.0390,226.6521, "Glen Park", "glen", true, false);
     return 1;
 }
 YCMD:sky(playerid, params[], help)
 {
-    PortPlayerMap(playerid, 1544.1896,-1352.2094,329.4762,182.8083, "Sky", "sky");
+    PortPlayerMap(playerid, 1544.1896,-1352.2094,329.4762,182.8083, "Sky", "sky", true, false);
     return 1;
 }
 YCMD:sftj(playerid, params[], help)
 {
-    PortPlayerMap(playerid, -1753.6401,884.9623,295.8750,358.5666, "San Fierro Tower Jump", "sftj");
+    PortPlayerMap(playerid, -1753.6401,884.9623,295.8750,358.5666, "San Fierro Tower Jump", "sftj", true, false);
     return 1;
 }
 YCMD:quarry(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid, 833.0357,851.8098,12.0047,109.5170,833.0357,851.8098,12.0047,109.5170, "Quarry", "quarry");
+    PortPlayerMapVeh(playerid, 833.0357,851.8098,12.0047,109.5170,833.0357,851.8098,12.0047,109.5170, "Quarry", "quarry", true, false);
     return 1;
 }
 YCMD:bordel(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid,-2682.1389,1344.4447,17.0603,244.5469,-2691.2363,1353.6704,16.7702,240.1605, "Bordel", "bordel");
+    PortPlayerMapVeh(playerid,-2682.1389,1344.4447,17.0603,244.5469,-2691.2363,1353.6704,16.7702,240.1605, "Bordel", "bordel", true, false);
     return 1;
 }
 YCMD:airc(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid,-1415.2069,517.7242,18.2427,179.5160,-1407.8441,505.6808,18.0025,89.5673, "Aircraft Carrier", "airc");
+    PortPlayerMapVeh(playerid,-1415.2069,517.7242,18.2427,179.5160,-1407.8441,505.6808,18.0025,89.5673, "Aircraft Carrier", "airc", true, false);
     return 1;
 }
 YCMD:bayside(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid,-2227.2446,2326.8723,7.5469,85.6516,-2258.7388,2326.4885,4.8125,180.9058, "Bayside", "bayside");
+    PortPlayerMapVeh(playerid,-2227.2446,2326.8723,7.5469,85.6516,-2258.7388,2326.4885,4.8125,180.9058, "Bayside", "bayside", true, false);
     return 1;
 }
 YCMD:vs(playerid, params[], help)
@@ -7607,12 +7607,12 @@ YCMD:vs(playerid, params[], help)
 }
 YCMD:gc(playerid, params[], help)
 {
-    PortPlayerMap(playerid, 654.5861, -1867.3845, 5.5861, 90.0, "Gold Credits", "gc");
+    PortPlayerMap(playerid, 654.5861, -1867.3845, 5.5861, 90.0, "Gold Credits", "gc", true, false);
     return 1;
 }
 YCMD:ms(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid, 800.6712,-1330.6608,13.1061,226.2979,800.6712,-1330.6608,13.1061,226.2979, "Market Station", "ms");
+    PortPlayerMapVeh(playerid, 800.6712,-1330.6608,13.1061,226.2979,800.6712,-1330.6608,13.1061,226.2979, "Market Station", "ms", true, false);
     return 1;
 }
 YCMD:speed(playerid, params[], help)
@@ -7622,7 +7622,7 @@ YCMD:speed(playerid, params[], help)
 }
 YCMD:glory(playerid, params[], help)
 {
-    PortPlayerMap(playerid, 2354.1689, -2067.3284, 22.3832, 90.0, "Glory", "glory");
+    PortPlayerMap(playerid, 2354.1689, -2067.3284, 22.3832, 90.0, "Glory", "glory", true, false);
     return 1;
 }
 YCMD:maze(playerid, params[], help)
@@ -7677,12 +7677,12 @@ YCMD:drag(playerid, params[], help)
 }
 YCMD:lvdrift(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid, 2333.8508,1405.8370,42.5904,358.0404,2333.8508,1405.8370,42.5904,358.0404, "Las Venturas Drift", "lvdrift");
+    PortPlayerMapVeh(playerid, 2333.8508,1405.8370,42.5904,358.0404,2333.8508,1405.8370,42.5904,358.0404, "Las Venturas Drift", "lvdrift", true, false);
     return 1;
 }
 YCMD:sfdrift(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid, -2410.9963, -600.7848, 132.3277, 127.1357, -2410.9963, -600.7848, 132.3277, 127.1357, "San Fierro Drift", "sfdrift");
+    PortPlayerMapVeh(playerid, -2410.9963, -600.7848, 132.3277, 127.1357, -2410.9963, -600.7848, 132.3277, 127.1357, "San Fierro Drift", "sfdrift", true, false);
     return 1;
 }
 YCMD:driftcity(playerid, params[], help)
@@ -7707,7 +7707,7 @@ YCMD:balloon(playerid, params[], help)
 }
 YCMD:lsp(playerid, params[], help)
 {
-    PortPlayerMap(playerid, 2505.2646,-1694.4974,17.9575,182.0808, "Los Santos Parkour", "lsp");
+    PortPlayerMap(playerid, 2505.2646,-1694.4974,17.9575,182.0808, "Los Santos Parkour", "lsp", true, false);
     return 1;
 }
 YCMD:parkour(playerid, params[], help)
@@ -7776,7 +7776,7 @@ YCMD:parkour8(playerid, params[], help)
 }
 YCMD:kk(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid, 2521.0232, -1504.3864, 25.5929, 180.0, 2521.0232, -1504.3864, 25.5929, 180.0, "Krusty Krab", "kk");
+    PortPlayerMapVeh(playerid, 2521.0232, -1504.3864, 25.5929, 180.0, 2521.0232, -1504.3864, 25.5929, 180.0, "Krusty Krab", "kk", true, false);
     return 1;
 }
 YCMD:globe(playerid, params[], help)
@@ -7786,7 +7786,7 @@ YCMD:globe(playerid, params[], help)
 }
 YCMD:farm(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid,-1206.7996,-1056.9430,128.3646,310.2706,-1206.7996,-1056.9430,128.3646,310.2706, "Farm", "farm");
+    PortPlayerMapVeh(playerid,-1206.7996,-1056.9430,128.3646,310.2706,-1206.7996,-1056.9430,128.3646,310.2706, "Farm", "farm", true, false);
     return 1;
 }
 YCMD:bowl(playerid, params[], help)
@@ -7796,7 +7796,7 @@ YCMD:bowl(playerid, params[], help)
 }
 YCMD:villa(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid,-2006.7003,2434.1331,34.6573,2.1006,-2006.7003,2434.1331,34.6573,2.1006, "Villa", "villa");
+    PortPlayerMapVeh(playerid,-2006.7003,2434.1331,34.6573,2.1006,-2006.7003,2434.1331,34.6573,2.1006, "Villa", "villa", true, false);
     return 1;
 }
 YCMD:palominocreek(playerid, params[], help)
@@ -7806,7 +7806,7 @@ YCMD:palominocreek(playerid, params[], help)
 }
 YCMD:glassjump(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid,2121.4280, 2560.6331, 514.7283, 0.0, 2121.4280, 2560.6331, 514.7283, 0.0, "Glass Jump", "glassjump");
+    PortPlayerMapVeh(playerid,2121.4280, 2560.6331, 514.7283, 0.0, 2121.4280, 2560.6331, 514.7283, 0.0, "Glass Jump", "glassjump", true, false);
     return 1;
 }
 YCMD:bj(playerid, params[], help)
@@ -7836,7 +7836,7 @@ YCMD:loopjump(playerid, params[], help)
 }
 YCMD:xslide(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid,1862.760, 1337.315, 55.933, 33.0,1862.760, 1337.315, 55.933, 33.0, "XSlide", "xslide");
+    PortPlayerMapVeh(playerid,1862.760, 1337.315, 55.933, 33.0,1862.760, 1337.315, 55.933, 33.0, "X-Slide", "xslide");
     return 1;
 }
 YCMD:drop(playerid, params[], help)
@@ -7927,37 +7927,37 @@ YCMD:pool(playerid, params[], help)
 }
 YCMD:docks(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid,2714.5000,-2711.2676,2.4919,170.7375,2714.5000,-2711.2676,2.4919,170.7375, "Docks", "docks");
+    PortPlayerMapVeh(playerid,2714.5000,-2711.2676,2.4919,170.7375,2714.5000,-2711.2676,2.4919,170.7375, "Docks", "docks", true, false);
     return 1;
 }
 YCMD:sfs(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid,-1952.5077,137.8305,26.2813,268.8237,-1952.5077,137.8305,26.2813,268.8237, "SF Station", "sfs");
+    PortPlayerMapVeh(playerid,-1952.5077,137.8305,26.2813,268.8237,-1952.5077,137.8305,26.2813,268.8237, "SF Station", "sfs", true, false);
     return 1;
 }
 YCMD:lss(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid,1706.4425,-1943.0046,13.5607,269.2462,1706.4425,-1943.0046,13.5607,269.2462, "LS Station", "lss");
+    PortPlayerMapVeh(playerid,1706.4425,-1943.0046,13.5607,269.2462,1706.4425,-1943.0046,13.5607,269.2462, "LS Station", "lss", true, false);
     return 1;
 }
 YCMD:lvs(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid,1433.8182,2606.3877,10.6719,90.1619,1433.8182,2606.3877,10.6719,90.1619, "LV Station", "lvs");
+    PortPlayerMapVeh(playerid,1433.8182,2606.3877,10.6719,90.1619,1433.8182,2606.3877,10.6719,90.1619, "LV Station", "lvs", true, false);
     return 1;
 }
 YCMD:lvs2(playerid, params[], help)
 {
-    PortPlayerMapVeh(playerid,2859.3931,1290.5574,10.00,272.3561,2859.3931,1290.5574,10.00,272.3561, "LV Station 2", "lvs2");
+    PortPlayerMapVeh(playerid,2859.3931,1290.5574,10.00,272.3561,2859.3931,1290.5574,10.00,272.3561, "LV Station 2", "lvs2", true, false);
     return 1;
 }
 YCMD:restaurant(playerid, params[], help)
 {
-    PortPlayerMap(playerid, 370.4659, -1717.2151, 15.0337, 1.9053, "Restaurant", "restaurant");
+    PortPlayerMap(playerid, 370.4659, -1717.2151, 15.0337, 1.9053, "Restaurant", "restaurant", true, false);
     return 1;
 }
 YCMD:concert(playerid, params[], help)
 {
-    PortPlayerMap(playerid, 1477.8225,-1714.1190,14.1400,359.7089, "Concert", "concert");
+    PortPlayerMap(playerid, 1477.8225,-1714.1190,14.1400,359.7089, "Concert", "concert", true, false);
     return 1;
 }
 YCMD:247(playerid, params[], help)
@@ -7988,7 +7988,7 @@ YCMD:bank(playerid, params[], help)
 #if WINTER_EDITION == true
 YCMD:xmas(playerid, params[], help)
 {
-    PortPlayerMap(playerid,1069.9008,-1790.0100,13.6575,1.1382, "Christmas", "xmas");
+    PortPlayerMap(playerid,1069.9008,-1790.0100,13.6575,1.1382, "Christmas", "xmas", true, false);
 	return 1;
 }
 #endif
@@ -23897,7 +23897,7 @@ server_load_visuals()
 	AddTeleport(1, "Slide", "slide", 1572.9949, -1238.7869, 277.7445);
 	AddTeleport(2, "Tugfun", "tugfun", 2774.316, -1309.180, 4316.250);
 	AddTeleport(2, "Drop", "drop", 309.7934, 5461.4546, 3426.6863);
-	AddTeleport(0, "XSlide", "xslide", 1862.760, 1337.315, 55.933);
+	AddTeleport(0, "X-Slide", "xslide", 1862.760, 1337.315, 55.933);
 	AddTeleport(1, "Loop Jump", "loopjump", -2682.3909, 385.2379, 924.8377);
 	AddTeleport(1, "Death Jump", "deathjump", 2629.9734,-1029.7679,882.9141);
 	AddTeleport(1, "Glass Jump", "glassjump", 2121.4280, 2560.6331, 514.7283);
@@ -24709,7 +24709,7 @@ CreateFinalCar(playerid, pv_slot)
     return 1;
 }
 
-PortPlayerMap(playerid, Float:X, Float:Y, Float:Z, Float:Angle, const mapname[], const cmd[], bool:populate = true)
+PortPlayerMap(playerid, Float:X, Float:Y, Float:Z, Float:Angle, const mapname[], const cmd[], bool:populate = true, bool:preload = true)
 {
 	if(gTeam[playerid] != gFREEROAM)
 	{
@@ -24720,7 +24720,9 @@ PortPlayerMap(playerid, Float:X, Float:Y, Float:Z, Float:Angle, const mapname[],
 	SetPlayerVirtualWorld(playerid, 0);
 	SetPlayerInterior(playerid, 0);
 
-    Streamer_UpdateEx(playerid, X, Y, Z);
+	if(preload)
+		Streamer_UpdateEx(playerid, X, Y, Z);
+
 	SetPlayerPos(playerid, X, Y, floatadd(Z, 3.0));
 	SetPlayerFacingAngle(playerid, Angle);
 
@@ -24739,7 +24741,7 @@ PortPlayerMap(playerid, Float:X, Float:Y, Float:Z, Float:Angle, const mapname[],
 	return 1;
 }
 
-PortPlayerMapVeh(playerid, Float:X, Float:Y, Float:Z, Float:Angle, Float:XVeh, Float:YVeh, Float:ZVeh, Float:AngleVeh, const mapname[], const cmd[], bool:populate = true)
+PortPlayerMapVeh(playerid, Float:X, Float:Y, Float:Z, Float:Angle, Float:XVeh, Float:YVeh, Float:ZVeh, Float:AngleVeh, const mapname[], const cmd[], bool:populate = true, bool:preload = true)
 {
 	if(gTeam[playerid] != gFREEROAM)
 	{
@@ -24752,17 +24754,19 @@ PortPlayerMapVeh(playerid, Float:X, Float:Y, Float:Z, Float:Angle, Float:XVeh, F
 	
 	if(GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
 	{
-	    new veh = GetPlayerVehicleID(playerid);
-	    Streamer_UpdateEx(playerid, XVeh, YVeh, ZVeh);
-	    SetVehiclePos(veh, XVeh, YVeh, floatadd(ZVeh, 4.5));
-	    SetVehicleVirtualWorld(veh, 0);
-   		SetVehicleZAngle(veh, AngleVeh);
-   		LinkVehicleToInterior(veh, 0);
-		PutPlayerInVehicle(playerid, veh,0);
+	    gint = GetPlayerVehicleID(playerid);
+	    if(preload)
+			Streamer_UpdateEx(playerid, XVeh, YVeh, ZVeh);
+		SetVehiclePos(gint, XVeh, YVeh, floatadd(ZVeh, 4.5));
+	    SetVehicleVirtualWorld(gint, 0);
+   		SetVehicleZAngle(gint, AngleVeh);
+   		LinkVehicleToInterior(gint, 0);
+		PutPlayerInVehicle(playerid, gint,0);
 	}
 	else
 	{
-	    Streamer_UpdateEx(playerid, X, Y, Z);
+	    if(preload)
+			Streamer_UpdateEx(playerid, X, Y, Z);
 		SetPlayerPos(playerid, X, Y, floatadd(Z, 3.0));
 		SetPlayerFacingAngle(playerid, Angle);
 	}
