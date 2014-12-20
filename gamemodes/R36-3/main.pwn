@@ -24724,7 +24724,7 @@ PortPlayerMap(playerid, Float:X, Float:Y, Float:Z, Float:Angle, const mapname[],
 	SetPlayerPos(playerid, X, Y, floatadd(Z, 3.0));
 	SetPlayerFacingAngle(playerid, Angle);
 
-    PlayerPlaySound(playerid, 1039, 0.0, 0.0, 0.0);
+    //PlayerPlaySound(playerid, 1039, 0.0, 0.0, 0.0);
     SetCameraBehindPlayer(playerid);
     
     if(populate)
@@ -24767,7 +24767,7 @@ PortPlayerMapVeh(playerid, Float:X, Float:Y, Float:Z, Float:Angle, Float:XVeh, F
 		SetPlayerFacingAngle(playerid, Angle);
 	}
 	
-	PlayerPlaySound(playerid, 1039, 0.0, 0.0, 0.0);
+	//PlayerPlaySound(playerid, 1039, 0.0, 0.0, 0.0);
     SetCameraBehindPlayer(playerid);
     
     if(populate)
