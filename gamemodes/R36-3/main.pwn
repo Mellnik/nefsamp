@@ -2722,6 +2722,7 @@ new Iterator:iterRaceJoins<MAX_PLAYERS>,
 	g_CustomCarShops[CAR_SHOPS][E_CAR_SHOP],
     g_dialogTpString[2000],
 	g_cmdString[32],
+	g_tickProcessTickCalls = 0,
 	gTime[6],
 	gint = 0,
 	gstr[144],
@@ -26270,6 +26271,8 @@ function:LogoSwitch()
 
 function:ProcessTick()
 {
+    g_tickProcessTickCalls++;
+
 	static utime;
 	utime = gettime();
 
@@ -26480,22 +26483,26 @@ function:ProcessTick()
 	    }
 	}
 	
-	format(gstr2, sizeof(gstr2), "~y~/derby ~r~~h~%i ~y~/cnr ~r~~h~%i ~y~/race ~r~~h~%i ~y~/tdm ~r~~h~%i ~y~/fallout ~r~~h~%i ~y~/gungame ~r~~h~%i ~y~/war ~r~~h~%i ~y~/mini ~r~~h~%i ~y~/sniper ~r~~h~%i ~y~/rocket ~r~~h~%i",
-        T_DerbyPlayers,
-        T_CNRPlayers,
-		T_RacePlayers,
-		T_TDMPlayers,
-		T_FalloutPlayers,
-		T_GunGamePlayers,
-		T_WarPlayers,
-		T_MinigunPlayers,
-		T_SniperPlayers,
-		T_RocketDMPlayers);
+	if(g_tickProcessTickCalls >= 3) /* TICK 3 SECONDS */
+	{
+	    g_tickProcessTickCalls = 0;
+	
+		format(gstr2, sizeof(gstr2), "~y~/derby ~r~~h~%i ~y~/cnr ~r~~h~%i ~y~/race ~r~~h~%i ~y~/tdm ~r~~h~%i ~y~/fallout ~r~~h~%i ~y~/gungame ~r~~h~%i ~y~/war ~r~~h~%i ~y~/mini ~r~~h~%i ~y~/sniper ~r~~h~%i ~y~/rocket ~r~~h~%i",
+	        T_DerbyPlayers,
+	        T_CNRPlayers,
+			T_RacePlayers,
+			T_TDMPlayers,
+			T_FalloutPlayers,
+			T_GunGamePlayers,
+			T_WarPlayers,
+			T_MinigunPlayers,
+			T_SniperPlayers,
+			T_RocketDMPlayers);
+		TextDrawSetString(TXTFooter, gstr2);
 
-	TextDrawSetString(TXTFooter, gstr2);
-
-	format(gstr, sizeof(gstr), "Welcome to New Evolution Freeroam!\n\nServer time: %02i:%02i | %02i.%02i\nPlayers online: %i", gTime[3], gTime[4], gTime[2], gTime[1], T_ServerPlayers);
-	SetDynamicObjectMaterialText(bb_mcc, 0, gstr, OBJECT_MATERIAL_SIZE_256x128, "Calibri", 0, 0, -32256, -16777216, OBJECT_MATERIAL_TEXT_ALIGN_LEFT);
+		format(gstr, sizeof(gstr), "Welcome to New Evolution Freeroam!\n\nServer time: %02i:%02i | %02i.%02i\nPlayers online: %i", gTime[3], gTime[4], gTime[2], gTime[1], T_ServerPlayers);
+		SetDynamicObjectMaterialText(bb_mcc, 0, gstr, OBJECT_MATERIAL_SIZE_256x128, "Calibri", 0, 0, -32256, -16777216, OBJECT_MATERIAL_TEXT_ALIGN_LEFT);
+	}
 
 	if(g_FalloutStatus != e_Fallout_Inactive)
 	{
