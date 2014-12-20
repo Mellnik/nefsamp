@@ -23283,7 +23283,8 @@ function:xReactionTest()
     
 	new xLength = (random(8) + 3);
 
-	xCash = 250 * (T_ServerPlayers > 1 && T_ServerPlayers < MAX_PLAYERS) ? T_ServerPlayers : 30;
+	gint = (T_ServerPlayers > 1 && T_ServerPlayers < MAX_PLAYERS) ? T_ServerPlayers : 30;
+	xCash = 250 * gint;
 	xScore = (random(7) + 2);
 	format(xChars, sizeof(xChars), "");
 	
