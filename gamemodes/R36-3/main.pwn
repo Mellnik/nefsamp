@@ -28590,7 +28590,7 @@ function:StartRobbery(playerid, namehash)
 	}
 	return 1;
 }
-
+/*
 GetStoreName(playerid)
 {
 	static store_names[11][] =
@@ -28612,6 +28612,54 @@ GetStoreName(playerid)
 		return store_names[0];
 		
 	return store_names[GetPVarInt(playerid, "InStore")];
+}*/
+GetStoreName(playerid)
+{
+	new store_name[40];
+	switch(GetPVarInt(playerid, "InStore"))
+	{
+		case 1:
+		{
+			store_name = "24/7 in Roca Escalente";
+		}
+		case 2:
+		{
+			store_name = "24/7 in Strip";
+		}
+		case 3:
+		{
+			store_name = "Casino in Strip";
+		}
+		case 4:
+		{
+			store_name = "Ammunation in Come-A-Lot";
+		}
+		case 5:
+		{
+			store_name = "Bank in Roca Escalente";
+		}
+		case 6:
+		{
+			store_name = "Bank in Las Venturas";
+		}
+		case 7:
+		{
+			store_name = "4 Dragons Casino";
+		}
+		case 8:
+		{
+			store_name = "Royal Casino";
+		}
+		case 9:
+		{
+			store_name = "Ammunation in Strip";
+		}
+		case 10:
+		{
+			store_name = "Caligulas Casino";
+		}
+  	}
+	return store_name;
 }
 
 function:CNR_RobberGateMoveBack(playerid)

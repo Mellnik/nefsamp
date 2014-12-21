@@ -123,7 +123,7 @@
 					</tr>
 				</table>
 				<?php
-				$stmt = $mysqli->prepare("SELECT `OldName`, `NewName`, `Date` FROM `ncrecords` WHERE `OldName` = ? OR `NewName` = ? ORDER BY `Date` DESC;");
+				$stmt = $mysqli->prepare("SELECT `oldname`, `newname`, `date` FROM `ncrecords` WHERE `oldname` = ? OR `newname` = ? ORDER BY `date` DESC;");
 				$stmt->bind_param("ss", $player, $player);
 				$stmt->execute();
 				$stmt->store_result();
