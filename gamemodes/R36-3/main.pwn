@@ -31432,9 +31432,7 @@ ResetPlayerVars(playerid)
     DestoryDamageBox(playerid);
 
 	for(new i = 0; E_PLAYER_ACH_DATA:i < E_PLAYER_ACH_DATA; i++)
-	{
 	    PlayerAchData[playerid][E_PLAYER_ACH_DATA:i][0] = 0;
-	}
 
     Iter_Clear(iterPlayerIgnore[playerid]);
 
