@@ -2931,7 +2931,7 @@ public OnGameModeInit()
     SQL_Connect();
 	SQL_CleanUp();
 
-	Streamer_SetTickRate(40);
+	//Streamer_SetTickRate(40);
 	
 	#if INC_ENVIRONMENT == true
     BuildServerMap();
