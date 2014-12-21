@@ -10670,7 +10670,7 @@ YCMD:nstats(playerid, params[], help)
 			    "%%",
 			    NetStats_ConnectionStatus(player));
 			    
-			NetStats_GetIpPort(playerid, ip_port, sizeof(ip_port));
+			NetStats_GetIpPort(player, ip_port, sizeof(ip_port));
 			strcat(string, ip_port);
 			
 			ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: Network Stats", string, "OK", "");

@@ -10,8 +10,20 @@ Build 37 (Winter Edition)
 - Bans now include serverside information; to be used in ban appeals.
 - Bans are now only valid if collected proof matches serverside information saved within the ban.
 
+Build 36-4 (Winter Edition)
+----------
+- Set Streamer to it's default tick rate.
+- You no longer get a pm sounds when being AFK.
+- Fixed /nstats showing wrong ip address.
+
+Build 36-3 (Winter Edition)
+----------
+- Script optimizations to reduce unnecessary overhead
+- Removed warp sound from teleports
+- Fixed CnR bug showing wrong store names
+
 Build 36-2 (Winter Edition)
----------
+----------
 - Added SUSPECT_FAKE_PACKETS.
 - Added sanity checks in some callbacks.
 - Added performance profiler.
