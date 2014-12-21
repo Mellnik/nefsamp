@@ -17628,7 +17628,7 @@ function:OnPlayerNameChangeRequest(playerid, newname[])
 
 public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 {
-	if(listitem < 0 || dialogid >= 32000 || dialogid < -32000)
+	if(listitem < -1 || dialogid >= 32000 || dialogid < -32000)
 	{
 		PlayerData[playerid][bwSuspect] |= SUSPECT_FAKE_PACKETS;
 		Log(LOG_NET, "Invalid data in OnDialogResponse(%i, %i, %i, %i)", playerid, dialogid, response, listitem);
