@@ -16732,12 +16732,11 @@ YCMD:pm(playerid, params[], help)
 	InfoTD_MSG(playerid, 3500, gstr);
 
 	PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
-	PlayerPlaySound(player, 1057, 0.0, 0.0, 0.0);
 
 	if(IsPlayerOnDesktop(player))
-	{
 	    SCM(playerid, -1, ""er"This player is on desktop and may not receive your message");
-	}
+	else
+	    PlayerPlaySound(player, 1057, 0.0, 0.0, 0.0);
 
 	format(gstr, sizeof(gstr), "[PM] from %s(%i) to %s(%i): %s", __GetName(playerid), playerid, __GetName(player), player, msg);
 	admin_broadcast(GREY, gstr);
@@ -16797,12 +16796,11 @@ YCMD:r(playerid, params[], help)
 	InfoTD_MSG(playerid, 3500, gstr);
 
 	PlayerPlaySound(playerid, 1057, 0.0, 0.0, 0.0);
-	PlayerPlaySound(lID, 1057, 0.0, 0.0, 0.0);
 
 	if(IsPlayerOnDesktop(lID))
-	{
 	    SCM(playerid, -1, ""er"This player is on desktop and may not receive your message");
-	}
+	else
+	    PlayerPlaySound(lID, 1057, 0.0, 0.0, 0.0);
 
 	format(gstr, sizeof(gstr), ""grey"[PM] from %s(%i) to %s(%i): %s", __GetName(playerid), playerid, __GetName(lID), lID, msg);
 	admin_broadcast(GREY, gstr);
