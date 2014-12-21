@@ -24,6 +24,8 @@
 || compile -d3 with crashdetect
 ||
 || Database changes:
+|| blacklist layout: id, ip
+|| ncrecords layout: id, oldname, newname, date
 ||
 || Script limits:
 || Max teleport categories: 9
@@ -11239,14 +11241,14 @@ YCMD:ncrecords(playerid, params[], help)
 
 	if(sscanf(params, "s[143]", gstr))
 	{
-		mysql_tquery(pSQL, "SELECT * FROM `ncrecords` ORDER BY `ID` DESC LIMIT 10;", "OnNCReceive", "i", playerid);
+		mysql_tquery(pSQL, "SELECT * FROM `ncrecords` ORDER BY `id` DESC LIMIT 10;", "OnNCReceive", "i", playerid);
 	}
 	else
 	{
 		if(strlen(gstr) > MAX_PLAYER_NAME)
 		    return SCM(playerid, -1, ""er"Invalid player name length");
 	
-		format(gstr2, sizeof(gstr2), "SELECT * FROM `ncrecords` WHERE `OldName` = '%s' OR `NewName` = '%s';", gstr, gstr);
+		format(gstr2, sizeof(gstr2), "SELECT * FROM `ncrecords` WHERE `oldname` = '%s' OR `newname` = '%s';", gstr, gstr);
 		mysql_tquery(pSQL, gstr2, "OnNCReceive2", "is", playerid, gstr);
 	}
 	return 1;
@@ -17589,7 +17591,7 @@ function:OnPlayerNameChangeRequest(playerid, newname[])
             format(query, sizeof(query), "UPDATE `race_records` SET `name` = '%s' WHERE `name` = '%s';", newname, oldname);
             mysql_tquery(pSQL, query, "", "");
             
-            format(query, sizeof(query), "INSERT INTO `ncrecords` VALUES (NULL, '%s', '%s', %i);", oldname, newname, gettime());
+            format(query, sizeof(query), "INSERT INTO `ncrecords` VALUES (NULL, '%s', '%s', UNIX_TIMESTAMP());", oldname, newname);
             mysql_tquery(pSQL, query, "", "");
             
             format(query, sizeof(query), "UPDATE `queue` SET `Extra` = '%s' WHERE `Extra` = '%s';", newname, oldname);
@@ -29851,7 +29853,7 @@ function:OnUnbanAttempt2()
 	    new ip[MAX_PLAYER_IP + 1];
 	    cache_get_row(0, 0, ip, pSQL, sizeof(ip));
 	    
-	    format(gstr, sizeof(gstr), "DELETE FROM `blacklist` WHERE `IP` = '%s';", ip);
+	    format(gstr, sizeof(gstr), "DELETE FROM `blacklist` WHERE `ip` = '%s';", ip);
 	    mysql_pquery(pSQL, gstr);
 	}
 	return 1;
@@ -29887,7 +29889,7 @@ function:OnOfflineBanAttempt2(playerid, ban[], reason[])
 	    new ip[16];
 		cache_get_row(0, 1, ip, pSQL, sizeof(ip));
 		
-		mysql_format(pSQL, gstr, sizeof(gstr), "SELECT `ID` FROM `blacklist` WHERE `IP` = '%e';", ip);
+		mysql_format(pSQL, gstr, sizeof(gstr), "SELECT `id` FROM `blacklist` WHERE `ip` = '%e';", ip);
 		new Cache:cache = mysql_query(pSQL, gstr);
 		
 		if(cache_get_row_count() == 0)
@@ -30533,7 +30535,7 @@ function:OnPlayerAccountRequest(playerid, namehash, request)
 				}
 	        }
 
-	        mysql_format(pSQL, gstr2, sizeof(gstr2), "SELECT * FROM `blacklist` WHERE `IP` = '%e' LIMIT 1;", __GetIP(playerid));
+	        mysql_format(pSQL, gstr2, sizeof(gstr2), "SELECT * FROM `blacklist` WHERE `ip` = '%e' LIMIT 1;", __GetIP(playerid));
 	        mysql_pquery(pSQL, gstr2, "OnPlayerAccountRequest", "iii", playerid, YHash(__GetName(playerid)), ACCOUNT_REQUEST_IP_BANNED);
 	        return 1;
 	    }
