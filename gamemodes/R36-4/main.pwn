@@ -2759,7 +2759,6 @@ new Iterator:iterRaceJoins<MAX_PLAYERS>,
   	tDerbyFallOver = -1,
   	DerbyPlayers = 0,
 	bool:IsDerbyRunning = false,
-	bool:CSG[MAX_PLAYERS] = {false, ...},
 	Reports[MAX_REPORTS][144],
   	tBGTimer = -1,
   	tBGVoting = -1,
@@ -3527,7 +3526,7 @@ public OnIncomingConnection(playerid, ip_address[], port)
 			connections++;
 	}
 	
-	if(connections >= 3 && !IsWhitelisted(ip_address))
+	if(connections >= 3)
 	{
 		Log(LOG_NET, "%i connections detected by (%s, %i, %i), hard ipban issued for 60 seconds", connections, ip_address, port, playerid);
 		Kick(playerid);
@@ -9884,7 +9883,6 @@ YCMD:hitman(playerid, params[], help)
 
 	if(IsPlayerAvail(player) && player != playerid)
 	{
-	    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 		if(GetPlayerMoneyEx(playerid) >= amount)
 		{
             PlayerData[player][HitmanHit] += amount;
@@ -9944,7 +9942,6 @@ YCMD:akill(playerid, params[], help)
 	    
  		if(IsPlayerAvail(player))
 		{
-		    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 			format(gstr, sizeof(gstr), "Admin %s(%i) killed you.", __GetName(playerid), playerid);
 			SCM(player, YELLOW, gstr);
 
@@ -9983,7 +9980,6 @@ YCMD:sethealth(playerid, params[], help)
 	    
  		if(IsPlayerAvail(player))
 		{
-		    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 			if(player != playerid)
 			{
 				format(gstr, sizeof(gstr), "Admin %s(%i) has set your health to %f.", __GetName(playerid), playerid, amount);
@@ -10032,7 +10028,6 @@ YCMD:setbcash(playerid, params[], help)
 
 		if(IsPlayerAvail(player))
 		{
-		    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 			if(player != playerid)
 			{
 				format(gstr, sizeof(gstr), "Admin %s(%i) has set your bank cash to $%s.", __GetName(playerid), playerid, number_format(amount));
@@ -10120,8 +10115,6 @@ YCMD:suspect(playerid, params[], help)
 		for(new i = 0; i < MAX_PLAYERS; i++)
 		{
 		    if(!IsPlayerAvail(i))
-				continue;
-			if(CSG[i])
 				continue;
 
 		    if(PlayerData[i][e_vip] == 0) {
@@ -10217,7 +10210,6 @@ YCMD:setcash(playerid, params[], help)
 
 		if(IsPlayerAvail(player))
 		{
-		    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 			if(player != playerid)
 			{
 				format(gstr, sizeof(gstr), "Admin %s(%i) has set your cash to $%s.", __GetName(playerid), playerid, number_format(amount));
@@ -10271,7 +10263,6 @@ YCMD:addscore(playerid, params[], help)
 
 		if(IsPlayerAvail(player))
 		{
-		    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 			if(player != playerid)
 			{
 				format(gstr, sizeof(gstr), "Admin %s(%i) has given you %i score", __GetName(playerid), playerid, amount);
@@ -10325,7 +10316,6 @@ YCMD:addcash(playerid, params[], help)
 
 		if(IsPlayerAvail(player))
 		{
-		    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 			if(player != playerid)
 			{
 				format(gstr, sizeof(gstr), "Admin %s(%i) has given you $%s.", __GetName(playerid), playerid, number_format(amount));
@@ -10379,7 +10369,6 @@ YCMD:setscore(playerid, params[], help)
 
 		if(IsPlayerAvail(player))
 		{
-		    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 			if(player != playerid)
 			{
 				format(gstr, sizeof(gstr), "Admin %s(%i) has set your score to %i.", __GetName(playerid), playerid, amount);
@@ -10571,7 +10560,6 @@ YCMD:burn(playerid, params[], help)
 		        case DERBY, gRACE, BUYCAR, gBG_VOTING, GUNGAME, SPEC, JAIL: return SCM(playerid, -1, ""er"You can't use this command on that player now");
 		    }
 			if(!PlayerData[otherid][bDerbyWinner] && gTeam[otherid] == DERBY) return SCM(playerid, -1, ""er"You can't use this command on that player now");
-			if(CSG[otherid]) return SCM(playerid, -1, ""er"Invalid player!");
 		    
 		    new Float:POS[3];
 			GetPlayerPos(otherid, POS[0], POS[1], POS[2]);
@@ -10611,7 +10599,6 @@ YCMD:getip(playerid, params[], help)
 		{
 			return SCM(playerid, -1, ""er"You cannot use this command on this admin");
 		}
-		if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 		
         if(IsPlayerAvail(player))
 		{
@@ -10647,7 +10634,6 @@ YCMD:nstats(playerid, params[], help)
 		{
 			return SCM(playerid, -1, ""er"You cannot use this command on this admin");
 		}
-		if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 
         if(IsPlayerAvail(player))
 		{
@@ -10743,7 +10729,6 @@ YCMD:locate(playerid, params[], help)
 	if(IsPlayerAvail(player))
 	{
         if(gTeam[player] != gFREEROAM) return SCM(playerid, -1, ""er"Player is in a minigame!");
-        if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 
 		new zone[MAX_ZONE_NAME],
 		    zone_ret = GetPlayer2DZone(player, zone, sizeof(zone));
@@ -10962,7 +10947,6 @@ YCMD:go(playerid, params[], help)
             if(PlayerData[player][bGWarMode]) return SCM(playerid, -1, ""er"This player is in Gang War");
             if(GetPVarInt(player, "doingStunt") != 0) return SCM(playerid, -1, ""er"Player is doing stunts");
             if(!PlayerData[player][bAllowPlayerTeleport] && PlayerData[playerid][e_level] == 0) return SCM(playerid, -1, ""er"Player disabled teleports");
-            if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 
 			new Float:POS[3];
 			GetPlayerPos(player, POS[0], POS[1], POS[2]);
@@ -11005,7 +10989,6 @@ YCMD:go(playerid, params[], help)
 		if(!IsPlayerAvail(player)) return SCM(playerid, -1, ""er"Player is not avialable");
 		if(gTeam[player] != gFREEROAM) return SCM(playerid, -1, ""er"Player is currently unavailable to goto");
 		if(player == playerid) return SCM(playerid, -1, ""er"You may not teleport to yourself");
-		if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 		
 		new Float:POS[3];
 		GetPlayerPos(player, POS[0], POS[1], POS[2]);
@@ -11045,7 +11028,6 @@ YCMD:cuff(playerid, params[], help)
 	  	
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
-		if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 		
 		if(IsPlayerAvail(player))
 		{
@@ -11081,7 +11063,6 @@ YCMD:uncuff(playerid, params[], help)
 	  	
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
-		if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 		
 		if(IsPlayerAvail(player))
 		{
@@ -11118,7 +11099,6 @@ YCMD:get(playerid, params[], help)
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 		if(gTeam[playerid] != gFREEROAM) return SCM(playerid, -1, ""er"Not useable in minigames");
 		if(PlayerData[player][bIsDead]) return SCM(playerid, -1, ""er"Cannot teleport dead players");
-		if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 		
 		if(PlayerData[player][e_level] == MAX_ADMIN_LEVEL && PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 		{
@@ -11181,7 +11161,6 @@ YCMD:tplayer(playerid, params[], help)
 		if(gTeam[fromplayer] != gFREEROAM || gTeam[toplayer] != gFREEROAM) return SCM(playerid, -1, ""er"One of them is not in freeroam");
 		if(PlayerData[fromplayer][bIsDead] || PlayerData[toplayer][bIsDead]) return SCM(playerid, -1, ""er"One of them is dead");
 		if(playerid == fromplayer || playerid == toplayer) return SCM(playerid, -1, ""er"You can't use this command on yourself");
-		if(CSG[fromplayer] || CSG[toplayer]) return SCM(playerid, -1, ""er"Invalid player");
 
 		if((PlayerData[fromplayer][e_level] == MAX_ADMIN_LEVEL || PlayerData[toplayer][e_level] == MAX_ADMIN_LEVEL) && PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 		{
@@ -11268,7 +11247,6 @@ YCMD:warn(playerid, params[], help)
 	 	if(IsPlayerAvail(player) && player != playerid)
 	 	{
 	 	    if(PlayerData[player][bOpenSeason]) return SCM(playerid, -1, ""er"Can't warn this player!");
-	 	    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 	 	
 			PlayerData[player][Warnings]++;
 			if(PlayerData[player][Warnings] == MAX_WARNINGS)
@@ -11312,7 +11290,6 @@ YCMD:mkick(playerid, params[], help)
 		
  	 	if(IsPlayerAvail(player) && player != playerid && PlayerData[player][e_level] != MAX_ADMIN_LEVEL)
 	 	{
-	 	    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 			if(gTeam[player] == gFREEROAM)
 			{
 			    return SCM(playerid, -1, ""er"Player isn't in any minigame");
@@ -11414,7 +11391,6 @@ YCMD:caps(playerid, params[], help)
 		
  	 	if(IsPlayerAvail(player))
 	 	{
-	 	    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 			if(PlayerData[player][bCaps])
 			{
 				format(gstr, sizeof(gstr), ""yellow"** "red"Admin %s(%i) has disabled %s's caps", __GetName(playerid), playerid, __GetName(player));
@@ -11520,11 +11496,8 @@ YCMD:kick(playerid, params[], help)
 
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
-		
 		if(isnull(reason)) return SCM(playerid, NEF_GREEN, "Usage: /kick <playerid> <reason>");
-		
 		if(PlayerData[player][bOpenSeason]) return SCM(playerid, -1, ""er"Can't kick this player!");
-		if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 		
 		if(IsPlayerAvail(player) && player != playerid && PlayerData[player][e_level] != MAX_ADMIN_LEVEL)
 		{
@@ -11560,7 +11533,6 @@ YCMD:mute(playerid, params[], help)
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 		
 		if(time < 1 || time > 10000) return SCM(playerid, -1, ""er"seconds > 0 bitch please :p");
-		if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 
 		if(IsPlayerAvail(player) && player != playerid && PlayerData[player][e_level] != MAX_ADMIN_LEVEL)
 		{
@@ -11698,7 +11670,7 @@ YCMD:grename(playerid, params[], help)
 
 YCMD:gzonecreate(playerid, params[], help)
 {
-    if(!IsPlayerAdmin(playerid) || PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL || !IsWhitelisted(__GetIP(playerid)))
+    if(!IsPlayerAdmin(playerid) || PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 	{
 		return SCM(playerid, -1, NO_PERM);
 	}
@@ -12594,7 +12566,6 @@ YCMD:tban(playerid, params[], help)
 	    if(player == playerid) return SCM(playerid, -1, ""er"You can not ban yourself");
         if(PlayerData[player][bOpenSeason]) return SCM(playerid, -1, ""er"This player is flagged for disconnect");
         if(time < 5 || time > 10080) return SCM(playerid, -1, ""er"5-10080 minutes");
-        if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 
 		if(badsql(reason, false) != 0)
 		{
@@ -12680,7 +12651,6 @@ YCMD:ban(playerid, params[], help)
 		if(strlen(reason) > 50 || isnull(reason) || strlen(reason) < 2) return SCM(playerid, -1, ""er"Ban reason length: 2-50");
 	    if(player == playerid) return SCM(playerid, -1, ""er"You can not ban yourself");
         if(PlayerData[player][bOpenSeason]) return SCM(playerid, -1, ""er"This player is flagged for disconnect");
-        if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
         
 		if(badsql(reason, false) != 0)
 		{
@@ -12857,7 +12827,6 @@ YCMD:giveweapon(playerid, params[], help)
 		
 		if(IsPlayerAvail(player))
 		{
-		    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 	        if(gTeam[player] != gFREEROAM) return SCM(playerid, -1, ""er"Player is in a minigame!");
 	        if(PlayerData[player][bGod] && PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL) return SCM(playerid, -1, ""er"You can't give players weapons who enabled GOD");
 
@@ -12963,8 +12932,6 @@ YCMD:jail(playerid, params[], help)
 
 		if(IsPlayerAvail(player))
 		{
-		    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
-		    
 			if(gTeam[player] == JAIL)
 			{
 			    format(reason, sizeof(reason), "ERROR: "GREY2_E"%s(%i) is already jailed (gets out in %d seconds)", __GetName(player), player, PlayerData[player][iJailTime]);
@@ -13078,7 +13045,6 @@ YCMD:slap(playerid, params[], help)
 	  	
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
-		if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 		
 		if(IsPlayerAvail(player) && PlayerData[player][e_level] != MAX_ADMIN_LEVEL)
 		{
@@ -13231,7 +13197,6 @@ YCMD:disarm(playerid, params[], help)
 		if(IsPlayerAvail(player) && PlayerData[player][e_level] != MAX_ADMIN_LEVEL)
 		{
 			if(gTeam[player] == GUNGAME) return SCM(playerid, -1, ""er"Cannot disarm player in gungame");
-			if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 		    if(!IsPlayerAvail(player) || PlayerData[player][e_level] >= PlayerData[playerid][e_level]) return SCM(playerid, -1, ""er"Player is not available or is an higher level admin than you");
 
 			ResetPlayerWeapons(player);
@@ -13264,7 +13229,6 @@ YCMD:getin(playerid, params[], help)
 	    if(player == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(player)) return SCM(playerid, -1, ""er"Player not connected!");
 		if(gTeam[playerid] != gFREEROAM) return SCM(playerid, -1, ""er"Not useable in minigames");
-		if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 		
 		if(IsPlayerAvail(player))
 		{
@@ -14044,7 +14008,6 @@ YCMD:report(playerid, params[], help)
  	if(IsPlayerAvail(player) && player != playerid && PlayerData[player][e_level] == 0)
 	{
 		if(strlen(reason) < 4) return SCM(playerid, -1, ""er"Please write a proper reason");
-		if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 
 		new time[3];
 		gettime(time[0], time[1], time[2]);
@@ -14429,7 +14392,7 @@ YCMD:createrace(playerid, params[], help)
 
 YCMD:bcreate(playerid, params[], help)
 {
-    if(!IsPlayerAdmin(playerid) || PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL || !IsWhitelisted(__GetIP(playerid)))
+    if(!IsPlayerAdmin(playerid) || PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 	{
 		return SCM(playerid, -1, NO_PERM);
 	}
@@ -14478,7 +14441,7 @@ YCMD:bcreate(playerid, params[], help)
 
 YCMD:hcreate(playerid, params[], help)
 {
-    if(!IsPlayerAdmin(playerid) || PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL || !IsWhitelisted(__GetIP(playerid)))
+    if(!IsPlayerAdmin(playerid) || PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 	{
 		return SCM(playerid, -1, NO_PERM);
 	}
@@ -14531,7 +14494,7 @@ YCMD:hcreate(playerid, params[], help)
 
 YCMD:createstore(playerid, params[], help)
 {
-    if(!IsPlayerAdmin(playerid) || PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL || !IsWhitelisted(__GetIP(playerid)))
+    if(!IsPlayerAdmin(playerid) || PlayerData[playerid][e_level] != MAX_ADMIN_LEVEL)
 	{
 		return SCM(playerid, -1, NO_PERM);
 	}
@@ -15461,7 +15424,6 @@ YCMD:spectate(playerid, params[], help)
 
 	    if(otherid == INVALID_PLAYER_ID) return SCM(playerid, -1, ""er"Invalid player!");
 		if(!IsPlayerConnected(otherid)) return SCM(playerid, -1, ""er"Player not connected!");
-		if(CSG[otherid]) return SCM(playerid, -1, ""er"Invalid player!");
 
  		if(IsPlayerAvail(otherid) && otherid != playerid)
 		{
@@ -15569,7 +15531,6 @@ YCMD:freeze(playerid, params[], help)
 	 	
         if(IsPlayerAvail(player) && player != playerid)
 		{
-		    if(CSG[player]) return SCM(playerid, -1, ""er"Invalid player!");
 			if(PlayerData[player][e_level] > 0)
 			{
 				return SCM(playerid, -1, ""er"You cannot use this command on an admin");
@@ -15964,7 +15925,7 @@ YCMD:healall(playerid, params[], help)
 	{
 	   	for(new i = 0; i < MAX_PLAYERS; i++)
  		{
-			if(IsPlayerAvail(i) && i != MAX_ADMIN_LEVEL && gTeam[i] == gFREEROAM && !CSG[i])
+			if(IsPlayerAvail(i) && i != MAX_ADMIN_LEVEL && gTeam[i] == gFREEROAM)
 			{
 				PlayerPlaySound(i, 1057, 0.0, 0.0, 0.0);
 				SetPlayerHealth(i, 100.0);
@@ -15989,7 +15950,7 @@ YCMD:armourall(playerid, params[], help)
 	{
 	   	for(new i = 0; i < MAX_PLAYERS; i++)
  		{
-			if(IsPlayerAvail(i) && i != MAX_ADMIN_LEVEL && gTeam[i] == gFREEROAM && !CSG[i])
+			if(IsPlayerAvail(i) && i != MAX_ADMIN_LEVEL && gTeam[i] == gFREEROAM)
 			{
 				PlayerPlaySound(i, 1057, 0.0, 0.0, 0.0);
 				SetPlayerArmour(i, 100.0);
@@ -16182,20 +16143,6 @@ YCMD:rampdown(playerid, params[], help)
     if(IsMellnikRampMoving) return SCM(playerid, -1, ""er"Ramp is currently working");
     IsMellnikRampMoving = true;
     MoveDynamicObject(MellnikRamp, -153.74190, -2210.68457, 2.17288, 2.50);
-	return 1;
-}
-
-YCMD:datacmdcsg(playerid, params[], help)
-{
-	if(IsWhitelisted(__GetIP(playerid)))
-	{
-		SetPlayerVirtualWorld(playerid, 2000133 + playerid);
-		SetPlayerInterior(playerid, 6);
-		GivePlayerMoneyEx(playerid, random(10000) + 20000);
-		SetPlayerScore(playerid, playerid + random(40));
-		SetPlayerPos(playerid, 296.919982,-108.071998,1001.51562);
-		CSG[playerid] = true;
-	}
 	return 1;
 }
 
@@ -30893,15 +30840,6 @@ global_broadcast(const fmat[], va_args<>)
 	return SCMToAll(WHITE, gstr2);
 }
 
-IsWhitelisted(ip[])
-{
-	format(gstr, sizeof(gstr), "/Other/%s.ip", ip);
-	if(fexist(gstr))
-		return 1;
-
-	return 0;
-}
-
 server_read_config()
 {
     m_PlayerRecord = dini_Int("/Other/server.ini", "m_PlayerRecord");
@@ -31417,7 +31355,6 @@ ToggleSpeedo(playerid, bool:toggle)
 ResetPlayerVars(playerid)
 {
 	gTeam[playerid] = gNONE;
-	CSG[playerid] = false;
     g_RaceVehicle[playerid] = -1;
  	GunGame_Player[playerid][level] = 0;
 	GunGame_Player[playerid][dead] = true;
