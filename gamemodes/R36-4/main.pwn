@@ -8023,7 +8023,7 @@ YCMD:skins(playerid, params[], help)
     ShowModelSelectionMenu(playerid, skinlist, "Select Skin", 0x0500009C, 0x050000FF, 0xFAFAFA4D);
 	return 1;
 }
-
+/*
 YCMD:mynetstats(playerid, params[], help)
 {
 	new stats[423];
@@ -8031,7 +8031,7 @@ YCMD:mynetstats(playerid, params[], help)
     ShowPlayerDialog(playerid, NO_DIALOG_ID, DIALOG_STYLE_MSGBOX, ""nef" :: My NetworkStats", stats, "OK", "");
 	return 1;
 }
-
+*/
 YCMD:netstats(playerid, params[], help)
 {
 	new stats[423];
@@ -19369,7 +19369,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						strcat(cstring, ""yellow"/bank "white"- random teleport to a bank\n");
 						strcat(cstring, ""yellow"/skin "white"- change your current skin\n");
 						strcat(cstring, ""yellow"/netstats "white"- servers network stats\n");
-						strcat(cstring, ""yellow"/mynetstats "white"- your network stats\n");
+						//strcat(cstring, ""yellow"/mynetstats "white"- your network stats\n");
 						strcat(cstring, ""yellow"/ping "white"- check somebody's ping\n");
 						strcat(cstring, ""yellow"/toggletoys "white"- hide/show your toys\n");
 					}
