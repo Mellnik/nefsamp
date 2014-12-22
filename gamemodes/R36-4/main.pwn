@@ -632,6 +632,7 @@ enum SUSPECT:(<<= 1)
 	SUSPECT_CRASHER_OVM,
 	SUSPECT_FAKE_PACKETS,
 	SUSPECT_AIMBOT,
+	SUSPECT_WEAPON,
 	SUSPECT_IMMUNE
 };
 
@@ -4657,6 +4658,7 @@ public OnPlayerUpdate(playerid)
 			        {
 			            case 38, 36, 35:
 			            {
+			                PlayerData[playerid][bwSuspect] |= SUSPECT_WEAPON;
 				            ResetPlayerWeapons(playerid);
 				            return 0;
 			            }
@@ -6894,208 +6896,234 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 
 public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 {
-	if(Key(KEY_SPRINT) && IsPlayerInRangeOfPoint(playerid, 2.2, 2311.63, -3.89, 26.74) && gTeam[playerid] == STORE)
+	if(gTeam[playerid] == STORE)
 	{
-	    if(!islogged(playerid)) return notlogged(playerid);
-	    return ShowDialog(playerid, BANK_DIALOG);
+        if(Key(KEY_SPRINT))
+        {
+            if(IsPlayerInRangeOfPoint(playerid, 2.2, 2311.63, -3.89, 26.74))
+            {
+			    if(!islogged(playerid)) return notlogged(playerid);
+			    ShowDialog(playerid, BANK_DIALOG);
+			    return 1;
+            }
+        }
 	}
-
+	
 	if(GetPVarInt(playerid, "doingStunt") != 0) return 1;
 
-	if(gTeam[playerid] == gFREEROAM)
+	switch(gTeam[playerid])
 	{
-	    if(IsPlayerInAnyVehicle(playerid) && GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
+	    case gFREEROAM:
 	    {
-			if(Key(KEY_SUBMISSION))
-			{
-		 		new currentveh, Float:angle;
-			    currentveh = GetPlayerVehicleID(playerid);
-			    GetVehicleZAngle(currentveh, angle);
-			    SetVehicleZAngle(currentveh, angle);
-			    return 1;
-			}
-
-			if(Key(KEY_FIRE) && GetPVarInt(playerid, "Ramped") == 1)
-			{
-			    if(!PlayerData[playerid][bRampActive])
-			    {
-				    new vehIDr = GetPlayerVehicleID(playerid), Float:vPOS[4], Float:salttmp;
-					GetVehiclePos(vehIDr, vPOS[0], vPOS[1], vPOS[2]);
-					GetVehicleZAngle(vehIDr, vPOS[3]);
-					salttmp = (floatpower(GetPlayerPing(playerid), 0.25) * 6.0 + 5.0);
-					vPOS[0] += (floatsin(-vPOS[3], degrees) * salttmp);
-					vPOS[1] += (floatcos(-vPOS[3], degrees) * salttmp);
-					SetTimerEx("DestroyRampObject", 3000, false, "ii", CreateDynamicObject(1632, vPOS[0], vPOS[1], vPOS[2], 0, 0, vPOS[3]), playerid);
-					PlayerData[playerid][bRampActive] = true;
-				}
-			    return 1;
-			}
-			
-			if(PlayerData[playerid][bSpeedBoost])
-			{
-				if(Key(KEY_FIRE))
+		    if(IsPlayerInAnyVehicle(playerid) && GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
+		    {
+				if(Key(KEY_SUBMISSION))
 				{
-					new Float:POS[3], vid = GetPlayerVehicleID(playerid);
-					GetVehicleVelocity(vid, POS[0], POS[1], POS[2]);
-					SetVehicleVelocity(vid, POS[0] * 1.3, POS[1] * 1.3, POS[2] * 1.3);
-					if(IsComponentIdCompatible(GetVehicleModel(vid), 1010)) AddVehicleComponent(vid, 1010);
-					return 1;
-		   		}
-		   		
-				if(Key(KEY_CROUCH))
-				{
-					new Float:POS[3], vid = GetPlayerVehicleID(playerid);
-					GetVehicleVelocity(vid, POS[0], POS[1], POS[2]);
-					SetVehicleVelocity(vid, POS[0], POS[1], POS[2] + 0.20);
-					SetVehicleHealth(vid, 1000.0);
-					return 1;
-				}
-
-				if(Key(KEY_YES) || Key(KEY_NO))
-				{
-					new Float:POS[3], vid = GetPlayerVehicleID(playerid);
-					GetVehicleVelocity(vid, POS[0], POS[1], POS[2]);
-					SetVehicleVelocity(vid, POS[0] > 0 ? POS[0] * 0.75 : 0.0, POS[1] > 0 ? POS[1] * 0.75 : 0.0, POS[2]);
-					SetVehicleHealth(vid, 1000.0);
+			 		new currentveh, Float:angle;
+				    currentveh = GetPlayerVehicleID(playerid);
+				    GetVehicleZAngle(currentveh, angle);
+				    SetVehicleZAngle(currentveh, angle);
 				    return 1;
 				}
-			}
-			else
-			{
-				if(Key(KEY_FIRE))
+
+				if(Key(KEY_FIRE) && GetPVarInt(playerid, "Ramped") == 1)
 				{
-					new vid = GetPlayerVehicleID(playerid);
-					if(IsComponentIdCompatible(GetVehicleModel(vid), 1010)) AddVehicleComponent(vid, 1010);
-					return 1;
-		   		}
-			}
-		}
+				    if(!PlayerData[playerid][bRampActive])
+				    {
+					    new vehIDr = GetPlayerVehicleID(playerid), Float:vPOS[4], Float:salttmp;
+						GetVehiclePos(vehIDr, vPOS[0], vPOS[1], vPOS[2]);
+						GetVehicleZAngle(vehIDr, vPOS[3]);
+						salttmp = (floatpower(GetPlayerPing(playerid), 0.25) * 6.0 + 5.0);
+						vPOS[0] += (floatsin(-vPOS[3], degrees) * salttmp);
+						vPOS[1] += (floatcos(-vPOS[3], degrees) * salttmp);
+						SetTimerEx("DestroyRampObject", 3000, false, "ii", CreateDynamicObject(1632, vPOS[0], vPOS[1], vPOS[2], 0, 0, vPOS[3]), playerid);
+						PlayerData[playerid][bRampActive] = true;
+					}
+				    return 1;
+				}
 
-		if(Key(KEY_SECONDARY_ATTACK))
-		{
-		    if(GetNearestHouse(playerid) != -1)
-		    {
-		        Command_ReProcess(playerid, "/enter", false);
-		        return 1;
-		    }
-		}
+				if(PlayerData[playerid][bSpeedBoost])
+				{
+					if(Key(KEY_FIRE))
+					{
+						new Float:POS[3], vid = GetPlayerVehicleID(playerid);
+						GetVehicleVelocity(vid, POS[0], POS[1], POS[2]);
+						SetVehicleVelocity(vid, POS[0] * 1.3, POS[1] * 1.3, POS[2] * 1.3);
+						if(IsComponentIdCompatible(GetVehicleModel(vid), 1010)) AddVehicleComponent(vid, 1010);
+						return 1;
+			   		}
 
-		if(PlayerData[playerid][bSuperJump] && GetPlayerState(playerid) == PLAYER_STATE_ONFOOT && Key(KEY_JUMP))
-		{
-		    if(!PlayerData[playerid][bGWarMode])
-		    {
-		        new cammode = GetPlayerCameraMode(playerid);
-		        
-		        if(cammode != 7 && cammode != 46 && cammode != 51 && cammode != 53)
-		        {
-					new Float:POS[3];
-					GetPlayerVelocity(playerid, POS[0], POS[1], POS[2]);
-					SetPlayerVelocity(playerid, POS[0], POS[1], floatadd(POS[2], 5.0));
+					if(Key(KEY_CROUCH))
+					{
+						new Float:POS[3], vid = GetPlayerVehicleID(playerid);
+						GetVehicleVelocity(vid, POS[0], POS[1], POS[2]);
+						SetVehicleVelocity(vid, POS[0], POS[1], POS[2] + 0.20);
+						SetVehicleHealth(vid, 1000.0);
+						return 1;
+					}
+
+					if(Key(KEY_YES) || Key(KEY_NO))
+					{
+						new Float:POS[3], vid = GetPlayerVehicleID(playerid);
+						GetVehicleVelocity(vid, POS[0], POS[1], POS[2]);
+						SetVehicleVelocity(vid, POS[0] > 0 ? POS[0] * 0.75 : 0.0, POS[1] > 0 ? POS[1] * 0.75 : 0.0, POS[2]);
+						SetVehicleHealth(vid, 1000.0);
+					    return 1;
+					}
+				}
+				else
+				{
+					if(Key(KEY_FIRE))
+					{
+						new vid = GetPlayerVehicleID(playerid);
+						if(IsComponentIdCompatible(GetVehicleModel(vid), 1010)) AddVehicleComponent(vid, 1010);
+						return 1;
+			   		}
 				}
 			}
-			return 1;
-		}
 
-		if(!IsPlayerInAnyVehicle(playerid) && Key(KEY_SECONDARY_ATTACK))
-		{
-		    new Float:POS[3];
-		    GetPlayerPos(playerid, POS[0], POS[1], POS[2]);
-		    if(POS[1] < -1301.4 && POS[1] > -1303.2417 && POS[0] < 1786.2131 && POS[0] > 1784.1555)
-		    {
-		        ShowElevatorDialog(playerid);
-			}
-			else
+			if(Key(KEY_SECONDARY_ATTACK))
 			{
-			    if(POS[1] > -1301.4 && POS[1] < -1299.1447 && POS[0] < 1785.6147 && POS[0] > 1781.9902)
-			    {
-					new i = 20;
-					while(POS[2] < GetDoorsZCoordForFloor(i) + 3.5 && i > 0)
-					{
-					    --i;
-					}
-
-					if(i == 0 && POS[2] < GetDoorsZCoordForFloor(0) + 2.0)
-					{
-					    i = -1;
-					}
-
-					if(i <= 19)
-					{
-						CallElevator(playerid, i + 1);
-						GameTextForPlayer(playerid, "~r~Elevator called", 3500, 4);
-					}
-			    }
-			}
-		}
-	}
-	else if(gTeam[playerid] == gBUILDRACE && g_BuildRace == playerid)
-	{
-	    new Float:vPos[4],
-	        rFile[32];
-	        
-	    if(Key(KEY_FIRE))
-	    {
-		    if(g_BuildTakeVehPos)
-		    {
-		    	if(!IsPlayerInAnyVehicle(playerid)) return SCM(playerid, RED, ">> You need to be in a vehicle");
-				format(rFile, sizeof(rFile), "/Race/%03i.race", g_RaceCount + 1);
-				GetVehiclePos(GetPlayerVehicleID(playerid), vPos[0], vPos[1], vPos[2]);
-				GetVehicleZAngle(GetPlayerVehicleID(playerid), vPos[3]);
-		        dini_Create(rFile);
-				dini_IntSet(rFile, "vModel", g_BuildModeVMID);
-				dini_IntSet(rFile, "rType", g_BuildRaceType);
-				dini_IntSet(rFile, "rVirtualWorld", g_BuildVirtualWorld);
-		        format(gstr, sizeof(gstr), "vPosX_%i", g_BuildVehPosCount);
-				dini_FloatSet(rFile, gstr, vPos[0]);
-		        format(gstr, sizeof(gstr), "vPosY_%i", g_BuildVehPosCount);
-				dini_FloatSet(rFile, gstr, vPos[1]);
-		        format(gstr, sizeof(gstr), "vPosZ_%i", g_BuildVehPosCount);
-				dini_FloatSet(rFile, gstr, vPos[2]);
-		        format(gstr, sizeof(gstr), "vAngle_%i", g_BuildVehPosCount);
-				dini_FloatSet(rFile, gstr, vPos[3]);
-		        format(gstr, sizeof(gstr), ">> Vehicle Pos '%i' has been taken.", ++g_BuildVehPosCount);
-		        SCM(playerid, YELLOW, gstr);
-			}
-
-   			if(g_BuildVehPosCount >= RACE_MAX_PLAYERS)
-		    {
-		        g_BuildVehPosCount = 0;
-		        g_BuildTakeVehPos = false;
-		        ShowDialog(playerid, DIALOG_RACE_CHECKPOINTS);
-		    }
-
-			if(g_BuildTakeCheckpoints)
-			{
-			    if(g_BuildCheckPointCount > RACE_MAX_CHECKPOINTS) return SCM(playerid, RED, ">> You reached the maximum amount of checkpoints!");
-			    if(!IsPlayerInAnyVehicle(playerid)) return SCM(playerid, RED, ">> You need to be in a vehicle");
-				format(rFile, sizeof(rFile), "/Race/%03i.race", g_RaceCount + 1);
-				GetVehiclePos(GetPlayerVehicleID(playerid), vPos[0], vPos[1], vPos[2]);
-				format(gstr, sizeof(gstr), "CP_%i_PosX", g_BuildCheckPointCount);
-				dini_FloatSet(rFile, gstr, vPos[0]);
-				format(gstr, sizeof(gstr), "CP_%i_PosY", g_BuildCheckPointCount);
-				dini_FloatSet(rFile, gstr, vPos[1]);
-				format(gstr, sizeof(gstr), "CP_%i_PosZ", g_BuildCheckPointCount);
-				dini_FloatSet(rFile, gstr, vPos[2]);
-    			format(gstr, sizeof(gstr), ">> Checkpoint '%i' has been set!", ++g_BuildCheckPointCount);
-		        SCM(playerid, YELLOW, gstr);
-			}
-		}
-
-		if(Key(KEY_SECONDARY_ATTACK))
-		{
-		    if(g_BuildTakeCheckpoints)
-		    {
-				format(gstr, sizeof(gstr), "/Race/%03i.race", g_RaceCount + 1);
-				dini_IntSet(gstr, "rTotalRaceCPs", g_BuildCheckPointCount);
-				dini_IntSet(gstr, "rDeployTime", (gettime() - g_BuildDeployTime) - 1);
-
-				format(gstr, sizeof(gstr), "/Race/Index/Index.ini");
-				dini_IntSet(gstr, "TotalRaces", ++g_RaceCount);
+				// Fast Distance Check
 				
-		        ShowDialog(playerid, DIALOG_RACE_RACERDY);
+				new Float:fPOS[3];
+				GetPlayerPos(playerid, fPOS[0], fPOS[1], fPOS[2]);
+				
+				for(new i = 0; i < houseid; i++)
+				{
+					if(4.0 > ((fPOS[0] - HouseData[i][e_x]) * (fPOS[0] - HouseData[i][e_x])) + ((fPOS[1] - HouseData[i][e_y]) * (fPOS[1] - HouseData[i][e_y])) + ((fPOS[2] - HouseData[i][e_z]) * (fPOS[2] - HouseData[i][e_z])))
+					{
+						EnterHouse(playerid, i);
+						return 1;
+					}
+				}
+				
+				/*
+			    if(GetNearestHouse(playerid) != -1)
+			    {
+			        Command_ReProcess(playerid, "/enter", false);
+			        return 1;
+			    }
+				*/
+			}
 
-				RemoveFromRaceBuilder(playerid);
-		    }
+			if(PlayerData[playerid][bSuperJump] && GetPlayerState(playerid) == PLAYER_STATE_ONFOOT && Key(KEY_JUMP))
+			{
+			    if(!PlayerData[playerid][bGWarMode])
+			    {
+			        new cammode = GetPlayerCameraMode(playerid);
+
+			        if(cammode != 7 && cammode != 46 && cammode != 51 && cammode != 53)
+			        {
+						new Float:POS[3];
+						GetPlayerVelocity(playerid, POS[0], POS[1], POS[2]);
+						SetPlayerVelocity(playerid, POS[0], POS[1], floatadd(POS[2], 5.0));
+					}
+				}
+				return 1;
+			}
+
+			if(!IsPlayerInAnyVehicle(playerid) && Key(KEY_SECONDARY_ATTACK))
+			{
+			    new Float:POS[3];
+			    GetPlayerPos(playerid, POS[0], POS[1], POS[2]);
+			    if(POS[1] < -1301.4 && POS[1] > -1303.2417 && POS[0] < 1786.2131 && POS[0] > 1784.1555)
+			    {
+			        ShowElevatorDialog(playerid);
+				}
+				else
+				{
+				    if(POS[1] > -1301.4 && POS[1] < -1299.1447 && POS[0] < 1785.6147 && POS[0] > 1781.9902)
+				    {
+						new i = 20;
+						while(POS[2] < GetDoorsZCoordForFloor(i) + 3.5 && i > 0)
+						{
+						    --i;
+						}
+
+						if(i == 0 && POS[2] < GetDoorsZCoordForFloor(0) + 2.0)
+						{
+						    i = -1;
+						}
+
+						if(i <= 19)
+						{
+							CallElevator(playerid, i + 1);
+							GameTextForPlayer(playerid, "~r~Elevator called", 3500, 4);
+						}
+				    }
+				}
+			}
+		}
+		case gBUILDRACE:
+		{
+			if(g_BuildRace == playerid)
+			{
+			    if(Key(KEY_FIRE))
+			    {
+				    if(g_BuildTakeVehPos)
+				    {
+				    	if(!IsPlayerInAnyVehicle(playerid)) return SCM(playerid, RED, ">> You need to be in a vehicle");
+						format(rFile, sizeof(rFile), "/Race/%03i.race", g_RaceCount + 1);
+						GetVehiclePos(GetPlayerVehicleID(playerid), vPos[0], vPos[1], vPos[2]);
+						GetVehicleZAngle(GetPlayerVehicleID(playerid), vPos[3]);
+				        dini_Create(rFile);
+						dini_IntSet(rFile, "vModel", g_BuildModeVMID);
+						dini_IntSet(rFile, "rType", g_BuildRaceType);
+						dini_IntSet(rFile, "rVirtualWorld", g_BuildVirtualWorld);
+				        format(gstr, sizeof(gstr), "vPosX_%i", g_BuildVehPosCount);
+						dini_FloatSet(rFile, gstr, vPos[0]);
+				        format(gstr, sizeof(gstr), "vPosY_%i", g_BuildVehPosCount);
+						dini_FloatSet(rFile, gstr, vPos[1]);
+				        format(gstr, sizeof(gstr), "vPosZ_%i", g_BuildVehPosCount);
+						dini_FloatSet(rFile, gstr, vPos[2]);
+				        format(gstr, sizeof(gstr), "vAngle_%i", g_BuildVehPosCount);
+						dini_FloatSet(rFile, gstr, vPos[3]);
+				        format(gstr, sizeof(gstr), ">> Vehicle Pos '%i' has been taken.", ++g_BuildVehPosCount);
+				        SCM(playerid, YELLOW, gstr);
+					}
+
+		   			if(g_BuildVehPosCount >= RACE_MAX_PLAYERS)
+				    {
+				        g_BuildVehPosCount = 0;
+				        g_BuildTakeVehPos = false;
+				        ShowDialog(playerid, DIALOG_RACE_CHECKPOINTS);
+				    }
+
+					if(g_BuildTakeCheckpoints)
+					{
+					    if(g_BuildCheckPointCount > RACE_MAX_CHECKPOINTS) return SCM(playerid, RED, ">> You reached the maximum amount of checkpoints!");
+					    if(!IsPlayerInAnyVehicle(playerid)) return SCM(playerid, RED, ">> You need to be in a vehicle");
+						format(rFile, sizeof(rFile), "/Race/%03i.race", g_RaceCount + 1);
+						GetVehiclePos(GetPlayerVehicleID(playerid), vPos[0], vPos[1], vPos[2]);
+						format(gstr, sizeof(gstr), "CP_%i_PosX", g_BuildCheckPointCount);
+						dini_FloatSet(rFile, gstr, vPos[0]);
+						format(gstr, sizeof(gstr), "CP_%i_PosY", g_BuildCheckPointCount);
+						dini_FloatSet(rFile, gstr, vPos[1]);
+						format(gstr, sizeof(gstr), "CP_%i_PosZ", g_BuildCheckPointCount);
+						dini_FloatSet(rFile, gstr, vPos[2]);
+		    			format(gstr, sizeof(gstr), ">> Checkpoint '%i' has been set!", ++g_BuildCheckPointCount);
+				        SCM(playerid, YELLOW, gstr);
+					}
+				}
+
+				if(Key(KEY_SECONDARY_ATTACK))
+				{
+				    if(g_BuildTakeCheckpoints)
+				    {
+						format(gstr, sizeof(gstr), "/Race/%03i.race", g_RaceCount + 1);
+						dini_IntSet(gstr, "rTotalRaceCPs", g_BuildCheckPointCount);
+						dini_IntSet(gstr, "rDeployTime", (gettime() - g_BuildDeployTime) - 1);
+
+						format(gstr, sizeof(gstr), "/Race/Index/Index.ini");
+						dini_IntSet(gstr, "TotalRaces", ++g_RaceCount);
+
+				        ShowDialog(playerid, DIALOG_RACE_RACERDY);
+
+						RemoveFromRaceBuilder(playerid);
+				    }
+				}
+			}
 		}
 	}
 	return 1;
@@ -8720,17 +8748,7 @@ YCMD:enter(playerid, params[], help)
 	new i = -1;
 	if((i = GetNearestHouse(playerid)) != -1)
 	{
-	    if(HouseData[i][locked])
-		{
-			return SCM(playerid, -1, ""er"This house is locked");
-		}
-		
-	    SetPlayerInterior(playerid, g_HouseInteriorTypes[HouseData[i][interior]][interior]);
-		SetPlayerVirtualWorld(playerid, HouseData[i][e_id] + 1000);
-  		SetPlayerPos(playerid, g_HouseInteriorTypes[HouseData[i][interior]][house_x], g_HouseInteriorTypes[HouseData[i][interior]][house_y], g_HouseInteriorTypes[HouseData[i][interior]][house_z]);
-		gTeam[playerid] = HOUSE;
-		player_notice(playerid, "House entered", "type ~y~/exit ~w~to leave", 4000);
-		SCM(playerid, -1, ""er"Type /exit to leave the house");
+	    EnterHouse(playerid, i);
 	}
 	else
 	{
@@ -10147,6 +10165,10 @@ YCMD:suspect(playerid, params[], help)
    			}
    			if(PlayerData[i][bwSuspect] & SUSPECT_FAKE_PACKETS) {
    			    format(tmpstring, sizeof(tmpstring), "%i) %s(%i) - AC_FAKE_PACKETS\n", ++count, __GetName(i), i);
+				strcat(finstring, tmpstring);
+   			}
+   			if(PlayerData[i][bwSuspect] & SUSPECT_WEAPON) {
+   			    format(tmpstring, sizeof(tmpstring), "%i) %s(%i) - AC_WEAPON\n", ++count, __GetName(i), i);
 				strcat(finstring, tmpstring);
    			}
 		}
@@ -31612,4 +31634,19 @@ RandomWeapons(playerid)
 	    case 3: GivePlayerWeapon(playerid, 43, 1);
 	}
     return 1;
+}
+
+EnterHouse(playerid, i)
+{
+    if(HouseData[i][locked])
+	{
+		return SCM(playerid, -1, ""er"This house is locked");
+	}
+
+    SetPlayerInterior(playerid, g_HouseInteriorTypes[HouseData[i][interior]][interior]);
+	SetPlayerVirtualWorld(playerid, HouseData[i][e_id] + 1000);
+	SetPlayerPos(playerid, g_HouseInteriorTypes[HouseData[i][interior]][house_x], g_HouseInteriorTypes[HouseData[i][interior]][house_y], g_HouseInteriorTypes[HouseData[i][interior]][house_z]);
+	gTeam[playerid] = HOUSE;
+	player_notice(playerid, "House entered", "type ~y~/exit ~w~to leave", 4000);
+	SCM(playerid, -1, ""er"Type /exit to leave the house")
 }

@@ -15,6 +15,8 @@ Build 36-4 (Winter Edition)
 - Set Streamer to it's default tick rate.
 - You no longer get a pm sound when being AFK.
 - Fixed /nstats showing wrong ip address.
+- Fixed SUSPECT_FAKE_PACKETS false positives.
+- Added SUSPECT_WEAPON.
 - Script optimizations to reduce unnecessary overhead.
 
 Build 36-3 (Winter Edition)
