@@ -2729,6 +2729,8 @@ new Iterator:iterRaceJoins<MAX_PLAYERS>,
 	gstr2[255],
 	g_LottoNumber,
 	g_LottoJackpot,
+	File:hLogCommand,
+	File:hLogChat,
 	bool:bLottoActive = false,
 	g_ServerStats[4],
 	mathsAnswered = -1,
@@ -2990,6 +2992,9 @@ public OnGameModeExit()
 {
 	Log(LOG_EXIT, "MySQL: Garbage cleanup");
     SQL_CleanUp();
+    
+    fclose(hLogChat);
+    fclose(hLogCommand);
     
 	mysql_stat(gstr2, pSQL, sizeof(gstr2));
 	Log(LOG_EXIT, "MySQL: %s", gstr2);
@@ -3923,13 +3928,8 @@ public OnPlayerCommandReceived(playerid, cmdtext[])
 
 public OnPlayerCommandPerformed(playerid, cmdtext[], success)
 {
-    new File:hFile = fopen("/Log/cmdlog.txt", io_append),
-        time[3];
-
-    gettime(time[0], time[1], time[2]);
-    format(gstr2, sizeof(gstr2), "[%02d:%02d:%02d] [%i]%s used %s with success: %i\r\n", time[0], time[1], time[2], playerid, __GetName(playerid), cmdtext, success);
-    fwrite(hFile, gstr2);
-    fclose(hFile);
+	format(gstr, sizeof(gstr), "[%02d:%02d:%02d] [%i]%s req:%s success:%i\r\n", gTime[3], gTime[4], gTime[5], playerid, __GetName(playerid), cmdtext, success);
+	fwrite(hLogCommand, gstr);
 
 	if(!success) {
 	    player_notice(playerid, "Unknown command", "Type ~y~/c ~w~for all commands");
@@ -4791,13 +4791,8 @@ public OnPlayerText(playerid, text[])
 	}
 	strmid(LastPlayerText[playerid], text, 0, 144, 144);
 
-    new File:hFile = fopen("/Log/chatlog.txt", io_append),
-        time[3];
-
-    gettime(time[0], time[1], time[2]);
-    format(gstr2, sizeof(gstr2), "[%02d:%02d:%02d] [%i]%s: %s \r\n", time[0], time[1], time[2], playerid, __GetName(playerid), text);
-    fwrite(hFile, gstr2);
-    fclose(hFile);
+	format(gstr2, sizeof(gstr2), "[%02d:%02d:%02d] [%i]%s: %s\r\n", gTime[3], gTime[4], gTime[5], playerid, __GetName(playerid, text);
+	fwrite(hLogChat);
 
 	if(IsAd(text))
 	{
@@ -23347,6 +23342,9 @@ server_initialize()
 	SetWeather(1);
 	SetWorldTime(12);
 	
+	hLogCommand = fopen("/Log/cmdlog.txt", io_append);
+    hLogChat = fopen("/Log/chatlog.txt", io_append);
+	
 	// Variable setting
     CurrentBGMap = BG_VOTING;
 	StartTime = gettime();
@@ -27825,7 +27823,7 @@ function:ShowDialog(playerid, dialogid)
 	        format(string, sizeof(string), "%s since %s. During that time...\n\n... "yellow_e"%i "white"commands have been performed\n... "yellow_e"%i "white"chat messages have been sent\n... "yellow_e"%i "white"new players have registered\n... "yellow_e"%i "white"players have been murdered",
 				GetUptime(), UTConvert(StartTime), g_ServerStats[0], g_ServerStats[1], g_ServerStats[2], g_ServerStats[3]);
 				
-			format(gstr2, sizeof(gstr2), "\n\nStreamed client objects: %i\nTotal map obejcts: %i\nServer FPS: %i\nPlayer record: %i", Streamer_CountVisibleItems(playerid, STREAMER_TYPE_OBJECT), Streamer_CountItems(STREAMER_TYPE_OBJECT), GetServerTickRate(), m_PlayerRecord);
+			format(gstr2, sizeof(gstr2), "\n\nStreamed client objects: %i\nServer FPS: %i\nPlayer record: %i", Streamer_CountVisibleItems(playerid, STREAMER_TYPE_OBJECT), GetServerTickRate(), m_PlayerRecord);
 	        strcat(string, gstr2);
 	        strcat(string, "\n\nServer version: "SVRNAME" "CURRENT_VERSION", "HOTFIX_REV" on "SAMP_VERSION"");
 	        
