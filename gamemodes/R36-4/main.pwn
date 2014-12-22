@@ -4792,8 +4792,8 @@ public OnPlayerText(playerid, text[])
 	}
 	strmid(LastPlayerText[playerid], text, 0, 144, 144);
 
-	format(gstr2, sizeof(gstr2), "[%02d:%02d:%02d] [%i]%s: %s\r\n", gTime[3], gTime[4], gTime[5], playerid, __GetName(playerid, text);
-	fwrite(hLogChat);
+	format(gstr2, sizeof(gstr2), "[%02d:%02d:%02d] [%i]%s: %s\r\n", gTime[3], gTime[4], gTime[5], playerid, __GetName(playerid), text);
+	fwrite(hLogChat, gstr2);
 
 	if(IsAd(text))
 	{
@@ -7059,6 +7059,9 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 		{
 			if(g_BuildRace == playerid)
 			{
+			    new Float:vPos[4],
+			        rFile[32];
+
 			    if(Key(KEY_FIRE))
 			    {
 				    if(g_BuildTakeVehPos)
@@ -13080,7 +13083,7 @@ YCMD:slap(playerid, params[], help)
 			  	Float:POS[3];
 
   			GetPlayerHealth(player, Health);
-			SetPlayerHealth(player, (Health - 25.0);
+			SetPlayerHealth(player, (Health - 25.0));
 			GetPlayerPos(player, POS[0], POS[1], POS[2]);
 			SetPlayerPos(player, POS[0], POS[1], floatadd(POS[2], 10.0));
 			
@@ -15116,7 +15119,7 @@ YCMD:gangs(playerid, params[], help)
 
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
-	    if(PlayerData[playerid][ExitType] != EXIT_FIRST_SPAWNED)) continue;
+	    if(PlayerData[playerid][ExitType] != EXIT_FIRST_SPAWNED) continue;
         if(PlayerData[i][e_gangid] > 0 && !Iter_Contains(Gangs[0], PlayerData[i][e_gangid]))
         {
             Iter_Add(Gangs[0], PlayerData[i][e_gangid]);
@@ -31575,27 +31578,27 @@ RandomWeapons(playerid)
 
     // melee
 	static const w_melee[8] = {2, 3, 4, 5, 6, 7, 8, 9};
-	GivePlayerWeapon(playerid, w_melee[random(sizeof(w_melee))]);
+	GivePlayerWeapon(playerid, w_melee[random(sizeof(w_melee))], 1);
 
 	// pistol
 	static const w_pistol[3] = {22, 23, 24};
-	GivePlayerWeapon(playerid, w_pistol[random(sizeof(w_pistol))]);
+	GivePlayerWeapon(playerid, w_pistol[random(sizeof(w_pistol))], 99999);
 	
 	// shotgun
 	static const w_shotgun[3] = {25, 26, 27};
-	GivePlayerWeapon(playerid, w_shotgun[random(sizeof(w_shotgun))];
+	GivePlayerWeapon(playerid, w_shotgun[random(sizeof(w_shotgun))], 99999);
 
 	// sub-machine pistol
 	static const w_smp[3] = {28, 29, 32};
-	GivePlayerWeapon(playerid, w_smp[random(sizeof(w_smp))];
+	GivePlayerWeapon(playerid, w_smp[random(sizeof(w_smp))], 99999);
 	
 	// aussault rifle
 	static const w_assault[2] = {30, 31};
-	GivePlayerWeapon(playerid, w_assault[random(sizeof(w_assault))];
+	GivePlayerWeapon(playerid, w_assault[random(sizeof(w_assault))], 99999);
 
 	// rifle
 	static const w_rifle[2] = {33, 34};
-	GivePlayerWeapon(playerid, w_rifle[random(sizeof(w_rifle))];
+	GivePlayerWeapon(playerid, w_rifle[random(sizeof(w_rifle))], 99999);
 
 	// heavy
 	switch(random(6)) // heavy
@@ -31629,5 +31632,6 @@ EnterHouse(playerid, i)
 	SetPlayerVirtualWorld(playerid, HouseData[i][e_id] + 1000);
 	SetPlayerPos(playerid, g_aHouseInteriorTypes[HouseData[i][interior]][house_x], g_aHouseInteriorTypes[HouseData[i][interior]][house_y], g_aHouseInteriorTypes[HouseData[i][interior]][house_z]);
 	player_notice(playerid, "House entered", "type ~y~/exit ~w~to leave", 4000);
-	SCM(playerid, -1, ""er"Type /exit to leave the house")
+	SCM(playerid, -1, ""er"Type /exit to leave the house");
+	return 1;
 }
