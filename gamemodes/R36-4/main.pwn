@@ -896,7 +896,7 @@ enum e_top_time
 	E_time
 };
 
-enum e_top_rtests
+enum e_top_reacts
 {
 	E_playerid,
 	E_test
@@ -14832,9 +14832,9 @@ YCMD:races(playerid, params[], help)
 	return 1;
 }
 
-YCMD:rtests(playerid, params[], help)
+YCMD:reacts(playerid, params[], help)
 {
-	new tests[MAX_PLAYERS][e_top_rtests],
+	new tests[MAX_PLAYERS][e_top_reacts],
 		finstring[2048],
 		tmpstring[68];
 
@@ -15166,7 +15166,7 @@ YCMD:top(playerid, params[], help)
 {
 	new string[1024];
 	strcat(string, "Richlist (/richlist)\nMost Wanteds (/wanteds)\nScore (/score)\nMost Kills (/kills)\nMost Deaths (/deaths)\nMost playing time (/toptime)\nOnline Gangs (/gangs)\nTop Gangs (/gtop)");
-	strcat(string, "\nMost Reaction Wins (/rtests)\nMost Race Wins (/races)\nMost Derby Wins (/derbys)\nMost Fallout Wins (/fallouts)\nMost Gungame Wins (/gungames)");
+	strcat(string, "\nMost Reaction Wins (/reacts)\nMost Race Wins (/races)\nMost Derby Wins (/derbys)\nMost Fallout Wins (/fallouts)\nMost Gungame Wins (/gungames)");
 	
 	ShowPlayerDialog(playerid, TOPLIST_DIALOG, DIALOG_STYLE_LIST, ""nef" :: Toplists", string, "Select", "Close");
 	return 1;
@@ -19388,7 +19388,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	                case 5: Command_ReProcess(playerid, "/toptime", false);
 	                case 6: Command_ReProcess(playerid, "/gangs", false);
 	                case 7: Command_ReProcess(playerid, "/gtop", false);
-	                case 8: Command_ReProcess(playerid, "/rtests", false);
+	                case 8: Command_ReProcess(playerid, "/reacts", false);
 	                case 9: Command_ReProcess(playerid, "/races", false);
 	                case 10: Command_ReProcess(playerid, "/derbys", false);
 	                case 11: Command_ReProcess(playerid, "/fallouts", false);
