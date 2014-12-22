@@ -14713,15 +14713,11 @@ YCMD:gungames(playerid, params[], help)
 	for(new i = 0; i < 30; i++)
 	{
 	    if(gungames[i][E_gungame] != -1)
-	    {
 		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Gungame Wins: %i\n", GetColorEx(gungames[i][E_playerid]) >>> 8, i + 1, __GetName(gungames[i][E_playerid]), gungames[i][E_playerid], gungames[i][E_gungame]);
-		    strcat(finstring, tmpstring);
-		}
 		else
-		{
 		    format(tmpstring, sizeof(tmpstring), ""white"%i - ---\n", i + 1);
-		    strcat(finstring, tmpstring);
-		}
+
+        strcat(finstring, tmpstring);
 	}
 
     ShowPlayerDialog(playerid, MOST_KILLS_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" :: Most Gungame Wins", finstring, "OK", "");
@@ -14753,15 +14749,11 @@ YCMD:fallouts(playerid, params[], help)
 	for(new i = 0; i < 30; i++)
 	{
 	    if(fallouts[i][E_fallout] != -1)
-	    {
 		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Fallout Wins: %i\n", GetColorEx(fallouts[i][E_playerid]) >>> 8, i + 1, __GetName(fallouts[i][E_playerid]), fallouts[i][E_playerid], fallouts[i][E_fallout]);
-		    strcat(finstring, tmpstring);
-		}
 		else
-		{
 		    format(tmpstring, sizeof(tmpstring), ""white"%i - ---\n", i + 1);
-		    strcat(finstring, tmpstring);
-		}
+
+		strcat(finstring, tmpstring);
 	}
 
     ShowPlayerDialog(playerid, MOST_KILLS_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" :: Most Fallout Wins", finstring, "OK", "");
@@ -14793,15 +14785,11 @@ YCMD:derbys(playerid, params[], help)
 	for(new i = 0; i < 30; i++)
 	{
 	    if(derbys[i][E_derby] != -1)
-	    {
 		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Derby Wins: %i\n", GetColorEx(derbys[i][E_playerid]) >>> 8, i + 1, __GetName(derbys[i][E_playerid]), derbys[i][E_playerid], derbys[i][E_derby]);
-		    strcat(finstring, tmpstring);
-		}
 		else
-		{
 		    format(tmpstring, sizeof(tmpstring), ""white"%i - ---\n", i + 1);
-		    strcat(finstring, tmpstring);
-		}
+
+		strcat(finstring, tmpstring);
 	}
 
     ShowPlayerDialog(playerid, MOST_KILLS_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" :: Most Derby Wins", finstring, "OK", "");
@@ -14833,15 +14821,11 @@ YCMD:races(playerid, params[], help)
 	for(new i = 0; i < 30; i++)
 	{
 	    if(races[i][E_race] != -1)
-	    {
 		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Race Wins: %i\n", GetColorEx(races[i][E_playerid]) >>> 8, i + 1, __GetName(races[i][E_playerid]), races[i][E_playerid], races[i][E_race]);
-		    strcat(finstring, tmpstring);
-		}
 		else
-		{
 		    format(tmpstring, sizeof(tmpstring), ""white"%i - ---\n", i + 1);
-		    strcat(finstring, tmpstring);
-		}
+		    
+		strcat(finstring, tmpstring);
 	}
 
     ShowPlayerDialog(playerid, MOST_KILLS_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" :: Most Race Wins", finstring, "OK", "");
@@ -14873,15 +14857,11 @@ YCMD:rtests(playerid, params[], help)
 	for(new i = 0; i < 30; i++)
 	{
 	    if(tests[i][E_test] != -1)
-	    {
 		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Reaction Wins: %i\n", GetColorEx(tests[i][E_playerid]) >>> 8, i + 1, __GetName(tests[i][E_playerid]), tests[i][E_playerid], tests[i][E_test]);
-		    strcat(finstring, tmpstring);
-		}
 		else
-		{
 		    format(tmpstring, sizeof(tmpstring), ""white"%i - ---\n", i + 1);
-		    strcat(finstring, tmpstring);
-		}
+		    
+		strcat(finstring, tmpstring);
 	}
 
     ShowPlayerDialog(playerid, MOST_KILLS_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" :: Most Reaction Wins", finstring, "OK", "");
@@ -14913,15 +14893,11 @@ YCMD:kills(playerid, params[], help)
 	for(new i = 0; i < 30; i++)
 	{
 	    if(kills[i][E_kills] != -1)
-	    {
 		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Kills: %i\n", GetColorEx(kills[i][E_playerid]) >>> 8, i + 1, __GetName(kills[i][E_playerid]), kills[i][E_playerid], kills[i][E_kills]);
-		    strcat(finstring, tmpstring);
-		}
 		else
-		{
 		    format(tmpstring, sizeof(tmpstring), ""white"%i - ---\n", i + 1);
-		    strcat(finstring, tmpstring);
-		}
+		    
+		strcat(finstring, tmpstring);
 	}
 
     ShowPlayerDialog(playerid, MOST_KILLS_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" :: Most Kills", finstring, "OK", "");
@@ -14953,15 +14929,11 @@ YCMD:deaths(playerid, params[], help)
 	for(new i = 0; i < 30; i++)
 	{
 	    if(deaths[i][E_deaths] != -1)
-	    {
 		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Deaths: %i\n", GetColorEx(deaths[i][E_playerid]) >>> 8, i + 1, __GetName(deaths[i][E_playerid]), deaths[i][E_playerid], deaths[i][E_deaths]);
-		    strcat(finstring, tmpstring);
-		}
 		else
-		{
 		    format(tmpstring, sizeof(tmpstring), ""white"%i - ---\n", i + 1);
-		    strcat(finstring, tmpstring);
-		}
+		    
+		strcat(finstring, tmpstring);
 	}
 
     ShowPlayerDialog(playerid, MOST_DEATHS_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" :: Most Deaths", finstring, "OK", "");
@@ -14995,15 +14967,11 @@ YCMD:toptime(playerid, params[], help)
 	for(new i = 0; i < 30; i++)
 	{
 	    if(playingtime[i][E_time] != -1)
-	    {
 		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Time: %s\n", GetColorEx(playingtime[i][E_playerid]) >>> 8, i + 1, __GetName(playingtime[i][E_playerid]), playingtime[i][E_playerid], GetPlayingTimeFormat(playingtime[i][E_playerid]));
-		    strcat(finstring, tmpstring);
-		}
 		else
-		{
 		    format(tmpstring, sizeof(tmpstring), ""white"%i - ---\n", i + 1);
-		    strcat(finstring, tmpstring);
-		}
+		    
+		strcat(finstring, tmpstring);
 	}
 
     ShowPlayerDialog(playerid, MOST_PLAYING_TIME_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" :: Most Playing Time", finstring, "OK", "");
@@ -15035,15 +15003,11 @@ YCMD:richlist(playerid, params[], help)
 	for(new i = 0; i < 30; i++)
 	{
 	    if(richlist[i][E_money] != -1)
-	    {
 		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Money: $%s\n", GetColorEx(richlist[i][E_playerid]) >>> 8, i + 1, __GetName(richlist[i][E_playerid]), richlist[i][E_playerid], number_format(richlist[i][E_money]));
-		    strcat(finstring, tmpstring);
-		}
 		else
-		{
 		    format(tmpstring, sizeof(tmpstring), ""white"%i - ---\n", i + 1);
-		    strcat(finstring, tmpstring);
-		}
+		    
+		strcat(finstring, tmpstring);
 	}
 
     ShowPlayerDialog(playerid, RICHLIST_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" :: Richlist", finstring, "OK", "");
@@ -15075,15 +15039,11 @@ YCMD:wanteds(playerid, params[], help)
 	for(new i = 0; i < 30; i++)
 	{
 	    if(wanteds[i][E_wanteds] != -1)
-	    {
 		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Wanteds: %i\n", GetColorEx(wanteds[i][E_playerid]) >>> 8, i + 1, __GetName(wanteds[i][E_playerid]), wanteds[i][E_playerid], wanteds[i][E_wanteds]);
-		    strcat(finstring, tmpstring);
-		}
 		else
-		{
 		    format(tmpstring, sizeof(tmpstring), ""white"%i - ---\n", i + 1);
-		    strcat(finstring, tmpstring);
-		}
+		    
+		strcat(finstring, tmpstring);
 	}
 	ShowPlayerDialog(playerid, WANTEDS_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" :: Most wanteds", finstring, "OK", "");
 	return 1;
@@ -15114,15 +15074,11 @@ YCMD:score(playerid, params[], help)
 	for(new i = 0; i < 30; i++)
 	{
 	    if(score[i][E_pscore] != -1)
-	    {
 		    format(tmpstring, sizeof(tmpstring), "{%06x}%i - %s(%i) - Score: %i\n", GetColorEx(score[i][E_playerid]) >>> 8, i + 1, __GetName(score[i][E_playerid]), score[i][E_playerid], score[i][E_pscore]);
-		    strcat(finstring, tmpstring);
-		}
 		else
-		{
 		    format(tmpstring, sizeof(tmpstring), ""white"%i - ---\n", i + 1);
-		    strcat(finstring, tmpstring);
-		}
+		    
+		strcat(finstring, tmpstring);
 	}
 	ShowPlayerDialog(playerid, SCORE_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" :: Score", finstring, "OK", "");
 	return 1;
