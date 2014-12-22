@@ -6663,7 +6663,7 @@ public OnObjectMoved(objectid)
 	    Floor_OpenDoors(ElevatorFloor);
 
 	    GetObjectPos(Obj_Elevator, POS[0], POS[1], POS[2]);
-        Label_Elevator = CreateDynamic3DTextLabel("Press '"vgreen"F"white"' to use elevator", -1, 1784.9822, -1302.0426, floatsub(POS[2], 0.9), 5.0, .testlos = 1, .worldid = 0);
+        Label_Elevator = CreateDynamic3DTextLabel("Press '"vgreen"F"white"' to use elevator", -1, 1784.9822, -1302.0426, (POS[2] - 0.9), 5.0, .testlos = 1, .worldid = 0);
 		
 	    ElevatorState = ELEVATOR_STATE_WAITING;
 	    SetTimer("Elevator_TurnToIdle", ELEVATOR_WAIT_TIME, false);
@@ -13058,7 +13058,7 @@ YCMD:slap(playerid, params[], help)
 			  	Float:POS[3];
 
   			GetPlayerHealth(player, Health);
-			SetPlayerHealth(player, floatsub(Health, 25.0));
+			SetPlayerHealth(player, (Health - 25.0);
 			GetPlayerPos(player, POS[0], POS[1], POS[2]);
 			SetPlayerPos(player, POS[0], POS[1], floatadd(POS[2], 10.0));
 			
@@ -27417,11 +27417,11 @@ function:fallout_squareshake(objectid)
 		{
 			new Float:patPOS[3];
 			GetDynamicObjectPos(FalloutData[I_iObject][objectid], patPOS[0], patPOS[1], patPOS[2]);
-			MoveDynamicObject(FalloutData[I_iObject][objectid], patPOS[0], patPOS[1], floatsub(patPOS[2], 100.0), 4);
+			MoveDynamicObject(FalloutData[I_iObject][objectid], patPOS[0], patPOS[1], (patPOS[2] - 100.0), 4);
 		}
 		case 11..99:
 		{
-  			SetDynamicObjectPos(FalloutData[I_iObject][objectid], floatsub(31.8, floatsub((FalloutData[I_iShake][objectid] * 2), 20)), 0, 0);
+  			SetDynamicObjectPos(FalloutData[I_iObject][objectid], 31.8 - floatsub((FalloutData[I_iShake][objectid] * 2), 20), 0, 0);
 		}
 		default:
 		{
