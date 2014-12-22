@@ -1,7 +1,7 @@
 New Evolution Freeroam SA-MP Server
 ===================================
 
-Build 37 (Winter Edition)
+Build XX
 --------
 - Added SUSPECT_AIMBOT.
 - Fixed bullet information textdraw for admins.
@@ -13,14 +13,15 @@ Build 37 (Winter Edition)
 Build 36-4 (Winter Edition)
 ----------
 - Set Streamer to it's default tick rate.
-- You no longer get a pm sounds when being AFK.
+- You no longer get a pm sound when being AFK.
 - Fixed /nstats showing wrong ip address.
+- Script optimizations to reduce unnecessary overhead.
 
 Build 36-3 (Winter Edition)
 ----------
-- Script optimizations to reduce unnecessary overhead
-- Removed warp sound from teleports
-- Fixed CnR bug showing wrong store names
+- Script optimizations to reduce unnecessary overhead.
+- Removed warp sound from teleports.
+- Fixed CnR bug showing wrong store names.
 
 Build 36-2 (Winter Edition)
 ----------
