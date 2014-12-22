@@ -1218,7 +1218,7 @@ enum e_firework
 };
 
 // Global Variables
-static const g_SAZones[][SAZONE_MAIN] = {  // Majority of names and area coordinates adopted from Mabako's 'Zones Script' v0.2
+static const g_aSAZones[][SAZONE_MAIN] = {  // Majority of names and area coordinates adopted from Mabako's 'Zones Script' v0.2
 	//	NAME                            AREA (Xmin,Ymin,Zmin,Xmax,Ymax,Zmax)
 	{"The Big Ear",	                {-410.00,1403.30,-3.00,-137.90,1681.20,200.00}},
 	{"Aldea Malvada",               {-1372.10,2498.50,0.00,-1277.50,2615.30,200.00}},
@@ -1598,7 +1598,7 @@ static const g_szBusinessTypes[5][] =
 };
 
 #if WINTER_EDITION == true
-static Float:g_CowCars[5][4] =
+static Float:g_aCowCars[5][4] =
 {
     {1082.0734, -1794.0173, 13.6664, 1.5867},
     {1093.6932, -1780.2679, 13.5951, 90.2608},
@@ -1857,7 +1857,7 @@ static const g_szStaffLevelNames[MAX_ADMIN_LEVEL + 1][E_STAFF_LEVELS] =
     {5, "Executive Administrator", "Executive Administration", "{0069ff}"}
 };
 
-static const g_sCustomCarCategories[11][] =
+static const g_szCustomCarCategories[11][] =
 {
 	/*0*/{"Lowriders"},
 	/*1*/{"Sport Vehicles"},
@@ -1872,7 +1872,7 @@ static const g_sCustomCarCategories[11][] =
  	/*10*/{"Aircraft"}
 };
 
-static const BusinessLevelMatrix[21][e_buss_matrix] =
+static const g_aBusinessLevelMatrix[21][e_buss_matrix] =
 {
 	{1, 0, 1000},
 	{2, 5000, 1250},
@@ -1897,7 +1897,7 @@ static const BusinessLevelMatrix[21][e_buss_matrix] =
 	{20, 2000000, 30000}
 };
 
-static const PVMatrix[101][e_pv_matrix] =
+static const g_aPVMatrix[101][e_pv_matrix] =
 {
 	{0, 536, 595000, "Blade"},
 	{0, 575, 390000, "Broadway"},
@@ -2003,7 +2003,7 @@ static const PVMatrix[101][e_pv_matrix] =
 };
 
 // Toy slots, pvs slots, house slots, house obj slots, business slot, instant namechange, medkit x20, medkit x100, money boost x2, money boost x3, scoreboost x2, scoreboost x3
-static const CreditsProductMatrix[14][e_credits_matrix] =
+static const g_aCreditsProductMatrix[14][e_credits_matrix] =
 {
 	{"Toy slot", 1000, 1, "Permanent", "This item expands your toy slots by 1.You can have 10 toy slots at most."},
     {"Custom car slot", 1500, 1, "Permanent", "This item expands your private vehicle slots by 1.\nYou can have 8 pv slots at most."},
@@ -2021,7 +2021,7 @@ static const CreditsProductMatrix[14][e_credits_matrix] =
 	{"Reset K/D", 3500, 1, "Permanent", "This item sets your kills and deaths to 0. Be careful you can't undo it."}
 };
 
-static const g_HouseInteriorTypes[15][e_house_type] =
+static const g_aHouseInteriorTypes[15][e_house_type] =
 {
     {1, 244.411987, 305.032989, 999.148437, "Barrack", 30000}, //0 			// 7, klein billig aber gut
     {2, 225.756989, 1240.000000, 1082.149902, "Standard", 1000000}, //1 				// 1, billig haus
@@ -7156,7 +7156,7 @@ public OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y,
 		if(h_id != -1)
 		{
 		    if(GetPlayerVirtualWorld(playerid) != (HouseData[h_id][e_id] + 1000)) return SCM(playerid, -1, ""er"You need to be in the house you selected!");
-			if(GetDistance3D(x, y, z, g_HouseInteriorTypes[HouseData[h_id][interior]][house_x], g_HouseInteriorTypes[HouseData[h_id][interior]][house_y], g_HouseInteriorTypes[HouseData[h_id][interior]][house_z]) > 200.0) return SCM(playerid, -1, ""er"You are not near your house");
+			if(GetDistance3D(x, y, z, g_aHouseInteriorTypes[HouseData[h_id][interior]][house_x], g_aHouseInteriorTypes[HouseData[h_id][interior]][house_y], g_aHouseInteriorTypes[HouseData[h_id][interior]][house_z]) > 200.0) return SCM(playerid, -1, ""er"You are not near your house");
 
 	        player_notice(playerid, "House item position saved", "");
 	        MoveDynamicObject(objectid, x, y, z, 5.0, rx, ry, rz);
@@ -9020,7 +9020,7 @@ YCMD:buy(playerid, params[], help)
 		strmid(HouseData[i][Owner], __GetName(playerid), 0, 25, 25);
 	    HouseData[i][sold] = 1;
 
-	    format(gstr, sizeof(gstr), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", __GetName(playerid), HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][e_score], g_HouseInteriorTypes[HouseData[i][interior]][intname]);
+	    format(gstr, sizeof(gstr), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", __GetName(playerid), HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][e_score], g_aHouseInteriorTypes[HouseData[i][interior]][intname]);
 	    UpdateDynamic3DTextLabelText(HouseData[i][e_labelid], -1, gstr);
 	    DestroyDynamicMapIcon(HouseData[i][e_iconid]);
 	    DestroyDynamicPickup(HouseData[i][pickid]);
@@ -9094,7 +9094,7 @@ YCMD:sell(playerid, params[], help)
 			}
 		}
 
-	    format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][e_score], g_HouseInteriorTypes[HouseData[i][interior]][intname]);
+	    format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][e_score], g_aHouseInteriorTypes[HouseData[i][interior]][intname]);
 	    UpdateDynamic3DTextLabelText(HouseData[i][e_labelid], -1, gstr);
 	    DestroyDynamicMapIcon(HouseData[i][e_iconid]);
 	    DestroyDynamicPickup(HouseData[i][pickid]);
@@ -9195,7 +9195,7 @@ YCMD:hlock(playerid, params[], help)
 	            PlayerPlaySound(playerid, 1027, 0.0, 0.0, 0.0);
 	            SQL_SaveHouse(i);
 			}
-			else if(IsPlayerInRangeOfPoint(playerid, 100.0, g_HouseInteriorTypes[HouseData[i][interior]][house_x], g_HouseInteriorTypes[HouseData[i][interior]][house_y], g_HouseInteriorTypes[HouseData[i][interior]][house_z]) && GetPlayerInterior(playerid) == g_HouseInteriorTypes[HouseData[i][interior]][interior] && GetPlayerVirtualWorld(playerid) == (HouseData[i][e_id] + 1000))
+			else if(IsPlayerInRangeOfPoint(playerid, 100.0, g_aHouseInteriorTypes[HouseData[i][interior]][house_x], g_aHouseInteriorTypes[HouseData[i][interior]][house_y], g_aHouseInteriorTypes[HouseData[i][interior]][house_z]) && GetPlayerInterior(playerid) == g_aHouseInteriorTypes[HouseData[i][interior]][interior] && GetPlayerVirtualWorld(playerid) == (HouseData[i][e_id] + 1000))
 			{
 				found = true;
 				if(strcmp(HouseData[i][Owner], __GetName(playerid), true))
@@ -10145,7 +10145,7 @@ YCMD:suspect(playerid, params[], help)
 	                strcat(finstring, tmpstring);
 				}
 
-                /* JETPACK CHECK */
+                /* JETPACK CHECK */ // TODO: https://github.com/myudev/SAMPAC/blob/master/src/CAntiCheat.cpp SPECATE_DETECTION
 				if(GetPlayerSpecialAction(i) == SPECIAL_ACTION_USEJETPACK) {
 	                format(tmpstring, sizeof(tmpstring), "%i) %s(%i) - AC_JETPACK\n", ++count, __GetName(i), i);
 	                strcat(finstring, tmpstring);
@@ -14199,7 +14199,7 @@ YCMD:hsetprice(playerid, params[], help)
 
 	    HouseData[i][price] = hprice;
 
- 	   	format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][e_score], g_HouseInteriorTypes[HouseData[i][interior]][intname]);
+ 	   	format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][e_score], g_aHouseInteriorTypes[HouseData[i][interior]][intname]);
 	    UpdateDynamic3DTextLabelText(HouseData[i][e_labelid], -1, gstr);
 	    SQL_SaveHouse(i);
 
@@ -14229,7 +14229,7 @@ YCMD:hsetscore(playerid, params[], help)
 
 	    HouseData[i][e_score] = hscore;
 
- 	   	format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][e_score], g_HouseInteriorTypes[HouseData[i][interior]][intname]);
+ 	   	format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][e_score], g_aHouseInteriorTypes[HouseData[i][interior]][intname]);
 	    UpdateDynamic3DTextLabelText(HouseData[i][e_labelid], -1, gstr);
 	    SQL_SaveHouse(i);
 
@@ -14283,7 +14283,7 @@ YCMD:hreset(playerid, params[], help)
         
 		SQL_SaveHouse(i, true);
 
-	    format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][e_score], g_HouseInteriorTypes[HouseData[i][interior]][intname]);
+	    format(gstr, sizeof(gstr), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][e_score], g_aHouseInteriorTypes[HouseData[i][interior]][intname]);
 	    UpdateDynamic3DTextLabelText(HouseData[i][e_labelid], -1, gstr);
 	    DestroyDynamicMapIcon(HouseData[i][e_iconid]);
 	    DestroyDynamicPickup(HouseData[i][pickid]);
@@ -17484,7 +17484,7 @@ function:OnPlayerNameChangeRequest(playerid, newname[])
 
                     strmid(HouseData[i][Owner], newname, 0, 25, 25);
 
-				    format(query, sizeof(query), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", __GetName(playerid), HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][e_score], g_HouseInteriorTypes[HouseData[i][interior]][intname]);
+				    format(query, sizeof(query), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", __GetName(playerid), HouseData[i][e_id], number_format(HouseData[i][price]), HouseData[i][e_score], g_aHouseInteriorTypes[HouseData[i][interior]][intname]);
 				    UpdateDynamic3DTextLabelText(HouseData[i][e_labelid], -1, query);
 				    SQL_SaveHouse(i);
 				}
@@ -17771,12 +17771,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						return 1;
 		            }
                 
-		            if(GetPlayerMoneyEx(playerid) < BusinessLevelMatrix[BusinessData[r][e_level]][E_bupgradeprice])
+		            if(GetPlayerMoneyEx(playerid) < g_aBusinessLevelMatrix[BusinessData[r][e_level]][E_bupgradeprice])
 		            {
 		                return SCM(playerid, -1, ""er"You don't have enough money!");
 		            }
 
-                    GivePlayerMoneyEx(playerid, -BusinessLevelMatrix[BusinessData[r][e_level]][E_bupgradeprice]);
+                    GivePlayerMoneyEx(playerid, -g_aBusinessLevelMatrix[BusinessData[r][e_level]][E_bupgradeprice]);
                     BusinessData[r][e_level]++;
                     
                     if(PlayerAchData[playerid][e_ach_mademan][0] == 0 && BusinessData[r][e_level] == 20)
@@ -17826,7 +17826,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        }
 	        case CM_DIALOG + 2: // toy slot
 	        {
-	            if(GetCredits(playerid) < CreditsProductMatrix[0][E_item_credits])
+	            if(GetCredits(playerid) < g_aCreditsProductMatrix[0][E_item_credits])
 	            {
         			SCM(playerid, -1, ""er"You don't have enough Gold Credits!");
 				    ShowDialog(playerid, CM_DIALOG);
@@ -17842,15 +17842,15 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				
 				PlayerData[playerid][e_addtoyslots]++;
 				
-				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[0][E_item_credits]));
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(g_aCreditsProductMatrix[0][E_item_credits]));
 				player_notice(playerid, "Item purchased", gstr, 5000);
 				
-				AlterPlayerCredits(playerid, -CreditsProductMatrix[0][E_item_credits]);
+				AlterPlayerCredits(playerid, -g_aCreditsProductMatrix[0][E_item_credits]);
 				return true;
 	        }
 	        case CM_DIALOG + 3: // pv slot
 	        {
-	            if(GetCredits(playerid) < CreditsProductMatrix[1][E_item_credits])
+	            if(GetCredits(playerid) < g_aCreditsProductMatrix[1][E_item_credits])
 	            {
 				    SCM(playerid, -1, ""er"You don't have enough Gold Credits!");
 				    ShowDialog(playerid, CM_DIALOG);
@@ -17866,15 +17866,15 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				PlayerData[playerid][e_addpvslots]++;
 
-				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[1][E_item_credits]));
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(g_aCreditsProductMatrix[1][E_item_credits]));
 				player_notice(playerid, "Item purchased", gstr, 5000);
                 
-				AlterPlayerCredits(playerid, -CreditsProductMatrix[1][E_item_credits]);
+				AlterPlayerCredits(playerid, -g_aCreditsProductMatrix[1][E_item_credits]);
 	            return true;
 	        }
 	        case CM_DIALOG + 4: // house slot
 	        {
-	            if(GetCredits(playerid) < CreditsProductMatrix[2][E_item_credits])
+	            if(GetCredits(playerid) < g_aCreditsProductMatrix[2][E_item_credits])
 	            {
 				    SCM(playerid, -1, ""er"You don't have enough Gold Credits!");
 				    ShowDialog(playerid, CM_DIALOG);
@@ -17890,15 +17890,15 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				PlayerData[playerid][e_addhouseslots]++;
 
-				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[2][E_item_credits]));
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(g_aCreditsProductMatrix[2][E_item_credits]));
 				player_notice(playerid, "Item purchased", gstr, 5000);
                 
-				AlterPlayerCredits(playerid, -CreditsProductMatrix[2][E_item_credits]);
+				AlterPlayerCredits(playerid, -g_aCreditsProductMatrix[2][E_item_credits]);
 	            return true;
 	        }
 	        case CM_DIALOG + 5: // house obj slot
 	        {
-	            if(GetCredits(playerid) < CreditsProductMatrix[3][E_item_credits])
+	            if(GetCredits(playerid) < g_aCreditsProductMatrix[3][E_item_credits])
 	            {
 				    SCM(playerid, -1, ""er"You don't have enough Gold Credits!");
 				    ShowDialog(playerid, CM_DIALOG);
@@ -17914,15 +17914,15 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				PlayerData[playerid][e_addhouseitemslots]++;
 
-				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[3][E_item_credits]));
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(g_aCreditsProductMatrix[3][E_item_credits]));
 				player_notice(playerid, "Item purchased", gstr, 5000);
                 
-				AlterPlayerCredits(playerid, -CreditsProductMatrix[3][E_item_credits]);
+				AlterPlayerCredits(playerid, -g_aCreditsProductMatrix[3][E_item_credits]);
 	            return true;
 	        }
 	        case CM_DIALOG + 6: // business slot
 	        {
-	            if(GetCredits(playerid) < CreditsProductMatrix[4][E_item_credits])
+	            if(GetCredits(playerid) < g_aCreditsProductMatrix[4][E_item_credits])
 	            {
 				    SCM(playerid, -1, ""er"You don't have enough Gold Credits!");
 				    ShowDialog(playerid, CM_DIALOG);
@@ -17938,16 +17938,16 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				PlayerData[playerid][e_addbizzslots]++;
 				
-				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[4][E_item_credits]));
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(g_aCreditsProductMatrix[4][E_item_credits]));
 				player_notice(playerid, "Item purchased", gstr, 5000);
                 
-				AlterPlayerCredits(playerid, -CreditsProductMatrix[4][E_item_credits]);
+				AlterPlayerCredits(playerid, -g_aCreditsProductMatrix[4][E_item_credits]);
 	            return true;
 	        }
 	        case CM_DIALOG + 7: // instant nc
 	        {
 	            if(!islogged(playerid)) return notlogged(playerid);
-	            if(GetCredits(playerid) < CreditsProductMatrix[5][E_item_credits])
+	            if(GetCredits(playerid) < g_aCreditsProductMatrix[5][E_item_credits])
 	            {
 				    SCM(playerid, -1, ""er"You don't have enough Gold Credits!");
 				    ShowDialog(playerid, CM_DIALOG);
@@ -17963,15 +17963,15 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				PlayerData[playerid][e_lastnc] = 0;
                 
-				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[5][E_item_credits]));
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(g_aCreditsProductMatrix[5][E_item_credits]));
 				player_notice(playerid, "Item purchased", gstr, 5000);
 
-				AlterPlayerCredits(playerid, -CreditsProductMatrix[5][E_item_credits]);
+				AlterPlayerCredits(playerid, -g_aCreditsProductMatrix[5][E_item_credits]);
 	            return true;
 	        }
 	        case CM_DIALOG + 8: // 20 medkit
 	        {
-	            if(GetCredits(playerid) < CreditsProductMatrix[6][E_item_credits])
+	            if(GetCredits(playerid) < g_aCreditsProductMatrix[6][E_item_credits])
 	            {
 				    SCM(playerid, -1, ""er"You don't have enough Gold Credits!");
 				    ShowDialog(playerid, CM_DIALOG);
@@ -17980,15 +17980,15 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				PlayerData[playerid][e_medkits] += 20;
 
-				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[6][E_item_credits]));
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(g_aCreditsProductMatrix[6][E_item_credits]));
 				player_notice(playerid, "Item purchased", gstr, 5000);
                 
-				AlterPlayerCredits(playerid, -CreditsProductMatrix[6][E_item_credits]);
+				AlterPlayerCredits(playerid, -g_aCreditsProductMatrix[6][E_item_credits]);
 	            return true;
 	        }
 	        case CM_DIALOG + 9: // 100 medkits
 	        {
-	            if(GetCredits(playerid) < CreditsProductMatrix[7][E_item_credits])
+	            if(GetCredits(playerid) < g_aCreditsProductMatrix[7][E_item_credits])
 	            {
 				    SCM(playerid, -1, ""er"You don't have enough Gold Credits!");
 				    ShowDialog(playerid, CM_DIALOG);
@@ -17997,16 +17997,16 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				PlayerData[playerid][e_medkits] += 100;
 
-				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[7][E_item_credits]));
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(g_aCreditsProductMatrix[7][E_item_credits]));
 				player_notice(playerid, "Item purchased", gstr, 5000);
                 
-				AlterPlayerCredits(playerid, -CreditsProductMatrix[7][E_item_credits]);
+				AlterPlayerCredits(playerid, -g_aCreditsProductMatrix[7][E_item_credits]);
 	            return true;
 	        }
 	        case CM_DIALOG + 10: // mb x2
 	        {
 	            if(!islogged(playerid)) return notlogged(playerid);
-	            if(GetCredits(playerid) < CreditsProductMatrix[8][E_item_credits])
+	            if(GetCredits(playerid) < g_aCreditsProductMatrix[8][E_item_credits])
 	            {
 				    SCM(playerid, -1, ""er"You don't have enough Gold Credits!");
 				    ShowDialog(playerid, CM_DIALOG);
@@ -18022,19 +18022,19 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				PlayerData[playerid][Boost] |= BOOST_MONEY_x2;
 
-				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[8][E_item_credits]));
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(g_aCreditsProductMatrix[8][E_item_credits]));
 				player_notice(playerid, "Item purchased", gstr, 5000);
                 
                 format(gstr, sizeof(gstr), "INSERT INTO `queue` VALUES (NULL, 2, UNIX_TIMESTAMP() + 86400, '%s');", __GetName(playerid));
                 mysql_tquery(pSQL, gstr, "", "");
                 
-				AlterPlayerCredits(playerid, -CreditsProductMatrix[8][E_item_credits]);
+				AlterPlayerCredits(playerid, -g_aCreditsProductMatrix[8][E_item_credits]);
 	            return true;
 	        }
 	        case CM_DIALOG + 11: // mb x3
 	        {
 	            if(!islogged(playerid)) return notlogged(playerid);
-	            if(GetCredits(playerid) < CreditsProductMatrix[9][E_item_credits])
+	            if(GetCredits(playerid) < g_aCreditsProductMatrix[9][E_item_credits])
 	            {
 				    SCM(playerid, -1, ""er"You don't have enough Gold Credits!");
 				    ShowDialog(playerid, CM_DIALOG);
@@ -18050,19 +18050,19 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				PlayerData[playerid][Boost] |= BOOST_MONEY_x3;
 
-				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[9][E_item_credits]));
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(g_aCreditsProductMatrix[9][E_item_credits]));
 				player_notice(playerid, "Item purchased", gstr, 5000);
 				
                 format(gstr, sizeof(gstr), "INSERT INTO `queue` VALUES (NULL, 3, UNIX_TIMESTAMP() + 86400, '%s');", __GetName(playerid));
                 mysql_tquery(pSQL, gstr, "", "");
                 
-				AlterPlayerCredits(playerid, -CreditsProductMatrix[9][E_item_credits]);
+				AlterPlayerCredits(playerid, -g_aCreditsProductMatrix[9][E_item_credits]);
 	            return true;
 	        }
 	        case CM_DIALOG + 12: // sb x2
 	        {
 	            if(!islogged(playerid)) return notlogged(playerid);
-	            if(GetCredits(playerid) < CreditsProductMatrix[10][E_item_credits])
+	            if(GetCredits(playerid) < g_aCreditsProductMatrix[10][E_item_credits])
 	            {
 				    SCM(playerid, -1, ""er"You don't have enough Gold Credits!");
 				    ShowDialog(playerid, CM_DIALOG);
@@ -18078,19 +18078,19 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				PlayerData[playerid][Boost] |= BOOST_SCORE_x2;
 
-				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[10][E_item_credits]));
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(g_aCreditsProductMatrix[10][E_item_credits]));
 				player_notice(playerid, "Item purchased", gstr, 5000);
                 
                 format(gstr, sizeof(gstr), "INSERT INTO `queue` VALUES (NULL, 4, UNIX_TIMESTAMP() + 86400, '%s');", __GetName(playerid));
                 mysql_tquery(pSQL, gstr, "", "");
                 
-				AlterPlayerCredits(playerid, -CreditsProductMatrix[10][E_item_credits]);
+				AlterPlayerCredits(playerid, -g_aCreditsProductMatrix[10][E_item_credits]);
 	            return true;
 	        }
 	        case CM_DIALOG + 13: // sb x3
 	        {
 	            if(!islogged(playerid)) return notlogged(playerid);
-	            if(GetCredits(playerid) < CreditsProductMatrix[11][E_item_credits])
+	            if(GetCredits(playerid) < g_aCreditsProductMatrix[11][E_item_credits])
 	            {
 				    SCM(playerid, -1, ""er"You don't have enough Gold Credits!");
 				    ShowDialog(playerid, CM_DIALOG);
@@ -18106,19 +18106,19 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				PlayerData[playerid][Boost] |= BOOST_SCORE_x3;
 
-				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[11][E_item_credits]));
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(g_aCreditsProductMatrix[11][E_item_credits]));
 				player_notice(playerid, "Item purchased", gstr, 5000);
                 
                 format(gstr, sizeof(gstr), "INSERT INTO `queue` VALUES (NULL, 5, UNIX_TIMESTAMP() + 86400, '%s');", __GetName(playerid));
                 mysql_tquery(pSQL, gstr, "", "");
                 
-				AlterPlayerCredits(playerid, -CreditsProductMatrix[11][E_item_credits]);
+				AlterPlayerCredits(playerid, -g_aCreditsProductMatrix[11][E_item_credits]);
 	            return true;
 	        }
 	        case CM_DIALOG + 14: // masterb
 	        {
 	            if(!islogged(playerid)) return notlogged(playerid);
-	            if(GetCredits(playerid) < CreditsProductMatrix[12][E_item_credits])
+	            if(GetCredits(playerid) < g_aCreditsProductMatrix[12][E_item_credits])
 	            {
 				    SCM(playerid, -1, ""er"You don't have enough Gold Credits!");
 				    ShowDialog(playerid, CM_DIALOG);
@@ -18134,18 +18134,18 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 				PlayerData[playerid][Boost] |= BOOST_MASTER;
 
-				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[12][E_item_credits]));
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(g_aCreditsProductMatrix[12][E_item_credits]));
 				player_notice(playerid, "Item purchased", gstr, 5000);
                 
                 format(gstr2, sizeof(gstr2), "INSERT INTO `queue` VALUES (NULL, 6, UNIX_TIMESTAMP() + 86400, '%s');", __GetName(playerid));
                 mysql_tquery(pSQL, gstr2, "", "");
                 
-				AlterPlayerCredits(playerid, -CreditsProductMatrix[12][E_item_credits]);
+				AlterPlayerCredits(playerid, -g_aCreditsProductMatrix[12][E_item_credits]);
 	            return true;
 	        }
 	        case CM_DIALOG + 15: // kills/deaths reset
 	        {
-	            if(GetCredits(playerid) < CreditsProductMatrix[13][E_item_credits])
+	            if(GetCredits(playerid) < g_aCreditsProductMatrix[13][E_item_credits])
 	            {
 				    SCM(playerid, -1, ""er"You don't have enough Gold Credits!");
 				    ShowDialog(playerid, CM_DIALOG);
@@ -18155,11 +18155,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 				PlayerData[playerid][e_deaths] = 0;
 				PlayerData[playerid][e_kills] = 0;
 
-				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(CreditsProductMatrix[13][E_item_credits]));
+				format(gstr, sizeof(gstr), "Gold Credits: ~y~-%sGC", number_format(g_aCreditsProductMatrix[13][E_item_credits]));
 				player_notice(playerid, "Item purchased", gstr, 5000);
 				SCM(playerid, NEF_YELLOW, "Your K/D has been reset!");
 				
-				AlterPlayerCredits(playerid, -CreditsProductMatrix[13][E_item_credits]);
+				AlterPlayerCredits(playerid, -g_aCreditsProductMatrix[13][E_item_credits]);
 	            return true;
 	        }
 	        case COPS_REFILL:
@@ -19335,7 +19335,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 	        {
 				PlayerData[playerid][HouseIntSelected] = listitem;
 
-				format(gstr2, sizeof(gstr2), ""white"House Upgrade\n\n- Interior: %s\n- Price: $%s\n\nClick \"Upgrade\" in order to apply the new interior.\n"green"* "white"All House Items will be removed in this slot!", g_HouseInteriorTypes[listitem][intname], number_format(g_HouseInteriorTypes[listitem][price]));
+				format(gstr2, sizeof(gstr2), ""white"House Upgrade\n\n- Interior: %s\n- Price: $%s\n\nClick \"Upgrade\" in order to apply the new interior.\n"green"* "white"All House Items will be removed in this slot!", g_aHouseInteriorTypes[listitem][intname], number_format(g_aHouseInteriorTypes[listitem][price]));
 				ShowPlayerDialog(playerid, HOUSE_UPGRADE_DIALOG + 1, DIALOG_STYLE_MSGBOX, ""nef" :: House Upgrade", gstr2, "Upgrade", "Cancel");
 				return true;
 	        }
@@ -19346,7 +19346,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 					player_notice(playerid, "Get out to upgrade the house", "");
 					return 1;
 				}
-	            if(GetPlayerMoneyEx(playerid) < g_HouseInteriorTypes[PlayerData[playerid][HouseIntSelected]][price])
+	            if(GetPlayerMoneyEx(playerid) < g_aHouseInteriorTypes[PlayerData[playerid][HouseIntSelected]][price])
 	            {
 	                return SCM(playerid, -1, ""er"You can't afford that interior");
 	            }
@@ -19364,7 +19364,7 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 
 		            for(new pid = 0; pid < MAX_PLAYERS; pid++)
 		            {
-		                if(gTeam[pid] == HOUSE && GetPlayerInterior(pid) == g_HouseInteriorTypes[HouseData[h_id][interior]][interior] && GetPlayerVirtualWorld(pid) == (HouseData[h_id][e_id] + 1000))
+		                if(gTeam[pid] == HOUSE && GetPlayerInterior(pid) == g_aHouseInteriorTypes[HouseData[h_id][interior]][interior] && GetPlayerVirtualWorld(pid) == (HouseData[h_id][e_id] + 1000))
 		                {
 		                    gTeam[pid] = gFREEROAM;
 		                    SetPlayerPos(pid, HouseData[h_id][e_x], HouseData[h_id][e_y], HouseData[h_id][e_z]);
@@ -19384,12 +19384,12 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 						}
 					}
 					
-	                GivePlayerMoneyEx(playerid, -g_HouseInteriorTypes[PlayerData[playerid][HouseIntSelected]][price]);
+	                GivePlayerMoneyEx(playerid, -g_aHouseInteriorTypes[PlayerData[playerid][HouseIntSelected]][price]);
 	                HouseData[h_id][interior] = PlayerData[playerid][HouseIntSelected];
 	       			SetPlayerPos(playerid, HouseData[h_id][e_x], HouseData[h_id][e_y], HouseData[h_id][e_z]);
 					ResetPlayerWorld(playerid);
 					gTeam[playerid] = gFREEROAM;
-	      		    format(gstr, sizeof(gstr), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", __GetName(playerid), HouseData[h_id][e_id], number_format(HouseData[h_id][price]), HouseData[h_id][e_score], g_HouseInteriorTypes[PlayerData[playerid][HouseIntSelected]][intname]);
+	      		    format(gstr, sizeof(gstr), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", __GetName(playerid), HouseData[h_id][e_id], number_format(HouseData[h_id][price]), HouseData[h_id][e_score], g_aHouseInteriorTypes[PlayerData[playerid][HouseIntSelected]][intname]);
 	    			UpdateDynamic3DTextLabelText(HouseData[h_id][e_labelid], -1, gstr);
 	                SQL_SaveHouse(h_id, true);
 	                SQL_SaveAccount(playerid, false, false);
@@ -20284,32 +20284,32 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			
 			    new string[2048];
 			    
-        	    for(new i = 0; i < sizeof(PVMatrix); i++)
+        	    for(new i = 0; i < sizeof(g_aPVMatrix); i++)
         	    {
-        	        if(PVMatrix[i][pv_category] == listitem)
+        	        if(g_aPVMatrix[i][pv_category] == listitem)
         	        {
-        	            format(gstr, sizeof(gstr), "%s "green"$%s\n", PVMatrix[i][pv_modelname], number_format(PVMatrix[i][pv_price]));
+        	            format(gstr, sizeof(gstr), "%s "green"$%s\n", g_aPVMatrix[i][pv_modelname], number_format(g_aPVMatrix[i][pv_price]));
         	            strcat(string, gstr);
         	        }
         	    }
 			    
 			    PVCatSel[playerid] = listitem;
 			    
-			    format(gstr, sizeof(gstr), ""nef" :: Custom cars > %s", g_sCustomCarCategories[listitem]);
+			    format(gstr, sizeof(gstr), ""nef" :: Custom cars > %s", g_szCustomCarCategories[listitem]);
 			    ShowPlayerDialog(playerid, CARBUY_DIALOG + 1, DIALOG_STYLE_LIST, gstr, string, "Select", "Back");
 			    return true;
 			}
 			case CARBUY_DIALOG + 1:
 			{
 				new idx = 0;
-				for(new i = 0; i < sizeof(PVMatrix); i++)
+				for(new i = 0; i < sizeof(g_aPVMatrix); i++)
 				{
-				    if(PVMatrix[i][pv_category] == PVCatSel[playerid])
+				    if(g_aPVMatrix[i][pv_category] == PVCatSel[playerid])
 				    {
 				        if(idx == listitem)
 				        {
-							PlayerPVTMP[playerid][0] = PVMatrix[i][pv_modelid];
-							PlayerPVTMP[playerid][1] = PVMatrix[i][pv_price];
+							PlayerPVTMP[playerid][0] = g_aPVMatrix[i][pv_modelid];
+							PlayerPVTMP[playerid][1] = g_aPVMatrix[i][pv_price];
 							break;
 				        }
 				        idx++;
@@ -20821,7 +20821,7 @@ function:OnHouseLoadEx(index)
 		HouseData[index][sold] = cache_get_row_int(0, 8, pSQL);
 		HouseData[index][locked] = cache_get_row_int(0, 9, pSQL);
 
-		format(line, sizeof(line), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[index][e_id], number_format(HouseData[index][price]), HouseData[index][e_score], g_HouseInteriorTypes[HouseData[index][interior]][intname]);
+		format(line, sizeof(line), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[index][e_id], number_format(HouseData[index][price]), HouseData[index][e_score], g_aHouseInteriorTypes[HouseData[index][interior]][intname]);
 
 		HouseData[index][e_labelid] = CreateDynamic3DTextLabel(line, (HouseData[index][sold]) ? (0xFF0000FF) : (0x00FF00FF), HouseData[index][e_x], HouseData[index][e_y], floatadd(HouseData[index][e_z], 0.3), 30.0, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, 0, -1, -1, 30.0);
 		HouseData[index][pickid] = CreateDynamicPickup((HouseData[index][sold]) ? (1272) : (1273), 1, HouseData[index][e_x], HouseData[index][e_y], HouseData[index][e_z], -1, -1, -1, 30.0);
@@ -20858,11 +20858,11 @@ function:OnHouseLoad()
 
 			if(!HouseData[houseid][sold])
 			{
-			    format(gstr2, sizeof(gstr2), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[houseid][e_id], number_format(HouseData[houseid][price]), HouseData[houseid][e_score], g_HouseInteriorTypes[HouseData[houseid][interior]][intname]);
+			    format(gstr2, sizeof(gstr2), ""house_mark"\nOwner: ---\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[houseid][e_id], number_format(HouseData[houseid][price]), HouseData[houseid][e_score], g_aHouseInteriorTypes[HouseData[houseid][interior]][intname]);
 			}
 			else
 			{
-			    format(gstr2, sizeof(gstr2), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[houseid][Owner], HouseData[houseid][e_id], number_format(HouseData[houseid][price]), HouseData[houseid][e_score], g_HouseInteriorTypes[HouseData[houseid][interior]][intname]);
+			    format(gstr2, sizeof(gstr2), ""house_mark"\nOwner: %s\nID: %i\nPrice: $%s\nScore: %i\nInterior: %s", HouseData[houseid][Owner], HouseData[houseid][e_id], number_format(HouseData[houseid][price]), HouseData[houseid][e_score], g_aHouseInteriorTypes[HouseData[houseid][interior]][intname]);
 
 				for(new ii = 0; ii < MAX_HOUSE_OBJECTS; ii++)
 				{
@@ -23278,9 +23278,9 @@ server_initialize()
 	for(new i = 1; i < MAX_REPORTS; i++)
 		Reports[i] = "<none>";
 
-	for(new i = 0; i < sizeof(g_sCustomCarCategories); i++)
+	for(new i = 0; i < sizeof(g_szCustomCarCategories); i++)
 	{
-	    format(gstr, sizeof(gstr), "%s\n", g_sCustomCarCategories[i]);
+	    format(gstr, sizeof(gstr), "%s\n", g_szCustomCarCategories[i]);
 	    strcat(g_sCustomCarCategory, gstr);
 	}
 		
@@ -23932,7 +23932,7 @@ server_load_visuals()
 	new veh_cow[5];
 	for(new i = 0; i < sizeof(veh_cow); i++)
 	{
-	    veh_cow[i] = AddStaticVehicleEx(451, g_CowCars[i][0], g_CowCars[i][1], g_CowCars[i][2], g_CowCars[i][3], 0, 0, RESPAWN_TIME);
+	    veh_cow[i] = AddStaticVehicleEx(451, g_aCowCars[i][0], g_aCowCars[i][1], g_aCowCars[i][2], g_aCowCars[i][3], 0, 0, RESPAWN_TIME);
 	    
 		AttachObjectToVehicle(veh_cow_obj[i][0], veh_cow[i], 0.000000, 3.250026, 2.2859988, 0.000000, 0.000000, 93.884956); //Object Model: 16442 |
 		AttachObjectToVehicle(veh_cow_obj[i][1], veh_cow[i], 0.000000, -0.100000, 0.1019988, 24.119995, 0.000000, -179.895095); //Object Model: 1458 |
@@ -27713,8 +27713,8 @@ function:ShowDialog(playerid, dialogid)
 				    format(gstr, sizeof(gstr), "%i\nCurrent Business Earnings: $%s\nEarnings in next level: $%s\n\nUpgrade now for "yellow_e"$%s"white"!",
 						BusinessData[r][e_level],
 						number_format(GetBusinessEarnings(r)),
-						number_format(BusinessLevelMatrix[BusinessData[r][e_level]][E_bearnings]),
-						number_format(BusinessLevelMatrix[BusinessData[r][e_level]][E_bupgradeprice]));
+						number_format(g_aBusinessLevelMatrix[BusinessData[r][e_level]][E_bearnings]),
+						number_format(g_aBusinessLevelMatrix[BusinessData[r][e_level]][E_bupgradeprice]));
 					strcat(string, gstr);
 				}
 				
@@ -28959,12 +28959,12 @@ GetPVNameByModelId(modelid)
 	new bool:found = false,
 		modelname[32];
 
-	for(new i = 0; i < sizeof(PVMatrix); i++)
+	for(new i = 0; i < sizeof(g_aPVMatrix); i++)
 	{
-	    if(PVMatrix[i][pv_modelid] == modelid)
+	    if(g_aPVMatrix[i][pv_modelid] == modelid)
 	    {
 	        found = true;
-	        strmid(modelname, PVMatrix[i][pv_modelname], 0, 32, 32);
+	        strmid(modelname, g_aPVMatrix[i][pv_modelname], 0, 32, 32);
 	        break;
 	    }
 	}
@@ -28974,11 +28974,11 @@ GetPVNameByModelId(modelid)
 
 GetPVPriceByModelId(modelid)
 {
-	for(new i = 0; i < sizeof(PVMatrix); i++)
+	for(new i = 0; i < sizeof(g_aPVMatrix); i++)
 	{
-	    if(PVMatrix[i][pv_modelid] == modelid)
+	    if(g_aPVMatrix[i][pv_modelid] == modelid)
 	    {
-	        new pr = PVMatrix[i][pv_price];
+	        new pr = g_aPVMatrix[i][pv_price];
 	        return pr;
 	    }
 	}
@@ -29241,7 +29241,7 @@ ExitPlayer(playerid)
 		    new bool:found = false;
 			for(new i = 0; i < houseid; i++)
 			{
-		    	if(GetPlayerInterior(playerid) == g_HouseInteriorTypes[HouseData[i][interior]][interior] && GetPlayerVirtualWorld(playerid) == (HouseData[i][e_id] + 1000))
+		    	if(GetPlayerInterior(playerid) == g_aHouseInteriorTypes[HouseData[i][interior]][interior] && GetPlayerVirtualWorld(playerid) == (HouseData[i][e_id] + 1000))
 				{
 				    found = true;
 				    
@@ -29536,13 +29536,13 @@ GetItem(index)
 {
 	new string[2048], tmp[300];
 	format(string, sizeof(string), ""green"* "white"Item: %s\n"green"* "white"Gold Credits: "white"%sGC\n"green"* "white"Quantity: "white"%i\n"green"* "white"Duration: "white"%s\n",
-		CreditsProductMatrix[index][E_item_name],
-		number_format(CreditsProductMatrix[index][E_item_credits]),
-        CreditsProductMatrix[index][E_item_quantity],
-        CreditsProductMatrix[index][E_item_duration]);
+		g_aCreditsProductMatrix[index][E_item_name],
+		number_format(g_aCreditsProductMatrix[index][E_item_credits]),
+        g_aCreditsProductMatrix[index][E_item_quantity],
+        g_aCreditsProductMatrix[index][E_item_duration]);
 	
 	format(tmp, sizeof(tmp), ""green"* "white"Item Description:\n%s",
-		CreditsProductMatrix[index][E_item_description]);
+		g_aCreditsProductMatrix[index][E_item_description]);
 	strcat(string, tmp);
 	return string;
 }
@@ -29696,11 +29696,11 @@ GetPlayerBusinessEarnings(playerid)
 GetBusinessEarnings(r)
 {
 	new __int32 = 0;
-	for(new i = 0; i < sizeof(BusinessLevelMatrix); i++)
+	for(new i = 0; i < sizeof(g_aBusinessLevelMatrix); i++)
 	{
 		if(i == (BusinessData[r][e_level] - 1))
 		{
-		    __int32 = BusinessLevelMatrix[i][E_bearnings];
+		    __int32 = g_aBusinessLevelMatrix[i][E_bearnings];
 		    return __int32;
 		}
 	}
@@ -31547,11 +31547,11 @@ GetPlayer2DZone(playerid, zone[], len)
 	new Float:x, Float:y, Float:z;
 	GetPlayerPos(playerid, x, y, z);
 	
- 	for(new i = 0; i != sizeof(g_SAZones); i++ )
+ 	for(new i = 0; i != sizeof(g_aSAZones); i++ )
  	{
-		if(x >= g_SAZones[i][SAZONE_AREA][0] && x <= g_SAZones[i][SAZONE_AREA][3] && y >= g_SAZones[i][SAZONE_AREA][1] && y <= g_SAZones[i][SAZONE_AREA][4])
+		if(x >= g_aSAZones[i][SAZONE_AREA][0] && x <= g_aSAZones[i][SAZONE_AREA][3] && y >= g_aSAZones[i][SAZONE_AREA][1] && y <= g_aSAZones[i][SAZONE_AREA][4])
 		{
-		    return format(zone, len, g_SAZones[i][SAZONE_NAME], 0);
+		    return format(zone, len, g_aSAZones[i][SAZONE_NAME], 0);
 		}
 	}
 	return 0;
@@ -31643,9 +31643,9 @@ EnterHouse(playerid, i)
 		return SCM(playerid, -1, ""er"This house is locked");
 	}
 
-    SetPlayerInterior(playerid, g_HouseInteriorTypes[HouseData[i][interior]][interior]);
+    SetPlayerInterior(playerid, g_aHouseInteriorTypes[HouseData[i][interior]][interior]);
 	SetPlayerVirtualWorld(playerid, HouseData[i][e_id] + 1000);
-	SetPlayerPos(playerid, g_HouseInteriorTypes[HouseData[i][interior]][house_x], g_HouseInteriorTypes[HouseData[i][interior]][house_y], g_HouseInteriorTypes[HouseData[i][interior]][house_z]);
+	SetPlayerPos(playerid, g_aHouseInteriorTypes[HouseData[i][interior]][house_x], g_aHouseInteriorTypes[HouseData[i][interior]][house_y], g_aHouseInteriorTypes[HouseData[i][interior]][house_z]);
 	gTeam[playerid] = HOUSE;
 	player_notice(playerid, "House entered", "type ~y~/exit ~w~to leave", 4000);
 	SCM(playerid, -1, ""er"Type /exit to leave the house")
