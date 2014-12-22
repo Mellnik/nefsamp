@@ -6794,14 +6794,14 @@ public OnVehicleDamageStatusUpdate(vehicleid, playerid)
 				if(PlayerData[playerid][bDerbyHealthBarShowing])
 				{
 					PlayerData[playerid][fDerbyCDamage] += PlayerData[playerid][fDerbyVehicleDamage];
-					format(gstr, sizeof(gstr), "{ffd800}-%.0f\n%s", PlayerData[playerid][fDerbyCDamage], derby_healthbar_format(HP));
+					format(gstr, sizeof(gstr), "{ffd800}-%.0f\n%s", PlayerData[playerid][fDerbyCDamage], derby_healthbar_format(floatround(HP)));
 					KillTimer(PlayerData[playerid][tDerbyHealthBar]);
 					PlayerData[playerid][tDerbyHealthBar] = SetTimerEx("derby_healthbar_reset", 2000, false, "ii", playerid, YHash(__GetName(playerid)));
 				}
 				else
 				{
 					PlayerData[playerid][bDerbyHealthBarShowing] = true;
-					format(gstr, sizeof(gstr), "{ffd800}-%.0f\n%s", PlayerData[playerid][fDerbyVehicleDamage], derby_healthbar_format(HP));
+					format(gstr, sizeof(gstr), "{ffd800}-%.0f\n%s", PlayerData[playerid][fDerbyVehicleDamage], derby_healthbar_format(floatround(HP)));
 					PlayerData[playerid][tDerbyHealthBar] = SetTimerEx("derby_healthbar_reset", 2000, false, "ii", playerid, YHash(__GetName(playerid)));
 				}
 				UpdatePlayer3DTextLabelText(playerid, PlayerData[playerid][t3dDerbyVehicleLabel], -1, gstr);
@@ -7191,6 +7191,13 @@ public OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y,
 
 public OnPlayerEditAttachedObject(playerid, response, index, modelid, boneid, Float:fOffsetX, Float:fOffsetY, Float:fOffsetZ, Float:fRotX, Float:fRotY, Float:fRotZ, Float:fScaleX, Float:fScaleY, Float:fScaleZ)
 {
+	if(index < 0 || response < 0 || modelid < 0)
+	{
+		PlayerData[playerid][bwSuspect] |= SUSPECT_FAKE_PACKETS;
+		Log(LOG_NET, "Invalid data in OnPlayerEditAttachedObject(%i, %i, %i, %i, %i)", playerid, response, index, modelid, boneid);
+		return 1;
+	}
+
     HidePlayerToyTextdraws(playerid);
     
     if(response)
@@ -25774,7 +25781,7 @@ function:Derby()
 
 function:DerbyFallOver()
 {
-	new CURRENT_FALLOVER;
+	static CURRENT_FALLOVER;
 	switch(CurrentDerbyMap)
 	{
 	    case 1: CURRENT_FALLOVER = DERBY_FALLOVER_M1;
@@ -25787,7 +25794,7 @@ function:DerbyFallOver()
 	    case 8: CURRENT_FALLOVER = DERBY_FALLOVER_M8;
 	    case 9: CURRENT_FALLOVER = DERBY_FALLOVER_M9;
 	}
-	
+
 	new Float:POS[3], string[64];
 	for(new i = 0; i < MAX_PLAYERS; i++)
 	{
@@ -26827,23 +26834,24 @@ derby_healthbar_update(playerid)
 {
 	new Float:HP;
 	GetVehicleHealth(GetPlayerVehicleID(playerid), HP);
-	UpdatePlayer3DTextLabelText(playerid, PlayerData[playerid][t3dDerbyVehicleLabel], -1, derby_healthbar_format(HP));
+	UpdatePlayer3DTextLabelText(playerid, PlayerData[playerid][t3dDerbyVehicleLabel], -1, derby_healthbar_format(floatround(HP)));
 	return 1;
 }
 
-derby_healthbar_format(Float:HP)
+derby_healthbar_format(hp)
 {
 	new str[30];
-	if(HP == 1000) format(str, sizeof(str), "{00ff00}••••••••••");
-	else if(HP >= 900) format(str, sizeof(str), "{66ff00}•••••••••{ffffff}•");
-	else if(HP >= 800) format(str, sizeof(str), "{7fff00}••••••••{ffffff}••");
-	else if(HP >= 700) format(str, sizeof(str), "{ccff00}•••••••{ffffff}•••");
-	else if(HP >= 600) format(str, sizeof(str), "{f7f21a}••••••{ffffff}••••");
-	else if(HP >= 500) format(str, sizeof(str), "{f4c430}•••••{ffffff}•••••");
-	else if(HP >= 400) format(str, sizeof(str), "{e49b0f}••••{ffffff}••••••");
-	else if(HP >= 300) format(str, sizeof(str), "{e4650e}•••{ffffff}•••••••");
-	else if(HP >= 250) format(str, sizeof(str), "{ff2400}••{ffffff}••••••••");
+	if(hp == 1000) format(str, sizeof(str), "{00ff00}••••••••••");
+	else if(hp >= 900) format(str, sizeof(str), "{66ff00}•••••••••{ffffff}•");
+	else if(hp >= 800) format(str, sizeof(str), "{7fff00}••••••••{ffffff}••");
+	else if(hp >= 700) format(str, sizeof(str), "{ccff00}•••••••{ffffff}•••");
+	else if(hp >= 600) format(str, sizeof(str), "{f7f21a}••••••{ffffff}••••");
+	else if(hp >= 500) format(str, sizeof(str), "{f4c430}•••••{ffffff}•••••");
+	else if(hp >= 400) format(str, sizeof(str), "{e49b0f}••••{ffffff}••••••");
+	else if(hp >= 300) format(str, sizeof(str), "{e4650e}•••{ffffff}•••••••");
+	else if(hp >= 250) format(str, sizeof(str), "{ff2400}••{ffffff}••••••••");
 	else format(str, sizeof(str), "{ff2400}Boom!");
+	
 	return str;
 }
 
