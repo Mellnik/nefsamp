@@ -31598,8 +31598,6 @@ RandomWeapons(playerid)
 	GivePlayerWeapon(playerid, w_rifle[random(sizeof(w_rifle))];
 
 	// heavy
-	static
-	
 	switch(random(6)) // heavy
 	{
 	    case 2: GivePlayerWeapon(playerid, 37, 99999);
