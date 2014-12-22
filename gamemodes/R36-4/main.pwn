@@ -31570,53 +31570,36 @@ RandomWeapons(playerid)
 {
 	ResetPlayerWeapons(playerid);
 
-	if(PlayerData[playerid][bGod]) return 1;
+	if(PlayerData[playerid][bGod])
+		return 1;
 
-	switch(random(8)) // melee
-	{
-	    case 0: GivePlayerWeapon(playerid, 2, 1);
-	    case 1: GivePlayerWeapon(playerid, 3, 1);
-	    case 2: GivePlayerWeapon(playerid, 4, 1);
-	    case 3: GivePlayerWeapon(playerid, 5, 1);
-	    case 4: GivePlayerWeapon(playerid, 6, 1);
-	    case 5: GivePlayerWeapon(playerid, 7, 1);
-	    case 6: GivePlayerWeapon(playerid, 8, 1);
-	    case 7: GivePlayerWeapon(playerid, 9, 1);
-	}
+    // melee
+	static const w_melee[8] = {2, 3, 4, 5, 6, 7, 8, 9};
+	GivePlayerWeapon(playerid, w_melee[random(sizeof(w_melee))]);
 
-	switch(random(3)) // pistol
-	{
-	    case 0: GivePlayerWeapon(playerid, 22, 99999);
-	    case 1: GivePlayerWeapon(playerid, 23, 99999);
-	    case 2: GivePlayerWeapon(playerid, 24, 99999);
-	}
+	// pistol
+	static const w_pistol[3] = {22, 23, 24};
+	GivePlayerWeapon(playerid, w_pistol[random(sizeof(w_pistol))]);
+	
+	// shotgun
+	static const w_shotgun[3] = {25, 26, 27};
+	GivePlayerWeapon(playerid, w_shotgun[random(sizeof(w_shotgun))];
 
-	switch(random(3)) // shotgun
-	{
-	    case 0: GivePlayerWeapon(playerid, 25, 99999);
-	    case 1: GivePlayerWeapon(playerid, 26, 99999);
-	    case 2: GivePlayerWeapon(playerid, 27, 99999);
-	}
+	// sub-machine pistol
+	static const w_smp[3] = {28, 29, 32};
+	GivePlayerWeapon(playerid, w_smp[random(sizeof(w_smp))];
+	
+	// aussault rifle
+	static const w_assault[2] = {30, 31};
+	GivePlayerWeapon(playerid, w_assault[random(sizeof(w_assault))];
 
-	switch(random(3)) // mp
-	{
-	    case 0: GivePlayerWeapon(playerid, 28, 99999);
-	    case 1: GivePlayerWeapon(playerid, 29, 99999);
-	    case 2: GivePlayerWeapon(playerid, 32, 99999);
-	}
+	// rifle
+	static const w_rifle[2] = {33, 34};
+	GivePlayerWeapon(playerid, w_rifle[random(sizeof(w_rifle))];
 
-	switch(random(2)) //assault
-	{
-	    case 0: GivePlayerWeapon(playerid, 30, 99999);
-	    case 1: GivePlayerWeapon(playerid, 31, 99999);
-	}
-
-	switch(random(2)) // rifle
-	{
-	    case 0: GivePlayerWeapon(playerid, 33, 99999);
-	    case 1: GivePlayerWeapon(playerid, 34, 99999);
-	}
-
+	// heavy
+	static
+	
 	switch(random(6)) // heavy
 	{
 	    case 2: GivePlayerWeapon(playerid, 37, 99999);
@@ -31643,10 +31626,10 @@ EnterHouse(playerid, i)
 		return SCM(playerid, -1, ""er"This house is locked");
 	}
 
+    gTeam[playerid] = HOUSE;
     SetPlayerInterior(playerid, g_aHouseInteriorTypes[HouseData[i][interior]][interior]);
 	SetPlayerVirtualWorld(playerid, HouseData[i][e_id] + 1000);
 	SetPlayerPos(playerid, g_aHouseInteriorTypes[HouseData[i][interior]][house_x], g_aHouseInteriorTypes[HouseData[i][interior]][house_y], g_aHouseInteriorTypes[HouseData[i][interior]][house_z]);
-	gTeam[playerid] = HOUSE;
 	player_notice(playerid, "House entered", "type ~y~/exit ~w~to leave", 4000);
 	SCM(playerid, -1, ""er"Type /exit to leave the house")
 }
