@@ -20067,10 +20067,10 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			    if(gTeam[playerid] == gDUEL) return SCM(playerid, -1, ""er"You tryin' to abuse? ;)");
 				switch(listitem)
 				{
-			    	case 0:{GivePlayerWeapon(playerid,30,99999);}
-			 		case 1:{GivePlayerWeapon(playerid,31,99999);}
-					case 2:{GivePlayerWeapon(playerid,33,99999);}
-					case 3:{GivePlayerWeapon(playerid,34,99999);}
+			    	case 0: GivePlayerWeapon(playerid,30,99999);
+			 		case 1: GivePlayerWeapon(playerid,31,99999);
+					case 2: GivePlayerWeapon(playerid,33,99999);
+					case 3: GivePlayerWeapon(playerid,34,99999);
 				}
 				return true;
 			}
@@ -20079,9 +20079,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			    if(gTeam[playerid] == gDUEL) return SCM(playerid, -1, ""er"You tryin' to abuse? ;)");
 				switch(listitem)
 				{
-			    	case 0:{GivePlayerWeapon(playerid,29,99999);}
-					case 1:{GivePlayerWeapon(playerid,28,99999);}
-					case 2:{GivePlayerWeapon(playerid,32,99999);}
+			    	case 0: GivePlayerWeapon(playerid,29,99999);
+					case 1: GivePlayerWeapon(playerid,28,99999);
+					case 2: GivePlayerWeapon(playerid,32,99999);
 				}
 				return true;
 			}
@@ -20090,9 +20090,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			    if(gTeam[playerid] == gDUEL) return SCM(playerid, -1, ""er"You tryin' to abuse? ;)");
 	  			switch(listitem)
 				{
-			    	case 0:{GivePlayerWeapon(playerid,25,99999);}
-            		case 1:{GivePlayerWeapon(playerid,26,99999);}
-					case 2:{GivePlayerWeapon(playerid,27,99999);}
+			    	case 0: GivePlayerWeapon(playerid,25,99999);
+            		case 1: GivePlayerWeapon(playerid,26,99999);
+					case 2: GivePlayerWeapon(playerid,27,99999);
 				}
 			    return true;
 			}
@@ -20101,9 +20101,9 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			    if(gTeam[playerid] == gDUEL) return SCM(playerid, -1, ""er"You tryin' to abuse? ;)");
 				switch(listitem)
 				{
-			    	case 0:{GivePlayerWeapon(playerid,22,99999);}
-					case 1:{GivePlayerWeapon(playerid,23,99999);}
-			    	case 2:{GivePlayerWeapon(playerid,24,99999);}
+			    	case 0: GivePlayerWeapon(playerid,22,99999);
+					case 1: GivePlayerWeapon(playerid,23,99999);
+			    	case 2: GivePlayerWeapon(playerid,24,99999);
 				}
 			    return true;
 			}
@@ -20112,15 +20112,15 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 			    if(gTeam[playerid] == gDUEL) return SCM(playerid, -1, ""er"You tryin' to abuse? ;)");
 	  			switch(listitem)
 				{
-					case 0:{GivePlayerWeapon(playerid,2,1);}
-            		case 1:{GivePlayerWeapon(playerid,3,1);}
-					case 2:{GivePlayerWeapon(playerid,4,1);}
-					case 3:{GivePlayerWeapon(playerid,6,1);}
-					case 4:{GivePlayerWeapon(playerid,8,1);}
-					case 5:{GivePlayerWeapon(playerid,9,1);}
-					case 6:{GivePlayerWeapon(playerid,10,1);}
-					case 7:{GivePlayerWeapon(playerid,13,1);}
-					case 8:{GivePlayerWeapon(playerid,14,1);}
+					case 0: GivePlayerWeapon(playerid,2,1);
+            		case 1: GivePlayerWeapon(playerid,3,1);
+					case 2: GivePlayerWeapon(playerid,4,1);
+					case 3: GivePlayerWeapon(playerid,6,1);
+					case 4: GivePlayerWeapon(playerid,8,1);
+					case 5: GivePlayerWeapon(playerid,9,1);
+					case 6: GivePlayerWeapon(playerid,10,1);
+					case 7: GivePlayerWeapon(playerid,13,1);
+					case 8: GivePlayerWeapon(playerid,14,1);
 				}
 			    return true;
 			}
@@ -20129,11 +20129,11 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
                 if(gTeam[playerid] == gDUEL) return SCM(playerid, -1, ""er"You tryin' to abuse? ;)");
 				switch(listitem)
 				{
-			    	case 0:{GivePlayerWeapon(playerid,17,99999);}
-					case 1:{GivePlayerWeapon(playerid,18,5);}
-			    	case 2:{GivePlayerWeapon(playerid,37,25);}
-					case 3:{GivePlayerWeapon(playerid,41,25);}
-			    	case 4:{GivePlayerWeapon(playerid,42,25);}
+			    	case 0: GivePlayerWeapon(playerid,17,99999);
+					case 1: GivePlayerWeapon(playerid,18,5);
+			    	case 2: GivePlayerWeapon(playerid,37,25);
+					case 3: GivePlayerWeapon(playerid,41,25);
+			    	case 4: GivePlayerWeapon(playerid,42,25);
 				}
 				return true;
 			}
