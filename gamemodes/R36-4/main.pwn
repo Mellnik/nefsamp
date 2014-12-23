@@ -25876,7 +25876,7 @@ function:QueueProcess()
 		    else if(PlayerData[i][e_bank] <= 10000000)
 		        bmul = 0.25;
 		    else if(PlayerData[i][e_bank] > 10000000)
-		        bmul = 0.25;
+		        bmul = 0.05;
 		    else
 		        bmul = 0.0;
 
