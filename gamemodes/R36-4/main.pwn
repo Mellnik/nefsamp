@@ -38,7 +38,7 @@
 #pragma dynamic 8192        // for md-sort
 
 #define IS_RELEASE_BUILD (true)
-#define INC_ENVIRONMENT (true)
+#define INC_ENVIRONMENT (false)
 #define WINTER_EDITION (true) // Requires FS ferriswheelfair.amx
 #define _YSI_NO_VERSION_CHECK
 #define YSI_IS_SERVER
