@@ -38,7 +38,7 @@
 #pragma dynamic 8192        // for md-sort
 
 #define IS_RELEASE_BUILD (true)
-#define INC_ENVIRONMENT (false)
+#define INC_ENVIRONMENT (true)
 #define WINTER_EDITION (true) // Requires FS ferriswheelfair.amx
 #define _YSI_NO_VERSION_CHECK
 #define YSI_IS_SERVER
@@ -12164,42 +12164,6 @@ YCMD:gwar(playerid, params[], help)
 	}
 	if(!bFound) SCM(playerid, -1, ""er"You aren't near of any gang zone!");
 	return 1;
-}
-
-SetPlayerGWarMode(playerid)
-{
-    SCM(playerid, -1, ""orange"You are now in Gang War mode, type /exit to leave Gang War!");
-    
-	if(PlayerData[playerid][bGod])
-	{
-        SetPVarInt(playerid, "HadGod", 0);
-        TextDrawHideForPlayer(playerid, TXTGodTD);
-        PlayerData[playerid][bGod] = false;
-        RandomWeapons(playerid);
-		SetPlayerHealth(playerid, 100.0);
-  		SCM(playerid, -1, ""orange"God mode has been disabled!");
-	}
-	
-	PlayerData[playerid][bSpeedBoost] = false;
-    PlayerData[playerid][bSuperJump] = false;
-    PlayerData[playerid][bGWarMode] = true;
-}
-
-ResetPlayerGWarMode(playerid, bool:msg = true)
-{
-    if(msg) SCM(playerid, -1, ""orange"You have left the gang war!");
-    
-    for(new r = 0; r < MAX_GZONES; r++)
-    {
-	    if(GZoneData[r][e_ormid] == ORM:-1)
-	        continue;
-	        
-        TextDrawHideForPlayer(playerid, GZoneData[r][e_txtid]);
-    }
-    
-    PlayerData[playerid][bGWarMode] = false;
-	PlayerData[playerid][bSpeedBoost] = true;
-    PlayerData[playerid][bSuperJump] = false;
 }
 
 YCMD:ginvite(playerid, params[], help)
@@ -31642,4 +31606,40 @@ EnterHouse(playerid, i)
 	player_notice(playerid, "House entered", "type ~y~/exit ~w~to leave", 4000);
 	SCM(playerid, -1, ""er"Type /exit to leave the house");
 	return 1;
+}
+
+SetPlayerGWarMode(playerid)
+{
+    SCM(playerid, -1, ""orange"You are now in Gang War mode, type /exit to leave Gang War!");
+
+	if(PlayerData[playerid][bGod])
+	{
+        SetPVarInt(playerid, "HadGod", 0);
+        TextDrawHideForPlayer(playerid, TXTGodTD);
+        PlayerData[playerid][bGod] = false;
+        RandomWeapons(playerid);
+		SetPlayerHealth(playerid, 100.0);
+  		SCM(playerid, -1, ""orange"God mode has been disabled!");
+	}
+
+	PlayerData[playerid][bSpeedBoost] = false;
+    PlayerData[playerid][bSuperJump] = false;
+    PlayerData[playerid][bGWarMode] = true;
+}
+
+ResetPlayerGWarMode(playerid, bool:msg = true)
+{
+    if(msg) SCM(playerid, -1, ""orange"You have left the gang war!");
+
+    for(new r = 0; r < MAX_GZONES; r++)
+    {
+	    if(GZoneData[r][e_ormid] == ORM:-1)
+	        continue;
+
+        TextDrawHideForPlayer(playerid, GZoneData[r][e_txtid]);
+    }
+
+    PlayerData[playerid][bGWarMode] = false;
+	PlayerData[playerid][bSpeedBoost] = true;
+    PlayerData[playerid][bSuperJump] = false;
 }
