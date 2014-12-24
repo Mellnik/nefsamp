@@ -11,8 +11,8 @@
 
 /*
 || Build Dependencies:
-|| NEFMOD Core, latest
 || SA-MP Server 0.3z-R4
+|| NEFMOD Core, latest
 || YSI Library 3.1.133
 || sscanf Plugin 2.8.1
 || Streamer Plugin v2.7.4
@@ -49,7 +49,6 @@
 #include <a_http>           // API Requests
 #include <nefmod>
 #include <crashdetect>
-#include <profiler>
 #include <amx\os>
 #include <YSI\y_iterate>
 #include <YSI\y_stringhash>
@@ -85,7 +84,7 @@ Float:GetDistance3D(Float:x1, Float:y1, Float:z1, Float:x2, Float:y2, Float:z2);
 #define SQL_PORT                        (3306)
 #if IS_RELEASE_BUILD == true
 #define SQL_USER   						"havocserver"
-#define SQL_PASS   						"t2t0.SZth-zTruhJpR(7ucr8?u"
+#define SQL_PASS   						"nlR:o%k15N5*5/u"
 #define SQL_DATA   						"havocserver"
 #else
 #define SQL_USER   						"havocdev"
@@ -108,7 +107,7 @@ Float:GetDistance3D(Float:x1, Float:y1, Float:z1, Float:x2, Float:y2, Float:z2);
 #else
 #define CURRENT_VERSION                 "beta-1.00"
 #endif
-#define SAMP_VERSION                    "SA-MP 0.3z-R4"
+#define SAMP_VERSION                    "0.3z-R4"
 #define MAX_REPORTS 					(7)
 #define MAX_GANG_NAME					(20)
 #define MIN_GANG_NAME					(4)
@@ -27721,7 +27720,7 @@ function:ShowDialog(playerid, dialogid)
 				
 			format(gstr2, sizeof(gstr2), "\n\nStreamed client objects: %i\nServer FPS: %i\nPlayer record: %i", Streamer_CountVisibleItems(playerid, STREAMER_TYPE_OBJECT), GetServerTickRate(), m_PlayerRecord);
 	        strcat(string, gstr2);
-	        strcat(string, "\n\nServer version: "SVRNAME" "CURRENT_VERSION" on "SAMP_VERSION"");
+	        strcat(string, "\n\nServer version: "SVRNAME" "CURRENT_VERSION" on SA-MP "SAMP_VERSION"");
 	        
 	        ShowPlayerDialog(playerid, SERVERSTATS_DIALOG, DIALOG_STYLE_MSGBOX, ""nef" :: Server Stats", string, "OK", "");
 	    }
