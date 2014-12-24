@@ -1,5 +1,10 @@
-New Evolution Freeroam SA-MP Server
-===================================
+Havoc Freeroam SA-MP Server
+===========================
+
+1.00 (1st Feb 2015)
+-------------------
+- 
+
 
 Build XX
 --------
