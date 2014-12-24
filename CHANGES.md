@@ -3,7 +3,11 @@ Havoc Freeroam SA-MP Server
 
 1.00 (1st Feb 2015)
 -------------------
-- 
+- Businesses have been renamed to Enterprises.
+- /sell /buy can now be used for houses and enterprises.
+- Now used salted whirlpool for password hashing.
+- Improved playing time counter.
+
 
 
 Build XX

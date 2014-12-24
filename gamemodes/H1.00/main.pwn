@@ -33,6 +33,8 @@
 || Max gang zones: 60
 || Max houses: 700
 || Gang name: 4-20 chars
+|| Money range: -2147483648 - 2147483647
+|| Score range: -8388608 - 8388607
 */
 
 #pragma dynamic 8192        // for md-sort
@@ -23524,7 +23526,7 @@ server_load_visuals()
     new count = GetTickCountEx();
     
 	bb_mcc = CreateDynamicObject(8323, -2322.76880, -1704.56067, 499.98999,   0.00000, 0.00000, 69.30000);
-	SetDynamicObjectMaterialText(bb_mcc, 0, "Welcome to New Evolution Freeroam!\nServer time: \n"green"Players online: ", OBJECT_MATERIAL_SIZE_256x128, "Calibri", 0, 0, -32256, -16777216, OBJECT_MATERIAL_TEXT_ALIGN_LEFT);
+	SetDynamicObjectMaterialText(bb_mcc, 0, "Welcome to Havoc Freeroam!\nServer time: \n"green"Players online: ", OBJECT_MATERIAL_SIZE_256x128, "Calibri", 0, 0, -32256, -16777216, OBJECT_MATERIAL_TEXT_ALIGN_LEFT);
 
     new object_id = CreateDynamicObject(11317, 1914.20313, -1377.58191, 26.29986,   0.00000, 0.00000, 91.91999); // Gold Credits Wang Cars
     SetDynamicObjectMaterial(object_id, 2, 19341, "egg_texts", "easter_egg01");
