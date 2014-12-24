@@ -2730,8 +2730,6 @@ new Iterator:iterRaceJoins<MAX_PLAYERS>,
 	gstr2[255],
 	g_LottoNumber,
 	g_LottoJackpot,
-	File:hLogCommand,
-	File:hLogChat,
 	bool:bLottoActive = false,
 	g_ServerStats[4],
 	mathsAnswered = -1,
@@ -2992,9 +2990,6 @@ public OnGameModeExit()
 {
 	Log(LOG_EXIT, "MySQL: Garbage cleanup");
     SQL_CleanUp();
-    
-    fclose(hLogChat);
-    fclose(hLogCommand);
     
 	mysql_stat(gstr2, pSQL, sizeof(gstr2));
 	Log(LOG_EXIT, "MySQL: %s", gstr2);
@@ -3929,7 +3924,9 @@ public OnPlayerCommandReceived(playerid, cmdtext[])
 public OnPlayerCommandPerformed(playerid, cmdtext[], success)
 {
 	format(gstr, sizeof(gstr), "[%02d:%02d:%02d] [%i]%s req:%s success:%i\r\n", gTime[3], gTime[4], gTime[5], playerid, __GetName(playerid), cmdtext, success);
+	new File:hLogCommand = fopen("/Log/cmdlog.txt", io_append);
 	fwrite(hLogCommand, gstr);
+	fclose(hLogCommand);
 
 	if(!success) {
 	    player_notice(playerid, "Unknown command", "Type ~y~/c ~w~for all commands");
@@ -4793,7 +4790,9 @@ public OnPlayerText(playerid, text[])
 	strmid(LastPlayerText[playerid], text, 0, 144, 144);
 
 	format(gstr2, sizeof(gstr2), "[%02d:%02d:%02d] [%i]%s: %s\r\n", gTime[3], gTime[4], gTime[5], playerid, __GetName(playerid), text);
+	new File:hLogChat = fopen("/Log/chatlog.txt", io_append);
 	fwrite(hLogChat, gstr2);
+	fclose(hLogChat);
 
 	if(IsAd(text))
 	{
@@ -23240,9 +23239,6 @@ server_initialize()
 	EnableStuntBonusForAll(0);
 	SetWeather(1);
 	SetWorldTime(12);
-	
-	hLogCommand = fopen("/Log/cmdlog.txt", io_append);
-    hLogChat = fopen("/Log/chatlog.txt", io_append);
 	
 	// Variable setting
     CurrentBGMap = BG_VOTING;
