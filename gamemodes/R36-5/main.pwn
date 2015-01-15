@@ -17,11 +17,9 @@
 || sscanf Plugin 2.8.1
 || Streamer Plugin v2.7.4
 || MySQL Plugin R38
-|| CrashDetect 4.15
 || amx_assembly Library .318
 ||
 || Build notes:
-|| compile -d3 with crashdetect
 ||
 || Database changes:
 ||
@@ -48,8 +46,6 @@
 #define MAX_PLAYERS (400)
 #include <a_http>           // API Requests
 #include <nefmod>
-#include <crashdetect>
-#include <profiler>
 #include <amx\os>
 #include <YSI\y_iterate>
 #include <YSI\y_stringhash>
@@ -28330,7 +28326,6 @@ GetTeleportDialogString(teleport_category)
     if(NC_GetTeleportDialogString(teleport_category, g_dialogTpString, sizeof(g_dialogTpString)) == 0)
 	{
 	    printf("NC_GetTeleportDialogString returned 0");
-	    PrintAmxBacktrace();
 	    strmid(g_dialogTpString, "INVALID", 0, sizeof(g_dialogTpString), sizeof(g_dialogTpString));
 	}
 }
@@ -28342,7 +28337,6 @@ PushTeleportInput(playerid, teleport_category, input)
 	if(NC_ProcessTeleportRequest(teleport_category, input, g_cmdString, sizeof(g_cmdString)) == 0)
 	{
 	    printf("NC_ProcessTeleportRequest returned 0");
-	    PrintAmxBacktrace();
 		return 0;
 	}
 	
